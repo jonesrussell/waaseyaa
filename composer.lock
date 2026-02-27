@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eea4e4d08c049ed7d164c5f36fdb003e",
+    "content-hash": "1ab663ba4c284f8459c9fe296be2d5b1",
     "packages": [
         {
             "name": "aurora/cache",
@@ -47,11 +47,9 @@
             "dist": {
                 "type": "path",
                 "url": "packages/config",
-                "reference": "164be90545e9e094a3c781b47b1632a1d869444b"
+                "reference": "4dbaa252ad6bbbcd7d35a1cfb31f59f920bb9997"
             },
             "require": {
-                "aurora/cache": "@dev",
-                "aurora/typed-data": "@dev",
                 "php": ">=8.3",
                 "symfony/event-dispatcher": "^7.0",
                 "symfony/yaml": "^7.0"
@@ -74,6 +72,81 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Configuration management as YAML with package-aware ownership for Aurora CMS",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "aurora/entity",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/entity",
+                "reference": "081f4791e6b83f0508a240739815224ab2dadd2a"
+            },
+            "require": {
+                "aurora/cache": "@dev",
+                "aurora/config": "@dev",
+                "aurora/plugin": "@dev",
+                "aurora/typed-data": "@dev",
+                "php": ">=8.3",
+                "symfony/event-dispatcher": "^7.3",
+                "symfony/uid": "^7.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\Entity\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\Entity\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Entity type system — types, interfaces, lifecycle, queries. No storage.",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "aurora/field",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/field",
+                "reference": "498c14ae4b443b31328cf39403ce6a611543e8a7"
+            },
+            "require": {
+                "aurora/entity": "@dev",
+                "aurora/plugin": "@dev",
+                "aurora/typed-data": "@dev",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\Field\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\Field\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Field type system — pluggable field types, definitions, formatters for Aurora CMS",
             "transport-options": {
                 "relative": true
             }
@@ -773,6 +846,89 @@
             "time": "2025-07-08T02:45:35+00:00"
         },
         {
+            "name": "symfony/polyfill-uuid",
+            "version": "v1.33.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-uuid.git",
+                "reference": "21533be36c24be3f4b1669c4725c7d1d2bab4ae2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-uuid/zipball/21533be36c24be3f4b1669c4725c7d1d2bab4ae2",
+                "reference": "21533be36c24be3f4b1669c4725c7d1d2bab4ae2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.2"
+            },
+            "provide": {
+                "ext-uuid": "*"
+            },
+            "suggest": {
+                "ext-uuid": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "thanks": {
+                    "url": "https://github.com/symfony/polyfill",
+                    "name": "symfony/polyfill"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "bootstrap.php"
+                ],
+                "psr-4": {
+                    "Symfony\\Polyfill\\Uuid\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Grégoire Pineau",
+                    "email": "lyrixx@lyrixx.info"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill for uuid functions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "uuid"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-uuid/tree/v1.33.0"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-09-09T11:45:10+00:00"
+        },
+        {
             "name": "symfony/translation-contracts",
             "version": "v3.6.1",
             "source": {
@@ -853,6 +1009,84 @@
                 }
             ],
             "time": "2025-07-15T13:41:35+00:00"
+        },
+        {
+            "name": "symfony/uid",
+            "version": "v7.4.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/uid.git",
+                "reference": "7719ce8aba76be93dfe249192f1fbfa52c588e36"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/uid/zipball/7719ce8aba76be93dfe249192f1fbfa52c588e36",
+                "reference": "7719ce8aba76be93dfe249192f1fbfa52c588e36",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "symfony/polyfill-uuid": "^1.15"
+            },
+            "require-dev": {
+                "symfony/console": "^6.4|^7.0|^8.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Uid\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Grégoire Pineau",
+                    "email": "lyrixx@lyrixx.info"
+                },
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Provides an object-oriented API to generate and represent UIDs",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "UID",
+                "ulid",
+                "uuid"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/uid/tree/v7.4.4"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-01-03T23:30:35+00:00"
         },
         {
             "name": "symfony/validator",
@@ -2764,6 +2998,8 @@
     "stability-flags": {
         "aurora/cache": 20,
         "aurora/config": 20,
+        "aurora/entity": 20,
+        "aurora/field": 20,
         "aurora/plugin": 20,
         "aurora/typed-data": 20
     },
