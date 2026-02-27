@@ -1,0 +1,112 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Aurora\Node;
+
+use Aurora\Access\AccessPolicyInterface;
+use Aurora\Access\AccessResult;
+use Aurora\Access\AccountInterface;
+use Aurora\Entity\EntityInterface;
+
+/**
+ * Access policy for node entities.
+ *
+ * Checks permissions for viewing, updating, deleting, and creating nodes
+ * based on the node type (bundle) and the relationship between the account
+ * and the node author.
+ */
+final class NodeAccessPolicy implements AccessPolicyInterface
+{
+    public function appliesTo(string $entityTypeId): bool
+    {
+        return $entityTypeId === 'node';
+    }
+
+    public function access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResult
+    {
+        // Admin bypass.
+        if ($account->hasPermission('administer nodes')) {
+            return AccessResult::allowed('User has administer nodes permission.');
+        }
+
+        assert($entity instanceof Node);
+
+        $type = $entity->getType();
+        $isOwner = $account->id() === $entity->getAuthorId();
+
+        return match ($operation) {
+            'view' => $this->viewAccess($entity, $account, $isOwner),
+            'update' => $this->editAccess($type, $account, $isOwner),
+            'delete' => $this->deleteAccess($type, $account, $isOwner),
+            default => AccessResult::neutral("No opinion on '$operation' operation."),
+        };
+    }
+
+    public function createAccess(string $entityTypeId, string $bundle, AccountInterface $account): AccessResult
+    {
+        // Admin bypass.
+        if ($account->hasPermission('administer nodes')) {
+            return AccessResult::allowed('User has administer nodes permission.');
+        }
+
+        if ($account->hasPermission("create $bundle content")) {
+            return AccessResult::allowed("User has 'create $bundle content' permission.");
+        }
+
+        return AccessResult::neutral("User lacks 'create $bundle content' permission.");
+    }
+
+    /**
+     * Check view access for a node.
+     */
+    private function viewAccess(Node $node, AccountInterface $account, bool $isOwner): AccessResult
+    {
+        if ($node->isPublished()) {
+            if ($account->hasPermission('access content')) {
+                return AccessResult::allowed('Published node and user has access content permission.');
+            }
+
+            return AccessResult::neutral('User lacks access content permission.');
+        }
+
+        // Unpublished node.
+        if ($isOwner && $account->hasPermission('view own unpublished content')) {
+            return AccessResult::allowed('Author viewing own unpublished content.');
+        }
+
+        return AccessResult::neutral('User cannot view this unpublished node.');
+    }
+
+    /**
+     * Check edit access for a node.
+     */
+    private function editAccess(string $type, AccountInterface $account, bool $isOwner): AccessResult
+    {
+        if ($account->hasPermission("edit any $type content")) {
+            return AccessResult::allowed("User has 'edit any $type content' permission.");
+        }
+
+        if ($isOwner && $account->hasPermission("edit own $type content")) {
+            return AccessResult::allowed("Author has 'edit own $type content' permission.");
+        }
+
+        return AccessResult::neutral("User lacks edit permission for $type content.");
+    }
+
+    /**
+     * Check delete access for a node.
+     */
+    private function deleteAccess(string $type, AccountInterface $account, bool $isOwner): AccessResult
+    {
+        if ($account->hasPermission("delete any $type content")) {
+            return AccessResult::allowed("User has 'delete any $type content' permission.");
+        }
+
+        if ($isOwner && $account->hasPermission("delete own $type content")) {
+            return AccessResult::allowed("Author has 'delete own $type content' permission.");
+        }
+
+        return AccessResult::neutral("User lacks delete permission for $type content.");
+    }
+}
