@@ -1,0 +1,12 @@
+# Dependencies
+vendor/
+packages/*/vendor/
+packages/*/composer.lock
+
+# IDE
+.idea/
+.vscode/
+
+# PHPUnit
+.phpunit.result.cache
+packages/*/.phpunit.result.cache
