@@ -40,6 +40,7 @@
         "php": ">=8.3",
         "aurora/access": "@dev",
         "aurora/cache": "@dev",
+        "aurora/cli": "@dev",
         "aurora/config": "@dev",
         "aurora/database-legacy": "@dev",
         "aurora/entity": "@dev",
@@ -52,6 +53,7 @@
         "aurora/plugin": "@dev",
         "aurora/queue": "@dev",
         "aurora/routing": "@dev",
+        "aurora/ssr": "@dev",
         "aurora/state": "@dev",
         "aurora/taxonomy": "@dev",
         "aurora/typed-data": "@dev",
@@ -71,6 +73,7 @@
     "autoload-dev": {
         "psr-4": {
             "Aurora\\Cache\\Tests\\": "packages/cache/tests/",
+            "Aurora\\CLI\\Tests\\": "packages/cli/tests/",
             "Aurora\\Config\\Tests\\": "packages/config/tests/",
             "Aurora\\Plugin\\Tests\\": "packages/plugin/tests/",
             "Aurora\\TypedData\\Tests\\": "packages/typed-data/tests/",
@@ -87,6 +90,7 @@
             "Aurora\\Node\\Tests\\": "packages/node/tests/",
             "Aurora\\Path\\Tests\\": "packages/path/tests/",
             "Aurora\\Routing\\Tests\\": "packages/routing/tests/",
+            "Aurora\\SSR\\Tests\\": "packages/ssr/tests/",
             "Aurora\\Taxonomy\\Tests\\": "packages/taxonomy/tests/",
             "Aurora\\User\\Tests\\": "packages/user/tests/",
             "Aurora\\Validation\\Tests\\": "packages/validation/tests/",

@@ -1,0 +1,78 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Aurora\SSR\Tests\Unit;
+
+use Aurora\SSR\Attribute\Component;
+use Aurora\SSR\ComponentMetadata;
+use Aurora\SSR\ComponentRegistry;
+use Aurora\SSR\ComponentRenderer;
+use Aurora\SSR\SsrController;
+use Aurora\SSR\SsrResponse;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Twig\Environment;
+use Twig\Loader\ArrayLoader;
+
+#[CoversClass(SsrController::class)]
+final class SsrControllerTest extends TestCase
+{
+    private SsrController $controller;
+
+    protected function setUp(): void
+    {
+        $loader = new ArrayLoader([
+            'components/page.html.twig' => '<h1>{{ title }}</h1><div>{{ body }}</div>',
+        ]);
+        $twig = new Environment($loader);
+
+        $registry = new ComponentRegistry();
+        $registry->register(new ComponentMetadata(
+            name: 'page',
+            template: 'components/page.html.twig',
+            className: ControllerTestPage::class,
+        ));
+
+        $renderer = new ComponentRenderer($twig, $registry);
+        $this->controller = new SsrController($renderer);
+    }
+
+    #[Test]
+    public function renderReturnsSsrResponse(): void
+    {
+        $response = $this->controller->render('page', [
+            'title' => 'Welcome',
+            'body' => 'Page content.',
+        ]);
+
+        $this->assertInstanceOf(SsrResponse::class, $response);
+        $this->assertSame('<h1>Welcome</h1><div>Page content.</div>', $response->content);
+        $this->assertSame(200, $response->statusCode);
+    }
+
+    #[Test]
+    public function renderObjectReturnsSsrResponse(): void
+    {
+        $component = new ControllerTestPage(
+            title: 'Object Page',
+            body: 'Object content.',
+        );
+
+        $response = $this->controller->renderObject($component);
+
+        $this->assertInstanceOf(SsrResponse::class, $response);
+        $this->assertSame('<h1>Object Page</h1><div>Object content.</div>', $response->content);
+        $this->assertSame(200, $response->statusCode);
+    }
+}
+
+#[Component(name: 'controller-test-page', template: 'components/page.html.twig')]
+final class ControllerTestPage
+{
+    public function __construct(
+        public readonly string $title,
+        public readonly string $body,
+    ) {}
+}
