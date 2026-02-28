@@ -34,6 +34,7 @@
         { "type": "path", "url": "packages/cli" },
         { "type": "path", "url": "packages/core" },
         { "type": "path", "url": "packages/cms" },
+        { "type": "path", "url": "packages/foundation" },
         { "type": "path", "url": "packages/full" }
     ],
     "require": {
@@ -51,6 +52,7 @@
         "aurora/entity": "@dev",
         "aurora/entity-storage": "@dev",
         "aurora/field": "@dev",
+        "aurora/foundation": "@dev",
         "aurora/media": "@dev",
         "aurora/menu": "@dev",
         "aurora/node": "@dev",
@@ -80,6 +82,7 @@
             "Aurora\\TypedData\\Tests\\": "packages/typed-data/tests/",
             "Aurora\\Entity\\Tests\\": "packages/entity/tests/",
             "Aurora\\Field\\Tests\\": "packages/field/tests/",
+            "Aurora\\Foundation\\Tests\\": "packages/foundation/tests/",
             "Aurora\\Database\\Tests\\": "packages/database-legacy/tests/",
             "Aurora\\EntityStorage\\Tests\\": "packages/entity-storage/tests/",
             "Aurora\\Access\\Tests\\": "packages/access/tests/",
