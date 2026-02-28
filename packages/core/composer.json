@@ -10,7 +10,6 @@
         "aurora/typed-data": "^0.1",
         "aurora/config": "^0.1",
         "aurora/entity": "^0.1",
-        "aurora/foundation": "^0.1",
         "aurora/field": "^0.1",
         "aurora/i18n": "^0.1",
         "aurora/entity-storage": "^0.1",
@@ -21,6 +20,7 @@
         "aurora/queue": "^0.1",
         "aurora/state": "^0.1",
         "aurora/testing": "^0.1",
+        "aurora/telescope": "^0.1",
         "aurora/validation": "^0.1"
     },
     "minimum-stability": "stable"

@@ -41,6 +41,7 @@
         { "type": "path", "url": "packages/i18n" }
         { "type": "path", "url": "packages/testing" }
         { "type": "path", "url": "packages/foundation" }
+        { "type": "path", "url": "packages/telescope" }
     ],
     "require": {
         "php": ">=8.3",
@@ -70,6 +71,7 @@
         "aurora/ssr": "@dev",
         "aurora/state": "@dev",
         "aurora/taxonomy": "@dev",
+        "aurora/telescope": "@dev",
         "aurora/typed-data": "@dev",
         "aurora/user": "@dev",
         "aurora/validation": "@dev",
@@ -113,6 +115,7 @@
             "Aurora\\AI\\Pipeline\\Tests\\": "packages/ai-pipeline/tests/",
             "Aurora\\AI\\Vector\\Tests\\": "packages/ai-vector/tests/",
             "Aurora\\Testing\\Tests\\": "packages/testing/tests/",
+            "Aurora\\Telescope\\Tests\\": "packages/telescope/tests/",
             "Aurora\\Tests\\": "tests/"
         }
     "minimum-stability": "dev",
