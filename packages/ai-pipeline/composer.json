@@ -3,11 +3,18 @@
     "description": "AI processing pipelines with queue-based execution for Aurora CMS",
     "type": "library",
     "license": "GPL-2.0-or-later",
+    "repositories": [
+        {"type": "path", "url": "../cache"},
+        {"type": "path", "url": "../plugin"},
+        {"type": "path", "url": "../typed-data"},
+        {"type": "path", "url": "../config"},
+        {"type": "path", "url": "../entity"},
+        {"type": "path", "url": "../queue"}
+    ],
     "require": {
         "php": ">=8.3",
-        "aurora/ai-agent": "^0.1",
-        "aurora/entity": "^0.1",
-        "aurora/queue": "^0.1"
+        "aurora/entity": "@dev",
+        "aurora/queue": "@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
@@ -22,5 +29,6 @@
             "Aurora\\AI\\Pipeline\\Tests\\": "tests/"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
