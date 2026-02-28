@@ -100,6 +100,11 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
             'Aurora\\Menu\\' => 12,
             'Aurora\\Media\\Tests\\' => 19,
             'Aurora\\Media\\' => 13,
+<<<<<<< HEAD
+=======
+            'Aurora\\Mcp\\Tests\\' => 17,
+            'Aurora\\Mcp\\' => 11,
+>>>>>>> unit-16-cache-assets
             'Aurora\\Foundation\\Tests\\' => 24,
             'Aurora\\Foundation\\' => 18,
             'Aurora\\Field\\Tests\\' => 19,
@@ -372,6 +377,17 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         array (
             0 => __DIR__ . '/..' . '/aurora/media/src',
         ),
+<<<<<<< HEAD
+=======
+        'Aurora\\Mcp\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/mcp/tests',
+        ),
+        'Aurora\\Mcp\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/mcp/src',
+        ),
+>>>>>>> unit-16-cache-assets
         'Aurora\\Foundation\\Tests\\' => 
         array (
             0 => __DIR__ . '/../..' . '/packages/foundation/tests',

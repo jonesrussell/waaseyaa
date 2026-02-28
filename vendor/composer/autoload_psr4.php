@@ -66,6 +66,11 @@ return array(
     'Aurora\\Menu\\' => array($vendorDir . '/aurora/menu/src'),
     'Aurora\\Media\\Tests\\' => array($baseDir . '/packages/media/tests'),
     'Aurora\\Media\\' => array($vendorDir . '/aurora/media/src'),
+<<<<<<< HEAD
+=======
+    'Aurora\\Mcp\\Tests\\' => array($baseDir . '/packages/mcp/tests'),
+    'Aurora\\Mcp\\' => array($vendorDir . '/aurora/mcp/src'),
+>>>>>>> unit-16-cache-assets
     'Aurora\\Foundation\\Tests\\' => array($baseDir . '/packages/foundation/tests'),
     'Aurora\\Foundation\\' => array($vendorDir . '/aurora/foundation/src'),
     'Aurora\\Field\\Tests\\' => array($baseDir . '/packages/field/tests'),

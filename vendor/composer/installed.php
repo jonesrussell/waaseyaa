@@ -3,7 +3,11 @@
         'name' => 'aurora/monorepo',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
+<<<<<<< HEAD
         'reference' => '1930f8730532be901d8ebe501e329b8624a70366',
+=======
+        'reference' => '047331f9e837592e01189e76454583242e3650c3',
+>>>>>>> unit-16-cache-assets
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -12,12 +16,17 @@
     'versions' => array(
         'aurora/access' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => 'c3b486d311dd75c2d54708a1a7a3e0e825b00ed6',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/access',
@@ -26,12 +35,17 @@
         ),
         'aurora/ai-agent' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '271b7b2a1f7833374b05350f50f60d9916a43b64',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/ai-agent',
@@ -40,12 +54,17 @@
         ),
         'aurora/ai-pipeline' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '400d02dc534639feb44bc872793bbe6aa1b74a35',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/ai-pipeline',
@@ -54,12 +73,17 @@
         ),
         'aurora/ai-schema' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '87319b9394b6ba17e88262a3f847f8a65f9239a2',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/ai-schema',
@@ -68,12 +92,17 @@
         ),
         'aurora/ai-vector' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '0a3495ad3ff15aff800b4dd7a6407792b2db22f6',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/ai-vector',
@@ -82,8 +111,13 @@
         ),
         'aurora/api' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '57b67432289156dffa91f1454387a71a98678adc',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
@@ -97,19 +131,6 @@
         ),
         'aurora/cache' => array(
 <<<<<<< HEAD
-            'pretty_version' => 'dev-unit-1-foundation',
-            'version' => 'dev-unit-1-foundation',
-=======
-            'pretty_version' => 'dev-unit-14-broadcasting',
-            'version' => 'dev-unit-14-broadcasting',
->>>>>>> unit-14-broadcasting
-            'reference' => '950c00396e810d11d0dc8048e7a2ac7b4d04bb80',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../aurora/cache',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
-        'aurora/cli' => array(
 <<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
@@ -117,6 +138,30 @@
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+            'reference' => '950c00396e810d11d0dc8048e7a2ac7b4d04bb80',
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+            'reference' => '563f4d8ad4eceb5dd60047c82d1e4cc0bbe01acf',
+>>>>>>> unit-16-cache-assets
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../aurora/cache',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'aurora/cli' => array(
+<<<<<<< HEAD
+<<<<<<< HEAD
+            'pretty_version' => 'dev-unit-1-foundation',
+            'version' => 'dev-unit-1-foundation',
+=======
+            'pretty_version' => 'dev-unit-14-broadcasting',
+            'version' => 'dev-unit-14-broadcasting',
+>>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '4736c14df56c52df4b5023c3a4b4cef74bea29d8',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/cli',
@@ -125,12 +170,17 @@
         ),
         'aurora/config' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '4dbaa252ad6bbbcd7d35a1cfb31f59f920bb9997',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/config',
@@ -139,12 +189,17 @@
         ),
         'aurora/database-legacy' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '42e1e1f968647cac60cb7188bdbb6fcf58284c14',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/database-legacy',
@@ -153,12 +208,17 @@
         ),
         'aurora/entity' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
             'reference' => 'ab59eb2702dea305e3e343216864b4e64deddffb',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '081f4791e6b83f0508a240739815224ab2dadd2a',
 >>>>>>> unit-14-broadcasting
             'type' => 'library',
@@ -168,12 +228,17 @@
         ),
         'aurora/entity-storage' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '2502900c0bddc62ef7c969924a76a7e2e4cc7104',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/entity-storage',
@@ -182,12 +247,17 @@
         ),
         'aurora/field' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '498c14ae4b443b31328cf39403ce6a611543e8a7',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/field',
@@ -195,6 +265,7 @@
             'dev_requirement' => false,
         ),
         'aurora/foundation' => array(
+<<<<<<< HEAD
 <<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
@@ -204,11 +275,17 @@
             'version' => 'dev-unit-14-broadcasting',
             'reference' => 'aa906694f71fa79996af834213c4ac837e515a2e',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+            'reference' => 'aa906694f71fa79996af834213c4ac837e515a2e',
+>>>>>>> unit-16-cache-assets
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/foundation',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+<<<<<<< HEAD
         'aurora/media' => array(
 <<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
@@ -217,6 +294,20 @@
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+        'aurora/mcp' => array(
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+            'reference' => 'c29e06281b076e40e8401ea9b0cf58921b60dc5d',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../aurora/mcp',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'aurora/media' => array(
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '2a95f9958c99ad96bded81d1f68665616e27412b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/media',
@@ -225,12 +316,17 @@
         ),
         'aurora/menu' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => 'b36f747bf0e914040b2accbfcb2cf820b4ffa931',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/menu',
@@ -240,7 +336,11 @@
         'aurora/monorepo' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
+<<<<<<< HEAD
             'reference' => '1930f8730532be901d8ebe501e329b8624a70366',
+=======
+            'reference' => '047331f9e837592e01189e76454583242e3650c3',
+>>>>>>> unit-16-cache-assets
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -248,12 +348,17 @@
         ),
         'aurora/node' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => 'ff20ee96806e20bb55ce8f81f577f32ccbb6c778',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/node',
@@ -262,12 +367,17 @@
         ),
         'aurora/path' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '3020270f596a7994cd8c54d0b580fb0d2d6d0814',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/path',
@@ -276,12 +386,17 @@
         ),
         'aurora/plugin' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '36dba64f6147415e04be7dfdc91aa9ea711c54da',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/plugin',
@@ -290,12 +405,17 @@
         ),
         'aurora/queue' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '5668dd240983679795d6e48260207181ae6a9b6a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/queue',
@@ -304,12 +424,17 @@
         ),
         'aurora/routing' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => 'dc7b99810fd3909d189d0bf1373a97ca2725601a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/routing',
@@ -318,12 +443,17 @@
         ),
         'aurora/ssr' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '4d36c43b2ebf24acd77919a371547934692b9992',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/ssr',
@@ -332,12 +462,17 @@
         ),
         'aurora/state' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '8020943140a5404a14bd4ad698f5282a5d1bfdc9',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/state',
@@ -346,12 +481,17 @@
         ),
         'aurora/taxonomy' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '96015fa88581559575ce62df7eb76152c4a2d7b5',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/taxonomy',
@@ -360,12 +500,17 @@
         ),
         'aurora/typed-data' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '588544f6412535f195d1524876064ecd81d42064',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/typed-data',
@@ -374,12 +519,17 @@
         ),
         'aurora/user' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '39b1bbad59afa46dd044181c53fdb8de0f2cfbd9',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/user',
@@ -388,12 +538,17 @@
         ),
         'aurora/validation' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => 'b2fe52f4f3a9942b43b2458d5f31374efacf4c25',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/validation',
@@ -402,12 +557,17 @@
         ),
         'aurora/workflows' => array(
 <<<<<<< HEAD
+<<<<<<< HEAD
             'pretty_version' => 'dev-unit-1-foundation',
             'version' => 'dev-unit-1-foundation',
 =======
             'pretty_version' => 'dev-unit-14-broadcasting',
             'version' => 'dev-unit-14-broadcasting',
 >>>>>>> unit-14-broadcasting
+=======
+            'pretty_version' => 'dev-unit-16-cache-assets',
+            'version' => 'dev-unit-16-cache-assets',
+>>>>>>> unit-16-cache-assets
             'reference' => '3db162067c99f0606e3889a27718dc003c9d75a4',
             'type' => 'library',
             'install_path' => __DIR__ . '/../aurora/workflows',
