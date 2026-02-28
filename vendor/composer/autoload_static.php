@@ -13,26 +13,42 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         '662a729f963d39afe703c9d9b7ab4a8c' => __DIR__ . '/..' . '/symfony/polyfill-php83/bootstrap.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
         '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
+        '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
+        'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
+        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        '89efb1254ef2d1c5d80096acd12c4098' => __DIR__ . '/..' . '/twig/twig/src/Resources/core.php',
+        'ffecb95d45175fd40f75be8a23b34f90' => __DIR__ . '/..' . '/twig/twig/src/Resources/debug.php',
+        'c7baa00073ee9c61edf148c51917cfb4' => __DIR__ . '/..' . '/twig/twig/src/Resources/escaper.php',
+        'f844ccf1d25df8663951193c3fc307c8' => __DIR__ . '/..' . '/twig/twig/src/Resources/string_loader.php',
         '9b38cf48e83f5d8f60375221cd213eee' => __DIR__ . '/..' . '/phpstan/phpstan/bootstrap.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
+        'T' => 
+        array (
+            'Twig\\' => 5,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Uuid\\' => 22,
             'Symfony\\Polyfill\\Php83\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
+            'Symfony\\Polyfill\\Intl\\Normalizer\\' => 33,
+            'Symfony\\Polyfill\\Intl\\Grapheme\\' => 31,
             'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Contracts\\Translation\\' => 30,
+            'Symfony\\Contracts\\Service\\' => 26,
             'Symfony\\Contracts\\EventDispatcher\\' => 34,
             'Symfony\\Component\\Yaml\\' => 23,
             'Symfony\\Component\\Validator\\' => 28,
             'Symfony\\Component\\Uid\\' => 22,
+            'Symfony\\Component\\String\\' => 25,
             'Symfony\\Component\\Routing\\' => 26,
             'Symfony\\Component\\Messenger\\' => 28,
             'Symfony\\Component\\EventDispatcher\\' => 34,
+            'Symfony\\Component\\Console\\' => 26,
             'Symfony\\Component\\Clock\\' => 24,
         ),
         'P' => 
@@ -40,6 +56,7 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
             'Psr\\EventDispatcher\\' => 20,
+            'Psr\\Container\\' => 14,
             'Psr\\Clock\\' => 10,
             'Psr\\Cache\\' => 10,
             'PhpParser\\' => 10,
@@ -63,6 +80,8 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
             'Aurora\\Taxonomy\\' => 16,
             'Aurora\\State\\Tests\\' => 19,
             'Aurora\\State\\' => 13,
+            'Aurora\\SSR\\Tests\\' => 17,
+            'Aurora\\SSR\\' => 11,
             'Aurora\\Routing\\Tests\\' => 21,
             'Aurora\\Routing\\' => 15,
             'Aurora\\Queue\\Tests\\' => 19,
@@ -89,14 +108,28 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
             'Aurora\\Config\\' => 14,
             'Aurora\\Cache\\Tests\\' => 19,
             'Aurora\\Cache\\' => 13,
+            'Aurora\\CLI\\Tests\\' => 17,
+            'Aurora\\CLI\\' => 11,
             'Aurora\\Api\\Tests\\' => 17,
             'Aurora\\Api\\' => 11,
             'Aurora\\Access\\Tests\\' => 20,
             'Aurora\\Access\\' => 14,
+            'Aurora\\AI\\Vector\\Tests\\' => 23,
+            'Aurora\\AI\\Vector\\' => 17,
+            'Aurora\\AI\\Schema\\Tests\\' => 23,
+            'Aurora\\AI\\Schema\\' => 17,
+            'Aurora\\AI\\Pipeline\\Tests\\' => 25,
+            'Aurora\\AI\\Pipeline\\' => 19,
+            'Aurora\\AI\\Agent\\Tests\\' => 22,
+            'Aurora\\AI\\Agent\\' => 16,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Twig\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/twig/twig/src',
+        ),
         'Symfony\\Polyfill\\Uuid\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-uuid',
@@ -109,6 +142,14 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
+        'Symfony\\Polyfill\\Intl\\Normalizer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer',
+        ),
+        'Symfony\\Polyfill\\Intl\\Grapheme\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme',
+        ),
         'Symfony\\Polyfill\\Ctype\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
@@ -116,6 +157,10 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         'Symfony\\Contracts\\Translation\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/translation-contracts',
+        ),
+        'Symfony\\Contracts\\Service\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/service-contracts',
         ),
         'Symfony\\Contracts\\EventDispatcher\\' => 
         array (
@@ -133,6 +178,10 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         array (
             0 => __DIR__ . '/..' . '/symfony/uid',
         ),
+        'Symfony\\Component\\String\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/string',
+        ),
         'Symfony\\Component\\Routing\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/routing',
@@ -144,6 +193,10 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         'Symfony\\Component\\EventDispatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
+        ),
+        'Symfony\\Component\\Console\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/console',
         ),
         'Symfony\\Component\\Clock\\' => 
         array (
@@ -160,6 +213,10 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         'Psr\\EventDispatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/event-dispatcher/src',
+        ),
+        'Psr\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/container/src',
         ),
         'Psr\\Clock\\' => 
         array (
@@ -228,6 +285,14 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         'Aurora\\State\\' => 
         array (
             0 => __DIR__ . '/..' . '/aurora/state/src',
+        ),
+        'Aurora\\SSR\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/ssr/tests',
+        ),
+        'Aurora\\SSR\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/ssr/src',
         ),
         'Aurora\\Routing\\Tests\\' => 
         array (
@@ -333,6 +398,14 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         array (
             0 => __DIR__ . '/..' . '/aurora/cache/src',
         ),
+        'Aurora\\CLI\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/cli/tests',
+        ),
+        'Aurora\\CLI\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/cli/src',
+        ),
         'Aurora\\Api\\Tests\\' => 
         array (
             0 => __DIR__ . '/../..' . '/packages/api/tests',
@@ -349,6 +422,38 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         array (
             0 => __DIR__ . '/..' . '/aurora/access/src',
         ),
+        'Aurora\\AI\\Vector\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/ai-vector/tests',
+        ),
+        'Aurora\\AI\\Vector\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/ai-vector/src',
+        ),
+        'Aurora\\AI\\Schema\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/ai-schema/tests',
+        ),
+        'Aurora\\AI\\Schema\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/ai-schema/src',
+        ),
+        'Aurora\\AI\\Pipeline\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/ai-pipeline/tests',
+        ),
+        'Aurora\\AI\\Pipeline\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/ai-pipeline/src',
+        ),
+        'Aurora\\AI\\Agent\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/ai-agent/tests',
+        ),
+        'Aurora\\AI\\Agent\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/ai-agent/src',
+        ),
     );
 
     public static $classMap = array (
@@ -362,6 +467,7 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         'DateMalformedStringException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateMalformedStringException.php',
         'DateObjectError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateObjectError.php',
         'DateRangeError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateRangeError.php',
+        'Normalizer' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/Resources/stubs/Normalizer.php',
         'Override' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/Override.php',
         'PHPUnit\\Event\\Application\\Finished' => __DIR__ . '/..' . '/phpunit/phpunit/src/Event/Events/Application/Finished.php',
         'PHPUnit\\Event\\Application\\FinishedSubscriber' => __DIR__ . '/..' . '/phpunit/phpunit/src/Event/Events/Application/FinishedSubscriber.php',

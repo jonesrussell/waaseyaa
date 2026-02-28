@@ -1,4 +1,0 @@
-services:
-  Drupal\destructable_test\Destructable:
-    tags:
-      - { name: needs_destruction }

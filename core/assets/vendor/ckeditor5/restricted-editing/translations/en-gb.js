@@ -1,1 +1,0 @@
-!function(e){const i=e["en-gb"]=e["en-gb"]||{};i.dictionary=Object.assign(i.dictionary||{},{"Disable editing":"","Enable editing":"Enable editing","Navigate editable regions":"Navigate editable regions","Next editable region":"Next editable region","Previous editable region":"Previous editable region"})}(window.CKEDITOR_TRANSLATIONS||(window.CKEDITOR_TRANSLATIONS={}));

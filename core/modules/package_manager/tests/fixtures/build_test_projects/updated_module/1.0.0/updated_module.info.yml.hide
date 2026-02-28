@@ -1,5 +1,0 @@
-name: 'Updated module'
-description: 'A module which will change during an update, to ensure that the changes are picked up.'
-type: module
-package: Testing
-project: updated_module

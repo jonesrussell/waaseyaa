@@ -1,4 +1,0 @@
-name: Second level sub recipe
-type: 'Testing'
-install:
-  - node

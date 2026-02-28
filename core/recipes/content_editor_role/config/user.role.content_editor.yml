@@ -1,8 +1,0 @@
-langcode: en
-status: true
-dependencies: {  }
-id: content_editor
-label: 'Content editor'
-weight: 2
-is_admin: false
-permissions: {  }

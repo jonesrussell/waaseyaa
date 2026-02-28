@@ -1,6 +1,0 @@
-http_kernel_test.empty:
-  path: '/http-kernel-test'
-  defaults:
-    _controller: '\Drupal\http_kernel_test\Controller\TestController::get'
-  requirements:
-    _access: 'TRUE'

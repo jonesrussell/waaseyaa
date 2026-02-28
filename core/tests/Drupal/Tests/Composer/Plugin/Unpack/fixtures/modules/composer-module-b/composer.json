@@ -1,6 +1,0 @@
-{
-  "name": "fixtures/module-b",
-  "version": "2.0.1",
-  "type": "drupal-module",
-  "description": "A Drupal module's composer for testing."
-}

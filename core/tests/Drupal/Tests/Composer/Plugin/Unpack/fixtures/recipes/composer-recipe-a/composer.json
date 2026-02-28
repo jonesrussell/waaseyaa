@@ -1,9 +1,0 @@
-{
-  "name": "fixtures/recipe-a",
-  "type": "drupal-recipe",
-  "description": "A Drupal recipe's composer for testing.",
-  "require": {
-    "fixtures/recipe-b": "*",
-    "fixtures/module-b": "^2.0"
-  }
-}

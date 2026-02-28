@@ -1,5 +1,0 @@
-name: 'Recipe depending on first installing modules, then a recipe with invalid config'
-type: 'Testing'
-recipes:
-  - install_two_modules
-  - invalid_config

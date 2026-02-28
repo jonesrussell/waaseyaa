@@ -1,6 +1,0 @@
-services:
-  _defaults:
-    autoconfigure: true
-    autowire: true
-
-  Drupal\module_installer_config_subscriber\EventSubscriber\ModuleInstallConfigTestSubscriber: ~

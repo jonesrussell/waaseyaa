@@ -1,4 +1,0 @@
-name: 'Recipe depending on an invalid recipe'
-type: 'Testing'
-recipes:
-  - invalid_config

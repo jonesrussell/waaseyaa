@@ -1,2 +1,0 @@
-parameters:
-  hook_collector_skip_procedural.skip_procedural_hook_scan: true
