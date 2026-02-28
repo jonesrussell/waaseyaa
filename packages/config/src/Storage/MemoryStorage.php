@@ -13,8 +13,20 @@ final class MemoryStorage implements StorageInterface
      */
     private array $data = [];
 
+    /**
+     * Shared collection instances keyed by collection name.
+     *
+     * @var array<string, self>
+     */
+    private array $collections = [];
+
+    /**
+     * @param string $collection The collection name for this storage instance.
+     * @param self|null $root The root storage (for collection instances to register back).
+     */
     public function __construct(
         private readonly string $collection = '',
+        private ?self $root = null,
     ) {}
 
     public function exists(string $name): bool
@@ -106,7 +118,16 @@ final class MemoryStorage implements StorageInterface
 
     public function createCollection(string $collection): static
     {
-        return new self($collection);
+        $rootStorage = $this->root ?? $this;
+
+        if (isset($rootStorage->collections[$collection])) {
+            return $rootStorage->collections[$collection];
+        }
+
+        $instance = new self($collection, $rootStorage);
+        $rootStorage->collections[$collection] = $instance;
+
+        return $instance;
     }
 
     public function getCollectionName(): string
@@ -116,6 +137,8 @@ final class MemoryStorage implements StorageInterface
 
     public function getAllCollectionNames(): array
     {
-        return [];
+        $rootStorage = $this->root ?? $this;
+
+        return array_keys($rootStorage->collections);
     }
 }
