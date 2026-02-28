@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c6549ed0250eff553d2e60be68a047b3",
+    "content-hash": "813aaa719714d2a7cefd20db0077792a",
     "packages": [
         {
             "name": "aurora/access",
@@ -37,6 +37,43 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Access control and permission system for Aurora CMS",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "aurora/api",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/api",
+                "reference": "2a584d4177863f53dfd2bdc9fcc9b3768cc72c8c"
+            },
+            "require": {
+                "aurora/access": "@dev",
+                "aurora/entity": "@dev",
+                "aurora/field": "@dev",
+                "aurora/routing": "@dev",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\Api\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\Api\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "RESTful JSON:API resource layer for Aurora CMS",
             "transport-options": {
                 "relative": true
             }
@@ -3838,6 +3875,7 @@
     "minimum-stability": "dev",
     "stability-flags": {
         "aurora/access": 20,
+        "aurora/api": 20,
         "aurora/cache": 20,
         "aurora/config": 20,
         "aurora/database-legacy": 20,
