@@ -153,7 +153,7 @@ final class CliCommandIntegrationTest extends TestCase
         $exportTester->execute([]);
 
         $this->assertSame(Command::SUCCESS, $exportTester->getStatusCode());
-        $this->assertStringContainsString('Exported 2 configuration items', $exportTester->getDisplay());
+        $this->assertStringContainsString('Configuration exported. Active storage contains 2 items', $exportTester->getDisplay());
 
         // Verify sync storage has the config.
         $this->assertSame(['name' => 'My Aurora Site', 'slogan' => 'Built with Aurora'], $this->syncStorage->read('system.site'));

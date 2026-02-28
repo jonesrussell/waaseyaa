@@ -28,7 +28,7 @@ class MakePluginCommandTest extends TestCase
         $output = $tester->getDisplay();
         $this->assertStringContainsString('#[AuroraPlugin(', $output);
         $this->assertStringContainsString("id: 'my_formatter'", $output);
-        $this->assertStringContainsString('class My_formatter', $output);
+        $this->assertStringContainsString('class MyFormatter', $output);
         $this->assertStringContainsString('use Aurora\\Plugin\\Attribute\\AuroraPlugin;', $output);
         $this->assertStringContainsString('declare(strict_types=1);', $output);
     }

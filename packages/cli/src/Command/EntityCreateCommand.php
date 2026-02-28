@@ -36,12 +36,22 @@ class EntityCreateCommand extends Command
         $entityType = $input->getArgument('entity_type');
         $valuesJson = $input->getOption('values');
 
-        /** @var array<string, mixed> $values */
-        $values = json_decode($valuesJson, associative: true, flags: \JSON_THROW_ON_ERROR);
+        try {
+            /** @var array<string, mixed> $values */
+            $values = json_decode($valuesJson, associative: true, flags: \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            $output->writeln(sprintf('<error>Invalid JSON for --values: %s</error>', $e->getMessage()));
+            return Command::FAILURE;
+        }
 
-        $storage = $this->entityTypeManager->getStorage($entityType);
-        $entity = $storage->create($values);
-        $storage->save($entity);
+        try {
+            $storage = $this->entityTypeManager->getStorage($entityType);
+            $entity = $storage->create($values);
+            $storage->save($entity);
+        } catch (\Throwable $e) {
+            $output->writeln(sprintf('<error>Failed to create %s entity: %s</error>', $entityType, $e->getMessage()));
+            return Command::FAILURE;
+        }
 
         $output->writeln(sprintf('Created %s entity with ID: %s', $entityType, (string) $entity->id()));
 

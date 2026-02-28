@@ -29,26 +29,26 @@ class MakeEntityTypeCommand extends Command
         $name = $input->getArgument('name');
         $isContent = $input->getOption('content');
 
-        $className = ucfirst($name);
+        $className = str_replace('_', '', ucwords($name, '_'));
         $baseClass = $isContent ? 'ContentEntityBase' : 'ConfigEntityBase';
         $baseImport = $isContent
-            ? 'use Aurora\\Entity\\ContentEntityBase;'
-            : 'use Aurora\\Entity\\ConfigEntityBase;';
+            ? 'use Aurora\Entity\ContentEntityBase;'
+            : 'use Aurora\Entity\ConfigEntityBase;';
 
         $template = <<<PHP
-        <?php
+<?php
 
-        declare(strict_types=1);
+declare(strict_types=1);
 
-        namespace App\\Entity;
+namespace App\Entity;
 
-        {$baseImport}
+{$baseImport}
 
-        class {$className} extends {$baseClass}
-        {
-        }
+class {$className} extends {$baseClass}
+{
+}
 
-        PHP;
+PHP;
 
         $output->write($template);
 

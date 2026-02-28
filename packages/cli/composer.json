@@ -9,7 +9,6 @@
         {"type": "path", "url": "../cache"},
         {"type": "path", "url": "../user"},
         {"type": "path", "url": "../access"},
-        {"type": "path", "url": "../plugin"},
         {"type": "path", "url": "../typed-data"},
         {"type": "path", "url": "../field"},
         {"type": "path", "url": "../routing"}

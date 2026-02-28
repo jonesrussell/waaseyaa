@@ -24,24 +24,24 @@ class MakePluginCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getArgument('name');
-        $className = ucfirst($name);
+        $className = str_replace('_', '', ucwords($name, '_'));
         $pluginId = strtolower($name);
 
         $template = <<<PHP
-        <?php
+<?php
 
-        declare(strict_types=1);
+declare(strict_types=1);
 
-        namespace App\\Plugin;
+namespace App\Plugin;
 
-        use Aurora\\Plugin\\Attribute\\AuroraPlugin;
+use Aurora\Plugin\Attribute\AuroraPlugin;
 
-        #[AuroraPlugin(id: '{$pluginId}', label: '{$className}')]
-        class {$className}
-        {
-        }
+#[AuroraPlugin(id: '{$pluginId}', label: '{$className}')]
+class {$className}
+{
+}
 
-        PHP;
+PHP;
 
         $output->write($template);
 

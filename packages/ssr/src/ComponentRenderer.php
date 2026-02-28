@@ -19,7 +19,7 @@ final class ComponentRenderer
      * @param string $name Component name (from #[Component] attribute).
      * @param array<string, mixed> $props Template variables.
      * @return string Rendered HTML.
-     * @throws \RuntimeException If component not found.
+     * @throws \RuntimeException If component not found or rendering fails.
      */
     public function render(string $name, array $props = []): string
     {
@@ -28,11 +28,22 @@ final class ComponentRenderer
             throw new \RuntimeException(sprintf('Component "%s" not found.', $name));
         }
 
-        return $this->twig->render($metadata->template, $props);
+        try {
+            return $this->twig->render($metadata->template, $props);
+        } catch (\Twig\Error\Error $e) {
+            throw new \RuntimeException(sprintf(
+                'Failed to render component "%s" (template: %s): %s',
+                $name,
+                $metadata->template,
+                $e->getMessage(),
+            ), previous: $e);
+        }
     }
 
     /**
      * Render a component object (extracts public properties as template vars).
+     *
+     * Uses the registry to resolve the template, ensuring overrides are respected.
      */
     public function renderObject(object $component): string
     {
@@ -48,12 +59,30 @@ final class ComponentRenderer
 
         $attr = $attributes[0]->newInstance();
 
+        // Use the registry to resolve the template, not the attribute directly.
+        $metadata = $this->registry->get($attr->name);
+        if ($metadata === null) {
+            throw new \RuntimeException(sprintf(
+                'Component "%s" not found in registry.',
+                $attr->name,
+            ));
+        }
+
         // Extract public properties as template variables.
         $props = [];
         foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
             $props[$prop->getName()] = $prop->getValue($component);
         }
 
-        return $this->twig->render($attr->template, $props);
+        try {
+            return $this->twig->render($metadata->template, $props);
+        } catch (\Twig\Error\Error $e) {
+            throw new \RuntimeException(sprintf(
+                'Failed to render component "%s" (template: %s): %s',
+                $attr->name,
+                $metadata->template,
+                $e->getMessage(),
+            ), previous: $e);
+        }
     }
 }

@@ -29,7 +29,7 @@ class ConfigExportCommand extends Command
         $configs = $this->configManager->getActiveStorage()->listAll();
         $count = count($configs);
 
-        $output->writeln(sprintf('Exported %d configuration items.', $count));
+        $output->writeln(sprintf('Configuration exported. Active storage contains %d items.', $count));
 
         return Command::SUCCESS;
     }

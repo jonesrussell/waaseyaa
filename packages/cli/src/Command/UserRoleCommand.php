@@ -52,16 +52,22 @@ class UserRoleCommand extends Command
 
         if ($remove) {
             $roles = array_values(array_filter($roles, fn(string $r): bool => $r !== $role));
-            $output->writeln(sprintf('Removed role "%s" from user %s.', $role, $userId));
         } else {
-            if (!in_array($role, $roles, true)) {
-                $roles[] = $role;
+            if (in_array($role, $roles, true)) {
+                $output->writeln(sprintf('User %s already has role "%s". No change.', $userId, $role));
+                return Command::SUCCESS;
             }
-            $output->writeln(sprintf('Added role "%s" to user %s.', $role, $userId));
+            $roles[] = $role;
         }
 
         $user->set('roles', $roles);
         $storage->save($user);
+
+        if ($remove) {
+            $output->writeln(sprintf('Removed role "%s" from user %s.', $role, $userId));
+        } else {
+            $output->writeln(sprintf('Added role "%s" to user %s.', $role, $userId));
+        }
 
         return Command::SUCCESS;
     }

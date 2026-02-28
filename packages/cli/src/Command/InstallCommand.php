@@ -27,35 +27,44 @@ class InstallCommand extends Command
 
     protected function configure(): void
     {
-        $this->addOption(
-            'site-name',
-            null,
-            InputOption::VALUE_REQUIRED,
-            'The name of the site',
-            'Aurora',
-        );
+        $this
+            ->addOption('site-name', null, InputOption::VALUE_REQUIRED, 'The name of the site', 'Aurora')
+            ->addOption('site-mail', null, InputOption::VALUE_REQUIRED, 'Site email address', 'admin@example.com')
+            ->addOption('admin-email', null, InputOption::VALUE_REQUIRED, 'Admin user email', 'admin@example.com')
+            ->addOption('admin-password', null, InputOption::VALUE_REQUIRED, 'Admin user password');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $siteName = $input->getOption('site-name');
+        $siteMail = $input->getOption('site-mail');
+        $adminEmail = $input->getOption('admin-email');
+        $adminPassword = $input->getOption('admin-password');
+
+        if ($adminPassword === null || $adminPassword === '') {
+            $output->writeln('<comment>Warning: No --admin-password provided. The admin account will have no password.</comment>');
+        }
 
         // Step 1: Write initial site configuration.
         $output->writeln('Writing initial site configuration...');
         $this->configManager->getActiveStorage()->write('system.site', [
             'name' => $siteName,
             'slogan' => '',
-            'mail' => 'admin@example.com',
+            'mail' => $siteMail,
         ]);
 
         // Step 2: Create admin user.
         $output->writeln('Creating admin user...');
         $storage = $this->entityTypeManager->getStorage('user');
-        $admin = $storage->create([
+        $userValues = [
             'name' => 'admin',
-            'email' => 'admin@example.com',
+            'email' => $adminEmail,
             'roles' => ['administrator'],
-        ]);
+        ];
+        if ($adminPassword !== null && $adminPassword !== '') {
+            $userValues['password'] = $adminPassword;
+        }
+        $admin = $storage->create($userValues);
         $storage->save($admin);
 
         // Step 3: Output success.

@@ -110,17 +110,18 @@ final class ComponentRegistryTest extends TestCase
     }
 
     #[Test]
-    public function registerOverwritesPreviousEntry(): void
+    public function registerThrowsOnDuplicateName(): void
     {
         $registry = new ComponentRegistry();
         $meta1 = new ComponentMetadata('article', 'old.twig', 'OldClass');
         $meta2 = new ComponentMetadata('article', 'new.twig', 'NewClass');
 
         $registry->register($meta1);
-        $registry->register($meta2);
 
-        $this->assertSame($meta2, $registry->get('article'));
-        $this->assertCount(1, $registry->all());
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Component "article" is already registered');
+
+        $registry->register($meta2);
     }
 }
 

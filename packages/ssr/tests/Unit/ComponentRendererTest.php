@@ -101,7 +101,7 @@ final class ComponentRendererTest extends TestCase
     }
 }
 
-#[Component(name: 'renderer-test-article', template: 'components/article.html.twig')]
+#[Component(name: 'article', template: 'components/article.html.twig')]
 final class RendererTestArticle
 {
     public function __construct(

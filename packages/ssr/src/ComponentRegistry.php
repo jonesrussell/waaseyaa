@@ -11,6 +11,14 @@ final class ComponentRegistry
 
     public function register(ComponentMetadata $metadata): void
     {
+        if (isset($this->components[$metadata->name])) {
+            throw new \LogicException(sprintf(
+                'Component "%s" is already registered (class: %s).',
+                $metadata->name,
+                $this->components[$metadata->name]->className,
+            ));
+        }
+
         $this->components[$metadata->name] = $metadata;
     }
 

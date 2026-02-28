@@ -68,7 +68,7 @@ final class SsrControllerTest extends TestCase
     }
 }
 
-#[Component(name: 'controller-test-page', template: 'components/page.html.twig')]
+#[Component(name: 'page', template: 'components/page.html.twig')]
 final class ControllerTestPage
 {
     public function __construct(

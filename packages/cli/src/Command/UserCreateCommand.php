@@ -48,9 +48,14 @@ class UserCreateCommand extends Command
             $values['roles'] = [$role];
         }
 
-        $storage = $this->entityTypeManager->getStorage('user');
-        $user = $storage->create($values);
-        $storage->save($user);
+        try {
+            $storage = $this->entityTypeManager->getStorage('user');
+            $user = $storage->create($values);
+            $storage->save($user);
+        } catch (\Throwable $e) {
+            $output->writeln(sprintf('<error>Failed to create user "%s": %s</error>', $username, $e->getMessage()));
+            return Command::FAILURE;
+        }
 
         $output->writeln(sprintf('Created user "%s" with ID: %s', $username, (string) $user->id()));
 

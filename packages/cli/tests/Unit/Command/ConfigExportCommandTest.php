@@ -34,6 +34,6 @@ class ConfigExportCommandTest extends TestCase
         $tester->execute([]);
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertStringContainsString('Exported 3 configuration items.', $tester->getDisplay());
+        $this->assertStringContainsString('Configuration exported. Active storage contains 3 items.', $tester->getDisplay());
     }
 }

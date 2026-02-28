@@ -73,6 +73,9 @@ final class SsrRenderingIntegrationTest extends TestCase
     #[Test]
     public function testRenderObjectExtractsPublicProperties(): void
     {
+        // Register the greeting component.
+        $this->registry->registerClass(GreetingComponent::class);
+
         // Create a component object with public properties.
         $component = new GreetingComponent();
         $component->name = 'Alice';
