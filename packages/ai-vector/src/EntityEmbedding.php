@@ -13,6 +13,7 @@ final readonly class EntityEmbedding
      * @param string $entityTypeId Entity type (e.g. 'node').
      * @param int|string $entityId Entity ID.
      * @param float[] $vector The embedding vector.
+     * @param string $langcode Language code (e.g. 'en', 'fr'). Empty string means language-neutral.
      * @param array<string, mixed> $metadata Optional metadata (e.g. title, bundle).
      * @param int $createdAt Unix timestamp.
      */
@@ -20,6 +21,7 @@ final readonly class EntityEmbedding
         public string $entityTypeId,
         public int|string $entityId,
         public array $vector,
+        public string $langcode = '',
         public array $metadata = [],
         public int $createdAt = 0,
     ) {}

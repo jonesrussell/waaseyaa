@@ -30,9 +30,20 @@ interface VectorStoreInterface
      * @param float[] $queryVector The vector to search against.
      * @param int $limit Maximum number of results to return.
      * @param string|null $entityTypeId Optional entity type filter.
+     * @param string|null $langcode Optional language code filter. When provided, only
+     *                              embeddings matching this language are returned.
+     * @param string[] $fallbackLangcodes Optional fallback language codes. When $langcode
+     *                                    is set and no results are found, these languages
+     *                                    are tried in order.
      * @return SimilarityResult[] Results sorted by score descending.
      */
-    public function search(array $queryVector, int $limit = 10, ?string $entityTypeId = null): array;
+    public function search(
+        array $queryVector,
+        int $limit = 10,
+        ?string $entityTypeId = null,
+        ?string $langcode = null,
+        array $fallbackLangcodes = [],
+    ): array;
 
     /**
      * Get a stored embedding for a specific entity.

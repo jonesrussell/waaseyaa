@@ -12,7 +12,7 @@ namespace Aurora\AI\Vector;
 final class InMemoryVectorStore implements VectorStoreInterface
 {
     /**
-     * Stored embeddings keyed by "{entityTypeId}:{entityId}".
+     * Stored embeddings keyed by "{entityTypeId}:{entityId}:{langcode}".
      *
      * @var array<string, EntityEmbedding>
      */
@@ -20,34 +20,41 @@ final class InMemoryVectorStore implements VectorStoreInterface
 
     public function store(EntityEmbedding $embedding): void
     {
-        $key = $this->buildKey($embedding->entityTypeId, $embedding->entityId);
+        $key = $this->buildKey($embedding->entityTypeId, $embedding->entityId, $embedding->langcode);
         $this->embeddings[$key] = $embedding;
     }
 
     public function delete(string $entityTypeId, int|string $entityId): void
     {
-        $key = $this->buildKey($entityTypeId, $entityId);
-        unset($this->embeddings[$key]);
+        // Delete all langcode variants for this entity.
+        $prefix = $entityTypeId . ':' . $entityId . ':';
+        foreach ($this->embeddings as $key => $embedding) {
+            if (\str_starts_with($key, $prefix)) {
+                unset($this->embeddings[$key]);
+            }
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function search(array $queryVector, int $limit = 10, ?string $entityTypeId = null): array
-    {
-        $results = [];
+    public function search(
+        array $queryVector,
+        int $limit = 10,
+        ?string $entityTypeId = null,
+        ?string $langcode = null,
+        array $fallbackLangcodes = [],
+    ): array {
+        $results = $this->searchForLanguage($queryVector, $entityTypeId, $langcode);
 
-        foreach ($this->embeddings as $embedding) {
-            if ($entityTypeId !== null && $embedding->entityTypeId !== $entityTypeId) {
-                continue;
+        // If langcode filter was set, results are empty, and we have fallbacks, try them.
+        if ($langcode !== null && $results === [] && $fallbackLangcodes !== []) {
+            foreach ($fallbackLangcodes as $fallback) {
+                $results = $this->searchForLanguage($queryVector, $entityTypeId, $fallback);
+                if ($results !== []) {
+                    break;
+                }
             }
-
-            $score = self::cosineSimilarity($queryVector, $embedding->vector);
-
-            $results[] = new SimilarityResult(
-                embedding: $embedding,
-                score: $score,
-            );
         }
 
         // Sort by score descending.
@@ -55,19 +62,25 @@ final class InMemoryVectorStore implements VectorStoreInterface
             $b->score <=> $a->score
         );
 
-        return array_slice($results, 0, $limit);
+        return \array_slice($results, 0, $limit);
     }
 
     public function get(string $entityTypeId, int|string $entityId): ?EntityEmbedding
     {
-        $key = $this->buildKey($entityTypeId, $entityId);
-        return $this->embeddings[$key] ?? null;
+        // Return the first match for this entity (language-neutral or first langcode).
+        $prefix = $entityTypeId . ':' . $entityId . ':';
+        foreach ($this->embeddings as $key => $embedding) {
+            if (\str_starts_with($key, $prefix)) {
+                return $embedding;
+            }
+        }
+
+        return null;
     }
 
     public function has(string $entityTypeId, int|string $entityId): bool
     {
-        $key = $this->buildKey($entityTypeId, $entityId);
-        return isset($this->embeddings[$key]);
+        return $this->get($entityTypeId, $entityId) !== null;
     }
 
     /**
@@ -113,10 +126,40 @@ final class InMemoryVectorStore implements VectorStoreInterface
     }
 
     /**
-     * Build a storage key from entity type and ID.
+     * Build a storage key from entity type, ID, and langcode.
      */
-    private function buildKey(string $entityTypeId, int|string $entityId): string
+    private function buildKey(string $entityTypeId, int|string $entityId, string $langcode = ''): string
     {
-        return $entityTypeId . ':' . $entityId;
+        return $entityTypeId . ':' . $entityId . ':' . $langcode;
+    }
+
+    /**
+     * Search embeddings filtered by entity type and optional language.
+     *
+     * @param float[] $queryVector
+     * @return SimilarityResult[]
+     */
+    private function searchForLanguage(array $queryVector, ?string $entityTypeId, ?string $langcode): array
+    {
+        $results = [];
+
+        foreach ($this->embeddings as $embedding) {
+            if ($entityTypeId !== null && $embedding->entityTypeId !== $entityTypeId) {
+                continue;
+            }
+
+            if ($langcode !== null && $embedding->langcode !== $langcode) {
+                continue;
+            }
+
+            $score = self::cosineSimilarity($queryVector, $embedding->vector);
+
+            $results[] = new SimilarityResult(
+                embedding: $embedding,
+                score: $score,
+            );
+        }
+
+        return $results;
     }
 }

@@ -15,6 +15,9 @@ use Aurora\Entity\EntityTypeManagerInterface;
  * - update_{type}: Update an existing entity
  * - delete_{type}: Delete an entity by ID
  * - query_{type}: Query entities with filters, sort, and pagination
+ *
+ * All tools accept optional langcode and fallback parameters for
+ * multilingual content operations.
  */
 final class McpToolGenerator
 {
@@ -57,6 +60,28 @@ final class McpToolGenerator
         return $tools;
     }
 
+    /**
+     * Get the language parameter definitions shared by all tools.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private static function langcodeProperties(): array
+    {
+        return [
+            'langcode' => [
+                'type' => 'string',
+                'description' => 'Language code for the operation (e.g. "en", "fr"). When omitted, uses the default language.',
+            ],
+            'fallback' => [
+                'type' => 'array',
+                'description' => 'Ordered list of fallback language codes if the primary langcode has no result.',
+                'items' => [
+                    'type' => 'string',
+                ],
+            ],
+        ];
+    }
+
     private function createTool(string $entityTypeId, string $label): McpToolDefinition
     {
         return new McpToolDefinition(
@@ -70,6 +95,7 @@ final class McpToolGenerator
                         'description' => "The attribute values for the new {$label}.",
                         'additionalProperties' => true,
                     ],
+                    ...self::langcodeProperties(),
                 ],
                 'required' => ['attributes'],
                 'additionalProperties' => false,
@@ -89,6 +115,7 @@ final class McpToolGenerator
                         'type' => ['integer', 'string'],
                         'description' => "The ID of the {$label} to read.",
                     ],
+                    ...self::langcodeProperties(),
                 ],
                 'required' => ['id'],
                 'additionalProperties' => false,
@@ -113,6 +140,7 @@ final class McpToolGenerator
                         'description' => "The attribute values to update on the {$label}.",
                         'additionalProperties' => true,
                     ],
+                    ...self::langcodeProperties(),
                 ],
                 'required' => ['id', 'attributes'],
                 'additionalProperties' => false,
@@ -132,6 +160,7 @@ final class McpToolGenerator
                         'type' => ['integer', 'string'],
                         'description' => "The ID of the {$label} to delete.",
                     ],
+                    ...self::langcodeProperties(),
                 ],
                 'required' => ['id'],
                 'additionalProperties' => false,
@@ -184,6 +213,7 @@ final class McpToolGenerator
                         'description' => 'Number of results to skip.',
                         'default' => 0,
                     ],
+                    ...self::langcodeProperties(),
                 ],
                 'additionalProperties' => false,
             ],
