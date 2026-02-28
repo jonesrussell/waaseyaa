@@ -3,13 +3,20 @@
     "description": "AI agent orchestration and tool execution for Aurora CMS",
     "type": "library",
     "license": "GPL-2.0-or-later",
+    "repositories": [
+        {"type": "path", "url": "../ai-schema"},
+        {"type": "path", "url": "../access"},
+        {"type": "path", "url": "../entity"},
+        {"type": "path", "url": "../plugin"},
+        {"type": "path", "url": "../cache"},
+        {"type": "path", "url": "../typed-data"},
+        {"type": "path", "url": "../config"}
+    ],
     "require": {
         "php": ">=8.3",
-        "aurora/plugin": "^0.1",
-        "aurora/ai-schema": "^0.1",
-        "aurora/entity": "^0.1",
-        "aurora/config": "^0.1",
-        "aurora/access": "^0.1"
+        "aurora/ai-schema": "@dev",
+        "aurora/entity": "@dev",
+        "aurora/access": "@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
@@ -24,5 +31,6 @@
             "Aurora\\AI\\Agent\\Tests\\": "tests/"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
