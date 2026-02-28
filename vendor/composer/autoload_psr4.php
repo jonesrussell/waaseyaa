@@ -65,6 +65,8 @@ return array(
     'Aurora\\Config\\' => array($vendorDir . '/aurora/config/src'),
     'Aurora\\Cache\\Tests\\' => array($baseDir . '/packages/cache/tests'),
     'Aurora\\Cache\\' => array($vendorDir . '/aurora/cache/src'),
+    'Aurora\\Api\\Tests\\' => array($baseDir . '/packages/api/tests'),
+    'Aurora\\Api\\' => array($vendorDir . '/aurora/api/src'),
     'Aurora\\Access\\Tests\\' => array($baseDir . '/packages/access/tests'),
     'Aurora\\Access\\' => array($vendorDir . '/aurora/access/src'),
 );

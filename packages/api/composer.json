@@ -5,7 +5,6 @@
     "license": "GPL-2.0-or-later",
     "repositories": [
         {"type": "path", "url": "../entity"},
-        {"type": "path", "url": "../field"},
         {"type": "path", "url": "../routing"},
         {"type": "path", "url": "../access"},
         {"type": "path", "url": "../plugin"},
@@ -16,7 +15,6 @@
     "require": {
         "php": ">=8.3",
         "aurora/entity": "@dev",
-        "aurora/field": "@dev",
         "aurora/routing": "@dev",
         "aurora/access": "@dev"
     },

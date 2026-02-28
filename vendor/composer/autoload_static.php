@@ -89,6 +89,8 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
             'Aurora\\Config\\' => 14,
             'Aurora\\Cache\\Tests\\' => 19,
             'Aurora\\Cache\\' => 13,
+            'Aurora\\Api\\Tests\\' => 17,
+            'Aurora\\Api\\' => 11,
             'Aurora\\Access\\Tests\\' => 20,
             'Aurora\\Access\\' => 14,
         ),
@@ -330,6 +332,14 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         'Aurora\\Cache\\' => 
         array (
             0 => __DIR__ . '/..' . '/aurora/cache/src',
+        ),
+        'Aurora\\Api\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/api/tests',
+        ),
+        'Aurora\\Api\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/api/src',
         ),
         'Aurora\\Access\\Tests\\' => 
         array (

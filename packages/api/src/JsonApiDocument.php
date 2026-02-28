@@ -21,12 +21,16 @@ final readonly class JsonApiDocument
      * @param array<string, string>                       $links    Top-level links (self, next, prev, etc.).
      * @param array<JsonApiResource>                      $included Sideloaded (included) resource objects.
      */
+    /**
+     * @param int $statusCode Suggested HTTP status code for the response.
+     */
     public function __construct(
         public JsonApiResource|array|null $data = null,
         public array $errors = [],
         public array $meta = [],
         public array $links = [],
         public array $included = [],
+        public int $statusCode = 200,
     ) {}
 
     /**
@@ -83,9 +87,9 @@ final readonly class JsonApiDocument
     /**
      * Create a document containing a single resource.
      */
-    public static function fromResource(JsonApiResource $resource, array $links = [], array $meta = []): self
+    public static function fromResource(JsonApiResource $resource, array $links = [], array $meta = [], int $statusCode = 200): self
     {
-        return new self(data: $resource, links: $links, meta: $meta);
+        return new self(data: $resource, links: $links, meta: $meta, statusCode: $statusCode);
     }
 
     /**
@@ -103,16 +107,16 @@ final readonly class JsonApiDocument
      *
      * @param array<JsonApiError> $errors
      */
-    public static function fromErrors(array $errors, array $meta = []): self
+    public static function fromErrors(array $errors, array $meta = [], int $statusCode = 400): self
     {
-        return new self(errors: $errors, meta: $meta);
+        return new self(errors: $errors, meta: $meta, statusCode: $statusCode);
     }
 
     /**
      * Create a document with null data (e.g. after a DELETE).
      */
-    public static function empty(array $meta = []): self
+    public static function empty(array $meta = [], int $statusCode = 200): self
     {
-        return new self(data: null, meta: $meta);
+        return new self(data: null, meta: $meta, statusCode: $statusCode);
     }
 }

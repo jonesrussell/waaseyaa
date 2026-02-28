@@ -11,6 +11,7 @@ use Aurora\Api\Query\PaginationLinks;
 use Aurora\Api\Query\QueryApplier;
 use Aurora\Api\Query\QueryParser;
 use Aurora\Entity\EntityTypeManagerInterface;
+use Aurora\Entity\FieldableInterface;
 
 /**
  * Handles JSON:API CRUD operations.
@@ -208,6 +209,7 @@ final class JsonApiController
             data: $resource,
             links: ['self' => "/api/{$entityTypeId}/{$resource->id}"],
             meta: ['created' => true],
+            statusCode: 201,
         );
     }
 
@@ -250,6 +252,15 @@ final class JsonApiController
             );
         }
 
+        // Validate data.id matches the entity if provided (JSON:API spec: 409 Conflict).
+        if (isset($data['data']['id']) && (string) $data['data']['id'] !== (string) $entity->uuid()) {
+            return $this->errorDocument(
+                JsonApiError::conflict(
+                    "Resource id '{$data['data']['id']}' does not match entity id '{$entity->uuid()}'.",
+                ),
+            );
+        }
+
         // Check update access.
         if ($this->accessHandler !== null && $this->account !== null) {
             $access = $this->accessHandler->check($entity, 'update', $this->account);
@@ -262,10 +273,13 @@ final class JsonApiController
 
         // Apply attribute updates.
         $attributes = $data['data']['attributes'] ?? [];
-        if (method_exists($entity, 'set')) {
-            foreach ($attributes as $field => $value) {
-                $entity->set($field, $value);
-            }
+        if (!$entity instanceof FieldableInterface) {
+            return $this->errorDocument(
+                JsonApiError::unprocessable("Entity type '{$entityTypeId}' does not support field updates."),
+            );
+        }
+        foreach ($attributes as $field => $value) {
+            $entity->set($field, $value);
         }
 
         $storage->save($entity);
@@ -313,7 +327,7 @@ final class JsonApiController
 
         $storage->delete([$entity]);
 
-        return JsonApiDocument::empty(meta: ['deleted' => true]);
+        return JsonApiDocument::empty(meta: ['deleted' => true], statusCode: 204);
     }
 
     /**
@@ -321,6 +335,6 @@ final class JsonApiController
      */
     private function errorDocument(JsonApiError $error): JsonApiDocument
     {
-        return JsonApiDocument::fromErrors([$error]);
+        return JsonApiDocument::fromErrors([$error], statusCode: (int) $error->status);
     }
 }

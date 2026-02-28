@@ -39,6 +39,46 @@
             "install-path": "../aurora/access"
         },
         {
+            "name": "aurora/api",
+            "version": "dev-main",
+            "version_normalized": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/api",
+                "reference": "2a584d4177863f53dfd2bdc9fcc9b3768cc72c8c"
+            },
+            "require": {
+                "aurora/access": "@dev",
+                "aurora/entity": "@dev",
+                "aurora/field": "@dev",
+                "aurora/routing": "@dev",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\Api\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\Api\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "RESTful JSON:API resource layer for Aurora CMS",
+            "transport-options": {
+                "relative": true
+            },
+            "install-path": "../aurora/api"
+        },
+        {
             "name": "aurora/cache",
             "version": "dev-main",
             "version_normalized": "dev-main",

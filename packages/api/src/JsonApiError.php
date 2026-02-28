@@ -97,6 +97,18 @@ final readonly class JsonApiError
     }
 
     /**
+     * Create a 409 Conflict error.
+     */
+    public static function conflict(string $detail = ''): self
+    {
+        return new self(
+            status: '409',
+            title: 'Conflict',
+            detail: $detail,
+        );
+    }
+
+    /**
      * Create a 500 Internal Server Error.
      */
     public static function internalError(string $detail = ''): self
