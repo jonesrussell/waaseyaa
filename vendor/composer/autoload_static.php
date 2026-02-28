@@ -15,14 +15,14 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
         '8825ede83f2f289127722d4e842cf7e8' => __DIR__ . '/..' . '/symfony/polyfill-intl-grapheme/bootstrap.php',
         'e69f7f6ee287b969198c3c9d6777bd38' => __DIR__ . '/..' . '/symfony/polyfill-intl-normalizer/bootstrap.php',
-        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        'b6b991a57620e2fb6b2f66f03fe9ddc2' => __DIR__ . '/..' . '/symfony/string/Resources/functions.php',
+        'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         '89efb1254ef2d1c5d80096acd12c4098' => __DIR__ . '/..' . '/twig/twig/src/Resources/core.php',
         'ffecb95d45175fd40f75be8a23b34f90' => __DIR__ . '/..' . '/twig/twig/src/Resources/debug.php',
         'c7baa00073ee9c61edf148c51917cfb4' => __DIR__ . '/..' . '/twig/twig/src/Resources/escaper.php',
         'f844ccf1d25df8663951193c3fc307c8' => __DIR__ . '/..' . '/twig/twig/src/Resources/string_loader.php',
         '9b38cf48e83f5d8f60375221cd213eee' => __DIR__ . '/..' . '/phpstan/phpstan/bootstrap.php',
-        'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -80,6 +80,10 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
             'Aurora\\TypedData\\Tests\\' => 23,
             'Aurora\\TypedData\\' => 17,
             'Aurora\\Tests\\' => 13,
+            'Aurora\\Testing\\Tests\\' => 21,
+            'Aurora\\Testing\\' => 15,
+            'Aurora\\Telescope\\Tests\\' => 23,
+            'Aurora\\Telescope\\' => 17,
             'Aurora\\Taxonomy\\Tests\\' => 22,
             'Aurora\\Taxonomy\\' => 16,
             'Aurora\\State\\Tests\\' => 19,
@@ -100,11 +104,10 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
             'Aurora\\Menu\\' => 12,
             'Aurora\\Media\\Tests\\' => 19,
             'Aurora\\Media\\' => 13,
-<<<<<<< HEAD
-=======
             'Aurora\\Mcp\\Tests\\' => 17,
             'Aurora\\Mcp\\' => 11,
->>>>>>> unit-16-cache-assets
+            'Aurora\\I18n\\Tests\\' => 18,
+            'Aurora\\I18n\\' => 12,
             'Aurora\\Foundation\\Tests\\' => 24,
             'Aurora\\Foundation\\' => 18,
             'Aurora\\Field\\Tests\\' => 19,
@@ -297,6 +300,22 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         array (
             0 => __DIR__ . '/../..' . '/tests',
         ),
+        'Aurora\\Testing\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/testing/tests',
+        ),
+        'Aurora\\Testing\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/testing/src',
+        ),
+        'Aurora\\Telescope\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/telescope/tests',
+        ),
+        'Aurora\\Telescope\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/telescope/src',
+        ),
         'Aurora\\Taxonomy\\Tests\\' => 
         array (
             0 => __DIR__ . '/../..' . '/packages/taxonomy/tests',
@@ -377,8 +396,6 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         array (
             0 => __DIR__ . '/..' . '/aurora/media/src',
         ),
-<<<<<<< HEAD
-=======
         'Aurora\\Mcp\\Tests\\' => 
         array (
             0 => __DIR__ . '/../..' . '/packages/mcp/tests',
@@ -387,7 +404,14 @@ class ComposerStaticInitc6549ed0250eff553d2e60be68a047b3
         array (
             0 => __DIR__ . '/..' . '/aurora/mcp/src',
         ),
->>>>>>> unit-16-cache-assets
+        'Aurora\\I18n\\Tests\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/packages/i18n/tests',
+        ),
+        'Aurora\\I18n\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/aurora/i18n/src',
+        ),
         'Aurora\\Foundation\\Tests\\' => 
         array (
             0 => __DIR__ . '/../..' . '/packages/foundation/tests',

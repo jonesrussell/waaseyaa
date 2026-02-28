@@ -2,18 +2,8 @@
     "packages": [
         {
             "name": "aurora/access",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/access",
@@ -50,18 +40,8 @@
         },
         {
             "name": "aurora/ai-agent",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-agent",
@@ -98,18 +78,8 @@
         },
         {
             "name": "aurora/ai-pipeline",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-pipeline",
@@ -146,18 +116,8 @@
         },
         {
             "name": "aurora/ai-schema",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-schema",
@@ -193,18 +153,8 @@
         },
         {
             "name": "aurora/ai-vector",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-vector",
@@ -240,18 +190,8 @@
         },
         {
             "name": "aurora/api",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/api",
@@ -290,18 +230,8 @@
         },
         {
             "name": "aurora/cache",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/cache",
@@ -342,18 +272,8 @@
         },
         {
             "name": "aurora/cli",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
@@ -394,18 +314,8 @@
         },
         {
             "name": "aurora/config",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/config",
@@ -442,18 +352,8 @@
         },
         {
             "name": "aurora/database-legacy",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/database-legacy",
@@ -488,18 +388,8 @@
         },
         {
             "name": "aurora/entity",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/entity",
@@ -541,18 +431,8 @@
         },
         {
             "name": "aurora/entity-storage",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/entity-storage",
@@ -592,18 +472,8 @@
         },
         {
             "name": "aurora/field",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/field",
@@ -641,10 +511,8 @@
         },
         {
             "name": "aurora/foundation",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/foundation",
@@ -656,25 +524,6 @@
                 "symfony/dependency-injection": "^7.0",
                 "symfony/event-dispatcher": "^7.0",
                 "symfony/messenger": "^7.0",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
-            "dist": {
-                "type": "path",
-                "url": "packages/foundation",
-                "reference": "aa906694f71fa79996af834213c4ac837e515a2e"
-            },
-            "require": {
-                "php": ">=8.3",
-                "symfony/event-dispatcher": "^7.0",
-<<<<<<< HEAD
->>>>>>> unit-14-broadcasting
-=======
->>>>>>> unit-16-cache-assets
                 "symfony/uid": "^7.0"
             },
             "require-dev": {
@@ -702,19 +551,45 @@
             "install-path": "../aurora/foundation"
         },
         {
-<<<<<<< HEAD
-            "name": "aurora/media",
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
+            "name": "aurora/i18n",
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
+            "dist": {
+                "type": "path",
+                "url": "packages/i18n",
+                "reference": "3767fed335dbdd7b82f226d3fdd997c9e2f9eae4"
+            },
+            "require": {
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\I18n\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\I18n\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Internationalization foundation: Language, LanguageManager, LanguageContext, FallbackChain",
+            "transport-options": {
+                "relative": true
+            },
+            "install-path": "../aurora/i18n"
+        },
+        {
             "name": "aurora/mcp",
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/mcp",
@@ -753,9 +628,8 @@
         },
         {
             "name": "aurora/media",
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/media",
@@ -791,18 +665,8 @@
         },
         {
             "name": "aurora/menu",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/menu",
@@ -838,18 +702,8 @@
         },
         {
             "name": "aurora/node",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/node",
@@ -886,18 +740,8 @@
         },
         {
             "name": "aurora/path",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/path",
@@ -933,18 +777,8 @@
         },
         {
             "name": "aurora/plugin",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/plugin",
@@ -980,18 +814,8 @@
         },
         {
             "name": "aurora/queue",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/queue",
@@ -1027,26 +851,17 @@
         },
         {
             "name": "aurora/routing",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/routing",
-                "reference": "dc7b99810fd3909d189d0bf1373a97ca2725601a"
+                "reference": "5fa90d38ae87fbb0c926cd738e242bb2c093d736"
             },
             "require": {
                 "aurora/access": "@dev",
                 "aurora/entity": "@dev",
+                "aurora/i18n": "@dev",
                 "php": ">=8.3",
                 "symfony/routing": "^7.3"
             },
@@ -1076,18 +891,8 @@
         },
         {
             "name": "aurora/ssr",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ssr",
@@ -1125,18 +930,8 @@
         },
         {
             "name": "aurora/state",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/state",
@@ -1172,18 +967,8 @@
         },
         {
             "name": "aurora/taxonomy",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/taxonomy",
@@ -1219,19 +1004,79 @@
             "install-path": "../aurora/taxonomy"
         },
         {
+            "name": "aurora/telescope",
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
+            "dist": {
+                "type": "path",
+                "url": "packages/telescope",
+                "reference": "c52cfb57ea45ebb88ef076e09ee5542f2ea0c765"
+            },
+            "require": {
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\Telescope\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\Telescope\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Application observability and debugging for Aurora CMS",
+            "transport-options": {
+                "relative": true
+            },
+            "install-path": "../aurora/telescope"
+        },
+        {
+            "name": "aurora/testing",
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
+            "dist": {
+                "type": "path",
+                "url": "packages/testing",
+                "reference": "bb864beb6d68a70d5d4f9e309a7ef61cbddc865f"
+            },
+            "require": {
+                "php": ">=8.3",
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\Testing\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\Testing\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Testing utilities for Aurora CMS — base test case, entity factories, and helper traits.",
+            "transport-options": {
+                "relative": true
+            },
+            "install-path": "../aurora/testing"
+        },
+        {
             "name": "aurora/typed-data",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/typed-data",
@@ -1267,18 +1112,8 @@
         },
         {
             "name": "aurora/user",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/user",
@@ -1315,18 +1150,8 @@
         },
         {
             "name": "aurora/validation",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/validation",
@@ -1364,18 +1189,8 @@
         },
         {
             "name": "aurora/workflows",
-<<<<<<< HEAD
-<<<<<<< HEAD
-            "version": "dev-unit-1-foundation",
-            "version_normalized": "dev-unit-1-foundation",
-=======
-            "version": "dev-unit-14-broadcasting",
-            "version_normalized": "dev-unit-14-broadcasting",
->>>>>>> unit-14-broadcasting
-=======
-            "version": "dev-unit-16-cache-assets",
-            "version_normalized": "dev-unit-16-cache-assets",
->>>>>>> unit-16-cache-assets
+            "version": "dev-arch-v2-integration",
+            "version_normalized": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/workflows",
@@ -5600,6 +5415,7 @@
     ],
     "dev": true,
     "dev-package-names": [
+        "aurora/testing",
         "myclabs/deep-copy",
         "nikic/php-parser",
         "phar-io/manifest",

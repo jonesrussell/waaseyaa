@@ -4,11 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6bbd0cf4577eff8cacf06be9e524ca3c",
+    "content-hash": "bb891f8b0ea2551175e8159360d09eef",
     "packages": [
         {
             "name": "aurora/access",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/access",
@@ -43,7 +43,7 @@
         },
         {
             "name": "aurora/ai-agent",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-agent",
@@ -78,7 +78,7 @@
         },
         {
             "name": "aurora/ai-pipeline",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-pipeline",
@@ -113,7 +113,7 @@
         },
         {
             "name": "aurora/ai-schema",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-schema",
@@ -147,7 +147,7 @@
         },
         {
             "name": "aurora/ai-vector",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-vector",
@@ -181,15 +181,16 @@
         },
         {
             "name": "aurora/api",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/api",
-                "reference": "57b67432289156dffa91f1454387a71a98678adc"
+                "reference": "d0e67bc16455846933a6972069c18c85c76ee886"
             },
             "require": {
                 "aurora/access": "@dev",
                 "aurora/entity": "@dev",
+                "aurora/foundation": "@dev",
                 "aurora/routing": "@dev",
                 "php": ">=8.3"
             },
@@ -217,11 +218,11 @@
         },
         {
             "name": "aurora/cache",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/cache",
-                "reference": "950c00396e810d11d0dc8048e7a2ac7b4d04bb80"
+                "reference": "563f4d8ad4eceb5dd60047c82d1e4cc0bbe01acf"
             },
             "require": {
                 "php": ">=8.3",
@@ -230,6 +231,10 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
+            },
+            "suggest": {
+                "aurora/config": "Required for ConfigCacheInvalidator listener",
+                "aurora/entity": "Required for EntityCacheInvalidator listener"
             },
             "type": "library",
             "autoload": {
@@ -252,7 +257,7 @@
         },
         {
             "name": "aurora/cli",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
@@ -291,7 +296,7 @@
         },
         {
             "name": "aurora/config",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/config",
@@ -326,7 +331,7 @@
         },
         {
             "name": "aurora/database-legacy",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/database-legacy",
@@ -359,7 +364,7 @@
         },
         {
             "name": "aurora/entity",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/entity",
@@ -399,7 +404,7 @@
         },
         {
             "name": "aurora/entity-storage",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/entity-storage",
@@ -437,7 +442,7 @@
         },
         {
             "name": "aurora/field",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/field",
@@ -473,7 +478,7 @@
         },
         {
             "name": "aurora/foundation",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/foundation",
@@ -510,8 +515,78 @@
             }
         },
         {
+            "name": "aurora/i18n",
+            "version": "dev-arch-v2-integration",
+            "dist": {
+                "type": "path",
+                "url": "packages/i18n",
+                "reference": "3767fed335dbdd7b82f226d3fdd997c9e2f9eae4"
+            },
+            "require": {
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\I18n\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\I18n\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Internationalization foundation: Language, LanguageManager, LanguageContext, FallbackChain",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "aurora/mcp",
+            "version": "dev-arch-v2-integration",
+            "dist": {
+                "type": "path",
+                "url": "packages/mcp",
+                "reference": "c29e06281b076e40e8401ea9b0cf58921b60dc5d"
+            },
+            "require": {
+                "aurora/access": "@dev",
+                "aurora/ai-agent": "@dev",
+                "aurora/ai-schema": "@dev",
+                "aurora/routing": "@dev",
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\Mcp\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\Mcp\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Remote MCP server endpoint for Aurora CMS",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "aurora/media",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/media",
@@ -545,7 +620,7 @@
         },
         {
             "name": "aurora/menu",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/menu",
@@ -579,7 +654,7 @@
         },
         {
             "name": "aurora/node",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/node",
@@ -614,7 +689,7 @@
         },
         {
             "name": "aurora/path",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/path",
@@ -648,7 +723,7 @@
         },
         {
             "name": "aurora/plugin",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/plugin",
@@ -682,7 +757,7 @@
         },
         {
             "name": "aurora/queue",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/queue",
@@ -716,15 +791,16 @@
         },
         {
             "name": "aurora/routing",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/routing",
-                "reference": "dc7b99810fd3909d189d0bf1373a97ca2725601a"
+                "reference": "5fa90d38ae87fbb0c926cd738e242bb2c093d736"
             },
             "require": {
                 "aurora/access": "@dev",
                 "aurora/entity": "@dev",
+                "aurora/i18n": "@dev",
                 "php": ">=8.3",
                 "symfony/routing": "^7.3"
             },
@@ -752,7 +828,7 @@
         },
         {
             "name": "aurora/ssr",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/ssr",
@@ -788,7 +864,7 @@
         },
         {
             "name": "aurora/state",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/state",
@@ -822,7 +898,7 @@
         },
         {
             "name": "aurora/taxonomy",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/taxonomy",
@@ -856,8 +932,41 @@
             }
         },
         {
+            "name": "aurora/telescope",
+            "version": "dev-arch-v2-integration",
+            "dist": {
+                "type": "path",
+                "url": "packages/telescope",
+                "reference": "c52cfb57ea45ebb88ef076e09ee5542f2ea0c765"
+            },
+            "require": {
+                "php": ">=8.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\Telescope\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\Telescope\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Application observability and debugging for Aurora CMS",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "aurora/typed-data",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/typed-data",
@@ -891,7 +1000,7 @@
         },
         {
             "name": "aurora/user",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/user",
@@ -926,7 +1035,7 @@
         },
         {
             "name": "aurora/validation",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/validation",
@@ -962,7 +1071,7 @@
         },
         {
             "name": "aurora/workflows",
-            "version": "dev-unit-1-foundation",
+            "version": "dev-arch-v2-integration",
             "dist": {
                 "type": "path",
                 "url": "packages/workflows",
@@ -3292,6 +3401,37 @@
     ],
     "packages-dev": [
         {
+            "name": "aurora/testing",
+            "version": "dev-arch-v2-integration",
+            "dist": {
+                "type": "path",
+                "url": "packages/testing",
+                "reference": "bb864beb6d68a70d5d4f9e309a7ef61cbddc865f"
+            },
+            "require": {
+                "php": ">=8.3",
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Aurora\\Testing\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Aurora\\Testing\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Testing utilities for Aurora CMS — base test case, entity factories, and helper traits.",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "myclabs/deep-copy",
             "version": "1.13.4",
             "source": {
@@ -5031,6 +5171,8 @@
         "aurora/entity-storage": 20,
         "aurora/field": 20,
         "aurora/foundation": 20,
+        "aurora/i18n": 20,
+        "aurora/mcp": 20,
         "aurora/media": 20,
         "aurora/menu": 20,
         "aurora/node": 20,
@@ -5041,6 +5183,8 @@
         "aurora/ssr": 20,
         "aurora/state": 20,
         "aurora/taxonomy": 20,
+        "aurora/telescope": 20,
+        "aurora/testing": 20,
         "aurora/typed-data": 20,
         "aurora/user": 20,
         "aurora/validation": 20,

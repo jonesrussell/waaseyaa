@@ -36,12 +36,10 @@
         { "type": "path", "url": "packages/cms" },
         { "type": "path", "url": "packages/mcp" },
         { "type": "path", "url": "packages/foundation" },
+        { "type": "path", "url": "packages/i18n" },
+        { "type": "path", "url": "packages/testing" },
+        { "type": "path", "url": "packages/telescope" },
         { "type": "path", "url": "packages/full" }
-        { "type": "path", "url": "packages/full" },
-        { "type": "path", "url": "packages/i18n" }
-        { "type": "path", "url": "packages/testing" }
-        { "type": "path", "url": "packages/foundation" }
-        { "type": "path", "url": "packages/telescope" }
     ],
     "require": {
         "php": ">=8.3",
@@ -59,8 +57,8 @@
         "aurora/entity-storage": "@dev",
         "aurora/field": "@dev",
         "aurora/foundation": "@dev",
-        "aurora/mcp": "@dev",
         "aurora/i18n": "@dev",
+        "aurora/mcp": "@dev",
         "aurora/media": "@dev",
         "aurora/menu": "@dev",
         "aurora/node": "@dev",
@@ -82,6 +80,7 @@
         "aurora/testing": "@dev",
         "phpunit/phpunit": "^10.5",
         "phpstan/phpstan": "^1.10"
+    },
     "autoload-dev": {
         "psr-4": {
             "Aurora\\Cache\\Tests\\": "packages/cache/tests/",
@@ -118,6 +117,7 @@
             "Aurora\\Telescope\\Tests\\": "packages/telescope/tests/",
             "Aurora\\Tests\\": "tests/"
         }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {

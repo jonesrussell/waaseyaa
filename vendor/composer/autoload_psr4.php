@@ -46,6 +46,10 @@ return array(
     'Aurora\\TypedData\\Tests\\' => array($baseDir . '/packages/typed-data/tests'),
     'Aurora\\TypedData\\' => array($vendorDir . '/aurora/typed-data/src'),
     'Aurora\\Tests\\' => array($baseDir . '/tests'),
+    'Aurora\\Testing\\Tests\\' => array($baseDir . '/packages/testing/tests'),
+    'Aurora\\Testing\\' => array($vendorDir . '/aurora/testing/src'),
+    'Aurora\\Telescope\\Tests\\' => array($baseDir . '/packages/telescope/tests'),
+    'Aurora\\Telescope\\' => array($vendorDir . '/aurora/telescope/src'),
     'Aurora\\Taxonomy\\Tests\\' => array($baseDir . '/packages/taxonomy/tests'),
     'Aurora\\Taxonomy\\' => array($vendorDir . '/aurora/taxonomy/src'),
     'Aurora\\State\\Tests\\' => array($baseDir . '/packages/state/tests'),
@@ -66,11 +70,10 @@ return array(
     'Aurora\\Menu\\' => array($vendorDir . '/aurora/menu/src'),
     'Aurora\\Media\\Tests\\' => array($baseDir . '/packages/media/tests'),
     'Aurora\\Media\\' => array($vendorDir . '/aurora/media/src'),
-<<<<<<< HEAD
-=======
     'Aurora\\Mcp\\Tests\\' => array($baseDir . '/packages/mcp/tests'),
     'Aurora\\Mcp\\' => array($vendorDir . '/aurora/mcp/src'),
->>>>>>> unit-16-cache-assets
+    'Aurora\\I18n\\Tests\\' => array($baseDir . '/packages/i18n/tests'),
+    'Aurora\\I18n\\' => array($vendorDir . '/aurora/i18n/src'),
     'Aurora\\Foundation\\Tests\\' => array($baseDir . '/packages/foundation/tests'),
     'Aurora\\Foundation\\' => array($vendorDir . '/aurora/foundation/src'),
     'Aurora\\Field\\Tests\\' => array($baseDir . '/packages/field/tests'),
