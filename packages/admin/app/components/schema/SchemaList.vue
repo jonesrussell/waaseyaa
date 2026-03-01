@@ -11,7 +11,7 @@ const props = defineProps<{
 const { t } = useLanguage()
 const { schema, loading: schemaLoading, fetch: fetchSchema, sortedProperties } = useSchema(props.entityType)
 const { list, remove } = useEntity()
-const { messages, connected } = useRealtime(['admin'])
+const { messages, connected, error: sseError, reconnect } = useRealtime(['admin'])
 
 const entities = ref<JsonApiResource[]>([])
 const loading = ref(false)
@@ -152,6 +152,7 @@ watch(messages, (msgs) => {
         <button :disabled="offset === 0" class="btn btn-sm" @click="prevPage">{{ t('previous') }}</button>
         <button :disabled="offset + limit >= total" class="btn btn-sm" @click="nextPage">{{ t('next') }}</button>
         <span v-if="connected" class="sse-status" :title="t('realtime_connected')">&#9679;</span>
+        <button v-else-if="sseError" class="btn btn-sm" @click="reconnect">{{ sseError }}</button>
       </div>
 
       <div class="sr-only" role="status" aria-live="polite">

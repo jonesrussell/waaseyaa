@@ -22,6 +22,7 @@ const inputValue = ref('')
 const results = ref<JsonApiResource[]>([])
 const showDropdown = ref(false)
 const searching = ref(false)
+const searchError = ref<string | null>(null)
 const selectedLabel = ref('')
 const activeIndex = ref(-1)
 
@@ -59,11 +60,15 @@ function onInput(event: Event) {
 
   debounceTimer = setTimeout(async () => {
     searching.value = true
+    searchError.value = null
     try {
       results.value = await search(targetType.value, labelField.value, value)
       showDropdown.value = results.value.length > 0 || value.length >= 2
-    } catch {
+    } catch (e: any) {
+      console.error('[Waaseyaa] Autocomplete search failed:', e)
       results.value = []
+      searchError.value = e?.data?.errors?.[0]?.detail ?? t('error_generic')
+      showDropdown.value = true
     } finally {
       searching.value = false
     }
@@ -155,6 +160,9 @@ function clear() {
         <div v-if="searching" class="autocomplete-item autocomplete-loading">
           {{ t('autocomplete_loading') }}
         </div>
+        <div v-else-if="searchError" class="autocomplete-item autocomplete-error">
+          {{ searchError }}
+        </div>
         <div v-else-if="results.length === 0" class="autocomplete-item autocomplete-empty">
           {{ t('autocomplete_no_results') }}
         </div>
@@ -230,9 +238,13 @@ function clear() {
   color: #fff;
 }
 .autocomplete-loading,
-.autocomplete-empty {
+.autocomplete-empty,
+.autocomplete-error {
   color: var(--color-muted);
   cursor: default;
   font-style: italic;
+}
+.autocomplete-error {
+  color: var(--color-danger, #c0392b);
 }
 </style>

@@ -119,21 +119,29 @@ $broadcastStorage = new \Waaseyaa\Api\Controller\BroadcastStorage($database);
 
 // Push entity lifecycle events into the broadcast log.
 $dispatcher->addListener('waaseyaa.entity.post_save', function (object $event) use ($broadcastStorage): void {
-    $entity = $event->getEntity();
-    $broadcastStorage->push(
-        'admin',
-        'entity.saved',
-        ['entityType' => $entity->getEntityTypeId(), 'id' => (string) ($entity->uuid() ?: $entity->id())],
-    );
+    try {
+        $entity = $event->entity;
+        $broadcastStorage->push(
+            'admin',
+            'entity.saved',
+            ['entityType' => $entity->getEntityTypeId(), 'id' => (string) ($entity->uuid() ?: $entity->id())],
+        );
+    } catch (\Throwable $e) {
+        error_log(sprintf('[Waaseyaa] Failed to broadcast entity.saved: %s', $e->getMessage()));
+    }
 });
 
 $dispatcher->addListener('waaseyaa.entity.post_delete', function (object $event) use ($broadcastStorage): void {
-    $entity = $event->getEntity();
-    $broadcastStorage->push(
-        'admin',
-        'entity.deleted',
-        ['entityType' => $entity->getEntityTypeId(), 'id' => (string) ($entity->uuid() ?: $entity->id())],
-    );
+    try {
+        $entity = $event->entity;
+        $broadcastStorage->push(
+            'admin',
+            'entity.deleted',
+            ['entityType' => $entity->getEntityTypeId(), 'id' => (string) ($entity->uuid() ?: $entity->id())],
+        );
+    } catch (\Throwable $e) {
+        error_log(sprintf('[Waaseyaa] Failed to broadcast entity.deleted: %s', $e->getMessage()));
+    }
 });
 
 // --- Router setup -----------------------------------------------------------
@@ -267,7 +275,17 @@ try {
             $lastKeepalive = time();
 
             while (connection_aborted() === 0) {
-                $messages = $broadcastStorage->poll($cursor, $channels);
+                try {
+                    $messages = $broadcastStorage->poll($cursor, $channels);
+                } catch (\Throwable $e) {
+                    error_log(sprintf('[Waaseyaa] SSE poll error: %s', $e->getMessage()));
+                    echo "event: error\ndata: " . json_encode(['message' => 'Broadcast poll failed']) . "\n\n";
+                    if (ob_get_level() > 0) { ob_flush(); }
+                    flush();
+                    usleep(5_000_000); // Back off 5s on error.
+                    continue;
+                }
+
                 foreach ($messages as $msg) {
                     $cursor = $msg['id'];
                     $frame = "event: {$msg['event']}\ndata: " . json_encode($msg) . "\n\n";
@@ -285,8 +303,11 @@ try {
                     if (ob_get_level() > 0) { ob_flush(); }
                     flush();
                     $lastKeepalive = $now;
-                    // Prune old messages every keepalive cycle.
-                    $broadcastStorage->prune(300);
+                    try {
+                        $broadcastStorage->prune(300);
+                    } catch (\Throwable $e) {
+                        error_log(sprintf('[Waaseyaa] SSE prune error: %s', $e->getMessage()));
+                    }
                 }
 
                 usleep(500_000); // Poll every 500ms.

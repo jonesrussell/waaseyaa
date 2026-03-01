@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Controller;
 
-use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Database\PdoDatabase;
 
 /**
- * SQLite-backed message queue for SSE broadcasting.
+ * PDO-backed message queue for SSE broadcasting.
  *
  * Provides a durable store that decouples the HTTP request that triggers an
  * entity event from the long-lived SSE connection that delivers it. The SSE
@@ -15,7 +15,7 @@ use Waaseyaa\Database\DatabaseInterface;
  */
 final class BroadcastStorage
 {
-    public function __construct(private readonly DatabaseInterface $database)
+    public function __construct(private readonly PdoDatabase $database)
     {
         $this->ensureTable();
     }
@@ -73,7 +73,7 @@ final class BroadcastStorage
                 'id' => (int) $row['id'],
                 'channel' => $row['channel'],
                 'event' => $row['event'],
-                'data' => json_decode($row['data'], true),
+                'data' => json_decode($row['data'], true, 512, JSON_THROW_ON_ERROR),
                 'created_at' => (float) $row['created_at'],
             ];
         }
