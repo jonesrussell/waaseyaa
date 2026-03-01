@@ -27,9 +27,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Agent execution with audit logging, tool calls, and MCP server integration.
  *
- * Exercises: aurora/ai-agent (AgentExecutor, AgentContext, AgentResult,
- * AgentAction, McpServer) with aurora/ai-schema (McpToolExecutor,
- * SchemaRegistry) and aurora/entity, aurora/user.
+ * Exercises: waaseyaa/ai-agent (AgentExecutor, AgentContext, AgentResult,
+ * AgentAction, McpServer) with waaseyaa/ai-schema (McpToolExecutor,
+ * SchemaRegistry) and waaseyaa/entity, waaseyaa/user.
  */
 #[CoversNothing]
 final class AgentExecutionIntegrationTest extends TestCase

@@ -18,9 +18,9 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * OpenAPI spec generation integration tests with real entity types.
  *
- * Exercises: aurora/api (OpenApiGenerator, SchemaBuilder) with
- * aurora/entity (EntityTypeManager, EntityType), aurora/node (Node),
- * and aurora/taxonomy (Term).
+ * Exercises: waaseyaa/api (OpenApiGenerator, SchemaBuilder) with
+ * waaseyaa/entity (EntityTypeManager, EntityType), waaseyaa/node (Node),
+ * and waaseyaa/taxonomy (Term).
  */
 #[CoversNothing]
 final class OpenApiIntegrationTest extends TestCase
@@ -86,7 +86,7 @@ final class OpenApiIntegrationTest extends TestCase
         $this->assertArrayHasKey('info', $spec);
         $this->assertArrayHasKey('title', $spec['info']);
         $this->assertArrayHasKey('version', $spec['info']);
-        $this->assertSame('Aurora CMS API', $spec['info']['title']);
+        $this->assertSame('Waaseyaa API', $spec['info']['title']);
     }
 
     #[Test]

@@ -55,12 +55,12 @@ class EntityEventTest extends TestCase
 
     public function testEntityEventsEnumValues(): void
     {
-        $this->assertSame('aurora.entity.pre_save', EntityEvents::PRE_SAVE->value);
-        $this->assertSame('aurora.entity.post_save', EntityEvents::POST_SAVE->value);
-        $this->assertSame('aurora.entity.pre_delete', EntityEvents::PRE_DELETE->value);
-        $this->assertSame('aurora.entity.post_delete', EntityEvents::POST_DELETE->value);
-        $this->assertSame('aurora.entity.post_load', EntityEvents::POST_LOAD->value);
-        $this->assertSame('aurora.entity.pre_create', EntityEvents::PRE_CREATE->value);
+        $this->assertSame('waaseyaa.entity.pre_save', EntityEvents::PRE_SAVE->value);
+        $this->assertSame('waaseyaa.entity.post_save', EntityEvents::POST_SAVE->value);
+        $this->assertSame('waaseyaa.entity.pre_delete', EntityEvents::PRE_DELETE->value);
+        $this->assertSame('waaseyaa.entity.post_delete', EntityEvents::POST_DELETE->value);
+        $this->assertSame('waaseyaa.entity.post_load', EntityEvents::POST_LOAD->value);
+        $this->assertSame('waaseyaa.entity.pre_create', EntityEvents::PRE_CREATE->value);
     }
 
     public function testEntityEventsEnumCases(): void

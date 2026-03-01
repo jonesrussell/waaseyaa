@@ -17,7 +17,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 /**
  * SQL-based entity storage implementation.
  *
- * Stores entities in SQL tables using the aurora/database-legacy package.
+ * Stores entities in SQL tables using the waaseyaa/database-legacy package.
  * Supports CRUD operations and dispatches entity lifecycle events.
  *
  * For v0.1.0:

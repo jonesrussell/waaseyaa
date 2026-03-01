@@ -9,11 +9,11 @@ namespace Waaseyaa\Config;
  *
  * Resolution order (last wins):
  * 1. Base config from inner factory (config/sync/{name}.yml)
- * 2. Environment overlay from envStorage (config/environments/{AURORA_ENV}/{name}.yml)
- * 3. Environment variables with AURORA_CONFIG_* prefix (runtime overrides)
+ * 2. Environment overlay from envStorage (config/environments/{WAASEYAA_ENV}/{name}.yml)
+ * 3. Environment variables with WAASEYAA_CONFIG_* prefix (runtime overrides)
  *
  * Env var naming convention:
- *   AURORA_CONFIG_{CONFIG_NAME}__{PROPERTY_PATH}
+ *   WAASEYAA_CONFIG_{CONFIG_NAME}__{PROPERTY_PATH}
  *
  * Where:
  * - CONFIG_NAME: the config name with dots replaced by underscores, uppercased
@@ -22,7 +22,7 @@ namespace Waaseyaa\Config;
  *   e.g., "site_name" -> "SITE_NAME", "connection.host" -> "CONNECTION__HOST"
  * - The config name and property path are separated by double underscore "__"
  *
- * Example: AURORA_CONFIG_SYSTEM_SITE__SITE_NAME overrides system.site -> site_name
+ * Example: WAASEYAA_CONFIG_SYSTEM_SITE__SITE_NAME overrides system.site -> site_name
  */
 final class EnvironmentConfigFactory implements ConfigFactoryInterface
 {
@@ -40,7 +40,7 @@ final class EnvironmentConfigFactory implements ConfigFactoryInterface
         private readonly ConfigFactoryInterface $inner,
         private readonly StorageInterface $envStorage,
         private readonly string $environment,
-        private readonly string $envVarPrefix = 'AURORA_CONFIG_',
+        private readonly string $envVarPrefix = 'WAASEYAA_CONFIG_',
         ?callable $envVarResolver = null,
     ) {
         $this->envVarResolver = $envVarResolver !== null

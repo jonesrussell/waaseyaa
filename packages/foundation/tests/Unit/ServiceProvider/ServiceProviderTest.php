@@ -53,15 +53,15 @@ final class ServiceProviderTest extends TestCase
             public function register(): void
             {
                 $this->singleton('FooInterface', 'FooImpl');
-                $this->tag('FooInterface', 'aurora.managers');
+                $this->tag('FooInterface', 'waaseyaa.managers');
             }
         };
 
         $provider->register();
         $tags = $provider->getTags();
 
-        $this->assertArrayHasKey('aurora.managers', $tags);
-        $this->assertContains('FooInterface', $tags['aurora.managers']);
+        $this->assertArrayHasKey('waaseyaa.managers', $tags);
+        $this->assertContains('FooInterface', $tags['waaseyaa.managers']);
     }
 
     #[Test]

@@ -36,7 +36,7 @@ final class MigratorTest extends TestCase
     public function runs_pending_migrations(): void
     {
         $migrations = [
-            'aurora/test' => [
+            'waaseyaa/test' => [
                 '2026_03_01_000001_create_test' => new class extends Migration {
                     public function up(SchemaBuilder $schema): void
                     {
@@ -68,7 +68,7 @@ final class MigratorTest extends TestCase
             }
         };
 
-        $migrations = ['aurora/test' => ['2026_03_01_000001_create_test' => $migration]];
+        $migrations = ['waaseyaa/test' => ['2026_03_01_000001_create_test' => $migration]];
 
         $migrator = new Migrator($this->connection, $this->repository);
         $migrator->run($migrations);
@@ -94,7 +94,7 @@ final class MigratorTest extends TestCase
             }
         };
 
-        $migrations = ['aurora/test' => ['2026_03_01_000001_create_test' => $migration]];
+        $migrations = ['waaseyaa/test' => ['2026_03_01_000001_create_test' => $migration]];
 
         $migrator = new Migrator($this->connection, $this->repository);
         $migrator->run($migrations);
@@ -111,7 +111,7 @@ final class MigratorTest extends TestCase
         $order = [];
 
         $migrationA = new class($order) extends Migration {
-            public array $after = ['aurora/base'];
+            public array $after = ['waaseyaa/base'];
             public function __construct(private array &$order) {}
             public function up(SchemaBuilder $schema): void { $this->order[] = 'A'; }
         };
@@ -121,10 +121,10 @@ final class MigratorTest extends TestCase
             public function up(SchemaBuilder $schema): void { $this->order[] = 'B'; }
         };
 
-        // B is in aurora/base, A depends on aurora/base — B must run first
+        // B is in waaseyaa/base, A depends on waaseyaa/base — B must run first
         $migrations = [
-            'aurora/dependent' => ['2026_03_01_000001_a' => $migrationA],
-            'aurora/base' => ['2026_03_01_000001_b' => $migrationB],
+            'waaseyaa/dependent' => ['2026_03_01_000001_a' => $migrationA],
+            'waaseyaa/base' => ['2026_03_01_000001_b' => $migrationB],
         ];
 
         $migrator = new Migrator($this->connection, $this->repository);
@@ -141,7 +141,7 @@ final class MigratorTest extends TestCase
         };
 
         $migrations = [
-            'aurora/test' => [
+            'waaseyaa/test' => [
                 '2026_03_01_000001_first' => $migration,
                 '2026_03_01_000002_second' => $migration,
             ],

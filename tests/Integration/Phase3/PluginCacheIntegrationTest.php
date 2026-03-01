@@ -17,10 +17,10 @@ use Waaseyaa\Tests\Integration\Phase3\Fixtures\GreeterPlugin;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Integration tests verifying aurora/plugin works with aurora/cache.
+ * Integration tests verifying waaseyaa/plugin works with waaseyaa/cache.
  *
  * These tests exercise the cross-package dependency where
- * DefaultPluginManager uses CacheBackendInterface from aurora/cache
+ * DefaultPluginManager uses CacheBackendInterface from waaseyaa/cache
  * to persist discovered plugin definitions.
  */
 final class PluginCacheIntegrationTest extends TestCase

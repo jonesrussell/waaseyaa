@@ -17,7 +17,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Config system integration tests.
  *
- * Exercises: aurora/config with FileStorage (YAML round-trip), MemoryStorage,
+ * Exercises: waaseyaa/config with FileStorage (YAML round-trip), MemoryStorage,
  * ConfigFactory, ConfigManager, and event dispatching.
  */
 final class ConfigEntityLifecycleTest extends TestCase
@@ -28,7 +28,7 @@ final class ConfigEntityLifecycleTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->tempDir = sys_get_temp_dir() . '/aurora_config_test_' . uniqid();
+        $this->tempDir = sys_get_temp_dir() . '/waaseyaa_config_test_' . uniqid();
         $this->activeDirPath = $this->tempDir . '/active';
         $this->syncDirPath = $this->tempDir . '/sync';
         mkdir($this->activeDirPath, 0777, true);
@@ -134,14 +134,14 @@ final class ConfigEntityLifecycleTest extends TestCase
         $config = $factory->getEditable('system.site');
         $this->assertTrue($config->isNew(), 'Config should be new initially');
 
-        $config->set('name', 'Aurora CMS');
+        $config->set('name', 'Waaseyaa');
         $config->set('page.front', '/home');
         $config->set('theme.default', 'olivero');
         $config->save();
 
         // Load via immutable config (should read from file).
         $loaded = $factory->get('system.site');
-        $this->assertSame('Aurora CMS', $loaded->get('name'));
+        $this->assertSame('Waaseyaa', $loaded->get('name'));
         $this->assertSame('/home', $loaded->get('page.front'));
         $this->assertSame('olivero', $loaded->get('theme.default'));
         $this->assertFalse($loaded->isNew());
@@ -399,7 +399,7 @@ final class ConfigEntityLifecycleTest extends TestCase
         $syncStorage = new FileStorage($this->syncDirPath);
 
         // Write configs to active.
-        $activeStorage->write('system.site', ['name' => 'Aurora', 'slogan' => 'Modern CMS']);
+        $activeStorage->write('system.site', ['name' => 'Waaseyaa', 'slogan' => 'Modern CMS']);
         $activeStorage->write('node.type.article', ['label' => 'Article', 'description' => 'Blog posts']);
         $activeStorage->write('node.type.page', ['label' => 'Page', 'description' => 'Static pages']);
 
@@ -408,7 +408,7 @@ final class ConfigEntityLifecycleTest extends TestCase
         $manager->export();
 
         // Modify active storage (simulating site changes).
-        $activeStorage->write('system.site', ['name' => 'Aurora Modified', 'slogan' => 'Changed']);
+        $activeStorage->write('system.site', ['name' => 'Waaseyaa Modified', 'slogan' => 'Changed']);
         $activeStorage->write('new.config', ['added' => true]);
         $activeStorage->delete('node.type.page');
 
@@ -418,7 +418,7 @@ final class ConfigEntityLifecycleTest extends TestCase
 
         // Verify active is back to the exported state.
         $this->assertSame(
-            ['name' => 'Aurora', 'slogan' => 'Modern CMS'],
+            ['name' => 'Waaseyaa', 'slogan' => 'Modern CMS'],
             $activeStorage->read('system.site'),
         );
         $this->assertSame(

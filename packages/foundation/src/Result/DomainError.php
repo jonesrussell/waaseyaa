@@ -17,7 +17,7 @@ final readonly class DomainError
     public static function entityNotFound(string $entityType, string $id): self
     {
         return new self(
-            type: 'aurora:entity/not-found',
+            type: 'waaseyaa:entity/not-found',
             title: 'Entity Not Found',
             detail: sprintf('%s "%s" does not exist.', ucfirst($entityType), $id),
             statusCode: 404,
@@ -27,7 +27,7 @@ final readonly class DomainError
     public static function accessDenied(string $operation, string $entityType, string $id): self
     {
         return new self(
-            type: 'aurora:access/denied',
+            type: 'waaseyaa:access/denied',
             title: 'Access Denied',
             detail: sprintf('You do not have permission to %s %s "%s".', $operation, $entityType, $id),
             statusCode: 403,
@@ -37,7 +37,7 @@ final readonly class DomainError
     public static function validationFailed(array $violations): self
     {
         return new self(
-            type: 'aurora:validation/failed',
+            type: 'waaseyaa:validation/failed',
             title: 'Validation Failed',
             detail: sprintf('%d validation error(s) occurred.', count($violations)),
             statusCode: 422,
@@ -48,7 +48,7 @@ final readonly class DomainError
     public static function translationMissing(string $entityType, string $id, string $langcode): self
     {
         return new self(
-            type: 'aurora:i18n/translation-missing',
+            type: 'waaseyaa:i18n/translation-missing',
             title: 'Translation Missing',
             detail: sprintf('No %s translation exists for %s "%s".', $langcode, $entityType, $id),
             statusCode: 404,

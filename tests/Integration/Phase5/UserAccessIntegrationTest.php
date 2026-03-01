@@ -18,7 +18,7 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Integration tests for aurora/user + aurora/access interaction.
+ * Integration tests for waaseyaa/user + waaseyaa/access interaction.
  *
  * Verifies that User entities, AnonymousUser, roles, and permissions
  * integrate correctly with EntityAccessHandler and PermissionHandler.

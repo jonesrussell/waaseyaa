@@ -10,7 +10,7 @@ namespace Waaseyaa\Entity;
  * Content entities are fieldable: they support dynamic fields that can be
  * added and removed through configuration. For v0.1.0, field values are
  * stored as raw values in the values array. Full FieldItemList integration
- * will come with the aurora/field package.
+ * will come with the waaseyaa/field package.
  *
  * Unlike Drupal, a ContentEntityBase object represents ONE language at a time.
  * getTranslation() returns a separate entity object for the requested language.

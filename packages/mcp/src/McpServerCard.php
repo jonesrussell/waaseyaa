@@ -7,7 +7,7 @@ namespace Waaseyaa\Mcp;
 final readonly class McpServerCard
 {
     public function __construct(
-        private string $name = 'Aurora CMS',
+        private string $name = 'Waaseyaa',
         private string $version = '0.1.0',
         private string $endpoint = '/mcp',
     ) {}

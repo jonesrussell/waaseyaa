@@ -9,7 +9,7 @@ use Waaseyaa\Entity\ContentEntityBase;
 /**
  * Represents a piece of content (a node).
  *
- * Nodes are the primary content entity in Aurora CMS. Each node belongs
+ * Nodes are the primary content entity in Waaseyaa. Each node belongs
  * to a node type (bundle) and has properties like title, author, status,
  * and timestamps.
  */

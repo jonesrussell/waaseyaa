@@ -26,8 +26,8 @@ final class AboutCommandTest extends TestCase
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
         $output = $tester->getDisplay();
-        $this->assertStringContainsString('Aurora CMS', $output);
-        $this->assertStringContainsString('Aurora Version', $output);
+        $this->assertStringContainsString('Waaseyaa', $output);
+        $this->assertStringContainsString('Waaseyaa Version', $output);
         $this->assertStringContainsString('PHP Version', $output);
         $this->assertStringContainsString(PHP_VERSION, $output);
     }

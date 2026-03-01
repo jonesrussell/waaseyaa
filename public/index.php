@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * Aurora CMS HTTP front controller.
+ * Waaseyaa HTTP front controller.
  *
  * Usage:
  *   php -S localhost:8080 -t public
@@ -37,22 +37,22 @@ if ($autoloader === null) {
     exit(1);
 }
 
-use Aurora\Api\JsonApiController;
-use Aurora\Api\JsonApiDocument;
-use Aurora\Api\JsonApiRouteProvider;
-use Aurora\Api\Controller\SchemaController;
-use Aurora\Api\OpenApi\OpenApiGenerator;
-use Aurora\Api\ResourceSerializer;
-use Aurora\Api\Schema\SchemaPresenter;
-use Aurora\Database\PdoDatabase;
-use Aurora\Entity\EntityType;
-use Aurora\Entity\EntityTypeManager;
-use Aurora\EntityStorage\SqlEntityStorage;
-use Aurora\EntityStorage\SqlSchemaHandler;
-use Aurora\Node\Node;
-use Aurora\Routing\WaaseyaaRouter;
-use Aurora\Routing\RouteBuilder;
-use Aurora\User\User;
+use Waaseyaa\Api\JsonApiController;
+use Waaseyaa\Api\JsonApiDocument;
+use Waaseyaa\Api\JsonApiRouteProvider;
+use Waaseyaa\Api\Controller\SchemaController;
+use Waaseyaa\Api\OpenApi\OpenApiGenerator;
+use Waaseyaa\Api\ResourceSerializer;
+use Waaseyaa\Api\Schema\SchemaPresenter;
+use Waaseyaa\Database\PdoDatabase;
+use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\EntityStorage\SqlEntityStorage;
+use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\Node\Node;
+use Waaseyaa\Routing\WaaseyaaRouter;
+use Waaseyaa\Routing\RouteBuilder;
+use Waaseyaa\User\User;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RequestContext;
 
@@ -75,10 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// --- Bootstrap services (mirrors bin/aurora) --------------------------------
+// --- Bootstrap services (mirrors bin/waaseyaa) --------------------------------
 
 $projectRoot = dirname(__DIR__);
-$dbPath = getenv('AURORA_DB') ?: $projectRoot . '/aurora.sqlite';
+$dbPath = getenv('WAASEYAA_DB') ?: $projectRoot . '/waaseyaa.sqlite';
 
 $dispatcher = new EventDispatcher();
 $database = PdoDatabase::createSqlite($dbPath);
@@ -131,7 +131,7 @@ $routeProvider->registerRoutes($router);
 $router->addRoute(
     'api.schema.show',
     RouteBuilder::create('/api/schema/{entity_type}')
-        ->controller('Aurora\\Api\\Controller\\SchemaController::show')
+        ->controller('Waaseyaa\\Api\\Controller\\SchemaController::show')
         ->methods('GET')
         ->build(),
 );
@@ -232,7 +232,7 @@ try {
                 $method === 'PATCH' && $id !== null => $jsonApiController->update($entityTypeId, $id, $body ?? []),
                 $method === 'DELETE' && $id !== null => $jsonApiController->destroy($entityTypeId, $id),
                 default => JsonApiDocument::fromErrors(
-                    [new \Aurora\Api\JsonApiError('400', 'Bad Request', 'Unhandled method/resource combination.')],
+                    [new \Waaseyaa\Api\JsonApiError('400', 'Bad Request', 'Unhandled method/resource combination.')],
                     statusCode: 400,
                 ),
             };

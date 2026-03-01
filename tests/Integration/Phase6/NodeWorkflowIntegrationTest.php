@@ -21,7 +21,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Integration tests for aurora/node + aurora/workflows + aurora/access.
+ * Integration tests for waaseyaa/node + waaseyaa/workflows + waaseyaa/access.
  *
  * Verifies that nodes can be created with types, put through workflow
  * moderation states, and access control changes based on moderation state.

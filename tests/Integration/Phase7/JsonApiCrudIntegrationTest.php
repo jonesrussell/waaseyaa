@@ -19,8 +19,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Full CRUD lifecycle integration test for the JSON:API layer.
  *
- * Exercises: aurora/api (JsonApiController, ResourceSerializer, JsonApiDocument)
- * with aurora/entity (EntityTypeManager, EntityType) using in-memory storage.
+ * Exercises: waaseyaa/api (JsonApiController, ResourceSerializer, JsonApiDocument)
+ * with waaseyaa/entity (EntityTypeManager, EntityType) using in-memory storage.
  */
 #[CoversNothing]
 final class JsonApiCrudIntegrationTest extends TestCase

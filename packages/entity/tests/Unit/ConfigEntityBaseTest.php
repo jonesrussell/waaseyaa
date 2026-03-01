@@ -70,7 +70,7 @@ class ConfigEntityBaseTest extends TestCase
     {
         $deps = [
             'config' => ['system.site'],
-            'package' => ['aurora/node'],
+            'package' => ['waaseyaa/node'],
         ];
         $entity = new TestConfigEntity(['dependencies' => $deps]);
 
@@ -146,10 +146,10 @@ class ConfigEntityBaseTest extends TestCase
     public function testToConfigReflectsSetDependencies(): void
     {
         $entity = new TestConfigEntity(['id' => 'test']);
-        $entity->setDependencies(['package' => ['aurora/field']]);
+        $entity->setDependencies(['package' => ['waaseyaa/field']]);
 
         $config = $entity->toConfig();
 
-        $this->assertSame(['package' => ['aurora/field']], $config['dependencies']);
+        $this->assertSame(['package' => ['waaseyaa/field']], $config['dependencies']);
     }
 }

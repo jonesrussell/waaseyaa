@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- * Integration tests for aurora/taxonomy + aurora/node + aurora/access.
+ * Integration tests for waaseyaa/taxonomy + waaseyaa/node + waaseyaa/access.
  *
  * Verifies that taxonomy terms can be used to categorize nodes,
  * that both entity types can be persisted and loaded via storage,

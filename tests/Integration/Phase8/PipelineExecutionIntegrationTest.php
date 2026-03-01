@@ -20,9 +20,9 @@ use PHPUnit\Framework\TestCase;
 /**
  * Pipeline execution with step chaining, halt, failure, and queue dispatch.
  *
- * Exercises: aurora/ai-pipeline (Pipeline, PipelineExecutor, PipelineDispatcher,
+ * Exercises: waaseyaa/ai-pipeline (Pipeline, PipelineExecutor, PipelineDispatcher,
  * PipelineContext, StepResult, PipelineStepConfig, PipelineQueueMessage)
- * with aurora/queue (InMemoryQueue).
+ * with waaseyaa/queue (InMemoryQueue).
  */
 #[CoversNothing]
 final class PipelineExecutionIntegrationTest extends TestCase

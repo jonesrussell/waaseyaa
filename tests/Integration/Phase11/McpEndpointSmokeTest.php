@@ -82,7 +82,7 @@ final class McpEndpointSmokeTest extends TestCase
         // --- Step 1: Server card ---
         $card = new McpServerCard();
         $cardData = $card->toArray();
-        $this->assertSame('Aurora CMS', $cardData['name']);
+        $this->assertSame('Waaseyaa', $cardData['name']);
         $this->assertTrue($cardData['capabilities']['tools']);
 
         // --- Step 2: Route registration ---
@@ -184,6 +184,6 @@ final class McpEndpointSmokeTest extends TestCase
 
         $decoded = \json_decode($response->body, true);
         $this->assertSame('2025-03-26', $decoded['result']['protocolVersion']);
-        $this->assertSame('Aurora CMS', $decoded['result']['serverInfo']['name']);
+        $this->assertSame('Waaseyaa', $decoded['result']['serverInfo']['name']);
     }
 }

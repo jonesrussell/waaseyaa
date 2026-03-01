@@ -18,7 +18,7 @@ class WaaseyaaApplicationTest extends TestCase
     {
         $app = new WaaseyaaApplication();
 
-        $this->assertSame('aurora', $app->getName());
+        $this->assertSame('waaseyaa', $app->getName());
         $this->assertSame('0.1.0', $app->getVersion());
     }
 

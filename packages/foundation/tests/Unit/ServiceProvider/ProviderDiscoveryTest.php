@@ -18,17 +18,17 @@ final class ProviderDiscoveryTest extends TestCase
         $installed = [
             'packages' => [
                 [
-                    'name' => 'aurora/entity',
+                    'name' => 'waaseyaa/entity',
                     'extra' => [
-                        'aurora' => [
+                        'waaseyaa' => [
                             'providers' => ['Waaseyaa\\Entity\\EntityServiceProvider'],
                         ],
                     ],
                 ],
                 [
-                    'name' => 'aurora/cache',
+                    'name' => 'waaseyaa/cache',
                     'extra' => [
-                        'aurora' => [
+                        'waaseyaa' => [
                             'providers' => ['Waaseyaa\\Cache\\CacheServiceProvider'],
                         ],
                     ],
@@ -49,7 +49,7 @@ final class ProviderDiscoveryTest extends TestCase
     }
 
     #[Test]
-    public function skips_packages_without_aurora_extra(): void
+    public function skips_packages_without_waaseyaa_extra(): void
     {
         $installed = [
             'packages' => [
@@ -70,9 +70,9 @@ final class ProviderDiscoveryTest extends TestCase
         $installed = [
             'packages' => [
                 [
-                    'name' => 'aurora/ai-schema',
+                    'name' => 'waaseyaa/ai-schema',
                     'extra' => [
-                        'aurora' => [
+                        'waaseyaa' => [
                             'providers' => [
                                 'Waaseyaa\\AiSchema\\SchemaServiceProvider',
                                 'Waaseyaa\\AiSchema\\McpToolServiceProvider',

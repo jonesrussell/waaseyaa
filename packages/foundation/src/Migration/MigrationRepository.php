@@ -8,7 +8,7 @@ use Doctrine\DBAL\Connection;
 
 final class MigrationRepository
 {
-    private const TABLE = 'aurora_migrations';
+    private const TABLE = 'waaseyaa_migrations';
 
     public function __construct(
         private readonly Connection $connection,

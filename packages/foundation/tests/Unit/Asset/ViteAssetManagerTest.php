@@ -17,7 +17,7 @@ final class ViteAssetManagerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fixtureDir = sys_get_temp_dir() . '/aurora_vite_test_' . uniqid();
+        $this->fixtureDir = sys_get_temp_dir() . '/waaseyaa_vite_test_' . uniqid();
         mkdir($this->fixtureDir . '/admin/.vite', 0777, true);
         mkdir($this->fixtureDir . '/ssr/.vite', 0777, true);
     }

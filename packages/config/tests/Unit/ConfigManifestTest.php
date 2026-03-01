@@ -25,7 +25,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function generate_creates_manifest_with_version_and_checksum(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->storage->write('user.settings', ['registration' => 'admin_only']);
 
         $manifest = $this->manifest->generate();
@@ -41,7 +41,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function generate_includes_all_config_names(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->storage->write('system.mail', ['transport' => 'smtp']);
         $this->storage->write('user.settings', ['registration' => 'open']);
 
@@ -55,7 +55,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function generate_config_entries_have_checksums(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
 
         $manifest = $this->manifest->generate();
 
@@ -66,7 +66,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function generate_and_save_persists_manifest_to_storage(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
 
         $this->manifest->generateAndSave();
 
@@ -79,7 +79,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function verify_returns_true_for_unchanged_config(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->storage->write('user.settings', ['registration' => 'open']);
 
         $this->manifest->generateAndSave();
@@ -95,7 +95,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function verify_detects_modified_config(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->manifest->generateAndSave();
 
         // Modify the config after manifest was generated
@@ -110,7 +110,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function verify_detects_added_config(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->manifest->generateAndSave();
 
         // Add a new config after manifest was generated
@@ -125,7 +125,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function verify_detects_removed_config(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->storage->write('user.settings', ['registration' => 'open']);
         $this->manifest->generateAndSave();
 
@@ -141,7 +141,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function verify_returns_invalid_when_no_manifest_exists(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
 
         $result = $this->manifest->verify();
 
@@ -151,7 +151,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function get_version_returns_current_manifest_version(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->manifest->generateAndSave();
 
         $version = $this->manifest->getVersion();
@@ -169,7 +169,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function manifest_excludes_itself_from_config_list(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->manifest->generateAndSave();
 
         $manifestData = $this->storage->read(ConfigManifest::MANIFEST_NAME);
@@ -180,7 +180,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function checksum_changes_when_config_changes(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $manifest1 = $this->manifest->generate();
 
         $this->storage->write('system.site', ['site_name' => 'Changed']);
@@ -192,7 +192,7 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function checksum_is_deterministic(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->storage->write('user.settings', ['registration' => 'open']);
 
         $manifest1 = $this->manifest->generate();
@@ -213,15 +213,15 @@ final class ConfigManifestTest extends TestCase
     #[Test]
     public function generate_with_package_versions(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
 
         $manifest = $this->manifest->generate(packageVersions: [
-            'aurora/user' => '2026.03.15.001',
-            'aurora/node' => '2026.03.12.003',
+            'waaseyaa/user' => '2026.03.15.001',
+            'waaseyaa/node' => '2026.03.12.003',
         ]);
 
         $this->assertArrayHasKey('packages', $manifest);
-        $this->assertSame('2026.03.15.001', $manifest['packages']['aurora/user']);
-        $this->assertSame('2026.03.12.003', $manifest['packages']['aurora/node']);
+        $this->assertSame('2026.03.15.001', $manifest['packages']['waaseyaa/user']);
+        $this->assertSame('2026.03.12.003', $manifest['packages']['waaseyaa/node']);
     }
 }

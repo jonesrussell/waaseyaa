@@ -11,6 +11,6 @@ final class AuthenticationException extends WaaseyaaException
         array $context = [],
         ?\Throwable $previous = null,
     ) {
-        parent::__construct($message, 'aurora:auth/error', 401, $context, $previous);
+        parent::__construct($message, 'waaseyaa:auth/error', 401, $context, $previous);
     }
 }

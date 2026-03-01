@@ -8,7 +8,7 @@ abstract class WaaseyaaException extends \RuntimeException
 {
     public function __construct(
         string $message,
-        public readonly string $problemType = 'aurora:internal-error',
+        public readonly string $problemType = 'waaseyaa:internal-error',
         public readonly int $statusCode = 500,
         public readonly array $context = [],
         ?\Throwable $previous = null,

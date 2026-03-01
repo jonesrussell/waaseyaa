@@ -21,8 +21,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * End-to-end entity + field integration tests.
  *
- * Exercises: aurora/entity + aurora/field + aurora/database-legacy +
- * aurora/entity-storage working together. Creates entity types with
+ * Exercises: waaseyaa/entity + waaseyaa/field + waaseyaa/database-legacy +
+ * waaseyaa/entity-storage working together. Creates entity types with
  * field definitions, stores entities with field values via SqlEntityStorage,
  * loads them back, and queries by field values.
  */

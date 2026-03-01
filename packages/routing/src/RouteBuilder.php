@@ -7,7 +7,7 @@ namespace Waaseyaa\Routing;
 use Symfony\Component\Routing\Route;
 
 /**
- * Fluent API for building Symfony Route objects with Aurora conventions.
+ * Fluent API for building Symfony Route objects with Waaseyaa conventions.
  *
  * Usage:
  *   $route = RouteBuilder::create('/node/{node}')

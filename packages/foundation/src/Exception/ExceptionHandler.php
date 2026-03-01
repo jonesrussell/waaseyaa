@@ -79,7 +79,7 @@ final class ExceptionHandler
         return [
             'errors' => [
                 [
-                    'type' => 'aurora:internal-error',
+                    'type' => 'waaseyaa:internal-error',
                     'title' => 'Internal Server Error',
                     'detail' => $e->getMessage(),
                     'status' => 500,

@@ -23,7 +23,7 @@ final class ConfigCacheInvalidatorTest extends TestCase
             ->with(['config', 'config:system.site']);
 
         $listener = new ConfigCacheInvalidator($invalidator);
-        $listener->onPostSave(new ConfigEvent('system.site', ['name' => 'Aurora']));
+        $listener->onPostSave(new ConfigEvent('system.site', ['name' => 'Waaseyaa']));
     }
 
     #[Test]

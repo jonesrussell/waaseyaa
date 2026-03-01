@@ -10,7 +10,7 @@ use Waaseyaa\Entity\ContentEntityBase;
 /**
  * The User content entity.
  *
- * Represents an authenticated user account in Aurora CMS. Extends
+ * Represents an authenticated user account in Waaseyaa. Extends
  * ContentEntityBase for field support and implements AccountInterface
  * so that the access system can check permissions against this object.
  *

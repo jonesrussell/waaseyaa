@@ -11,6 +11,6 @@ final class StorageException extends WaaseyaaException
         array $context = [],
         ?\Throwable $previous = null,
     ) {
-        parent::__construct($message, 'aurora:storage/error', 503, $context, $previous);
+        parent::__construct($message, 'waaseyaa:storage/error', 503, $context, $previous);
     }
 }

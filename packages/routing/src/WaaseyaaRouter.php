@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Aurora CMS router wrapping Symfony's routing components.
+ * Waaseyaa router wrapping Symfony's routing components.
  *
  * Provides route matching (URL -> parameters) and URL generation
  * (route name + parameters -> URL).

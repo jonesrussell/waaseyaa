@@ -16,8 +16,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Entity embedding and similarity search with real entities.
  *
- * Exercises: aurora/ai-vector (EntityEmbedder, InMemoryVectorStore,
- * FakeEmbeddingProvider) with aurora/node (Node) and aurora/taxonomy (Term).
+ * Exercises: waaseyaa/ai-vector (EntityEmbedder, InMemoryVectorStore,
+ * FakeEmbeddingProvider) with waaseyaa/node (Node) and waaseyaa/taxonomy (Term).
  */
 #[CoversNothing]
 final class VectorSearchIntegrationTest extends TestCase

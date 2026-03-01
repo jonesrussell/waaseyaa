@@ -19,7 +19,7 @@ namespace Waaseyaa\Config;
  * version: "2026.03.15.001"
  * checksum: "sha256:a1b2c3..."
  * packages:
- *     aurora/user: "2026.03.15.001"
+ *     waaseyaa/user: "2026.03.15.001"
  * configs:
  *     system.site:
  *         checksum: "sha256:..."
@@ -29,7 +29,7 @@ namespace Waaseyaa\Config;
 final class ConfigManifest
 {
     /** The config name used to store the manifest itself. */
-    public const string MANIFEST_NAME = '.aurora-config-manifest';
+    public const string MANIFEST_NAME = '.waaseyaa-config-manifest';
 
     public function __construct(
         private readonly StorageInterface $storage,

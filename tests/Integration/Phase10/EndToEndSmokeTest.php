@@ -37,7 +37,7 @@ use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 
 /**
- * End-to-end smoke tests exercising the complete Aurora CMS stack.
+ * End-to-end smoke tests exercising the complete Waaseyaa stack.
  *
  * This is the final integration test suite (Phase 10) that validates the full
  * CMS lifecycle across all architectural layers: cache, config, entity, CLI,
@@ -109,7 +109,7 @@ final class EndToEndSmokeTest extends TestCase
             ],
         ));
 
-        // --- Step 1: Install Aurora CMS ---
+        // --- Step 1: Install Waaseyaa ---
 
         $installCommand = new InstallCommand($entityTypeManager, $configManager);
         $installTester = new CommandTester($installCommand);
@@ -208,8 +208,8 @@ final class EndToEndSmokeTest extends TestCase
      * Verifies that OpenAPI spec generation produces correct paths and methods
      * for registered entity types.
      *
-     * Exercises: aurora/api (OpenApiGenerator, SchemaBuilder) with
-     * aurora/entity (EntityTypeManager, EntityType).
+     * Exercises: waaseyaa/api (OpenApiGenerator, SchemaBuilder) with
+     * waaseyaa/entity (EntityTypeManager, EntityType).
      */
     #[Test]
     public function testOpenApiSpecGeneration(): void
@@ -269,8 +269,8 @@ final class EndToEndSmokeTest extends TestCase
     /**
      * Verifies that MCP tool definitions are generated for registered entity types.
      *
-     * Exercises: aurora/ai-schema (SchemaRegistry, EntityJsonSchemaGenerator,
-     * McpToolGenerator) with aurora/entity (EntityTypeManager, EntityType).
+     * Exercises: waaseyaa/ai-schema (SchemaRegistry, EntityJsonSchemaGenerator,
+     * McpToolGenerator) with waaseyaa/entity (EntityTypeManager, EntityType).
      */
     #[Test]
     public function testMcpToolGeneration(): void
@@ -342,7 +342,7 @@ final class EndToEndSmokeTest extends TestCase
     /**
      * Exercises the full SSR pipeline: registry -> Twig rendering -> SsrResponse.
      *
-     * Exercises: aurora/ssr (ComponentRegistry, ComponentRenderer,
+     * Exercises: waaseyaa/ssr (ComponentRegistry, ComponentRenderer,
      * SsrController, SsrResponse, ComponentMetadata) with Twig.
      */
     #[Test]
@@ -379,9 +379,9 @@ final class EndToEndSmokeTest extends TestCase
 
         // Render article card via controller.
         $response = $controller->render('article-card', [
-            'title' => 'Aurora CMS Launches',
+            'title' => 'Waaseyaa Launches',
             'summary' => 'A next-generation content management system.',
-            'author' => 'Aurora Team',
+            'author' => 'Waaseyaa Team',
         ]);
 
         // Verify SsrResponse.
@@ -391,27 +391,27 @@ final class EndToEndSmokeTest extends TestCase
 
         // Verify rendered content.
         $this->assertStringContainsString('<article class="card">', $response->content);
-        $this->assertStringContainsString('<h2>Aurora CMS Launches</h2>', $response->content);
+        $this->assertStringContainsString('<h2>Waaseyaa Launches</h2>', $response->content);
         $this->assertStringContainsString('A next-generation content management system.', $response->content);
-        $this->assertStringContainsString('Aurora Team', $response->content);
+        $this->assertStringContainsString('Waaseyaa Team', $response->content);
 
         // Render page layout via controller.
         $pageResponse = $controller->render('page-layout', [
-            'page_title' => 'Home - Aurora',
-            'content' => '<p>Welcome to Aurora CMS.</p>',
+            'page_title' => 'Home - Waaseyaa',
+            'content' => '<p>Welcome to Waaseyaa.</p>',
         ]);
 
         $this->assertInstanceOf(SsrResponse::class, $pageResponse);
         $this->assertSame(200, $pageResponse->statusCode);
-        $this->assertStringContainsString('<title>Home - Aurora</title>', $pageResponse->content);
-        $this->assertStringContainsString('<p>Welcome to Aurora CMS.</p>', $pageResponse->content);
+        $this->assertStringContainsString('<title>Home - Waaseyaa</title>', $pageResponse->content);
+        $this->assertStringContainsString('<p>Welcome to Waaseyaa.</p>', $pageResponse->content);
     }
 
     /**
      * Verifies cache warming and invalidation across multiple bins.
      *
-     * Exercises: aurora/cache (CacheFactory, MemoryBackend) with
-     * aurora/cli (CacheClearCommand) for cross-layer cache management.
+     * Exercises: waaseyaa/cache (CacheFactory, MemoryBackend) with
+     * waaseyaa/cli (CacheClearCommand) for cross-layer cache management.
      */
     #[Test]
     public function testCacheIntegrationAcrossOperations(): void

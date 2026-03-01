@@ -27,10 +27,10 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
- * Integration tests for CLI commands with real (in-memory) Aurora services.
+ * Integration tests for CLI commands with real (in-memory) Waaseyaa services.
  *
- * Exercises: aurora/cli commands with aurora/cache (CacheFactory, MemoryBackend),
- * aurora/config (ConfigManager, MemoryStorage), and aurora/entity
+ * Exercises: waaseyaa/cli commands with waaseyaa/cache (CacheFactory, MemoryBackend),
+ * waaseyaa/config (ConfigManager, MemoryStorage), and waaseyaa/entity
  * (EntityTypeManager) using in-memory storage.
  */
 #[CoversNothing]
@@ -140,8 +140,8 @@ final class CliCommandIntegrationTest extends TestCase
     {
         // Write config to active storage.
         $this->activeStorage->write('system.site', [
-            'name' => 'My Aurora Site',
-            'slogan' => 'Built with Aurora',
+            'name' => 'My Waaseyaa Site',
+            'slogan' => 'Built with Waaseyaa',
         ]);
         $this->activeStorage->write('system.theme', [
             'default' => 'stark',
@@ -156,7 +156,7 @@ final class CliCommandIntegrationTest extends TestCase
         $this->assertStringContainsString('Configuration exported. Active storage contains 2 items', $exportTester->getDisplay());
 
         // Verify sync storage has the config.
-        $this->assertSame(['name' => 'My Aurora Site', 'slogan' => 'Built with Aurora'], $this->syncStorage->read('system.site'));
+        $this->assertSame(['name' => 'My Waaseyaa Site', 'slogan' => 'Built with Waaseyaa'], $this->syncStorage->read('system.site'));
         $this->assertSame(['default' => 'stark'], $this->syncStorage->read('system.theme'));
 
         // Modify active storage (simulate drift).
@@ -179,8 +179,8 @@ final class CliCommandIntegrationTest extends TestCase
 
         // Verify active matches sync after import.
         $restored = $this->activeStorage->read('system.site');
-        $this->assertSame('My Aurora Site', $restored['name']);
-        $this->assertSame('Built with Aurora', $restored['slogan']);
+        $this->assertSame('My Waaseyaa Site', $restored['name']);
+        $this->assertSame('Built with Waaseyaa', $restored['slogan']);
     }
 
     #[Test]
@@ -241,15 +241,15 @@ final class CliCommandIntegrationTest extends TestCase
     {
         $command = new InstallCommand($this->entityTypeManager, $this->configManager);
         $tester = new CommandTester($command);
-        $tester->execute(['--site-name' => 'Test Aurora']);
+        $tester->execute(['--site-name' => 'Test Waaseyaa']);
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertStringContainsString('Aurora CMS "Test Aurora" installed successfully', $tester->getDisplay());
+        $this->assertStringContainsString('Waaseyaa "Test Waaseyaa" installed successfully', $tester->getDisplay());
 
         // Verify initial config was written.
         $siteConfig = $this->activeStorage->read('system.site');
         $this->assertIsArray($siteConfig);
-        $this->assertSame('Test Aurora', $siteConfig['name']);
+        $this->assertSame('Test Waaseyaa', $siteConfig['name']);
         $this->assertSame('admin@example.com', $siteConfig['mail']);
 
         // Verify admin user was created.

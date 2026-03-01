@@ -11,7 +11,7 @@ class WaaseyaaApplication extends Application
 {
     public function __construct()
     {
-        parent::__construct(name: 'aurora', version: '0.1.0');
+        parent::__construct(name: 'waaseyaa', version: '0.1.0');
     }
 
     /**

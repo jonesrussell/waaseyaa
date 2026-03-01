@@ -20,7 +20,7 @@ final class MakeMigrationCommand extends AbstractMakeCommand
     {
         $this
             ->addArgument('name', InputArgument::REQUIRED, 'The migration name (e.g. "create_comments_table")')
-            ->addOption('package', null, InputOption::VALUE_REQUIRED, 'Target package (e.g. "aurora/node")')
+            ->addOption('package', null, InputOption::VALUE_REQUIRED, 'Target package (e.g. "waaseyaa/node")')
             ->addOption('create', null, InputOption::VALUE_REQUIRED, 'Table name to create')
             ->addOption('table', null, InputOption::VALUE_REQUIRED, 'Existing table name to modify');
     }

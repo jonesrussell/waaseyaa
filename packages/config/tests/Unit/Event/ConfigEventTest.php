@@ -46,11 +46,11 @@ final class ConfigEventTest extends TestCase
 
     public function testConfigEventsEnumValues(): void
     {
-        $this->assertSame('aurora.config.pre_save', ConfigEvents::PRE_SAVE->value);
-        $this->assertSame('aurora.config.post_save', ConfigEvents::POST_SAVE->value);
-        $this->assertSame('aurora.config.pre_delete', ConfigEvents::PRE_DELETE->value);
-        $this->assertSame('aurora.config.post_delete', ConfigEvents::POST_DELETE->value);
-        $this->assertSame('aurora.config.import', ConfigEvents::IMPORT->value);
+        $this->assertSame('waaseyaa.config.pre_save', ConfigEvents::PRE_SAVE->value);
+        $this->assertSame('waaseyaa.config.post_save', ConfigEvents::POST_SAVE->value);
+        $this->assertSame('waaseyaa.config.pre_delete', ConfigEvents::PRE_DELETE->value);
+        $this->assertSame('waaseyaa.config.post_delete', ConfigEvents::POST_DELETE->value);
+        $this->assertSame('waaseyaa.config.import', ConfigEvents::IMPORT->value);
     }
 
     public function testConfigEventsHasFiveCases(): void

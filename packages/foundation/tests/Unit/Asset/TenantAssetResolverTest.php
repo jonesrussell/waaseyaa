@@ -18,7 +18,7 @@ final class TenantAssetResolverTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->fixtureDir = sys_get_temp_dir() . '/aurora_tenant_test_' . uniqid();
+        $this->fixtureDir = sys_get_temp_dir() . '/waaseyaa_tenant_test_' . uniqid();
         mkdir($this->fixtureDir, 0777, true);
     }
 

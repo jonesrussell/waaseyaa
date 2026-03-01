@@ -65,7 +65,7 @@ final readonly class McpEndpoint
                 'tools' => ['listChanged' => false],
             ],
             'serverInfo' => [
-                'name' => 'Aurora CMS',
+                'name' => 'Waaseyaa',
                 'version' => '0.1.0',
             ],
         ]);

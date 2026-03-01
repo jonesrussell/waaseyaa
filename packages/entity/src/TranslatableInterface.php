@@ -7,7 +7,7 @@ namespace Waaseyaa\Entity;
 /**
  * Entities implementing this support multiple languages.
  *
- * Unlike Drupal, an Aurora entity object represents ONE language
+ * Unlike Drupal, an Waaseyaa entity object represents ONE language
  * at a time. getTranslation() returns a separate entity object
  * for the requested language. This simplification removes hidden
  * state and makes field values unambiguous.

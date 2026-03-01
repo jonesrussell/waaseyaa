@@ -6,10 +6,10 @@ namespace Waaseyaa\Entity\Event;
 
 enum EntityEvents: string
 {
-    case PRE_SAVE = 'aurora.entity.pre_save';
-    case POST_SAVE = 'aurora.entity.post_save';
-    case PRE_DELETE = 'aurora.entity.pre_delete';
-    case POST_DELETE = 'aurora.entity.post_delete';
-    case POST_LOAD = 'aurora.entity.post_load';
-    case PRE_CREATE = 'aurora.entity.pre_create';
+    case PRE_SAVE = 'waaseyaa.entity.pre_save';
+    case POST_SAVE = 'waaseyaa.entity.post_save';
+    case PRE_DELETE = 'waaseyaa.entity.pre_delete';
+    case POST_DELETE = 'waaseyaa.entity.post_delete';
+    case POST_LOAD = 'waaseyaa.entity.post_load';
+    case PRE_CREATE = 'waaseyaa.entity.pre_create';
 }

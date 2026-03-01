@@ -19,7 +19,7 @@ use Twig\Loader\ArrayLoader;
 /**
  * Integration tests for SSR rendering pipeline with real Twig.
  *
- * Exercises: aurora/ssr (ComponentRegistry, ComponentRenderer, SsrController,
+ * Exercises: waaseyaa/ssr (ComponentRegistry, ComponentRenderer, SsrController,
  * SsrResponse) with Twig\Environment + ArrayLoader.
  */
 #[CoversNothing]
@@ -61,12 +61,12 @@ final class SsrRenderingIntegrationTest extends TestCase
 
         // Render with Twig.
         $html = $this->renderer->render('hero', [
-            'title' => 'Welcome to Aurora',
+            'title' => 'Welcome to Waaseyaa',
             'subtitle' => 'A modern CMS',
         ]);
 
         $this->assertStringContainsString('<section class="hero">', $html);
-        $this->assertStringContainsString('<h1>Welcome to Aurora</h1>', $html);
+        $this->assertStringContainsString('<h1>Welcome to Waaseyaa</h1>', $html);
         $this->assertStringContainsString('<p>A modern CMS</p>', $html);
     }
 

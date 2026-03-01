@@ -18,8 +18,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Filtering, sorting, and pagination integration tests with real storage.
  *
- * Exercises: aurora/api (JsonApiController, QueryParser, QueryApplier,
- * PaginationLinks) with aurora/entity (EntityTypeManager) using
+ * Exercises: waaseyaa/api (JsonApiController, QueryParser, QueryApplier,
+ * PaginationLinks) with waaseyaa/entity (EntityTypeManager) using
  * in-memory storage with 10+ entities for meaningful query tests.
  */
 #[CoversNothing]

@@ -47,12 +47,12 @@ final class MakeMigrationCommandTest extends TestCase
         $tester = $this->createTester();
         $tester->execute([
             'name' => 'create_nodes_table',
-            '--package' => 'aurora/node',
+            '--package' => 'waaseyaa/node',
             '--create' => 'nodes',
         ]);
 
         $output = $tester->getDisplay();
-        $this->assertStringContainsString('aurora/node', $output);
+        $this->assertStringContainsString('waaseyaa/node', $output);
     }
 
     private function createTester(): CommandTester

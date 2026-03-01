@@ -25,7 +25,7 @@ final class WaaseyaaExceptionTest extends TestCase
 
         $this->assertSame('Database is down', $e->getMessage());
         $this->assertSame(503, $e->statusCode);
-        $this->assertSame('aurora:storage/error', $e->problemType);
+        $this->assertSame('waaseyaa:storage/error', $e->problemType);
         $this->assertInstanceOf(WaaseyaaException::class, $e);
     }
 
@@ -35,7 +35,7 @@ final class WaaseyaaExceptionTest extends TestCase
         $e = new ConfigException('Invalid YAML');
 
         $this->assertSame(500, $e->statusCode);
-        $this->assertSame('aurora:config/error', $e->problemType);
+        $this->assertSame('waaseyaa:config/error', $e->problemType);
     }
 
     #[Test]
@@ -44,7 +44,7 @@ final class WaaseyaaExceptionTest extends TestCase
         $e = new AuthenticationException('Invalid token');
 
         $this->assertSame(401, $e->statusCode);
-        $this->assertSame('aurora:auth/error', $e->problemType);
+        $this->assertSame('waaseyaa:auth/error', $e->problemType);
     }
 
     #[Test]
@@ -73,7 +73,7 @@ final class WaaseyaaExceptionTest extends TestCase
         $e = new StorageException('Database is down');
         $error = $e->toApiError();
 
-        $this->assertSame('aurora:storage/error', $error['type']);
+        $this->assertSame('waaseyaa:storage/error', $error['type']);
         $this->assertSame('Database is down', $error['detail']);
         $this->assertSame(503, $error['status']);
     }

@@ -27,7 +27,7 @@ class InstallCommandTest extends TestCase
         $mockStorage->expects($this->once())
             ->method('write')
             ->with('system.site', $this->callback(function (array $data): bool {
-                return $data['name'] === 'Aurora' && $data['mail'] === 'admin@example.com';
+                return $data['name'] === 'Waaseyaa' && $data['mail'] === 'admin@example.com';
             }));
 
         $mockConfigManager = $this->createMock(ConfigManagerInterface::class);
@@ -62,7 +62,7 @@ class InstallCommandTest extends TestCase
         $this->assertStringContainsString('Warning: No --admin-password provided', $display);
         $this->assertStringContainsString('Writing initial site configuration...', $display);
         $this->assertStringContainsString('Creating admin user...', $display);
-        $this->assertStringContainsString('Aurora CMS "Aurora" installed successfully.', $display);
+        $this->assertStringContainsString('Waaseyaa "Waaseyaa" installed successfully.', $display);
     }
 
     #[Test]
@@ -93,6 +93,6 @@ class InstallCommandTest extends TestCase
         $tester->execute(['--site-name' => 'My Site']);
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertStringContainsString('Aurora CMS "My Site" installed successfully.', $tester->getDisplay());
+        $this->assertStringContainsString('Waaseyaa "My Site" installed successfully.', $tester->getDisplay());
     }
 }

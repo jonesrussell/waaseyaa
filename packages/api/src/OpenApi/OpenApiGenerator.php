@@ -20,7 +20,7 @@ final class OpenApiGenerator
     public function __construct(
         private readonly EntityTypeManagerInterface $entityTypeManager,
         private string $basePath = '/api',
-        private string $title = 'Aurora CMS API',
+        private string $title = 'Waaseyaa API',
         private string $version = '0.1.0',
     ) {
         $this->schemaBuilder = new SchemaBuilder();

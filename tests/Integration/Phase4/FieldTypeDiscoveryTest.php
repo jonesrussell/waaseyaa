@@ -21,7 +21,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Field type system integration tests.
  *
- * Exercises: aurora/field + aurora/plugin discovery working together
+ * Exercises: waaseyaa/field + waaseyaa/plugin discovery working together
  * to discover built-in field types, create field items, and verify
  * schema/jsonSchema output.
  */
@@ -370,7 +370,7 @@ final class FieldTypeDiscoveryTest extends TestCase
             'values' => ['value' => 'php'],
         ]);
         $item2 = $this->fieldTypeManager->createInstance('string', [
-            'values' => ['value' => 'aurora'],
+            'values' => ['value' => 'waaseyaa'],
         ]);
 
         $list->appendItem($item1);
@@ -378,12 +378,12 @@ final class FieldTypeDiscoveryTest extends TestCase
 
         $this->assertCount(2, $list);
         $this->assertFalse($list->isEmpty());
-        $this->assertSame('php, aurora', $list->getString());
+        $this->assertSame('php, waaseyaa', $list->getString());
 
         $values = $list->getValue();
         $this->assertCount(2, $values);
         $this->assertSame('php', $values[0]['value']);
-        $this->assertSame('aurora', $values[1]['value']);
+        $this->assertSame('waaseyaa', $values[1]['value']);
     }
 
     public function testFieldItemListPropertyAccess(): void

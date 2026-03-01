@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Testing\Traits;
 
 /**
- * Trait that boots and shuts down the Aurora application for tests.
+ * Trait that boots and shuts down the Waaseyaa application for tests.
  *
  * Provides a minimal bootstrap that creates an in-memory SQLite
  * database and a default configuration. Override bootApplication()

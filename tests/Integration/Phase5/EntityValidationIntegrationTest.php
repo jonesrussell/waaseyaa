@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Validation;
 
 /**
- * Integration tests for aurora/validation + aurora/entity (User).
+ * Integration tests for waaseyaa/validation + waaseyaa/entity (User).
  *
  * Verifies that EntityValidator correctly validates User entity fields
  * using NotEmpty, AllowedValues, and SafeMarkup constraints.
@@ -27,7 +27,7 @@ final class EntityValidationIntegrationTest extends TestCase
 
     protected function setUp(): void
     {
-        // Build a Symfony Validator that knows about Aurora custom constraint validators.
+        // Build a Symfony Validator that knows about Waaseyaa custom constraint validators.
         $validator = Validation::createValidatorBuilder()
             ->getValidator();
 

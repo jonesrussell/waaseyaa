@@ -20,7 +20,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Full CRUD lifecycle integration test through the entity storage stack.
  *
- * Exercises: aurora/entity + aurora/database-legacy + aurora/entity-storage
+ * Exercises: waaseyaa/entity + waaseyaa/database-legacy + waaseyaa/entity-storage
  * working together end-to-end with a real SQLite in-memory database.
  */
 final class EntityStorageCrudTest extends TestCase

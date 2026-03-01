@@ -10,12 +10,12 @@ use Waaseyaa\Testing\Traits\InteractsWithEvents;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Base test case for Aurora CMS tests.
+ * Base test case for Waaseyaa tests.
  *
  * Provides application bootstrapping, authentication helpers,
  * event interaction, and common assertion methods. Extend this
  * class instead of PHPUnit\Framework\TestCase for tests that
- * need the Aurora application environment.
+ * need the Waaseyaa application environment.
  */
 abstract class WaaseyaaTestCase extends TestCase
 {

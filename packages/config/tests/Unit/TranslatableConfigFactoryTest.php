@@ -37,17 +37,17 @@ final class TranslatableConfigFactoryTest extends TestCase
     #[Test]
     public function get_returns_config_from_inner_factory(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
 
         $config = $this->factory->get('system.site');
 
-        $this->assertSame('Aurora', $config->get('site_name'));
+        $this->assertSame('Waaseyaa', $config->get('site_name'));
     }
 
     #[Test]
     public function get_original_returns_untranslated_config(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
 
         // Write a French translation collection
         $frCollection = $this->storage->createCollection('i18n.fr');
@@ -55,14 +55,14 @@ final class TranslatableConfigFactoryTest extends TestCase
 
         $original = $this->factory->getOriginal('system.site');
 
-        $this->assertSame('Aurora', $original->get('site_name'));
+        $this->assertSame('Waaseyaa', $original->get('site_name'));
     }
 
     #[Test]
     public function get_translated_returns_translated_config(): void
     {
         $this->storage->write('system.site', [
-            'site_name' => 'Aurora',
+            'site_name' => 'Waaseyaa',
             'slogan' => 'The CMS',
             'default_langcode' => 'en',
         ]);
@@ -87,31 +87,31 @@ final class TranslatableConfigFactoryTest extends TestCase
     public function get_translated_falls_back_to_original_when_no_translation(): void
     {
         $this->storage->write('system.site', [
-            'site_name' => 'Aurora',
+            'site_name' => 'Waaseyaa',
             'slogan' => 'The CMS',
         ]);
 
         $translated = $this->factory->getTranslated('system.site', 'de');
 
-        $this->assertSame('Aurora', $translated->get('site_name'));
+        $this->assertSame('Waaseyaa', $translated->get('site_name'));
         $this->assertSame('The CMS', $translated->get('slogan'));
     }
 
     #[Test]
     public function get_translated_with_default_langcode_returns_original(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
 
         $translated = $this->factory->getTranslated('system.site', 'en');
 
-        $this->assertSame('Aurora', $translated->get('site_name'));
+        $this->assertSame('Waaseyaa', $translated->get('site_name'));
     }
 
     #[Test]
     public function get_translated_merges_partial_translation(): void
     {
         $this->storage->write('system.site', [
-            'site_name' => 'Aurora',
+            'site_name' => 'Waaseyaa',
             'slogan' => 'The CMS',
             'footer' => 'Copyright 2026',
         ]);
@@ -132,7 +132,7 @@ final class TranslatableConfigFactoryTest extends TestCase
     #[Test]
     public function get_editable_delegates_to_inner_factory(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
 
         $editable = $this->factory->getEditable('system.site');
         $editable->set('site_name', 'New Name')->save();
@@ -144,13 +144,13 @@ final class TranslatableConfigFactoryTest extends TestCase
     #[Test]
     public function load_multiple_returns_multiple_configs(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->storage->write('system.mail', ['transport' => 'smtp']);
 
         $configs = $this->factory->loadMultiple(['system.site', 'system.mail']);
 
         $this->assertCount(2, $configs);
-        $this->assertSame('Aurora', $configs['system.site']->get('site_name'));
+        $this->assertSame('Waaseyaa', $configs['system.site']->get('site_name'));
         $this->assertSame('smtp', $configs['system.mail']->get('transport'));
     }
 
@@ -180,9 +180,9 @@ final class TranslatableConfigFactoryTest extends TestCase
     #[Test]
     public function get_available_languages_returns_collection_langcodes(): void
     {
-        $this->storage->write('system.site', ['site_name' => 'Aurora']);
+        $this->storage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->storage->createCollection('i18n.fr')->write('system.site', ['site_name' => 'Aurore']);
-        $this->storage->createCollection('i18n.de')->write('system.site', ['site_name' => 'Aurora DE']);
+        $this->storage->createCollection('i18n.de')->write('system.site', ['site_name' => 'Waaseyaa DE']);
 
         $languages = $this->factory->getAvailableLanguages('system.site');
 

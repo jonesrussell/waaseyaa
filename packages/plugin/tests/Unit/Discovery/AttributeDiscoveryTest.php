@@ -62,7 +62,7 @@ final class AttributeDiscoveryTest extends TestCase
 
     public function testEmptyDirectory(): void
     {
-        $emptyDir = sys_get_temp_dir() . '/aurora_plugin_test_empty_' . uniqid();
+        $emptyDir = sys_get_temp_dir() . '/waaseyaa_plugin_test_empty_' . uniqid();
         mkdir($emptyDir);
 
         try {
@@ -82,7 +82,7 @@ final class AttributeDiscoveryTest extends TestCase
     public function testNonExistentDirectory(): void
     {
         $discovery = new AttributeDiscovery(
-            directories: ['/tmp/nonexistent_aurora_dir_' . uniqid()],
+            directories: ['/tmp/nonexistent_waaseyaa_dir_' . uniqid()],
             attributeClass: WaaseyaaPlugin::class,
         );
 
@@ -108,7 +108,7 @@ final class AttributeDiscoveryTest extends TestCase
 
     public function testMultipleDirectories(): void
     {
-        $emptyDir = sys_get_temp_dir() . '/aurora_plugin_test_empty_' . uniqid();
+        $emptyDir = sys_get_temp_dir() . '/waaseyaa_plugin_test_empty_' . uniqid();
         mkdir($emptyDir);
 
         try {

@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'install',
-    description: 'Install Aurora CMS with initial configuration',
+    description: 'Install Waaseyaa with initial configuration',
 )]
 class InstallCommand extends Command
 {
@@ -28,7 +28,7 @@ class InstallCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('site-name', null, InputOption::VALUE_REQUIRED, 'The name of the site', 'Aurora')
+            ->addOption('site-name', null, InputOption::VALUE_REQUIRED, 'The name of the site', 'Waaseyaa')
             ->addOption('site-mail', null, InputOption::VALUE_REQUIRED, 'Site email address', 'admin@example.com')
             ->addOption('admin-email', null, InputOption::VALUE_REQUIRED, 'Admin user email', 'admin@example.com')
             ->addOption('admin-password', null, InputOption::VALUE_REQUIRED, 'Admin user password');
@@ -68,7 +68,7 @@ class InstallCommand extends Command
         $storage->save($admin);
 
         // Step 3: Output success.
-        $output->writeln(sprintf('Aurora CMS "%s" installed successfully.', $siteName));
+        $output->writeln(sprintf('Waaseyaa "%s" installed successfully.', $siteName));
 
         return Command::SUCCESS;
     }

@@ -37,7 +37,7 @@ final class EnvironmentConfigFactoryTest extends TestCase
             inner: $baseFactory,
             envStorage: $this->envStorage,
             environment: $environment,
-            envVarPrefix: 'AURORA_CONFIG_',
+            envVarPrefix: 'WAASEYAA_CONFIG_',
             envVarResolver: static fn(string $name): ?string => $envVars[$name] ?? null,
         );
     }
@@ -46,14 +46,14 @@ final class EnvironmentConfigFactoryTest extends TestCase
     public function get_returns_base_config_when_no_overrides(): void
     {
         $this->baseStorage->write('system.site', [
-            'site_name' => 'Aurora',
+            'site_name' => 'Waaseyaa',
             'slogan' => 'The CMS',
         ]);
 
         $factory = $this->createFactory();
         $config = $factory->get('system.site');
 
-        $this->assertSame('Aurora', $config->get('site_name'));
+        $this->assertSame('Waaseyaa', $config->get('site_name'));
         $this->assertSame('The CMS', $config->get('slogan'));
     }
 
@@ -61,17 +61,17 @@ final class EnvironmentConfigFactoryTest extends TestCase
     public function get_applies_environment_overlay(): void
     {
         $this->baseStorage->write('system.site', [
-            'site_name' => 'Aurora',
+            'site_name' => 'Waaseyaa',
             'slogan' => 'The CMS',
         ]);
         $this->envStorage->write('system.site', [
-            'site_name' => 'Aurora Local',
+            'site_name' => 'Waaseyaa Local',
         ]);
 
         $factory = $this->createFactory(environment: 'local');
         $config = $factory->get('system.site');
 
-        $this->assertSame('Aurora Local', $config->get('site_name'));
+        $this->assertSame('Waaseyaa Local', $config->get('site_name'));
         // Non-overridden keys fall back to base
         $this->assertSame('The CMS', $config->get('slogan'));
     }
@@ -80,22 +80,22 @@ final class EnvironmentConfigFactoryTest extends TestCase
     public function get_applies_env_var_overrides_last(): void
     {
         $this->baseStorage->write('system.site', [
-            'site_name' => 'Aurora',
+            'site_name' => 'Waaseyaa',
             'slogan' => 'The CMS',
         ]);
         $this->envStorage->write('system.site', [
-            'site_name' => 'Aurora Staging',
+            'site_name' => 'Waaseyaa Staging',
         ]);
 
         $factory = $this->createFactory(
             environment: 'staging',
-            envVars: ['AURORA_CONFIG_SYSTEM_SITE__SITE_NAME' => 'Production Aurora'],
+            envVars: ['WAASEYAA_CONFIG_SYSTEM_SITE__SITE_NAME' => 'Production Waaseyaa'],
         );
 
         $config = $factory->get('system.site');
 
         // Environment variable wins over env overlay
-        $this->assertSame('Production Aurora', $config->get('site_name'));
+        $this->assertSame('Production Waaseyaa', $config->get('site_name'));
     }
 
     #[Test]
@@ -106,9 +106,9 @@ final class EnvironmentConfigFactoryTest extends TestCase
             'port' => 3306,
         ]);
 
-        // AURORA_CONFIG_DATABASE_SETTINGS__HOST maps to database.settings -> host
+        // WAASEYAA_CONFIG_DATABASE_SETTINGS__HOST maps to database.settings -> host
         $factory = $this->createFactory(
-            envVars: ['AURORA_CONFIG_DATABASE_SETTINGS__HOST' => 'db.production.com'],
+            envVars: ['WAASEYAA_CONFIG_DATABASE_SETTINGS__HOST' => 'db.production.com'],
         );
 
         $config = $factory->get('database.settings');
@@ -120,7 +120,7 @@ final class EnvironmentConfigFactoryTest extends TestCase
     #[Test]
     public function get_editable_delegates_to_inner(): void
     {
-        $this->baseStorage->write('system.site', ['site_name' => 'Aurora']);
+        $this->baseStorage->write('system.site', ['site_name' => 'Waaseyaa']);
 
         $factory = $this->createFactory();
         $editable = $factory->getEditable('system.site');
@@ -134,14 +134,14 @@ final class EnvironmentConfigFactoryTest extends TestCase
     #[Test]
     public function load_multiple_applies_overrides_to_all(): void
     {
-        $this->baseStorage->write('system.site', ['site_name' => 'Aurora']);
+        $this->baseStorage->write('system.site', ['site_name' => 'Waaseyaa']);
         $this->baseStorage->write('system.mail', ['transport' => 'sendmail']);
         $this->envStorage->write('system.mail', ['transport' => 'smtp']);
 
         $factory = $this->createFactory();
         $configs = $factory->loadMultiple(['system.site', 'system.mail']);
 
-        $this->assertSame('Aurora', $configs['system.site']->get('site_name'));
+        $this->assertSame('Waaseyaa', $configs['system.site']->get('site_name'));
         $this->assertSame('smtp', $configs['system.mail']->get('transport'));
     }
 
@@ -190,7 +190,7 @@ final class EnvironmentConfigFactoryTest extends TestCase
     public function env_overlay_only_applied_when_env_storage_has_data(): void
     {
         $this->baseStorage->write('system.site', [
-            'site_name' => 'Aurora',
+            'site_name' => 'Waaseyaa',
             'slogan' => 'The CMS',
         ]);
         // envStorage has nothing for system.site
@@ -198,7 +198,7 @@ final class EnvironmentConfigFactoryTest extends TestCase
         $factory = $this->createFactory(environment: 'production');
         $config = $factory->get('system.site');
 
-        $this->assertSame('Aurora', $config->get('site_name'));
+        $this->assertSame('Waaseyaa', $config->get('site_name'));
         $this->assertSame('The CMS', $config->get('slogan'));
     }
 
@@ -213,9 +213,9 @@ final class EnvironmentConfigFactoryTest extends TestCase
         ]);
 
         // Nested key: database.settings -> connection.host
-        // Convention: AURORA_CONFIG_{CONFIG_NAME}__{DOT_PATH_WITH_UNDERSCORES}
+        // Convention: WAASEYAA_CONFIG_{CONFIG_NAME}__{DOT_PATH_WITH_UNDERSCORES}
         $factory = $this->createFactory(
-            envVars: ['AURORA_CONFIG_DATABASE_SETTINGS__CONNECTION__HOST' => 'db.prod.com'],
+            envVars: ['WAASEYAA_CONFIG_DATABASE_SETTINGS__CONNECTION__HOST' => 'db.prod.com'],
         );
 
         $config = $factory->get('database.settings');

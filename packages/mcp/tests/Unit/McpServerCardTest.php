@@ -18,7 +18,7 @@ final class McpServerCardTest extends TestCase
         $card = new McpServerCard();
         $result = $card->toArray();
 
-        $this->assertSame('Aurora CMS', $result['name']);
+        $this->assertSame('Waaseyaa', $result['name']);
         $this->assertSame('0.1.0', $result['version']);
         $this->assertSame('/mcp', $result['endpoint']);
         $this->assertSame('streamable-http', $result['transport']);
@@ -51,6 +51,6 @@ final class McpServerCardTest extends TestCase
         $json = $card->toJson();
 
         $decoded = \json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
-        $this->assertSame('Aurora CMS', $decoded['name']);
+        $this->assertSame('Waaseyaa', $decoded['name']);
     }
 }

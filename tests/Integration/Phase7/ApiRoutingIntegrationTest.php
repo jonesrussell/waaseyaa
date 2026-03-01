@@ -22,8 +22,8 @@ use Symfony\Component\Routing\RequestContext;
 /**
  * End-to-end: routes + API controller + entity storage integration tests.
  *
- * Exercises: aurora/api (JsonApiRouteProvider, JsonApiController) with
- * aurora/routing (WaaseyaaRouter, RouteBuilder) and aurora/entity
+ * Exercises: waaseyaa/api (JsonApiRouteProvider, JsonApiController) with
+ * waaseyaa/routing (WaaseyaaRouter, RouteBuilder) and waaseyaa/entity
  * (EntityTypeManager).
  */
 #[CoversNothing]

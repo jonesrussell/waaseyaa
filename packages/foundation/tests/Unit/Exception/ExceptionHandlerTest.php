@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 final class ExceptionHandlerTest extends TestCase
 {
     #[Test]
-    public function renders_aurora_exception_as_json_api_error(): void
+    public function renders_waaseyaa_exception_as_json_api_error(): void
     {
         $handler = new ExceptionHandler();
         $e = new StorageException('Database is down');
@@ -25,7 +25,7 @@ final class ExceptionHandlerTest extends TestCase
         $result = $handler->render($e);
 
         $this->assertArrayHasKey('errors', $result);
-        $this->assertSame('aurora:storage/error', $result['errors'][0]['type']);
+        $this->assertSame('waaseyaa:storage/error', $result['errors'][0]['type']);
         $this->assertSame(503, $result['errors'][0]['status']);
     }
 
@@ -37,7 +37,7 @@ final class ExceptionHandlerTest extends TestCase
 
         $result = $handler->render($e);
 
-        $this->assertSame('aurora:internal-error', $result['errors'][0]['type']);
+        $this->assertSame('waaseyaa:internal-error', $result['errors'][0]['type']);
         $this->assertSame(500, $result['errors'][0]['status']);
     }
 
@@ -63,7 +63,7 @@ final class ExceptionHandlerTest extends TestCase
 
         $this->assertStringContainsString('StorageException', $output);
         $this->assertStringContainsString('Database is down', $output);
-        $this->assertStringContainsString('aurora:storage/error', $output);
+        $this->assertStringContainsString('waaseyaa:storage/error', $output);
     }
 
     #[Test]

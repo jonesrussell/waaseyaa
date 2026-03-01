@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Validation;
 
 /**
- * Integration tests for aurora/media + aurora/validation.
+ * Integration tests for waaseyaa/media + waaseyaa/validation.
  *
  * Verifies that media entities work with file storage, that File value
  * objects report correct metadata, and that validation integrates with

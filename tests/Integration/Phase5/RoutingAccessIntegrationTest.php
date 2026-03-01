@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Integration tests for aurora/routing + aurora/access + aurora/user.
+ * Integration tests for waaseyaa/routing + waaseyaa/access + waaseyaa/user.
  *
  * Verifies that WaaseyaaRouter, RouteBuilder, and AccessChecker work together
  * to enforce permission-based, role-based, and public route access.

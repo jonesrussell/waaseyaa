@@ -31,8 +31,8 @@ use Twig\Loader\ArrayLoader;
 /**
  * Cross-package integration tests: CLI + SSR + Entity system.
  *
- * Exercises interactions between aurora/cli, aurora/ssr, aurora/entity,
- * aurora/config, and aurora/cache using in-memory services.
+ * Exercises interactions between waaseyaa/cli, waaseyaa/ssr, waaseyaa/entity,
+ * waaseyaa/config, and waaseyaa/cache using in-memory services.
  */
 #[CoversNothing]
 final class CliSsrCrossPackageIntegrationTest extends TestCase

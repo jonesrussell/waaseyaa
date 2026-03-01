@@ -17,7 +17,7 @@ final class DomainErrorTest extends TestCase
     {
         $error = DomainError::entityNotFound('node', '42');
 
-        $this->assertSame('aurora:entity/not-found', $error->type);
+        $this->assertSame('waaseyaa:entity/not-found', $error->type);
         $this->assertSame('Entity Not Found', $error->title);
         $this->assertStringContainsString('Node', $error->detail);
         $this->assertStringContainsString('42', $error->detail);
@@ -29,7 +29,7 @@ final class DomainErrorTest extends TestCase
     {
         $error = DomainError::accessDenied('update', 'node', '42');
 
-        $this->assertSame('aurora:access/denied', $error->type);
+        $this->assertSame('waaseyaa:access/denied', $error->type);
         $this->assertSame(403, $error->statusCode);
     }
 
@@ -39,7 +39,7 @@ final class DomainErrorTest extends TestCase
         $violations = ['title' => 'Title is required', 'body' => 'Body is too short'];
         $error = DomainError::validationFailed($violations);
 
-        $this->assertSame('aurora:validation/failed', $error->type);
+        $this->assertSame('waaseyaa:validation/failed', $error->type);
         $this->assertSame(422, $error->statusCode);
         $this->assertSame($violations, $error->meta['violations']);
     }
@@ -49,7 +49,7 @@ final class DomainErrorTest extends TestCase
     {
         $error = DomainError::translationMissing('node', '42', 'fr');
 
-        $this->assertSame('aurora:i18n/translation-missing', $error->type);
+        $this->assertSame('waaseyaa:i18n/translation-missing', $error->type);
         $this->assertSame(404, $error->statusCode);
     }
 

@@ -35,8 +35,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Full-stack integration test combining all AI layer packages.
  *
- * Exercises: aurora/ai-schema, aurora/ai-agent, aurora/ai-vector,
- * aurora/ai-pipeline together with aurora/entity, aurora/user.
+ * Exercises: waaseyaa/ai-schema, waaseyaa/ai-agent, waaseyaa/ai-vector,
+ * waaseyaa/ai-pipeline together with waaseyaa/entity, waaseyaa/user.
  *
  * Scenario: set up entity storage, create entities via agent tool calls,
  * embed entities in vector store, search for similar content, and run a

@@ -8,7 +8,7 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\FieldableInterface;
 
 /**
- * Executes MCP tool calls against the Aurora entity system.
+ * Executes MCP tool calls against the Waaseyaa entity system.
  *
  * Parses tool names to determine the operation and entity type,
  * then delegates to the appropriate entity storage methods.

@@ -39,9 +39,9 @@ use Symfony\Component\Validator\Validation;
 /**
  * Full lifecycle integration test spanning most Layer 3 packages.
  *
- * Exercises: aurora/node, aurora/taxonomy, aurora/media, aurora/path,
- * aurora/menu, aurora/workflows, aurora/access, aurora/validation,
- * aurora/queue, and aurora/state working together end-to-end.
+ * Exercises: waaseyaa/node, waaseyaa/taxonomy, waaseyaa/media, waaseyaa/path,
+ * waaseyaa/menu, waaseyaa/workflows, waaseyaa/access, waaseyaa/validation,
+ * waaseyaa/queue, and waaseyaa/state working together end-to-end.
  */
 #[CoversNothing]
 final class ContentLifecycleIntegrationTest extends TestCase

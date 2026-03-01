@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Integration tests for aurora/path + aurora/menu + aurora/routing.
+ * Integration tests for waaseyaa/path + waaseyaa/menu + waaseyaa/routing.
  *
  * Verifies that path aliases resolve correctly through the PathProcessor,
  * that menus and menu links form proper hierarchical trees, and that

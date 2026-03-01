@@ -23,8 +23,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * JSON:API operations with access control integration tests.
  *
- * Exercises: aurora/api (JsonApiController) with aurora/access (EntityAccessHandler),
- * aurora/node (NodeAccessPolicy), and aurora/user (User, AnonymousUser).
+ * Exercises: waaseyaa/api (JsonApiController) with waaseyaa/access (EntityAccessHandler),
+ * waaseyaa/node (NodeAccessPolicy), and waaseyaa/user (User, AnonymousUser).
  */
 #[CoversNothing]
 final class JsonApiAccessIntegrationTest extends TestCase

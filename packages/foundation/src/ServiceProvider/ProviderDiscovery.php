@@ -16,12 +16,12 @@ final class ProviderDiscovery
         $providers = [];
 
         foreach ($installed['packages'] ?? [] as $package) {
-            $auroraExtra = $package['extra']['aurora'] ?? null;
-            if ($auroraExtra === null) {
+            $waaseyaaExtra = $package['extra']['waaseyaa'] ?? null;
+            if ($waaseyaaExtra === null) {
                 continue;
             }
 
-            foreach ($auroraExtra['providers'] ?? [] as $providerClass) {
+            foreach ($waaseyaaExtra['providers'] ?? [] as $providerClass) {
                 $providers[] = $providerClass;
             }
         }

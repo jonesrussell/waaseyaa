@@ -46,14 +46,14 @@ final class CacheRecorderTest extends TestCase
     #[Test]
     public function recordHitConvenience(): void
     {
-        $this->recorder->recordHit('config:site', 'Aurora CMS', 0.2);
+        $this->recorder->recordHit('config:site', 'Waaseyaa', 0.2);
 
         $entries = $this->store->query(CacheRecorder::TYPE);
         $data = $entries[0]->data;
 
         $this->assertSame('hit', $data['operation']);
         $this->assertSame('config:site', $data['key']);
-        $this->assertSame('Aurora CMS', $data['value']);
+        $this->assertSame('Waaseyaa', $data['value']);
     }
 
     #[Test]

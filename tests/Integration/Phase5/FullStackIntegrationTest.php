@@ -39,9 +39,9 @@ use Symfony\Component\Validator\Validation;
 /**
  * Full-stack integration test spanning most Phase 5 packages.
  *
- * Exercises: aurora/entity, aurora/entity-storage, aurora/database-legacy,
- * aurora/user, aurora/access, aurora/routing, aurora/queue, aurora/state,
- * aurora/validation working together end-to-end.
+ * Exercises: waaseyaa/entity, waaseyaa/entity-storage, waaseyaa/database-legacy,
+ * waaseyaa/user, waaseyaa/access, waaseyaa/routing, waaseyaa/queue, waaseyaa/state,
+ * waaseyaa/validation working together end-to-end.
  */
 #[CoversNothing]
 final class FullStackIntegrationTest extends TestCase

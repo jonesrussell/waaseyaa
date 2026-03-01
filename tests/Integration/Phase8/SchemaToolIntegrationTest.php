@@ -21,8 +21,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Schema generation + MCP tool execution with real entity storage.
  *
- * Exercises: aurora/ai-schema (EntityJsonSchemaGenerator, McpToolGenerator,
- * McpToolExecutor, SchemaRegistry) with aurora/entity (EntityTypeManager,
+ * Exercises: waaseyaa/ai-schema (EntityJsonSchemaGenerator, McpToolGenerator,
+ * McpToolExecutor, SchemaRegistry) with waaseyaa/entity (EntityTypeManager,
  * EntityType) using in-memory storage.
  */
 #[CoversNothing]

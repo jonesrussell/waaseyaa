@@ -12,11 +12,11 @@ use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
 
 /**
- * Displays system information about the Aurora installation.
+ * Displays system information about the Waaseyaa installation.
  */
 #[AsCommand(
     name: 'about',
-    description: 'Display information about the Aurora installation',
+    description: 'Display information about the Waaseyaa installation',
 )]
 final class AboutCommand extends Command
 {
@@ -31,7 +31,7 @@ final class AboutCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('<info>Aurora CMS</info>');
+        $output->writeln('<info>Waaseyaa</info>');
         $output->writeln('');
 
         $info = array_merge($this->getDefaultInfo(), $this->info);
@@ -55,12 +55,12 @@ final class AboutCommand extends Command
     private function getDefaultInfo(): array
     {
         return [
-            'Aurora Version' => '0.1.0',
+            'Waaseyaa Version' => '0.1.0',
             'PHP Version' => PHP_VERSION,
             'Environment' => $_ENV['APP_ENV'] ?? 'production',
             'Debug Mode' => ($_ENV['APP_DEBUG'] ?? '0') === '1' ? 'ON' : 'OFF',
-            'Database' => $_ENV['AURORA_DB'] ?? './aurora.sqlite',
-            'Config Dir' => $_ENV['AURORA_CONFIG_DIR'] ?? './config/sync',
+            'Database' => $_ENV['WAASEYAA_DB'] ?? './waaseyaa.sqlite',
+            'Config Dir' => $_ENV['WAASEYAA_CONFIG_DIR'] ?? './config/sync',
             'OS' => PHP_OS_FAMILY,
         ];
     }

@@ -40,7 +40,7 @@ final class OpenApiGeneratorTest extends TestCase
         $spec = $generator->generate();
 
         $this->assertArrayHasKey('info', $spec);
-        $this->assertSame('Aurora CMS API', $spec['info']['title']);
+        $this->assertSame('Waaseyaa API', $spec['info']['title']);
         $this->assertSame('0.1.0', $spec['info']['version']);
         $this->assertArrayHasKey('description', $spec['info']);
         $this->assertNotEmpty($spec['info']['description']);

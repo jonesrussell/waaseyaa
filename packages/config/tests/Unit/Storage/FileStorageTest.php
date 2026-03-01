@@ -17,7 +17,7 @@ final class FileStorageTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->directory = sys_get_temp_dir() . '/aurora_config_test_' . uniqid();
+        $this->directory = sys_get_temp_dir() . '/waaseyaa_config_test_' . uniqid();
         mkdir($this->directory, 0777, true);
         $this->storage = new FileStorage($this->directory);
     }

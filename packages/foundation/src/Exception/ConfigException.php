@@ -11,6 +11,6 @@ final class ConfigException extends WaaseyaaException
         array $context = [],
         ?\Throwable $previous = null,
     ) {
-        parent::__construct($message, 'aurora:config/error', 500, $context, $previous);
+        parent::__construct($message, 'waaseyaa:config/error', 500, $context, $previous);
     }
 }

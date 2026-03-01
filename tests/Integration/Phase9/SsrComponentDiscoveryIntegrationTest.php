@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Integration tests for component discovery from classes.
  *
- * Exercises: aurora/ssr (ComponentRegistry::registerClass()) with PHP
+ * Exercises: waaseyaa/ssr (ComponentRegistry::registerClass()) with PHP
  * reflection and #[Component] attributes.
  */
 #[CoversNothing]

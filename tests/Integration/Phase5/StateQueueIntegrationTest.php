@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Integration tests for aurora/state + aurora/queue.
+ * Integration tests for waaseyaa/state + waaseyaa/queue.
  *
  * Verifies that MemoryState can track queue processing state,
  * that messages flow through InMemoryQueue and SyncQueue correctly,

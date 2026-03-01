@@ -59,7 +59,7 @@ final class ContainerCompilerTest extends TestCase
             public function register(): void
             {
                 $this->singleton(\DateTimeInterface::class, \DateTimeImmutable::class);
-                $this->tag(\DateTimeInterface::class, 'aurora.time');
+                $this->tag(\DateTimeInterface::class, 'waaseyaa.time');
             }
         };
 
@@ -67,7 +67,7 @@ final class ContainerCompilerTest extends TestCase
         $container = new ContainerBuilder();
         $compiler->compile([$provider], $container);
 
-        $tagged = $container->findTaggedServiceIds('aurora.time');
+        $tagged = $container->findTaggedServiceIds('waaseyaa.time');
         $this->assertArrayHasKey(\DateTimeInterface::class, $tagged);
     }
 

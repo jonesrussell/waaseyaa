@@ -31,7 +31,7 @@ final class ConfigSchemaValidatorTest extends TestCase
             ],
         ];
 
-        $data = ['site_name' => 'Aurora', 'page_size' => 25];
+        $data = ['site_name' => 'Waaseyaa', 'page_size' => 25];
 
         $violations = $this->validator->validate($data, $schema);
 
@@ -306,7 +306,7 @@ final class ConfigSchemaValidatorTest extends TestCase
             ],
         ];
 
-        $data = ['site_name' => 'Aurora', 'extra_key' => 'value'];
+        $data = ['site_name' => 'Waaseyaa', 'extra_key' => 'value'];
 
         $violations = $this->validator->validate($data, $schema);
 
