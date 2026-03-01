@@ -127,6 +127,10 @@ final class SqlEntityQuery implements EntityQueryInterface
                 $select->isNull($condition['field']);
             } elseif ($operator === 'IS NOT NULL') {
                 $select->isNotNull($condition['field']);
+            } elseif ($operator === 'CONTAINS') {
+                $select->condition($condition['field'], '%' . $condition['value'] . '%', 'LIKE');
+            } elseif ($operator === 'STARTS_WITH') {
+                $select->condition($condition['field'], $condition['value'] . '%', 'LIKE');
             } else {
                 $select->condition($condition['field'], $condition['value'], $condition['operator']);
             }
