@@ -11,13 +11,15 @@ interface EntityTypeInfo {
 
 const entityTypes = ref<EntityTypeInfo[]>([])
 const loading = ref(true)
+const loadError = ref<string | null>(null)
 
 onMounted(async () => {
   try {
     const response = await $fetch<{ data: EntityTypeInfo[] }>('/api/entity-types')
     entityTypes.value = response.data
-  } catch {
-    // Dashboard loads with empty state.
+  } catch (e: any) {
+    console.error('[Aurora] Failed to load entity types for dashboard:', e)
+    loadError.value = e.data?.errors?.[0]?.detail ?? e.message ?? t('error_loading_types')
   } finally {
     loading.value = false
   }
@@ -31,6 +33,7 @@ onMounted(async () => {
     </div>
 
     <div v-if="loading" class="loading">{{ t('loading') }}</div>
+    <div v-else-if="loadError" class="error">{{ loadError }}</div>
 
     <div v-else class="card-grid">
       <NuxtLink

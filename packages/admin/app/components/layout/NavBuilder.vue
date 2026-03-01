@@ -9,13 +9,15 @@ interface EntityTypeInfo {
 }
 
 const entityTypes = ref<EntityTypeInfo[]>([])
+const loadError = ref(false)
 
 onMounted(async () => {
   try {
     const response = await $fetch<{ data: EntityTypeInfo[] }>('/api/entity-types')
     entityTypes.value = response.data
-  } catch {
-    // Fallback: navigation will be empty.
+  } catch (e: unknown) {
+    console.error('[Aurora] Failed to load navigation entity types:', e)
+    loadError.value = true
   }
 })
 </script>
@@ -26,6 +28,7 @@ onMounted(async () => {
       {{ t('dashboard') }}
     </NuxtLink>
     <div class="nav-section">{{ t('content') }}</div>
+    <div v-if="loadError" class="nav-error">{{ t('error_nav') }}</div>
     <NuxtLink
       v-for="et in entityTypes"
       :key="et.id"
@@ -55,4 +58,9 @@ onMounted(async () => {
 }
 .nav-item:hover { background: var(--color-bg); }
 .nav-item.router-link-active { color: var(--color-primary); font-weight: 500; }
+.nav-error {
+  padding: 8px 16px;
+  font-size: 12px;
+  color: var(--color-danger, #c00);
+}
 </style>
