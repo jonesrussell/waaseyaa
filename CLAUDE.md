@@ -20,6 +20,8 @@
 - Symfony 7.x components (Console, EventDispatcher, Routing, Validator, Uid, Yaml, Messenger)
 - Named constructor parameters: `new EntityType(id: 'node', label: 'Content', ...)`
 - `final class` by default for concrete implementations
+- Admin SPA: Nuxt 3 + Vue 3 + TypeScript. Composables in `packages/admin/app/composables/`, i18n in `packages/admin/app/i18n/en.json`
+- Frontend entry point: `public/index.php` (PHP built-in server front controller)
 
 ## Architecture Gotchas
 - **Entity subclass constructors**: User, Node etc. only accept `(array $values)` and hardcode entityTypeId/entityKeys. SqlEntityStorage uses reflection to detect constructor shape.
@@ -29,6 +31,11 @@
 - **PascalCase conversion**: Use `str_replace('_', '', ucwords($name, '_'))` not `ucfirst()`.
 - **InMemoryEntityStorage** (`Waaseyaa\Api\Tests\Fixtures\`) — use for tests. SqlEntityStorage for real storage.
 - **EntityTypeManager** takes `(EventDispatcher, callable $storageFactory)` where factory receives `EntityType $definition`.
+- **EntityEvent uses public properties**: `$event->entity` and `$event->originalEntity` are public readonly — no getter methods. Common mistake: `$event->getEntity()`.
+- **DatabaseInterface vs PdoDatabase**: `DatabaseInterface` does NOT have `getPdo()`. If raw PDO is needed, type-hint `PdoDatabase` directly. Prefer using query builder (`select()`, `insert()`, `delete()`) over raw PDO when possible.
+- **LIKE wildcard escaping**: `PdoSelect` appends `ESCAPE '\'` for LIKE/NOT LIKE operators. When building LIKE patterns in `SqlEntityQuery`, escape `%` and `_` in user input with `str_replace(['%', '_'], ['\\%', '\\_'], $value)`.
+- **JSON symmetry**: Always pair `json_encode(..., JSON_THROW_ON_ERROR)` with `json_decode(..., JSON_THROW_ON_ERROR)`. Asymmetric usage causes silent `null` on corrupt data.
+- **Best-effort side effects**: Event listeners for non-critical operations (broadcasting, logging) should wrap in try-catch to avoid crashing the primary request.
 
 ## Testing
 - Integration tests in `tests/Integration/PhaseN/` — one directory per implementation phase
