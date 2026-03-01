@@ -63,8 +63,8 @@ export function useSchema(entityType: string) {
   }
 
   /**
-   * Return properties sorted by x-weight, filtering out readOnly/hidden fields when
-   * `editable` is true.
+   * Return properties sorted by x-weight. When `editable` is true, readOnly and
+   * hidden fields are excluded. When false (default), all properties are returned.
    */
   function sortedProperties(editable = false) {
     if (!schema.value) return []
