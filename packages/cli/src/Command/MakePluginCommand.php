@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'make:plugin',
-    description: 'Generate a plugin class with #[AuroraPlugin] attribute',
+    description: 'Generate a plugin class with #[WaaseyaaPlugin] attribute',
 )]
 class MakePluginCommand extends Command
 {
@@ -34,9 +34,9 @@ declare(strict_types=1);
 
 namespace App\Plugin;
 
-use Waaseyaa\Plugin\Attribute\AuroraPlugin;
+use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 
-#[AuroraPlugin(id: '{$pluginId}', label: '{$className}')]
+#[WaaseyaaPlugin(id: '{$pluginId}', label: '{$className}')]
 class {$className}
 {
 }

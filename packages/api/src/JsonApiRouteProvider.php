@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Api;
 
 use Waaseyaa\Entity\EntityTypeManagerInterface;
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\Routing\RouteBuilder;
 
 /**
@@ -30,7 +30,7 @@ final class JsonApiRouteProvider
     /**
      * Register JSON:API routes for all entity types on the given router.
      */
-    public function registerRoutes(AuroraRouter $router): void
+    public function registerRoutes(WaaseyaaRouter $router): void
     {
         foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $definition) {
             $this->registerEntityTypeRoutes($router, $entityTypeId);
@@ -40,7 +40,7 @@ final class JsonApiRouteProvider
     /**
      * Register the five CRUD routes for a single entity type.
      */
-    private function registerEntityTypeRoutes(AuroraRouter $router, string $entityTypeId): void
+    private function registerEntityTypeRoutes(WaaseyaaRouter $router, string $entityTypeId): void
     {
         $collectionPath = $this->basePath . '/' . $entityTypeId;
         $resourcePath = $collectionPath . '/{id}';

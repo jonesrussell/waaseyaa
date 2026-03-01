@@ -21,7 +21,7 @@ use Waaseyaa\Mcp\Bridge\ToolRegistryInterface;
 use Waaseyaa\Mcp\McpEndpoint;
 use Waaseyaa\Mcp\McpRouteProvider;
 use Waaseyaa\Mcp\McpServerCard;
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
@@ -86,7 +86,7 @@ final class McpEndpointSmokeTest extends TestCase
         $this->assertTrue($cardData['capabilities']['tools']);
 
         // --- Step 2: Route registration ---
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $routeProvider = new McpRouteProvider();
         $routeProvider->registerRoutes($router);
 

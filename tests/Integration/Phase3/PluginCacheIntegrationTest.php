@@ -8,7 +8,7 @@ use Waaseyaa\Cache\Backend\MemoryBackend;
 use Waaseyaa\Cache\CacheBackendInterface;
 use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\Cache\CacheTagsInvalidator;
-use Waaseyaa\Plugin\Attribute\AuroraPlugin;
+use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 use Waaseyaa\Plugin\DefaultPluginManager;
 use Waaseyaa\Plugin\Discovery\AttributeDiscovery;
 use Waaseyaa\Plugin\Discovery\PluginDiscoveryInterface;
@@ -124,7 +124,7 @@ final class PluginCacheIntegrationTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $cache = new MemoryBackend();
@@ -158,7 +158,7 @@ final class PluginCacheIntegrationTest extends TestCase
 
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $manager = new DefaultPluginManager($discovery, $backend);

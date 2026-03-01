@@ -26,10 +26,10 @@ class MakePluginCommandTest extends TestCase
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
         $output = $tester->getDisplay();
-        $this->assertStringContainsString('#[AuroraPlugin(', $output);
+        $this->assertStringContainsString('#[WaaseyaaPlugin(', $output);
         $this->assertStringContainsString("id: 'my_formatter'", $output);
         $this->assertStringContainsString('class MyFormatter', $output);
-        $this->assertStringContainsString('use Waaseyaa\\Plugin\\Attribute\\AuroraPlugin;', $output);
+        $this->assertStringContainsString('use Waaseyaa\\Plugin\\Attribute\\WaaseyaaPlugin;', $output);
         $this->assertStringContainsString('declare(strict_types=1);', $output);
     }
 }

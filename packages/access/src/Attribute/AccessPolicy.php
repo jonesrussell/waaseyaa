@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Access\Attribute;
 
-use Waaseyaa\Plugin\Attribute\AuroraPlugin;
+use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 
 /**
  * Attribute for discovering access policy plugins.
@@ -13,7 +13,7 @@ use Waaseyaa\Plugin\Attribute\AuroraPlugin;
  * to enable attribute-based plugin discovery.
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class AccessPolicy extends AuroraPlugin
+class AccessPolicy extends WaaseyaaPlugin
 {
     /**
      * @param string   $id          Unique plugin ID.

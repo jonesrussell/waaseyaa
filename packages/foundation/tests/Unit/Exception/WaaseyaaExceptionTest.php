@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Tests\Unit\Exception;
 
-use Waaseyaa\Foundation\Exception\AuroraException;
+use Waaseyaa\Foundation\Exception\WaaseyaaException;
 use Waaseyaa\Foundation\Exception\AuthenticationException;
 use Waaseyaa\Foundation\Exception\ConfigException;
 use Waaseyaa\Foundation\Exception\StorageException;
@@ -12,11 +12,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(AuroraException::class)]
+#[CoversClass(WaaseyaaException::class)]
 #[CoversClass(StorageException::class)]
 #[CoversClass(ConfigException::class)]
 #[CoversClass(AuthenticationException::class)]
-final class AuroraExceptionTest extends TestCase
+final class WaaseyaaExceptionTest extends TestCase
 {
     #[Test]
     public function storage_exception_has_correct_defaults(): void
@@ -26,7 +26,7 @@ final class AuroraExceptionTest extends TestCase
         $this->assertSame('Database is down', $e->getMessage());
         $this->assertSame(503, $e->statusCode);
         $this->assertSame('aurora:storage/error', $e->problemType);
-        $this->assertInstanceOf(AuroraException::class, $e);
+        $this->assertInstanceOf(WaaseyaaException::class, $e);
     }
 
     #[Test]

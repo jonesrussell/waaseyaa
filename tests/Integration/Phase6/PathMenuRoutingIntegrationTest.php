@@ -10,7 +10,7 @@ use Waaseyaa\Menu\MenuTreeBuilder;
 use Waaseyaa\Path\InMemoryPathAliasManager;
 use Waaseyaa\Path\PathAlias;
 use Waaseyaa\Path\PathProcessor;
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\Routing\RouteBuilder;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
@@ -28,7 +28,7 @@ final class PathMenuRoutingIntegrationTest extends TestCase
 {
     private InMemoryPathAliasManager $aliasManager;
     private PathProcessor $pathProcessor;
-    private AuroraRouter $router;
+    private WaaseyaaRouter $router;
     private MenuTreeBuilder $treeBuilder;
 
     protected function setUp(): void
@@ -38,7 +38,7 @@ final class PathMenuRoutingIntegrationTest extends TestCase
         $this->treeBuilder = new MenuTreeBuilder();
 
         // Set up router with content routes.
-        $this->router = new AuroraRouter();
+        $this->router = new WaaseyaaRouter();
 
         $this->router->addRoute(
             'node.view',

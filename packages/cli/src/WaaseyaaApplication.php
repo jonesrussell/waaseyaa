@@ -7,7 +7,7 @@ namespace Waaseyaa\CLI;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 
-class AuroraApplication extends Application
+class WaaseyaaApplication extends Application
 {
     public function __construct()
     {

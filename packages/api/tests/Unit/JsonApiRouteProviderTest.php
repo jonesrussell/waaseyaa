@@ -8,7 +8,7 @@ use Waaseyaa\Api\JsonApiRouteProvider;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -18,12 +18,12 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 final class JsonApiRouteProviderTest extends TestCase
 {
     private EntityTypeManager $entityTypeManager;
-    private AuroraRouter $router;
+    private WaaseyaaRouter $router;
 
     protected function setUp(): void
     {
         $this->entityTypeManager = new EntityTypeManager(new EventDispatcher());
-        $this->router = new AuroraRouter();
+        $this->router = new WaaseyaaRouter();
     }
 
     #[Test]
@@ -227,7 +227,7 @@ final class JsonApiRouteProviderTest extends TestCase
 
         // The router should be able to match the path.
         $context = new \Symfony\Component\Routing\RequestContext('', 'GET');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $provider->registerRoutes($router);
 
         $match = $router->match('/api/article');
@@ -246,7 +246,7 @@ final class JsonApiRouteProviderTest extends TestCase
         ));
 
         $context = new \Symfony\Component\Routing\RequestContext('', 'GET');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
         $provider->registerRoutes($router);

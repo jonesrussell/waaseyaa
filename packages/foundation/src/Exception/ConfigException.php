@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Exception;
 
-final class ConfigException extends AuroraException
+final class ConfigException extends WaaseyaaException
 {
     public function __construct(
         string $message,

@@ -16,7 +16,7 @@ use Symfony\Component\Routing\RouteCollection;
  * Provides route matching (URL -> parameters) and URL generation
  * (route name + parameters -> URL).
  */
-final class AuroraRouter
+final class WaaseyaaRouter
 {
     private RouteCollection $routes;
     private ?UrlMatcher $matcher;

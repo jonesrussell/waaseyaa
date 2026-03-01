@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Mcp\Tests\Unit;
 
 use Waaseyaa\Mcp\McpRouteProvider;
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +16,7 @@ final class McpRouteProviderTest extends TestCase
     #[Test]
     public function registerRoutesAddsMcpEndpointRoute(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $provider = new McpRouteProvider();
 
         $provider->registerRoutes($router);
@@ -33,7 +33,7 @@ final class McpRouteProviderTest extends TestCase
     #[Test]
     public function registerRoutesAddsServerCardRoute(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $provider = new McpRouteProvider();
 
         $provider->registerRoutes($router);
@@ -49,7 +49,7 @@ final class McpRouteProviderTest extends TestCase
     #[Test]
     public function serverCardRouteIsPublic(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $provider = new McpRouteProvider();
 
         $provider->registerRoutes($router);

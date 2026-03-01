@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Exception;
 
-abstract class AuroraException extends \RuntimeException
+abstract class WaaseyaaException extends \RuntimeException
 {
     public function __construct(
         string $message,

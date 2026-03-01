@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
  * class instead of PHPUnit\Framework\TestCase for tests that
  * need the Aurora application environment.
  */
-abstract class AuroraTestCase extends TestCase
+abstract class WaaseyaaTestCase extends TestCase
 {
     use CreatesApplication;
     use InteractsWithAuth;

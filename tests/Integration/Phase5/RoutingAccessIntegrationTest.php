@@ -6,7 +6,7 @@ namespace Waaseyaa\Tests\Integration\Phase5;
 
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Routing\AccessChecker;
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\RouteMatch;
 use Waaseyaa\User\AnonymousUser;
@@ -17,18 +17,18 @@ use PHPUnit\Framework\TestCase;
 /**
  * Integration tests for aurora/routing + aurora/access + aurora/user.
  *
- * Verifies that AuroraRouter, RouteBuilder, and AccessChecker work together
+ * Verifies that WaaseyaaRouter, RouteBuilder, and AccessChecker work together
  * to enforce permission-based, role-based, and public route access.
  */
 #[CoversNothing]
 final class RoutingAccessIntegrationTest extends TestCase
 {
-    private AuroraRouter $router;
+    private WaaseyaaRouter $router;
     private AccessChecker $accessChecker;
 
     protected function setUp(): void
     {
-        $this->router = new AuroraRouter();
+        $this->router = new WaaseyaaRouter();
         $this->accessChecker = new AccessChecker();
 
         // Register routes using RouteBuilder.

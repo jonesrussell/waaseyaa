@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Routing\Tests\Unit;
 
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -12,13 +12,13 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 
-#[CoversClass(AuroraRouter::class)]
-final class AuroraRouterTest extends TestCase
+#[CoversClass(WaaseyaaRouter::class)]
+final class WaaseyaaRouterTest extends TestCase
 {
     #[Test]
     public function matchReturnsParametersForStaticRoute(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('home', new Route('/'));
 
         $result = $router->match('/');
@@ -29,7 +29,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function matchReturnsParametersForDynamicRoute(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('node.view', new Route('/node/{id}', [], ['id' => '\d+']));
 
         $result = $router->match('/node/42');
@@ -41,7 +41,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function matchThrowsForUnknownPath(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('home', new Route('/'));
 
         $this->expectException(ResourceNotFoundException::class);
@@ -51,7 +51,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function matchRespectsRequirements(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('node.view', new Route('/node/{id}', [], ['id' => '\d+']));
 
         // Non-numeric ID should not match.
@@ -62,7 +62,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function generateProducesUrlForStaticRoute(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('home', new Route('/'));
 
         $url = $router->generate('home');
@@ -73,7 +73,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function generateProducesUrlWithParameters(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('node.view', new Route('/node/{id}'));
 
         $url = $router->generate('node.view', ['id' => 42]);
@@ -84,7 +84,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function generateAddsExtraParametersAsQueryString(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('node.view', new Route('/node/{id}'));
 
         $url = $router->generate('node.view', ['id' => 42, 'tab' => 'edit']);
@@ -95,7 +95,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function getRouteCollectionReturnsAllRoutes(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('home', new Route('/'));
         $router->addRoute('about', new Route('/about'));
 
@@ -109,7 +109,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function addingRouteResetsMatcherAndGenerator(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('home', new Route('/'));
 
         // Trigger matcher/generator creation.
@@ -132,7 +132,7 @@ final class AuroraRouterTest extends TestCase
         $context = new RequestContext();
         $context->setBaseUrl('/app');
 
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $router->addRoute('home', new Route('/'));
 
         $url = $router->generate('home');
@@ -143,7 +143,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function matchReturnsDefaultValues(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('list', new Route('/items/{page}', ['page' => '1']));
 
         $result = $router->match('/items');
@@ -155,7 +155,7 @@ final class AuroraRouterTest extends TestCase
     #[Test]
     public function matchMultipleParameterRoute(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute(
             'node.revision',
             new Route('/node/{node}/revision/{revision}', [], ['node' => '\d+', 'revision' => '\d+'])

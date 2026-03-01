@@ -33,8 +33,8 @@ final class ExceptionHandler
 
     public function render(\Throwable $e): array
     {
-        if ($e instanceof AuroraException) {
-            return $this->renderAuroraException($e);
+        if ($e instanceof WaaseyaaException) {
+            return $this->renderWaaseyaaException($e);
         }
 
         return $this->renderGenericException($e);
@@ -42,7 +42,7 @@ final class ExceptionHandler
 
     public function renderForCli(\Throwable $e): string
     {
-        if ($e instanceof AuroraException) {
+        if ($e instanceof WaaseyaaException) {
             return sprintf(
                 "[%s] %s\n  Type: %s\n  Status: %d",
                 (new \ReflectionClass($e))->getShortName(),
@@ -61,7 +61,7 @@ final class ExceptionHandler
         );
     }
 
-    private function renderAuroraException(AuroraException $e): array
+    private function renderWaaseyaaException(WaaseyaaException $e): array
     {
         $error = $e->toApiError();
 

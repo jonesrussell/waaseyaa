@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity\Attribute;
 
-use Waaseyaa\Plugin\Attribute\AuroraPlugin;
+use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 
 /**
  * PHP attribute for declaring entity types.
  *
- * This extends the base AuroraPlugin attribute with entity-type-specific
+ * This extends the base WaaseyaaPlugin attribute with entity-type-specific
  * fields. It is provided for future plugin-based discovery of entity types.
  *
  * Usage:
@@ -22,7 +22,7 @@ use Waaseyaa\Plugin\Attribute\AuroraPlugin;
  *   class Node extends ContentEntityBase { ... }
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class EntityTypeAttribute extends AuroraPlugin
+class EntityTypeAttribute extends WaaseyaaPlugin
 {
     /**
      * @param string $id Machine name of the entity type.

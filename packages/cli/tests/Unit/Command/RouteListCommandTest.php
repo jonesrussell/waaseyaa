@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\CLI\Tests\Unit\Command;
 
 use Waaseyaa\CLI\Command\RouteListCommand;
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +20,7 @@ final class RouteListCommandTest extends TestCase
     #[Test]
     public function it_lists_registered_routes(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('api.nodes', new Route('/api/node/{id}', methods: ['GET']));
         $router->addRoute('api.nodes.create', new Route('/api/node', methods: ['POST']));
 
@@ -39,7 +39,7 @@ final class RouteListCommandTest extends TestCase
     #[Test]
     public function it_shows_any_for_routes_without_methods(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('catch.all', new Route('/catch'));
 
         $tester = $this->createTester($router);
@@ -52,7 +52,7 @@ final class RouteListCommandTest extends TestCase
     #[Test]
     public function it_filters_routes_by_path(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
         $router->addRoute('api.nodes', new Route('/api/node/{id}', methods: ['GET']));
         $router->addRoute('admin.dashboard', new Route('/admin/dashboard', methods: ['GET']));
 
@@ -67,7 +67,7 @@ final class RouteListCommandTest extends TestCase
     #[Test]
     public function it_shows_message_when_no_routes_found(): void
     {
-        $router = new AuroraRouter();
+        $router = new WaaseyaaRouter();
 
         $tester = $this->createTester($router);
         $tester->execute([]);
@@ -76,7 +76,7 @@ final class RouteListCommandTest extends TestCase
         $this->assertStringContainsString('No routes found.', $output);
     }
 
-    private function createTester(AuroraRouter $router): CommandTester
+    private function createTester(WaaseyaaRouter $router): CommandTester
     {
         $app = new Application();
         $app->add(new RouteListCommand($router));

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Plugin\Tests\Unit;
 
 use Waaseyaa\Cache\Backend\MemoryBackend;
-use Waaseyaa\Plugin\Attribute\AuroraPlugin;
+use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 use Waaseyaa\Plugin\DefaultPluginManager;
 use Waaseyaa\Plugin\Definition\PluginDefinition;
 use Waaseyaa\Plugin\Discovery\AttributeDiscovery;
@@ -27,7 +27,7 @@ final class DefaultPluginManagerTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $manager = new DefaultPluginManager($discovery);
@@ -42,7 +42,7 @@ final class DefaultPluginManagerTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $manager = new DefaultPluginManager($discovery);
@@ -58,7 +58,7 @@ final class DefaultPluginManagerTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $manager = new DefaultPluginManager($discovery);
@@ -73,7 +73,7 @@ final class DefaultPluginManagerTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $manager = new DefaultPluginManager($discovery);
@@ -87,7 +87,7 @@ final class DefaultPluginManagerTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $manager = new DefaultPluginManager($discovery);
@@ -102,7 +102,7 @@ final class DefaultPluginManagerTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $manager = new DefaultPluginManager($discovery);
@@ -204,7 +204,7 @@ final class DefaultPluginManagerTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $manager = new DefaultPluginManager($discovery);

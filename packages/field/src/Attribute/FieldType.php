@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Field\Attribute;
 
-use Waaseyaa\Plugin\Attribute\AuroraPlugin;
+use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class FieldType extends AuroraPlugin
+class FieldType extends WaaseyaaPlugin
 {
     public function __construct(
         string $id,

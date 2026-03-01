@@ -50,7 +50,7 @@ use Aurora\Entity\EntityTypeManager;
 use Aurora\EntityStorage\SqlEntityStorage;
 use Aurora\EntityStorage\SqlSchemaHandler;
 use Aurora\Node\Node;
-use Aurora\Routing\AuroraRouter;
+use Aurora\Routing\WaaseyaaRouter;
 use Aurora\Routing\RouteBuilder;
 use Aurora\User\User;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -121,7 +121,7 @@ if (!is_string($path)) {
 $queryString = $_SERVER['QUERY_STRING'] ?? '';
 
 $context = new RequestContext('', $method);
-$router = new AuroraRouter($context);
+$router = new WaaseyaaRouter($context);
 
 // Register JSON:API CRUD routes.
 $routeProvider = new JsonApiRouteProvider($entityTypeManager);

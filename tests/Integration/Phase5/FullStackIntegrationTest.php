@@ -19,7 +19,7 @@ use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\Queue\InMemoryQueue;
 use Waaseyaa\Queue\Message\EntityMessage;
 use Waaseyaa\Routing\AccessChecker;
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\Routing\ParamConverter\EntityParamConverter;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\RouteMatch;
@@ -50,7 +50,7 @@ final class FullStackIntegrationTest extends TestCase
     private EventDispatcher $eventDispatcher;
     private EntityTypeManager $entityTypeManager;
     private SqlEntityStorage $articleStorage;
-    private AuroraRouter $router;
+    private WaaseyaaRouter $router;
     private AccessChecker $accessChecker;
     private EntityAccessHandler $entityAccessHandler;
     private EntityParamConverter $paramConverter;
@@ -119,7 +119,7 @@ final class FullStackIntegrationTest extends TestCase
         ]);
 
         // ---- Routing ----
-        $this->router = new AuroraRouter();
+        $this->router = new WaaseyaaRouter();
         $this->accessChecker = new AccessChecker();
         $this->paramConverter = new EntityParamConverter($this->entityTypeManager);
 

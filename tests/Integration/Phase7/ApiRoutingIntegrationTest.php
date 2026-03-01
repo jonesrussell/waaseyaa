@@ -11,7 +11,7 @@ use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -23,13 +23,13 @@ use Symfony\Component\Routing\RequestContext;
  * End-to-end: routes + API controller + entity storage integration tests.
  *
  * Exercises: aurora/api (JsonApiRouteProvider, JsonApiController) with
- * aurora/routing (AuroraRouter, RouteBuilder) and aurora/entity
+ * aurora/routing (WaaseyaaRouter, RouteBuilder) and aurora/entity
  * (EntityTypeManager).
  */
 #[CoversNothing]
 final class ApiRoutingIntegrationTest extends TestCase
 {
-    private AuroraRouter $router;
+    private WaaseyaaRouter $router;
     private EntityTypeManager $entityTypeManager;
     private InMemoryEntityStorage $nodeStorage;
     private JsonApiController $controller;
@@ -56,7 +56,7 @@ final class ApiRoutingIntegrationTest extends TestCase
         ));
 
         // Set up router with API routes.
-        $this->router = new AuroraRouter(new RequestContext());
+        $this->router = new WaaseyaaRouter(new RequestContext());
         $routeProvider = new JsonApiRouteProvider($this->entityTypeManager);
         $routeProvider->registerRoutes($this->router);
 
@@ -81,7 +81,7 @@ final class ApiRoutingIntegrationTest extends TestCase
     public function indexRouteMatchesGetCollection(): void
     {
         $context = new RequestContext('', 'GET');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $routeProvider = new JsonApiRouteProvider($this->entityTypeManager);
         $routeProvider->registerRoutes($router);
 
@@ -95,7 +95,7 @@ final class ApiRoutingIntegrationTest extends TestCase
     public function showRouteMatchesGetWithId(): void
     {
         $context = new RequestContext('', 'GET');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $routeProvider = new JsonApiRouteProvider($this->entityTypeManager);
         $routeProvider->registerRoutes($router);
 
@@ -110,7 +110,7 @@ final class ApiRoutingIntegrationTest extends TestCase
     public function storeRouteMatchesPostCollection(): void
     {
         $context = new RequestContext('', 'POST');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $routeProvider = new JsonApiRouteProvider($this->entityTypeManager);
         $routeProvider->registerRoutes($router);
 
@@ -124,7 +124,7 @@ final class ApiRoutingIntegrationTest extends TestCase
     public function updateRouteMatchesPatchWithId(): void
     {
         $context = new RequestContext('', 'PATCH');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $routeProvider = new JsonApiRouteProvider($this->entityTypeManager);
         $routeProvider->registerRoutes($router);
 
@@ -139,7 +139,7 @@ final class ApiRoutingIntegrationTest extends TestCase
     public function destroyRouteMatchesDeleteWithId(): void
     {
         $context = new RequestContext('', 'DELETE');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $routeProvider = new JsonApiRouteProvider($this->entityTypeManager);
         $routeProvider->registerRoutes($router);
 
@@ -154,7 +154,7 @@ final class ApiRoutingIntegrationTest extends TestCase
     public function routeParametersExtractEntityTypeAndId(): void
     {
         $context = new RequestContext('', 'GET');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $routeProvider = new JsonApiRouteProvider($this->entityTypeManager);
         $routeProvider->registerRoutes($router);
 
@@ -168,7 +168,7 @@ final class ApiRoutingIntegrationTest extends TestCase
     public function unmatchedPathThrowsResourceNotFound(): void
     {
         $context = new RequestContext('', 'GET');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $routeProvider = new JsonApiRouteProvider($this->entityTypeManager);
         $routeProvider->registerRoutes($router);
 
@@ -189,7 +189,7 @@ final class ApiRoutingIntegrationTest extends TestCase
 
         // Step 2: Match a GET route for the entity.
         $context = new RequestContext('', 'GET');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         $routeProvider = new JsonApiRouteProvider($this->entityTypeManager);
         $routeProvider->registerRoutes($router);
 
@@ -218,7 +218,7 @@ final class ApiRoutingIntegrationTest extends TestCase
     {
         // POST: Create via route match.
         $postContext = new RequestContext('', 'POST');
-        $postRouter = new AuroraRouter($postContext);
+        $postRouter = new WaaseyaaRouter($postContext);
         (new JsonApiRouteProvider($this->entityTypeManager))->registerRoutes($postRouter);
 
         $postParams = $postRouter->match('/api/node');
@@ -240,7 +240,7 @@ final class ApiRoutingIntegrationTest extends TestCase
 
         // GET: Read via route match.
         $getContext = new RequestContext('', 'GET');
-        $getRouter = new AuroraRouter($getContext);
+        $getRouter = new WaaseyaaRouter($getContext);
         (new JsonApiRouteProvider($this->entityTypeManager))->registerRoutes($getRouter);
 
         $getParams = $getRouter->match('/api/node/1');
@@ -251,7 +251,7 @@ final class ApiRoutingIntegrationTest extends TestCase
 
         // PATCH: Update via route match.
         $patchContext = new RequestContext('', 'PATCH');
-        $patchRouter = new AuroraRouter($patchContext);
+        $patchRouter = new WaaseyaaRouter($patchContext);
         (new JsonApiRouteProvider($this->entityTypeManager))->registerRoutes($patchRouter);
 
         $patchParams = $patchRouter->match('/api/node/1');
@@ -270,7 +270,7 @@ final class ApiRoutingIntegrationTest extends TestCase
 
         // DELETE: Destroy via route match.
         $deleteContext = new RequestContext('', 'DELETE');
-        $deleteRouter = new AuroraRouter($deleteContext);
+        $deleteRouter = new WaaseyaaRouter($deleteContext);
         (new JsonApiRouteProvider($this->entityTypeManager))->registerRoutes($deleteRouter);
 
         $deleteParams = $deleteRouter->match('/api/node/1');
@@ -325,7 +325,7 @@ final class ApiRoutingIntegrationTest extends TestCase
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name', 'bundle' => 'vid'],
         ));
 
-        $router = new AuroraRouter(new RequestContext('', 'GET'));
+        $router = new WaaseyaaRouter(new RequestContext('', 'GET'));
         $routeProvider = new JsonApiRouteProvider($entityTypeManager);
         $routeProvider->registerRoutes($router);
 
@@ -375,7 +375,7 @@ final class ApiRoutingIntegrationTest extends TestCase
 
         // Match the index route.
         $context = new RequestContext('', 'GET');
-        $router = new AuroraRouter($context);
+        $router = new WaaseyaaRouter($context);
         (new JsonApiRouteProvider($this->entityTypeManager))->registerRoutes($router);
 
         $params = $router->match('/api/node');

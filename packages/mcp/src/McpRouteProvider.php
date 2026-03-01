@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Mcp;
 
-use Waaseyaa\Routing\AuroraRouter;
+use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\Routing\RouteBuilder;
 
 final readonly class McpRouteProvider
 {
-    public function registerRoutes(AuroraRouter $router): void
+    public function registerRoutes(WaaseyaaRouter $router): void
     {
         $router->addRoute(
             'mcp.endpoint',

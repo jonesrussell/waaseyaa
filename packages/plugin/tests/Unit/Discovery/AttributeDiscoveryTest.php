@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Plugin\Tests\Unit\Discovery;
 
-use Waaseyaa\Plugin\Attribute\AuroraPlugin;
+use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 use Waaseyaa\Plugin\Definition\PluginDefinition;
 use Waaseyaa\Plugin\Discovery\AttributeDiscovery;
 use Waaseyaa\Plugin\Tests\Fixtures\AnotherPlugin;
@@ -24,7 +24,7 @@ final class AttributeDiscoveryTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $definitions = $discovery->getDefinitions();
@@ -38,7 +38,7 @@ final class AttributeDiscoveryTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $definitions = $discovery->getDefinitions();
@@ -68,7 +68,7 @@ final class AttributeDiscoveryTest extends TestCase
         try {
             $discovery = new AttributeDiscovery(
                 directories: [$emptyDir],
-                attributeClass: AuroraPlugin::class,
+                attributeClass: WaaseyaaPlugin::class,
             );
 
             $definitions = $discovery->getDefinitions();
@@ -83,7 +83,7 @@ final class AttributeDiscoveryTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: ['/tmp/nonexistent_aurora_dir_' . uniqid()],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $definitions = $discovery->getDefinitions();
@@ -95,7 +95,7 @@ final class AttributeDiscoveryTest extends TestCase
     {
         $discovery = new AttributeDiscovery(
             directories: [$this->fixturesDir],
-            attributeClass: AuroraPlugin::class,
+            attributeClass: WaaseyaaPlugin::class,
         );
 
         $definitions = $discovery->getDefinitions();
@@ -114,7 +114,7 @@ final class AttributeDiscoveryTest extends TestCase
         try {
             $discovery = new AttributeDiscovery(
                 directories: [$this->fixturesDir, $emptyDir],
-                attributeClass: AuroraPlugin::class,
+                attributeClass: WaaseyaaPlugin::class,
             );
 
             $definitions = $discovery->getDefinitions();

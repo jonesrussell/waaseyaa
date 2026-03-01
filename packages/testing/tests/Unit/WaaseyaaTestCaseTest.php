@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Testing\Tests\Unit;
 
-use Waaseyaa\Testing\AuroraTestCase;
+use Waaseyaa\Testing\WaaseyaaTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Tests the AuroraTestCase base class via a concrete subclass.
+ * Tests the WaaseyaaTestCase base class via a concrete subclass.
  */
-#[CoversClass(AuroraTestCase::class)]
-final class AuroraTestCaseTest extends TestCase
+#[CoversClass(WaaseyaaTestCase::class)]
+final class WaaseyaaTestCaseTest extends TestCase
 {
     #[Test]
     public function assertArrayHasKeysPassesWhenAllKeysPresent(): void
@@ -145,11 +145,11 @@ final class AuroraTestCaseTest extends TestCase
 }
 
 /**
- * Concrete subclass of AuroraTestCase for testing purposes.
+ * Concrete subclass of WaaseyaaTestCase for testing purposes.
  *
  * Exposes protected methods as public so we can call them from the test.
  */
-final class ConcreteTestCase extends AuroraTestCase
+final class ConcreteTestCase extends WaaseyaaTestCase
 {
     public function callSetUp(): void
     {
