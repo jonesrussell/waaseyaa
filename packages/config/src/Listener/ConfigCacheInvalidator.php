@@ -14,8 +14,12 @@ final class ConfigCacheInvalidator
 
     public function __invoke(ConfigEvent $event): void
     {
-        if (is_file($this->cachePath)) {
-            unlink($this->cachePath);
+        try {
+            if (is_file($this->cachePath)) {
+                unlink($this->cachePath);
+            }
+        } catch (\Throwable) {
+            // Best-effort: cache invalidation failure should not crash the primary request
         }
     }
 }

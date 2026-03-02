@@ -65,19 +65,23 @@ final class PackageManifestCompiler
             }
 
             foreach ($ref->getAttributes(Listener::class) as $attr) {
-                $instance = $attr->newInstance();
-                // Listener classes must implement __invoke(DomainEvent)
-                $invoke = $ref->getMethod('__invoke');
-                $params = $invoke->getParameters();
-                if (count($params) > 0) {
-                    $eventType = $params[0]->getType();
-                    if ($eventType instanceof \ReflectionNamedType) {
-                        $eventClass = $eventType->getName();
-                        $listeners[$eventClass][] = [
-                            'class' => $class,
-                            'priority' => $instance->priority,
-                        ];
+                try {
+                    $instance = $attr->newInstance();
+                    $invoke = $ref->getMethod('__invoke');
+                    $params = $invoke->getParameters();
+                    if (count($params) > 0) {
+                        $eventType = $params[0]->getType();
+                        if ($eventType instanceof \ReflectionNamedType) {
+                            $eventClass = $eventType->getName();
+                            $listeners[$eventClass][] = [
+                                'class' => $class,
+                                'priority' => $instance->priority,
+                            ];
+                        }
                     }
+                } catch (\ReflectionException) {
+                    // Skip listeners with missing __invoke or invalid signatures
+                    continue;
                 }
             }
 
@@ -123,12 +127,22 @@ final class PackageManifestCompiler
         $manifest = $this->compile();
 
         $dir = $this->storagePath . '/framework';
-        if (!is_dir($dir)) {
-            mkdir($dir, 0o755, true);
+        if (!is_dir($dir) && !mkdir($dir, 0o755, true)) {
+            throw new \RuntimeException(sprintf('Failed to create cache directory: %s', $dir));
         }
 
+        $cachePath = $dir . '/packages.php';
         $content = '<?php return ' . var_export($manifest->toArray(), true) . ';' . "\n";
-        file_put_contents($dir . '/packages.php', $content);
+        $tmpPath = $cachePath . '.tmp.' . getmypid();
+
+        if (file_put_contents($tmpPath, $content) === false) {
+            throw new \RuntimeException(sprintf('Failed to write package manifest cache to %s', $cachePath));
+        }
+
+        if (!rename($tmpPath, $cachePath)) {
+            @unlink($tmpPath);
+            throw new \RuntimeException(sprintf('Failed to atomically replace package manifest at %s', $cachePath));
+        }
 
         return $manifest;
     }
@@ -140,7 +154,14 @@ final class PackageManifestCompiler
     {
         $cachePath = $this->storagePath . '/framework/packages.php';
         if (is_file($cachePath)) {
-            return PackageManifest::fromArray(require $cachePath);
+            try {
+                $data = require $cachePath;
+                if (is_array($data)) {
+                    return PackageManifest::fromArray($data);
+                }
+            } catch (\Throwable) {
+                // Corrupt cache — recompile
+            }
         }
 
         return $this->compileAndCache();

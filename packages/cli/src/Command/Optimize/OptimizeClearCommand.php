@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'optimize:clear',
     description: 'Remove all cached optimization artifacts',
 )]
-class OptimizeClearCommand extends Command
+final class OptimizeClearCommand extends Command
 {
     public function __construct(
         private readonly string $storagePath,
@@ -30,7 +30,7 @@ class OptimizeClearCommand extends Command
             return Command::SUCCESS;
         }
 
-        $files = glob($frameworkPath . '/*.php');
+        $files = glob($frameworkPath . '/*.php') ?: [];
         $count = 0;
 
         foreach ($files as $file) {

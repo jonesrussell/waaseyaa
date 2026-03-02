@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'optimize',
     description: 'Run all optimization compilers',
 )]
-class OptimizeCommand extends Command
+final class OptimizeCommand extends Command
 {
     /**
      * Sub-commands to run in order.

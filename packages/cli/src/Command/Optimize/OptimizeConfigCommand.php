@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'optimize:config',
     description: 'Compile and cache all configuration',
 )]
-class OptimizeConfigCommand extends Command
+final class OptimizeConfigCommand extends Command
 {
     public function __construct(
         private readonly ConfigCacheCompiler $compiler,

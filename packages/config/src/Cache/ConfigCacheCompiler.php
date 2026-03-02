@@ -40,12 +40,21 @@ final class ConfigCacheCompiler
         $data = $this->compile();
 
         $dir = dirname($this->cachePath);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0o755, true);
+        if (!is_dir($dir) && !mkdir($dir, 0o755, true)) {
+            throw new \RuntimeException(sprintf('Failed to create cache directory: %s', $dir));
         }
 
         $content = '<?php return ' . var_export($data, true) . ';' . "\n";
-        file_put_contents($this->cachePath, $content);
+        $tmpPath = $this->cachePath . '.tmp.' . getmypid();
+
+        if (file_put_contents($tmpPath, $content) === false) {
+            throw new \RuntimeException(sprintf('Failed to write config cache to %s', $this->cachePath));
+        }
+
+        if (!rename($tmpPath, $this->cachePath)) {
+            @unlink($tmpPath);
+            throw new \RuntimeException(sprintf('Failed to atomically replace config cache at %s', $this->cachePath));
+        }
 
         return $data;
     }

@@ -74,7 +74,14 @@ final class CachedConfigFactory implements ConfigFactoryInterface
         $path = $this->cachePath;
 
         if (is_file($path)) {
-            $this->cache = require $path;
+            try {
+                $data = require $path;
+                if (is_array($data)) {
+                    $this->cache = $data;
+                }
+            } catch (\Throwable) {
+                // Corrupt cache — fall through to inner factory
+            }
         }
     }
 }

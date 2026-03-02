@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
     name: 'optimize:manifest',
     description: 'Compile the package discovery manifest',
 )]
-class OptimizeManifestCommand extends Command
+final class OptimizeManifestCommand extends Command
 {
     public function __construct(
         private readonly PackageManifestCompiler $compiler,
