@@ -1,0 +1,127 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\User\Tests\Unit\Middleware;
+
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Entity\Storage\EntityStorageInterface;
+use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
+use Waaseyaa\User\AnonymousUser;
+use Waaseyaa\User\Middleware\SessionMiddleware;
+use Waaseyaa\User\User;
+
+#[CoversClass(SessionMiddleware::class)]
+final class SessionMiddlewareTest extends TestCase
+{
+    #[Test]
+    public function sets_anonymous_user_when_no_session(): void
+    {
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $storage->expects($this->never())->method('load');
+
+        $middleware = new SessionMiddleware($storage);
+        $request = Request::create('/test');
+
+        $capturedAccount = null;
+        $next = new class($capturedAccount) implements HttpHandlerInterface {
+            public function __construct(private ?AccountInterface &$ref) {}
+
+            public function handle(Request $request): Response
+            {
+                $this->ref = $request->attributes->get('_account');
+                return new Response('ok');
+            }
+        };
+
+        $middleware->process($request, $next);
+
+        $this->assertInstanceOf(AnonymousUser::class, $capturedAccount);
+    }
+
+    #[Test]
+    public function resolves_user_from_session(): void
+    {
+        $user = new User(['uid' => 42, 'name' => 'admin', 'permissions' => ['access content']]);
+
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $storage->expects($this->once())
+            ->method('load')
+            ->with(42)
+            ->willReturn($user);
+
+        $middleware = new SessionMiddleware($storage);
+        $request = Request::create('/test');
+        $request->attributes->set('_session', ['waaseyaa_uid' => 42]);
+
+        $capturedAccount = null;
+        $next = new class($capturedAccount) implements HttpHandlerInterface {
+            public function __construct(private ?AccountInterface &$ref) {}
+
+            public function handle(Request $request): Response
+            {
+                $this->ref = $request->attributes->get('_account');
+                return new Response('ok');
+            }
+        };
+
+        $middleware->process($request, $next);
+
+        $this->assertInstanceOf(User::class, $capturedAccount);
+        $this->assertSame(42, $capturedAccount->id());
+    }
+
+    #[Test]
+    public function falls_back_to_anonymous_when_user_not_found(): void
+    {
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $storage->expects($this->once())
+            ->method('load')
+            ->with(999)
+            ->willReturn(null);
+
+        $middleware = new SessionMiddleware($storage);
+        $request = Request::create('/test');
+        $request->attributes->set('_session', ['waaseyaa_uid' => 999]);
+
+        $capturedAccount = null;
+        $next = new class($capturedAccount) implements HttpHandlerInterface {
+            public function __construct(private ?AccountInterface &$ref) {}
+
+            public function handle(Request $request): Response
+            {
+                $this->ref = $request->attributes->get('_account');
+                return new Response('ok');
+            }
+        };
+
+        $middleware->process($request, $next);
+
+        $this->assertInstanceOf(AnonymousUser::class, $capturedAccount);
+    }
+
+    #[Test]
+    public function passes_response_from_next_handler(): void
+    {
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $middleware = new SessionMiddleware($storage);
+        $request = Request::create('/test');
+
+        $next = new class implements HttpHandlerInterface {
+            public function handle(Request $request): Response
+            {
+                return new Response('downstream', 201);
+            }
+        };
+
+        $response = $middleware->process($request, $next);
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('downstream', $response->getContent());
+    }
+}
