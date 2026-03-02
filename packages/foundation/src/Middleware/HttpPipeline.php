@@ -14,8 +14,17 @@ final class HttpPipeline
         private readonly array $middleware = [],
     ) {}
 
+    public function withMiddleware(HttpMiddlewareInterface $middleware): self
+    {
+        return new self([...$this->middleware, $middleware]);
+    }
+
     public function handle(Request $request, HttpHandlerInterface $finalHandler): Response
     {
+        if ($this->middleware === []) {
+            return $finalHandler->handle($request);
+        }
+
         $handler = $finalHandler;
 
         foreach (array_reverse($this->middleware) as $mw) {

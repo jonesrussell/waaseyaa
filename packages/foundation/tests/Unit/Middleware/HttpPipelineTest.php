@@ -100,6 +100,36 @@ final class HttpPipelineTest extends TestCase
     }
 
     #[Test]
+    public function with_middleware_returns_new_instance(): void
+    {
+        $original = new HttpPipeline();
+
+        $mw = new class implements HttpMiddlewareInterface {
+            public function process(Request $request, HttpHandlerInterface $next): Response
+            {
+                return $next->handle($request);
+            }
+        };
+
+        $new = $original->withMiddleware($mw);
+
+        $this->assertNotSame($original, $new);
+
+        // Original still has no middleware — delegates directly
+        $handler = new class implements HttpHandlerInterface {
+            public int $calls = 0;
+            public function handle(Request $request): Response
+            {
+                $this->calls++;
+                return new Response('ok');
+            }
+        };
+
+        $original->handle(Request::create('/test'), $handler);
+        $this->assertSame(1, $handler->calls);
+    }
+
+    #[Test]
     public function middleware_can_modify_request(): void
     {
         $addHeader = new class implements HttpMiddlewareInterface {

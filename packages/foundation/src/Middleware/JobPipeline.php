@@ -13,8 +13,18 @@ final class JobPipeline
         private readonly array $middleware = [],
     ) {}
 
+    public function withMiddleware(JobMiddlewareInterface $middleware): self
+    {
+        return new self([...$this->middleware, $middleware]);
+    }
+
     public function handle(Job $job, JobHandlerInterface $finalHandler): void
     {
+        if ($this->middleware === []) {
+            $finalHandler->handle($job);
+            return;
+        }
+
         $handler = $finalHandler;
 
         foreach (array_reverse($this->middleware) as $mw) {

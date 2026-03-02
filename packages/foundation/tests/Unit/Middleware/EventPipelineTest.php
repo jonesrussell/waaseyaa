@@ -97,6 +97,22 @@ final class EventPipelineTest extends TestCase
         $this->assertFalse($reached);
     }
 
+    #[Test]
+    public function with_middleware_returns_new_instance(): void
+    {
+        $original = new EventPipeline();
+
+        $mw = new class implements EventMiddlewareInterface {
+            public function process(DomainEvent $event, EventHandlerInterface $next): void
+            {
+                $next->handle($event);
+            }
+        };
+
+        $new = $original->withMiddleware($mw);
+        $this->assertNotSame($original, $new);
+    }
+
     private function createEvent(): DomainEvent
     {
         return new class('test', '1') extends DomainEvent {

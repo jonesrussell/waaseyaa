@@ -13,8 +13,18 @@ final class EventPipeline
         private readonly array $middleware = [],
     ) {}
 
+    public function withMiddleware(EventMiddlewareInterface $middleware): self
+    {
+        return new self([...$this->middleware, $middleware]);
+    }
+
     public function handle(DomainEvent $event, EventHandlerInterface $finalHandler): void
     {
+        if ($this->middleware === []) {
+            $finalHandler->handle($event);
+            return;
+        }
+
         $handler = $finalHandler;
 
         foreach (array_reverse($this->middleware) as $mw) {

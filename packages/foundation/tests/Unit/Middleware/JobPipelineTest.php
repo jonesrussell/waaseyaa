@@ -97,6 +97,22 @@ final class JobPipelineTest extends TestCase
         $this->assertFalse($reached);
     }
 
+    #[Test]
+    public function with_middleware_returns_new_instance(): void
+    {
+        $original = new JobPipeline();
+
+        $mw = new class implements JobMiddlewareInterface {
+            public function process(Job $job, JobHandlerInterface $next): void
+            {
+                $next->handle($job);
+            }
+        };
+
+        $new = $original->withMiddleware($mw);
+        $this->assertNotSame($original, $new);
+    }
+
     private function createJob(): Job
     {
         return new class extends Job {

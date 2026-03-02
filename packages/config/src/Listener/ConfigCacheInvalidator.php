@@ -18,8 +18,8 @@ final class ConfigCacheInvalidator
             if (is_file($this->cachePath)) {
                 unlink($this->cachePath);
             }
-        } catch (\Throwable) {
-            // Best-effort: cache invalidation failure should not crash the primary request
+        } catch (\Throwable $e) {
+            error_log(sprintf('ConfigCacheInvalidator: failed to delete %s: %s', $this->cachePath, $e->getMessage()));
         }
     }
 }
