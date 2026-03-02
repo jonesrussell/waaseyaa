@@ -57,6 +57,7 @@ use Waaseyaa\User\User;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RequestContext;
 use Waaseyaa\Api\Controller\BroadcastController;
+use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Access\Middleware\AuthorizationMiddleware;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
@@ -254,6 +255,13 @@ if ($authResponse->getStatusCode() >= 400) {
     exit;
 }
 
+// --- Field-level access context ------------------------------------------------
+
+$account = $httpRequest->attributes->get('_account');
+// TODO: Populate with field-access policies from discovery/registry.
+// With an empty policy set, open-by-default semantics apply: all fields are accessible.
+$accessHandler = new EntityAccessHandler([]);
+
 // --- Dispatch ---------------------------------------------------------------
 
 $controller = $params['_controller'] ?? '';
@@ -360,15 +368,15 @@ try {
         })(),
 
         // Schema controller.
-        str_contains($controller, 'SchemaController') => (function () use ($entityTypeManager, $schemaPresenter, $params): never {
-            $schemaController = new SchemaController($entityTypeManager, $schemaPresenter);
+        str_contains($controller, 'SchemaController') => (function () use ($entityTypeManager, $schemaPresenter, $accessHandler, $account, $params): never {
+            $schemaController = new SchemaController($entityTypeManager, $schemaPresenter, $accessHandler, $account);
             $document = $schemaController->show($params['entity_type']);
             sendJson($document->statusCode, $document->toArray());
         })(),
 
         // JSON:API controller.
-        str_contains($controller, 'JsonApiController') => (function () use ($entityTypeManager, $serializer, $params, $query, $body, $method): never {
-            $jsonApiController = new JsonApiController($entityTypeManager, $serializer);
+        str_contains($controller, 'JsonApiController') => (function () use ($entityTypeManager, $serializer, $accessHandler, $account, $params, $query, $body, $method): never {
+            $jsonApiController = new JsonApiController($entityTypeManager, $serializer, $accessHandler, $account);
             $entityTypeId = $params['_entity_type'];
             $id = $params['id'] ?? null;
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Controller;
 
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Api\JsonApiDocument;
 use Waaseyaa\Api\JsonApiError;
 use Waaseyaa\Api\Schema\SchemaPresenter;
@@ -20,6 +22,8 @@ final class SchemaController
     public function __construct(
         private readonly EntityTypeManagerInterface $entityTypeManager,
         private readonly SchemaPresenter $schemaPresenter,
+        private readonly ?EntityAccessHandler $accessHandler = null,
+        private readonly ?AccountInterface $account = null,
     ) {}
 
     /**
@@ -35,7 +39,29 @@ final class SchemaController
         }
 
         $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
-        $schema = $this->schemaPresenter->present($entityType);
+
+        $entity = null;
+        if ($this->accessHandler !== null && $this->account !== null) {
+            $class = $entityType->getClass();
+            try {
+                $entity = new $class([]);
+            } catch (\Throwable $e) {
+                error_log(sprintf(
+                    '[Waaseyaa] SchemaController: failed to create prototype entity for %s (%s): %s',
+                    $entityTypeId,
+                    $class,
+                    $e->getMessage(),
+                ));
+            }
+        }
+
+        $schema = $this->schemaPresenter->present(
+            $entityType,
+            [],
+            $entity,
+            $this->accessHandler,
+            $this->account,
+        );
 
         return new JsonApiDocument(
             meta: [

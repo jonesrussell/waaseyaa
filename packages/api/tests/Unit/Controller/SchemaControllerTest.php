@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Tests\Unit\Controller;
 
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Api\Controller\SchemaController;
 use Waaseyaa\Api\Schema\SchemaPresenter;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
@@ -114,5 +116,29 @@ final class SchemaControllerTest extends TestCase
         $this->assertArrayHasKey('errors', $array);
         $this->assertSame('404', $array['errors'][0]['status']);
         $this->assertStringContainsString('nonexistent', $array['errors'][0]['detail']);
+    }
+
+    #[Test]
+    public function showAcceptsFieldAccessContext(): void
+    {
+        $account = $this->createMock(AccountInterface::class);
+        $handler = new EntityAccessHandler([]);
+
+        $controller = new SchemaController(
+            $this->entityTypeManager,
+            new SchemaPresenter(),
+            $handler,
+            $account,
+        );
+
+        $doc = $controller->show('article');
+        $schema = $doc->toArray()['meta']['schema'];
+
+        $this->assertSame(200, $doc->statusCode);
+
+        // System properties are always present — not subject to field access.
+        $this->assertArrayHasKey('id', $schema['properties']);
+        $this->assertArrayHasKey('uuid', $schema['properties']);
+        $this->assertArrayHasKey('title', $schema['properties']);
     }
 }
