@@ -7,6 +7,7 @@ namespace Waaseyaa\Media;
 use Waaseyaa\Access\AccessPolicyInterface;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\Gate\PolicyAttribute;
 use Waaseyaa\Entity\EntityInterface;
 
 /**
@@ -15,6 +16,7 @@ use Waaseyaa\Entity\EntityInterface;
  * Mirrors the Node access model: admin bypass, ownership checks for
  * edit/delete, published status for view, bundle-specific permissions.
  */
+#[PolicyAttribute(entityType: 'media')]
 final class MediaAccessPolicy implements AccessPolicyInterface
 {
     public function appliesTo(string $entityTypeId): bool

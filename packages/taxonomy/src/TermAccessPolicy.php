@@ -7,6 +7,7 @@ namespace Waaseyaa\Taxonomy;
 use Waaseyaa\Access\AccessPolicyInterface;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\Gate\PolicyAttribute;
 use Waaseyaa\Entity\EntityInterface;
 
 /**
@@ -15,6 +16,7 @@ use Waaseyaa\Entity\EntityInterface;
  * Controls who can view, create, update, and delete taxonomy terms
  * based on per-vocabulary permissions and the global 'administer taxonomy' permission.
  */
+#[PolicyAttribute(entityType: 'taxonomy_term')]
 final class TermAccessPolicy implements AccessPolicyInterface
 {
     /**

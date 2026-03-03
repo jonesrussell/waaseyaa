@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Access;
 
+use Waaseyaa\Access\Gate\PolicyAttribute;
 use Waaseyaa\Entity\EntityInterface;
 
 /**
@@ -13,6 +14,7 @@ use Waaseyaa\Entity\EntityInterface;
  * Returns neutral for all other accounts, letting deny-by-default semantics
  * reject the request unless another policy grants access.
  */
+#[PolicyAttribute(entityType: ['node_type', 'taxonomy_vocabulary', 'media_type', 'workflow', 'pipeline', 'path_alias', 'menu', 'menu_link'])]
 final class ConfigEntityAccessPolicy implements AccessPolicyInterface
 {
     private const ADMIN_ROLE = 'administrator';

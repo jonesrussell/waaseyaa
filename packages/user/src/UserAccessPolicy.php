@@ -7,6 +7,7 @@ namespace Waaseyaa\User;
 use Waaseyaa\Access\AccessPolicyInterface;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\Gate\PolicyAttribute;
 use Waaseyaa\Entity\EntityInterface;
 
 /**
@@ -17,6 +18,7 @@ use Waaseyaa\Entity\EntityInterface;
  * - Delete: admin-only; self-deletion is forbidden.
  * - Create: admin-only.
  */
+#[PolicyAttribute(entityType: 'user')]
 final class UserAccessPolicy implements AccessPolicyInterface
 {
     public function appliesTo(string $entityTypeId): bool
