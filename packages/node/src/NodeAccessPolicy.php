@@ -7,6 +7,7 @@ namespace Waaseyaa\Node;
 use Waaseyaa\Access\AccessPolicyInterface;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\Gate\PolicyAttribute;
 use Waaseyaa\Entity\EntityInterface;
 
 /**
@@ -16,6 +17,7 @@ use Waaseyaa\Entity\EntityInterface;
  * based on the node type (bundle) and the relationship between the account
  * and the node author.
  */
+#[PolicyAttribute(entityType: 'node')]
 final class NodeAccessPolicy implements AccessPolicyInterface
 {
     public function appliesTo(string $entityTypeId): bool

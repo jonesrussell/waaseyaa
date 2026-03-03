@@ -68,12 +68,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RequestContext;
 use Waaseyaa\Api\Controller\BroadcastController;
 use Waaseyaa\Access\AccountInterface;
-use Waaseyaa\Access\ConfigEntityAccessPolicy;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Access\Gate\EntityAccessGate;
 use Waaseyaa\Access\Middleware\AuthorizationMiddleware;
-use Waaseyaa\Node\NodeAccessPolicy;
-use Waaseyaa\Taxonomy\TermAccessPolicy;
+use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
 use Waaseyaa\Routing\AccessChecker;
@@ -331,19 +329,25 @@ if ($matchedRoute !== null) {
 
 $userStorage = $entityTypeManager->getStorage('user');
 
-// --- Entity access handler -----------------------------------------------------
+// --- Entity access handler (auto-discovered via #[PolicyAttribute]) -----------
 
-$accessHandler = new EntityAccessHandler([
-    new NodeAccessPolicy(),
-    new TermAccessPolicy(),
-    new ConfigEntityAccessPolicy(entityTypeIds: [
-        'node_type',
-        'taxonomy_vocabulary',
-        'media_type',
-        'workflow',
-        'pipeline',
-    ]),
-]);
+$manifestCompiler = new PackageManifestCompiler(
+    basePath: dirname(__DIR__),
+    storagePath: dirname(__DIR__) . '/storage',
+);
+$manifest = $manifestCompiler->load();
+
+$policies = [];
+foreach ($manifest->policies as $class => $entityTypes) {
+    $ref = new \ReflectionClass($class);
+    $constructor = $ref->getConstructor();
+    if ($constructor !== null && $constructor->getNumberOfRequiredParameters() > 0) {
+        $policies[] = new $class($entityTypes);
+    } else {
+        $policies[] = new $class();
+    }
+}
+$accessHandler = new EntityAccessHandler($policies);
 
 $gate = new EntityAccessGate($accessHandler);
 $accessChecker = new AccessChecker(gate: $gate);

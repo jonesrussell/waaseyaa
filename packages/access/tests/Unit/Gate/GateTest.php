@@ -318,6 +318,17 @@ final class GateTest extends TestCase
     }
 
     #[Test]
+    public function multiEntityTypePolicyResolvesForAllTypes(): void
+    {
+        $policy = new MultiEntityPolicyFixture();
+        $gate = new Gate(policies: [$policy]);
+
+        $this->assertTrue($gate->allows('view', 'config_alpha'));
+        $this->assertTrue($gate->allows('view', 'config_beta'));
+        $this->assertFalse($gate->allows('view', 'config_gamma'));
+    }
+
+    #[Test]
     public function lastPolicyWinsWhenMultipleForSameEntityType(): void
     {
         $policy1 = new NodePolicyFixture(viewResult: false);
@@ -351,11 +362,19 @@ final class GateTest extends TestCase
     }
 
     #[Test]
-    public function policyAttributeEntityTypeProperty(): void
+    public function policyAttributeEntityTypesPropertyFromString(): void
     {
         $attr = new PolicyAttribute(entityType: 'node');
 
-        $this->assertSame('node', $attr->entityType);
+        $this->assertSame(['node'], $attr->entityTypes);
+    }
+
+    #[Test]
+    public function policyAttributeEntityTypesPropertyFromArray(): void
+    {
+        $attr = new PolicyAttribute(entityType: ['node_type', 'taxonomy_vocabulary']);
+
+        $this->assertSame(['node_type', 'taxonomy_vocabulary'], $attr->entityTypes);
     }
 
     #[Test]
@@ -501,6 +520,18 @@ final class TaxonomyVocabularyPolicy
  * would conventionally resolve to "attribute_overrides_name".
  * The attribute should take precedence.
  */
+/**
+ * Policy covering multiple entity types via array attribute.
+ */
+#[PolicyAttribute(entityType: ['config_alpha', 'config_beta'])]
+final class MultiEntityPolicyFixture
+{
+    public function view(?object $user, mixed $subject): bool
+    {
+        return true;
+    }
+}
+
 #[PolicyAttribute(entityType: 'media')]
 final class AttributeOverridesNamePolicy
 {

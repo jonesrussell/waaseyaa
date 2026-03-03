@@ -12,7 +12,7 @@
 
 ## Orchestration
 
-When working on files matching these patterns, load the specialist skill and retrieve the spec for deep context:
+When working on files matching these patterns, retrieve the spec for deep context. **Orchestration skills are not Skill-tool skills**: The `waaseyaa:*` entries below are conceptual — use `waaseyaa_get_spec` / `waaseyaa_search_specs` MCP tools to retrieve the context they reference, not the `Skill` tool.
 
 | File pattern | Specialist skill | Cold memory spec |
 |---|---|---|
@@ -63,6 +63,7 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 3. Implement `access()` returning `AccessResult` — use `::allowed()`, `::neutral()`, `::forbidden()`
 4. For field access: implement `fieldAccess()` — Neutral = accessible (open-by-default), only Forbidden restricts
 5. Test with anonymous classes implementing both interfaces (PHPUnit `createMock()` can't mock intersection types)
+6. Run `waaseyaa optimize:manifest` (or restart dev server) to pick up the new policy
 
 **Adding an API endpoint:**
 1. Add route in `RouteBuilder` with access options (`_public`, `_permission`, `_role`, or `_gate`)
@@ -135,6 +136,7 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 - **Paired nullable parameters**: `ResourceSerializer::serialize()` and `SchemaPresenter::present()` accept `?EntityAccessHandler` + `?AccountInterface`. Both must be non-null or both null — only two of four states are meaningful. The guard pattern is `if ($handler !== null && $account !== null)`.
 - **SchemaPresenter `x-access-restricted`**: JSON Schema extension marking fields viewable but not editable. The admin SPA reads this to show disabled widgets instead of hiding the field. Distinct from system `readOnly` (id, uuid) which hides the field from forms entirely.
 - **Stale specs cause bad code**: When refactoring a subsystem, update the relevant `docs/specs/` file. Stale specs cause agents to generate code conflicting with recent changes. Run `tools/drift-detector.sh` to find affected specs.
+- **`sendJson()` in `index.php` exits**: The front controller's `sendJson()` helper sends a JSON:API response and calls `exit`. Code after a `sendJson()` call is unreachable — no `return` needed.
 
 ## Testing
 - Integration tests in `tests/Integration/PhaseN/` — one directory per implementation phase
