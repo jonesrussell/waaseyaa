@@ -67,6 +67,7 @@ use Waaseyaa\Workflows\Workflow;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RequestContext;
 use Waaseyaa\Api\Controller\BroadcastController;
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\ConfigEntityAccessPolicy;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Access\Middleware\AuthorizationMiddleware;
@@ -353,9 +354,14 @@ if ($authResponse->getStatusCode() >= 400) {
     exit;
 }
 
-// --- Field-level access context ------------------------------------------------
+// --- Entity access handler -----------------------------------------------------
 
 $account = $httpRequest->attributes->get('_account');
+if (!$account instanceof AccountInterface) {
+    error_log('[Waaseyaa] _account attribute missing or invalid after authorization pipeline.');
+    sendJson(500, ['jsonapi' => ['version' => '1.1'], 'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => 'Account resolution failed.']]]);
+}
+
 $accessHandler = new EntityAccessHandler([
     new NodeAccessPolicy(),
     new TermAccessPolicy(),

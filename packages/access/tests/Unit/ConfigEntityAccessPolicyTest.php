@@ -8,6 +8,7 @@ use Waaseyaa\Access\AccessPolicyInterface;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\ConfigEntityAccessPolicy;
+use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Entity\EntityInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -181,7 +182,60 @@ final class ConfigEntityAccessPolicyTest extends TestCase
     public function testEmptyEntityTypeIdsThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('At least one entity type ID is required.');
         new ConfigEntityAccessPolicy([]);
+    }
+
+    public function testNonStringEntityTypeIdThrows(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each entity type ID must be a non-empty string.');
+        new ConfigEntityAccessPolicy(['node_type', 42]); // @phpstan-ignore argument.type
+    }
+
+    public function testEmptyStringEntityTypeIdThrows(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Each entity type ID must be a non-empty string.');
+        new ConfigEntityAccessPolicy(['']); // @phpstan-ignore argument.type
+    }
+
+    public function testSingleEntityTypeId(): void
+    {
+        $policy = new ConfigEntityAccessPolicy(['node_type']);
+        $this->assertTrue($policy->appliesTo('node_type'));
+        $this->assertFalse($policy->appliesTo('taxonomy_vocabulary'));
+    }
+
+    // -----------------------------------------------------------------
+    // Integration: ConfigEntityAccessPolicy through EntityAccessHandler
+    // -----------------------------------------------------------------
+
+    public function testHandlerGrantsCreateAccessForAdminOnConfigEntity(): void
+    {
+        $handler = new EntityAccessHandler([$this->policy]);
+        $account = $this->createAccount(['administrator']);
+
+        $result = $handler->checkCreateAccess('node_type', '', $account);
+        $this->assertTrue($result->isAllowed());
+    }
+
+    public function testHandlerDeniesCreateAccessForNonAdminOnConfigEntity(): void
+    {
+        $handler = new EntityAccessHandler([$this->policy]);
+        $account = $this->createAccount(['authenticated']);
+
+        $result = $handler->checkCreateAccess('node_type', '', $account);
+        $this->assertFalse($result->isAllowed());
+    }
+
+    public function testHandlerReturnsNeutralForUncoveredEntityType(): void
+    {
+        $handler = new EntityAccessHandler([$this->policy]);
+        $account = $this->createAccount(['administrator']);
+
+        $result = $handler->checkCreateAccess('user', '', $account);
+        $this->assertTrue($result->isNeutral());
     }
 
     // -----------------------------------------------------------------
