@@ -74,6 +74,8 @@ use Waaseyaa\Access\Gate\EntityAccessGate;
 use Waaseyaa\Access\Middleware\AuthorizationMiddleware;
 use Waaseyaa\Node\NodeAccessPolicy;
 use Waaseyaa\Taxonomy\TermAccessPolicy;
+use Waaseyaa\User\UserAccessPolicy;
+use Waaseyaa\Media\MediaAccessPolicy;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
 use Waaseyaa\Routing\AccessChecker;
@@ -336,12 +338,17 @@ $userStorage = $entityTypeManager->getStorage('user');
 $accessHandler = new EntityAccessHandler([
     new NodeAccessPolicy(),
     new TermAccessPolicy(),
+    new UserAccessPolicy(),
+    new MediaAccessPolicy(),
     new ConfigEntityAccessPolicy(entityTypeIds: [
         'node_type',
         'taxonomy_vocabulary',
         'media_type',
         'workflow',
         'pipeline',
+        'path_alias',
+        'menu',
+        'menu_link',
     ]),
 ]);
 

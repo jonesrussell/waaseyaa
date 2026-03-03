@@ -7,9 +7,9 @@ The access control system has four layers, being built bottom-up:
 | # | Layer | Status | Description |
 |---|-------|--------|-------------|
 | 1 | Entity access policies | Done | `NodeAccessPolicy`, `TermAccessPolicy`, `ConfigEntityAccessPolicy` wired into `EntityAccessHandler` |
-| 2 | Gate wiring | Next | Instantiate `Gate` with policies, pass to `AccessChecker` in `index.php` |
-| 3 | Route-level `_gate` options | Planned | Attach `_gate` to entity CRUD routes in `JsonApiRouteProvider` so `AccessChecker` rejects at the route level |
-| 4 | Uncovered entity policies | Planned | Add policies for `user`, `media`, `path_alias`, `menu`, `menu_link` — user/media need per-bundle rules |
+| 2 | Gate wiring | Done | `EntityAccessGate` instantiated with policies, passed to `AccessChecker` in `index.php` |
+| 3 | Route-level `_gate` options | Done | `_gate` attached to entity CRUD routes; `AccessChecker` rejects at the route level |
+| 4 | Uncovered entity policies | Done | `UserAccessPolicy`, `MediaAccessPolicy` added; `path_alias`, `menu`, `menu_link` covered by `ConfigEntityAccessPolicy` |
 | 5 | Policy auto-discovery | Planned | Wire `PackageManifest.policies` into `EntityAccessHandler` instead of hardcoding in `index.php` |
 
 ## Authentication
