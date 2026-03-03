@@ -21,10 +21,10 @@ final class DevAdminAccountTest extends TestCase
     }
 
     #[Test]
-    public function id_returns_one(): void
+    public function id_returns_sentinel_value(): void
     {
         $account = new DevAdminAccount();
-        $this->assertSame(1, $account->id());
+        $this->assertSame(PHP_INT_MAX, $account->id());
     }
 
     #[Test]

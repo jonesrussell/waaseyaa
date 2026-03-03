@@ -159,7 +159,7 @@ final class SessionMiddlewareTest extends TestCase
         $middleware->process($request, $next);
 
         $this->assertInstanceOf(DevAdminAccount::class, $capturedAccount);
-        $this->assertSame(1, $capturedAccount->id());
+        $this->assertSame(PHP_INT_MAX, $capturedAccount->id());
     }
 
     #[Test]
@@ -193,6 +193,66 @@ final class SessionMiddlewareTest extends TestCase
 
         $this->assertInstanceOf(User::class, $capturedAccount);
         $this->assertSame(42, $capturedAccount->id());
+    }
+
+    #[Test]
+    public function does_not_use_dev_fallback_when_session_uid_exists_but_user_not_found(): void
+    {
+        $devAccount = new DevAdminAccount();
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $storage->expects($this->once())
+            ->method('load')
+            ->with(999)
+            ->willReturn(null);
+
+        $middleware = new SessionMiddleware($storage, $devAccount);
+        $request = Request::create('/test');
+        $request->attributes->set('_session', ['waaseyaa_uid' => 999]);
+
+        $capturedAccount = null;
+        $next = new class($capturedAccount) implements HttpHandlerInterface {
+            public function __construct(private ?AccountInterface &$ref) {}
+
+            public function handle(Request $request): Response
+            {
+                $this->ref = $request->attributes->get('_account');
+                return new Response('ok');
+            }
+        };
+
+        $middleware->process($request, $next);
+
+        $this->assertInstanceOf(AnonymousUser::class, $capturedAccount);
+    }
+
+    #[Test]
+    public function does_not_use_dev_fallback_when_session_uid_exists_but_storage_throws(): void
+    {
+        $devAccount = new DevAdminAccount();
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $storage->expects($this->once())
+            ->method('load')
+            ->with(42)
+            ->willThrowException(new \RuntimeException('Database unavailable'));
+
+        $middleware = new SessionMiddleware($storage, $devAccount);
+        $request = Request::create('/test');
+        $request->attributes->set('_session', ['waaseyaa_uid' => 42]);
+
+        $capturedAccount = null;
+        $next = new class($capturedAccount) implements HttpHandlerInterface {
+            public function __construct(private ?AccountInterface &$ref) {}
+
+            public function handle(Request $request): Response
+            {
+                $this->ref = $request->attributes->get('_account');
+                return new Response('ok');
+            }
+        };
+
+        $middleware->process($request, $next);
+
+        $this->assertInstanceOf(AnonymousUser::class, $capturedAccount);
     }
 
     #[Test]

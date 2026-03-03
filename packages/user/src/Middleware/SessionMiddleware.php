@@ -14,6 +14,10 @@ use Waaseyaa\User\AnonymousUser;
 
 final class SessionMiddleware implements HttpMiddlewareInterface
 {
+    /**
+     * @param EntityStorageInterface $userStorage Storage for loading user entities.
+     * @param AccountInterface|null $devFallback Account returned when no session UID exists. Intended for dev environments only.
+     */
     public function __construct(
         private readonly EntityStorageInterface $userStorage,
         private readonly ?AccountInterface $devFallback = null,
@@ -33,7 +37,11 @@ final class SessionMiddleware implements HttpMiddlewareInterface
         $uid = $session['waaseyaa_uid'] ?? null;
 
         if ($uid === null) {
-            return $this->devFallback ?? new AnonymousUser();
+            if ($this->devFallback !== null) {
+                error_log('[Waaseyaa] SessionMiddleware: using dev fallback account (all permissions granted). This should only happen in development.');
+                return $this->devFallback;
+            }
+            return new AnonymousUser();
         }
 
         try {
