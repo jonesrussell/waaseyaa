@@ -11,7 +11,7 @@ The access control system has four layers, being built bottom-up:
 | 3 | Route-level `_gate` options | Done | `_gate` attached to entity CRUD routes; `AccessChecker` rejects at the route level |
 | 4 | Uncovered entity policies | Done | `UserAccessPolicy`, `MediaAccessPolicy` added; `path_alias`, `menu`, `menu_link` covered by `ConfigEntityAccessPolicy` |
 | 5 | Policy auto-discovery | Done | `#[PolicyAttribute]` on policy classes; `PackageManifestCompiler` discovers and `index.php` instantiates from manifest |
-| 6 | Manifest classmap bug | Bug | `PackageManifestCompiler::scanClasses()` only reads classmap, which is empty under default PSR-4. Requires `composer dump-autoload --optimize`. See #17 |
+| 6 | Manifest classmap bug | Done | PSR-4 fallback added when classmap has no Waaseyaa entries. Logs warning recommending `--optimize`. See #17, PR #20 |
 
 ## Authentication
 
