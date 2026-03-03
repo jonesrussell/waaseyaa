@@ -63,7 +63,7 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 3. Implement `access()` returning `AccessResult` — use `::allowed()`, `::neutral()`, `::forbidden()`
 4. For field access: implement `fieldAccess()` — Neutral = accessible (open-by-default), only Forbidden restricts
 5. Test with anonymous classes implementing both interfaces (PHPUnit `createMock()` can't mock intersection types)
-6. Wire into `EntityAccessHandler` policy array in `public/index.php` (manual until policy auto-discovery)
+6. Run `waaseyaa optimize:manifest` (or restart dev server) to pick up the new policy
 
 **Adding an API endpoint:**
 1. Add route in `RouteBuilder` with access options (`_public`, `_permission`, `_role`, or `_gate`)
