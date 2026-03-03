@@ -67,8 +67,11 @@ use Waaseyaa\Workflows\Workflow;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RequestContext;
 use Waaseyaa\Api\Controller\BroadcastController;
+use Waaseyaa\Access\ConfigEntityAccessPolicy;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Access\Middleware\AuthorizationMiddleware;
+use Waaseyaa\Node\NodeAccessPolicy;
+use Waaseyaa\Taxonomy\TermAccessPolicy;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
 use Waaseyaa\Routing\AccessChecker;
@@ -353,9 +356,17 @@ if ($authResponse->getStatusCode() >= 400) {
 // --- Field-level access context ------------------------------------------------
 
 $account = $httpRequest->attributes->get('_account');
-// TODO: Populate with field-access policies from discovery/registry.
-// With an empty policy set, open-by-default semantics apply: all fields are accessible.
-$accessHandler = new EntityAccessHandler([]);
+$accessHandler = new EntityAccessHandler([
+    new NodeAccessPolicy(),
+    new TermAccessPolicy(),
+    new ConfigEntityAccessPolicy(entityTypeIds: [
+        'node_type',
+        'taxonomy_vocabulary',
+        'media_type',
+        'workflow',
+        'pipeline',
+    ]),
+]);
 
 // --- Dispatch ---------------------------------------------------------------
 
