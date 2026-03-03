@@ -25,3 +25,5 @@ storage/
 # Worktrees
 .worktrees/
 
+.playwright-mcp/
+
