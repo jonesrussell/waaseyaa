@@ -110,6 +110,31 @@ For semantic index warm-ups tied to deterministic read-path validation:
 bin/waaseyaa semantic:warm --type node --json
 ```
 
+## v1.2 Tooling Workflows
+
+Waaseyaa includes deterministic developer tooling added in v1.2:
+
+```bash
+# Scaffold config payloads
+bin/waaseyaa scaffold:bundle --id article --label "Article"
+bin/waaseyaa scaffold:relationship --id related --label "Related"
+bin/waaseyaa scaffold:workflow --bundle article
+
+# Generate deterministic fixture templates
+bin/waaseyaa fixture:generate --template fanout --output tests/fixtures/scenarios/fanout.json
+
+# Render workflow/traversal/SSR debug context
+bin/waaseyaa debug:context --entity-type node --entity-id 1 --workflow-state review --relationship-counts 3:2
+
+# Generate and compare perf baselines
+bin/waaseyaa perf:baseline --snapshot-hash abc123 --threshold semantic_search:120 --threshold warm:500
+bin/waaseyaa perf:compare --baseline tests/Baselines/perf_baseline.json --current tests/Baselines/perf_current.json --json
+```
+
+For consolidated upgrade and operations runbooks, see:
+
+- `docs/specs/operations-playbooks.md`
+
 ## Project Stats
 
 - **29** implementation packages + 3 meta-packages + 1 admin SPA

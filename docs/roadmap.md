@@ -15,4 +15,6 @@ Issue tracking and milestone planning is managed on GitHub:
 | [v0.4 — AI & MCP](https://github.com/jonesrussell/waaseyaa/milestone/5) | Vector embeddings, semantic search, MCP endpoint — AI layer online before the content model |
 | [v0.5 — System Integration & Verification](https://github.com/jonesrussell/waaseyaa/issues/57) | End-to-end verification in the new Minoo app: Playwright E2E, SSR snapshots, semantic search, MCP integration |
 | [v0.6 — Minoo Content Model & Authoring Foundation](https://github.com/jonesrussell/waaseyaa/issues/73) | Relationship-first domain model, deterministic fixtures, SSR/search/MCP traversal contracts, and v0.6 release gate |
-| [v1.0 — Production](https://github.com/jonesrussell/waaseyaa/milestone/6) | Performance hardening, security audit, FrankenPHP config, Telescope, deployment docs |
+| [v1.0 — Platform Hardening & API Stabilization](https://github.com/jonesrussell/waaseyaa/issues/106) | Stable traversal/SSR/MCP/semantic contracts, security hardening, deterministic release verification |
+| [v1.1 — Performance, Caching, and Scale](https://github.com/jonesrussell/waaseyaa/issues/125) | SSR and MCP read-path caching, semantic refresh operations, hot-path optimization, regression baselines |
+| [v1.2 — Developer Ergonomics, Tooling, and Ecosystem Readiness](https://github.com/jonesrussell/waaseyaa/issues/134) | Deterministic scaffolding, fixture generation, debug/perf diagnostics, MCP introspection, onboarding consolidation |
