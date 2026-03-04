@@ -306,6 +306,37 @@ final class SchemaPresenterTest extends TestCase
         $this->assertSame('Created Date', $properties['created_date']['x-label']);
     }
 
+    #[Test]
+    public function presentIncludesDefaultValueFromFieldDefinition(): void
+    {
+        $entityType = $this->createEntityType();
+
+        $fieldDefinitions = [
+            'status' => [
+                'type' => 'boolean',
+                'label' => 'Published',
+                'default' => true,
+            ],
+            'promote' => [
+                'type' => 'boolean',
+                'label' => 'Promoted',
+                'default' => false,
+            ],
+            'summary' => [
+                'type' => 'string',
+                'label' => 'Summary',
+                'default' => '',
+            ],
+        ];
+
+        $schema = $this->presenter->present($entityType, $fieldDefinitions);
+        $properties = $schema['properties'];
+
+        $this->assertTrue($properties['status']['default']);
+        $this->assertFalse($properties['promote']['default']);
+        $this->assertSame('', $properties['summary']['default']);
+    }
+
     // --- Helpers ---
 
     private function createEntityType(

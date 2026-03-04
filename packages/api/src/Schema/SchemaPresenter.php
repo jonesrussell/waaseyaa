@@ -326,6 +326,16 @@ final class SchemaPresenter
             }
         }
 
+        // Default value.
+        if (array_key_exists('default', $definition)) {
+            $defaultValue = $definition['default'];
+            // Cast boolean defaults to native bool for JSON Schema.
+            if ($fieldType === 'boolean') {
+                $defaultValue = (bool) $defaultValue;
+            }
+            $schema['default'] = $defaultValue;
+        }
+
         return $schema;
     }
 }
