@@ -16,18 +16,25 @@ final class AbstractKernelTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->projectRoot = sys_get_temp_dir() . '/waaseyaa_kernel_test_' . uniqid();
-        mkdir($this->projectRoot . '/config', 0755, true);
-        mkdir($this->projectRoot . '/storage', 0755, true);
+        $this->projectRoot = $this->createMinimalProjectRoot();
+    }
+
+    private function createMinimalProjectRoot(): string
+    {
+        $projectRoot = sys_get_temp_dir() . '/waaseyaa_kernel_test_' . uniqid();
+        mkdir($projectRoot . '/config', 0755, true);
+        mkdir($projectRoot . '/storage', 0755, true);
 
         file_put_contents(
-            $this->projectRoot . '/config/waaseyaa.php',
+            $projectRoot . '/config/waaseyaa.php',
             "<?php return ['database' => ':memory:'];",
         );
         file_put_contents(
-            $this->projectRoot . '/config/entity-types.php',
+            $projectRoot . '/config/entity-types.php',
             '<?php return [];',
         );
+
+        return $projectRoot;
     }
 
     protected function tearDown(): void
@@ -86,5 +93,22 @@ final class AbstractKernelTest extends TestCase
 
         $this->assertSame(2, $kernel->bootCount);
         $this->assertInstanceOf(\Waaseyaa\Entity\EntityTypeManager::class, $kernel->getEntityTypeManager());
+    }
+
+    #[Test]
+    public function boot_writes_manifest_cache_inside_fake_project_root(): void
+    {
+        $kernel = new class($this->projectRoot) extends AbstractKernel {
+            public function publicBoot(): void
+            {
+                $this->boot();
+            }
+        };
+
+        $kernel->publicBoot();
+
+        $cachePath = $this->projectRoot . '/storage/framework/packages.php';
+        $this->assertFileExists($cachePath);
+        $this->assertIsArray(require $cachePath);
     }
 }
