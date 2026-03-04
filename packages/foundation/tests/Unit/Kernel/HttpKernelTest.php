@@ -65,7 +65,7 @@ final class HttpKernelTest extends TestCase
         $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
         $method->setAccessible(true);
 
-        $headers = $method->invoke($kernel, 'http://localhost:3000', ['http://localhost:3000']);
+        $headers = $method->invoke($kernel, 'http://localhost:3000', ['http://localhost:3000'], false);
 
         $this->assertCount(5, $headers);
         $this->assertContains('Access-Control-Allow-Origin: http://localhost:3000', $headers);
@@ -79,8 +79,33 @@ final class HttpKernelTest extends TestCase
         $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
         $method->setAccessible(true);
 
-        $headers = $method->invoke($kernel, 'http://evil.test', ['http://localhost:3000']);
+        $headers = $method->invoke($kernel, 'http://evil.test', ['http://localhost:3000'], false);
 
+        $this->assertSame([], $headers);
+    }
+
+    #[Test]
+    public function resolve_cors_headers_allows_localhost_any_port_in_development_mode(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
+        $method->setAccessible(true);
+
+        $headers = $method->invoke($kernel, 'http://localhost:4321', ['http://localhost:3000'], true);
+        $this->assertContains('Access-Control-Allow-Origin: http://localhost:4321', $headers);
+
+        $headersLoopback = $method->invoke($kernel, 'http://127.0.0.1:5173', ['http://localhost:3000'], true);
+        $this->assertContains('Access-Control-Allow-Origin: http://127.0.0.1:5173', $headersLoopback);
+    }
+
+    #[Test]
+    public function resolve_cors_headers_does_not_allow_non_localhost_in_development_mode(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
+        $method->setAccessible(true);
+
+        $headers = $method->invoke($kernel, 'http://example.com:3001', ['http://localhost:3000'], true);
         $this->assertSame([], $headers);
     }
 
@@ -94,6 +119,27 @@ final class HttpKernelTest extends TestCase
         $this->assertTrue($method->invoke($kernel, 'OPTIONS'));
         $this->assertTrue($method->invoke($kernel, 'options'));
         $this->assertFalse($method->invoke($kernel, 'GET'));
+    }
+
+    #[Test]
+    public function detects_development_mode_from_common_environment_names(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+
+        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
+        $configProp->setAccessible(true);
+
+        $method = new \ReflectionMethod(HttpKernel::class, 'isDevelopmentMode');
+        $method->setAccessible(true);
+
+        $configProp->setValue($kernel, ['environment' => 'development']);
+        $this->assertTrue($method->invoke($kernel));
+
+        $configProp->setValue($kernel, ['environment' => 'local']);
+        $this->assertTrue($method->invoke($kernel));
+
+        $configProp->setValue($kernel, ['environment' => 'production']);
+        $this->assertFalse($method->invoke($kernel));
     }
 
     #[Test]

@@ -129,8 +129,13 @@ final class HttpKernel extends AbstractKernel
     {
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
         $allowedOrigins = $this->config['cors_origins'] ?? ['http://localhost:3000', 'http://127.0.0.1:3000'];
+        $overrideOrigin = getenv('WAASEYAA_CORS_ORIGIN');
+        if (is_string($overrideOrigin) && trim($overrideOrigin) !== '') {
+            $allowedOrigins = [trim($overrideOrigin)];
+        }
+        $allowDevLocalhostPorts = $this->isDevelopmentMode();
 
-        foreach ($this->resolveCorsHeaders($origin, $allowedOrigins) as $header) {
+        foreach ($this->resolveCorsHeaders($origin, $allowedOrigins, $allowDevLocalhostPorts) as $header) {
             header($header);
         }
 
@@ -144,9 +149,9 @@ final class HttpKernel extends AbstractKernel
      * @param list<string> $allowedOrigins
      * @return list<string>
      */
-    private function resolveCorsHeaders(string $origin, array $allowedOrigins): array
+    private function resolveCorsHeaders(string $origin, array $allowedOrigins, bool $allowDevLocalhostPorts = false): array
     {
-        if (in_array($origin, $allowedOrigins, true)) {
+        if ($this->isOriginAllowed($origin, $allowedOrigins, $allowDevLocalhostPorts)) {
             return [
                 "Access-Control-Allow-Origin: {$origin}",
                 'Vary: Origin',
@@ -168,9 +173,35 @@ final class HttpKernel extends AbstractKernel
         return [];
     }
 
+    /**
+     * @param list<string> $allowedOrigins
+     */
+    private function isOriginAllowed(string $origin, array $allowedOrigins, bool $allowDevLocalhostPorts): bool
+    {
+        if (in_array($origin, $allowedOrigins, true)) {
+            return true;
+        }
+
+        if (!$allowDevLocalhostPorts) {
+            return false;
+        }
+
+        return preg_match('#^https?://(localhost|127\.0\.0\.1):\d+$#', $origin) === 1;
+    }
+
     private function isCorsPreflightRequest(string $method): bool
     {
         return strtoupper($method) === 'OPTIONS';
+    }
+
+    private function isDevelopmentMode(): bool
+    {
+        $env = $this->config['environment'] ?? getenv('APP_ENV') ?: '';
+        if (!is_string($env)) {
+            return false;
+        }
+
+        return in_array(strtolower($env), ['dev', 'development', 'local'], true);
     }
 
     private function registerRoutes(WaaseyaaRouter $router): void
