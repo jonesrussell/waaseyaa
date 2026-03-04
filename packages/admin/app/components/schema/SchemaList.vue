@@ -85,6 +85,27 @@ async function deleteEntity(entity: JsonApiResource) {
   }
 }
 
+function formatCellValue(value: unknown, fieldSchema: Record<string, unknown>): string {
+  if (value === null || value === undefined) return ''
+
+  const type = fieldSchema.type as string
+  const format = fieldSchema.format as string | undefined
+
+  if (type === 'boolean') {
+    return value ? '✓' : '—'
+  }
+
+  if (format === 'date-time' && typeof value === 'string') {
+    try {
+      return new Date(value).toLocaleString()
+    } catch {
+      return String(value)
+    }
+  }
+
+  return String(value)
+}
+
 onMounted(async () => {
   await fetchSchema()
   await fetchEntities()
@@ -128,8 +149,8 @@ watch(messages, (msgs) => {
             <td :colspan="columns.length + 1" class="empty">{{ t('no_items') }}</td>
           </tr>
           <tr v-for="entity in entities" :key="entity.id">
-            <td v-for="[fieldName] in columns" :key="fieldName">
-              {{ entity.attributes[fieldName] ?? '' }}
+            <td v-for="[fieldName, fieldSchema] in columns" :key="fieldName">
+              {{ formatCellValue(entity.attributes[fieldName], fieldSchema) }}
             </td>
             <td class="actions">
               <NuxtLink :to="`/${entityType}/${entity.id}`" class="btn btn-sm">
