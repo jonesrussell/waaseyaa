@@ -26,12 +26,24 @@ onMounted(async () => {
   await fetchSchema()
 
   if (schema.value && props.entityId) {
+    // Edit mode: load existing entity.
     try {
       const resource = await get(props.entityType, props.entityId)
       formData.value = { ...resource.attributes }
     } catch (e: any) {
       loadError.value = e.data?.errors?.[0]?.detail ?? e.message ?? 'Failed to load entity'
     }
+  } else if (schema.value) {
+    // Create mode: initialize from schema defaults.
+    const defaults: Record<string, any> = {}
+    for (const [fieldName, fieldSchema] of Object.entries(schema.value.properties ?? {})) {
+      if ('default' in fieldSchema) {
+        defaults[fieldName] = fieldSchema.default
+      } else if (fieldSchema.type === 'boolean') {
+        defaults[fieldName] = false
+      }
+    }
+    formData.value = defaults
   }
 })
 
