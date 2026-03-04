@@ -139,6 +139,28 @@ TWIG,
     }
 
     #[Test]
+    public function unpublishedWorkflowStatesAreHiddenFromPublicSsr(): void
+    {
+        $draft = $this->request('/node/2');
+        $review = $this->request('/node/3');
+        $archived = $this->request('/node/4');
+
+        $this->assertSame(404, $draft['status']);
+        $this->assertSame(404, $review['status']);
+        $this->assertSame(404, $archived['status']);
+    }
+
+    #[Test]
+    public function unauthenticatedPreviewQueryDoesNotBypassVisibility(): void
+    {
+        $draftPreview = $this->request('/node/2?preview=1');
+        $reviewPreview = $this->request('/node/3?preview=true');
+
+        $this->assertSame(404, $draftPreview['status']);
+        $this->assertSame(404, $reviewPreview['status']);
+    }
+
+    #[Test]
     public function secondRequestUsesRenderCacheForSameEntity(): void
     {
         $first = $this->request('/node/1');
@@ -170,8 +192,42 @@ TWIG,
             'created' => 1735689600,
             'changed' => 1735689600,
             'status' => 1,
+            'workflow_state' => 'published',
         ]);
         $nodeStorage->save($node);
+
+        $draftNode = $nodeStorage->create([
+            'title' => 'Draft Node',
+            'type' => 'article',
+            'uid' => 7,
+            'created' => 1735689600,
+            'changed' => 1735689600,
+            'status' => 0,
+            'workflow_state' => 'draft',
+        ]);
+        $nodeStorage->save($draftNode);
+
+        $reviewNode = $nodeStorage->create([
+            'title' => 'Review Node',
+            'type' => 'article',
+            'uid' => 7,
+            'created' => 1735689600,
+            'changed' => 1735689600,
+            'status' => 0,
+            'workflow_state' => 'review',
+        ]);
+        $nodeStorage->save($reviewNode);
+
+        $archivedNode = $nodeStorage->create([
+            'title' => 'Archived Node',
+            'type' => 'article',
+            'uid' => 7,
+            'created' => 1735689600,
+            'changed' => 1735689600,
+            'status' => 0,
+            'workflow_state' => 'archived',
+        ]);
+        $nodeStorage->save($archivedNode);
 
         $pathAliasStorage = $kernel->getEntityTypeManager()->getStorage('path_alias');
         $directPath = $pathAliasStorage->create([
@@ -189,6 +245,30 @@ TWIG,
             'status' => 1,
         ]);
         $pathAliasStorage->save($teachingAlias);
+
+        $draftAlias = $pathAliasStorage->create([
+            'alias' => '/node/2',
+            'path' => '/node/2',
+            'langcode' => 'en',
+            'status' => 1,
+        ]);
+        $pathAliasStorage->save($draftAlias);
+
+        $reviewAlias = $pathAliasStorage->create([
+            'alias' => '/node/3',
+            'path' => '/node/3',
+            'langcode' => 'en',
+            'status' => 1,
+        ]);
+        $pathAliasStorage->save($reviewAlias);
+
+        $archivedAlias = $pathAliasStorage->create([
+            'alias' => '/node/4',
+            'path' => '/node/4',
+            'langcode' => 'en',
+            'status' => 1,
+        ]);
+        $pathAliasStorage->save($archivedAlias);
     }
 
     /**

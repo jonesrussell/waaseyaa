@@ -55,6 +55,7 @@ use Waaseyaa\Relationship\RelationshipTraversalService;
 use Waaseyaa\User\Middleware\BearerAuthMiddleware;
 use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\SessionMiddleware;
+use Waaseyaa\Workflows\EditorialVisibilityResolver;
 
 /**
  * HTTP front controller kernel.
@@ -693,6 +694,16 @@ final class HttpKernel extends AbstractKernel
                 $this->sendHtml($response->statusCode, $response->content, $headers);
             }
 
+            $previewRequested = $this->isPreviewRequested($httpRequest);
+            $visibilityResolver = new EditorialVisibilityResolver();
+            $visibility = $visibilityResolver->canRender($entity, $account, $previewRequested);
+            if ($visibility->isForbidden()) {
+                $response = (new RenderController($twig))->renderNotFound($aliasLookupPath);
+                $headers = $response->headers;
+                $headers['Cache-Control'] = $cacheControlHeader;
+                $this->sendHtml($response->statusCode, $response->content, $headers);
+            }
+
             $formatterRegistry = SsrServiceProvider::getFormatterRegistry()
                 ?? new FieldFormatterRegistry($this->manifest->formatters);
             $viewModeConfig = new ArrayViewModeConfig(
@@ -701,11 +712,14 @@ final class HttpKernel extends AbstractKernel
             $entityRenderer = new EntityRenderer($this->entityTypeManager, $formatterRegistry, $viewModeConfig);
             $safeViewMode = preg_replace('/[^a-z0-9_]+/i', '', strtolower($requestedViewMode)) ?: 'full';
             $viewMode = new ViewMode($safeViewMode);
-            $renderContext = $this->buildRelationshipRenderContext($entity);
-            $hasRelationshipContext = $renderContext !== [];
+            $relationshipContext = $this->buildRelationshipRenderContext($entity);
+            $hasRelationshipContext = $relationshipContext !== [];
+            $renderContext = $relationshipContext;
+            $renderContext['workflow_visibility'] = $visibilityResolver->buildRenderContext($entity, $previewRequested);
 
             if (
                 !$account->isAuthenticated()
+                && !$previewRequested
                 && !$hasRelationshipContext
                 && $this->renderCache !== null
                 && $entity->id() !== null
@@ -726,6 +740,7 @@ final class HttpKernel extends AbstractKernel
             $response = (new RenderController($twig, $entityRenderer))->renderEntity($entity, $viewMode, $renderContext);
             if (
                 !$account->isAuthenticated()
+                && !$previewRequested
                 && !$hasRelationshipContext
                 && $this->renderCache !== null
                 && $entity->id() !== null
@@ -755,6 +770,22 @@ final class HttpKernel extends AbstractKernel
                 ]],
             ]);
         }
+    }
+
+    private function isPreviewRequested(HttpRequest $request): bool
+    {
+        $preview = $request->query->get('preview');
+        if (is_bool($preview)) {
+            return $preview;
+        }
+        if (is_int($preview)) {
+            return $preview === 1;
+        }
+        if (is_string($preview)) {
+            return in_array(strtolower(trim($preview)), ['1', 'true', 'yes'], true);
+        }
+
+        return false;
     }
 
     /**
