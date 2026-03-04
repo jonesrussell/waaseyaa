@@ -43,6 +43,7 @@ use Waaseyaa\SSR\ViewMode;
 use Waaseyaa\AI\Vector\EmbeddingProviderFactory;
 use Waaseyaa\AI\Vector\SearchController;
 use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
+use Waaseyaa\Mcp\McpController;
 use Waaseyaa\User\Middleware\BearerAuthMiddleware;
 use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\SessionMiddleware;
@@ -294,6 +295,15 @@ final class HttpKernel extends AbstractKernel
         );
 
         $router->addRoute(
+            'mcp.endpoint',
+            RouteBuilder::create('/mcp')
+                ->controller('mcp.endpoint')
+                ->allowAll()
+                ->methods('GET', 'POST')
+                ->build(),
+        );
+
+        $router->addRoute(
             'public.home',
             RouteBuilder::create('/')
                 ->controller('render.page')
@@ -490,6 +500,52 @@ final class HttpKernel extends AbstractKernel
 
                     $document = $controller->search($searchQuery, $entityType, $limit);
                     $this->sendJson($document->statusCode, $document->toArray());
+                })(),
+
+                $controller === 'mcp.endpoint' => (function () use ($method, $httpRequest, $account, $serializer): never {
+                    $embeddingProvider = EmbeddingProviderFactory::fromConfig($this->config);
+                    $embeddingStorage = new SqliteEmbeddingStorage($this->database->getPdo());
+                    $mcp = new McpController(
+                        entityTypeManager: $this->entityTypeManager,
+                        serializer: $serializer,
+                        accessHandler: $this->accessHandler,
+                        account: $account,
+                        embeddingStorage: $embeddingStorage,
+                        embeddingProvider: $embeddingProvider,
+                    );
+
+                    if ($method === 'GET') {
+                        $this->sendJson(200, $mcp->manifest());
+                    }
+
+                    $raw = trim($httpRequest->getContent());
+                    if ($raw === '') {
+                        $this->sendJson(400, [
+                            'jsonrpc' => '2.0',
+                            'id' => null,
+                            'error' => ['code' => -32700, 'message' => 'Parse error'],
+                        ]);
+                    }
+
+                    try {
+                        $rpc = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+                    } catch (\JsonException) {
+                        $this->sendJson(400, [
+                            'jsonrpc' => '2.0',
+                            'id' => null,
+                            'error' => ['code' => -32700, 'message' => 'Parse error'],
+                        ]);
+                    }
+
+                    if (!is_array($rpc)) {
+                        $this->sendJson(400, [
+                            'jsonrpc' => '2.0',
+                            'id' => null,
+                            'error' => ['code' => -32600, 'message' => 'Invalid request'],
+                        ]);
+                    }
+
+                    $this->sendJson(200, $mcp->handleRpc($rpc));
                 })(),
 
                 $controller === 'render.page' => (function () use ($params, $query, $account): never {
