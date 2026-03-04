@@ -1,0 +1,113 @@
+# Relationship Modeling (v0.6)
+
+## Decision
+
+Relationships are modeled as **first-class entities**.
+
+This is the canonical v0.6 design for Minoo and downstream AI/MCP traversal.
+
+## Rationale
+
+- Supports culturally rich many-to-many and directional links.
+- Supports qualifiers and provenance per relationship.
+- Works cleanly with semantic retrieval and MCP graph traversal.
+- Avoids schema lock-in from embedded references.
+
+## Entity Contract
+
+Entity type: `relationship` (name subject to final bundle naming convention)
+
+Required fields:
+
+- `relationship_type`
+- `from_entity_type`
+- `from_entity_id`
+- `to_entity_type`
+- `to_entity_id`
+- `directionality` (`directed` | `bidirectional`)
+- `status`
+
+Optional qualifiers:
+
+- `weight` (numeric ranking hint)
+- `start_date`
+- `end_date`
+- `confidence`
+- `source_ref`
+- `notes`
+
+## Validation Contract
+
+- All required fields must be present.
+- Endpoint entity references must resolve.
+- `start_date <= end_date` when both are set.
+- Duplicate-edge policy must be explicit (unique constraint or idempotent upsert).
+- Self-link policy must be explicit by relationship type.
+
+## Query/Traversal Contract
+
+Traversal must support:
+
+- direction filter (`outbound` | `inbound` | `both`)
+- type filter (`relationship_type` in set)
+- temporal filtering
+- status visibility filtering
+
+Deterministic ordering contract:
+
+- `status` visibility first
+- `weight` descending
+- `start_date` ascending
+- stable tie-breaker by entity id
+
+## Indexing Requirements
+
+Minimum indexes:
+
+- (`from_entity_type`, `from_entity_id`, `status`)
+- (`to_entity_type`, `to_entity_id`, `status`)
+- (`relationship_type`, `status`)
+- temporal index for (`start_date`, `end_date`) filtering
+
+## Inverse Semantics
+
+- Relationship types that have logical inverses must declare them.
+- `bidirectional` relationships must not create infinite duplicate pairs.
+- Traversal responses must represent inverse semantics predictably.
+
+## API/MCP/AI Alignment
+
+- JSON:API shape for relationship entities must be stable.
+- MCP traversal tools must consume relationship entities directly.
+- Semantic indexing may include relationship context fields where relevant.
+
+## Test Matrix
+
+Unit:
+
+- field validation and temporal constraints
+- inverse/duplicate/self-link behavior
+- deterministic ordering
+
+Integration:
+
+- multi-entity graph traversal (teachings/stories/clans/events)
+- cycles and self-links
+- status-filtered visibility
+
+E2E/Contract:
+
+- admin authoring of relationships
+- MCP traversal contract coverage
+- semantic regression corpus including relationship-aware queries
+
+## Deterministic Fixtures
+
+Fixture corpus must include:
+
+- directed chain
+- bidirectional pair
+- cycle
+- self-link edge case (allowed or forbidden by type)
+- temporal-bounded relationship
+- unpublished relationship

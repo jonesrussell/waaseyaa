@@ -29,6 +29,8 @@ final class McpControllerTest extends TestCase
         $this->assertContains('search_teachings', $toolNames);
         $this->assertContains('get_entity', $toolNames);
         $this->assertContains('list_entity_types', $toolNames);
+        $this->assertContains('traverse_relationships', $toolNames);
+        $this->assertContains('get_related_entities', $toolNames);
     }
 
     #[Test]
@@ -43,7 +45,7 @@ final class McpControllerTest extends TestCase
 
         $this->assertSame('2.0', $response['jsonrpc']);
         $this->assertSame(1, $response['id']);
-        $this->assertCount(3, $response['result']['tools']);
+        $this->assertCount(5, $response['result']['tools']);
     }
 
     #[Test]
@@ -84,6 +86,22 @@ final class McpControllerTest extends TestCase
         $decoded = json_decode($text, true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame('node', $decoded['data'][0]['id']);
         $this->assertSame('Node', $decoded['data'][0]['label']);
+    }
+
+    #[Test]
+    public function traverseRelationshipsReturnsInvalidParamsWhenRequiredArgumentsAreMissing(): void
+    {
+        $controller = $this->createController();
+
+        $response = $controller->handleRpc([
+            'jsonrpc' => '2.0',
+            'id' => 17,
+            'method' => 'tools/call',
+            'params' => ['name' => 'traverse_relationships', 'arguments' => []],
+        ]);
+
+        $this->assertSame(-32602, $response['error']['code']);
+        $this->assertStringContainsString('requires non-empty "type" and "id"', $response['error']['message']);
     }
 
     private function createController(): McpController

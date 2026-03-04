@@ -19,6 +19,14 @@ return [
     'jwt_secret' => getenv('WAASEYAA_JWT_SECRET') ?: '',
     // API key map: raw key => uid. Example: ['dev-machine-key' => 1].
     'api_keys' => [],
+    // Dev-only fallback account for local built-in server workflows.
+    // Must remain false outside local development.
+    'auth' => [
+        'dev_fallback_account' => filter_var(
+            getenv('WAASEYAA_DEV_FALLBACK_ACCOUNT') ?: false,
+            FILTER_VALIDATE_BOOLEAN,
+        ),
+    ],
 
     // Upload validation (POST /api/media/upload).
     'upload_max_bytes' => 10 * 1024 * 1024, // 10 MiB
@@ -35,6 +43,13 @@ return [
 
     // Allowed CORS origins for the admin SPA.
     'cors_origins' => ['http://localhost:3000', 'http://127.0.0.1:3000'],
+
+    // Locale negotiation defaults used by public SSR path resolution.
+    'i18n' => [
+        'languages' => [
+            ['id' => 'en', 'label' => 'English', 'is_default' => true],
+        ],
+    ],
 
     // SSR theme id discovered from Composer package metadata.
     // Theme packages expose extra.waaseyaa.theme in composer.json.

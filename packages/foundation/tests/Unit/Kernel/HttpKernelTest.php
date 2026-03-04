@@ -7,6 +7,7 @@ namespace Waaseyaa\Foundation\Tests\Unit\Kernel;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\Foundation\Kernel\AbstractKernel;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
 use Waaseyaa\User\AnonymousUser;
@@ -145,6 +146,51 @@ final class HttpKernelTest extends TestCase
     }
 
     #[Test]
+    public function dev_fallback_account_is_disabled_by_default_even_in_development(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+
+        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
+        $configProp->setAccessible(true);
+        $configProp->setValue($kernel, ['environment' => 'development']);
+
+        $method = new \ReflectionMethod(HttpKernel::class, 'shouldUseDevFallbackAccount');
+        $method->setAccessible(true);
+
+        $this->assertFalse($method->invoke($kernel, 'cli-server'));
+    }
+
+    #[Test]
+    public function dev_fallback_account_requires_development_mode_flag_and_cli_server_sapi(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+
+        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
+        $configProp->setAccessible(true);
+
+        $method = new \ReflectionMethod(HttpKernel::class, 'shouldUseDevFallbackAccount');
+        $method->setAccessible(true);
+
+        $configProp->setValue($kernel, [
+            'environment' => 'development',
+            'auth' => ['dev_fallback_account' => true],
+        ]);
+        $this->assertTrue($method->invoke($kernel, 'cli-server'));
+
+        $configProp->setValue($kernel, [
+            'environment' => 'production',
+            'auth' => ['dev_fallback_account' => true],
+        ]);
+        $this->assertFalse($method->invoke($kernel, 'cli-server'));
+
+        $configProp->setValue($kernel, [
+            'environment' => 'development',
+            'auth' => ['dev_fallback_account' => true],
+        ]);
+        $this->assertFalse($method->invoke($kernel, 'cli'));
+    }
+
+    #[Test]
     public function registers_core_routes_on_router(): void
     {
         $kernel = new HttpKernel($this->projectRoot);
@@ -230,6 +276,75 @@ final class HttpKernelTest extends TestCase
 
         $this->assertSame('public, max-age=120', $method->invoke($kernel, new AnonymousUser(), 120));
         $this->assertSame('private, no-store', $method->invoke($kernel, new DevAdminAccount(), 120));
+    }
+
+    #[Test]
+    public function render_language_resolution_uses_url_prefix_and_strips_alias_lookup_path(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
+        $configProp->setAccessible(true);
+        $configProp->setValue($kernel, [
+            'i18n' => [
+                'languages' => [
+                    ['id' => 'en', 'label' => 'English', 'is_default' => true],
+                    ['id' => 'fr', 'label' => 'French', 'is_default' => false],
+                ],
+            ],
+        ]);
+
+        $method = new \ReflectionMethod(HttpKernel::class, 'resolveRenderLanguageAndAliasPath');
+        $method->setAccessible(true);
+
+        $request = Request::create('/fr/teachings/water');
+        $resolved = $method->invoke($kernel, '/fr/teachings/water', $request);
+
+        $this->assertSame('fr', $resolved['langcode']);
+        $this->assertSame('/teachings/water', $resolved['alias_path']);
+    }
+
+    #[Test]
+    public function render_language_resolution_uses_accept_language_when_no_url_prefix(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
+        $configProp->setAccessible(true);
+        $configProp->setValue($kernel, [
+            'i18n' => [
+                'languages' => [
+                    ['id' => 'en', 'label' => 'English', 'is_default' => true],
+                    ['id' => 'fr', 'label' => 'French', 'is_default' => false],
+                ],
+            ],
+        ]);
+
+        $method = new \ReflectionMethod(HttpKernel::class, 'resolveRenderLanguageAndAliasPath');
+        $method->setAccessible(true);
+
+        $request = Request::create('/teachings/water');
+        $request->headers->set('Accept-Language', 'fr-CA,fr;q=0.9,en;q=0.8');
+        $resolved = $method->invoke($kernel, '/teachings/water', $request);
+
+        $this->assertSame('fr', $resolved['langcode']);
+        $this->assertSame('/teachings/water', $resolved['alias_path']);
+    }
+
+    #[Test]
+    public function render_language_resolution_defaults_to_english_when_not_configured(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
+        $configProp->setAccessible(true);
+        $configProp->setValue($kernel, []);
+
+        $method = new \ReflectionMethod(HttpKernel::class, 'resolveRenderLanguageAndAliasPath');
+        $method->setAccessible(true);
+
+        $request = Request::create('/teachings/water');
+        $resolved = $method->invoke($kernel, '/teachings/water', $request);
+
+        $this->assertSame('en', $resolved['langcode']);
+        $this->assertSame('/teachings/water', $resolved['alias_path']);
     }
 
 }

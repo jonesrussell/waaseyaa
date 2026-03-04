@@ -12,6 +12,7 @@
     ],
     "require": {
         "php": ">=8.3",
+        "waaseyaa/access": "@dev",
         "waaseyaa/entity": "@dev"
     },
     "require-dev": {

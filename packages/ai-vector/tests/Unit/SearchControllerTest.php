@@ -141,6 +141,72 @@ final class SearchControllerTest extends TestCase
         $this->assertSame('6', $array['data'][1]['id']);
         $this->assertSame('keyword', $array['meta']['mode']);
     }
+
+    #[Test]
+    public function fallsBackToKeywordModeWhenSemanticProviderFails(): void
+    {
+        $query = new class implements EntityQueryInterface {
+            private int $call = 0;
+            public function condition(string $field, mixed $value, string $operator = '='): static { return $this; }
+            public function exists(string $field): static { return $this; }
+            public function notExists(string $field): static { return $this; }
+            public function sort(string $field, string $direction = 'ASC'): static { return $this; }
+            public function range(int $offset, int $limit): static { return $this; }
+            public function count(): static { return $this; }
+            public function accessCheck(bool $check = true): static { return $this; }
+            public function execute(): array
+            {
+                $this->call++;
+                return $this->call === 1 ? [42] : [];
+            }
+        };
+
+        $entity = new SearchEntity(42, 'node', ['title' => 'Fallback Result']);
+
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $storage->method('getQuery')->willReturn($query);
+        $storage->expects($this->once())
+            ->method('loadMultiple')
+            ->with([42])
+            ->willReturn([42 => $entity]);
+
+        $definition = new EntityType(
+            id: 'node',
+            label: 'Node',
+            class: SearchEntity::class,
+            keys: ['id' => 'id', 'label' => 'title'],
+            fieldDefinitions: ['title' => ['type' => 'string']],
+        );
+
+        $manager = $this->createMock(EntityTypeManagerInterface::class);
+        $manager->method('hasDefinition')->willReturnCallback(static fn(string $id): bool => $id === 'node');
+        $manager->method('getStorage')->willReturn($storage);
+        $manager->method('getDefinition')->willReturn($definition);
+
+        $provider = $this->createMock(EmbeddingProviderInterface::class);
+        $provider->expects($this->once())
+            ->method('embed')
+            ->with('water')
+            ->willThrowException(new \RuntimeException('provider unavailable'));
+
+        $embeddingStorage = $this->createMock(EmbeddingStorageInterface::class);
+        $embeddingStorage->expects($this->never())->method('findSimilar');
+
+        $controller = new SearchController(
+            entityTypeManager: $manager,
+            serializer: new ResourceSerializer($manager),
+            embeddingStorage: $embeddingStorage,
+            embeddingProvider: $provider,
+        );
+
+        $document = $controller->search('water', 'node', 10);
+        $array = $document->toArray();
+
+        $this->assertSame('keyword', $array['meta']['mode']);
+        $this->assertSame('semantic', $array['meta']['requested_mode']);
+        $this->assertSame('embedding_provider_error', $array['meta']['fallback_reason']);
+        $this->assertSame('42', $array['data'][0]['id']);
+    }
 }
 
 final readonly class SearchEntity implements EntityInterface

@@ -39,10 +39,22 @@ final class SearchController
 
         $limit = max(1, min(100, $limit));
         $storage = $this->entityTypeManager->getStorage($entityTypeId);
+        $mode = $this->embeddingProvider !== null ? 'semantic' : 'keyword';
+        $fallbackReason = null;
+        $requestedMode = $mode;
 
-        $ids = $this->embeddingProvider !== null
-            ? $this->semanticSearchIds($query, $entityTypeId, $limit)
-            : $this->keywordSearchIds($storage, $query, $limit);
+        if ($this->embeddingProvider !== null) {
+            $semanticResult = $this->semanticSearchIds($query, $entityTypeId, $limit);
+            if ($semanticResult['fallback_reason'] !== null) {
+                $mode = 'keyword';
+                $fallbackReason = $semanticResult['fallback_reason'];
+                $ids = $this->keywordSearchIds($storage, $query, $limit);
+            } else {
+                $ids = $semanticResult['ids'];
+            }
+        } else {
+            $ids = $this->keywordSearchIds($storage, $query, $limit);
+        }
 
         $entities = $ids !== [] ? $storage->loadMultiple($ids) : [];
 
@@ -62,26 +74,33 @@ final class SearchController
 
         $resources = $this->serializer->serializeCollection($orderedEntities, $this->accessHandler, $this->account);
 
-        return JsonApiDocument::fromCollection(
-            $resources,
-            meta: [
-                'query' => $query,
-                'type' => $entityTypeId,
-                'limit' => $limit,
-                'mode' => $this->embeddingProvider !== null ? 'semantic' : 'keyword',
-            ],
-        );
+        $meta = [
+            'query' => $query,
+            'type' => $entityTypeId,
+            'limit' => $limit,
+            'mode' => $mode,
+        ];
+        if ($fallbackReason !== null) {
+            $meta['requested_mode'] = $requestedMode;
+            $meta['fallback_reason'] = $fallbackReason;
+        }
+
+        return JsonApiDocument::fromCollection($resources, meta: $meta);
     }
 
     /**
-     * @return array<int|string>
+     * @return array{ids: array<int|string>, fallback_reason: ?string}
      */
     private function semanticSearchIds(string $query, string $entityTypeId, int $limit): array
     {
         try {
             $queryVector = $this->embeddingProvider?->embed($query) ?? [];
-        } catch (\Throwable) {
-            return [];
+        } catch (\Throwable $exception) {
+            error_log(sprintf(
+                '[Waaseyaa] Semantic search provider error; falling back to keyword mode: %s',
+                $exception->getMessage(),
+            ));
+            return ['ids' => [], 'fallback_reason' => 'embedding_provider_error'];
         }
 
         $matches = $this->embeddingStorage->findSimilar($queryVector, $entityTypeId, $limit);
@@ -94,7 +113,7 @@ final class SearchController
             }
         }
 
-        return $ids;
+        return ['ids' => $ids, 'fallback_reason' => null];
     }
 
     /**

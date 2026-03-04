@@ -52,9 +52,13 @@ final class SqliteEmbeddingStorage implements EmbeddingStorageInterface
         $stmt->execute([':entity_type' => $entityType]);
 
         $results = [];
+        $dimensionMismatches = 0;
         while (($row = $stmt->fetch(\PDO::FETCH_ASSOC)) !== false) {
             $vector = $this->decodeVector($row['vector'] ?? null);
             if ($vector === null || count($vector) !== count($query)) {
+                if ($vector !== null && count($vector) !== count($query)) {
+                    $dimensionMismatches++;
+                }
                 continue;
             }
 
@@ -66,7 +70,29 @@ final class SqliteEmbeddingStorage implements EmbeddingStorageInterface
 
         usort($results, static fn(array $a, array $b): int => $b['score'] <=> $a['score']);
 
+        if ($dimensionMismatches > 0) {
+            error_log(sprintf(
+                '[Waaseyaa] Embedding dimension mismatch: skipped %d row(s) for entity type "%s".',
+                $dimensionMismatches,
+                $entityType,
+            ));
+        }
+
         return array_slice($results, 0, max(0, $limit));
+    }
+
+    public function delete(string $entityType, string $id): void
+    {
+        $this->ensureSchema();
+
+        $stmt = $this->pdo->prepare(sprintf(
+            'DELETE FROM %s WHERE entity_type = :entity_type AND entity_id = :entity_id',
+            $this->table,
+        ));
+        $stmt->execute([
+            ':entity_type' => $entityType,
+            ':entity_id' => $id,
+        ]);
     }
 
     private function ensureSchema(): void

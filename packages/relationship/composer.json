@@ -1,0 +1,19 @@
+{
+    "name": "waaseyaa/relationship",
+    "description": "Reusable relationship primitives for Waaseyaa applications",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "Waaseyaa\\Relationship\\": "src/"
+        }
+    },
+    "require": {
+        "php": ">=8.3",
+        "waaseyaa/access": "@dev",
+        "waaseyaa/database-legacy": "@dev",
+        "waaseyaa/entity": "@dev"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

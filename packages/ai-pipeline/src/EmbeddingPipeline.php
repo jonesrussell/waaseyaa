@@ -54,7 +54,7 @@ final class EmbeddingPipeline
     private function extractText(EntityInterface $entity): string
     {
         $values = $entity->toArray();
-        $fields = $this->configuredFieldsForEntityType($entity->getEntityTypeId());
+        $fields = $this->configuredFieldsForEntity($entity);
         if ($fields === []) {
             $fields = ['title', 'name', 'body'];
         }
@@ -79,15 +79,48 @@ final class EmbeddingPipeline
     /**
      * @return list<string>
      */
-    private function configuredFieldsForEntityType(string $entityTypeId): array
+    private function configuredFieldsForEntity(EntityInterface $entity): array
     {
+        $entityTypeId = $entity->getEntityTypeId();
         $ai = is_array($this->config['ai'] ?? null) ? $this->config['ai'] : [];
         $map = is_array($ai['embedding_fields'] ?? null) ? $ai['embedding_fields'] : [];
-        $fields = $map[$entityTypeId] ?? null;
-        if (!is_array($fields)) {
+        $configured = $map[$entityTypeId] ?? null;
+        if (!is_array($configured)) {
             return [];
         }
 
+        if (array_is_list($configured)) {
+            return $this->normalizeFieldList($configured);
+        }
+
+        $bundle = trim($entity->bundle());
+        if ($bundle !== '' && is_array($configured[$bundle] ?? null)) {
+            $bundleFields = $this->normalizeFieldList($configured[$bundle]);
+            if ($bundleFields !== []) {
+                return $bundleFields;
+            }
+        }
+
+        foreach (['*', 'default', '_default'] as $fallbackKey) {
+            if (!is_array($configured[$fallbackKey] ?? null)) {
+                continue;
+            }
+
+            $fallbackFields = $this->normalizeFieldList($configured[$fallbackKey]);
+            if ($fallbackFields !== []) {
+                return $fallbackFields;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * @param array<int, mixed> $fields
+     * @return list<string>
+     */
+    private function normalizeFieldList(array $fields): array
+    {
         $output = [];
         foreach ($fields as $field) {
             if (is_string($field) && $field !== '') {

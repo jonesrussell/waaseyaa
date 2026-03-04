@@ -27,10 +27,15 @@ use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
+use Waaseyaa\I18n\Language;
+use Waaseyaa\I18n\LanguageManager;
 use Waaseyaa\Media\File;
 use Waaseyaa\Media\LocalFileRepository;
 use Waaseyaa\Path\PathAliasResolver;
 use Waaseyaa\Routing\AccessChecker;
+use Waaseyaa\Routing\Language\AcceptHeaderNegotiator;
+use Waaseyaa\Routing\Language\LanguageNegotiator;
+use Waaseyaa\Routing\Language\UrlPrefixNegotiator;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\SSR\ArrayViewModeConfig;
@@ -41,6 +46,7 @@ use Waaseyaa\SSR\RenderCache;
 use Waaseyaa\SSR\SsrServiceProvider;
 use Waaseyaa\SSR\ViewMode;
 use Waaseyaa\AI\Vector\EmbeddingProviderFactory;
+use Waaseyaa\AI\Vector\EntityEmbeddingCleanupListener;
 use Waaseyaa\AI\Vector\SearchController;
 use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
 use Waaseyaa\Mcp\McpController;
@@ -82,6 +88,7 @@ final class HttpKernel extends AbstractKernel
         ));
         $this->renderCache = new RenderCache((new CacheFactory($cacheConfig))->get('render'));
         $this->registerRenderCacheListeners($this->renderCache);
+        $this->registerEmbeddingLifecycleListeners(new SqliteEmbeddingStorage($this->database->getPdo()));
 
         // Router setup.
         $context = new RequestContext('', $method);
@@ -119,7 +126,7 @@ final class HttpKernel extends AbstractKernel
             ))
             ->withMiddleware(new SessionMiddleware(
                 $userStorage,
-                PHP_SAPI === 'cli-server' ? new DevAdminAccount() : null,
+                $this->shouldUseDevFallbackAccount() ? new DevAdminAccount() : null,
             ))
             ->withMiddleware(new AuthorizationMiddleware($accessChecker));
 
@@ -237,6 +244,25 @@ final class HttpKernel extends AbstractKernel
         }
 
         return in_array(strtolower($env), ['dev', 'development', 'local'], true);
+    }
+
+    private function shouldUseDevFallbackAccount(?string $sapi = null): bool
+    {
+        $resolvedSapi = $sapi ?? PHP_SAPI;
+        if ($resolvedSapi !== 'cli-server') {
+            return false;
+        }
+
+        if (!$this->isDevelopmentMode()) {
+            return false;
+        }
+
+        $authConfig = $this->config['auth'] ?? null;
+        if (!is_array($authConfig)) {
+            return false;
+        }
+
+        return ($authConfig['dev_fallback_account'] ?? false) === true;
     }
 
     private function registerRoutes(WaaseyaaRouter $router): void
@@ -548,11 +574,11 @@ final class HttpKernel extends AbstractKernel
                     $this->sendJson(200, $mcp->handleRpc($rpc));
                 })(),
 
-                $controller === 'render.page' => (function () use ($params, $query, $account): never {
+                $controller === 'render.page' => (function () use ($params, $query, $account, $httpRequest): never {
                     $requestedViewMode = is_string($query['view_mode'] ?? null)
                         ? trim((string) $query['view_mode'])
                         : 'full';
-                    $this->handleRenderPage((string) ($params['path'] ?? '/'), $account, $requestedViewMode);
+                    $this->handleRenderPage((string) ($params['path'] ?? '/'), $account, $httpRequest, $requestedViewMode);
                 })(),
 
                 str_contains($controller, 'SchemaController') => (function () use ($account, $params, $schemaPresenter): never {
@@ -598,7 +624,12 @@ final class HttpKernel extends AbstractKernel
         }
     }
 
-    private function handleRenderPage(string $path, AccountInterface $account, string $requestedViewMode = 'full'): never
+    private function handleRenderPage(
+        string $path,
+        AccountInterface $account,
+        HttpRequest $httpRequest,
+        string $requestedViewMode = 'full',
+    ): never
     {
         $twig = SsrServiceProvider::getTwigEnvironment();
         if ($twig === null) {
@@ -632,10 +663,20 @@ final class HttpKernel extends AbstractKernel
                 $normalizedPath = '/' . $normalizedPath;
             }
 
+            $language = $this->resolveRenderLanguageAndAliasPath($normalizedPath, $httpRequest);
+            $contentLangcode = $language['langcode'];
+            $aliasLookupPath = $language['alias_path'];
+            if ($aliasLookupPath === '/') {
+                $response = (new RenderController($twig))->renderPath('/');
+                $headers = $response->headers;
+                $headers['Cache-Control'] = $cacheControlHeader;
+                $this->sendHtml($response->statusCode, $response->content, $headers);
+            }
+
             $aliasResolver = new PathAliasResolver($this->entityTypeManager->getStorage('path_alias'));
-            $resolved = $aliasResolver->resolve($normalizedPath);
+            $resolved = $aliasResolver->resolve($aliasLookupPath, $contentLangcode);
             if ($resolved === null) {
-                $response = (new RenderController($twig))->renderNotFound($normalizedPath);
+                $response = (new RenderController($twig))->renderNotFound($aliasLookupPath);
                 $headers = $response->headers;
                 $headers['Cache-Control'] = $cacheControlHeader;
                 $this->sendHtml($response->statusCode, $response->content, $headers);
@@ -644,7 +685,7 @@ final class HttpKernel extends AbstractKernel
             $targetStorage = $this->entityTypeManager->getStorage($resolved->entityTypeId);
             $entity = $targetStorage->load($resolved->entityId);
             if ($entity === null) {
-                $response = (new RenderController($twig))->renderNotFound($normalizedPath);
+                $response = (new RenderController($twig))->renderNotFound($aliasLookupPath);
                 $headers = $response->headers;
                 $headers['Cache-Control'] = $cacheControlHeader;
                 $this->sendHtml($response->statusCode, $response->content, $headers);
@@ -664,7 +705,7 @@ final class HttpKernel extends AbstractKernel
                     $resolved->entityTypeId,
                     $entity->id(),
                     $viewMode->name,
-                    $entity->language(),
+                    $contentLangcode,
                 );
                 if ($cached !== null) {
                     $headers = $cached->headers;
@@ -679,7 +720,7 @@ final class HttpKernel extends AbstractKernel
                     $resolved->entityTypeId,
                     $entity->id(),
                     $viewMode->name,
-                    $entity->language(),
+                    $contentLangcode,
                     $response,
                     $cacheMaxAge,
                 );
@@ -701,6 +742,145 @@ final class HttpKernel extends AbstractKernel
         }
     }
 
+    /**
+     * @return array{langcode: string, alias_path: string}
+     */
+    private function resolveRenderLanguageAndAliasPath(string $path, HttpRequest $request): array
+    {
+        $manager = $this->buildLanguageManager();
+        $availableLanguages = array_keys($manager->getLanguages());
+
+        $headers = [];
+        $acceptLanguage = $request->headers->get('Accept-Language');
+        if (is_string($acceptLanguage) && trim($acceptLanguage) !== '') {
+            $headers['accept-language'] = $acceptLanguage;
+        }
+
+        $context = (new LanguageNegotiator(
+            negotiators: [new UrlPrefixNegotiator(), new AcceptHeaderNegotiator()],
+            languageManager: $manager,
+        ))->negotiate($path, $headers);
+        $langcode = $context->getContentLanguage()->id;
+
+        $aliasPath = $path;
+        $prefixLangcode = $this->detectLanguagePrefixFromPath($path, $availableLanguages);
+        if ($prefixLangcode !== null) {
+            $aliasPath = $this->stripLanguagePrefix($path, $prefixLangcode);
+        }
+
+        return [
+            'langcode' => $langcode,
+            'alias_path' => $aliasPath,
+        ];
+    }
+
+    private function buildLanguageManager(): LanguageManager
+    {
+        $configured = $this->config['i18n']['languages'] ?? null;
+        if (!is_array($configured) || $configured === []) {
+            return new LanguageManager([new Language(id: 'en', label: 'English', isDefault: true)]);
+        }
+
+        $languages = [];
+        foreach ($configured as $candidate) {
+            if (!is_array($candidate)) {
+                continue;
+            }
+
+            $id = isset($candidate['id']) && is_string($candidate['id']) ? trim($candidate['id']) : '';
+            if ($id === '') {
+                continue;
+            }
+
+            $label = isset($candidate['label']) && is_string($candidate['label']) && trim($candidate['label']) !== ''
+                ? trim($candidate['label'])
+                : strtoupper($id);
+            $direction = isset($candidate['direction']) && is_string($candidate['direction']) && in_array($candidate['direction'], ['ltr', 'rtl'], true)
+                ? $candidate['direction']
+                : 'ltr';
+            $weight = isset($candidate['weight']) && is_numeric($candidate['weight']) ? (int) $candidate['weight'] : 0;
+            $isDefault = ($candidate['is_default'] ?? false) === true;
+
+            $languages[] = new Language(
+                id: $id,
+                label: $label,
+                direction: $direction,
+                weight: $weight,
+                isDefault: $isDefault,
+            );
+        }
+
+        if ($languages === []) {
+            return new LanguageManager([new Language(id: 'en', label: 'English', isDefault: true)]);
+        }
+
+        $defaultCount = count(array_filter($languages, static fn(Language $language): bool => $language->isDefault));
+        if ($defaultCount === 0) {
+            $first = $languages[0];
+            $languages[0] = new Language(
+                id: $first->id,
+                label: $first->label,
+                direction: $first->direction,
+                weight: $first->weight,
+                isDefault: true,
+            );
+        }
+        if ($defaultCount > 1) {
+            $seenDefault = false;
+            foreach ($languages as $index => $language) {
+                if (!$language->isDefault) {
+                    continue;
+                }
+                if (!$seenDefault) {
+                    $seenDefault = true;
+                    continue;
+                }
+
+                $languages[$index] = new Language(
+                    id: $language->id,
+                    label: $language->label,
+                    direction: $language->direction,
+                    weight: $language->weight,
+                    isDefault: false,
+                );
+            }
+        }
+
+        return new LanguageManager($languages);
+    }
+
+    /**
+     * @param list<string> $availableLanguages
+     */
+    private function detectLanguagePrefixFromPath(string $path, array $availableLanguages): ?string
+    {
+        $segments = explode('/', ltrim($path, '/'));
+        if ($segments === [] || $segments[0] === '') {
+            return null;
+        }
+
+        $prefix = $segments[0];
+        if (in_array($prefix, $availableLanguages, true)) {
+            return $prefix;
+        }
+
+        return null;
+    }
+
+    private function stripLanguagePrefix(string $path, string $langcode): string
+    {
+        $prefix = '/' . ltrim($langcode, '/');
+        if ($path === $prefix) {
+            return '/';
+        }
+        if (str_starts_with($path, $prefix . '/')) {
+            $stripped = substr($path, strlen($prefix));
+            return $stripped !== '' ? $stripped : '/';
+        }
+
+        return $path;
+    }
+
     private function registerRenderCacheListeners(RenderCache $renderCache): void
     {
         $invalidate = function (object $event) use ($renderCache): void {
@@ -716,6 +896,15 @@ final class HttpKernel extends AbstractKernel
 
         $this->dispatcher->addListener(EntityEvents::POST_SAVE->value, $invalidate);
         $this->dispatcher->addListener(EntityEvents::POST_DELETE->value, $invalidate);
+    }
+
+    private function registerEmbeddingLifecycleListeners(SqliteEmbeddingStorage $embeddingStorage): void
+    {
+        $cleanupListener = new EntityEmbeddingCleanupListener($embeddingStorage);
+        $this->dispatcher->addListener(
+            EntityEvents::POST_DELETE->value,
+            [$cleanupListener, 'onPostDelete'],
+        );
     }
 
     private function resolveRenderCacheMaxAge(): int
