@@ -65,6 +65,83 @@ final class McpControllerTest extends TestCase
     }
 
     #[Test]
+    public function toolsIntrospectReturnsDeterministicContractAndCacheContext(): void
+    {
+        $cache = new TrackingMemoryCacheBackend();
+        $controller = $this->createTraversalControllerWithCache(
+            sourceStatus: 1,
+            relatedStatus: 1,
+            permissions: ['view unpublished content'],
+            roles: ['editor', 'authenticated'],
+            authenticated: true,
+            userId: 101,
+            cache: $cache,
+        );
+
+        $response = $controller->handleRpc([
+            'jsonrpc' => '2.0',
+            'id' => 2,
+            'method' => 'tools/introspect',
+            'params' => [
+                'name' => 'get_related_entities',
+            ],
+        ]);
+
+        $this->assertSame('2.0', $response['jsonrpc']);
+        $this->assertSame(2, $response['id']);
+        $this->assertSame('get_related_entities', $response['result']['tool']['requested']);
+        $this->assertSame('get_related_entities', $response['result']['tool']['canonical']);
+        $this->assertFalse($response['result']['tool']['is_alias']);
+        $this->assertSame('v1.0', $response['result']['contract']['contract_version']);
+        $this->assertSame('stable', $response['result']['contract']['contract_stability']);
+        $this->assertTrue($response['result']['cache']['read_cacheable']);
+        $this->assertTrue($response['result']['cache']['read_cache_enabled']);
+        $this->assertSame('authenticated', $response['result']['cache']['scope']);
+        $this->assertSame('101', $response['result']['cache']['account_context']['account_id']);
+        $this->assertContains('entity:view', $response['result']['permissions']['boundaries']);
+        $this->assertContains('relationship:view', $response['result']['permissions']['boundaries']);
+        $this->assertContains('resolver:toolGetRelatedEntities', $response['result']['diagnostics']['execution_path']);
+    }
+
+    #[Test]
+    public function toolsIntrospectNormalizesLegacyAliasToCanonicalTool(): void
+    {
+        $controller = $this->createController();
+        $response = $controller->handleRpc([
+            'jsonrpc' => '2.0',
+            'id' => 3,
+            'method' => 'tools/introspect',
+            'params' => [
+                'name' => 'search_teachings',
+            ],
+        ]);
+
+        $this->assertSame('search_teachings', $response['result']['tool']['requested']);
+        $this->assertSame('search_entities', $response['result']['tool']['canonical']);
+        $this->assertTrue($response['result']['tool']['is_alias']);
+        $this->assertSame('search_entities', $response['result']['contract']['stable_meta']['tool']);
+        $this->assertSame('search_teachings', $response['result']['contract']['stable_meta']['tool_invoked']);
+        $this->assertSame('search_teachings', $response['result']['contract']['stable_meta']['deprecated_alias']);
+    }
+
+    #[Test]
+    public function toolsIntrospectReturnsInvalidParamsForUnknownTool(): void
+    {
+        $controller = $this->createController();
+        $response = $controller->handleRpc([
+            'jsonrpc' => '2.0',
+            'id' => 4,
+            'method' => 'tools/introspect',
+            'params' => [
+                'name' => 'nope',
+            ],
+        ]);
+
+        $this->assertSame(-32602, $response['error']['code']);
+        $this->assertStringContainsString('Unknown tool: nope', $response['error']['message']);
+    }
+
+    #[Test]
     public function listEntityTypesToolReturnsDefinitions(): void
     {
         $definition = new EntityType(

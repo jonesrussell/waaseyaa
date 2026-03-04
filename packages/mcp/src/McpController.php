@@ -86,9 +86,78 @@ final class McpController
 
         return match ($method) {
             'tools/list' => $this->result($id, ['tools' => $this->manifest()['tools']]),
+            'tools/introspect' => $this->handleToolIntrospection($id, $params),
             'tools/call' => $this->handleToolCall($id, $params),
             default => $this->error($id, -32601, "Method not found: {$method}"),
         };
+    }
+
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>
+     */
+    private function handleToolIntrospection(mixed $id, array $params): array
+    {
+        $requestedTool = is_string($params['name'] ?? null) ? trim($params['name']) : '';
+        if ($requestedTool === '') {
+            return $this->error($id, -32602, 'Missing tool name.');
+        }
+
+        $knownTools = array_map(
+            static fn(array $tool): string => (string) ($tool['name'] ?? ''),
+            $this->manifest()['tools'],
+        );
+        if (!in_array($requestedTool, $knownTools, true)) {
+            return $this->error($id, -32602, "Unknown tool: {$requestedTool}");
+        }
+
+        $canonicalTool = $this->canonicalToolName($requestedTool);
+        $descriptor = $this->toolDiagnosticsDescriptor($canonicalTool);
+        $accountContext = $this->readCacheAccountContext();
+        $stableMeta = [
+            'contract_version' => self::CONTRACT_VERSION,
+            'contract_stability' => self::CONTRACT_STABILITY,
+            'tool_invoked' => $requestedTool,
+            'tool' => $canonicalTool,
+        ];
+        if ($requestedTool !== $canonicalTool) {
+            $stableMeta['deprecated_alias'] = $requestedTool;
+        }
+
+        return $this->result($id, [
+            'tool' => [
+                'requested' => $requestedTool,
+                'canonical' => $canonicalTool,
+                'is_alias' => $requestedTool !== $canonicalTool,
+                'handler' => $descriptor['handler'],
+                'category' => $descriptor['category'],
+            ],
+            'contract' => [
+                'protocol_version' => '2024-11-05',
+                'contract_version' => self::CONTRACT_VERSION,
+                'contract_stability' => self::CONTRACT_STABILITY,
+                'stable_meta' => $stableMeta,
+            ],
+            'cache' => [
+                'read_cacheable' => $this->isReadCacheableTool($canonicalTool),
+                'read_cache_enabled' => $this->readCache !== null,
+                'scope' => $accountContext['authenticated'] ? 'authenticated' : 'anonymous',
+                'account_context' => $accountContext,
+                'cache_key_dimensions' => ['contract_version', 'tool', 'arguments', 'account'],
+                'cache_tags' => $descriptor['cache_tags'],
+            ],
+            'visibility' => [
+                'source_access' => $descriptor['visibility_source_access'],
+                'workflow_policy' => $descriptor['workflow_policy'],
+            ],
+            'permissions' => [
+                'boundaries' => $descriptor['permission_boundaries'],
+            ],
+            'diagnostics' => [
+                'execution_path' => $descriptor['execution_path'],
+                'failure_modes' => $descriptor['failure_modes'],
+            ],
+        ]);
     }
 
     /**
@@ -1126,7 +1195,7 @@ final class McpController
             $result['meta'] = [];
         }
 
-        $canonicalTool = $invokedTool === 'search_teachings' ? 'search_entities' : $invokedTool;
+        $canonicalTool = $this->canonicalToolName($invokedTool);
         $result['meta']['contract_version'] = self::CONTRACT_VERSION;
         $result['meta']['contract_stability'] = self::CONTRACT_STABILITY;
         $result['meta']['tool_invoked'] = $invokedTool;
@@ -1135,6 +1204,149 @@ final class McpController
         }
 
         return $result;
+    }
+
+    private function canonicalToolName(string $tool): string
+    {
+        return $tool === 'search_teachings' ? 'search_entities' : $tool;
+    }
+
+    /**
+     * @return array{
+     *   handler: string,
+     *   category: string,
+     *   cache_tags: list<string>,
+     *   visibility_source_access: string,
+     *   workflow_policy: string,
+     *   permission_boundaries: list<string>,
+     *   execution_path: list<string>,
+     *   failure_modes: list<string>
+     * }
+     */
+    private function toolDiagnosticsDescriptor(string $tool): array
+    {
+        return match ($tool) {
+            'search_entities' => [
+                'handler' => 'toolSearchEntities',
+                'category' => 'semantic_read',
+                'cache_tags' => ['mcp_read', 'mcp_read:tool:search_entities'],
+                'visibility_source_access' => 'entity_view_access',
+                'workflow_policy' => 'visibility-aware',
+                'permission_boundaries' => ['entity:view'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolSearchEntities', 'meta:stable_contract', 'response:format_tool_content'],
+                'failure_modes' => ['invalid_query_type', 'embedding_provider_failure'],
+            ],
+            'ai_discover' => [
+                'handler' => 'toolAiDiscover',
+                'category' => 'discovery_read',
+                'cache_tags' => ['mcp_read', 'mcp_read:tool:ai_discover'],
+                'visibility_source_access' => 'entity_view_access',
+                'workflow_policy' => 'published_only',
+                'permission_boundaries' => ['entity:view'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolAiDiscover', 'graph:optional_anchor_context', 'meta:stable_contract', 'response:format_tool_content'],
+                'failure_modes' => ['missing_query', 'hidden_anchor_entity', 'non_public_anchor_entity', 'semantic_search_failure'],
+            ],
+            'get_entity' => [
+                'handler' => 'toolGetEntity',
+                'category' => 'entity_read',
+                'cache_tags' => ['mcp_read:disabled'],
+                'visibility_source_access' => 'entity_view_access',
+                'workflow_policy' => 'visibility-aware',
+                'permission_boundaries' => ['entity:view'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolGetEntity', 'response:format_tool_content'],
+                'failure_modes' => ['unknown_entity_type', 'entity_not_found', 'access_denied'],
+            ],
+            'list_entity_types' => [
+                'handler' => 'toolListEntityTypes',
+                'category' => 'schema_read',
+                'cache_tags' => ['mcp_read:disabled'],
+                'visibility_source_access' => 'none',
+                'workflow_policy' => 'not_applicable',
+                'permission_boundaries' => ['schema:list'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolListEntityTypes', 'response:format_tool_content'],
+                'failure_modes' => ['definition_resolution_failure'],
+            ],
+            'traverse_relationships' => [
+                'handler' => 'toolTraverseRelationships',
+                'category' => 'graph_read',
+                'cache_tags' => ['mcp_read', 'mcp_read:tool:traverse_relationships'],
+                'visibility_source_access' => 'source_view_required',
+                'workflow_policy' => 'relationship_visibility_filter',
+                'permission_boundaries' => ['entity:view', 'relationship:view'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolTraverseRelationships', 'graph:collectTraversalRows', 'meta:stable_contract', 'response:format_tool_content'],
+                'failure_modes' => ['missing_source_arguments', 'unknown_source_type', 'hidden_source_entity'],
+            ],
+            'get_related_entities' => [
+                'handler' => 'toolGetRelatedEntities',
+                'category' => 'graph_read',
+                'cache_tags' => ['mcp_read', 'mcp_read:tool:get_related_entities'],
+                'visibility_source_access' => 'source_view_required',
+                'workflow_policy' => 'relationship_visibility_filter',
+                'permission_boundaries' => ['entity:view', 'relationship:view'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolGetRelatedEntities', 'graph:collectTraversalRows', 'meta:stable_contract', 'response:format_tool_content'],
+                'failure_modes' => ['missing_source_arguments', 'unknown_source_type', 'hidden_source_entity'],
+            ],
+            'get_knowledge_graph' => [
+                'handler' => 'toolGetKnowledgeGraph',
+                'category' => 'graph_read',
+                'cache_tags' => ['mcp_read', 'mcp_read:tool:get_knowledge_graph'],
+                'visibility_source_access' => 'source_view_required',
+                'workflow_policy' => 'relationship_visibility_filter',
+                'permission_boundaries' => ['entity:view', 'relationship:view'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolGetKnowledgeGraph', 'graph:collectTraversalRows_or_service', 'meta:stable_contract', 'response:format_tool_content'],
+                'failure_modes' => ['missing_source_arguments', 'unknown_source_type', 'hidden_source_entity'],
+            ],
+            'editorial_transition' => [
+                'handler' => 'toolEditorialTransition',
+                'category' => 'editorial_write',
+                'cache_tags' => ['mcp_read:disabled'],
+                'visibility_source_access' => 'entity_update_access',
+                'workflow_policy' => 'workflow_transition_enforced',
+                'permission_boundaries' => ['entity:update', 'workflow:transition', 'storage:save'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolEditorialTransition', 'workflow:validate_transition', 'storage:save', 'meta:stable_contract', 'response:format_tool_content'],
+                'failure_modes' => ['missing_target_state', 'unknown_target_state', 'transition_unauthorized', 'validation_failed'],
+            ],
+            'editorial_validate' => [
+                'handler' => 'toolEditorialValidate',
+                'category' => 'editorial_read',
+                'cache_tags' => ['mcp_read:disabled'],
+                'visibility_source_access' => 'entity_update_access',
+                'workflow_policy' => 'workflow_transition_enforced',
+                'permission_boundaries' => ['entity:update', 'workflow:transition'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolEditorialValidate', 'workflow:validate_transition', 'meta:stable_contract', 'response:format_tool_content'],
+                'failure_modes' => ['missing_entity_identity', 'unknown_target_state', 'transition_unauthorized'],
+            ],
+            'editorial_publish' => [
+                'handler' => 'toolEditorialPublish',
+                'category' => 'editorial_write',
+                'cache_tags' => ['mcp_read:disabled'],
+                'visibility_source_access' => 'entity_update_access',
+                'workflow_policy' => 'workflow_transition_enforced',
+                'permission_boundaries' => ['entity:update', 'workflow:publish', 'storage:save'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolEditorialPublish', 'resolver:toolEditorialTransition', 'storage:save', 'meta:stable_contract', 'response:format_tool_content'],
+                'failure_modes' => ['transition_unauthorized', 'validation_failed'],
+            ],
+            'editorial_archive' => [
+                'handler' => 'toolEditorialArchive',
+                'category' => 'editorial_write',
+                'cache_tags' => ['mcp_read:disabled'],
+                'visibility_source_access' => 'entity_update_access',
+                'workflow_policy' => 'workflow_transition_enforced',
+                'permission_boundaries' => ['entity:update', 'workflow:archive', 'storage:save'],
+                'execution_path' => ['rpc:tools/call', 'resolver:toolEditorialArchive', 'resolver:toolEditorialTransition', 'storage:save', 'meta:stable_contract', 'response:format_tool_content'],
+                'failure_modes' => ['transition_unauthorized', 'validation_failed'],
+            ],
+            default => [
+                'handler' => 'unknown',
+                'category' => 'unknown',
+                'cache_tags' => ['mcp_read:disabled'],
+                'visibility_source_access' => 'unknown',
+                'workflow_policy' => 'unknown',
+                'permission_boundaries' => [],
+                'execution_path' => ['rpc:tools/call'],
+                'failure_modes' => ['unknown_tool'],
+            ],
+        };
     }
 
     /**
