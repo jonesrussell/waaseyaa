@@ -83,6 +83,33 @@ cd my-site
 ./vendor/bin/phpunit --testsuite Integration
 ```
 
+## Fixture Ergonomics
+
+Waaseyaa includes deterministic fixture helpers for workflow/graph regression setup:
+
+```bash
+# Scaffold a workflow-aware fixture scenario
+bin/waaseyaa fixture:scaffold \
+  --key water_anchor \
+  --title "Water Anchor" \
+  --bundle teaching \
+  --workflow-state published \
+  --relationship-type related \
+  --to-key river_memory \
+  --output tests/fixtures/scenarios/water_anchor.json
+
+# Refresh aggregate fixture pack + deterministic hash
+bin/waaseyaa fixture:pack:refresh \
+  --input-dir tests/fixtures/scenarios \
+  --output tests/fixtures/scenarios/pack.json
+```
+
+For semantic index warm-ups tied to deterministic read-path validation:
+
+```bash
+bin/waaseyaa semantic:warm --type node --json
+```
+
 ## Project Stats
 
 - **29** implementation packages + 3 meta-packages + 1 admin SPA

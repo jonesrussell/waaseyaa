@@ -19,6 +19,8 @@ use Waaseyaa\CLI\Command\EntityCreateCommand;
 use Waaseyaa\CLI\Command\EntityListCommand;
 use Waaseyaa\CLI\Command\EntityTypeListCommand;
 use Waaseyaa\CLI\Command\EventListCommand;
+use Waaseyaa\CLI\Command\FixturePackRefreshCommand;
+use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
 use Waaseyaa\CLI\Command\Make\MakeEntityCommand;
 use Waaseyaa\CLI\Command\Make\MakeJobCommand;
@@ -141,6 +143,8 @@ final class ConsoleKernel extends AbstractKernel
             new RouteListCommand($router),
             new PermissionListCommand($permissionHandler),
             new SemanticWarmCommand($semanticWarmer),
+            new FixtureScaffoldCommand(),
+            new FixturePackRefreshCommand(),
             new OptimizeCommand(),
             new OptimizeManifestCommand($manifestCompiler),
             new OptimizeConfigCommand(new ConfigCacheCompiler(
