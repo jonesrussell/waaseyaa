@@ -123,21 +123,30 @@ final class SqlSchemaHandler
         $keys = $this->entityType->getKeys();
         $fields = [];
 
-        // ID column (serial / auto-increment).
+        // ID column: varchar for config entities, serial for content entities.
         $idKey = $keys['id'] ?? 'id';
-        $fields[$idKey] = [
-            'type' => 'serial',
-            'not null' => true,
-        ];
+        if (isset($keys['uuid'])) {
+            $fields[$idKey] = [
+                'type' => 'serial',
+                'not null' => true,
+            ];
+        } else {
+            $fields[$idKey] = [
+                'type' => 'varchar',
+                'length' => 255,
+                'not null' => true,
+            ];
+        }
 
-        // UUID column.
-        $uuidKey = $keys['uuid'] ?? 'uuid';
-        $fields[$uuidKey] = [
-            'type' => 'varchar',
-            'length' => 128,
-            'not null' => true,
-            'default' => '',
-        ];
+        // UUID column (content entities only).
+        if (isset($keys['uuid'])) {
+            $fields[$keys['uuid']] = [
+                'type' => 'varchar',
+                'length' => 128,
+                'not null' => true,
+                'default' => '',
+            ];
+        }
 
         // Bundle column.
         $bundleKey = $keys['bundle'] ?? 'bundle';
@@ -173,16 +182,22 @@ final class SqlSchemaHandler
             'default' => '{}',
         ];
 
-        return [
+        $spec = [
             'fields' => $fields,
             'primary key' => [$idKey],
-            'unique keys' => [
-                $this->tableName . '_uuid' => [$uuidKey],
-            ],
             'indexes' => [
                 $this->tableName . '_bundle' => [$bundleKey],
             ],
         ];
+
+        // UUID unique index (content entities only).
+        if (isset($keys['uuid'])) {
+            $spec['unique keys'] = [
+                $this->tableName . '_uuid' => [$keys['uuid']],
+            ];
+        }
+
+        return $spec;
     }
 
     /**

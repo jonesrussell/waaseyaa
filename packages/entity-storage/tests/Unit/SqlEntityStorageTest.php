@@ -11,6 +11,7 @@ use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\EntityStorage\Tests\Fixtures\TestConfigEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestStorageEntity;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
@@ -329,5 +330,164 @@ final class SqlEntityStorageTest extends TestCase
 
         // Explicit non-zero created should be preserved.
         $this->assertSame(1700000000, (int) $loaded->get('created'));
+    }
+
+    public function testCreateEnforcesIsNew(): void
+    {
+        $entity = $this->storage->create([
+            'label' => 'New Entity',
+            'bundle' => 'article',
+        ]);
+
+        $this->assertTrue($entity->isNew());
+    }
+
+    public function testConfigEntityCreateSaveAndLoad(): void
+    {
+        $configStorage = $this->createConfigStorage();
+
+        // Create and save a config entity with a string ID.
+        $entity = $configStorage->create([
+            'type' => 'article',
+            'name' => 'Article',
+            'bundle' => '',
+        ]);
+
+        $this->assertTrue($entity->isNew());
+        $this->assertSame('article', $entity->id());
+
+        $result = $configStorage->save($entity);
+        $this->assertSame(EntityConstants::SAVED_NEW, $result);
+        $this->assertFalse($entity->isNew());
+        // String ID should be preserved, not cast to int.
+        $this->assertSame('article', $entity->id());
+
+        // Load and verify.
+        $loaded = $configStorage->load('article');
+        $this->assertNotNull($loaded);
+        $this->assertSame('article', $loaded->id());
+        $this->assertSame('Article', $loaded->label());
+        $this->assertFalse($loaded->isNew());
+    }
+
+    public function testConfigEntityUpdate(): void
+    {
+        $configStorage = $this->createConfigStorage();
+
+        // Create and save.
+        $entity = $configStorage->create([
+            'type' => 'page',
+            'name' => 'Basic Page',
+            'bundle' => '',
+        ]);
+        $configStorage->save($entity);
+
+        // Load, update, re-save.
+        $loaded = $configStorage->load('page');
+        $loaded->set('name', 'Updated Page');
+        $result = $configStorage->save($loaded);
+
+        $this->assertSame(EntityConstants::SAVED_UPDATED, $result);
+
+        // Reload and verify.
+        $reloaded = $configStorage->load('page');
+        $this->assertSame('Updated Page', $reloaded->label());
+    }
+
+    public function testConfigEntityDeleteWithStringIds(): void
+    {
+        $configStorage = $this->createConfigStorage();
+
+        $entity1 = $configStorage->create(['type' => 'article', 'name' => 'Article', 'bundle' => '']);
+        $entity2 = $configStorage->create(['type' => 'page', 'name' => 'Page', 'bundle' => '']);
+        $entity3 = $configStorage->create(['type' => 'blog', 'name' => 'Blog', 'bundle' => '']);
+
+        $configStorage->save($entity1);
+        $configStorage->save($entity2);
+        $configStorage->save($entity3);
+
+        $configStorage->delete([$entity1, $entity2]);
+
+        $this->assertNull($configStorage->load('article'));
+        $this->assertNull($configStorage->load('page'));
+        $this->assertNotNull($configStorage->load('blog'));
+    }
+
+    public function testConfigEntityLoadMultipleWithStringIds(): void
+    {
+        $configStorage = $this->createConfigStorage();
+
+        $entity1 = $configStorage->create(['type' => 'article', 'name' => 'Article', 'bundle' => '']);
+        $entity2 = $configStorage->create(['type' => 'page', 'name' => 'Page', 'bundle' => '']);
+        $entity3 = $configStorage->create(['type' => 'blog', 'name' => 'Blog', 'bundle' => '']);
+
+        $configStorage->save($entity1);
+        $configStorage->save($entity2);
+        $configStorage->save($entity3);
+
+        $entities = $configStorage->loadMultiple(['article', 'blog']);
+
+        $this->assertCount(2, $entities);
+        $this->assertArrayHasKey('article', $entities);
+        $this->assertArrayHasKey('blog', $entities);
+        $this->assertSame('Article', $entities['article']->label());
+        $this->assertSame('Blog', $entities['blog']->label());
+    }
+
+    public function testContentEntityWithPresetIntegerId(): void
+    {
+        $entity = $this->storage->create([
+            'id' => 42,
+            'label' => 'Pre-set ID',
+            'bundle' => 'article',
+        ]);
+        $entity->enforceIsNew();
+
+        $result = $this->storage->save($entity);
+
+        $this->assertSame(EntityConstants::SAVED_NEW, $result);
+        $this->assertSame(42, $entity->id());
+        $this->assertFalse($entity->isNew());
+
+        // Reload and verify.
+        $loaded = $this->storage->load(42);
+        $this->assertNotNull($loaded);
+        $this->assertSame(42, $loaded->id());
+        $this->assertSame('Pre-set ID', $loaded->label());
+    }
+
+    public function testConfigEntitySaveRejectsEmptyId(): void
+    {
+        $configStorage = $this->createConfigStorage();
+
+        $entity = $configStorage->create(['type' => '', 'name' => 'No ID', 'bundle' => '']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('requires a non-empty string ID');
+        $configStorage->save($entity);
+    }
+
+    private function createConfigStorage(): SqlEntityStorage
+    {
+        $configType = new EntityType(
+            id: 'node_type',
+            label: 'Content Type',
+            class: TestConfigEntity::class,
+            keys: [
+                'id' => 'type',
+                'label' => 'name',
+                'bundle' => 'bundle',
+                'langcode' => 'langcode',
+            ],
+        );
+
+        $schemaHandler = new SqlSchemaHandler($configType, $this->database);
+        $schemaHandler->ensureTable();
+
+        return new SqlEntityStorage(
+            $configType,
+            $this->database,
+            $this->eventDispatcher,
+        );
     }
 }

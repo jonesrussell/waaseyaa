@@ -13,7 +13,8 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
  * Converts EntityInterface objects to JsonApiResource value objects.
  *
  * Maps entity fields to JSON:API attributes, excluding entity keys
- * (id, uuid) which become the resource's top-level id/type.
+ * which become the resource's top-level id/type. Content entities use
+ * UUID as the resource ID; config entities use their string machine name.
  */
 final class ResourceSerializer
 {
@@ -37,7 +38,7 @@ final class ResourceSerializer
         $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
         $keys = $entityType->getKeys();
 
-        // Use UUID as the resource ID if available, otherwise fall back to entity ID.
+        // Content entities use UUID as resource ID; config entities use their string ID.
         $resourceId = $entity->uuid() !== '' ? $entity->uuid() : (string) $entity->id();
 
         // Build attributes from entity values, excluding entity keys (id, uuid).

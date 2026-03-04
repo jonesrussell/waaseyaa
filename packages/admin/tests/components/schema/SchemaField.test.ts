@@ -41,6 +41,18 @@ describe('SchemaField widget dispatch', () => {
     expect(wrapper.find('input').exists()).toBe(true)
   })
 
+  it('renders a machine name input for x-widget: machine_name', async () => {
+    const wrapper = await mountSuspended(SchemaField, {
+      props: {
+        name: 'type',
+        modelValue: '',
+        schema: makeSchema('machine_name', { 'x-source-field': 'name' }),
+      },
+    })
+    expect(wrapper.find('input[type="text"]').exists()).toBe(true)
+    expect(wrapper.find('.field-input--machine-name').exists()).toBe(true)
+  })
+
   it('passes disabled=true to widget when x-access-restricted is set', async () => {
     const wrapper = await mountSuspended(SchemaField, {
       props: {

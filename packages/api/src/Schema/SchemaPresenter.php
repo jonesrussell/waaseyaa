@@ -20,6 +20,7 @@ use Waaseyaa\Entity\EntityTypeInterface;
  * - "x-weight": field display order weight
  * - "x-required": whether the field is required in forms
  * - "x-access-restricted": field is viewable but not editable by the current account
+ * - "x-source-field": for machine_name widgets, the field name to auto-generate from
  */
 final class SchemaPresenter
 {
@@ -197,12 +198,27 @@ final class SchemaPresenter
         $properties = [];
 
         if (isset($keys['id'])) {
-            $properties[$keys['id']] = [
-                'type' => 'integer',
-                'description' => 'The primary identifier.',
-                'readOnly' => true,
-                'x-widget' => 'hidden',
-            ];
+            if (isset($keys['uuid'])) {
+                // Content entity: auto-increment integer ID, hidden.
+                $properties[$keys['id']] = [
+                    'type' => 'integer',
+                    'description' => 'The primary identifier.',
+                    'readOnly' => true,
+                    'x-widget' => 'hidden',
+                ];
+            } else {
+                // Config entity: editable string machine name.
+                $prop = [
+                    'type' => 'string',
+                    'description' => 'The machine name identifier.',
+                    'x-widget' => 'machine_name',
+                    'x-label' => 'Machine name',
+                ];
+                if (isset($keys['label'])) {
+                    $prop['x-source-field'] = $keys['label'];
+                }
+                $properties[$keys['id']] = $prop;
+            }
         }
 
         if (isset($keys['uuid'])) {

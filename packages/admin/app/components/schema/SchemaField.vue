@@ -27,6 +27,7 @@ const widgetMap: Record<string, Component> = {
   datetime: resolveComponent('WidgetsDateTimeInput') as Component,
   entity_autocomplete: resolveComponent('WidgetsEntityAutocomplete') as Component,
   hidden: resolveComponent('WidgetsHiddenField') as Component,
+  machine_name: resolveComponent('WidgetsMachineNameInput') as Component,
   password: resolveComponent('WidgetsTextInput') as Component,
   image: resolveComponent('WidgetsTextInput') as Component,
   file: resolveComponent('WidgetsTextInput') as Component,

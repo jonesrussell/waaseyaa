@@ -20,6 +20,10 @@ const { get, create, update } = useEntity()
 const formData = ref<Record<string, any>>({})
 const saving = ref(false)
 const loadError = ref<string | null>(null)
+const isEditMode = computed(() => !!props.entityId)
+
+provide('schemaFormData', formData)
+provide('schemaFormEditMode', isEditMode)
 
 // Load schema, then optionally load existing entity if schema succeeded.
 onMounted(async () => {

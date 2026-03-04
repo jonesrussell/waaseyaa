@@ -29,7 +29,6 @@ final class SqlEntityStorage implements EntityStorageInterface
 {
     private readonly string $tableName;
     private readonly string $idKey;
-    private readonly string $uuidKey;
 
     /** @var array<string, string> */
     private readonly array $entityKeys;
@@ -45,16 +44,19 @@ final class SqlEntityStorage implements EntityStorageInterface
         $this->tableName = $this->entityType->id();
         $keys = $this->entityType->getKeys();
         $this->idKey = $keys['id'] ?? 'id';
-        $this->uuidKey = $keys['uuid'] ?? 'uuid';
         $this->entityKeys = $keys;
-
     }
 
     public function create(array $values = []): EntityInterface
     {
         $class = $this->entityType->getClass();
+        $entity = $this->instantiateEntity($class, $values);
 
-        return $this->instantiateEntity($class, $values);
+        if (method_exists($entity, 'enforceIsNew')) {
+            $entity->enforceIsNew();
+        }
+
+        return $entity;
     }
 
     public function load(int|string $id): ?EntityInterface
@@ -133,13 +135,24 @@ final class SqlEntityStorage implements EntityStorageInterface
                 $insertValues[$key] = $value;
             }
 
+            // Config entities (no uuid key) must have an explicit non-empty ID.
+            if (!isset($this->entityKeys['uuid']) && (!isset($insertValues[$this->idKey]) || $insertValues[$this->idKey] === '')) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Config entity "%s" requires a non-empty string ID in the "%s" field.',
+                    $this->entityType->id(),
+                    $this->idKey,
+                ));
+            }
+
             $id = $this->database->insert($this->tableName)
                 ->fields(array_keys($insertValues))
                 ->values($insertValues)
                 ->execute();
 
-            // Set the ID on the entity after insert.
-            if (method_exists($entity, 'set')) {
+            // Set the auto-generated ID only when ID was not in the insert
+            // (auto-increment). Config entities and entities with pre-set IDs
+            // already have their ID and should not be overwritten.
+            if (!isset($insertValues[$this->idKey]) && method_exists($entity, 'set')) {
                 $entity->set($this->idKey, (int) $id);
             }
 
@@ -243,7 +256,12 @@ final class SqlEntityStorage implements EntityStorageInterface
 
         // Merge extra data from the _data JSON column back into values.
         if (isset($row['_data'])) {
-            $extra = json_decode((string) $row['_data'], associative: true) ?: [];
+            try {
+                $extra = json_decode((string) $row['_data'], associative: true, flags: \JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                error_log(sprintf('Corrupt _data JSON for %s entity %s: %s', $this->tableName, $row[$this->idKey] ?? '?', $e->getMessage()));
+                $extra = [];
+            }
             unset($row['_data']);
             $row = array_merge($row, $extra);
         }

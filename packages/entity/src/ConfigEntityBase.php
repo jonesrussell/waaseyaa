@@ -9,7 +9,8 @@ namespace Waaseyaa\Entity;
  *
  * Config entities represent site configuration that can be exported,
  * imported, and synchronized (e.g. content types, vocabularies, views).
- * They are stored in the config system as YAML, not in the database.
+ * Unlike content entities, config entities use a string machine name as
+ * their primary key and do not have a UUID.
  */
 abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterface
 {

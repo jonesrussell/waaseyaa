@@ -100,7 +100,7 @@ class ConfigEntityBaseTest extends TestCase
         $this->assertSame('article', $config['id']);
         $this->assertSame('Article', $config['label']);
         $this->assertTrue($config['status']);
-        $this->assertArrayHasKey('uuid', $config);
+        $this->assertArrayNotHasKey('uuid', $config);
     }
 
     public function testToConfigIncludesDependencies(): void

@@ -337,6 +337,53 @@ final class SchemaPresenterTest extends TestCase
         $this->assertSame('', $properties['summary']['default']);
     }
 
+    #[Test]
+    public function presentConfigEntityIdAsMachineNameWidget(): void
+    {
+        // Config entities have no uuid key.
+        $entityType = $this->createEntityType(keys: [
+            'id' => 'type',
+            'label' => 'name',
+            'bundle' => 'bundle',
+        ]);
+
+        $schema = $this->presenter->present($entityType);
+        $properties = $schema['properties'];
+
+        // ID should be string with machine_name widget.
+        $this->assertArrayHasKey('type', $properties);
+        $this->assertSame('string', $properties['type']['type']);
+        $this->assertSame('machine_name', $properties['type']['x-widget']);
+        $this->assertSame('Machine name', $properties['type']['x-label']);
+        $this->assertSame('name', $properties['type']['x-source-field']);
+
+        // Should NOT have readOnly (editable on create).
+        $this->assertArrayNotHasKey('readOnly', $properties['type']);
+
+        // Should NOT have a uuid property.
+        $this->assertArrayNotHasKey('uuid', $properties);
+    }
+
+    #[Test]
+    public function presentContentEntityIdAsHiddenInteger(): void
+    {
+        $entityType = $this->createEntityType(keys: [
+            'id' => 'id',
+            'uuid' => 'uuid',
+            'label' => 'title',
+            'bundle' => 'type',
+        ]);
+
+        $schema = $this->presenter->present($entityType);
+        $properties = $schema['properties'];
+
+        // Content entity ID should be integer, readOnly, hidden.
+        $this->assertSame('integer', $properties['id']['type']);
+        $this->assertTrue($properties['id']['readOnly']);
+        $this->assertSame('hidden', $properties['id']['x-widget']);
+        $this->assertArrayNotHasKey('x-source-field', $properties['id']);
+    }
+
     // --- Helpers ---
 
     private function createEntityType(

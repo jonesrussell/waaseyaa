@@ -46,21 +46,12 @@ final class NodeTypeTest extends TestCase
         $this->assertFalse($type->isNew());
     }
 
-    public function testAutoGeneratesUuid(): void
+    public function testConfigEntityHasNoUuid(): void
     {
         $type = new NodeType();
-        $uuid = $type->uuid();
-        $this->assertNotEmpty($uuid);
-        $this->assertMatchesRegularExpression(
-            '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i',
-            $uuid,
-        );
-    }
 
-    public function testExplicitUuidIsPreserved(): void
-    {
-        $type = new NodeType(['uuid' => 'custom-uuid-1234']);
-        $this->assertSame('custom-uuid-1234', $type->uuid());
+        // Config entities do not have UUIDs.
+        $this->assertSame('', $type->uuid());
     }
 
     // -----------------------------------------------------------------
@@ -261,7 +252,7 @@ final class NodeTypeTest extends TestCase
         $this->assertTrue($config['new_revision']);
         $this->assertTrue($config['display_submitted']);
         $this->assertTrue($config['status']);
-        $this->assertArrayHasKey('uuid', $config);
+        $this->assertArrayNotHasKey('uuid', $config);
     }
 
     public function testToConfigIncludesStatus(): void

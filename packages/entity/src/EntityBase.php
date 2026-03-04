@@ -57,10 +57,12 @@ abstract class EntityBase implements EntityInterface
 
         $this->values = $values;
 
-        // Auto-generate UUID if not provided.
-        $uuidKey = $this->entityKeys['uuid'] ?? 'uuid';
-        if (!isset($this->values[$uuidKey]) || $this->values[$uuidKey] === '') {
-            $this->values[$uuidKey] = Uuid::v4()->toRfc4122();
+        // Auto-generate UUID only when the entity type defines a uuid key.
+        if (isset($this->entityKeys['uuid'])) {
+            $uuidKey = $this->entityKeys['uuid'];
+            if (!isset($this->values[$uuidKey]) || $this->values[$uuidKey] === '') {
+                $this->values[$uuidKey] = Uuid::v4()->toRfc4122();
+            }
         }
     }
 
