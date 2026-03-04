@@ -18,9 +18,22 @@ export function useRealtime(channels: string[] = ['admin']) {
   let eventSource: EventSource | null = null
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null
   let retryCount = 0
+  let disconnectRequested = false
+
+  function appendMessage(raw: string) {
+    if (!raw || raw.trim() === '') return
+
+    try {
+      const msg: BroadcastMessage = JSON.parse(raw)
+      messages.value = [...messages.value.slice(-99), msg]
+    } catch (e) {
+      console.warn('[Waaseyaa] Failed to parse SSE message:', raw)
+    }
+  }
 
   function connect() {
     if (typeof window === 'undefined') return
+    disconnectRequested = false
 
     const channelParam = channels.join(',')
     eventSource = new EventSource(`/api/broadcast?channels=${channelParam}`)
@@ -28,22 +41,31 @@ export function useRealtime(channels: string[] = ['admin']) {
     eventSource.onopen = () => {
       connected.value = true
       retryCount = 0
+      error.value = null
     }
 
     eventSource.onmessage = (event) => {
-      if (!event.data || event.data.trim() === '') return
-
-      try {
-        const msg: BroadcastMessage = JSON.parse(event.data)
-        messages.value = [...messages.value.slice(-99), msg]
-      } catch (e) {
-        console.warn('[Waaseyaa] Failed to parse SSE message:', event.data)
-      }
+      appendMessage(event.data)
     }
 
+    // Server uses named SSE events.
+    eventSource.addEventListener('connected', (event: MessageEvent) => appendMessage(event.data))
+    eventSource.addEventListener('entity.saved', (event: MessageEvent) => appendMessage(event.data))
+    eventSource.addEventListener('entity.deleted', (event: MessageEvent) => appendMessage(event.data))
+
     eventSource.onerror = () => {
+      if (disconnectRequested) return
+
       connected.value = false
-      eventSource?.close()
+      if (!eventSource) return
+
+      // Let native EventSource retry while CONNECTING; forcing close/recreate
+      // here causes noisy disconnect loops on unstable dev servers.
+      if (eventSource.readyState === EventSource.CONNECTING) {
+        return
+      }
+
+      eventSource.close()
       eventSource = null
 
       retryCount++
@@ -60,6 +82,7 @@ export function useRealtime(channels: string[] = ['admin']) {
   }
 
   function disconnect() {
+    disconnectRequested = true
     if (reconnectTimer) {
       clearTimeout(reconnectTimer)
       reconnectTimer = null
