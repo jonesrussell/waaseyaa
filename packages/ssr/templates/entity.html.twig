@@ -1,0 +1,7 @@
+<article class="entity entity-{{ entity_type }} entity-view-{{ view_mode }}">
+  {% for field_name, field in fields %}
+    <div class="field field-{{ field_name }}">
+      {{ field.formatted|raw }}
+    </div>
+  {% endfor %}
+</article>

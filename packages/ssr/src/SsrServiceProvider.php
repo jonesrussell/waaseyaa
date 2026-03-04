@@ -57,6 +57,12 @@ final class SsrServiceProvider extends ServiceProvider
             }
         }
 
+        // Base SSR theme templates (lowest priority fallback).
+        $baseThemeTemplates = rtrim($projectRoot, '/') . '/packages/ssr/templates';
+        if (is_dir($baseThemeTemplates)) {
+            $loader->addPath($baseThemeTemplates);
+        }
+
         return new Environment($loader, [
             'cache' => false,
             'auto_reload' => true,
