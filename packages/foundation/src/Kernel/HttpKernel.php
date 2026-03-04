@@ -27,6 +27,7 @@ use Waaseyaa\Media\LocalFileRepository;
 use Waaseyaa\Routing\AccessChecker;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
+use Waaseyaa\User\Middleware\BearerAuthMiddleware;
 use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\SessionMiddleware;
 
@@ -85,6 +86,11 @@ final class HttpKernel extends AbstractKernel
         $gate = new EntityAccessGate($this->accessHandler);
         $accessChecker = new AccessChecker(gate: $gate);
         $pipeline = (new HttpPipeline())
+            ->withMiddleware(new BearerAuthMiddleware(
+                $userStorage,
+                (string) ($this->config['jwt_secret'] ?? ''),
+                is_array($this->config['api_keys'] ?? null) ? $this->config['api_keys'] : [],
+            ))
             ->withMiddleware(new SessionMiddleware(
                 $userStorage,
                 PHP_SAPI === 'cli-server' ? new DevAdminAccount() : null,

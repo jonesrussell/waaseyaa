@@ -14,6 +14,12 @@ return [
     // File storage root for LocalFileRepository (media package).
     'files_dir' => getenv('WAASEYAA_FILES_DIR') ?: __DIR__ . '/../files',
 
+    // Bearer auth settings for machine clients.
+    // JWT uses HS256 with this shared secret.
+    'jwt_secret' => getenv('WAASEYAA_JWT_SECRET') ?: '',
+    // API key map: raw key => uid. Example: ['dev-machine-key' => 1].
+    'api_keys' => [],
+
     // Upload validation (POST /api/media/upload).
     'upload_max_bytes' => 10 * 1024 * 1024, // 10 MiB
     'upload_allowed_mime_types' => [

@@ -25,6 +25,11 @@ final class SessionMiddleware implements HttpMiddlewareInterface
 
     public function process(Request $request, HttpHandlerInterface $next): Response
     {
+        $existingAccount = $request->attributes->get('_account');
+        if ($existingAccount instanceof AccountInterface) {
+            return $next->handle($request);
+        }
+
         $account = $this->resolveAccount($request);
         $request->attributes->set('_account', $account);
 

@@ -274,4 +274,31 @@ final class SessionMiddlewareTest extends TestCase
         $this->assertSame(201, $response->getStatusCode());
         $this->assertSame('downstream', $response->getContent());
     }
+
+    #[Test]
+    public function does_not_override_existing_account_attribute(): void
+    {
+        $existing = new User(['uid' => 88, 'name' => 'token-user']);
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $storage->expects($this->never())->method('load');
+
+        $middleware = new SessionMiddleware($storage);
+        $request = Request::create('/test');
+        $request->attributes->set('_account', $existing);
+
+        $capturedAccount = null;
+        $next = new class($capturedAccount) implements HttpHandlerInterface {
+            public function __construct(private ?AccountInterface &$ref) {}
+
+            public function handle(Request $request): Response
+            {
+                $this->ref = $request->attributes->get('_account');
+                return new Response('ok');
+            }
+        };
+
+        $middleware->process($request, $next);
+
+        $this->assertSame($existing, $capturedAccount);
+    }
 }
