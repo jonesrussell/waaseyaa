@@ -9,9 +9,11 @@ const props = defineProps<{
 }>()
 
 const { t } = useLanguage()
+const config = useRuntimeConfig()
+const realtimeEnabled = config.public.enableRealtime === '1'
 const { schema, loading: schemaLoading, fetch: fetchSchema, sortedProperties } = useSchema(props.entityType)
 const { list, remove } = useEntity()
-const { messages, connected, error: sseError, reconnect } = useRealtime(['admin'])
+const { messages, connected, error: sseError, connect, reconnect } = useRealtime(['admin'], { autoConnect: false })
 
 const entities = ref<JsonApiResource[]>([])
 const loading = ref(false)
@@ -109,6 +111,9 @@ function formatCellValue(value: unknown, fieldSchema: Record<string, unknown>): 
 onMounted(async () => {
   await fetchSchema()
   await fetchEntities()
+  if (realtimeEnabled) {
+    connect()
+  }
 })
 
 // Auto-refresh when entity events arrive for this entity type.

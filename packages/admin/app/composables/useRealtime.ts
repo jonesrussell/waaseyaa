@@ -9,8 +9,12 @@ export interface BroadcastMessage {
 
 const MAX_RETRIES = 10
 
+interface UseRealtimeOptions {
+  autoConnect?: boolean
+}
+
 // Requires a server-side SSE endpoint at /api/broadcast (not yet implemented in public/index.php).
-export function useRealtime(channels: string[] = ['admin']) {
+export function useRealtime(channels: string[] = ['admin'], options: UseRealtimeOptions = {}) {
   const messages: Ref<BroadcastMessage[]> = ref([])
   const connected = ref(false)
   const error = ref<string | null>(null)
@@ -98,8 +102,10 @@ export function useRealtime(channels: string[] = ['admin']) {
     connect()
   }
 
-  connect()
+  if (options.autoConnect !== false) {
+    connect()
+  }
   onUnmounted(disconnect)
 
-  return { messages, connected, error, disconnect, reconnect }
+  return { messages, connected, error, connect, disconnect, reconnect }
 }

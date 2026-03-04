@@ -107,4 +107,12 @@ describe('useRealtime', () => {
 
     expect(MockEventSource.instances).toHaveLength(2)
   })
+
+  it('supports manual connect when autoConnect is disabled', () => {
+    const realtime = useRealtime(['admin'], { autoConnect: false })
+    expect(MockEventSource.instances).toHaveLength(0)
+
+    realtime.connect()
+    expect(MockEventSource.instances).toHaveLength(1)
+  })
 })
