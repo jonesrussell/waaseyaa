@@ -8,6 +8,9 @@ use Waaseyaa\Access\PermissionHandler;
 use Waaseyaa\Cache\Backend\DatabaseBackend;
 use Waaseyaa\Cache\CacheConfiguration;
 use Waaseyaa\Cache\CacheFactory;
+use Waaseyaa\AI\Vector\EmbeddingProviderFactory;
+use Waaseyaa\AI\Vector\SemanticIndexWarmer;
+use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
 use Waaseyaa\CLI\Command\AboutCommand;
 use Waaseyaa\CLI\Command\CacheClearCommand;
 use Waaseyaa\CLI\Command\ConfigExportCommand;
@@ -32,6 +35,7 @@ use Waaseyaa\CLI\Command\Optimize\OptimizeConfigCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeManifestCommand;
 use Waaseyaa\CLI\Command\PermissionListCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
+use Waaseyaa\CLI\Command\SemanticWarmCommand;
 use Waaseyaa\CLI\Command\Telescope\TelescopeClearCommand;
 use Waaseyaa\CLI\Command\Telescope\TelescopeListCommand;
 use Waaseyaa\CLI\Command\Telescope\TelescopePruneCommand;
@@ -97,6 +101,13 @@ final class ConsoleKernel extends AbstractKernel
             basePath: $this->projectRoot,
             storagePath: $this->projectRoot . '/storage',
         );
+        $embeddingStorage = new SqliteEmbeddingStorage($this->database->getPdo());
+        $embeddingProvider = EmbeddingProviderFactory::fromConfig($this->config);
+        $semanticWarmer = new SemanticIndexWarmer(
+            entityTypeManager: $this->entityTypeManager,
+            embeddingStorage: $embeddingStorage,
+            embeddingProvider: $embeddingProvider,
+        );
 
         $app = new WaaseyaaApplication();
         $app->setAutoExit(false);
@@ -129,6 +140,7 @@ final class ConsoleKernel extends AbstractKernel
             new EventListCommand($this->dispatcher),
             new RouteListCommand($router),
             new PermissionListCommand($permissionHandler),
+            new SemanticWarmCommand($semanticWarmer),
             new OptimizeCommand(),
             new OptimizeManifestCommand($manifestCompiler),
             new OptimizeConfigCommand(new ConfigCacheCompiler(

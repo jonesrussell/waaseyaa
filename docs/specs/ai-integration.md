@@ -512,6 +512,59 @@ enum DistanceMetric: string
 
 Deterministic embedding provider for tests. Generates vectors by SHA-256 hashing the input text with HMAC iterations, then normalizing to unit magnitude. Same text always produces the same vector. Default dimensionality is 128.
 
+## Semantic Warming + Baselines
+
+### SemanticIndexWarmer
+
+**File:** `packages/ai-vector/src/SemanticIndexWarmer.php`
+
+Reusable warmer that iterates entity IDs in deterministic order, applies published-only workflow visibility for nodes, and updates/removes embeddings via `EntityEmbeddingListener`.
+
+Contract:
+
+- `contract_version: v1.0`
+- `contract_surface: semantic_index_warm`
+- stable report payload with:
+  - requested entity types
+  - processed/stored/removed/missing totals
+  - per-type status blocks (`ok` / `missing_entity_type`)
+  - measured duration
+
+Operational behavior:
+
+- If no embedding provider is configured, warmer returns `status=skipped_no_provider` (no writes).
+- For `node`, only `published` content is indexed; non-public states are removed from the semantic index.
+- Non-node types remain indexable by default.
+
+### CLI Warm Command
+
+**File:** `packages/cli/src/Command/SemanticWarmCommand.php`
+
+`semantic:warm` is the framework-level operational entry point for deterministic warming runs.
+
+Supported options:
+
+- `--type|-t` one or more entity type IDs (repeatable / comma-separated)
+- `--limit|-l` per-type candidate limit (0 = unbounded)
+- `--json` full machine-readable report output
+
+Exit semantics:
+
+- `0` when warming completed (including partial skips for missing entity types)
+- non-zero when no embedding provider is configured (`skipped_no_provider`)
+
+### Read-Path Baseline Drift Gate
+
+**File:** `tests/Integration/Phase15/SemanticWarmBaselineIntegrationTest.php`
+
+Deterministic baseline gate for semantic/discovery read paths:
+
+- warms `node` embeddings using workflow fixture corpus,
+- validates semantic search and MCP `ai_discover` output shape/order against a fixed baseline hash,
+- enforces latency budgets for warm, semantic search, and MCP discovery calls.
+
+This gate is part of the v1.0 hardening verification substrate and is intended to detect both contract drift and severe read-path performance regressions.
+
 ## Tool Safety
 
 MCP tool execution has the following safety properties:
@@ -565,3 +618,5 @@ Pipeline uses `syncStepsToValues()` to maintain a single source of truth. Called
 | `packages/ai-vector/src/InMemoryVectorStore.php` | `InMemoryVectorStore` | In-memory store (cosine similarity) |
 | `packages/ai-vector/src/DistanceMetric.php` | `DistanceMetric` | Distance metric enum |
 | `packages/ai-vector/src/Testing/FakeEmbeddingProvider.php` | `FakeEmbeddingProvider` | Deterministic test embeddings |
+| `packages/ai-vector/src/SemanticIndexWarmer.php` | `SemanticIndexWarmer` | Deterministic semantic index warming service |
+| `packages/cli/src/Command/SemanticWarmCommand.php` | `SemanticWarmCommand` | Operational CLI entry point for warmer |
