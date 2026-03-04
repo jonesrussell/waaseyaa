@@ -7,15 +7,8 @@ namespace Waaseyaa\AI\Vector;
 /**
  * Interface for embedding providers that generate vector representations of text.
  */
-interface EmbeddingInterface
+interface EmbeddingInterface extends EmbeddingProviderInterface
 {
-    /**
-     * Generate an embedding vector from text.
-     *
-     * @return float[] The embedding vector.
-     */
-    public function embed(string $text): array;
-
     /**
      * Generate embeddings for multiple texts.
      *
