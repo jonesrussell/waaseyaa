@@ -207,6 +207,85 @@ final class SearchControllerTest extends TestCase
         $this->assertSame('embedding_provider_error', $array['meta']['fallback_reason']);
         $this->assertSame('42', $array['data'][0]['id']);
     }
+
+    #[Test]
+    public function semanticModeCanRerankByRelationshipGraphContext(): void
+    {
+        $entityA = new SearchEntity(1, 'node', ['title' => 'A']);
+        $entityB = new SearchEntity(2, 'node', ['title' => 'B']);
+
+        $nodeStorage = $this->createMock(EntityStorageInterface::class);
+        $nodeStorage->expects($this->once())
+            ->method('loadMultiple')
+            ->with([2, 1])
+            ->willReturn([1 => $entityA, 2 => $entityB]);
+
+        $relationshipQuery = new class implements EntityQueryInterface {
+            public function condition(string $field, mixed $value, string $operator = '='): static { return $this; }
+            public function exists(string $field): static { return $this; }
+            public function notExists(string $field): static { return $this; }
+            public function sort(string $field, string $direction = 'ASC'): static { return $this; }
+            public function range(int $offset, int $limit): static { return $this; }
+            public function count(): static { return $this; }
+            public function accessCheck(bool $check = true): static { return $this; }
+            public function execute(): array { return [99]; }
+        };
+
+        $relationshipStorage = $this->createMock(EntityStorageInterface::class);
+        $relationshipStorage->method('getQuery')->willReturn($relationshipQuery);
+        $relationshipStorage->expects($this->once())
+            ->method('loadMultiple')
+            ->with([99])
+            ->willReturn([
+                99 => new SearchEntity(99, 'relationship', [
+                    'status' => 1,
+                    'from_entity_type' => 'node',
+                    'from_entity_id' => '2',
+                    'to_entity_type' => 'node',
+                    'to_entity_id' => '999',
+                ]),
+            ]);
+
+        $definition = new EntityType(
+            id: 'node',
+            label: 'Node',
+            class: SearchEntity::class,
+            keys: ['id' => 'id', 'label' => 'title'],
+            fieldDefinitions: ['title' => ['type' => 'string']],
+        );
+
+        $manager = $this->createMock(EntityTypeManagerInterface::class);
+        $manager->method('hasDefinition')->willReturnCallback(static fn(string $id): bool => in_array($id, ['node', 'relationship'], true));
+        $manager->method('getStorage')->willReturnCallback(
+            static fn(string $id): EntityStorageInterface => $id === 'relationship' ? $relationshipStorage : $nodeStorage,
+        );
+        $manager->method('getDefinition')->willReturn($definition);
+
+        $provider = $this->createMock(EmbeddingProviderInterface::class);
+        $provider->expects($this->once())->method('embed')->with('water')->willReturn([0.1, 0.2]);
+
+        $embeddingStorage = $this->createMock(EmbeddingStorageInterface::class);
+        $embeddingStorage->expects($this->once())
+            ->method('findSimilar')
+            ->with([0.1, 0.2], 'node', 5)
+            ->willReturn([
+                ['id' => '1', 'score' => 0.5000],
+                ['id' => '2', 'score' => 0.4995],
+            ]);
+
+        $controller = new SearchController(
+            entityTypeManager: $manager,
+            serializer: new ResourceSerializer($manager),
+            embeddingStorage: $embeddingStorage,
+            embeddingProvider: $provider,
+        );
+
+        $array = $controller->search('water', 'node', 5)->toArray();
+
+        $this->assertSame('2', $array['data'][0]['id']);
+        $this->assertSame('1', $array['data'][1]['id']);
+        $this->assertSame('semantic+graph_context', $array['meta']['ranking']);
+    }
 }
 
 final readonly class SearchEntity implements EntityInterface

@@ -43,6 +43,7 @@ final class SearchController
         $fallbackReason = null;
         $requestedMode = $mode;
 
+        $semanticScores = [];
         if ($this->embeddingProvider !== null) {
             $semanticResult = $this->semanticSearchIds($query, $entityTypeId, $limit);
             if ($semanticResult['fallback_reason'] !== null) {
@@ -51,9 +52,17 @@ final class SearchController
                 $ids = $this->keywordSearchIds($storage, $query, $limit);
             } else {
                 $ids = $semanticResult['ids'];
+                $semanticScores = $semanticResult['scores'];
             }
         } else {
             $ids = $this->keywordSearchIds($storage, $query, $limit);
+        }
+
+        $graphRerankApplied = false;
+        if ($mode === 'semantic' && $ids !== []) {
+            $graphRerank = $this->rerankWithRelationshipContext($entityTypeId, $ids, $semanticScores);
+            $ids = $graphRerank['ids'];
+            $graphRerankApplied = $graphRerank['applied'];
         }
 
         $entities = $ids !== [] ? $storage->loadMultiple($ids) : [];
@@ -84,12 +93,94 @@ final class SearchController
             $meta['requested_mode'] = $requestedMode;
             $meta['fallback_reason'] = $fallbackReason;
         }
+        if ($graphRerankApplied) {
+            $meta['ranking'] = 'semantic+graph_context';
+        }
 
         return JsonApiDocument::fromCollection($resources, meta: $meta);
     }
 
     /**
-     * @return array{ids: array<int|string>, fallback_reason: ?string}
+     * @param array<int|string> $ids
+     * @param array<string, float> $semanticScores
+     * @return array{ids: array<int|string>, applied: bool}
+     */
+    private function rerankWithRelationshipContext(string $entityTypeId, array $ids, array $semanticScores): array
+    {
+        if (!$this->entityTypeManager->hasDefinition('relationship')) {
+            return ['ids' => $ids, 'applied' => false];
+        }
+
+        $baseOrder = [];
+        foreach ($ids as $index => $id) {
+            $key = (string) $id;
+            $baseOrder[$key] = $index;
+        }
+
+        try {
+            $relationshipStorage = $this->entityTypeManager->getStorage('relationship');
+            $relationshipIds = $relationshipStorage->getQuery()->accessCheck(false)->execute();
+            if ($relationshipIds === []) {
+                return ['ids' => $ids, 'applied' => false];
+            }
+
+            $relationshipEntities = $relationshipStorage->loadMultiple($relationshipIds);
+        } catch (\Throwable) {
+            return ['ids' => $ids, 'applied' => false];
+        }
+
+        $relationshipScores = [];
+        foreach ($ids as $id) {
+            $relationshipScores[(string) $id] = 0;
+        }
+
+        foreach ($relationshipEntities as $relationship) {
+            $values = $relationship->toArray();
+            if ((int) ($values['status'] ?? 0) !== 1) {
+                continue;
+            }
+
+            $fromType = (string) ($values['from_entity_type'] ?? '');
+            $toType = (string) ($values['to_entity_type'] ?? '');
+            $fromId = (string) ($values['from_entity_id'] ?? '');
+            $toId = (string) ($values['to_entity_id'] ?? '');
+
+            if ($fromType === $entityTypeId && isset($relationshipScores[$fromId])) {
+                $relationshipScores[$fromId] += 1;
+            }
+            if ($toType === $entityTypeId && isset($relationshipScores[$toId])) {
+                $relationshipScores[$toId] += 1;
+            }
+        }
+
+        $combinedScores = [];
+        foreach ($ids as $id) {
+            $key = (string) $id;
+            $semantic = $semanticScores[$key] ?? (1.0 - (($baseOrder[$key] ?? 0) * 0.0001));
+            $combinedScores[$key] = $semantic + (($relationshipScores[$key] ?? 0) * 0.001);
+        }
+
+        $reranked = $ids;
+        usort($reranked, function (int|string $a, int|string $b) use ($combinedScores, $baseOrder): int {
+            $aKey = (string) $a;
+            $bKey = (string) $b;
+            $scoreCmp = ($combinedScores[$bKey] ?? 0.0) <=> ($combinedScores[$aKey] ?? 0.0);
+            if ($scoreCmp !== 0) {
+                return $scoreCmp;
+            }
+
+            return ($baseOrder[$aKey] ?? PHP_INT_MAX) <=> ($baseOrder[$bKey] ?? PHP_INT_MAX);
+        });
+
+        if ($reranked === $ids) {
+            return ['ids' => $ids, 'applied' => false];
+        }
+
+        return ['ids' => $reranked, 'applied' => true];
+    }
+
+    /**
+     * @return array{ids: array<int|string>, scores: array<string, float>, fallback_reason: ?string}
      */
     private function semanticSearchIds(string $query, string $entityTypeId, int $limit): array
     {
@@ -100,20 +191,25 @@ final class SearchController
                 '[Waaseyaa] Semantic search provider error; falling back to keyword mode: %s',
                 $exception->getMessage(),
             ));
-            return ['ids' => [], 'fallback_reason' => 'embedding_provider_error'];
+            return ['ids' => [], 'scores' => [], 'fallback_reason' => 'embedding_provider_error'];
         }
 
         $matches = $this->embeddingStorage->findSimilar($queryVector, $entityTypeId, $limit);
 
         $ids = [];
+        $scores = [];
         foreach ($matches as $match) {
             if (is_array($match) && is_string($match['id'] ?? null) && $match['id'] !== '') {
                 $rawId = $match['id'];
-                $ids[] = ctype_digit($rawId) ? (int) $rawId : $rawId;
+                $id = ctype_digit($rawId) ? (int) $rawId : $rawId;
+                $ids[] = $id;
+                if (is_numeric($match['score'] ?? null)) {
+                    $scores[(string) $id] = (float) $match['score'];
+                }
             }
         }
 
-        return ['ids' => $ids, 'fallback_reason' => null];
+        return ['ids' => $ids, 'scores' => $scores, 'fallback_reason' => null];
     }
 
     /**
