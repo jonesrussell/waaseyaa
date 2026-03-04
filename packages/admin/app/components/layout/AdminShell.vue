@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useLanguage } from '~/composables/useLanguage'
 
-const { t } = useLanguage()
+const { t, locale, locales, setLocale } = useLanguage()
 const sidebarOpen = ref(false)
 
 function toggleSidebar() {
@@ -13,16 +13,33 @@ const route = useRoute()
 watch(() => route.fullPath, () => {
   sidebarOpen.value = false
 })
+
+function onLocaleChange(event: Event) {
+  setLocale((event.target as HTMLSelectElement).value)
+}
 </script>
 
 <template>
   <div class="admin-shell">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <header class="topbar" role="banner">
-      <button class="topbar-toggle" aria-label="Toggle menu" @click="toggleSidebar">
+      <button class="topbar-toggle" :aria-label="t('toggle_menu')" @click="toggleSidebar">
         <span class="topbar-toggle-icon">&#9776;</span>
       </button>
       <NuxtLink to="/" class="topbar-brand">{{ t('app_name') }}</NuxtLink>
+      <label class="topbar-locale">
+        <span class="sr-only">{{ t('language') }}</span>
+        <select
+          class="topbar-locale-select"
+          :value="locale"
+          :aria-label="t('language')"
+          @change="onLocaleChange"
+        >
+          <option v-for="code in locales" :key="code" :value="code">
+            {{ code.toUpperCase() }}
+          </option>
+        </select>
+      </label>
     </header>
 
     <div class="admin-body">
@@ -74,6 +91,7 @@ body {
   color: #fff;
   display: flex;
   align-items: center;
+  gap: 12px;
   padding: 0 16px;
 }
 
@@ -82,6 +100,7 @@ body {
   text-decoration: none;
   font-weight: 600;
   font-size: 16px;
+  margin-right: auto;
 }
 
 .topbar-toggle {
@@ -93,6 +112,22 @@ body {
   cursor: pointer;
   padding: 0 8px;
   margin-right: 8px;
+}
+
+.topbar-locale {
+  display: inline-flex;
+  align-items: center;
+}
+
+.topbar-locale-select {
+  height: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-radius: 4px;
+  padding: 0 8px;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .admin-body {

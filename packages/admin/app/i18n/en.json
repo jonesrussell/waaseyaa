@@ -1,5 +1,7 @@
 {
   "app_name": "Waaseyaa",
+  "language": "Language",
+  "toggle_menu": "Toggle menu",
   "dashboard": "Dashboard",
   "content": "Content",
   "loading": "Loading...",

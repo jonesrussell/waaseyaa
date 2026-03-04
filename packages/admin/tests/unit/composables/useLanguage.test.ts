@@ -3,8 +3,25 @@ import { describe, it, expect } from 'vitest'
 import { useLanguage } from '~/composables/useLanguage'
 
 describe('useLanguage.t', () => {
+  it('switches locale to French for known keys', () => {
+    const { t, setLocale } = useLanguage()
+    setLocale('en')
+    expect(t('dashboard')).toBe('Dashboard')
+
+    setLocale('fr')
+    expect(t('dashboard')).toBe('Tableau de bord')
+  })
+
+  it('ignores unknown locales', () => {
+    const { t, setLocale } = useLanguage()
+    setLocale('en')
+    setLocale('de')
+    expect(t('dashboard')).toBe('Dashboard')
+  })
+
   it('returns the English translation for a known key', () => {
-    const { t } = useLanguage()
+    const { t, setLocale } = useLanguage()
+    setLocale('en')
     // 'dashboard' is defined in app/i18n/en.json
     expect(t('dashboard')).not.toBe('dashboard')
     expect(typeof t('dashboard')).toBe('string')
