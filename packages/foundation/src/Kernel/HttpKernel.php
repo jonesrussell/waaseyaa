@@ -20,7 +20,9 @@ use Waaseyaa\Api\JsonApiRouteProvider;
 use Waaseyaa\Api\OpenApi\OpenApiGenerator;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Schema\SchemaPresenter;
+use Waaseyaa\Cache\Backend\DatabaseBackend;
 use Waaseyaa\Cache\CacheFactory;
+use Waaseyaa\Cache\CacheConfiguration;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
@@ -69,7 +71,12 @@ final class HttpKernel extends AbstractKernel
         // Broadcast storage for SSE.
         $broadcastStorage = new BroadcastStorage($this->database);
         $this->registerBroadcastListeners($broadcastStorage);
-        $this->renderCache = new RenderCache((new CacheFactory())->get('render'));
+        $cacheConfig = new CacheConfiguration();
+        $cacheConfig->setFactoryForBin('render', fn(): DatabaseBackend => new DatabaseBackend(
+            $this->database->getPdo(),
+            'cache_render',
+        ));
+        $this->renderCache = new RenderCache((new CacheFactory($cacheConfig))->get('render'));
         $this->registerRenderCacheListeners($this->renderCache);
 
         // Router setup.
@@ -442,8 +449,11 @@ final class HttpKernel extends AbstractKernel
                     $this->handleMediaUpload($httpRequest, $account, $serializer);
                 })(),
 
-                $controller === 'render.page' => (function () use ($params, $account): never {
-                    $this->handleRenderPage((string) ($params['path'] ?? '/'), $account);
+                $controller === 'render.page' => (function () use ($params, $query, $account): never {
+                    $requestedViewMode = is_string($query['view_mode'] ?? null)
+                        ? trim((string) $query['view_mode'])
+                        : 'full';
+                    $this->handleRenderPage((string) ($params['path'] ?? '/'), $account, $requestedViewMode);
                 })(),
 
                 str_contains($controller, 'SchemaController') => (function () use ($account, $params, $schemaPresenter): never {
@@ -489,7 +499,7 @@ final class HttpKernel extends AbstractKernel
         }
     }
 
-    private function handleRenderPage(string $path, AccountInterface $account): never
+    private function handleRenderPage(string $path, AccountInterface $account, string $requestedViewMode = 'full'): never
     {
         $twig = SsrServiceProvider::getTwigEnvironment();
         if ($twig === null) {
@@ -547,13 +557,14 @@ final class HttpKernel extends AbstractKernel
                 is_array($this->config['view_modes'] ?? null) ? $this->config['view_modes'] : [],
             );
             $entityRenderer = new EntityRenderer($this->entityTypeManager, $formatterRegistry, $viewModeConfig);
-            $viewMode = ViewMode::full();
+            $safeViewMode = preg_replace('/[^a-z0-9_]+/i', '', strtolower($requestedViewMode)) ?: 'full';
+            $viewMode = new ViewMode($safeViewMode);
 
             if (!$account->isAuthenticated() && $this->renderCache !== null && $entity->id() !== null) {
                 $cached = $this->renderCache->get(
                     $resolved->entityTypeId,
                     $entity->id(),
-                    $viewMode->id(),
+                    $viewMode->name,
                     $entity->language(),
                 );
                 if ($cached !== null) {
@@ -568,7 +579,7 @@ final class HttpKernel extends AbstractKernel
                 $this->renderCache->set(
                     $resolved->entityTypeId,
                     $entity->id(),
-                    $viewMode->id(),
+                    $viewMode->name,
                     $entity->language(),
                     $response,
                     $cacheMaxAge,

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Waaseyaa\Foundation\Kernel;
 
 use Waaseyaa\Access\PermissionHandler;
+use Waaseyaa\Cache\Backend\DatabaseBackend;
+use Waaseyaa\Cache\CacheConfiguration;
 use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\Command\AboutCommand;
 use Waaseyaa\CLI\Command\CacheClearCommand;
@@ -83,7 +85,12 @@ final class ConsoleKernel extends AbstractKernel
         $syncStorage = new FileStorage($configDir);
         $configManager = new ConfigManager($activeStorage, $syncStorage, $this->dispatcher);
 
-        $cacheFactory = new CacheFactory();
+        $cacheConfig = new CacheConfiguration();
+        $cacheConfig->setFactoryForBin('render', fn(): DatabaseBackend => new DatabaseBackend(
+            $this->database->getPdo(),
+            'cache_render',
+        ));
+        $cacheFactory = new CacheFactory($cacheConfig);
         $router = new WaaseyaaRouter();
         $permissionHandler = new PermissionHandler();
         $manifestCompiler = new PackageManifestCompiler(

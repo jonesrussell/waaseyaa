@@ -20,21 +20,24 @@ final readonly class PathAliasResolver
 
         $query = $this->pathAliasStorage->getQuery()
             ->condition('alias', $alias)
-            ->condition('status', 1)
             ->condition('langcode', $langcode)
-            ->range(0, 1);
+            ->range(0, 20);
 
         $ids = $query->execute();
         if ($ids === []) {
             return null;
         }
 
-        $entity = $this->pathAliasStorage->load($ids[0]);
-        if (!$entity instanceof PathAlias) {
-            return null;
+        foreach ($ids as $id) {
+            $entity = $this->pathAliasStorage->load($id);
+            if (!$entity instanceof PathAlias || !$entity->isPublished()) {
+                continue;
+            }
+
+            return $this->resolvePathAlias($entity);
         }
 
-        return $this->resolvePathAlias($entity);
+        return null;
     }
 
     public function resolvePathAlias(PathAlias $alias): ?ResolvedPath
