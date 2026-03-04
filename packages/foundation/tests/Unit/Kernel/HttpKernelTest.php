@@ -413,4 +413,36 @@ final class HttpKernelTest extends TestCase
         $this->assertNotSame($keyA, $keyB);
     }
 
+    #[Test]
+    public function discovery_payload_contract_meta_is_added_when_missing(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+        $method = new \ReflectionMethod(HttpKernel::class, 'withDiscoveryContractMeta');
+        $method->setAccessible(true);
+
+        $payload = $method->invoke($kernel, ['data' => ['source' => ['type' => 'node', 'id' => '1']]]);
+
+        $this->assertSame('v1.0', $payload['meta']['contract_version']);
+        $this->assertSame('stable', $payload['meta']['contract_stability']);
+        $this->assertSame('discovery_api', $payload['meta']['surface']);
+    }
+
+    #[Test]
+    public function discovery_payload_contract_meta_preserves_existing_surface(): void
+    {
+        $kernel = new HttpKernel('/tmp/test-project');
+        $method = new \ReflectionMethod(HttpKernel::class, 'withDiscoveryContractMeta');
+        $method->setAccessible(true);
+
+        $payload = $method->invoke($kernel, [
+            'data' => [],
+            'meta' => ['surface' => 'custom_surface', 'count' => 3],
+        ]);
+
+        $this->assertSame('v1.0', $payload['meta']['contract_version']);
+        $this->assertSame('stable', $payload['meta']['contract_stability']);
+        $this->assertSame('custom_surface', $payload['meta']['surface']);
+        $this->assertSame(3, $payload['meta']['count']);
+    }
+
 }

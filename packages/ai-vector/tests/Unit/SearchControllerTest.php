@@ -72,6 +72,10 @@ final class SearchControllerTest extends TestCase
         $array = $document->toArray();
         $this->assertSame('2', $array['data'][0]['id']);
         $this->assertSame('1', $array['data'][1]['id']);
+        $this->assertSame('v1.0', $array['meta']['contract_version']);
+        $this->assertSame('semantic_search', $array['meta']['contract_surface']);
+        $this->assertSame('stable', $array['meta']['contract_stability']);
+        $this->assertContains('graph_context_rerank', $array['meta']['semantic_extension_hooks']);
         $this->assertSame('semantic', $array['meta']['mode']);
         $this->assertSame('water', $array['meta']['query']);
     }

@@ -69,6 +69,9 @@ use Waaseyaa\Workflows\EditorialVisibilityResolver;
  */
 final class HttpKernel extends AbstractKernel
 {
+    private const string DISCOVERY_CONTRACT_VERSION = 'v1.0';
+    private const string DISCOVERY_CONTRACT_STABILITY = 'stable';
+
     private ?RenderCache $renderCache = null;
     private ?CacheBackendInterface $discoveryCache = null;
 
@@ -949,7 +952,7 @@ final class HttpKernel extends AbstractKernel
             return null;
         }
 
-        return $item->data;
+        return $this->withDiscoveryContractMeta($item->data);
     }
 
     /**
@@ -957,6 +960,7 @@ final class HttpKernel extends AbstractKernel
      */
     private function sendDiscoveryJson(int $status, array $payload, string $cacheKey, AccountInterface $account): never
     {
+        $payload = $this->withDiscoveryContractMeta($payload);
         $headers = [];
         if ($account->isAuthenticated()) {
             $headers['Cache-Control'] = 'private, no-store';
@@ -969,6 +973,24 @@ final class HttpKernel extends AbstractKernel
         }
 
         $this->sendJson($status, $payload, $headers);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    private function withDiscoveryContractMeta(array $payload): array
+    {
+        if (!isset($payload['meta']) || !is_array($payload['meta'])) {
+            $payload['meta'] = [];
+        }
+        $payload['meta']['contract_version'] = self::DISCOVERY_CONTRACT_VERSION;
+        $payload['meta']['contract_stability'] = self::DISCOVERY_CONTRACT_STABILITY;
+        if (!is_string($payload['meta']['surface'] ?? null) || trim((string) $payload['meta']['surface']) === '') {
+            $payload['meta']['surface'] = 'discovery_api';
+        }
+
+        return $payload;
     }
 
     private function isDiscoveryEndpointPairPublic(string $fromType, string $fromId, string $toType, string $toId): bool
@@ -1225,6 +1247,11 @@ final class HttpKernel extends AbstractKernel
             if ($entityType === 'node') {
                 return [
                     'relationship_navigation' => [
+                        'contract' => [
+                            'version' => self::DISCOVERY_CONTRACT_VERSION,
+                            'stability' => self::DISCOVERY_CONTRACT_STABILITY,
+                            'surface' => 'ssr_relationship_navigation',
+                        ],
                         'entity' => $discovery->endpointPage($entityType, $entityId, [
                             'status' => 'published',
                             'limit' => 12,
@@ -1248,6 +1275,11 @@ final class HttpKernel extends AbstractKernel
 
             return [
                 'relationship_navigation' => [
+                    'contract' => [
+                        'version' => self::DISCOVERY_CONTRACT_VERSION,
+                        'stability' => self::DISCOVERY_CONTRACT_STABILITY,
+                        'surface' => 'ssr_relationship_navigation',
+                    ],
                     'from_endpoint' => [
                         'type' => (string) ($endpoint['from_endpoint']['endpoint']['type'] ?? ''),
                         'id' => (string) ($endpoint['from_endpoint']['endpoint']['id'] ?? ''),

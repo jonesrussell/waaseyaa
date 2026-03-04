@@ -14,6 +14,10 @@ use Waaseyaa\Entity\Storage\EntityStorageInterface;
 
 final class SearchController
 {
+    public const string CONTRACT_VERSION = 'v1.0';
+    public const string CONTRACT_SURFACE = 'semantic_search';
+    public const string CONTRACT_STABILITY = 'stable';
+
     private const float DEFAULT_SEMANTIC_WEIGHT = 1.0;
     private const float DEFAULT_GRAPH_WEIGHT = 0.001;
 
@@ -96,6 +100,10 @@ final class SearchController
         $resources = $this->serializer->serializeCollection($orderedEntities, $this->accessHandler, $this->account);
 
         $meta = [
+            'contract_version' => self::CONTRACT_VERSION,
+            'contract_surface' => self::CONTRACT_SURFACE,
+            'contract_stability' => self::CONTRACT_STABILITY,
+            'semantic_extension_hooks' => ['graph_context_rerank'],
             'query' => $query,
             'type' => $entityTypeId,
             'limit' => $limit,

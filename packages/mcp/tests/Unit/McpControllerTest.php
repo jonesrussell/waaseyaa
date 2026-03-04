@@ -29,7 +29,9 @@ final class McpControllerTest extends TestCase
         $manifest = $controller->manifest();
 
         $this->assertSame('2024-11-05', $manifest['protocolVersion']);
+        $this->assertSame('v1.0', $manifest['server']['version']);
         $toolNames = array_map(static fn(array $tool): string => $tool['name'], $manifest['tools']);
+        $this->assertContains('search_entities', $toolNames);
         $this->assertContains('search_teachings', $toolNames);
         $this->assertContains('ai_discover', $toolNames);
         $this->assertContains('get_entity', $toolNames);
@@ -55,7 +57,7 @@ final class McpControllerTest extends TestCase
 
         $this->assertSame('2.0', $response['jsonrpc']);
         $this->assertSame(1, $response['id']);
-        $this->assertCount(11, $response['result']['tools']);
+        $this->assertCount(12, $response['result']['tools']);
     }
 
     #[Test]
@@ -301,7 +303,8 @@ final class McpControllerTest extends TestCase
         ]);
 
         $payload = $this->decodeToolPayload($response);
-        $this->assertSame('v0.9', $payload['meta']['contract_version']);
+        $this->assertSame('v1.0', $payload['meta']['contract_version']);
+        $this->assertSame('stable', $payload['meta']['contract_stability']);
         $this->assertSame('ai_discover', $payload['meta']['tool']);
         $this->assertSame(1, $payload['meta']['count']);
         $this->assertCount(1, $payload['data']['recommendations']);
@@ -337,6 +340,47 @@ final class McpControllerTest extends TestCase
 
         $this->assertSame(-32000, $response['error']['code']);
         $this->assertStringContainsString('not public', $response['error']['message']);
+    }
+
+    #[Test]
+    public function searchEntitiesAndLegacyAliasShareStableContractMetadata(): void
+    {
+        $controller = $this->createEditorialController(
+            permissions: ['edit any article content'],
+            roles: ['contributor'],
+            workflowState: 'published',
+            status: 1,
+        );
+
+        $canonical = $controller->handleRpc([
+            'jsonrpc' => '2.0',
+            'id' => 27,
+            'method' => 'tools/call',
+            'params' => [
+                'name' => 'search_entities',
+                'arguments' => ['query' => 'Editorial', 'type' => 'node', 'limit' => 5],
+            ],
+        ]);
+        $canonicalPayload = $this->decodeToolPayload($canonical);
+        $this->assertSame('v1.0', $canonicalPayload['meta']['contract_version']);
+        $this->assertSame('stable', $canonicalPayload['meta']['contract_stability']);
+        $this->assertSame('search_entities', $canonicalPayload['meta']['tool']);
+        $this->assertSame('search_entities', $canonicalPayload['meta']['tool_invoked']);
+
+        $legacy = $controller->handleRpc([
+            'jsonrpc' => '2.0',
+            'id' => 28,
+            'method' => 'tools/call',
+            'params' => [
+                'name' => 'search_teachings',
+                'arguments' => ['query' => 'Editorial', 'type' => 'node', 'limit' => 5],
+            ],
+        ]);
+        $legacyPayload = $this->decodeToolPayload($legacy);
+        $this->assertSame('v1.0', $legacyPayload['meta']['contract_version']);
+        $this->assertSame('search_entities', $legacyPayload['meta']['tool']);
+        $this->assertSame('search_teachings', $legacyPayload['meta']['tool_invoked']);
+        $this->assertSame('search_teachings', $legacyPayload['meta']['deprecated_alias']);
     }
 
     private function createController(): McpController

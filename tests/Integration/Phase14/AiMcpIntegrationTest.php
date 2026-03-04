@@ -153,6 +153,7 @@ final class AiMcpIntegrationTest extends TestCase
         );
         $manifest = $mcp->manifest();
         $toolNames = array_column($manifest['tools'], 'name');
+        $this->assertContains('search_entities', $toolNames);
         $this->assertContains('search_teachings', $toolNames);
         $this->assertContains('get_entity', $toolNames);
         $this->assertContains('list_entity_types', $toolNames);
@@ -251,7 +252,8 @@ final class AiMcpIntegrationTest extends TestCase
         ]);
 
         $payload = json_decode((string) $response['result']['content'][0]['text'], true, 512, JSON_THROW_ON_ERROR);
-        $this->assertSame('v0.9', $payload['meta']['contract_version']);
+        $this->assertSame('v1.0', $payload['meta']['contract_version']);
+        $this->assertSame('stable', $payload['meta']['contract_stability']);
         $this->assertSame('semantic', $payload['meta']['mode']);
         $this->assertSame(2, $payload['meta']['count']);
         $this->assertCount(2, $payload['data']['recommendations']);

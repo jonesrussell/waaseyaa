@@ -181,7 +181,7 @@ All communication uses JSON-RPC 2.0 over HTTP.
 | `tools/list` | Returns all registered tool definitions |
 | `tools/call` | Executes a tool by name with arguments |
 
-### Discovery Blend Tool Contract (v0.9 extension)
+### Discovery Blend Tool Contract (v1.0 stable extension)
 
 Waaseyaa's MCP server also exposes first-party discovery tools from `Waaseyaa\Mcp\McpController`, including `ai_discover`.
 
@@ -196,6 +196,15 @@ Contract guarantees:
 - stable error paths:
   - invalid argument contract violations => JSON-RPC `-32602`,
   - unauthorized/non-public anchor execution failures => JSON-RPC `-32000`.
+- stable metadata envelope on tool payloads:
+  - `meta.contract_version = v1.0`
+  - `meta.contract_stability = stable`
+  - `meta.tool` (canonical tool)
+  - `meta.tool_invoked` (actual invoked tool name)
+
+Canonical search naming:
+- `search_entities` is the stable semantic/keyword search contract.
+- `search_teachings` is maintained as a backward-compatible alias and is marked deprecated in tool metadata.
 
 ### Request Format
 

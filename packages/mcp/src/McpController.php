@@ -21,6 +21,9 @@ use Waaseyaa\Workflows\EditorialWorkflowStateMachine;
 
 final class McpController
 {
+    private const string CONTRACT_VERSION = 'v1.0';
+    private const string CONTRACT_STABILITY = 'stable';
+
     private readonly EditorialWorkflowStateMachine $editorialStateMachine;
     private readonly EditorialTransitionAccessResolver $editorialTransitionResolver;
 
@@ -46,10 +49,11 @@ final class McpController
             'protocolVersion' => '2024-11-05',
             'server' => [
                 'name' => 'Waaseyaa MCP',
-                'version' => '0.4.0',
+                'version' => self::CONTRACT_VERSION,
             ],
             'tools' => [
-                ['name' => 'search_teachings', 'description' => 'Semantic search for teachings'],
+                ['name' => 'search_entities', 'description' => 'Stable semantic/keyword search contract for entities'],
+                ['name' => 'search_teachings', 'description' => 'Deprecated alias of search_entities (kept for backward compatibility)'],
                 ['name' => 'ai_discover', 'description' => 'Blend semantic search and graph context for deterministic discovery recommendations'],
                 ['name' => 'get_entity', 'description' => 'Fetch a single entity by type and ID'],
                 ['name' => 'list_entity_types', 'description' => 'List available entity types and schemas'],
@@ -96,6 +100,7 @@ final class McpController
 
         try {
             $result = match ($tool) {
+                'search_entities' => $this->toolSearchEntities($arguments),
                 'search_teachings' => $this->toolSearchTeachings($arguments),
                 'ai_discover' => $this->toolAiDiscover($arguments),
                 'get_entity' => $this->toolGetEntity($arguments),
@@ -118,6 +123,7 @@ final class McpController
         if ($result === null) {
             return $this->error($id, -32602, "Unknown tool: {$tool}");
         }
+        $result = $this->withStableContractMeta($result, $tool);
 
         return $this->result($id, [
             'content' => [[
@@ -133,6 +139,18 @@ final class McpController
      */
     private function toolSearchTeachings(array $arguments): array
     {
+        $result = $this->toolSearchEntities($arguments);
+        $result['meta']['deprecated_alias'] = 'search_teachings';
+
+        return $result;
+    }
+
+    /**
+     * @param array<string, mixed> $arguments
+     * @return array<string, mixed>
+     */
+    private function toolSearchEntities(array $arguments): array
+    {
         $query = is_string($arguments['query'] ?? null) ? trim($arguments['query']) : '';
         $entityType = is_string($arguments['type'] ?? null) ? trim($arguments['type']) : 'node';
         $limit = is_numeric($arguments['limit'] ?? null) ? (int) $arguments['limit'] : 10;
@@ -146,7 +164,13 @@ final class McpController
             account: $this->account,
         );
 
-        return $controller->search($query, $entityType, $limit)->toArray();
+        $result = $controller->search($query, $entityType, $limit)->toArray();
+        if (!isset($result['meta']) || !is_array($result['meta'])) {
+            $result['meta'] = [];
+        }
+        $result['meta']['tool'] = 'search_entities';
+
+        return $result;
     }
 
     /**
@@ -223,7 +247,6 @@ final class McpController
             ],
             'meta' => [
                 'tool' => 'ai_discover',
-                'contract_version' => 'v0.9',
                 'query' => $query,
                 'type' => $entityType,
                 'mode' => is_string($searchMeta['mode'] ?? null) ? $searchMeta['mode'] : 'unknown',
@@ -1039,5 +1062,26 @@ final class McpController
                 'message' => $message,
             ],
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $result
+     * @return array<string, mixed>
+     */
+    private function withStableContractMeta(array $result, string $invokedTool): array
+    {
+        if (!isset($result['meta']) || !is_array($result['meta'])) {
+            $result['meta'] = [];
+        }
+
+        $canonicalTool = $invokedTool === 'search_teachings' ? 'search_entities' : $invokedTool;
+        $result['meta']['contract_version'] = self::CONTRACT_VERSION;
+        $result['meta']['contract_stability'] = self::CONTRACT_STABILITY;
+        $result['meta']['tool_invoked'] = $invokedTool;
+        if (!is_string($result['meta']['tool'] ?? null) || trim($result['meta']['tool']) === '') {
+            $result['meta']['tool'] = $canonicalTool;
+        }
+
+        return $result;
     }
 }

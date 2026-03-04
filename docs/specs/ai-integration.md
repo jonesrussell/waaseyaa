@@ -271,6 +271,10 @@ When an embedding provider is available, search runs in semantic mode and may ap
 
 When graph reranking changes order, JSON:API response meta includes:
 
+- `contract_version: v1.0`
+- `contract_surface: semantic_search`
+- `contract_stability: stable`
+- `semantic_extension_hooks: [graph_context_rerank]`
 - `ranking: semantic+graph_context`
 - `ranking_weights`:
   - `semantic` (default `1.0`)
@@ -284,7 +288,7 @@ When graph reranking changes order, JSON:API response meta includes:
 
 Workflow visibility remains enforced at search output: node entities are only returned when resolved workflow state is `published`.
 
-## AI-Assisted Discovery Blend Contract (v0.9)
+## AI-Assisted Discovery Blend Contract (v1.0)
 
 The MCP discovery surface now exposes a deterministic blend contract via the `ai_discover` tool (`Waaseyaa\Mcp\McpController`):
 
@@ -308,6 +312,9 @@ The MCP discovery surface now exposes a deterministic blend contract via the `ai
   - anchor entity must exist and pass `view` access checks,
   - node anchors must be public (`workflow_state=published` or equivalent status),
   - invalid params return JSON-RPC `-32602`; authorization/publicity failures return execution error `-32000`.
+- Stable metadata:
+  - MCP tool payloads include `meta.contract_version = v1.0` and `meta.contract_stability = stable`.
+  - `search_entities` is the canonical MCP semantic search tool name; `search_teachings` is a deprecated alias retained for compatibility.
 
 ## Pipeline System
 
