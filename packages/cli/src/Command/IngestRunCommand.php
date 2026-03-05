@@ -13,6 +13,7 @@ use Waaseyaa\CLI\Ingestion\IngestionEnvelopeNormalizer;
 use Waaseyaa\CLI\Ingestion\RelationshipInferenceEngine;
 use Waaseyaa\CLI\Ingestion\SchemaDiagnosticEmitter;
 use Waaseyaa\CLI\Ingestion\SchemaValidator;
+use Waaseyaa\CLI\Ingestion\SemanticRefreshTriggerPlanner;
 use Waaseyaa\CLI\Ingestion\ValidationDiagnosticEmitter;
 use Waaseyaa\CLI\Ingestion\ValidationGateValidator;
 
@@ -37,6 +38,8 @@ final class IngestRunCommand extends Command
             ->addOption('policy', null, InputOption::VALUE_REQUIRED, 'Ingestion policy: atomic_fail_fast|validate_only', 'atomic_fail_fast')
             ->addOption('source', null, InputOption::VALUE_REQUIRED, 'Source identifier for audit metadata', 'manual://default')
             ->addOption('infer-relationships', null, InputOption::VALUE_NONE, 'Infer candidate relationships from ingested text (review-safe defaults)')
+            ->addOption('refresh-baseline', null, InputOption::VALUE_REQUIRED, 'Optional baseline snapshot JSON path for refresh change detection')
+            ->addOption('refresh-snapshot-output', null, InputOption::VALUE_REQUIRED, 'Optional output path for current refresh snapshot JSON')
             ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Optional mapped output file (.json)')
             ->addOption('diagnostics-output', null, InputOption::VALUE_REQUIRED, 'Optional diagnostics output file (.json)');
     }
@@ -95,6 +98,7 @@ final class IngestRunCommand extends Command
             'schema' => [],
             'validation' => [],
             'inference' => [],
+            'refresh' => [],
             'errors' => [],
             'warnings' => [],
         ];
@@ -151,6 +155,22 @@ final class IngestRunCommand extends Command
         }
         $diagnostics['validation_summary'] = $this->buildValidationSummary($diagnostics['validation']);
 
+        $currentRefreshSnapshot = $this->buildRefreshSnapshot(
+            envelope: $normalizedEnvelope['envelope'],
+            relationships: $mappedCandidate['relationships'],
+            policy: $policy,
+            inferRelationships: $inferRelationships,
+            nodeCount: count($mappedCandidate['nodes']),
+            itemCount: count((array) ($normalizedEnvelope['envelope']['items'] ?? [])),
+        );
+        $baselineRefreshSnapshot = $this->readRefreshBaseline(
+            trim((string) ($input->getOption('refresh-baseline') ?? '')),
+            $diagnostics,
+        );
+        $refreshPlan = (new SemanticRefreshTriggerPlanner())->plan($currentRefreshSnapshot, $baselineRefreshSnapshot);
+        $diagnostics['refresh'] = $refreshPlan['diagnostics'];
+        $diagnostics['refresh_summary'] = $refreshPlan['summary'];
+
         $mapped = ['nodes' => [], 'relationships' => []];
         $canEmitMapped = $policy !== 'validate_only'
             && $diagnostics['schema'] === []
@@ -172,6 +192,8 @@ final class IngestRunCommand extends Command
                 'node_count' => count($mapped['nodes']),
                 'relationship_count' => count($mapped['relationships']),
                 'inferred_relationship_count' => count($diagnostics['inference']),
+                'refresh_required' => (bool) (($diagnostics['refresh_summary']['needs_refresh'] ?? false)),
+                'refresh_primary_category' => $diagnostics['refresh_summary']['primary_category'] ?? null,
                 'error_count' => count($diagnostics['schema']) + count($diagnostics['validation']) + count($diagnostics['errors']),
                 'schema_error_count' => count($diagnostics['schema']),
                 'validation_error_count' => count($diagnostics['validation']),
@@ -204,6 +226,15 @@ final class IngestRunCommand extends Command
                 return Command::FAILURE;
             }
             $output->writeln(sprintf('Ingest diagnostics written: %s', $diagnosticsPath));
+        }
+
+        $refreshSnapshotOutputPath = trim((string) ($input->getOption('refresh-snapshot-output') ?? ''));
+        if ($refreshSnapshotOutputPath !== '') {
+            $refreshSnapshotPayload = json_encode($currentRefreshSnapshot, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL;
+            if (!$this->writeFile($refreshSnapshotOutputPath, $refreshSnapshotPayload, $output)) {
+                return Command::FAILURE;
+            }
+            $output->writeln(sprintf('Refresh snapshot written: %s', $refreshSnapshotOutputPath));
         }
 
         $errorCount = count($diagnostics['schema']) + count($diagnostics['validation']) + count($diagnostics['errors']);
@@ -593,6 +624,102 @@ final class IngestRunCommand extends Command
             'categories' => $uniqueCategories,
             'codes' => $uniqueCodes,
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $envelope
+     * @param list<array<string, mixed>> $relationships
+     * @return array<string, mixed>
+     */
+    private function buildRefreshSnapshot(
+        array $envelope,
+        array $relationships,
+        string $policy,
+        bool $inferRelationships,
+        int $nodeCount,
+        int $itemCount,
+    ): array {
+        $items = [];
+        foreach ((array) ($envelope['items'] ?? []) as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $items[] = [
+                'source_uri' => (string) ($item['source_uri'] ?? ''),
+                'ingested_at' => is_scalar($item['ingested_at'] ?? null) ? (string) $item['ingested_at'] : '',
+                'parser_version' => array_key_exists('parser_version', $item) && $item['parser_version'] !== null
+                    ? (string) $item['parser_version']
+                    : null,
+            ];
+        }
+
+        $relationshipRows = [];
+        foreach ($relationships as $relationship) {
+            $relationshipRows[] = [
+                'key' => (string) ($relationship['key'] ?? ''),
+                'relationship_type' => (string) ($relationship['relationship_type'] ?? ''),
+                'from' => (string) ($relationship['from'] ?? ''),
+                'to' => (string) ($relationship['to'] ?? ''),
+                'inference_confidence' => (float) ($relationship['inference_confidence'] ?? 1.0),
+            ];
+        }
+        usort(
+            $relationshipRows,
+            static fn(array $a, array $b): int => strcmp((string) ($a['key'] ?? ''), (string) ($b['key'] ?? '')),
+        );
+
+        return [
+            'envelope' => [
+                'batch_id' => (string) ($envelope['batch_id'] ?? ''),
+                'source_set_uri' => (string) ($envelope['source_set_uri'] ?? ''),
+                'items' => array_values($items),
+            ],
+            'policy' => [
+                'ingestion_policy' => $policy,
+                'infer_relationships' => $inferRelationships,
+            ],
+            'relationships' => $relationshipRows,
+            'structure' => [
+                'item_count' => $itemCount,
+                'node_count' => $nodeCount,
+                'relationship_count' => count($relationshipRows),
+                'item_field_types' => [
+                    'ingested_at' => 'string_or_int',
+                    'parser_version' => 'string_or_null',
+                    'source_uri' => 'string',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param array{errors:list<string>,warnings:list<string>} $diagnostics
+     * @return array<string, mixed>|null
+     */
+    private function readRefreshBaseline(string $path, array &$diagnostics): ?array
+    {
+        if ($path === '') {
+            return null;
+        }
+        if (!is_file($path) || !is_readable($path)) {
+            $diagnostics['warnings'][] = sprintf('Refresh baseline not readable: %s', $path);
+            return null;
+        }
+
+        $raw = file_get_contents($path);
+        if ($raw === false) {
+            $diagnostics['warnings'][] = sprintf('Refresh baseline read failed: %s', $path);
+            return null;
+        }
+
+        try {
+            $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Throwable $e) {
+            $diagnostics['warnings'][] = 'Refresh baseline decode failed: ' . $e->getMessage();
+            return null;
+        }
+
+        return is_array($decoded) ? $decoded : null;
     }
 
     /**

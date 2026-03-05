@@ -377,4 +377,72 @@ TXT);
         $this->assertSame('needs_review', $decoded['relationships'][0]['inference_review_state']);
         $this->assertSame(0, $decoded['relationships'][0]['status']);
     }
+
+    #[Test]
+    public function it_emits_refresh_policy_change_when_baseline_policy_differs(): void
+    {
+        $baselinePath = $this->tempDir . '/refresh-baseline.json';
+        file_put_contents($baselinePath, json_encode([
+            'envelope' => [
+                'batch_id' => 'batch_fixed',
+                'source_set_uri' => 'dataset://refresh',
+                'items' => [[
+                    'source_uri' => 'item://anchor',
+                    'ingested_at' => '1735689600',
+                    'parser_version' => null,
+                ]],
+            ],
+            'policy' => [
+                'ingestion_policy' => 'atomic_fail_fast',
+                'infer_relationships' => false,
+            ],
+            'relationships' => [],
+            'structure' => [
+                'item_count' => 1,
+                'node_count' => 1,
+                'relationship_count' => 0,
+                'item_field_types' => [
+                    'ingested_at' => 'string_or_int',
+                    'parser_version' => 'string_or_null',
+                    'source_uri' => 'string',
+                ],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $inputPath = $this->tempDir . '/refresh-policy-change.json';
+        file_put_contents($inputPath, json_encode([
+            'items' => [[
+                'key' => 'anchor',
+                'title' => 'Anchor',
+                'workflow_state' => 'draft',
+                'source_uri' => 'item://anchor',
+                'ingested_at' => 1735689600,
+                'body' => 'Anchor body for policy change refresh testing.',
+            ]],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $app = new Application();
+        $app->add(new IngestRunCommand());
+        $tester = new CommandTester($app->find('ingest:run'));
+        $mappedPath = $this->tempDir . '/mapped-refresh-policy-change.json';
+        $snapshotOutputPath = $this->tempDir . '/refresh-current.json';
+        $tester->execute([
+            '--input' => $inputPath,
+            '--format' => 'structured',
+            '--source' => 'dataset://refresh',
+            '--batch-id' => 'batch_fixed',
+            '--policy' => 'validate_only',
+            '--refresh-baseline' => $baselinePath,
+            '--refresh-snapshot-output' => $snapshotOutputPath,
+            '--output' => $mappedPath,
+        ]);
+
+        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertTrue($decoded['meta']['refresh_required']);
+        $this->assertSame('policy_change', $decoded['meta']['refresh_primary_category']);
+        $this->assertSame('refresh.policy_change', $decoded['diagnostics']['refresh'][0]['code']);
+        $this->assertFileExists($snapshotOutputPath);
+    }
 }
