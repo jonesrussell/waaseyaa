@@ -20,7 +20,29 @@ final class SchemaValidator
     {
         $violations = [];
 
+        $batchId = is_string($envelope['batch_id'] ?? null) ? trim((string) $envelope['batch_id']) : '';
+        if ($batchId === '') {
+            $violations[] = [
+                'code' => 'schema.missing_required_envelope_field',
+                'location' => '/batch_id',
+                'item_index' => null,
+                'value' => null,
+                'expected' => 'non-empty string',
+                'field_name' => 'batch_id',
+            ];
+        }
+
         $policy = is_string($envelope['policy'] ?? null) ? (string) $envelope['policy'] : '';
+        if ($policy === '') {
+            $violations[] = [
+                'code' => 'schema.missing_required_envelope_field',
+                'location' => '/policy',
+                'item_index' => null,
+                'value' => null,
+                'expected' => 'non-empty string',
+                'field_name' => 'policy',
+            ];
+        }
         if (!in_array($policy, self::ALLOWED_POLICIES, true)) {
             $violations[] = [
                 'code' => 'schema.invalid_policy_value',
@@ -33,6 +55,16 @@ final class SchemaValidator
         }
 
         $sourceSetUri = is_string($envelope['source_set_uri'] ?? null) ? (string) $envelope['source_set_uri'] : '';
+        if ($sourceSetUri === '') {
+            $violations[] = [
+                'code' => 'schema.missing_required_envelope_field',
+                'location' => '/source_set_uri',
+                'item_index' => null,
+                'value' => null,
+                'expected' => 'non-empty string',
+                'field_name' => 'source_set_uri',
+            ];
+        }
         if (!$this->isValidSourceSetUriFormat($sourceSetUri)) {
             $violations[] = [
                 'code' => 'schema.malformed_source_set_uri',
@@ -55,7 +87,19 @@ final class SchemaValidator
             }
         }
 
-        $items = is_array($envelope['items'] ?? null) ? $envelope['items'] : [];
+        if (!is_array($envelope['items'] ?? null)) {
+            $violations[] = [
+                'code' => 'schema.invalid_items_type',
+                'location' => '/items',
+                'item_index' => null,
+                'value' => gettype($envelope['items'] ?? null),
+                'expected' => 'array',
+            ];
+
+            return $violations;
+        }
+
+        $items = $envelope['items'];
         $seenSourceUris = [];
 
         foreach (array_values($items) as $index => $item) {
@@ -104,6 +148,14 @@ final class SchemaValidator
                     'expected' => 'non-empty value',
                     'field_name' => 'ingested_at',
                 ];
+            } elseif (!$this->isValidIngestedAt($ingestedAt)) {
+                $violations[] = [
+                    'code' => 'schema.malformed_ingested_at',
+                    'location' => '/items/' . $index . '/ingested_at',
+                    'item_index' => $index,
+                    'value' => is_scalar($ingestedAt) ? (string) $ingestedAt : null,
+                    'expected' => 'unix_timestamp_or_iso8601',
+                ];
             }
         }
 
@@ -123,5 +175,26 @@ final class SchemaValidator
     {
         $parts = explode('://', $uri, 2);
         return strtolower(trim($parts[0] ?? ''));
+    }
+
+    private function isValidIngestedAt(mixed $value): bool
+    {
+        if (is_int($value)) {
+            return true;
+        }
+
+        if (!is_string($value)) {
+            return false;
+        }
+
+        $trimmed = trim($value);
+        if ($trimmed === '') {
+            return false;
+        }
+        if (ctype_digit($trimmed)) {
+            return true;
+        }
+
+        return preg_match('/^\d{4}-\d{2}-\d{2}(?:[T\s]\d{2}:\d{2}:\d{2}(?:Z)?)?$/', $trimmed) === 1;
     }
 }

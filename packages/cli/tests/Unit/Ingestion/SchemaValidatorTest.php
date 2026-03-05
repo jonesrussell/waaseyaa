@@ -88,4 +88,67 @@ final class SchemaValidatorTest extends TestCase
 
         $this->assertSame(['/items/0/ingested_at', '/items/0/source_uri'], $locations);
     }
+
+    #[Test]
+    public function it_reports_missing_required_envelope_fields(): void
+    {
+        $validator = new SchemaValidator();
+        $violations = $validator->validate([
+            'batch_id' => '',
+            'source_set_uri' => '',
+            'policy' => '',
+            'items' => [],
+        ]);
+
+        $missingEnvelope = array_values(array_filter(
+            $violations,
+            static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.missing_required_envelope_field',
+        ));
+        $locations = array_values(array_map(static fn(array $row): string => (string) ($row['location'] ?? ''), $missingEnvelope));
+        sort($locations);
+
+        $this->assertSame(['/batch_id', '/policy', '/source_set_uri'], $locations);
+    }
+
+    #[Test]
+    public function it_reports_invalid_items_type_when_items_is_not_an_array(): void
+    {
+        $validator = new SchemaValidator();
+        $violations = $validator->validate([
+            'batch_id' => 'batch-1',
+            'source_set_uri' => 'dataset://set',
+            'policy' => 'atomic_fail_fast',
+            'items' => 'not-array',
+        ]);
+
+        $invalidItems = array_values(array_filter(
+            $violations,
+            static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.invalid_items_type',
+        ));
+
+        $this->assertCount(1, $invalidItems);
+        $this->assertSame('/items', $invalidItems[0]['location']);
+    }
+
+    #[Test]
+    public function it_reports_malformed_ingested_at_when_value_is_not_timestamp_or_iso_date(): void
+    {
+        $validator = new SchemaValidator();
+        $violations = $validator->validate([
+            'batch_id' => 'batch-1',
+            'source_set_uri' => 'dataset://set',
+            'policy' => 'validate_only',
+            'items' => [
+                ['source_uri' => 'a', 'ingested_at' => 'not-a-date', 'parser_version' => null],
+            ],
+        ]);
+
+        $malformed = array_values(array_filter(
+            $violations,
+            static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.malformed_ingested_at',
+        ));
+
+        $this->assertCount(1, $malformed);
+        $this->assertSame('/items/0/ingested_at', $malformed[0]['location']);
+    }
 }

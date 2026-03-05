@@ -169,6 +169,9 @@ Initial frozen code set:
 - `schema.unknown_source_set_scheme`
 - `schema.missing_required_provenance_field`
 - `schema.invalid_policy_value`
+- `schema.missing_required_envelope_field`
+- `schema.invalid_items_type`
+- `schema.malformed_ingested_at`
 
 ## Fixed Message Templates
 
@@ -184,6 +187,12 @@ Message text must remain stable in v1.5.
   - `Missing required provenance field: "<field_name>".`
 - `schema.invalid_policy_value`:
   - `Invalid ingestion policy: "<value>". Allowed policies: <allowed_policies>.`
+- `schema.missing_required_envelope_field`:
+  - `Missing required envelope field: "<field_name>".`
+- `schema.invalid_items_type`:
+  - `Invalid items field type: "<value>". Expected: "<expected>".`
+- `schema.malformed_ingested_at`:
+  - `Malformed ingested_at value: "<value>". Expected: "<expected>".`
 
 ## Severity Contract
 

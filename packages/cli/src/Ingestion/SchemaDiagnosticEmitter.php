@@ -88,6 +88,20 @@ final class SchemaDiagnosticEmitter
                 'Missing required provenance field: "%s".',
                 (string) ($violation['field_name'] ?? 'unknown'),
             ),
+            'schema.missing_required_envelope_field' => sprintf(
+                'Missing required envelope field: "%s".',
+                (string) ($violation['field_name'] ?? 'unknown'),
+            ),
+            'schema.invalid_items_type' => sprintf(
+                'Invalid items field type: "%s". Expected: "%s".',
+                (string) $value,
+                (string) ($violation['expected'] ?? ''),
+            ),
+            'schema.malformed_ingested_at' => sprintf(
+                'Malformed ingested_at value: "%s". Expected: "%s".',
+                (string) $value,
+                (string) ($violation['expected'] ?? ''),
+            ),
             'schema.invalid_policy_value' => sprintf(
                 'Invalid ingestion policy: "%s". Allowed policies: %s.',
                 (string) $value,
