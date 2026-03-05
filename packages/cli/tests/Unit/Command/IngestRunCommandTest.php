@@ -46,15 +46,15 @@ final class IngestRunCommandTest extends TestCase
                     'title' => 'Water Anchor',
                     'bundle' => 'teaching',
                     'workflow_state' => 'published',
-                    'body' => 'Water stewardship body.',
+                    'body' => 'Water stewardship teachings guide seasonal practice across communities.',
                     'relationships' => [['to' => 'story_node', 'type' => 'supports']],
                 ],
                 [
                     'key' => 'story_node',
                     'title' => 'Story Node',
                     'bundle' => 'story',
-                    'workflow_state' => 'review',
-                    'body' => 'Story body.',
+                    'workflow_state' => 'published',
+                    'body' => 'Story teachings preserve memory across generations through ceremony.',
                 ],
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
@@ -79,7 +79,7 @@ final class IngestRunCommandTest extends TestCase
         $this->assertSame(1, $decoded['meta']['relationship_count']);
         $this->assertSame(0, $decoded['meta']['error_count']);
         $this->assertSame(1, $decoded['nodes']['water_anchor']['status']);
-        $this->assertSame('review', $decoded['nodes']['story_node']['workflow_state']);
+        $this->assertSame('published', $decoded['nodes']['story_node']['workflow_state']);
         $this->assertSame('water_anchor_to_story_node_supports', $decoded['relationships'][0]['key']);
     }
 
@@ -92,12 +92,12 @@ Water Ceremony
 Bundle: teaching
 Workflow: published
 Relates: language_memory supports
-Seasonal water ceremony protocol.
+Seasonal water ceremony protocol preserves intergenerational knowledge practices.
 
 Language Memory
 Bundle: story
-Workflow: review
-Intergenerational language memory notes.
+Workflow: published
+Intergenerational language memory notes preserve oral teaching continuity.
 TXT);
 
         $app = new Application();
@@ -244,5 +244,89 @@ TXT);
         $this->assertCount(1, $duplicate);
         $this->assertSame('/items/1/source_uri', $duplicate[0]['location']);
         $this->assertSame(1, $duplicate[0]['item_index']);
+    }
+
+    #[Test]
+    public function validate_only_policy_emits_validation_gate_diagnostics_without_mapping(): void
+    {
+        $inputPath = $this->tempDir . '/validate-only-validation-gates.json';
+        file_put_contents($inputPath, json_encode([
+            'items' => [
+                [
+                    'key' => 'published_short',
+                    'title' => 'Published Short',
+                    'workflow_state' => 'published',
+                    'source_uri' => 'item://published_short',
+                    'ingested_at' => 1735689600,
+                    'body' => 'tiny',
+                ],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $app = new Application();
+        $app->add(new IngestRunCommand());
+        $tester = new CommandTester($app->find('ingest:run'));
+        $mappedPath = $this->tempDir . '/mapped-validate-only-validation-gates.json';
+        $tester->execute([
+            '--input' => $inputPath,
+            '--format' => 'structured',
+            '--policy' => 'validate_only',
+            '--source' => 'dataset://set',
+            '--output' => $mappedPath,
+        ]);
+
+        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame([], $decoded['nodes']);
+        $this->assertSame([], $decoded['relationships']);
+        $this->assertSame(1, $decoded['meta']['validation_error_count']);
+        $this->assertSame([
+            'error_count' => 1,
+            'warning_count' => 0,
+            'categories' => ['semantic'],
+            'codes' => ['validation.semantic.insufficient_publishable_tokens'],
+        ], $decoded['diagnostics']['validation_summary']);
+    }
+
+    #[Test]
+    public function atomic_policy_blocks_publishable_output_when_validation_gates_fail(): void
+    {
+        $inputPath = $this->tempDir . '/atomic-validation-gate-failure.txt';
+        file_put_contents($inputPath, <<<TXT
+Public Story
+Bundle: story
+Workflow: published
+Relates: draft_story supports
+tiny
+
+Draft Story
+Bundle: teaching
+Workflow: draft
+Has enough words here to avoid semantic gate issues.
+TXT);
+
+        $app = new Application();
+        $app->add(new IngestRunCommand());
+        $tester = new CommandTester($app->find('ingest:run'));
+        $mappedPath = $this->tempDir . '/mapped-atomic-validation-gate-failure.json';
+        $tester->execute([
+            '--input' => $inputPath,
+            '--format' => 'unstructured',
+            '--policy' => 'atomic_fail_fast',
+            '--source' => 'manual://notes',
+            '--output' => $mappedPath,
+        ]);
+
+        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame([], $decoded['nodes']);
+        $this->assertSame([], $decoded['relationships']);
+        $codes = array_values(array_map(
+            static fn(array $row): string => (string) ($row['code'] ?? ''),
+            $decoded['diagnostics']['validation'],
+        ));
+        $this->assertContains('validation.semantic.insufficient_publishable_tokens', $codes);
+        $this->assertContains('validation.visibility.relationship_requires_public_endpoints', $codes);
     }
 }

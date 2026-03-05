@@ -12,6 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Waaseyaa\CLI\Ingestion\IngestionEnvelopeNormalizer;
 use Waaseyaa\CLI\Ingestion\SchemaDiagnosticEmitter;
 use Waaseyaa\CLI\Ingestion\SchemaValidator;
+use Waaseyaa\CLI\Ingestion\ValidationDiagnosticEmitter;
+use Waaseyaa\CLI\Ingestion\ValidationGateValidator;
 
 #[AsCommand(
     name: 'ingest:run',
@@ -88,6 +90,7 @@ final class IngestRunCommand extends Command
 
         $diagnostics = [
             'schema' => [],
+            'validation' => [],
             'errors' => [],
             'warnings' => [],
         ];
@@ -108,10 +111,9 @@ final class IngestRunCommand extends Command
         $diagnostics['schema'] = (new SchemaDiagnosticEmitter())->emit($violations);
         $diagnostics['schema_summary'] = $this->buildSchemaSummary($diagnostics['schema']);
 
-        $mapped = ['nodes' => [], 'relationships' => []];
-        $canMap = $policy !== 'validate_only' && $diagnostics['schema'] === [];
-        if ($canMap) {
-            $mapped = $this->mapRecords(
+        $mappedCandidate = ['nodes' => [], 'relationships' => []];
+        if ($diagnostics['schema'] === []) {
+            $mappedCandidate = $this->mapRecords(
                 $records,
                 $defaultBundle,
                 $defaultState,
@@ -120,6 +122,23 @@ final class IngestRunCommand extends Command
                 $source,
                 $diagnostics,
             );
+        }
+        if ($diagnostics['schema'] === [] && $diagnostics['errors'] === []) {
+            $validationViolations = (new ValidationGateValidator())->validate(
+                $mappedCandidate['nodes'],
+                $mappedCandidate['relationships'],
+            );
+            $diagnostics['validation'] = (new ValidationDiagnosticEmitter())->emit($validationViolations);
+        }
+        $diagnostics['validation_summary'] = $this->buildValidationSummary($diagnostics['validation']);
+
+        $mapped = ['nodes' => [], 'relationships' => []];
+        $canEmitMapped = $policy !== 'validate_only'
+            && $diagnostics['schema'] === []
+            && $diagnostics['errors'] === []
+            && $diagnostics['validation'] === [];
+        if ($canEmitMapped) {
+            $mapped = $mappedCandidate;
         }
 
         $result = [
@@ -132,8 +151,9 @@ final class IngestRunCommand extends Command
                 'policy' => $normalizedEnvelope['envelope']['policy'] ?? $policy,
                 'node_count' => count($mapped['nodes']),
                 'relationship_count' => count($mapped['relationships']),
-                'error_count' => count($diagnostics['schema']) + count($diagnostics['errors']),
+                'error_count' => count($diagnostics['schema']) + count($diagnostics['validation']) + count($diagnostics['errors']),
                 'schema_error_count' => count($diagnostics['schema']),
+                'validation_error_count' => count($diagnostics['validation']),
                 'warning_count' => count($diagnostics['warnings']),
             ],
             'nodes' => $mapped['nodes'],
@@ -165,7 +185,7 @@ final class IngestRunCommand extends Command
             $output->writeln(sprintf('Ingest diagnostics written: %s', $diagnosticsPath));
         }
 
-        $errorCount = count($diagnostics['schema']) + count($diagnostics['errors']);
+        $errorCount = count($diagnostics['schema']) + count($diagnostics['validation']) + count($diagnostics['errors']);
         if ($errorCount > 0) {
             $output->writeln(sprintf('<error>Ingest completed with %d error(s).</error>', $errorCount));
             return Command::FAILURE;
@@ -479,6 +499,39 @@ final class IngestRunCommand extends Command
         return [
             'error_count' => count($schemaDiagnostics),
             'warning_count' => 0,
+            'codes' => $uniqueCodes,
+        ];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $validationDiagnostics
+     * @return array{error_count:int,warning_count:int,categories:list<string>,codes:list<string>}
+     */
+    private function buildValidationSummary(array $validationDiagnostics): array
+    {
+        $codes = [];
+        $categories = [];
+        foreach ($validationDiagnostics as $diagnostic) {
+            $code = (string) ($diagnostic['code'] ?? '');
+            if ($code !== '') {
+                $codes[$code] = true;
+            }
+
+            $category = (string) ($diagnostic['category'] ?? '');
+            if ($category !== '') {
+                $categories[$category] = true;
+            }
+        }
+
+        $uniqueCodes = array_keys($codes);
+        sort($uniqueCodes);
+        $uniqueCategories = array_keys($categories);
+        sort($uniqueCategories);
+
+        return [
+            'error_count' => count($validationDiagnostics),
+            'warning_count' => 0,
+            'categories' => $uniqueCategories,
             'codes' => $uniqueCodes,
         ];
     }
