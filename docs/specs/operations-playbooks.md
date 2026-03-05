@@ -95,6 +95,21 @@ Use this as the default runbook for upgrades, baseline refreshes, and verificati
    - `docs/plans/artifacts/v1.3-cross-repo-harness.md`
 3. Treat non-zero harness exit as a cross-repo regression gate failure.
 
+### Playbook F: Structured/Unstructured Ingestion Pipeline (v1.4)
+
+1. Run ingestion on structured JSON:
+   - `php bin/waaseyaa ingest:run --input <input.json> --format structured --source ingest://<source> --output <mapped.json> --diagnostics-output <diag.json>`
+2. Run ingestion on unstructured notes/transcripts:
+   - `php bin/waaseyaa ingest:run --input <input.txt> --format unstructured --source ingest://<source> --output <mapped.json> --diagnostics-output <diag.json>`
+3. Validate deterministic mapping output:
+   - node keys are normalized and sorted,
+   - workflow state maps to publish status (`published => status=1`, otherwise `0`),
+   - relationship keys are deterministic (`from_to_type`) and sorted.
+4. Treat non-zero exit as ingest gate failure; inspect diagnostics:
+   - `diagnostics.errors` for hard mapping/validation failures,
+   - `diagnostics.warnings` for skipped/partial rows requiring review.
+5. Commit ingest artifacts and issue report for auditability.
+
 ## Onboarding Path (Contributor Quick Path)
 
 1. Read `CLAUDE.md` for architecture and gotchas.
