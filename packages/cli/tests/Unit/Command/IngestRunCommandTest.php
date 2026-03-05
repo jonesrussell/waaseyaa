@@ -152,4 +152,97 @@ TXT);
         $this->assertGreaterThan(0, $decoded['meta']['error_count']);
         $this->assertStringContainsString('Relationship target key missing', $decoded['diagnostics']['errors'][0]);
     }
+
+    #[Test]
+    public function it_emits_contract_shaped_schema_diagnostics_for_unknown_batch_scheme(): void
+    {
+        $inputPath = $this->tempDir . '/unknown-scheme.json';
+        file_put_contents($inputPath, json_encode([
+            'items' => [
+                [
+                    'key' => 'anchor',
+                    'title' => 'Anchor',
+                    'source_uri' => 'source://anchor',
+                    'ingested_at' => 1735689600,
+                ],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $app = new Application();
+        $app->add(new IngestRunCommand());
+        $tester = new CommandTester($app->find('ingest:run'));
+        $mappedPath = $this->tempDir . '/mapped-unknown-scheme.json';
+        $tester->execute([
+            '--input' => $inputPath,
+            '--format' => 'structured',
+            '--policy' => 'validate_only',
+            '--source' => 'legacy://source-set',
+            '--output' => $mappedPath,
+        ]);
+
+        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame(1, $decoded['meta']['schema_error_count']);
+        $this->assertSame([], $decoded['nodes']);
+        $this->assertSame([], $decoded['relationships']);
+        $this->assertSame([
+            'error_count' => 1,
+            'warning_count' => 0,
+            'codes' => ['schema.unknown_source_set_scheme'],
+        ], $decoded['diagnostics']['schema_summary']);
+
+        $diagnostic = $decoded['diagnostics']['schema'][0];
+        $this->assertSame('schema.unknown_source_set_scheme', $diagnostic['code']);
+        $this->assertSame('/source_set_uri', $diagnostic['location']);
+        $this->assertNull($diagnostic['item_index']);
+        $this->assertStringContainsString('Unknown source_set_uri scheme', (string) $diagnostic['message']);
+        $this->assertSame(['value', 'expected', 'allowed_schemes'], array_keys($diagnostic['context']));
+    }
+
+    #[Test]
+    public function it_emits_duplicate_source_uri_diagnostics_with_item_location(): void
+    {
+        $inputPath = $this->tempDir . '/duplicate-source-uri.json';
+        file_put_contents($inputPath, json_encode([
+            'items' => [
+                [
+                    'key' => 'anchor_a',
+                    'title' => 'Anchor A',
+                    'source_uri' => 'source://dup',
+                    'ingested_at' => 1735689600,
+                ],
+                [
+                    'key' => 'anchor_b',
+                    'title' => 'Anchor B',
+                    'source_uri' => ' source://dup ',
+                    'ingested_at' => 1735689601,
+                ],
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+
+        $app = new Application();
+        $app->add(new IngestRunCommand());
+        $tester = new CommandTester($app->find('ingest:run'));
+        $mappedPath = $this->tempDir . '/mapped-duplicate-source-uri.json';
+        $tester->execute([
+            '--input' => $inputPath,
+            '--format' => 'structured',
+            '--policy' => 'validate_only',
+            '--source' => 'dataset://set',
+            '--output' => $mappedPath,
+        ]);
+
+        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
+        $schema = $decoded['diagnostics']['schema'];
+
+        $duplicate = array_values(array_filter(
+            $schema,
+            static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.duplicate_source_uri',
+        ));
+        $this->assertCount(1, $duplicate);
+        $this->assertSame('/items/1/source_uri', $duplicate[0]['location']);
+        $this->assertSame(1, $duplicate[0]['item_index']);
+    }
 }

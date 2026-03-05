@@ -106,6 +106,7 @@ final class IngestRunCommand extends Command
         $normalizedEnvelope = (new IngestionEnvelopeNormalizer())->normalize($schemaEnvelope);
         $violations = (new SchemaValidator())->validate($normalizedEnvelope['envelope']);
         $diagnostics['schema'] = (new SchemaDiagnosticEmitter())->emit($violations);
+        $diagnostics['schema_summary'] = $this->buildSchemaSummary($diagnostics['schema']);
 
         $mapped = ['nodes' => [], 'relationships' => []];
         $canMap = $policy !== 'validate_only' && $diagnostics['schema'] === [];
@@ -453,6 +454,29 @@ final class IngestRunCommand extends Command
             'source_set_uri' => $sourceSetUri,
             'policy' => $policy,
             'items' => $items,
+        ];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $schemaDiagnostics
+     * @return array{error_count:int,warning_count:int,codes:list<string>}
+     */
+    private function buildSchemaSummary(array $schemaDiagnostics): array
+    {
+        $codes = [];
+        foreach ($schemaDiagnostics as $diagnostic) {
+            $code = (string) ($diagnostic['code'] ?? '');
+            if ($code !== '') {
+                $codes[$code] = true;
+            }
+        }
+        $uniqueCodes = array_keys($codes);
+        sort($uniqueCodes);
+
+        return [
+            'error_count' => count($schemaDiagnostics),
+            'warning_count' => 0,
+            'codes' => $uniqueCodes,
         ];
     }
 
