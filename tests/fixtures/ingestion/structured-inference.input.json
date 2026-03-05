@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "key": "seasonal_water",
+      "title": "Seasonal Water",
+      "workflow_state": "published",
+      "source_uri": "item://seasonal_water",
+      "ingested_at": 1735689600,
+      "body": "Seasonal water ceremony teachings preserve memory and stewardship continuity."
+    },
+    {
+      "key": "memory_stewardship",
+      "title": "Memory Stewardship",
+      "workflow_state": "published",
+      "source_uri": "item://memory_stewardship",
+      "ingested_at": 1735689601,
+      "body": "Memory stewardship teachings support seasonal ceremony and community continuity."
+    }
+  ]
+}

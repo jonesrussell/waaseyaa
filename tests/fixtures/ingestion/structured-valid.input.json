@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "key": "river_teaching",
+      "title": "River Teaching",
+      "bundle": "teaching",
+      "workflow_state": "published",
+      "source_uri": "item://river_teaching",
+      "ingested_at": 1735689600,
+      "body": "River stewardship teachings preserve seasonal knowledge across community families.",
+      "relationships": [
+        {
+          "to": "water_story",
+          "type": "supports"
+        }
+      ]
+    },
+    {
+      "key": "water_story",
+      "title": "Water Story",
+      "bundle": "story",
+      "workflow_state": "published",
+      "source_uri": "item://water_story",
+      "ingested_at": 1735689601,
+      "body": "Water story memory teachings sustain ceremony and language continuity."
+    }
+  ]
+}

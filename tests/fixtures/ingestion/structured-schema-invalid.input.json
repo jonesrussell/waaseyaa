@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "key": "dup_a",
+      "title": "Duplicate A",
+      "workflow_state": "draft",
+      "source_uri": "item://dup",
+      "ingested_at": 1735689600,
+      "body": "Draft node body for duplicate source URI coverage."
+    },
+    {
+      "key": "dup_b",
+      "title": "Duplicate B",
+      "workflow_state": "draft",
+      "source_uri": "item://dup",
+      "ingested_at": 1735689601,
+      "body": "Second draft node body preserving duplicate source URI."
+    }
+  ]
+}

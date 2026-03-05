@@ -121,6 +121,13 @@ Use this as the default runbook for upgrades, baseline refreshes, and verificati
    - inference review pending totals
    - refresh-required categories
 
+### Ingestion Fixture Pack Regression
+1. Replay versioned ingestion fixtures through ingest command tests:
+   - `./vendor/bin/phpunit --configuration phpunit.xml.dist packages/cli/tests/Unit/Command/IngestionFixturePackRegressionTest.php`
+2. Refresh deterministic scenario aggregate:
+   - `php bin/waaseyaa fixture:pack:refresh --input-dir tests/fixtures/scenarios --output tests/fixtures/scenarios/fixture-pack.aggregate.json`
+3. Verify repeated refresh runs keep the same aggregate hash.
+
 ## Onboarding Path (Contributor Quick Path)
 
 1. Read `CLAUDE.md` for architecture and gotchas.

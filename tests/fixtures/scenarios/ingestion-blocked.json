@@ -1,0 +1,10 @@
+{
+  "nodes": {
+    "published_short": {
+      "title": "Published Short",
+      "workflow_state": "published",
+      "status": 1
+    }
+  },
+  "relationships": []
+}

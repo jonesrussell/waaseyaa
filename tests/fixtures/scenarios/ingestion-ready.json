@@ -1,0 +1,23 @@
+{
+  "nodes": {
+    "river_teaching": {
+      "title": "River Teaching",
+      "workflow_state": "published",
+      "status": 1
+    },
+    "water_story": {
+      "title": "Water Story",
+      "workflow_state": "published",
+      "status": 1
+    }
+  },
+  "relationships": [
+    {
+      "key": "river_teaching_to_water_story_supports",
+      "relationship_type": "supports",
+      "from": "river_teaching",
+      "to": "water_story",
+      "status": 1
+    }
+  ]
+}

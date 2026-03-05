@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "key": "published_short",
+      "title": "Published Short",
+      "workflow_state": "published",
+      "source_uri": "item://published_short",
+      "ingested_at": 1735689600,
+      "body": "tiny"
+    }
+  ]
+}

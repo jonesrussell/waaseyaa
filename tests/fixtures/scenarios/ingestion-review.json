@@ -1,0 +1,25 @@
+{
+  "nodes": {
+    "memory_stewardship": {
+      "title": "Memory Stewardship",
+      "workflow_state": "published",
+      "status": 1
+    },
+    "seasonal_water": {
+      "title": "Seasonal Water",
+      "workflow_state": "published",
+      "status": 1
+    }
+  },
+  "relationships": [
+    {
+      "key": "memory_stewardship_to_seasonal_water_related_to_inferred",
+      "relationship_type": "related_to",
+      "from": "memory_stewardship",
+      "to": "seasonal_water",
+      "status": 0,
+      "inference_source": "text_overlap_v1",
+      "inference_review_state": "needs_review"
+    }
+  ]
+}
