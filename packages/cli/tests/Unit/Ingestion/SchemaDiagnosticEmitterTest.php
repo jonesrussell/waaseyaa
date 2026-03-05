@@ -106,4 +106,38 @@ final class SchemaDiagnosticEmitterTest extends TestCase
         $this->assertContains('Malformed source_uri value: "not-a-uri". Expected: "<scheme>://<identifier>".', $messages);
         $this->assertContains('Invalid parser_version type: "integer". Expected: "string_or_null".', $messages);
     }
+
+    #[Test]
+    public function it_emits_fixed_templates_for_item_shape_rule_codes(): void
+    {
+        $emitter = new SchemaDiagnosticEmitter();
+        $diagnostics = $emitter->emit([
+            [
+                'code' => 'schema.empty_items_array',
+                'location' => '/items',
+                'item_index' => null,
+                'value' => null,
+                'expected' => 'non-empty array',
+            ],
+            [
+                'code' => 'schema.invalid_item_type',
+                'location' => '/items/0',
+                'item_index' => 0,
+                'value' => 'string',
+                'expected' => 'object',
+            ],
+            [
+                'code' => 'schema.disallowed_item_field',
+                'location' => '/items/0/unexpected',
+                'item_index' => 0,
+                'value' => 'unexpected',
+                'expected' => 'source_uri|ingested_at|parser_version',
+            ],
+        ]);
+
+        $messages = array_values(array_map(static fn(array $row): string => (string) ($row['message'] ?? ''), $diagnostics));
+        $this->assertContains('Items array must not be empty.', $messages);
+        $this->assertContains('Invalid item type: "string". Expected: "object".', $messages);
+        $this->assertContains('Disallowed item field: "unexpected". Allowed fields: "source_uri|ingested_at|parser_version".', $messages);
+    }
 }

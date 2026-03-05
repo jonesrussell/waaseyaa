@@ -108,19 +108,44 @@ final class SchemaValidator
         }
 
         $items = $envelope['items'];
+        if ($items === []) {
+            $violations[] = [
+                'code' => 'schema.empty_items_array',
+                'location' => '/items',
+                'item_index' => null,
+                'value' => null,
+                'expected' => 'non-empty array',
+            ];
+        }
+
         $seenSourceUris = [];
 
         foreach (array_values($items) as $index => $item) {
             if (!is_array($item)) {
                 $violations[] = [
-                    'code' => 'schema.missing_required_provenance_field',
+                    'code' => 'schema.invalid_item_type',
                     'location' => '/items/' . $index,
                     'item_index' => $index,
-                    'value' => null,
+                    'value' => gettype($item),
                     'expected' => 'object',
-                    'field_name' => 'item',
                 ];
                 continue;
+            }
+
+            $allowedItemFields = ['source_uri', 'ingested_at', 'parser_version'];
+            foreach ($item as $field => $_value) {
+                $fieldName = (string) $field;
+                if (in_array($fieldName, $allowedItemFields, true)) {
+                    continue;
+                }
+
+                $violations[] = [
+                    'code' => 'schema.disallowed_item_field',
+                    'location' => '/items/' . $index . '/' . $fieldName,
+                    'item_index' => $index,
+                    'value' => $fieldName,
+                    'expected' => 'source_uri|ingested_at|parser_version',
+                ];
             }
 
             $sourceUri = is_string($item['source_uri'] ?? null) ? (string) $item['source_uri'] : '';

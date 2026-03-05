@@ -112,6 +112,17 @@ final class SchemaDiagnosticEmitter
                 (string) $value,
                 (string) ($violation['expected'] ?? ''),
             ),
+            'schema.empty_items_array' => 'Items array must not be empty.',
+            'schema.invalid_item_type' => sprintf(
+                'Invalid item type: "%s". Expected: "%s".',
+                (string) $value,
+                (string) ($violation['expected'] ?? ''),
+            ),
+            'schema.disallowed_item_field' => sprintf(
+                'Disallowed item field: "%s". Allowed fields: "%s".',
+                (string) $value,
+                (string) ($violation['expected'] ?? ''),
+            ),
             'schema.malformed_ingested_at' => sprintf(
                 'Malformed ingested_at value: "%s". Expected: "%s".',
                 (string) $value,

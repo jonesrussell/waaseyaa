@@ -131,6 +131,26 @@ final class SchemaValidatorTest extends TestCase
     }
 
     #[Test]
+    public function it_reports_empty_items_array_when_items_is_empty(): void
+    {
+        $validator = new SchemaValidator();
+        $violations = $validator->validate([
+            'batch_id' => 'batch_1',
+            'source_set_uri' => 'dataset://set',
+            'policy' => 'atomic_fail_fast',
+            'items' => [],
+        ]);
+
+        $empty = array_values(array_filter(
+            $violations,
+            static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.empty_items_array',
+        ));
+
+        $this->assertCount(1, $empty);
+        $this->assertSame('/items', $empty[0]['location']);
+    }
+
+    #[Test]
     public function it_reports_malformed_ingested_at_when_value_is_not_timestamp_or_iso_date(): void
     {
         $validator = new SchemaValidator();
@@ -214,5 +234,50 @@ final class SchemaValidatorTest extends TestCase
 
         $this->assertCount(1, $invalidType);
         $this->assertSame('/items/0/parser_version', $invalidType[0]['location']);
+    }
+
+    #[Test]
+    public function it_reports_invalid_item_type_when_item_row_is_not_an_object(): void
+    {
+        $validator = new SchemaValidator();
+        $violations = $validator->validate([
+            'batch_id' => 'batch_1',
+            'source_set_uri' => 'dataset://set',
+            'policy' => 'validate_only',
+            'items' => ['not-object'],
+        ]);
+
+        $invalidType = array_values(array_filter(
+            $violations,
+            static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.invalid_item_type',
+        ));
+
+        $this->assertCount(1, $invalidType);
+        $this->assertSame('/items/0', $invalidType[0]['location']);
+    }
+
+    #[Test]
+    public function it_reports_disallowed_item_field_for_unknown_item_keys(): void
+    {
+        $validator = new SchemaValidator();
+        $violations = $validator->validate([
+            'batch_id' => 'batch_1',
+            'source_set_uri' => 'dataset://set',
+            'policy' => 'validate_only',
+            'items' => [[
+                'source_uri' => 'item://a',
+                'ingested_at' => 1735689600,
+                'parser_version' => null,
+                'unexpected' => 'value',
+            ]],
+        ]);
+
+        $unknown = array_values(array_filter(
+            $violations,
+            static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.disallowed_item_field',
+        ));
+
+        $this->assertCount(1, $unknown);
+        $this->assertSame('/items/0/unexpected', $unknown[0]['location']);
     }
 }

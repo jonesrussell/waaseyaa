@@ -175,6 +175,9 @@ Initial frozen code set:
 - `schema.malformed_batch_id`
 - `schema.malformed_source_uri`
 - `schema.invalid_parser_version_type`
+- `schema.empty_items_array`
+- `schema.invalid_item_type`
+- `schema.disallowed_item_field`
 
 ## Fixed Message Templates
 
@@ -202,6 +205,12 @@ Message text must remain stable in v1.5.
   - `Malformed source_uri value: "<value>". Expected: "<expected>".`
 - `schema.invalid_parser_version_type`:
   - `Invalid parser_version type: "<value>". Expected: "<expected>".`
+- `schema.empty_items_array`:
+  - `Items array must not be empty.`
+- `schema.invalid_item_type`:
+  - `Invalid item type: "<value>". Expected: "<expected>".`
+- `schema.disallowed_item_field`:
+  - `Disallowed item field: "<value>". Allowed fields: "<expected>".`
 
 ## Severity Contract
 
