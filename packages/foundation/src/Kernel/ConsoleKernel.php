@@ -25,6 +25,7 @@ use Waaseyaa\CLI\Command\ExtensionScaffoldCommand;
 use Waaseyaa\CLI\Command\FixtureGenerateCommand;
 use Waaseyaa\CLI\Command\FixturePackRefreshCommand;
 use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
+use Waaseyaa\CLI\Command\IngestDashboardCommand;
 use Waaseyaa\CLI\Command\IngestRunCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
 use Waaseyaa\CLI\Command\Make\MakeEntityCommand;
@@ -158,6 +159,7 @@ final class ConsoleKernel extends AbstractKernel
             new FixtureScaffoldCommand(),
             new FixtureGenerateCommand(),
             new FixturePackRefreshCommand(),
+            new IngestDashboardCommand(),
             new IngestRunCommand(),
             new BundleScaffoldCommand(),
             new RelationshipTypeScaffoldCommand(),

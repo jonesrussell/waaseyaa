@@ -110,6 +110,17 @@ Use this as the default runbook for upgrades, baseline refreshes, and verificati
    - `diagnostics.warnings` for skipped/partial rows requiring review.
 5. Commit ingest artifacts and issue report for auditability.
 
+### Editorial Dashboard Review
+1. Build editorial dashboard from one or more ingest artifacts:
+   - `php bin/waaseyaa ingest:dashboard --input <mapped-a.json> --input <mapped-b.json>`
+2. Build dashboard from fixture/output glob and emit JSON:
+   - `php bin/waaseyaa ingest:dashboard --glob 'artifacts/ingest/*.json' --json --output artifacts/ingest/dashboard.json`
+3. Review queue and diagnostics surfaces:
+   - blocked/review/ready counts
+   - workflow mismatch totals
+   - inference review pending totals
+   - refresh-required categories
+
 ## Onboarding Path (Contributor Quick Path)
 
 1. Read `CLAUDE.md` for architecture and gotchas.
