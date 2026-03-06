@@ -12,6 +12,44 @@ use Waaseyaa\CLI\Ingestion\SourcePriorityMergeResolver;
 
 final class MultiSourceFixturePackTest extends TestCase
 {
+    /** @var list<string> v1.6 multi-source fixture paths (ingestion-fixture-pack-contract.md) */
+    private const V16_INGESTION_FIXTURES = [
+        'adapter-normalization-canonical.json',
+        'adapter-normalization-mutation.json',
+        'multi-source-federated.input.json',
+        'multi-source-refresh.baseline.json',
+        'multi-source-refresh.current.json',
+    ];
+
+    /** @var list<string> v1.6 connector fixture paths (source-connectors-contract.md) */
+    private const V16_CONNECTOR_FIXTURES = [
+        'dataset.json',
+        'api.json',
+        'file.json',
+        'crawl.json',
+    ];
+
+    #[Test]
+    public function v16_fixture_pack_paths_exist_and_are_valid_json(): void
+    {
+        $baseIngestion = dirname(__DIR__, 5) . '/tests/fixtures/ingestion';
+        $baseConnectors = dirname(__DIR__, 5) . '/tests/fixtures/connectors';
+        foreach (self::V16_INGESTION_FIXTURES as $name) {
+            $path = $baseIngestion . '/' . $name;
+            $this->assertFileExists($path, "v1.6 ingestion fixture must exist: {$name}");
+            $raw = file_get_contents($path);
+            $decoded = json_decode((string) $raw, true, 512, JSON_THROW_ON_ERROR);
+            $this->assertIsArray($decoded, "v1.6 ingestion fixture must be valid JSON: {$name}");
+        }
+        foreach (self::V16_CONNECTOR_FIXTURES as $name) {
+            $path = $baseConnectors . '/' . $name;
+            $this->assertFileExists($path, "v1.6 connector fixture must exist: {$name}");
+            $raw = file_get_contents($path);
+            $decoded = json_decode((string) $raw, true, 512, JSON_THROW_ON_ERROR);
+            $this->assertIsArray($decoded, "v1.6 connector fixture must be valid JSON: {$name}");
+        }
+    }
+
     #[Test]
     public function federated_fixture_pack_is_deterministic_across_identity_merge_and_refresh(): void
     {

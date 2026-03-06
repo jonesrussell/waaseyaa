@@ -37,3 +37,43 @@
 ## Stability Rules
 - Fixture corpus and expectations are contract-stable for v1.5.
 - Additions are allowed; renames/removals require coordinated test/spec updates.
+
+---
+
+## v1.6 Multi-Source Fixture Pack (Issue #178)
+
+### Scope
+- Issue: `#178`
+- Goal: expand fixture corpus with federated multi-source scenarios; cover adapter normalization, dedupe, merge conflicts, and refresh deltas; preserve fixture-pack hash and replay determinism.
+
+### Multi-Source Fixture Paths
+- Adapter normalization (canonical vs mutation):
+  - `tests/fixtures/ingestion/adapter-normalization-canonical.json`
+  - `tests/fixtures/ingestion/adapter-normalization-mutation.json`
+- Federated multi-source identity/merge:
+  - `tests/fixtures/ingestion/multi-source-federated.input.json`
+- Refresh deltas (baseline vs current):
+  - `tests/fixtures/ingestion/multi-source-refresh.baseline.json`
+  - `tests/fixtures/ingestion/multi-source-refresh.current.json`
+- Connector transport fixtures (see `docs/specs/source-connectors-contract.md`):
+  - `tests/fixtures/connectors/dataset.json`
+  - `tests/fixtures/connectors/api.json`
+  - `tests/fixtures/connectors/file.json`
+  - `tests/fixtures/connectors/crawl.json`
+
+### Required Coverage (v1.6)
+- Adapter normalization: canonical URI pass-through and mutation normalization (diagnostic `adapter.normalized_uri`).
+- Dedupe / canonical identity: multi-source rows resolved to stable identity bindings (order-independent).
+- Merge conflicts: source-priority merge with field conflict diagnostics (`merge.field_conflict`).
+- Refresh deltas: baseline vs current comparison with relationship/field change categories (`refresh.relationship_change`).
+- Fixture-pack aggregate determinism: `fixture:pack:refresh` hash stability over scenario corpus including multi-source fixtures.
+
+### Regression Consumption (v1.6)
+- `SourceAdapterNormalizerTest` must consume `adapter-normalization-canonical.json` and `adapter-normalization-mutation.json`; assert expected provenance and diagnostics.
+- `MultiSourceFixturePackTest` must consume `multi-source-federated.input.json` and `multi-source-refresh.*.json`; assert identity stability, merge diagnostics, refresh category.
+- `IngestionFixturePackRegressionTest` and `FixturePackRefreshCommandTest` continue to consume scenario pack; multi-source fixtures are part of the deterministic corpus for hash stability.
+- All v1.6 fixture paths must exist and be valid JSON (version-controlled, static).
+
+### Determinism Rules (v1.6)
+- Same as v1.5: static version-controlled files, fixed options in replay tests, sorted order for aggregates.
+- Multi-source fixture inputs use fixed `source_id` / `source_uri` and ownership; replay order (e.g. row order) must not change canonical identity or merge outcome.
