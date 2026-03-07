@@ -875,6 +875,10 @@ final class HttpKernel extends AbstractKernel
                     $this->sendJson($document->statusCode, $document->toArray());
                 })(),
 
+                str_contains($controller, '::') => $this->dispatchAppController(
+                    $controller, $params, $query, $account, $httpRequest
+                ),
+
                 default => (function () use ($controller): never {
                     error_log(sprintf('[Waaseyaa] Unknown controller: %s', $controller));
                     $this->sendJson(500, ['jsonapi' => ['version' => '1.1'], 'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => 'Unknown route handler.']]]);
@@ -1222,6 +1226,36 @@ final class HttpKernel extends AbstractKernel
                 ]],
             ]);
         }
+    }
+
+    /**
+     * Dispatch an app-level controller registered via ServiceProvider::routes().
+     *
+     * Controllers use Class::method format. The class receives EntityTypeManager
+     * and Twig Environment via constructor; the method receives route params,
+     * query params, and account.
+     */
+    private function dispatchAppController(
+        string $controller,
+        array $params,
+        array $query,
+        AccountInterface $account,
+        HttpRequest $httpRequest,
+    ): never {
+        [$class, $method] = explode('::', $controller, 2);
+
+        $twig = SsrServiceProvider::getTwigEnvironment();
+        if ($twig === null) {
+            $twig = SsrServiceProvider::createTwigEnvironment($this->projectRoot, $this->config);
+        }
+
+        $instance = new $class($this->entityTypeManager, $twig);
+        $response = $instance->{$method}($params, $query, $account);
+
+        $cacheMaxAge = $this->resolveRenderCacheMaxAge();
+        $headers = $response->headers;
+        $headers['Cache-Control'] = $this->cacheControlHeaderForRender($account, $cacheMaxAge);
+        $this->sendHtml($response->statusCode, $response->content, $headers);
     }
 
     private function isPreviewRequested(HttpRequest $request): bool
