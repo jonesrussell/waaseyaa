@@ -3,6 +3,8 @@ import { useLanguage } from '~/composables/useLanguage'
 import type { EntityTypeInfo } from '~/composables/useNavGroups'
 
 const { t } = useLanguage()
+const config = useRuntimeConfig()
+useHead({ title: computed(() => `${t('dashboard')} | ${config.public.appName}`) })
 
 const entityTypes = ref<EntityTypeInfo[]>([])
 const loading = ref(true)
@@ -46,7 +48,6 @@ onMounted(async () => {
         class="card"
       >
         <h2 class="card-title">{{ et.label }}</h2>
-        <p class="card-sub">{{ et.id }}</p>
       </NuxtLink>
     </div>
   </div>

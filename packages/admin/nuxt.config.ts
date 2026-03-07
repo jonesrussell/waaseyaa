@@ -35,6 +35,8 @@ export default defineNuxtConfig({
       // Disable SSE by default in dev to avoid php -S single-process request starvation.
       // Set NUXT_PUBLIC_ENABLE_REALTIME=1 to force-enable.
       enableRealtime: process.env.NUXT_PUBLIC_ENABLE_REALTIME ?? (process.env.NODE_ENV === 'production' ? '1' : '0'),
+      // Override site name via NUXT_PUBLIC_APP_NAME env var (e.g. "Minoo").
+      appName: process.env.NUXT_PUBLIC_APP_NAME ?? 'Waaseyaa',
     },
   },
 })

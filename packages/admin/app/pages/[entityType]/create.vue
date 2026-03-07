@@ -10,6 +10,8 @@ const entityType = computed(() => route.params.entityType as string)
 const { schema, fetch: fetchSchema } = useSchema(entityType.value)
 onMounted(() => fetchSchema())
 const entityLabel = computed(() => schema.value?.title ?? entityType.value)
+const config = useRuntimeConfig()
+useHead({ title: computed(() => `${t('create')} ${entityLabel.value} | ${config.public.appName}`) })
 const successMessage = ref('')
 const errorMessage = ref('')
 

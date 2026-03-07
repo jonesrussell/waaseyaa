@@ -2,6 +2,8 @@
 import { useLanguage } from '~/composables/useLanguage'
 
 const { t, locale, locales, setLocale } = useLanguage()
+const config = useRuntimeConfig()
+const appName = config.public.appName as string
 const sidebarOpen = ref(false)
 
 function toggleSidebar() {
@@ -26,7 +28,7 @@ function onLocaleChange(event: Event) {
       <button class="topbar-toggle" :aria-label="t('toggle_menu')" @click="toggleSidebar">
         <span class="topbar-toggle-icon">&#9776;</span>
       </button>
-      <NuxtLink to="/" class="topbar-brand">{{ t('app_name') }}</NuxtLink>
+      <NuxtLink to="/" class="topbar-brand">{{ appName }}</NuxtLink>
       <label class="topbar-locale">
         <span class="sr-only">{{ t('language') }}</span>
         <select
