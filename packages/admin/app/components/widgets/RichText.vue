@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SchemaProperty } from '~/composables/useSchema'
 
-defineProps<{
+const props = defineProps<{
   modelValue: string
   label?: string
   description?: string
