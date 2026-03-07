@@ -106,6 +106,20 @@ final class ServiceProviderTest extends TestCase
     }
 
     #[Test]
+    public function routes_is_callable_by_default(): void
+    {
+        $provider = new class extends ServiceProvider {
+            public function register(): void {}
+        };
+
+        $router = new \Waaseyaa\Routing\WaaseyaaRouter();
+        $provider->routes($router);
+
+        // Default no-op should not add any routes
+        $this->assertSame(0, $router->getRouteCollection()->count());
+    }
+
+    #[Test]
     public function non_deferred_provider(): void
     {
         $provider = new class extends ServiceProvider {

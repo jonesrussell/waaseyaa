@@ -27,6 +27,8 @@ abstract class ServiceProvider implements ServiceProviderInterface
 
     public function boot(): void {}
 
+    public function routes(\Waaseyaa\Routing\WaaseyaaRouter $router): void {}
+
     public function provides(): array
     {
         return [];
