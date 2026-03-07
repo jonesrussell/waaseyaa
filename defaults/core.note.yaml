@@ -1,0 +1,122 @@
+# core.note — Waaseyaa built-in content type
+# This manifest is immutable. Do not delete. Disable per tenant via admin UI or CLI.
+
+id: core.note
+label: Note
+namespace: core
+version: "0.1.0"
+status: active
+
+project_versioning:
+  release_stage: pre-v1
+  owner: jonesrussell
+  release_approval_required: true
+  tag_policy: deletable-with-owner-approval
+
+schema:
+  ref: core.note.schema.json
+  version: "0.1.0"
+  compatibility: liberal  # pre-v1: breaking changes allowed with migration task
+
+entity_keys:
+  id: id
+  uuid: uuid
+  label: title
+  owner: tenant_id
+
+fields:
+  id:
+    type: integer
+    label: ID
+    system: true
+    writable: false
+  uuid:
+    type: uuid
+    label: UUID
+    system: true
+    writable: false
+  tenant_id:
+    type: string
+    label: Tenant ID
+    system: true
+    writable: false
+  title:
+    type: string
+    label: Title
+    required: true
+    max_length: 512
+  body:
+    type: text
+    label: Body
+    required: false
+  created_at:
+    type: timestamp
+    label: Created At
+    system: true
+    writable: false
+  updated_at:
+    type: timestamp
+    label: Updated At
+    system: true
+    writable: false
+
+access_control:
+  read:
+    - tenant.member
+    - tenant.admin
+    - platform.admin
+  write:
+    - tenant.admin
+    - platform.admin
+  delete: []
+  field_overrides:
+    id:
+      read: [tenant.member, tenant.admin, platform.admin]
+      write: []
+    uuid:
+      read: [tenant.member, tenant.admin, platform.admin]
+      write: []
+    tenant_id:
+      read: [tenant.admin, platform.admin]
+      write: []
+
+lifecycle:
+  deletable: false
+  disableable: true
+  disable_requires_audit_log: true
+  disable_requires_replacement: false
+
+onboarding:
+  show_in_type_picker: true
+  onboarding_label: "Note (built-in)"
+  description: "A simple built-in note type. Use this to get started or as a reference for custom types."
+  quickstart_example: core.note.example.json
+
+ingestion:
+  envelope_version: "1"
+  required_provenance_fields:
+    - source
+    - ingested_at
+  validation: strict
+  error_handling: log-and-reject
+
+diagnostics:
+  boot_required: true
+  error_codes:
+    missing: DEFAULT_TYPE_MISSING
+    disabled: DEFAULT_TYPE_DISABLED
+
+telemetry:
+  audit_fields:
+    - actor
+    - action
+    - entity_id
+    - tenant_id
+    - timestamp
+  retention_policy: 90d
+  replay_metadata: true
+
+namespace_rules:
+  namespace: core
+  tenant_override: false
+  extension_override: false

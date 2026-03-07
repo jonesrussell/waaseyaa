@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "waaseyaa://defaults/core.note",
+  "title": "core.note",
+  "description": "Waaseyaa built-in Note content type. Minimal, generic, stable.",
+  "type": "object",
+  "required": ["title", "tenant_id"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Auto-assigned primary key. Read-only.",
+      "readOnly": true
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Stable public identifier. Read-only.",
+      "readOnly": true
+    },
+    "tenant_id": {
+      "type": "string",
+      "description": "Owning tenant identifier.",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "description": "Note title.",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "body": {
+      "type": "string",
+      "description": "Note body. Plain text or Markdown.",
+      "default": ""
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp (ISO 8601). Read-only.",
+      "readOnly": true
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp (ISO 8601). Read-only.",
+      "readOnly": true
+    }
+  },
+  "x-waaseyaa": {
+    "entity_type": "core.note",
+    "namespace": "core",
+    "version": "0.1.0",
+    "project_versioning": {
+      "release_stage": "pre-v1",
+      "owner": "jonesrussell",
+      "release_approval_required": true,
+      "tag_policy": "deletable-with-owner-approval"
+    },
+    "immutable": true,
+    "disableable": true,
+    "boot_required": true
+  }
+}
