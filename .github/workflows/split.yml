@@ -70,6 +70,16 @@ jobs:
           curl -sL https://github.com/splitsh/lite/releases/latest/download/lite_linux_amd64.tar.gz | tar xz
           sudo mv splitsh-lite /usr/local/bin/splitsh-lite
 
+      - name: Guard against unauthorized v1.0 tag
+        if: startsWith(github.ref_name, 'v1.0')
+        run: |
+          if [ ! -f "release-approvals/v1.0.approved" ]; then
+            echo "::error::UNAUTHORIZED_V1_TAG: Monorepo split aborted."
+            echo "::error::A v1.0 tag was pushed without owner approval. See VERSIONING.md."
+            exit 1
+          fi
+          echo "v1.0 approval artifact verified. Proceeding with split."
+
       - name: Split and push
         env:
           GITHUB_TOKEN: ${{ secrets.SPLIT_TOKEN }}
