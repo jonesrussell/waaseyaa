@@ -18,6 +18,7 @@ export interface SchemaProperty {
   'x-target-type'?: string
   'x-access-restricted'?: boolean
   'x-source-field'?: string
+  'x-list-display'?: boolean
   default?: string | number | boolean
 }
 

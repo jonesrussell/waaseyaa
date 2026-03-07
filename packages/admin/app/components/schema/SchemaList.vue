@@ -24,11 +24,12 @@ const sortField = ref<string | null>(null)
 const sortAsc = ref(true)
 const listError = ref<string | null>(null)
 
-// Visible columns: non-hidden fields, sorted by weight (take first 6).
+// Visible columns: prefer fields with x-list-display:true; fall back to first 6
+// non-hidden fields when no schema field declares x-list-display.
 const columns = computed(() => {
-  return sortedProperties(false)
-    .filter(([, prop]) => prop['x-widget'] !== 'hidden')
-    .slice(0, 6)
+  const all = sortedProperties(false).filter(([, prop]) => prop['x-widget'] !== 'hidden')
+  const explicit = all.filter(([, prop]) => prop['x-list-display'] === true)
+  return explicit.length > 0 ? explicit : all.slice(0, 6)
 })
 
 async function fetchEntities() {
