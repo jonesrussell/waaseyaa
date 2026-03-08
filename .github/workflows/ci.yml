@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: PHPUnit
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run unit tests
+        run: ./vendor/bin/phpunit --testsuite Unit
+
+      - name: Run integration tests (includes boot validation)
+        run: ./vendor/bin/phpunit --testsuite Integration
+
+  manifest-conformance:
+    name: Manifest conformance
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate defaults manifests have project_versioning
+        run: |
+          fail=0
+          for f in defaults/*.yaml; do
+            if ! grep -q 'project_versioning' "$f"; then
+              echo "FAIL: $f is missing project_versioning block"
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Validate defaults JSON Schemas are well-formed
+        run: |
+          fail=0
+          for f in defaults/*.schema.json; do
+            if ! python3 -c "import json,sys; json.load(open('$f'))" 2>/dev/null; then
+              echo "FAIL: $f is not valid JSON"
+              fail=1
+            fi
+          done
+          exit $fail
