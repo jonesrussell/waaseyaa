@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+DEFAULTS_DIR="$(cd "$(dirname "$0")/.." && pwd)/defaults"
+FAIL=0
+
+echo "=== Ingestion defaults check: $DEFAULTS_DIR ==="
+
+# 1. Every *.schema.json must have x-waaseyaa with entity_type + version + compatibility
+for f in "$DEFAULTS_DIR"/*.schema.json; do
+  [ -f "$f" ] || continue
+  basename="$(basename "$f")"
+
+  # Check x-waaseyaa block exists
+  if ! python3 -c "
+import json, sys
+data = json.load(open('$f'))
+ext = data.get('x-waaseyaa')
+if not ext:
+    print('FAIL: $basename missing x-waaseyaa block')
+    sys.exit(1)
+for key in ['entity_type', 'version', 'compatibility']:
+    if key not in ext:
+        print(f'FAIL: $basename x-waaseyaa missing required field: {key}')
+        sys.exit(1)
+# Validate compatibility is a known value
+compat = ext['compatibility']
+if compat not in ('liberal', 'strict'):
+    print(f'FAIL: $basename x-waaseyaa.compatibility must be liberal or strict, got: {compat}')
+    sys.exit(1)
+# Validate version looks like semver
+import re
+if not re.match(r'^\d+\.\d+\.\d+$', ext['version']):
+    print(f'FAIL: $basename x-waaseyaa.version must be semver (e.g. 0.1.0), got: {ext[\"version\"]}')
+    sys.exit(1)
+# Validate schema_kind if present
+kind = ext.get('schema_kind', 'entity')
+if kind not in ('entity', 'ingestion_envelope'):
+    print(f'FAIL: $basename x-waaseyaa.schema_kind must be entity or ingestion_envelope, got: {kind}')
+    sys.exit(1)
+# Validate stability if present
+stab = ext.get('stability', 'stable')
+if stab not in ('experimental', 'stable', 'deprecated'):
+    print(f'FAIL: $basename x-waaseyaa.stability must be experimental, stable, or deprecated, got: {stab}')
+    sys.exit(1)
+" 2>&1; then
+    FAIL=1
+  fi
+done
+
+# 2. Ingestion envelope schema must exist
+ENVELOPE="$DEFAULTS_DIR/ingestion.envelope.schema.json"
+if [ ! -f "$ENVELOPE" ]; then
+  echo "FAIL: ingestion.envelope.schema.json not found in defaults/"
+  FAIL=1
+else
+  # Validate it has the required envelope fields
+  if ! python3 -c "
+import json, sys
+data = json.load(open('$ENVELOPE'))
+required = data.get('required', [])
+for field in ['source', 'type', 'payload', 'timestamp']:
+    if field not in required:
+        print(f'FAIL: ingestion.envelope.schema.json missing required field: {field}')
+        sys.exit(1)
+ext = data.get('x-waaseyaa', {})
+if ext.get('schema_kind') != 'ingestion_envelope':
+    print(f'FAIL: ingestion.envelope.schema.json x-waaseyaa.schema_kind must be ingestion_envelope')
+    sys.exit(1)
+" 2>&1; then
+    FAIL=1
+  fi
+fi
+
+# 3. Entity schemas must have entity_type matching filename convention
+for f in "$DEFAULTS_DIR"/*.schema.json; do
+  [ -f "$f" ] || continue
+  basename="$(basename "$f" .schema.json)"
+
+  if ! python3 -c "
+import json, sys
+data = json.load(open('$f'))
+ext = data.get('x-waaseyaa', {})
+entity_type = ext.get('entity_type', '')
+expected = '$basename'
+if entity_type != expected:
+    print(f'FAIL: $(basename "$f") x-waaseyaa.entity_type is \"{entity_type}\", expected \"{expected}\"')
+    sys.exit(1)
+" 2>&1; then
+    FAIL=1
+  fi
+done
+
+if [ "$FAIL" -eq 0 ]; then
+  echo "OK: All ingestion defaults are valid"
+fi
+
+exit "$FAIL"
