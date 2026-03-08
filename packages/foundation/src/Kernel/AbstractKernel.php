@@ -9,6 +9,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Database\PdoDatabase;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Entity\Audit\EntityAuditLogger;
+use Waaseyaa\Entity\Audit\EntityWriteAuditListener;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
@@ -31,6 +33,7 @@ abstract class AbstractKernel
     protected PackageManifest $manifest;
     protected EntityAccessHandler $accessHandler;
     protected EntityTypeLifecycleManager $lifecycleManager;
+    protected EntityAuditLogger $entityAuditLogger;
 
     /** @var array<string, mixed> */
     protected array $config = [];
@@ -61,8 +64,14 @@ abstract class AbstractKernel
 
         $this->config = ConfigLoader::load($this->projectRoot . '/config/waaseyaa.php');
 
-        $this->dispatcher = new EventDispatcher();
-        $this->lifecycleManager = new EntityTypeLifecycleManager($this->projectRoot);
+        $this->dispatcher         = new EventDispatcher();
+        $this->lifecycleManager   = new EntityTypeLifecycleManager($this->projectRoot);
+        $this->entityAuditLogger  = new EntityAuditLogger($this->projectRoot);
+
+        $auditListener = new EntityWriteAuditListener($this->entityAuditLogger);
+        $this->dispatcher->addListener(\Waaseyaa\Entity\Event\EntityEvents::PRE_SAVE->value,    [$auditListener, 'onPreSave']);
+        $this->dispatcher->addListener(\Waaseyaa\Entity\Event\EntityEvents::POST_SAVE->value,   [$auditListener, 'onPostSave']);
+        $this->dispatcher->addListener(\Waaseyaa\Entity\Event\EntityEvents::POST_DELETE->value, [$auditListener, 'onPostDelete']);
         $this->bootDatabase();
         $this->bootEntityTypeManager();
         $this->compileManifest();
@@ -353,6 +362,11 @@ abstract class AbstractKernel
     public function getLifecycleManager(): EntityTypeLifecycleManager
     {
         return $this->lifecycleManager;
+    }
+
+    public function getEntityAuditLogger(): EntityAuditLogger
+    {
+        return $this->entityAuditLogger;
     }
 
     public function getProjectRoot(): string

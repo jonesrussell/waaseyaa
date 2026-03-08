@@ -156,7 +156,7 @@ final class ConsoleKernel extends AbstractKernel
             new EntityTypeListCommand($this->entityTypeManager),
             new TypeDisableCommand($this->entityTypeManager, $this->lifecycleManager),
             new TypeEnableCommand($this->entityTypeManager, $this->lifecycleManager),
-            new AuditLogCommand($this->lifecycleManager),
+            new AuditLogCommand($this->lifecycleManager, $this->entityAuditLogger),
             new EventListCommand($this->dispatcher),
             new RouteListCommand($router),
             new PermissionListCommand($permissionHandler),
