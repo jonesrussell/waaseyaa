@@ -51,6 +51,7 @@
     "entity_type": "core.note",
     "namespace": "core",
     "version": "0.1.0",
+    "compatibility": "liberal",
     "project_versioning": {
       "release_stage": "pre-v1",
       "owner": "jonesrussell",

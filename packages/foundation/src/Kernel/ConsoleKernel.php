@@ -47,6 +47,7 @@ use Waaseyaa\CLI\Command\Perf\PerformanceCompareCommand;
 use Waaseyaa\CLI\Command\PermissionListCommand;
 use Waaseyaa\CLI\Command\RelationshipTypeScaffoldCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
+use Waaseyaa\CLI\Command\SchemaListCommand;
 use Waaseyaa\CLI\Command\SemanticRefreshCommand;
 use Waaseyaa\CLI\Command\SemanticWarmCommand;
 use Waaseyaa\CLI\Command\Telescope\TelescopeClearCommand;
@@ -62,6 +63,7 @@ use Waaseyaa\Config\Cache\ConfigCacheCompiler;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\FileStorage;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
+use Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 final class ConsoleKernel extends AbstractKernel
@@ -124,6 +126,7 @@ final class ConsoleKernel extends AbstractKernel
             embeddingStorage: $embeddingStorage,
             embeddingProvider: $embeddingProvider,
         );
+        $schemaRegistry = new DefaultsSchemaRegistry($this->projectRoot . '/defaults');
 
         $app = new WaaseyaaApplication();
         $app->setAutoExit(false);
@@ -159,6 +162,7 @@ final class ConsoleKernel extends AbstractKernel
             new AuditLogCommand($this->lifecycleManager, $this->entityAuditLogger),
             new EventListCommand($this->dispatcher),
             new RouteListCommand($router),
+            new SchemaListCommand($schemaRegistry),
             new PermissionListCommand($permissionHandler),
             new SemanticWarmCommand($semanticWarmer),
             new SemanticRefreshCommand($semanticWarmer),
