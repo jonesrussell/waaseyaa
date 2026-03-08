@@ -268,6 +268,39 @@ final class AccessCheckerTest extends TestCase
         $this->assertTrue($result->isForbidden());
     }
 
+    // --- _public + _authenticated interaction ---
+
+    #[Test]
+    public function publicWithAuthenticatedRejectsAnonymous(): void
+    {
+        // _authenticated short-circuits before _public has any effect.
+        $route = new Route('/api/node');
+        $route->setOption('_public', true);
+        $route->setOption('_authenticated', true);
+
+        $account = $this->createMock(AccountInterface::class);
+        $account->method('isAuthenticated')->willReturn(false);
+
+        $result = $this->checker->check($route, $account);
+
+        $this->assertTrue($result->isUnauthenticated());
+    }
+
+    #[Test]
+    public function publicWithAuthenticatedAllowsAuthenticated(): void
+    {
+        $route = new Route('/api/node');
+        $route->setOption('_public', true);
+        $route->setOption('_authenticated', true);
+
+        $account = $this->createMock(AccountInterface::class);
+        $account->method('isAuthenticated')->willReturn(true);
+
+        $result = $this->checker->check($route, $account);
+
+        $this->assertTrue($result->isAllowed());
+    }
+
     #[Test]
     public function publicWithPermissionBothPass(): void
     {

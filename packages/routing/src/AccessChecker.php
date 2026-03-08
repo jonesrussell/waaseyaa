@@ -14,9 +14,13 @@ use Symfony\Component\Routing\Route;
  *
  * Routes can declare access requirements via options:
  *   - '_public' => true — always allow access (no authentication required)
+ *   - '_authenticated' => true — require a non-anonymous identity (returns 401 if not authenticated)
  *   - '_permission' => 'administer site' — require a specific permission
  *   - '_role' => 'administrator' — require a specific role (or comma-separated list)
  *   - '_gate' => ['ability' => 'config.export', 'subject' => null] — require a gate ability
+ *
+ * '_authenticated' short-circuits before other checks: if present and the account
+ * is anonymous, access is denied immediately without evaluating further options.
  *
  * Multiple requirements are combined with AND logic (all must pass).
  * If no access requirements are present, returns AccessResult::neutral().
