@@ -31,7 +31,10 @@ final class HttpKernelTest extends TestCase
         mkdir($this->projectRoot . '/config', 0755, true);
         mkdir($this->projectRoot . '/storage', 0755, true);
         file_put_contents($this->projectRoot . '/config/waaseyaa.php', "<?php return ['database' => ':memory:'];");
-        file_put_contents($this->projectRoot . '/config/entity-types.php', '<?php return [];');
+        file_put_contents(
+            $this->projectRoot . '/config/entity-types.php',
+            "<?php\nreturn [\n    new \\Waaseyaa\\Entity\\EntityType(\n        id: 'test',\n        label: 'Test',\n        class: \\stdClass::class,\n        keys: ['id' => 'id'],\n    ),\n];",
+        );
     }
 
     protected function tearDown(): void

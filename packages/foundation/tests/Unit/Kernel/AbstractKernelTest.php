@@ -31,7 +31,7 @@ final class AbstractKernelTest extends TestCase
         );
         file_put_contents(
             $projectRoot . '/config/entity-types.php',
-            '<?php return [];',
+            "<?php\nreturn [\n    new \\Waaseyaa\\Entity\\EntityType(\n        id: 'test',\n        label: 'Test',\n        class: \\stdClass::class,\n        keys: ['id' => 'id'],\n    ),\n];",
         );
 
         return $projectRoot;

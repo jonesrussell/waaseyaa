@@ -63,6 +63,7 @@ abstract class AbstractKernel
         $this->compileManifest();
         $this->discoverAndRegisterProviders();
         $this->loadAppEntityTypes();
+        $this->validateContentTypes();
         $this->bootProviders();
         $this->discoverAccessPolicies();
         $this->bootKnowledgeExtensionRunner();
@@ -171,6 +172,28 @@ abstract class AbstractKernel
                 ));
             }
         }
+    }
+
+    /**
+     * Validate that at least one content type is registered.
+     *
+     * Throws if zero types are registered (DEFAULT_TYPE_MISSING).
+     * DEFAULT_TYPE_DISABLED (all types disabled) is deferred to #198
+     * once the lifecycle/status concept exists on EntityType.
+     *
+     * @throws \RuntimeException if no content types are registered.
+     */
+    protected function validateContentTypes(): void
+    {
+        if ($this->entityTypeManager->getDefinitions() !== []) {
+            return;
+        }
+
+        throw new \RuntimeException(
+            '[CRITICAL] DEFAULT_TYPE_MISSING: No content types registered. '
+            . 'Remediation: Ensure core.note is not disabled, or register a custom type. '
+            . 'See defaults/core.note.yaml and defaults/README.md.',
+        );
     }
 
     protected function bootProviders(): void
