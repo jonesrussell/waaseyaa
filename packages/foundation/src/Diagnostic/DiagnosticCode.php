@@ -13,12 +13,21 @@ namespace Waaseyaa\Foundation\Diagnostic;
  */
 enum DiagnosticCode: string
 {
+    // --- Boot-time codes ---
     case DEFAULT_TYPE_MISSING        = 'DEFAULT_TYPE_MISSING';
     case DEFAULT_TYPE_DISABLED       = 'DEFAULT_TYPE_DISABLED';
     case UNAUTHORIZED_V1_TAG         = 'UNAUTHORIZED_V1_TAG';
     case TAG_QUARANTINE_DETECTED     = 'TAG_QUARANTINE_DETECTED';
     case MANIFEST_VERSIONING_MISSING = 'MANIFEST_VERSIONING_MISSING';
     case NAMESPACE_RESERVED          = 'NAMESPACE_RESERVED';
+
+    // --- Runtime health codes ---
+    case DATABASE_UNREACHABLE        = 'DATABASE_UNREACHABLE';
+    case DATABASE_SCHEMA_DRIFT       = 'DATABASE_SCHEMA_DRIFT';
+    case CACHE_DIRECTORY_UNWRITABLE  = 'CACHE_DIRECTORY_UNWRITABLE';
+    case STORAGE_DIRECTORY_MISSING   = 'STORAGE_DIRECTORY_MISSING';
+    case INGESTION_LOG_OVERSIZED     = 'INGESTION_LOG_OVERSIZED';
+    case INGESTION_RECENT_FAILURES   = 'INGESTION_RECENT_FAILURES';
 
     public function defaultMessage(): string
     {
@@ -35,6 +44,18 @@ enum DiagnosticCode: string
                 'A defaults manifest is missing the required project_versioning block.',
             self::NAMESPACE_RESERVED =>
                 'The "core." namespace is reserved for built-in platform types and cannot be used by extensions or tenants.',
+            self::DATABASE_UNREACHABLE =>
+                'The database file is missing, corrupt, or not accessible.',
+            self::DATABASE_SCHEMA_DRIFT =>
+                'One or more entity table columns do not match the expected schema definition.',
+            self::CACHE_DIRECTORY_UNWRITABLE =>
+                'The cache storage directory exists but is not writable by the current process.',
+            self::STORAGE_DIRECTORY_MISSING =>
+                'The storage/framework/ directory does not exist and could not be created.',
+            self::INGESTION_LOG_OVERSIZED =>
+                'The ingestion log file exceeds the expected size for the retention window. Run pruning.',
+            self::INGESTION_RECENT_FAILURES =>
+                'A high proportion of recent ingestion attempts have failed.',
         };
     }
 
@@ -53,6 +74,41 @@ enum DiagnosticCode: string
                 'Add a project_versioning block to the manifest per VERSIONING.md §3. Run `bin/check-milestones` to verify.',
             self::NAMESPACE_RESERVED =>
                 'Use a custom namespace prefix (e.g., myorg.article). The "core." prefix is reserved for platform built-ins.',
+            self::DATABASE_UNREACHABLE =>
+                'Verify the WAASEYAA_DB environment variable points to a valid SQLite file. Run `waaseyaa install` to initialize.',
+            self::DATABASE_SCHEMA_DRIFT =>
+                'Delete the SQLite database and restart to recreate tables, or run `waaseyaa schema:check` for details.',
+            self::CACHE_DIRECTORY_UNWRITABLE =>
+                'Check file permissions on storage/framework/. The web server user must have write access.',
+            self::STORAGE_DIRECTORY_MISSING =>
+                'Create the storage/framework/ directory with appropriate permissions: `mkdir -p storage/framework && chmod 755 storage/framework`.',
+            self::INGESTION_LOG_OVERSIZED =>
+                'Run `waaseyaa health:check` to review log size, then prune old entries or increase the retention window.',
+            self::INGESTION_RECENT_FAILURES =>
+                'Review recent ingestion errors in storage/framework/ingestion.jsonl. Check envelope format and payload schemas.',
+        };
+    }
+
+    /**
+     * Severity level for health check display.
+     */
+    public function severity(): string
+    {
+        return match ($this) {
+            self::DEFAULT_TYPE_MISSING,
+            self::DEFAULT_TYPE_DISABLED,
+            self::DATABASE_UNREACHABLE,
+            self::DATABASE_SCHEMA_DRIFT => 'error',
+
+            self::UNAUTHORIZED_V1_TAG,
+            self::TAG_QUARANTINE_DETECTED,
+            self::INGESTION_RECENT_FAILURES,
+            self::CACHE_DIRECTORY_UNWRITABLE => 'warning',
+
+            self::MANIFEST_VERSIONING_MISSING,
+            self::NAMESPACE_RESERVED,
+            self::STORAGE_DIRECTORY_MISSING,
+            self::INGESTION_LOG_OVERSIZED => 'warning',
         };
     }
 }

@@ -23,6 +23,8 @@ use Waaseyaa\CLI\Command\EntityListCommand;
 use Waaseyaa\CLI\Command\EntityTypeListCommand;
 use Waaseyaa\CLI\Command\EventListCommand;
 use Waaseyaa\CLI\Command\ExtensionScaffoldCommand;
+use Waaseyaa\CLI\Command\HealthCheckCommand;
+use Waaseyaa\CLI\Command\HealthReportCommand;
 use Waaseyaa\CLI\Command\FixtureGenerateCommand;
 use Waaseyaa\CLI\Command\FixturePackRefreshCommand;
 use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
@@ -47,6 +49,7 @@ use Waaseyaa\CLI\Command\Perf\PerformanceCompareCommand;
 use Waaseyaa\CLI\Command\PermissionListCommand;
 use Waaseyaa\CLI\Command\RelationshipTypeScaffoldCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
+use Waaseyaa\CLI\Command\SchemaCheckCommand;
 use Waaseyaa\CLI\Command\SchemaListCommand;
 use Waaseyaa\CLI\Command\SemanticRefreshCommand;
 use Waaseyaa\CLI\Command\SemanticWarmCommand;
@@ -62,6 +65,7 @@ use Waaseyaa\CLI\WaaseyaaApplication;
 use Waaseyaa\Config\Cache\ConfigCacheCompiler;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\FileStorage;
+use Waaseyaa\Foundation\Diagnostic\HealthChecker;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry;
 use Waaseyaa\Routing\WaaseyaaRouter;
@@ -127,6 +131,12 @@ final class ConsoleKernel extends AbstractKernel
             embeddingProvider: $embeddingProvider,
         );
         $schemaRegistry = new DefaultsSchemaRegistry($this->projectRoot . '/defaults');
+        $healthChecker = new HealthChecker(
+            bootReport: $this->getBootReport(),
+            database: $this->database,
+            entityTypeManager: $this->entityTypeManager,
+            projectRoot: $this->projectRoot,
+        );
 
         $app = new WaaseyaaApplication();
         $app->setAutoExit(false);
@@ -163,6 +173,9 @@ final class ConsoleKernel extends AbstractKernel
             new EventListCommand($this->dispatcher),
             new RouteListCommand($router),
             new SchemaListCommand($schemaRegistry),
+            new SchemaCheckCommand($healthChecker),
+            new HealthCheckCommand($healthChecker),
+            new HealthReportCommand($healthChecker, $this->projectRoot),
             new PermissionListCommand($permissionHandler),
             new SemanticWarmCommand($semanticWarmer),
             new SemanticRefreshCommand($semanticWarmer),
