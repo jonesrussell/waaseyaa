@@ -12,4 +12,15 @@ final readonly class SchemaEntry
         public string $compatibility,
         public string $schemaPath,
     ) {}
+
+    /** @return array{id: string, version: string, compatibility: string, schema_path: string} */
+    public function toArray(): array
+    {
+        return [
+            'id'            => $this->id,
+            'version'       => $this->version,
+            'compatibility' => $this->compatibility,
+            'schema_path'   => $this->schemaPath,
+        ];
+    }
 }

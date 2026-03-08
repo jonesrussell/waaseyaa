@@ -10,35 +10,16 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Waaseyaa\CLI\Command\SchemaListCommand;
-use Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry;
+use Waaseyaa\Foundation\Schema\SchemaEntry;
+use Waaseyaa\Foundation\Schema\SchemaRegistryInterface;
 
 #[CoversClass(SchemaListCommand::class)]
 final class SchemaListCommandTest extends TestCase
 {
-    private string $defaultsDir;
-
-    protected function setUp(): void
-    {
-        $this->defaultsDir = sys_get_temp_dir() . '/waaseyaa_schema_list_cmd_test_' . uniqid();
-        mkdir($this->defaultsDir, 0755, true);
-    }
-
-    protected function tearDown(): void
-    {
-        $items = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($this->defaultsDir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($items as $item) {
-            $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
-        }
-        rmdir($this->defaultsDir);
-    }
-
     #[Test]
     public function outputsNoSchemasFoundWhenRegistryIsEmpty(): void
     {
-        $tester = $this->execute();
+        $tester = $this->execute([]);
 
         $this->assertStringContainsString('No schemas found', $tester->getDisplay());
         $this->assertSame(0, $tester->getStatusCode());
@@ -47,9 +28,9 @@ final class SchemaListCommandTest extends TestCase
     #[Test]
     public function outputsTableWithSchemaDetails(): void
     {
-        $this->writeSchema('core.note', 'core.note', '0.1.0', 'liberal');
-
-        $output = $this->execute()->getDisplay();
+        $output = $this->execute([
+            new SchemaEntry('core.note', '0.1.0', 'liberal', '/defaults/core.note.schema.json'),
+        ])->getDisplay();
 
         $this->assertStringContainsString('core.note', $output);
         $this->assertStringContainsString('0.1.0', $output);
@@ -59,10 +40,10 @@ final class SchemaListCommandTest extends TestCase
     #[Test]
     public function outputsMultipleSchemasInTable(): void
     {
-        $this->writeSchema('core.note', 'core.note', '0.1.0', 'liberal');
-        $this->writeSchema('core.article', 'core.article', '0.2.0', 'strict');
-
-        $output = $this->execute()->getDisplay();
+        $output = $this->execute([
+            new SchemaEntry('core.note', '0.1.0', 'liberal', '/defaults/core.note.schema.json'),
+            new SchemaEntry('core.article', '0.2.0', 'strict', '/defaults/core.article.schema.json'),
+        ])->getDisplay();
 
         $this->assertStringContainsString('core.note', $output);
         $this->assertStringContainsString('core.article', $output);
@@ -72,9 +53,29 @@ final class SchemaListCommandTest extends TestCase
     // Helpers
     // -----------------------------------------------------------------------
 
-    private function execute(): CommandTester
+    /** @param list<SchemaEntry> $entries */
+    private function execute(array $entries): CommandTester
     {
-        $registry = new DefaultsSchemaRegistry($this->defaultsDir);
+        $registry = new class ($entries) implements SchemaRegistryInterface {
+            /** @param list<SchemaEntry> $entries */
+            public function __construct(private readonly array $entries) {}
+
+            public function list(): array
+            {
+                return $this->entries;
+            }
+
+            public function get(string $id): ?SchemaEntry
+            {
+                foreach ($this->entries as $entry) {
+                    if ($entry->id === $id) {
+                        return $entry;
+                    }
+                }
+
+                return null;
+            }
+        };
 
         $app = new Application();
         $app->add(new SchemaListCommand($registry));
@@ -84,21 +85,5 @@ final class SchemaListCommandTest extends TestCase
         $tester->execute([]);
 
         return $tester;
-    }
-
-    private function writeSchema(string $filename, string $entityType, string $version, string $compatibility): void
-    {
-        file_put_contents(
-            $this->defaultsDir . '/' . $filename . '.schema.json',
-            json_encode([
-                '$schema'    => 'http://json-schema.org/draft-07/schema#',
-                'title'      => $entityType,
-                'x-waaseyaa' => [
-                    'entity_type'   => $entityType,
-                    'version'       => $version,
-                    'compatibility' => $compatibility,
-                ],
-            ], JSON_THROW_ON_ERROR),
-        );
     }
 }

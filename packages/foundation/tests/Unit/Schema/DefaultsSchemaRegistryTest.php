@@ -154,6 +154,54 @@ final class DefaultsSchemaRegistryTest extends TestCase
     }
 
     #[Test]
+    public function listIgnoresSchemasWithMissingEntityType(): void
+    {
+        $this->writeSchema('no-type', [
+            '$schema' => 'http://json-schema.org/draft-07/schema#',
+            'x-waaseyaa' => [
+                'version'       => '0.1.0',
+                'compatibility' => 'liberal',
+            ],
+        ]);
+
+        $entries = (new DefaultsSchemaRegistry($this->defaultsDir))->list();
+
+        $this->assertSame([], $entries);
+    }
+
+    #[Test]
+    public function listIgnoresSchemasWithMissingVersion(): void
+    {
+        $this->writeSchema('no-version', [
+            '$schema' => 'http://json-schema.org/draft-07/schema#',
+            'x-waaseyaa' => [
+                'entity_type'   => 'core.note',
+                'compatibility' => 'liberal',
+            ],
+        ]);
+
+        $entries = (new DefaultsSchemaRegistry($this->defaultsDir))->list();
+
+        $this->assertSame([], $entries);
+    }
+
+    #[Test]
+    public function listIgnoresSchemasWithMissingCompatibility(): void
+    {
+        $this->writeSchema('no-compat', [
+            '$schema' => 'http://json-schema.org/draft-07/schema#',
+            'x-waaseyaa' => [
+                'entity_type' => 'core.note',
+                'version'     => '0.1.0',
+            ],
+        ]);
+
+        $entries = (new DefaultsSchemaRegistry($this->defaultsDir))->list();
+
+        $this->assertSame([], $entries);
+    }
+
+    #[Test]
     public function listMultipleSchemasInAlphabeticalOrder(): void
     {
         $this->writeSchema('core.article', [
