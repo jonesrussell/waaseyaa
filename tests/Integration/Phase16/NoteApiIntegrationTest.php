@@ -105,6 +105,32 @@ final class NoteApiIntegrationTest extends TestCase
     }
 
     // -----------------------------------------------------------------------
+    // Update access — NoteAccessPolicy returns neutral; deny-by-default applies
+    // -----------------------------------------------------------------------
+
+    #[Test]
+    public function updateWithoutExplicitAllowReturns403(): void
+    {
+        // NoteAccessPolicy returns neutral for 'update'. With deny-by-default
+        // semantics (isAllowed() = false unless a policy explicitly allows),
+        // updates are blocked until a policy grants permission. This test
+        // documents that contract explicitly.
+        $note = $this->seedNote('Existing Note');
+        $user = $this->makeUser(permissions: ['edit any note content']);
+        $controller = $this->buildController($user);
+
+        $doc = $controller->update('note', $note->id(), [
+            'data' => [
+                'type' => 'note',
+                'id' => $note->uuid(),
+                'attributes' => ['title' => 'Updated Title'],
+            ],
+        ]);
+
+        $this->assertSame(403, $doc->statusCode);
+    }
+
+    // -----------------------------------------------------------------------
     // DELETE guard — core.note is non-deletable
     // -----------------------------------------------------------------------
 

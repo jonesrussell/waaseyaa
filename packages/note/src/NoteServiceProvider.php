@@ -17,6 +17,7 @@ final class NoteServiceProvider extends ServiceProvider
             class: Note::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
             group: 'content',
+            // Field definitions mirror defaults/core.note.yaml — keep in sync.
             fieldDefinitions: [
                 'title' => [
                     'type' => 'string',

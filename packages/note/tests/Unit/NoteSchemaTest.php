@@ -11,8 +11,13 @@ use PHPUnit\Framework\TestCase;
 /**
  * Validates the defaults/core.note.schema.json file structure.
  *
- * These tests verify that the JSON Schema correctly defines required fields
- * and constraints for the core.note content type.
+ * These are structural tests — they assert that the schema file is valid JSON
+ * and that the declared fields, constraints, and required array are correct.
+ * They do not run payloads through a JSON Schema validator.
+ *
+ * Full payload validation (valid payload accepted, invalid payload rejected)
+ * will be exercised by a real JSON Schema validator once the schema registry
+ * is implemented in #207.
  */
 #[CoversNothing]
 final class NoteSchemaTest extends TestCase
