@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Waaseyaa\Note\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\FieldAccessPolicyInterface;
 use Waaseyaa\Access\Gate\PolicyAttribute;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Note\NoteAccessPolicy;
@@ -129,5 +131,182 @@ final class NoteAccessPolicyTest extends TestCase
         $this->assertCount(1, $attributes);
         $instance = $attributes[0]->newInstance();
         $this->assertContains('note', $instance->entityTypes);
+    }
+
+    #[Test]
+    public function implementsFieldAccessPolicyInterface(): void
+    {
+        $this->assertInstanceOf(FieldAccessPolicyInterface::class, $this->policy);
+    }
+
+    // -----------------------------------------------------------------------
+    // Role-based entity access
+    // -----------------------------------------------------------------------
+
+    #[Test]
+    public function tenantMemberCanViewNote(): void
+    {
+        $member = $this->accountWithRoles(['tenant.member']);
+        $result = $this->policy->access($this->entity, 'view', $member);
+        $this->assertTrue($result->isAllowed());
+    }
+
+    #[Test]
+    public function tenantAdminCanViewNote(): void
+    {
+        $admin = $this->accountWithRoles(['tenant.admin']);
+        $result = $this->policy->access($this->entity, 'view', $admin);
+        $this->assertTrue($result->isAllowed());
+    }
+
+    #[Test]
+    public function platformAdminCanViewNote(): void
+    {
+        $admin = $this->accountWithRoles(['platform.admin']);
+        $result = $this->policy->access($this->entity, 'view', $admin);
+        $this->assertTrue($result->isAllowed());
+    }
+
+    #[Test]
+    public function tenantMemberCannotUpdateNote(): void
+    {
+        $member = $this->accountWithRoles(['tenant.member']);
+        $result = $this->policy->access($this->entity, 'update', $member);
+        $this->assertTrue($result->isNeutral());
+    }
+
+    #[Test]
+    public function tenantAdminCanUpdateNote(): void
+    {
+        $admin = $this->accountWithRoles(['tenant.admin']);
+        $result = $this->policy->access($this->entity, 'update', $admin);
+        $this->assertTrue($result->isAllowed());
+    }
+
+    #[Test]
+    public function platformAdminCanUpdateNote(): void
+    {
+        $admin = $this->accountWithRoles(['platform.admin']);
+        $result = $this->policy->access($this->entity, 'update', $admin);
+        $this->assertTrue($result->isAllowed());
+    }
+
+    #[Test]
+    public function deleteIsForbiddenForPlatformAdmin(): void
+    {
+        $admin = $this->accountWithRoles(['platform.admin']);
+        $result = $this->policy->access($this->entity, 'delete', $admin);
+        $this->assertTrue($result->isForbidden());
+    }
+
+    // -----------------------------------------------------------------------
+    // Role-based create access
+    // -----------------------------------------------------------------------
+
+    #[Test]
+    public function tenantMemberCannotCreate(): void
+    {
+        $member = $this->accountWithRoles(['tenant.member']);
+        $result = $this->policy->createAccess('note', '', $member);
+        $this->assertTrue($result->isNeutral());
+    }
+
+    #[Test]
+    public function tenantAdminCanCreate(): void
+    {
+        $admin = $this->accountWithRoles(['tenant.admin']);
+        $result = $this->policy->createAccess('note', '', $admin);
+        $this->assertTrue($result->isAllowed());
+    }
+
+    #[Test]
+    public function platformAdminCanCreate(): void
+    {
+        $admin = $this->accountWithRoles(['platform.admin']);
+        $result = $this->policy->createAccess('note', '', $admin);
+        $this->assertTrue($result->isAllowed());
+    }
+
+    // -----------------------------------------------------------------------
+    // Field-level access: system fields
+    // -----------------------------------------------------------------------
+
+    /** @return array<string, array{string}> */
+    public static function systemFieldProvider(): array
+    {
+        return [
+            'id'         => ['id'],
+            'uuid'       => ['uuid'],
+            'tenant_id'  => ['tenant_id'],
+            'created_at' => ['created_at'],
+            'updated_at' => ['updated_at'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('systemFieldProvider')]
+    public function systemFieldEditIsForbiddenForTenantMember(string $field): void
+    {
+        $member = $this->accountWithRoles(['tenant.member']);
+        $result = $this->policy->fieldAccess($this->entity, $field, 'edit', $member);
+        $this->assertTrue($result->isForbidden());
+    }
+
+    #[Test]
+    #[DataProvider('systemFieldProvider')]
+    public function systemFieldEditIsForbiddenForTenantAdmin(string $field): void
+    {
+        $admin = $this->accountWithRoles(['tenant.admin']);
+        $result = $this->policy->fieldAccess($this->entity, $field, 'edit', $admin);
+        $this->assertTrue($result->isForbidden());
+    }
+
+    #[Test]
+    #[DataProvider('systemFieldProvider')]
+    public function systemFieldEditIsNeutralForPlatformAdmin(string $field): void
+    {
+        $admin = $this->accountWithRoles(['platform.admin']);
+        $result = $this->policy->fieldAccess($this->entity, $field, 'edit', $admin);
+        $this->assertTrue($result->isNeutral());
+    }
+
+    #[Test]
+    #[DataProvider('systemFieldProvider')]
+    public function systemFieldViewIsNeutralForAll(string $field): void
+    {
+        $member = $this->accountWithRoles(['tenant.member']);
+        $result = $this->policy->fieldAccess($this->entity, $field, 'view', $member);
+        $this->assertTrue($result->isNeutral());
+    }
+
+    #[Test]
+    public function userFieldEditIsNeutralForTenantAdmin(): void
+    {
+        $admin = $this->accountWithRoles(['tenant.admin']);
+        $result = $this->policy->fieldAccess($this->entity, 'title', 'edit', $admin);
+        $this->assertTrue($result->isNeutral());
+    }
+
+    #[Test]
+    public function userFieldEditIsNeutralForTenantMember(): void
+    {
+        $member = $this->accountWithRoles(['tenant.member']);
+        $result = $this->policy->fieldAccess($this->entity, 'body', 'edit', $member);
+        $this->assertTrue($result->isNeutral());
+    }
+
+    // -----------------------------------------------------------------------
+    // Helpers
+    // -----------------------------------------------------------------------
+
+    private function accountWithRoles(array $roles): AccountInterface
+    {
+        return new class($roles) implements AccountInterface {
+            public function __construct(private readonly array $roles) {}
+            public function id(): int { return 42; }
+            public function isAuthenticated(): bool { return true; }
+            public function hasPermission(string $permission): bool { return false; }
+            public function getRoles(): array { return $this->roles; }
+        };
     }
 }
