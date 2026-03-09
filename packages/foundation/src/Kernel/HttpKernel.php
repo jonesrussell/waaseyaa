@@ -1948,7 +1948,7 @@ final class HttpKernel extends AbstractKernel
             return $configured;
         }
 
-        return $this->projectRoot . '/files';
+        return $this->projectRoot . '/storage/files';
     }
 
     private function resolveUploadMaxBytes(): int

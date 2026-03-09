@@ -12,7 +12,7 @@ return [
     'config_dir' => getenv('WAASEYAA_CONFIG_DIR') ?: __DIR__ . '/sync',
 
     // File storage root for LocalFileRepository (media package).
-    'files_dir' => getenv('WAASEYAA_FILES_DIR') ?: __DIR__ . '/../files',
+    'files_dir' => getenv('WAASEYAA_FILES_DIR') ?: __DIR__ . '/../storage/files',
 
     // Bearer auth settings for machine clients.
     // JWT uses HS256 with this shared secret.
