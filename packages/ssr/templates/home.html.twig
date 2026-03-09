@@ -147,6 +147,21 @@
       line-height: 1.5;
     }
 
+    .card-hint {
+      font-size: 0.75rem;
+      color: #6B7280;
+      margin-top: 8px;
+      line-height: 1.4;
+    }
+
+    .card-hint code {
+      background: rgba(245, 158, 11, 0.1);
+      color: #F59E0B;
+      padding: 1px 5px;
+      border-radius: 3px;
+      font-size: 0.7rem;
+    }
+
     .card-arrow {
       display: inline-block;
       margin-top: 16px;
@@ -355,12 +370,14 @@
           <div class="card-label">Interface</div>
           <h3 class="card-title">Admin SPA</h3>
           <div class="card-desc">Manage content, entities, and configuration through the admin dashboard.</div>
+          <div class="card-hint">Requires <code>npm run dev</code> in <code>packages/admin</code></div>
           <span class="card-arrow">/admin &rarr;</span>
         </a>
         <a href="/api" class="card">
           <div class="card-label">Endpoint</div>
           <h3 class="card-title">API</h3>
           <div class="card-desc">Explore the JSON:API endpoints for your entity types and resources.</div>
+          <div class="card-hint">Try <code>/api/{type}</code> — e.g. <code>/api/node</code>, <code>/api/user</code></div>
           <span class="card-arrow">/api &rarr;</span>
         </a>
         <a href="https://github.com/waaseyaa/framework" target="_blank" rel="noopener noreferrer" class="card">

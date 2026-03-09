@@ -58,6 +58,7 @@ use Waaseyaa\Mcp\McpController;
 use Waaseyaa\Relationship\RelationshipDiscoveryService;
 use Waaseyaa\Relationship\RelationshipTraversalService;
 use Waaseyaa\User\Middleware\BearerAuthMiddleware;
+use Waaseyaa\User\Middleware\CsrfMiddleware;
 use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\SessionMiddleware;
 use Waaseyaa\Workflows\EditorialVisibilityResolver;
@@ -155,6 +156,7 @@ final class HttpKernel extends AbstractKernel
                 $userStorage,
                 $this->shouldUseDevFallbackAccount() ? new DevAdminAccount() : null,
             ))
+            ->withMiddleware(new CsrfMiddleware())
             ->withMiddleware(new AuthorizationMiddleware($accessChecker));
 
         try {
@@ -1260,6 +1262,20 @@ final class HttpKernel extends AbstractKernel
 
         $instance = $this->resolveControllerInstance($class, $twig, $account, $httpRequest);
         $response = $instance->{$method}($params, $query, $account, $httpRequest);
+
+        if (!$response instanceof HttpResponse) {
+            $route = $httpRequest->attributes->get('_route_object');
+            $isRenderRoute = $route instanceof \Symfony\Component\Routing\Route
+                && $route->getOption('_render') === true;
+            if (!$isRenderRoute) {
+                error_log(sprintf(
+                    '[Waaseyaa] Controller %s::%s returned SsrResponse on a non-render route. '
+                    . 'Add ->render() to the RouteBuilder chain to fix SSR dispatch.',
+                    $class,
+                    $method,
+                ));
+            }
+        }
 
         if ($response instanceof HttpResponse) {
             $cacheMaxAge = $this->resolveRenderCacheMaxAge();

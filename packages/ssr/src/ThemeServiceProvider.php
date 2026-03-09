@@ -7,6 +7,7 @@ namespace Waaseyaa\SSR;
 use Twig\Environment;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFunction;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
 final class ThemeServiceProvider extends ServiceProvider
@@ -44,11 +45,21 @@ final class ThemeServiceProvider extends ServiceProvider
 
         $loader = self::createTemplateChainLoader($projectRoot, $activeTheme);
 
-        return new Environment($loader, [
+        $env = new Environment($loader, [
             'cache' => false,
             'auto_reload' => true,
             'strict_variables' => false,
         ]);
+
+        if (class_exists(\Waaseyaa\User\Middleware\CsrfMiddleware::class)) {
+            $env->addFunction(new TwigFunction(
+                'csrf_token',
+                [\Waaseyaa\User\Middleware\CsrfMiddleware::class, 'token'],
+                ['is_safe' => ['html']],
+            ));
+        }
+
+        return $env;
     }
 
     public static function createTemplateChainLoader(string $projectRoot, string $activeTheme = ''): ChainLoader

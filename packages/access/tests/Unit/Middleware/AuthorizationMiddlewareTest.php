@@ -174,4 +174,89 @@ final class AuthorizationMiddlewareTest extends TestCase
         $this->assertSame(403, $response->getStatusCode());
         $this->assertStringContainsString('No authenticated account', $response->getContent());
     }
+
+    #[Test]
+    public function render_route_401_redirects_to_login(): void
+    {
+        $route = new Route('/dashboard');
+        $route->setOption('_authenticated', true);
+        $route->setOption('_render', true);
+
+        $account = new AnonymousUser();
+        $accessChecker = new AccessChecker();
+        $middleware = new AuthorizationMiddleware($accessChecker);
+
+        $request = Request::create('/dashboard');
+        $request->attributes->set('_account', $account);
+        $request->attributes->set('_route_object', $route);
+
+        $next = new class implements HttpHandlerInterface {
+            public function handle(Request $request): Response
+            {
+                return new Response('should not reach here');
+            }
+        };
+
+        $response = $middleware->process($request, $next);
+
+        $this->assertSame(302, $response->getStatusCode());
+        $this->assertSame('/login?redirect=%2Fdashboard', $response->headers->get('Location'));
+    }
+
+    #[Test]
+    public function render_route_403_returns_html_error_page(): void
+    {
+        $route = new Route('/admin/settings');
+        $route->setOption('_permission', 'administer site');
+        $route->setOption('_render', true);
+
+        $account = new AnonymousUser();
+        $accessChecker = new AccessChecker();
+        $middleware = new AuthorizationMiddleware($accessChecker);
+
+        $request = Request::create('/admin/settings');
+        $request->attributes->set('_account', $account);
+        $request->attributes->set('_route_object', $route);
+
+        $next = new class implements HttpHandlerInterface {
+            public function handle(Request $request): Response
+            {
+                return new Response('should not reach here');
+            }
+        };
+
+        $response = $middleware->process($request, $next);
+
+        $this->assertSame(403, $response->getStatusCode());
+        $this->assertStringContainsString('text/html', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('Forbidden', $response->getContent());
+        $this->assertStringContainsString('Sign in', $response->getContent());
+    }
+
+    #[Test]
+    public function api_route_403_still_returns_json(): void
+    {
+        $route = new Route('/api/admin');
+        $route->setOption('_permission', 'administer site');
+
+        $account = new AnonymousUser();
+        $accessChecker = new AccessChecker();
+        $middleware = new AuthorizationMiddleware($accessChecker);
+
+        $request = Request::create('/api/admin');
+        $request->attributes->set('_account', $account);
+        $request->attributes->set('_route_object', $route);
+
+        $next = new class implements HttpHandlerInterface {
+            public function handle(Request $request): Response
+            {
+                return new Response('should not reach here');
+            }
+        };
+
+        $response = $middleware->process($request, $next);
+
+        $this->assertSame(403, $response->getStatusCode());
+        $this->assertStringContainsString('application/vnd.api+json', $response->headers->get('Content-Type'));
+    }
 }
