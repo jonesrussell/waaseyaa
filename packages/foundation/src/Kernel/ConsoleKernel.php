@@ -202,6 +202,13 @@ final class ConsoleKernel extends AbstractKernel
             new TelescopePruneCommand(),
         ]);
 
+        foreach ($this->providers as $provider) {
+            $pluginCommands = $provider->commands($this->entityTypeManager, $this->database, $this->dispatcher);
+            if ($pluginCommands !== []) {
+                $app->registerCommands($pluginCommands);
+            }
+        }
+
         return $app->run();
     }
 }

@@ -29,6 +29,19 @@ abstract class ServiceProvider implements ServiceProviderInterface
 
     public function routes(\Waaseyaa\Routing\WaaseyaaRouter $router): void {}
 
+    /**
+     * Return plugin CLI commands to register with the console application.
+     *
+     * @return list<\Symfony\Component\Console\Command\Command>
+     */
+    public function commands(
+        \Waaseyaa\Entity\EntityTypeManager $entityTypeManager,
+        \Waaseyaa\Database\PdoDatabase $database,
+        \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher,
+    ): array {
+        return [];
+    }
+
     public function provides(): array
     {
         return [];
