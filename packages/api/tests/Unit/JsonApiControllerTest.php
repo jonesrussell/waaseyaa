@@ -201,6 +201,38 @@ final class JsonApiControllerTest extends TestCase
         $this->assertSame('404', $array['errors'][0]['status']);
     }
 
+    #[Test]
+    public function storeRejectsEmptyBundleType(): void
+    {
+        $doc = $this->controller->store('article', [
+            'data' => [
+                'type' => 'article',
+                'attributes' => ['title' => 'No Bundle', 'type' => ''],
+            ],
+        ]);
+
+        $array = $doc->toArray();
+        $this->assertArrayHasKey('errors', $array);
+        $this->assertSame('422', $array['errors'][0]['status']);
+        $this->assertStringContainsString('type', $array['errors'][0]['detail']);
+    }
+
+    #[Test]
+    public function storeRejectsEmptyLabel(): void
+    {
+        $doc = $this->controller->store('article', [
+            'data' => [
+                'type' => 'article',
+                'attributes' => ['title' => '', 'type' => 'blog_post'],
+            ],
+        ]);
+
+        $array = $doc->toArray();
+        $this->assertArrayHasKey('errors', $array);
+        $this->assertSame('422', $array['errors'][0]['status']);
+        $this->assertStringContainsString('title', $array['errors'][0]['detail']);
+    }
+
     // --- Update (PATCH) ---
 
     #[Test]

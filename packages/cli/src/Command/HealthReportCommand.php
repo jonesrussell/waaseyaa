@@ -40,6 +40,12 @@ final class HealthReportCommand extends Command
         $healthResults = $this->checker->runAll();
         $ingestionSummary = $this->gatherIngestionSummary();
 
+        $outputFile = $input->getOption('output');
+        if ($outputFile !== null && !$input->getOption('json')) {
+            $output->writeln('<error>The --output option requires --json. Use: health:report --json --output report.json</error>');
+            return self::FAILURE;
+        }
+
         if ($input->getOption('json')) {
             $report = [
                 'generated_at' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
@@ -53,7 +59,6 @@ final class HealthReportCommand extends Command
 
             $json = json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
 
-            $outputFile = $input->getOption('output');
             if ($outputFile !== null) {
                 file_put_contents($outputFile, $json . "\n");
                 $output->writeln(sprintf('<info>Report written to %s</info>', $outputFile));
@@ -135,7 +140,13 @@ final class HealthReportCommand extends Command
     private function gatherIngestionSummary(): array
     {
         $logger = new IngestionLogger($this->projectRoot);
-        $entries = $logger->read();
+
+        try {
+            $entries = $logger->read();
+        } catch (\Throwable $e) {
+            error_log(sprintf('[Waaseyaa] Failed to read ingestion log: %s', $e->getMessage()));
+            return [];
+        }
 
         if ($entries === []) {
             return [];

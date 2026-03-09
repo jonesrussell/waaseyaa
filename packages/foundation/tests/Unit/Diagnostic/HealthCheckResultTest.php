@@ -87,4 +87,35 @@ final class HealthCheckResultTest extends TestCase
         $this->assertArrayNotHasKey('remediation', $arr);
         $this->assertArrayNotHasKey('context', $arr);
     }
+
+    #[Test]
+    public function toArrayFiltersAllNullContextValues(): void
+    {
+        $result = HealthCheckResult::fail(
+            'Test',
+            DiagnosticCode::DATABASE_SCHEMA_DRIFT,
+            'Drift detected.',
+            ['table' => null, 'drift' => null],
+        );
+
+        $arr = $result->toArray();
+
+        $this->assertArrayNotHasKey('context', $arr);
+    }
+
+    #[Test]
+    public function toArrayKeepsNonNullContextValues(): void
+    {
+        $result = HealthCheckResult::fail(
+            'Test',
+            DiagnosticCode::DATABASE_SCHEMA_DRIFT,
+            'Drift detected.',
+            ['table' => 'node', 'drift' => null],
+        );
+
+        $arr = $result->toArray();
+
+        $this->assertArrayHasKey('context', $arr);
+        $this->assertSame(['table' => 'node'], $arr['context']);
+    }
 }

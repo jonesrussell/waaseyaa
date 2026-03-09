@@ -86,6 +86,24 @@ final class HealthReportCommandTest extends TestCase
         $this->assertArrayHasKey('system', $decoded);
     }
 
+    #[Test]
+    public function outputWithoutJsonReturnsFailure(): void
+    {
+        $checker = $this->createMock(HealthCheckerInterface::class);
+        $checker->method('runAll')->willReturn([
+            HealthCheckResult::pass('Database', 'OK'),
+        ]);
+
+        $outputFile = $this->projectRoot . '/report.json';
+
+        $tester = $this->createTester($checker);
+        $tester->execute(['--output' => $outputFile]);
+
+        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $this->assertStringContainsString('--json', $tester->getDisplay());
+        $this->assertFileDoesNotExist($outputFile);
+    }
+
     private function createTester(HealthCheckerInterface $checker): CommandTester
     {
         $app = new Application();

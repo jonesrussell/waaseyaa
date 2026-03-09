@@ -189,19 +189,45 @@ final class JsonApiController
 
         $attributes = $data['data']['attributes'] ?? [];
 
-        // Auto-generate machine name for config entities if ID is empty.
+        // Validate required fields for content entities.
         $definition = $this->entityTypeManager->getDefinition($entityTypeId);
         $keys = $definition->getKeys();
+
+        // Bundle validation: if bundle key is explicitly provided but empty, reject it.
+        $bundleKey = $keys['bundle'] ?? null;
+        if ($bundleKey !== null && isset($keys['uuid'])
+            && array_key_exists($bundleKey, $attributes) && trim((string) $attributes[$bundleKey]) === '') {
+            return $this->errorDocument(
+                JsonApiError::unprocessable(
+                    "The '{$bundleKey}' attribute cannot be empty for {$entityTypeId} entities.",
+                ),
+            );
+        }
+
+        // Label validation: if entity type has a label key, require non-empty value.
+        $labelKey = $keys['label'] ?? null;
+        if ($labelKey !== null && array_key_exists($labelKey, $attributes)) {
+            $labelValue = trim((string) ($attributes[$labelKey] ?? ''));
+            if ($labelValue === '') {
+                return $this->errorDocument(
+                    JsonApiError::unprocessable(
+                        "The '{$labelKey}' field cannot be empty.",
+                    ),
+                );
+            }
+        }
+
+        // Auto-generate machine name for config entities if ID is empty.
         if (!isset($keys['uuid'])) {
             $idKey = $keys['id'] ?? 'id';
-            $labelKey = $keys['label'] ?? 'label';
+            $configLabelKey = $keys['label'] ?? 'label';
             if ((!isset($attributes[$idKey]) || $attributes[$idKey] === '')
-                && isset($attributes[$labelKey]) && $attributes[$labelKey] !== '') {
-                $machineName = self::toMachineName((string) $attributes[$labelKey]);
+                && isset($attributes[$configLabelKey]) && $attributes[$configLabelKey] !== '') {
+                $machineName = self::toMachineName((string) $attributes[$configLabelKey]);
                 if ($machineName === '') {
                     return $this->errorDocument(
                         JsonApiError::unprocessable(
-                            "Cannot generate a machine name from label '{$attributes[$labelKey]}'. "
+                            "Cannot generate a machine name from label '{$attributes[$configLabelKey]}'. "
                             . 'Provide an explicit ID or use a label with alphanumeric characters.',
                         ),
                     );
@@ -239,7 +265,21 @@ final class JsonApiController
             }
         }
 
-        $storage->save($entity);
+        try {
+            $storage->save($entity);
+        } catch (\PDOException $e) {
+            if (str_contains($e->getMessage(), 'UNIQUE constraint failed')
+                || str_starts_with($e->getCode(), '23')) {
+                return $this->errorDocument(
+                    new JsonApiError(
+                        '409',
+                        'Conflict',
+                        sprintf("An entity of type '%s' with this ID already exists.", $entityTypeId),
+                    ),
+                );
+            }
+            throw $e;
+        }
 
         $resource = $this->serializer->serialize($entity, $this->accessHandler, $this->account);
 

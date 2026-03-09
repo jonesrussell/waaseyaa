@@ -67,8 +67,9 @@ final class HealthCheckResult
             $result['remediation'] = $this->remediation;
         }
 
-        if ($this->context !== []) {
-            $result['context'] = $this->context;
+        $filteredContext = array_filter($this->context, static fn(mixed $v): bool => $v !== null);
+        if ($filteredContext !== []) {
+            $result['context'] = $filteredContext;
         }
 
         return $result;

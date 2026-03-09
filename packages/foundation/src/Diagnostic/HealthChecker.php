@@ -178,6 +178,7 @@ final class HealthChecker implements HealthCheckerInterface
 
             if (!$schema->tableExists($tableName)) {
                 // Table doesn't exist yet (lazy creation) — not drift, just uninitialized.
+                error_log(sprintf('[Waaseyaa] Schema drift: skipping %s — table %s does not exist (lazy creation)', $id, $tableName));
                 continue;
             }
 
