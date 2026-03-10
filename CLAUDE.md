@@ -20,14 +20,20 @@ When working on files matching these patterns, retrieve the spec for deep contex
 | `packages/access/*`, `packages/user/src/Middleware/*` | `waaseyaa:access-control` | `docs/specs/access-control.md`, `docs/specs/field-access.md` |
 | `packages/api/*`, `packages/routing/*` | `waaseyaa:api-layer` | `docs/specs/api-layer.md` |
 | `packages/admin/*` | `waaseyaa:admin-spa` | `docs/specs/admin-spa.md` |
-| `packages/ai-*/*` | `waaseyaa:ai-integration` | `docs/specs/ai-integration.md` |
-| `packages/foundation/src/Ingestion/*`, `defaults/ingestion.*` | `waaseyaa:ingestion` | `docs/specs/ingestion-defaults.md` |
+| `packages/ai-*/*` | `waaseyaa:ai-integration` | `docs/specs/ai-integration.md`, `docs/specs/authoring-assist-contract.md`, `docs/specs/semantic-refresh-trigger-contract.md` |
+| `packages/foundation/src/Ingestion/*`, `defaults/ingestion.*` | `waaseyaa:ingestion` | `docs/specs/ingestion-defaults.md`, `docs/specs/ingestion-validator-contract.md`, `docs/specs/ingestion-validation-gates-contract.md`, `docs/specs/ingestion-fixture-pack-contract.md`, `docs/specs/ingestion-editorial-dashboard-contract.md`, `docs/specs/source-adapter-contract.md`, `docs/specs/source-connectors-contract.md`, `docs/specs/source-priority-merge-contract.md`, `docs/specs/cross-source-identity-contract.md` |
 | `defaults/*`, `bin/check-no-secrets`, `bin/check-ingestion-defaults` | `waaseyaa:security-defaults` | `docs/specs/security-defaults.md` |
-| `packages/foundation/src/Diagnostic/*`, `packages/cli/src/Command/Health*`, `packages/cli/src/Command/SchemaCheck*` | `waaseyaa:operator-diagnostics` | `docs/specs/operator-diagnostics.md` |
-| `packages/foundation/*`, `packages/cache/*`, `packages/database-legacy/*`, `packages/plugin/*` | `waaseyaa:infrastructure` | `docs/specs/infrastructure.md`, `docs/specs/package-discovery.md`, `docs/specs/plugin-extension-points.md`, `docs/specs/external-extension-sdk.md`, `docs/specs/extension-compatibility-matrix.md`, `docs/specs/extension-release-playbook.md`, `docs/specs/extension-author-onboarding.md` |
+| `packages/foundation/src/Diagnostic/*`, `packages/cli/src/Command/Health*`, `packages/cli/src/Command/SchemaCheck*` | `waaseyaa:operator-diagnostics` | `docs/specs/operator-diagnostics.md`, `docs/specs/operations-playbooks.md` |
+| `packages/foundation/*`, `packages/cache/*`, `packages/database-legacy/*`, `packages/plugin/*`, `packages/i18n/*`, `packages/queue/*`, `packages/state/*`, `packages/validation/*`, `packages/typed-data/*`, `packages/testing/*` | `waaseyaa:infrastructure` | `docs/specs/infrastructure.md`, `docs/specs/package-discovery.md`, `docs/specs/plugin-extension-points.md`, `docs/specs/external-extension-sdk.md`, `docs/specs/extension-compatibility-matrix.md`, `docs/specs/extension-release-playbook.md`, `docs/specs/extension-author-onboarding.md` |
 | `packages/mcp/*` | `waaseyaa:mcp-endpoint` | `docs/specs/mcp-endpoint.md` |
 | `public/index.php`, `packages/*/src/Middleware/*` | `waaseyaa:middleware-pipeline` | `docs/specs/middleware-pipeline.md` |
-| GitHub issues, milestones, new features, roadmap | — | `docs/specs/workflow.md` |
+| `packages/note/*` | — | `docs/specs/ingestion-defaults.md` |
+| `packages/relationship/*` | — | `docs/specs/relationship-modeling.md`, `docs/specs/relationship-inference-contract.md` |
+| `packages/search/*` | — | — |
+| `packages/ssr/*` | — | — |
+| `packages/telescope/*` | — | — |
+| `packages/workflows/*` | — | — |
+| GitHub issues, milestones, new features, roadmap | — | `docs/specs/workflow.md`, `docs/specs/v1.5-verification-gate-contract.md`, `docs/specs/v1.6-verification-gate-contract.md` |
 
 Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the mapping isn't obvious.
 
@@ -42,8 +48,8 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 |---|---|---|
 | 0 | Foundation | foundation, cache, plugin, typed-data, database-legacy, testing, i18n, queue, state, validation |
 | 1 | Core Data | entity, entity-storage, access, user, config, field |
-| 2 | Content Types | node, taxonomy, media, path, menu |
-| 3 | Services | workflows |
+| 2 | Content Types | node, taxonomy, media, path, menu, note, relationship |
+| 3 | Services | workflows, search |
 | 4 | API | api, routing |
 | 5 | AI | ai-schema, ai-agent, ai-pipeline, ai-vector |
 | 6 | Interfaces | cli, admin, mcp, ssr, telescope |
