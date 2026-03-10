@@ -25,56 +25,67 @@ final class EntityTypeLifecycleManager
      *
      * @return string[]
      */
-    public function getDisabledTypeIds(): array
+    public function getDisabledTypeIds(?string $tenantId = null): array
     {
-        $file = $this->statusFile();
+        $status = $this->readStatus();
+        $tenantId = $this->normalizeTenantId($tenantId);
 
-        if (!file_exists($file)) {
-            return [];
+        if ($tenantId !== null) {
+            $tenantDisabled = $status['tenants'][$tenantId] ?? [];
+            if ($status['disabled'] === []) {
+                return $tenantDisabled;
+            }
+
+            return array_values(array_unique(array_merge($status['disabled'], $tenantDisabled)));
         }
 
-        try {
-            /** @var array{disabled?: string[]} $data */
-            $data = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
-
-            return $data['disabled'] ?? [];
-        } catch (\JsonException) {
-            return [];
-        }
+        return $status['disabled'];
     }
 
-    public function isDisabled(string $entityTypeId): bool
+    /**
+     * @return string[]
+     */
+    public function getTenantIds(): array
     {
-        return in_array($entityTypeId, $this->getDisabledTypeIds(), true);
+        $status = $this->readStatus();
+
+        return array_keys($status['tenants']);
+    }
+
+    public function isDisabled(string $entityTypeId, ?string $tenantId = null): bool
+    {
+        return in_array($entityTypeId, $this->getDisabledTypeIds($tenantId), true);
     }
 
     /**
      * Disable an entity type, recording the actor in the audit log.
      */
-    public function disable(string $entityTypeId, int|string $actorId): void
+    public function disable(string $entityTypeId, int|string $actorId, ?string $tenantId = null): void
     {
-        $disabled = $this->getDisabledTypeIds();
+        $tenantId = $this->normalizeTenantId($tenantId);
+        $disabled = $this->getDisabledTypeIds($tenantId);
 
         if (!in_array($entityTypeId, $disabled, true)) {
             $disabled[] = $entityTypeId;
         }
 
-        $this->writeStatus($disabled);
-        $this->appendAudit($entityTypeId, 'disabled', $actorId);
+        $this->writeStatus($disabled, $tenantId);
+        $this->appendAudit($entityTypeId, 'disabled', $actorId, $tenantId);
     }
 
     /**
      * Re-enable a disabled entity type, recording the actor in the audit log.
      */
-    public function enable(string $entityTypeId, int|string $actorId): void
+    public function enable(string $entityTypeId, int|string $actorId, ?string $tenantId = null): void
     {
+        $tenantId = $this->normalizeTenantId($tenantId);
         $disabled = array_values(array_filter(
-            $this->getDisabledTypeIds(),
+            $this->getDisabledTypeIds($tenantId),
             static fn(string $id): bool => $id !== $entityTypeId,
         ));
 
-        $this->writeStatus($disabled);
-        $this->appendAudit($entityTypeId, 'enabled', $actorId);
+        $this->writeStatus($disabled, $tenantId);
+        $this->appendAudit($entityTypeId, 'enabled', $actorId, $tenantId);
     }
 
     /**
@@ -82,7 +93,7 @@ final class EntityTypeLifecycleManager
      *
      * @return list<array{entity_type_id: string, action: string, actor_id: string, timestamp: string}>
      */
-    public function readAuditLog(string $entityTypeFilter = ''): array
+    public function readAuditLog(string $entityTypeFilter = '', ?string $tenantId = null): array
     {
         $file = $this->auditFile();
 
@@ -98,12 +109,18 @@ final class EntityTypeLifecycleManager
 
         $entries = [];
 
+        $tenantId = $this->normalizeTenantId($tenantId);
+
         foreach ($lines as $line) {
             try {
-                /** @var array{entity_type_id: string, action: string, actor_id: string, timestamp: string} $entry */
+                /** @var array{entity_type_id: string, action: string, actor_id: string, timestamp: string, tenant_id?: string} $entry */
                 $entry = json_decode($line, true, 512, JSON_THROW_ON_ERROR);
+                $entryTenant = isset($entry['tenant_id']) ? (string) $entry['tenant_id'] : null;
 
-                if ($entityTypeFilter === '' || $entry['entity_type_id'] === $entityTypeFilter) {
+                $typeMatch = $entityTypeFilter === '' || $entry['entity_type_id'] === $entityTypeFilter;
+                $tenantMatch = $tenantId === null || $entryTenant === $tenantId;
+
+                if ($typeMatch && $tenantMatch) {
                     $entries[] = $entry;
                 }
             } catch (\JsonException) {
@@ -118,31 +135,49 @@ final class EntityTypeLifecycleManager
     // Private helpers
     // -----------------------------------------------------------------------
 
-    /** @param string[] $disabled */
-    private function writeStatus(array $disabled): void
+    /**
+     * @param string[] $disabled
+     */
+    private function writeStatus(array $disabled, ?string $tenantId = null): void
     {
+        $tenantId = $this->normalizeTenantId($tenantId);
+        $status = $this->readStatus();
+
+        if ($tenantId === null) {
+            $status['disabled'] = array_values($disabled);
+        } else {
+            $status['tenants'][$tenantId] = array_values($disabled);
+        }
+
         $file = $this->statusFile();
         $this->ensureDirectory(dirname($file));
 
         $tmp = $file . '.tmp.' . getmypid();
         file_put_contents(
             $tmp,
-            json_encode(['disabled' => array_values($disabled)], JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT),
+            json_encode($status, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT),
         );
         rename($tmp, $file);
     }
 
-    private function appendAudit(string $entityTypeId, string $action, int|string $actorId): void
+    private function appendAudit(string $entityTypeId, string $action, int|string $actorId, ?string $tenantId = null): void
     {
         $file = $this->auditFile();
         $this->ensureDirectory(dirname($file));
 
-        $entry = json_encode([
+        $payload = [
             'entity_type_id' => $entityTypeId,
             'action'         => $action,
             'actor_id'       => (string) $actorId,
             'timestamp'      => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
-        ], JSON_THROW_ON_ERROR);
+        ];
+
+        $tenantId = $this->normalizeTenantId($tenantId);
+        if ($tenantId !== null) {
+            $payload['tenant_id'] = $tenantId;
+        }
+
+        $entry = json_encode($payload, JSON_THROW_ON_ERROR);
 
         file_put_contents($file, $entry . "\n", FILE_APPEND | LOCK_EX);
     }
@@ -162,5 +197,36 @@ final class EntityTypeLifecycleManager
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
+    }
+
+    /**
+     * @return array{disabled: string[], tenants: array<string, string[]>}
+     */
+    private function readStatus(): array
+    {
+        $file = $this->statusFile();
+
+        if (!file_exists($file)) {
+            return ['disabled' => [], 'tenants' => []];
+        }
+
+        try {
+            /** @var array{disabled?: string[], tenants?: array<string, string[]>} $data */
+            $data = json_decode((string) file_get_contents($file), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return ['disabled' => [], 'tenants' => []];
+        }
+
+        return [
+            'disabled' => array_values($data['disabled'] ?? []),
+            'tenants' => $data['tenants'] ?? [],
+        ];
+    }
+
+    private function normalizeTenantId(?string $tenantId): ?string
+    {
+        $tenantId = $tenantId !== null ? trim($tenantId) : null;
+
+        return $tenantId !== '' ? $tenantId : null;
     }
 }

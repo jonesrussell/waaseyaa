@@ -23,15 +23,31 @@ const groupOrder: string[] = [
   'ai',
 ]
 
+const defaultGroupById: Record<string, string> = {
+  user: 'people',
+  node: 'content',
+  node_type: 'content',
+  taxonomy_term: 'taxonomy',
+  taxonomy_vocabulary: 'taxonomy',
+  media: 'media',
+  media_type: 'media',
+  path_alias: 'structure',
+  menu: 'structure',
+  menu_link: 'structure',
+  workflow: 'workflows',
+  pipeline: 'workflows',
+}
+
 export function groupEntityTypes(entityTypes: EntityTypeInfo[]): ResolvedNavGroup[] {
   const grouped = new Map<string, EntityTypeInfo[]>()
   const ungrouped: EntityTypeInfo[] = []
 
   for (const et of entityTypes) {
-    if (et.group) {
-      const list = grouped.get(et.group) ?? []
+    const key = et.group ?? defaultGroupById[et.id] ?? null
+    if (key) {
+      const list = grouped.get(key) ?? []
       list.push(et)
-      grouped.set(et.group, list)
+      grouped.set(key, list)
     } else {
       ungrouped.push(et)
     }

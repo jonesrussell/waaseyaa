@@ -40,6 +40,7 @@ use Waaseyaa\CLI\Command\Make\MakeProviderCommand;
 use Waaseyaa\CLI\Command\Make\MakeTestCommand;
 use Waaseyaa\CLI\Command\MakeEntityTypeCommand;
 use Waaseyaa\CLI\Command\MakePluginCommand;
+use Waaseyaa\CLI\Command\MigrateDefaultsCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeClearCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeConfigCommand;
@@ -58,6 +59,7 @@ use Waaseyaa\CLI\Command\Telescope\TelescopeListCommand;
 use Waaseyaa\CLI\Command\Telescope\TelescopePruneCommand;
 use Waaseyaa\CLI\Command\TypeDisableCommand;
 use Waaseyaa\CLI\Command\TypeEnableCommand;
+use Waaseyaa\Entity\EntityTypeIdNormalizer;
 use Waaseyaa\CLI\Command\UserCreateCommand;
 use Waaseyaa\CLI\Command\UserRoleCommand;
 use Waaseyaa\CLI\Command\WorkflowScaffoldCommand;
@@ -138,6 +140,8 @@ final class ConsoleKernel extends AbstractKernel
             projectRoot: $this->projectRoot,
         );
 
+        $typeIdNormalizer = new EntityTypeIdNormalizer($this->entityTypeManager);
+
         $app = new WaaseyaaApplication();
         $app->setAutoExit(false);
 
@@ -152,6 +156,13 @@ final class ConsoleKernel extends AbstractKernel
             new UserCreateCommand($this->entityTypeManager),
             new UserRoleCommand($this->entityTypeManager),
             new MakePluginCommand(),
+            new MigrateDefaultsCommand(
+                $this->entityTypeManager,
+                $this->lifecycleManager,
+                $this->entityAuditLogger,
+                $this->projectRoot,
+                $typeIdNormalizer,
+            ),
             new MakeEntityTypeCommand(),
             new MakeEntityCommand(),
             new MakeJobCommand(),
@@ -167,8 +178,8 @@ final class ConsoleKernel extends AbstractKernel
                 'environment' => getenv('APP_ENV') ?: 'production',
             ]),
             new EntityTypeListCommand($this->entityTypeManager),
-            new TypeDisableCommand($this->entityTypeManager, $this->lifecycleManager),
-            new TypeEnableCommand($this->entityTypeManager, $this->lifecycleManager),
+            new TypeDisableCommand($this->entityTypeManager, $this->lifecycleManager, $typeIdNormalizer),
+            new TypeEnableCommand($this->entityTypeManager, $this->lifecycleManager, $typeIdNormalizer),
             new AuditLogCommand($this->lifecycleManager, $this->entityAuditLogger),
             new EventListCommand($this->dispatcher),
             new RouteListCommand($router),

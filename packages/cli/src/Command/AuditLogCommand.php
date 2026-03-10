@@ -30,6 +30,7 @@ final class AuditLogCommand extends Command
     {
         $this
             ->addOption('type', null, InputOption::VALUE_REQUIRED, 'Filter lifecycle log by entity type ID (e.g. note)', '')
+            ->addOption('tenant', null, InputOption::VALUE_REQUIRED, 'Filter lifecycle log by tenant ID', '')
             ->addOption('entity-type', null, InputOption::VALUE_REQUIRED, 'Show entity-write audit log, optionally filtered by type (e.g. note)', null);
     }
 
@@ -43,13 +44,16 @@ final class AuditLogCommand extends Command
 
         /** @var string $typeFilter */
         $typeFilter = $input->getOption('type') ?? '';
+        /** @var string $tenantFilter */
+        $tenantFilter = $input->getOption('tenant') ?? '';
 
-        return $this->showLifecycleLog($typeFilter, $output);
+        return $this->showLifecycleLog($typeFilter, $tenantFilter, $output);
     }
 
-    private function showLifecycleLog(string $typeFilter, OutputInterface $output): int
+    private function showLifecycleLog(string $typeFilter, string $tenantFilter, OutputInterface $output): int
     {
-        $entries = $this->lifecycleManager->readAuditLog($typeFilter);
+        $tenantFilter = trim($tenantFilter);
+        $entries = $this->lifecycleManager->readAuditLog($typeFilter, $tenantFilter !== '' ? $tenantFilter : null);
 
         if ($entries === []) {
             $output->writeln($typeFilter !== ''
@@ -61,12 +65,13 @@ final class AuditLogCommand extends Command
         }
 
         $table = new Table($output);
-        $table->setHeaders(['Entity Type', 'Action', 'Actor', 'Timestamp']);
+        $table->setHeaders(['Entity Type', 'Action', 'Tenant', 'Actor', 'Timestamp']);
 
         foreach ($entries as $entry) {
             $table->addRow([
                 $entry['entity_type_id'] ?? '',
                 $entry['action']         ?? '',
+                $entry['tenant_id']      ?? '',
                 $entry['actor_id']       ?? '',
                 $entry['timestamp']      ?? '',
             ]);

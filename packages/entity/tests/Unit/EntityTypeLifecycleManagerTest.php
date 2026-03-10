@@ -38,6 +38,7 @@ final class EntityTypeLifecycleManagerTest extends TestCase
     public function noTypesDisabledByDefault(): void
     {
         $this->assertSame([], $this->manager->getDisabledTypeIds());
+        $this->assertSame([], $this->manager->getDisabledTypeIds('acme'));
     }
 
     #[Test]
@@ -101,9 +102,12 @@ final class EntityTypeLifecycleManagerTest extends TestCase
     public function statusPersistsAcrossInstances(): void
     {
         $this->manager->disable('note', 1);
+        $this->manager->disable('article', 2, 'acme');
 
         $another = new EntityTypeLifecycleManager($this->projectRoot);
         $this->assertContains('note', $another->getDisabledTypeIds());
+        $this->assertContains('article', $another->getDisabledTypeIds('acme'));
+        $this->assertContains('note', $another->getDisabledTypeIds('acme'));
     }
 
     // -----------------------------------------------------------------------
@@ -114,13 +118,15 @@ final class EntityTypeLifecycleManagerTest extends TestCase
     public function disableWritesAuditEntry(): void
     {
         $this->manager->disable('note', 42);
+        $this->manager->disable('article', 7, 'acme');
 
         $entries = $this->manager->readAuditLog();
-        $this->assertCount(1, $entries);
+        $this->assertCount(2, $entries);
         $this->assertSame('note', $entries[0]['entity_type_id']);
         $this->assertSame('disabled', $entries[0]['action']);
         $this->assertSame('42', $entries[0]['actor_id']);
         $this->assertArrayHasKey('timestamp', $entries[0]);
+        $this->assertSame('acme', $entries[1]['tenant_id']);
     }
 
     #[Test]
@@ -139,11 +145,22 @@ final class EntityTypeLifecycleManagerTest extends TestCase
     public function readAuditLogFiltersbyEntityType(): void
     {
         $this->manager->disable('note', 1);
-        $this->manager->disable('article', 1);
+        $this->manager->disable('article', 1, 'acme');
 
         $noteEntries = $this->manager->readAuditLog('note');
         $this->assertCount(1, $noteEntries);
         $this->assertSame('note', $noteEntries[0]['entity_type_id']);
+    }
+
+    #[Test]
+    public function readAuditLogFiltersByTenant(): void
+    {
+        $this->manager->disable('note', 1, 'acme');
+        $this->manager->disable('note', 1, 'beta');
+
+        $entries = $this->manager->readAuditLog('', 'beta');
+        $this->assertCount(1, $entries);
+        $this->assertSame('beta', $entries[0]['tenant_id']);
     }
 
     #[Test]
@@ -170,13 +187,35 @@ final class EntityTypeLifecycleManagerTest extends TestCase
     public function isDisabledReturnsTrueForDisabledType(): void
     {
         $this->manager->disable('note', 1);
+        $this->manager->disable('article', 1, 'acme');
 
         $this->assertTrue($this->manager->isDisabled('note'));
+        $this->assertTrue($this->manager->isDisabled('article', 'acme'));
+        $this->assertFalse($this->manager->isDisabled('article'));
     }
 
     #[Test]
     public function isDisabledReturnsFalseForEnabledType(): void
     {
         $this->assertFalse($this->manager->isDisabled('note'));
+        $this->assertFalse($this->manager->isDisabled('note', 'acme'));
+    }
+
+    #[Test]
+    public function tenantScopedDisableDoesNotAffectGlobal(): void
+    {
+        $this->manager->disable('note', 1, 'acme');
+
+        $this->assertSame([], $this->manager->getDisabledTypeIds());
+        $this->assertSame(['note'], $this->manager->getDisabledTypeIds('acme'));
+    }
+
+    #[Test]
+    public function globalDisableAppliesToTenantView(): void
+    {
+        $this->manager->disable('note', 1);
+
+        $this->assertSame(['note'], $this->manager->getDisabledTypeIds());
+        $this->assertContains('note', $this->manager->getDisabledTypeIds('acme'));
     }
 }

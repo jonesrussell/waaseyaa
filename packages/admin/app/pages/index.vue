@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useLanguage } from '~/composables/useLanguage'
+import { useEntity } from '~/composables/useEntity'
 import type { EntityTypeInfo } from '~/composables/useNavGroups'
+import OnboardingPrompt from '~/components/onboarding/OnboardingPrompt.vue'
 
 const { t, entityLabel } = useLanguage()
 const config = useRuntimeConfig()
@@ -9,6 +11,10 @@ useHead({ title: computed(() => `${t('dashboard')} | ${config.public.appName}`) 
 const entityTypes = ref<EntityTypeInfo[]>([])
 const loading = ref(true)
 const loadError = ref<string | null>(null)
+const onboardingReady = ref(false)
+const showOnboarding = ref(false)
+const onboardingError = ref<string | null>(null)
+const { list } = useEntity()
 
 onMounted(async () => {
   try {
@@ -27,6 +33,21 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+onMounted(async () => {
+  onboardingReady.value = false
+  onboardingError.value = null
+  try {
+    const result = await list('node_type', { page: { offset: 0, limit: 1 } })
+    const total = typeof result.meta?.total === 'number' ? result.meta.total : result.data.length
+    showOnboarding.value = total === 0
+  } catch (e: unknown) {
+    console.error('[Waaseyaa] Failed to detect onboarding state:', e)
+    onboardingError.value = (e as any)?.data?.errors?.[0]?.detail ?? (e instanceof Error ? e.message : null)
+  } finally {
+    onboardingReady.value = true
+  }
+})
 </script>
 
 <template>
@@ -34,6 +55,14 @@ onMounted(async () => {
     <div class="page-header">
       <h1>{{ t('dashboard') }}</h1>
     </div>
+
+    <OnboardingPrompt
+      v-if="onboardingReady && showOnboarding"
+      :docs-url="config.public.docsUrl"
+      note-path="/note/create"
+      custom-type-path="/node_type/create"
+    />
+    <div v-else-if="onboardingReady && onboardingError" class="error">{{ onboardingError }}</div>
 
     <IngestSummaryWidget />
 
