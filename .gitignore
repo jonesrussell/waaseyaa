@@ -34,3 +34,5 @@ storage/
 .playwright-mcp/
 mcp/node_modules/
 
+bin/
+
