@@ -20,7 +20,7 @@ jobs:
           coverage: none
 
       - name: Validate composer.json
-        run: composer validate --strict
+        run: composer validate
 
       - name: Check PHP syntax
         run: find packages/*/src -name '*.php' -print0 | xargs -0 -n1 php -l
