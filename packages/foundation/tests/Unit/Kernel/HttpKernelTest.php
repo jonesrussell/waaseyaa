@@ -15,6 +15,7 @@ use Waaseyaa\Cache\TagAwareCacheInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
+use Waaseyaa\Foundation\Http\CorsHandler;
 use Waaseyaa\Foundation\Kernel\AbstractKernel;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
 use Waaseyaa\User\AnonymousUser;
@@ -74,11 +75,9 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function resolve_cors_headers_for_allowed_origin(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
-        $method->setAccessible(true);
+        $handler = new CorsHandler(allowedOrigins: ['http://localhost:3000']);
 
-        $headers = $method->invoke($kernel, 'http://localhost:3000', ['http://localhost:3000'], false);
+        $headers = $handler->resolveCorsHeaders('http://localhost:3000');
 
         $this->assertCount(5, $headers);
         $this->assertContains('Access-Control-Allow-Origin: http://localhost:3000', $headers);
@@ -88,11 +87,9 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function resolve_cors_headers_for_disallowed_origin_returns_empty_list(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
-        $method->setAccessible(true);
+        $handler = new CorsHandler(allowedOrigins: ['http://localhost:3000']);
 
-        $headers = $method->invoke($kernel, 'http://evil.test', ['http://localhost:3000'], false);
+        $headers = $handler->resolveCorsHeaders('http://evil.test');
 
         $this->assertSame([], $headers);
     }
@@ -100,38 +97,32 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function resolve_cors_headers_allows_localhost_any_port_in_development_mode(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
-        $method->setAccessible(true);
+        $handler = new CorsHandler(allowedOrigins: ['http://localhost:3000'], allowDevLocalhostPorts: true);
 
-        $headers = $method->invoke($kernel, 'http://localhost:4321', ['http://localhost:3000'], true);
+        $headers = $handler->resolveCorsHeaders('http://localhost:4321');
         $this->assertContains('Access-Control-Allow-Origin: http://localhost:4321', $headers);
 
-        $headersLoopback = $method->invoke($kernel, 'http://127.0.0.1:5173', ['http://localhost:3000'], true);
+        $headersLoopback = $handler->resolveCorsHeaders('http://127.0.0.1:5173');
         $this->assertContains('Access-Control-Allow-Origin: http://127.0.0.1:5173', $headersLoopback);
     }
 
     #[Test]
     public function resolve_cors_headers_does_not_allow_non_localhost_in_development_mode(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
-        $method->setAccessible(true);
+        $handler = new CorsHandler(allowedOrigins: ['http://localhost:3000'], allowDevLocalhostPorts: true);
 
-        $headers = $method->invoke($kernel, 'http://example.com:3001', ['http://localhost:3000'], true);
+        $headers = $handler->resolveCorsHeaders('http://example.com:3001');
         $this->assertSame([], $headers);
     }
 
     #[Test]
     public function detects_cors_preflight_request_method(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'isCorsPreflightRequest');
-        $method->setAccessible(true);
+        $handler = new CorsHandler();
 
-        $this->assertTrue($method->invoke($kernel, 'OPTIONS'));
-        $this->assertTrue($method->invoke($kernel, 'options'));
-        $this->assertFalse($method->invoke($kernel, 'GET'));
+        $this->assertTrue($handler->isCorsPreflightRequest('OPTIONS'));
+        $this->assertTrue($handler->isCorsPreflightRequest('options'));
+        $this->assertFalse($handler->isCorsPreflightRequest('GET'));
     }
 
     #[Test]
