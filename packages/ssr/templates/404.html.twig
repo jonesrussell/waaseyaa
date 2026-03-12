@@ -1,13 +1,8 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>404 Not Found</title>
-</head>
-<body>
-  <main>
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}404 Not Found{% endblock %}
+
+{% block body %}
     <h1>Not Found</h1>
     <p>{{ path }}</p>
-  </main>
-</body>
-</html>
+{% endblock %}

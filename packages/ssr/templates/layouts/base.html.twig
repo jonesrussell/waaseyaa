@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="{{ lang|default('en') }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %}</title>
+  {% block meta %}{% endblock %}
+  {% block styles %}{% endblock %}
+</head>
+<body>
+  <header>
+    {% block header %}{% endblock %}
+  </header>
+
+  <main>
+    {% block body %}{% endblock %}
+  </main>
+
+  <footer>
+    {% block footer %}{% endblock %}
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>
