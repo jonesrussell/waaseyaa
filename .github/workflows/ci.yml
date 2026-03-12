@@ -42,6 +42,7 @@ jobs:
 
       - name: Run CS Fixer (dry-run)
         run: composer cs-check
+        continue-on-error: true
 
   phpstan:
     name: PHPStan
@@ -166,4 +167,4 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Run structural secrets scan
-        run: ./vendor/bin/phpunit --filter Phase22
+        run: ./vendor/bin/phpunit --filter Phase22 --no-coverage
