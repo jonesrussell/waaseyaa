@@ -376,6 +376,16 @@ parameters:
 			path: packages/foundation/src/Discovery/PackageManifestCompiler.php
 
 		-
+			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
+			count: 1
+			path: packages/foundation/src/Http/ControllerDispatcher.php
+
+		-
+			message: "#^Offset 'event' on array\\{id\\: int, channel\\: string, event\\: string, data\\: array, created_at\\: float\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/foundation/src/Http/ControllerDispatcher.php
+
+		-
 			message: "#^Parameter \\#1 \\$dispatcher of class Waaseyaa\\\\CLI\\\\Command\\\\EventListCommand constructor expects Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcherInterface, Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface given\\.$#"
 			count: 1
 			path: packages/foundation/src/Kernel/ConsoleKernel.php
@@ -388,37 +398,7 @@ parameters:
 		-
 			message: "#^Call to an undefined method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:addListener\\(\\)\\.$#"
 			count: 10
-			path: packages/foundation/src/Kernel/HttpKernel.php
-
-		-
-			message: "#^Call to function is_bool\\(\\) with string\\|null will always evaluate to false\\.$#"
-			count: 1
-			path: packages/foundation/src/Kernel/HttpKernel.php
-
-		-
-			message: "#^Call to function is_int\\(\\) with string\\|null will always evaluate to false\\.$#"
-			count: 1
-			path: packages/foundation/src/Kernel/HttpKernel.php
-
-		-
-			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
-			count: 1
-			path: packages/foundation/src/Kernel/HttpKernel.php
-
-		-
-			message: "#^Offset 'event' on array\\{id\\: int, channel\\: string, event\\: string, data\\: array, created_at\\: float\\} on left side of \\?\\? always exists and is not nullable\\.$#"
-			count: 1
-			path: packages/foundation/src/Kernel/HttpKernel.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between \\*NEVER\\* and 1 will always evaluate to false\\.$#"
-			count: 1
-			path: packages/foundation/src/Kernel/HttpKernel.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between non\\-empty\\-array\\<int, string\\> and array\\{\\} will always evaluate to false\\.$#"
-			count: 1
-			path: packages/foundation/src/Kernel/HttpKernel.php
+			path: packages/foundation/src/Kernel/EventListenerRegistrar.php
 
 		-
 			message: "#^Parameter \\#1 \\$columnNames of method Doctrine\\\\DBAL\\\\Schema\\\\Table\\:\\:setPrimaryKey\\(\\) expects non\\-empty\\-array\\<int, string\\>, array given\\.$#"
@@ -457,18 +437,28 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Waaseyaa\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#"
-			count: 13
-			path: packages/mcp/src/McpController.php
+			count: 1
+			path: packages/mcp/src/Tools/DiscoveryTools.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#"
+			count: 2
+			path: packages/mcp/src/Tools/McpTool.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#"
+			count: 10
+			path: packages/mcp/src/Tools/TraversalTools.php
 
 		-
 			message: "#^Offset 'inverse' on array\\{relationship\\: Waaseyaa\\\\Entity\\\\EntityInterface, related_entity_type\\: string, related_entity_id\\: string, direction\\: string, inverse\\: bool\\} on left side of \\?\\? always exists and is not nullable\\.$#"
 			count: 1
-			path: packages/mcp/src/McpController.php
+			path: packages/mcp/src/Tools/TraversalTools.php
 
 		-
 			message: "#^Offset 'total' on array\\{outbound\\: int, inbound\\: int, total\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
 			count: 1
-			path: packages/mcp/src/McpController.php
+			path: packages/mcp/src/Tools/TraversalTools.php
 
 		-
 			message: "#^Dead catch \\- ReflectionException is never thrown in the try block\\.$#"
@@ -534,3 +524,23 @@ parameters:
 			message: "#^Result of && is always true\\.$#"
 			count: 1
 			path: packages/ssr/src/FieldFormatterRegistry.php
+
+		-
+			message: "#^Call to function is_bool\\(\\) with string\\|null will always evaluate to false\\.$#"
+			count: 1
+			path: packages/ssr/src/SsrPageHandler.php
+
+		-
+			message: "#^Call to function is_int\\(\\) with string\\|null will always evaluate to false\\.$#"
+			count: 1
+			path: packages/ssr/src/SsrPageHandler.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between \\*NEVER\\* and 1 will always evaluate to false\\.$#"
+			count: 1
+			path: packages/ssr/src/SsrPageHandler.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between non\\-empty\\-array\\<int, string\\> and array\\{\\} will always evaluate to false\\.$#"
+			count: 1
+			path: packages/ssr/src/SsrPageHandler.php
