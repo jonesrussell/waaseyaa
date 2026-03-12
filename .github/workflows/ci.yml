@@ -25,6 +25,43 @@ jobs:
       - name: Check PHP syntax
         run: find packages/*/src -name '*.php' -print0 | xargs -0 -n1 php -l
 
+  cs-check:
+    name: CS Fixer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run CS Fixer (dry-run)
+        run: composer cs-check
+        continue-on-error: true
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHPStan
+        run: composer phpstan
+
   test:
     name: PHPUnit
     runs-on: ubuntu-latest
@@ -36,7 +73,7 @@ jobs:
         with:
           php-version: '8.4'
           extensions: pdo_sqlite, sqlite3, mbstring, xml
-          coverage: none
+          coverage: pcov
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
@@ -46,6 +83,14 @@ jobs:
 
       - name: Run integration tests
         run: ./vendor/bin/phpunit --testsuite Integration
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: build/logs/clover.xml
+          retention-days: 14
 
   manifest-conformance:
     name: Manifest conformance
@@ -122,4 +167,4 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Run structural secrets scan
-        run: ./vendor/bin/phpunit --filter Phase22
+        run: ./vendor/bin/phpunit --filter Phase22 --no-coverage

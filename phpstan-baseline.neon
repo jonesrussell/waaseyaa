@@ -1,0 +1,536 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Offset 'id' on array\\{id\\: string, score\\: float\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/ai-vector/src/SearchController.php
+
+		-
+			message: "#^Offset 'score' on array\\{id\\: non\\-empty\\-string, score\\: float\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/ai-vector/src/SearchController.php
+
+		-
+			message: "#^Result of && is always true\\.$#"
+			count: 1
+			path: packages/ai-vector/src/SearchController.php
+
+		-
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			count: 1
+			path: packages/ai-vector/src/SemanticIndexWarmer.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Waaseyaa\\\\Api\\\\ResourceSerializer\\:\\:serialize\\(\\) expects Waaseyaa\\\\Entity\\\\EntityInterface, Waaseyaa\\\\Api\\\\MutableTranslatableInterface given\\.$#"
+			count: 1
+			path: packages/api/src/Controller/TranslationController.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Waaseyaa\\\\Api\\\\ResourceSerializer\\:\\:serialize\\(\\) expects Waaseyaa\\\\Entity\\\\EntityInterface, Waaseyaa\\\\Entity\\\\TranslatableInterface given\\.$#"
+			count: 3
+			path: packages/api/src/Controller/TranslationController.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Waaseyaa\\\\Entity\\\\Storage\\\\EntityStorageInterface\\:\\:save\\(\\) expects Waaseyaa\\\\Entity\\\\EntityInterface, Waaseyaa\\\\Api\\\\MutableTranslatableInterface given\\.$#"
+			count: 1
+			path: packages/api/src/Controller/TranslationController.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Waaseyaa\\\\Entity\\\\Storage\\\\EntityStorageInterface\\:\\:save\\(\\) expects Waaseyaa\\\\Entity\\\\EntityInterface, Waaseyaa\\\\Entity\\\\TranslatableInterface given\\.$#"
+			count: 2
+			path: packages/api/src/Controller/TranslationController.php
+
+		-
+			message: "#^Offset 'action' on array\\{entity_type_id\\: string, action\\: string, actor_id\\: string, timestamp\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/AuditLogCommand.php
+
+		-
+			message: "#^Offset 'actor_id' on array\\{entity_type_id\\: string, action\\: string, actor_id\\: string, timestamp\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/AuditLogCommand.php
+
+		-
+			message: "#^Offset 'entity_type_id' on array\\{entity_type_id\\: string, action\\: string, actor_id\\: string, timestamp\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/AuditLogCommand.php
+
+		-
+			message: "#^Offset 'tenant_id' on array\\{entity_type_id\\: string, action\\: string, actor_id\\: string, timestamp\\: string\\} on left side of \\?\\? does not exist\\.$#"
+			count: 1
+			path: packages/cli/src/Command/AuditLogCommand.php
+
+		-
+			message: "#^Offset 'timestamp' on array\\{entity_type_id\\: string, action\\: string, actor_id\\: string, timestamp\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/AuditLogCommand.php
+
+		-
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			count: 1
+			path: packages/cli/src/Command/DebugContextCommand.php
+
+		-
+			message: "#^Match arm is unreachable because previous comparison is always true\\.$#"
+			count: 1
+			path: packages/cli/src/Command/FixtureGenerateCommand.php
+
+		-
+			message: "#^Offset 'key' on array\\{key\\: string, relationship_type\\: string, from\\: string, to\\: string, inference_confidence\\: float\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Command/IngestRunCommand.php
+
+		-
+			message: "#^Offset 'location' on array\\{code\\: string, category\\: string, message\\: string, location\\: string, item_index\\: null, context\\: array\\{from\\: string, to\\: string, relationship_type\\: string, inference_confidence\\: float, inference_source\\: string, inference_review_state\\: string\\}\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Command/IngestRunCommand.php
+
+		-
+			message: "#^Offset 'needs_refresh' on array\\{needs_refresh\\: bool, primary_category\\: string\\|null, trigger_count\\: int, categories\\: array\\<int, string\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/IngestRunCommand.php
+
+		-
+			message: "#^Offset 'description' on array\\{title\\: string, description\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/PermissionListCommand.php
+
+		-
+			message: "#^Offset 'title' on array\\{title\\: string, description\\: string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/PermissionListCommand.php
+
+		-
+			message: "#^Offset 'batch_processed' on array\\{contract_version\\: string, contract_surface\\: string, status\\: string, requested_entity_types\\: array\\<int, string\\>, batch_size\\: int, batch_processed\\: int, stored_total\\: int, removed_total\\: int, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/SemanticRefreshCommand.php
+
+		-
+			message: "#^Offset 'duration_ms' on array\\{contract_version\\: string, contract_surface\\: string, status\\: string, requested_entity_types\\: array\\<int, string\\>, batch_size\\: int, batch_processed\\: int, stored_total\\: int, removed_total\\: int, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/SemanticRefreshCommand.php
+
+		-
+			message: "#^Offset 'missing_total' on array\\{contract_version\\: string, contract_surface\\: string, status\\: string, requested_entity_types\\: array\\<int, string\\>, batch_size\\: int, batch_processed\\: int, stored_total\\: int, removed_total\\: int, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/SemanticRefreshCommand.php
+
+		-
+			message: "#^Offset 'removed_total' on array\\{contract_version\\: string, contract_surface\\: string, status\\: string, requested_entity_types\\: array\\<int, string\\>, batch_size\\: int, batch_processed\\: int, stored_total\\: int, removed_total\\: int, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/SemanticRefreshCommand.php
+
+		-
+			message: "#^Offset 'status' on array\\{contract_version\\: string, contract_surface\\: string, status\\: string, requested_entity_types\\: array\\<int, string\\>, batch_size\\: int, batch_processed\\: int, stored_total\\: int, removed_total\\: int, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Command/SemanticRefreshCommand.php
+
+		-
+			message: "#^Offset 'stored_total' on array\\{contract_version\\: string, contract_surface\\: string, status\\: string, requested_entity_types\\: array\\<int, string\\>, batch_size\\: int, batch_processed\\: int, stored_total\\: int, removed_total\\: int, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/SemanticRefreshCommand.php
+
+		-
+			message: "#^Call to method getEntries\\(\\) on an unknown class Waaseyaa\\\\CLI\\\\Command\\\\Telescope\\\\TelescopeStoreInterface\\.$#"
+			count: 1
+			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
+
+		-
+			message: "#^Offset 'summary' on array\\{time\\: string, type\\: string, summary\\: string, duration\\?\\: float\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
+
+		-
+			message: "#^Offset 'time' on array\\{time\\: string, type\\: string, summary\\: string, duration\\?\\: float\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
+
+		-
+			message: "#^Offset 'type' on array\\{time\\: string, type\\: string, summary\\: string, duration\\?\\: float\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
+
+		-
+			message: "#^Parameter \\$store of method Waaseyaa\\\\CLI\\\\Command\\\\Telescope\\\\TelescopeListCommand\\:\\:__construct\\(\\) has invalid type Waaseyaa\\\\CLI\\\\Command\\\\Telescope\\\\TelescopeStoreInterface\\.$#"
+			count: 1
+			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
+
+		-
+			message: "#^Property Waaseyaa\\\\CLI\\\\Command\\\\Telescope\\\\TelescopeListCommand\\:\\:\\$store has unknown class Waaseyaa\\\\CLI\\\\Command\\\\Telescope\\\\TelescopeStoreInterface as its type\\.$#"
+			count: 1
+			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
+
+		-
+			message: "#^Call to an undefined method Symfony\\\\Component\\\\Console\\\\Helper\\\\HelperInterface\\:\\:ask\\(\\)\\.$#"
+			count: 1
+			path: packages/cli/src/Command/TypeDisableCommand.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#"
+			count: 1
+			path: packages/cli/src/Command/UserRoleCommand.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\Entity\\\\EntityInterface\\:\\:set\\(\\)\\.$#"
+			count: 1
+			path: packages/cli/src/Command/UserRoleCommand.php
+
+		-
+			message: "#^Offset 'confidence' on array\\{suggestion_id\\: string, title\\: string, body\\: string, confidence\\: float, source_item_index\\: int, tags\\?\\: non\\-empty\\-array\\<int, string\\>, provenance\\: string, explainability\\: array\\{primary_cue\\: string, supporting_cues\\: array\\<int, string\\>, inference_edges_used\\: array\\<int, string\\>, validation_signals\\: array\\<int, string\\>\\}\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/AuthoringAssistBuilder.php
+
+		-
+			message: "#^Offset 'cue' on array\\{cue\\: non\\-falsy\\-string, weight\\: 50\\|100\\|200\\|300\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/AuthoringAssistBuilder.php
+
+		-
+			message: "#^Offset 'cue' on array\\{cue\\: string, weight\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/AuthoringAssistBuilder.php
+
+		-
+			message: "#^Offset 'location' on array\\{code\\: string, message\\: string, location\\: string, item_index\\: int, context\\: array\\{source_item_index\\: int, source_uri\\: string\\}\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/AuthoringAssistBuilder.php
+
+		-
+			message: "#^Offset 'source_item_index' on array\\{suggestion_id\\: string, title\\: string, body\\: string, confidence\\: float, source_item_index\\: int, tags\\?\\: non\\-empty\\-array\\<int, string\\>, provenance\\: string, explainability\\: array\\{primary_cue\\: string, supporting_cues\\: array\\<int, string\\>, inference_edges_used\\: array\\<int, string\\>, validation_signals\\: array\\<int, string\\>\\}\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/AuthoringAssistBuilder.php
+
+		-
+			message: "#^Offset 'suggestion_id' on array\\{suggestion_id\\: string, title\\: string, body\\: string, confidence\\: float, source_item_index\\: int, tags\\?\\: non\\-empty\\-array\\<int, string\\>, provenance\\: string, explainability\\: array\\{primary_cue\\: string, supporting_cues\\: array\\<int, string\\>, inference_edges_used\\: array\\<int, string\\>, validation_signals\\: array\\<int, string\\>\\}\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/AuthoringAssistBuilder.php
+
+		-
+			message: "#^Offset 'weight' on array\\{cue\\: string, weight\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/AuthoringAssistBuilder.php
+
+		-
+			message: "#^Offset 1 on array\\{string, non\\-empty\\-string\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/AuthoringAssistBuilder.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between non\\-falsy\\-string and '' will always evaluate to false\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/AuthoringAssistBuilder.php
+
+		-
+			message: "#^Offset 'canonical_id' on non\\-empty\\-array\\<string, mixed\\> on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/CrossSourceIdentityResolver.php
+
+		-
+			message: "#^Comparison operation \"\\>\" between int\\<1, max\\> and 0 is always true\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/RelationshipInferenceEngine.php
+
+		-
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/RelationshipInferenceEngine.php
+
+		-
+			message: "#^Offset 'key' on array\\{key\\: string, relationship_type\\: string, from\\: string, to\\: string, status\\: int, start_date\\: null, end_date\\: null, source_ref\\: string, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/RelationshipInferenceEngine.php
+
+		-
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/SchemaDiagnosticEmitter.php
+
+		-
+			message: "#^Offset 'adapter_type' on array\\{raw_source_uri\\: string, adapter_type\\: string, ownership\\: string, synthetic_flag\\: bool, batch_id\\: string, ingested_at\\: string, parser_version\\: string\\|null, metadata\\?\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/SourceAdapterNormalizer.php
+
+		-
+			message: "#^Offset 'batch_id' on array\\{raw_source_uri\\: string, adapter_type\\: string, ownership\\: string, synthetic_flag\\: bool, batch_id\\: string, ingested_at\\: string, parser_version\\: string\\|null, metadata\\?\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/SourceAdapterNormalizer.php
+
+		-
+			message: "#^Offset 'ingested_at' on array\\{raw_source_uri\\: string, adapter_type\\: string, ownership\\: string, synthetic_flag\\: bool, batch_id\\: string, ingested_at\\: string, parser_version\\: string\\|null, metadata\\?\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/SourceAdapterNormalizer.php
+
+		-
+			message: "#^Offset 'ownership' on array\\{raw_source_uri\\: string, adapter_type\\: string, ownership\\: string, synthetic_flag\\: bool, batch_id\\: string, ingested_at\\: string, parser_version\\: string\\|null, metadata\\?\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/SourceAdapterNormalizer.php
+
+		-
+			message: "#^Offset 'raw_source_uri' on array\\{raw_source_uri\\: string, adapter_type\\: string, ownership\\: string, synthetic_flag\\: bool, batch_id\\: string, ingested_at\\: string, parser_version\\: string\\|null, metadata\\?\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/SourceAdapterNormalizer.php
+
+		-
+			message: "#^Offset 'synthetic_flag' on array\\{raw_source_uri\\: string, adapter_type\\: string, ownership\\: string, synthetic_flag\\: bool, batch_id\\: string, ingested_at\\: string, parser_version\\: string\\|null, metadata\\?\\: array\\<string, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/cli/src/Ingestion/SourceAdapterNormalizer.php
+
+		-
+			message: "#^Offset 'category' on array\\{code\\: string, category\\: string, message\\: string, location\\: string, item_index\\: mixed, context\\: array\\<string, array\\<bool\\|float\\|int\\|string\\>\\|bool\\|float\\|int\\|string\\|null\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/ValidationDiagnosticEmitter.php
+
+		-
+			message: "#^Offset 'code' on array\\{code\\: string, category\\: string, message\\: string, location\\: string, item_index\\: mixed, context\\: array\\<string, array\\<bool\\|float\\|int\\|string\\>\\|bool\\|float\\|int\\|string\\|null\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/ValidationDiagnosticEmitter.php
+
+		-
+			message: "#^Offset 'location' on array\\{code\\: string, category\\: string, message\\: string, location\\: string, item_index\\: mixed, context\\: array\\<string, array\\<bool\\|float\\|int\\|string\\>\\|bool\\|float\\|int\\|string\\|null\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/cli/src/Ingestion/ValidationDiagnosticEmitter.php
+
+		-
+			message: "#^Call to function array_is_list\\(\\) with array\\<string, mixed\\> will always evaluate to false\\.$#"
+			count: 2
+			path: packages/database-legacy/src/Query/PdoInsert.php
+
+		-
+			message: "#^Empty array passed to foreach\\.$#"
+			count: 1
+			path: packages/database-legacy/src/Query/PdoSelect.php
+
+		-
+			message: "#^Match arm is unreachable because previous comparison is always true\\.$#"
+			count: 3
+			path: packages/database-legacy/src/Query/PdoSelect.php
+
+		-
+			message: "#^Method Psr\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+			count: 4
+			path: packages/entity-storage/src/EntityRepository.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#"
+			count: 1
+			path: packages/entity-storage/src/SqlEntityStorage.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\Entity\\\\EntityInterface\\:\\:set\\(\\)\\.$#"
+			count: 2
+			path: packages/entity-storage/src/SqlEntityStorage.php
+
+		-
+			message: "#^Method Psr\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+			count: 4
+			path: packages/entity-storage/src/SqlEntityStorage.php
+
+		-
+			message: "#^Empty array passed to foreach\\.$#"
+			count: 1
+			path: packages/entity-storage/src/UnitOfWork.php
+
+		-
+			message: "#^Method Psr\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:dispatch\\(\\) invoked with 2 parameters, 1 required\\.$#"
+			count: 2
+			path: packages/entity-storage/src/UnitOfWork.php
+
+		-
+			message: "#^Default value of the parameter \\#5 \\$storageClass \\(string\\) of method Waaseyaa\\\\Entity\\\\Attribute\\\\EntityTypeAttribute\\:\\:__construct\\(\\) is incompatible with type class\\-string\\.$#"
+			count: 1
+			path: packages/entity/src/Attribute/EntityTypeAttribute.php
+
+		-
+			message: "#^Default value of the parameter \\#4 \\$storageClass \\(string\\) of method Waaseyaa\\\\Entity\\\\EntityType\\:\\:__construct\\(\\) is incompatible with type class\\-string\\<Waaseyaa\\\\Entity\\\\Storage\\\\EntityStorageInterface\\>\\.$#"
+			count: 1
+			path: packages/entity/src/EntityType.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between class\\-string\\<Waaseyaa\\\\Entity\\\\Storage\\\\EntityStorageInterface\\> and '' will always evaluate to false\\.$#"
+			count: 1
+			path: packages/entity/src/EntityTypeManager.php
+
+		-
+			message: "#^Method Waaseyaa\\\\Field\\\\FieldItemBase\\:\\:getProperties\\(\\) should return array\\<string, Waaseyaa\\\\TypedData\\\\DataDefinitionInterface\\> but returns array\\<Waaseyaa\\\\Field\\\\PropertyValue\\>\\.$#"
+			count: 1
+			path: packages/field/src/FieldItemBase.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\TypedData\\\\TypedDataInterface\\:\\:get\\(\\)\\.$#"
+			count: 1
+			path: packages/field/src/FieldItemList.php
+
+		-
+			message: "#^Comparison operation \"\\>\" between int\\<1, max\\> and 0 is always true\\.$#"
+			count: 1
+			path: packages/foundation/src/Diagnostic/HealthChecker.php
+
+		-
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			count: 1
+			path: packages/foundation/src/Diagnostic/HealthChecker.php
+
+		-
+			message: "#^Right side of && is always true\\.$#"
+			count: 1
+			path: packages/foundation/src/Discovery/PackageManifestCompiler.php
+
+		-
+			message: "#^Parameter \\#1 \\$dispatcher of class Waaseyaa\\\\CLI\\\\Command\\\\EventListCommand constructor expects Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcherInterface, Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface given\\.$#"
+			count: 1
+			path: packages/foundation/src/Kernel/ConsoleKernel.php
+
+		-
+			message: "#^Parameter \\#3 \\$eventDispatcher of class Waaseyaa\\\\Config\\\\ConfigManager constructor expects Symfony\\\\Component\\\\EventDispatcher\\\\EventDispatcherInterface, Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface given\\.$#"
+			count: 1
+			path: packages/foundation/src/Kernel/ConsoleKernel.php
+
+		-
+			message: "#^Call to an undefined method Symfony\\\\Contracts\\\\EventDispatcher\\\\EventDispatcherInterface\\:\\:addListener\\(\\)\\.$#"
+			count: 10
+			path: packages/foundation/src/Kernel/HttpKernel.php
+
+		-
+			message: "#^Call to function is_bool\\(\\) with string\\|null will always evaluate to false\\.$#"
+			count: 1
+			path: packages/foundation/src/Kernel/HttpKernel.php
+
+		-
+			message: "#^Call to function is_int\\(\\) with string\\|null will always evaluate to false\\.$#"
+			count: 1
+			path: packages/foundation/src/Kernel/HttpKernel.php
+
+		-
+			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
+			count: 1
+			path: packages/foundation/src/Kernel/HttpKernel.php
+
+		-
+			message: "#^Offset 'event' on array\\{id\\: int, channel\\: string, event\\: string, data\\: array, created_at\\: float\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/foundation/src/Kernel/HttpKernel.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between \\*NEVER\\* and 1 will always evaluate to false\\.$#"
+			count: 1
+			path: packages/foundation/src/Kernel/HttpKernel.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between non\\-empty\\-array\\<int, string\\> and array\\{\\} will always evaluate to false\\.$#"
+			count: 1
+			path: packages/foundation/src/Kernel/HttpKernel.php
+
+		-
+			message: "#^Parameter \\#1 \\$columnNames of method Doctrine\\\\DBAL\\\\Schema\\\\Table\\:\\:setPrimaryKey\\(\\) expects non\\-empty\\-array\\<int, string\\>, array given\\.$#"
+			count: 1
+			path: packages/foundation/src/Migration/SchemaBuilder.php
+
+		-
+			message: "#^Method Waaseyaa\\\\Foundation\\\\Result\\\\Result\\:\\:map\\(\\) has invalid return type Waaseyaa\\\\Foundation\\\\Result\\\\U\\.$#"
+			count: 1
+			path: packages/foundation/src/Result/Result.php
+
+		-
+			message: "#^Method Waaseyaa\\\\Foundation\\\\Result\\\\Result\\:\\:map\\(\\) should return Waaseyaa\\\\Foundation\\\\Result\\\\Result\\<Waaseyaa\\\\Foundation\\\\Result\\\\U, E\\> but returns Waaseyaa\\\\Foundation\\\\Result\\\\Result\\<T, never\\>\\.$#"
+			count: 1
+			path: packages/foundation/src/Result/Result.php
+
+		-
+			message: "#^Method Waaseyaa\\\\Foundation\\\\Result\\\\Result\\:\\:mapError\\(\\) has invalid return type Waaseyaa\\\\Foundation\\\\Result\\\\F\\.$#"
+			count: 1
+			path: packages/foundation/src/Result/Result.php
+
+		-
+			message: "#^Method Waaseyaa\\\\Foundation\\\\Result\\\\Result\\:\\:mapError\\(\\) should return Waaseyaa\\\\Foundation\\\\Result\\\\Result\\<T, Waaseyaa\\\\Foundation\\\\Result\\\\F\\> but returns Waaseyaa\\\\Foundation\\\\Result\\\\Result\\<never, E\\>\\.$#"
+			count: 1
+			path: packages/foundation/src/Result/Result.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\Foundation\\\\ServiceProvider\\\\ServiceProviderInterface\\:\\:getBindings\\(\\)\\.$#"
+			count: 1
+			path: packages/foundation/src/ServiceProvider/ContainerCompiler.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\Foundation\\\\ServiceProvider\\\\ServiceProviderInterface\\:\\:getTags\\(\\)\\.$#"
+			count: 1
+			path: packages/foundation/src/ServiceProvider/ContainerCompiler.php
+
+		-
+			message: "#^Call to an undefined method Waaseyaa\\\\Entity\\\\EntityInterface\\:\\:get\\(\\)\\.$#"
+			count: 13
+			path: packages/mcp/src/McpController.php
+
+		-
+			message: "#^Offset 'inverse' on array\\{relationship\\: Waaseyaa\\\\Entity\\\\EntityInterface, related_entity_type\\: string, related_entity_id\\: string, direction\\: string, inverse\\: bool\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/mcp/src/McpController.php
+
+		-
+			message: "#^Offset 'total' on array\\{outbound\\: int, inbound\\: int, total\\: int\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/mcp/src/McpController.php
+
+		-
+			message: "#^Dead catch \\- ReflectionException is never thrown in the try block\\.$#"
+			count: 1
+			path: packages/plugin/src/Discovery/AttributeDiscovery.php
+
+		-
+			message: "#^Else branch is unreachable because ternary operator condition is always true\\.$#"
+			count: 2
+			path: packages/relationship/src/RelationshipDiscoveryService.php
+
+		-
+			message: "#^Offset 'count' on array\\{cluster_key\\: mixed, relationship_type\\: mixed, related_entity_type\\: mixed, count\\: int, related_entities\\: array\\<int, mixed\\>\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/relationship/src/RelationshipDiscoveryService.php
+
+		-
+			message: "#^Offset 'direction' on array\\{relationship_id\\: string, relationship_type\\: string, direction\\: string, inverse\\: bool, directionality\\: string, related_entity_type\\: string, related_entity_id\\: string, related_entity_label\\: string, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/relationship/src/RelationshipDiscoveryService.php
+
+		-
+			message: "#^Offset 'inbound' on array\\{source\\: array\\{type\\: string, id\\: string\\}, outbound\\: array\\<int, array\\{relationship_id\\: string, relationship_type\\: string, direction\\: 'inbound'\\|'outbound', inverse\\: bool, directionality\\: string, related_entity_type\\: string, related_entity_id\\: string, related_entity_label\\: string, \\.\\.\\.\\}\\>, inbound\\: array\\<int, array\\{relationship_id\\: string, relationship_type\\: string, direction\\: 'inbound'\\|'outbound', inverse\\: bool, directionality\\: string, related_entity_type\\: string, related_entity_id\\: string, related_entity_label\\: string, \\.\\.\\.\\}\\>, counts\\: array\\{outbound\\: int, inbound\\: int, total\\: int\\}\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/relationship/src/RelationshipDiscoveryService.php
+
+		-
+			message: "#^Offset 'outbound' on array\\{source\\: array\\{type\\: string, id\\: string\\}, outbound\\: array\\<int, array\\{relationship_id\\: string, relationship_type\\: string, direction\\: 'inbound'\\|'outbound', inverse\\: bool, directionality\\: string, related_entity_type\\: string, related_entity_id\\: string, related_entity_label\\: string, \\.\\.\\.\\}\\>, inbound\\: array\\<int, array\\{relationship_id\\: string, relationship_type\\: string, direction\\: 'inbound'\\|'outbound', inverse\\: bool, directionality\\: string, related_entity_type\\: string, related_entity_id\\: string, related_entity_label\\: string, \\.\\.\\.\\}\\>, counts\\: array\\{outbound\\: int, inbound\\: int, total\\: int\\}\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/relationship/src/RelationshipDiscoveryService.php
+
+		-
+			message: "#^Offset 'related_entity_id' on array\\{relationship_id\\: string, relationship_type\\: string, direction\\: string, inverse\\: bool, directionality\\: string, related_entity_type\\: string, related_entity_id\\: string, related_entity_label\\: string, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/relationship/src/RelationshipDiscoveryService.php
+
+		-
+			message: "#^Offset 'related_entity_type' on array\\{relationship_id\\: string, relationship_type\\: string, direction\\: string, inverse\\: bool, directionality\\: string, related_entity_type\\: string, related_entity_id\\: string, related_entity_label\\: string, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/relationship/src/RelationshipDiscoveryService.php
+
+		-
+			message: "#^Offset 'relationship_id' on array\\{relationship_id\\: string, relationship_type\\: string, direction\\: string, inverse\\: bool, directionality\\: string, related_entity_type\\: string, related_entity_id\\: string, related_entity_label\\: string, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/relationship/src/RelationshipDiscoveryService.php
+
+		-
+			message: "#^Offset 'relationship_type' on array\\{relationship_id\\: string, relationship_type\\: string, direction\\: string, inverse\\: bool, directionality\\: string, related_entity_type\\: string, related_entity_id\\: string, related_entity_label\\: string, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 2
+			path: packages/relationship/src/RelationshipDiscoveryService.php
+
+		-
+			message: "#^Offset 'ability' on array\\{ability\\: string, subject\\?\\: mixed\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			count: 1
+			path: packages/routing/src/AccessChecker.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between non\\-empty\\-array\\<int, string\\> and array\\{\\} will always evaluate to false\\.$#"
+			count: 1
+			path: packages/routing/src/Language/UrlPrefixNegotiator.php
+
+		-
+			message: "#^Result of && is always true\\.$#"
+			count: 1
+			path: packages/ssr/src/FieldFormatterRegistry.php

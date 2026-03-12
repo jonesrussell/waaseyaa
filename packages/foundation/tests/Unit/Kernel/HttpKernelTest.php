@@ -15,7 +15,18 @@ use Waaseyaa\Cache\TagAwareCacheInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
+use Waaseyaa\Cache\CacheConfigResolver;
+use Waaseyaa\Database\PdoDatabase;
+use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Foundation\Http\CorsHandler;
+use Waaseyaa\Api\Http\DiscoveryApiHandler;
+use Waaseyaa\Access\EntityAccessHandler;
+use Waaseyaa\Entity\EntityTypeLifecycleManager;
+use Waaseyaa\Foundation\Http\ControllerDispatcher;
+use Waaseyaa\SSR\SsrPageHandler;
 use Waaseyaa\Foundation\Kernel\AbstractKernel;
+use Waaseyaa\Foundation\Kernel\BuiltinRouteRegistrar;
+use Waaseyaa\Foundation\Kernel\EventListenerRegistrar;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
 use Waaseyaa\User\AnonymousUser;
 use Waaseyaa\User\DevAdminAccount;
@@ -74,11 +85,9 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function resolve_cors_headers_for_allowed_origin(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
-        $method->setAccessible(true);
+        $handler = new CorsHandler(allowedOrigins: ['http://localhost:3000']);
 
-        $headers = $method->invoke($kernel, 'http://localhost:3000', ['http://localhost:3000'], false);
+        $headers = $handler->resolveCorsHeaders('http://localhost:3000');
 
         $this->assertCount(5, $headers);
         $this->assertContains('Access-Control-Allow-Origin: http://localhost:3000', $headers);
@@ -88,11 +97,9 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function resolve_cors_headers_for_disallowed_origin_returns_empty_list(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
-        $method->setAccessible(true);
+        $handler = new CorsHandler(allowedOrigins: ['http://localhost:3000']);
 
-        $headers = $method->invoke($kernel, 'http://evil.test', ['http://localhost:3000'], false);
+        $headers = $handler->resolveCorsHeaders('http://evil.test');
 
         $this->assertSame([], $headers);
     }
@@ -100,38 +107,32 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function resolve_cors_headers_allows_localhost_any_port_in_development_mode(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
-        $method->setAccessible(true);
+        $handler = new CorsHandler(allowedOrigins: ['http://localhost:3000'], allowDevLocalhostPorts: true);
 
-        $headers = $method->invoke($kernel, 'http://localhost:4321', ['http://localhost:3000'], true);
+        $headers = $handler->resolveCorsHeaders('http://localhost:4321');
         $this->assertContains('Access-Control-Allow-Origin: http://localhost:4321', $headers);
 
-        $headersLoopback = $method->invoke($kernel, 'http://127.0.0.1:5173', ['http://localhost:3000'], true);
+        $headersLoopback = $handler->resolveCorsHeaders('http://127.0.0.1:5173');
         $this->assertContains('Access-Control-Allow-Origin: http://127.0.0.1:5173', $headersLoopback);
     }
 
     #[Test]
     public function resolve_cors_headers_does_not_allow_non_localhost_in_development_mode(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveCorsHeaders');
-        $method->setAccessible(true);
+        $handler = new CorsHandler(allowedOrigins: ['http://localhost:3000'], allowDevLocalhostPorts: true);
 
-        $headers = $method->invoke($kernel, 'http://example.com:3001', ['http://localhost:3000'], true);
+        $headers = $handler->resolveCorsHeaders('http://example.com:3001');
         $this->assertSame([], $headers);
     }
 
     #[Test]
     public function detects_cors_preflight_request_method(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'isCorsPreflightRequest');
-        $method->setAccessible(true);
+        $handler = new CorsHandler();
 
-        $this->assertTrue($method->invoke($kernel, 'OPTIONS'));
-        $this->assertTrue($method->invoke($kernel, 'options'));
-        $this->assertFalse($method->invoke($kernel, 'GET'));
+        $this->assertTrue($handler->isCorsPreflightRequest('OPTIONS'));
+        $this->assertTrue($handler->isCorsPreflightRequest('options'));
+        $this->assertFalse($handler->isCorsPreflightRequest('GET'));
     }
 
     #[Test]
@@ -209,10 +210,13 @@ final class HttpKernelTest extends TestCase
         $boot->setAccessible(true);
         $boot->invoke($kernel);
 
+        $etmProp = new \ReflectionProperty(AbstractKernel::class, 'entityTypeManager');
+        $etmProp->setAccessible(true);
+        $entityTypeManager = $etmProp->getValue($kernel);
+
+        $registrar = new BuiltinRouteRegistrar($entityTypeManager);
         $router = new \Waaseyaa\Routing\WaaseyaaRouter(new \Symfony\Component\Routing\RequestContext('', 'GET'));
-        $registerRoutes = new \ReflectionMethod(HttpKernel::class, 'registerRoutes');
-        $registerRoutes->setAccessible(true);
-        $registerRoutes->invoke($kernel, $router);
+        $registrar->register($router);
 
         $routes = $router->getRouteCollection();
         $this->assertNotNull($routes->get('api.schema.show'));
@@ -234,125 +238,89 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function allows_wildcard_upload_mime_types(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'isAllowedMimeType');
-        $method->setAccessible(true);
-
-        $this->assertTrue($method->invoke($kernel, 'image/jpeg', ['image/*']));
-        $this->assertTrue($method->invoke($kernel, 'application/pdf', ['image/*', 'application/pdf']));
-        $this->assertFalse($method->invoke($kernel, 'text/html', ['image/*', 'application/pdf']));
+        $dispatcher = $this->createControllerDispatcher();
+        $this->assertTrue($dispatcher->isAllowedMimeType('image/jpeg', ['image/*']));
+        $this->assertTrue($dispatcher->isAllowedMimeType('application/pdf', ['image/*', 'application/pdf']));
+        $this->assertFalse($dispatcher->isAllowedMimeType('text/html', ['image/*', 'application/pdf']));
     }
 
     #[Test]
     public function resolves_files_root_dir_defaults_to_storage_files(): void
     {
-        $kernel = new HttpKernel('/var/www/myapp');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveFilesRootDir');
-        $method->setAccessible(true);
-
-        $this->assertSame('/var/www/myapp/storage/files', $method->invoke($kernel));
+        $dispatcher = $this->createControllerDispatcher(projectRoot: '/var/www/myapp');
+        $this->assertSame('/var/www/myapp/storage/files', $dispatcher->resolveFilesRootDir());
     }
 
     #[Test]
     public function resolves_files_root_dir_uses_configured_path_when_set(): void
     {
-        $kernel = new HttpKernel('/var/www/myapp');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue($kernel, ['files_dir' => '/mnt/uploads']);
-
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveFilesRootDir');
-        $method->setAccessible(true);
-
-        $this->assertSame('/mnt/uploads', $method->invoke($kernel));
+        $dispatcher = $this->createControllerDispatcher(
+            projectRoot: '/var/www/myapp',
+            config: ['files_dir' => '/mnt/uploads'],
+        );
+        $this->assertSame('/mnt/uploads', $dispatcher->resolveFilesRootDir());
     }
 
     #[Test]
     public function builds_public_file_url_from_public_uri(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'buildPublicFileUrl');
-        $method->setAccessible(true);
-
-        $this->assertSame('/files/images/photo.jpg', $method->invoke($kernel, 'public://images/photo.jpg'));
-        $this->assertSame('/files/tmp/doc.pdf', $method->invoke($kernel, 'tmp/doc.pdf'));
+        $dispatcher = $this->createControllerDispatcher();
+        $this->assertSame('/files/images/photo.jpg', $dispatcher->buildPublicFileUrl('public://images/photo.jpg'));
+        $this->assertSame('/files/tmp/doc.pdf', $dispatcher->buildPublicFileUrl('tmp/doc.pdf'));
     }
 
     #[Test]
     public function sanitizes_uploaded_filename(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'sanitizeUploadFilename');
-        $method->setAccessible(true);
-
-        $this->assertSame('my_photo_.jpg', $method->invoke($kernel, 'my photo?.jpg'));
-        $this->assertSame('upload.bin', $method->invoke($kernel, '../../'));
+        $dispatcher = $this->createControllerDispatcher();
+        $this->assertSame('my_photo_.jpg', $dispatcher->sanitizeUploadFilename('my photo?.jpg'));
+        $this->assertSame('upload.bin', $dispatcher->sanitizeUploadFilename('../../'));
     }
 
     #[Test]
     public function resolves_render_cache_max_age_from_config_or_default(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveRenderCacheMaxAge');
-        $method->setAccessible(true);
+        $resolver = new CacheConfigResolver(['ssr' => ['cache_max_age' => 600]]);
+        $this->assertSame(600, $resolver->resolveRenderCacheMaxAge());
 
-        $configProp->setValue($kernel, ['ssr' => ['cache_max_age' => 600]]);
-        $this->assertSame(600, $method->invoke($kernel));
-
-        $configProp->setValue($kernel, []);
-        $this->assertSame(300, $method->invoke($kernel));
+        $resolverDefault = new CacheConfigResolver([]);
+        $this->assertSame(300, $resolverDefault->resolveRenderCacheMaxAge());
     }
 
     #[Test]
     public function render_cache_control_header_depends_on_authentication(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue($kernel, []);
-        $method = new \ReflectionMethod(HttpKernel::class, 'cacheControlHeaderForRender');
-        $method->setAccessible(true);
+        $resolver = new CacheConfigResolver([]);
 
         $this->assertSame(
             'public, max-age=120, s-maxage=120, stale-while-revalidate=60, stale-if-error=600',
-            $method->invoke($kernel, new AnonymousUser(), 120),
+            $resolver->cacheControlHeaderForRender(new AnonymousUser(), 120),
         );
-        $this->assertSame('private, no-store', $method->invoke($kernel, new DevAdminAccount(), 120));
+        $this->assertSame('private, no-store', $resolver->cacheControlHeaderForRender(new DevAdminAccount(), 120));
     }
 
     #[Test]
     public function render_cache_control_header_honors_shared_and_stale_config(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue($kernel, [
+        $resolver = new CacheConfigResolver([
             'ssr' => [
                 'cache_shared_max_age' => 900,
                 'cache_stale_while_revalidate' => 180,
                 'cache_stale_if_error' => 3600,
             ],
         ]);
-        $method = new \ReflectionMethod(HttpKernel::class, 'cacheControlHeaderForRender');
-        $method->setAccessible(true);
 
         $this->assertSame(
             'public, max-age=300, s-maxage=900, stale-while-revalidate=180, stale-if-error=3600',
-            $method->invoke($kernel, new AnonymousUser(), 300),
+            $resolver->cacheControlHeaderForRender(new AnonymousUser(), 300),
         );
     }
 
     #[Test]
     public function render_surrogate_headers_include_workflow_and_graph_dimensions(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'buildRenderSurrogateHeaders');
-        $method->setAccessible(true);
-
-        $headers = $method->invoke(
-            $kernel,
+        $handler = $this->createSsrPageHandler();
+        $headers = $handler->buildRenderSurrogateHeaders(
             'node',
             '42',
             'full',
@@ -379,10 +347,7 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function render_language_resolution_uses_url_prefix_and_strips_alias_lookup_path(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue($kernel, [
+        $handler = $this->createSsrPageHandler([
             'i18n' => [
                 'languages' => [
                     ['id' => 'en', 'label' => 'English', 'is_default' => true],
@@ -391,11 +356,8 @@ final class HttpKernelTest extends TestCase
             ],
         ]);
 
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveRenderLanguageAndAliasPath');
-        $method->setAccessible(true);
-
         $request = Request::create('/fr/teachings/water');
-        $resolved = $method->invoke($kernel, '/fr/teachings/water', $request);
+        $resolved = $handler->resolveRenderLanguageAndAliasPath('/fr/teachings/water', $request);
 
         $this->assertSame('fr', $resolved['langcode']);
         $this->assertSame('/teachings/water', $resolved['alias_path']);
@@ -404,10 +366,7 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function render_language_resolution_uses_accept_language_when_no_url_prefix(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue($kernel, [
+        $handler = $this->createSsrPageHandler([
             'i18n' => [
                 'languages' => [
                     ['id' => 'en', 'label' => 'English', 'is_default' => true],
@@ -416,12 +375,9 @@ final class HttpKernelTest extends TestCase
             ],
         ]);
 
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveRenderLanguageAndAliasPath');
-        $method->setAccessible(true);
-
         $request = Request::create('/teachings/water');
         $request->headers->set('Accept-Language', 'fr-CA,fr;q=0.9,en;q=0.8');
-        $resolved = $method->invoke($kernel, '/teachings/water', $request);
+        $resolved = $handler->resolveRenderLanguageAndAliasPath('/teachings/water', $request);
 
         $this->assertSame('fr', $resolved['langcode']);
         $this->assertSame('/teachings/water', $resolved['alias_path']);
@@ -430,16 +386,10 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function render_language_resolution_defaults_to_english_when_not_configured(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue($kernel, []);
-
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveRenderLanguageAndAliasPath');
-        $method->setAccessible(true);
+        $handler = $this->createSsrPageHandler();
 
         $request = Request::create('/teachings/water');
-        $resolved = $method->invoke($kernel, '/teachings/water', $request);
+        $resolved = $handler->resolveRenderLanguageAndAliasPath('/teachings/water', $request);
 
         $this->assertSame('en', $resolved['langcode']);
         $this->assertSame('/teachings/water', $resolved['alias_path']);
@@ -448,42 +398,32 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function parses_relationship_types_from_comma_separated_query_string(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'parseRelationshipTypesQuery');
-        $method->setAccessible(true);
-
-        $types = $method->invoke($kernel, 'references, influences, ,references');
-
+        $handler = new DiscoveryApiHandler(new EntityTypeManager(new EventDispatcher()), PdoDatabase::createSqlite());
+        $types = $handler->parseRelationshipTypesQuery('references, influences, ,references');
         $this->assertSame(['references', 'influences', 'references'], $types);
     }
 
     #[Test]
     public function parses_relationship_types_from_array_query_value(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'parseRelationshipTypesQuery');
-        $method->setAccessible(true);
-
-        $types = $method->invoke($kernel, ['references', 'influences', 'references', '', 123]);
-
+        $handler = new DiscoveryApiHandler(new EntityTypeManager(new EventDispatcher()), PdoDatabase::createSqlite());
+        $types = $handler->parseRelationshipTypesQuery(['references', 'influences', 'references', '', 123]);
         $this->assertSame(['references', 'influences'], $types);
     }
 
     #[Test]
     public function discovery_cache_key_is_deterministic_for_equivalent_option_order(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'buildDiscoveryCacheKey');
-        $method->setAccessible(true);
+        $handler = new DiscoveryApiHandler(new EntityTypeManager(new EventDispatcher()), PdoDatabase::createSqlite());
 
-        $keyA = $method->invoke($kernel, 'timeline', 'node', '1', [
+        $keyA = $handler->buildDiscoveryCacheKey('timeline', 'node', '1', [
             'status' => 'published',
             'direction' => 'both',
             'from' => 100,
             'to' => 200,
             'relationship_types' => ['references', 'influences'],
         ]);
-        $keyB = $method->invoke($kernel, 'timeline', 'node', '1', [
+        $keyB = $handler->buildDiscoveryCacheKey('timeline', 'node', '1', [
             'relationship_types' => ['references', 'influences'],
             'to' => 200,
             'from' => 100,
@@ -497,12 +437,10 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function discovery_cache_key_changes_when_filter_values_change(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'buildDiscoveryCacheKey');
-        $method->setAccessible(true);
+        $handler = new DiscoveryApiHandler(new EntityTypeManager(new EventDispatcher()), PdoDatabase::createSqlite());
 
-        $keyA = $method->invoke($kernel, 'hub', 'node', '1', ['status' => 'published', 'limit' => 10]);
-        $keyB = $method->invoke($kernel, 'hub', 'node', '1', ['status' => 'published', 'limit' => 20]);
+        $keyA = $handler->buildDiscoveryCacheKey('hub', 'node', '1', ['status' => 'published', 'limit' => 10]);
+        $keyB = $handler->buildDiscoveryCacheKey('hub', 'node', '1', ['status' => 'published', 'limit' => 20]);
 
         $this->assertNotSame($keyA, $keyB);
     }
@@ -510,11 +448,8 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function discovery_payload_contract_meta_is_added_when_missing(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'withDiscoveryContractMeta');
-        $method->setAccessible(true);
-
-        $payload = $method->invoke($kernel, ['data' => ['source' => ['type' => 'node', 'id' => '1']]]);
+        $handler = new DiscoveryApiHandler(new EntityTypeManager(new EventDispatcher()), PdoDatabase::createSqlite());
+        $payload = $handler->withDiscoveryContractMeta(['data' => ['source' => ['type' => 'node', 'id' => '1']]]);
 
         $this->assertSame('v1.0', $payload['meta']['contract_version']);
         $this->assertSame('stable', $payload['meta']['contract_stability']);
@@ -524,11 +459,8 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function discovery_payload_contract_meta_preserves_existing_surface(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'withDiscoveryContractMeta');
-        $method->setAccessible(true);
-
-        $payload = $method->invoke($kernel, [
+        $handler = new DiscoveryApiHandler(new EntityTypeManager(new EventDispatcher()), PdoDatabase::createSqlite());
+        $payload = $handler->withDiscoveryContractMeta([
             'data' => [],
             'meta' => ['surface' => 'custom_surface', 'count' => 3],
         ]);
@@ -542,11 +474,8 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function discovery_cache_tags_include_surface_entity_and_filters(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'buildDiscoveryCacheTags');
-        $method->setAccessible(true);
-
-        $tags = $method->invoke($kernel, [
+        $handler = new DiscoveryApiHandler(new EntityTypeManager(new EventDispatcher()), PdoDatabase::createSqlite());
+        $tags = $handler->buildDiscoveryCacheTags([
             'data' => [
                 'data' => [
                     'source' => ['type' => 'node', 'id' => '42'],
@@ -570,17 +499,11 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function discovery_cache_listener_uses_tag_invalidation_when_available(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
         $dispatcher = new EventDispatcher();
-
-        $dispatcherProp = new \ReflectionProperty(AbstractKernel::class, 'dispatcher');
-        $dispatcherProp->setAccessible(true);
-        $dispatcherProp->setValue($kernel, $dispatcher);
+        $registrar = new EventListenerRegistrar($dispatcher);
 
         $cache = new TestTagAwareCacheBackend();
-        $method = new \ReflectionMethod(HttpKernel::class, 'registerDiscoveryCacheListeners');
-        $method->setAccessible(true);
-        $method->invoke($kernel, $cache);
+        $registrar->registerDiscoveryCacheListeners($cache);
 
         $dispatcher->dispatch(
             new EntityEvent(new TestKernelEntity(9, 'node')),
@@ -597,17 +520,11 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function discovery_cache_listener_falls_back_to_delete_all_for_non_tag_backend(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
         $dispatcher = new EventDispatcher();
-
-        $dispatcherProp = new \ReflectionProperty(AbstractKernel::class, 'dispatcher');
-        $dispatcherProp->setAccessible(true);
-        $dispatcherProp->setValue($kernel, $dispatcher);
+        $registrar = new EventListenerRegistrar($dispatcher);
 
         $cache = new TestNonTagCacheBackend();
-        $method = new \ReflectionMethod(HttpKernel::class, 'registerDiscoveryCacheListeners');
-        $method->setAccessible(true);
-        $method->invoke($kernel, $cache);
+        $registrar->registerDiscoveryCacheListeners($cache);
 
         $dispatcher->dispatch(
             new EntityEvent(new TestKernelEntity(5, 'node')),
@@ -620,17 +537,11 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function mcp_read_cache_listener_uses_tag_invalidation_when_available(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
         $dispatcher = new EventDispatcher();
-
-        $dispatcherProp = new \ReflectionProperty(AbstractKernel::class, 'dispatcher');
-        $dispatcherProp->setAccessible(true);
-        $dispatcherProp->setValue($kernel, $dispatcher);
+        $registrar = new EventListenerRegistrar($dispatcher);
 
         $cache = new TestTagAwareCacheBackend();
-        $method = new \ReflectionMethod(HttpKernel::class, 'registerMcpReadCacheListeners');
-        $method->setAccessible(true);
-        $method->invoke($kernel, $cache);
+        $registrar->registerMcpReadCacheListeners($cache);
 
         $dispatcher->dispatch(
             new EntityEvent(new TestKernelEntity(11, 'node')),
@@ -646,17 +557,11 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function mcp_read_cache_listener_falls_back_to_delete_all_for_non_tag_backend(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
         $dispatcher = new EventDispatcher();
-
-        $dispatcherProp = new \ReflectionProperty(AbstractKernel::class, 'dispatcher');
-        $dispatcherProp->setAccessible(true);
-        $dispatcherProp->setValue($kernel, $dispatcher);
+        $registrar = new EventListenerRegistrar($dispatcher);
 
         $cache = new TestNonTagCacheBackend();
-        $method = new \ReflectionMethod(HttpKernel::class, 'registerMcpReadCacheListeners');
-        $method->setAccessible(true);
-        $method->invoke($kernel, $cache);
+        $registrar->registerMcpReadCacheListeners($cache);
 
         $dispatcher->dispatch(
             new EntityEvent(new TestKernelEntity(12, 'node')),
@@ -669,11 +574,9 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function ssr_cache_variant_langcode_is_deterministic_for_equivalent_context_order(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'buildSsrCacheVariantLangcode');
-        $method->setAccessible(true);
+        $handler = $this->createSsrPageHandler();
 
-        $variantA = $method->invoke($kernel, 'en', 'full', false, [
+        $variantA = $handler->buildSsrCacheVariantLangcode('en', 'full', false, [
             'workflow_visibility' => [
                 'state' => 'published',
                 'preview_requested' => false,
@@ -684,7 +587,7 @@ final class HttpKernelTest extends TestCase
                 'contract' => ['version' => 'v1.0', 'surface' => 'ssr_relationship_navigation'],
             ],
         ]);
-        $variantB = $method->invoke($kernel, 'en', 'full', false, [
+        $variantB = $handler->buildSsrCacheVariantLangcode('en', 'full', false, [
             'relationship_navigation' => [
                 'contract' => ['surface' => 'ssr_relationship_navigation', 'version' => 'v1.0'],
                 'entity' => ['counts' => ['inbound' => 2, 'outbound' => 1]],
@@ -702,27 +605,25 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function ssr_cache_variant_langcode_changes_with_workflow_or_graph_dimensions(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'buildSsrCacheVariantLangcode');
-        $method->setAccessible(true);
+        $handler = $this->createSsrPageHandler();
 
-        $published = $method->invoke($kernel, 'en', 'full', false, [
+        $published = $handler->buildSsrCacheVariantLangcode('en', 'full', false, [
             'workflow_visibility' => ['state' => 'published'],
             'relationship_navigation' => ['entity' => ['counts' => ['outbound' => 1]]],
         ]);
-        $review = $method->invoke($kernel, 'en', 'full', false, [
+        $review = $handler->buildSsrCacheVariantLangcode('en', 'full', false, [
             'workflow_visibility' => ['state' => 'review'],
             'relationship_navigation' => ['entity' => ['counts' => ['outbound' => 1]]],
         ]);
-        $differentGraph = $method->invoke($kernel, 'en', 'full', false, [
+        $differentGraph = $handler->buildSsrCacheVariantLangcode('en', 'full', false, [
             'workflow_visibility' => ['state' => 'published'],
             'relationship_navigation' => ['entity' => ['counts' => ['outbound' => 3]]],
         ]);
-        $previewVariant = $method->invoke($kernel, 'en', 'full', true, [
+        $previewVariant = $handler->buildSsrCacheVariantLangcode('en', 'full', true, [
             'workflow_visibility' => ['state' => 'published'],
             'relationship_navigation' => ['entity' => ['counts' => ['outbound' => 1]]],
         ]);
-        $teaserVariant = $method->invoke($kernel, 'en', 'teaser', false, [
+        $teaserVariant = $handler->buildSsrCacheVariantLangcode('en', 'teaser', false, [
             'workflow_visibility' => ['state' => 'published'],
             'relationship_navigation' => ['entity' => ['counts' => ['outbound' => 1]]],
         ]);
@@ -737,11 +638,8 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function discovery_cache_tags_include_related_entities_for_invalidation_coverage(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'buildDiscoveryCacheTags');
-        $method->setAccessible(true);
-
-        $tags = $method->invoke($kernel, [
+        $handler = new DiscoveryApiHandler(new EntityTypeManager(new EventDispatcher()), PdoDatabase::createSqlite());
+        $tags = $handler->buildDiscoveryCacheTags([
             'data' => [
                 'source' => ['type' => 'node', 'id' => '1'],
                 'items' => [
@@ -766,6 +664,54 @@ final class HttpKernelTest extends TestCase
         $this->assertContains('discovery:direction:both', $tags);
     }
 
+    private function createControllerDispatcher(
+        string $projectRoot = '/tmp/test-project',
+        array $config = [],
+    ): ControllerDispatcher {
+        $entityTypeManager = new EntityTypeManager(new EventDispatcher());
+        $database = PdoDatabase::createSqlite();
+        $discoveryHandler = new DiscoveryApiHandler($entityTypeManager, $database);
+        $cacheConfigResolver = new CacheConfigResolver($config);
+        $ssrPageHandler = new SsrPageHandler(
+            entityTypeManager: $entityTypeManager,
+            database: $database,
+            renderCache: null,
+            cacheConfigResolver: $cacheConfigResolver,
+            discoveryHandler: $discoveryHandler,
+            projectRoot: $projectRoot,
+            config: $config,
+        );
+
+        return new ControllerDispatcher(
+            entityTypeManager: $entityTypeManager,
+            database: $database,
+            accessHandler: new EntityAccessHandler(),
+            lifecycleManager: new EntityTypeLifecycleManager($projectRoot),
+            discoveryHandler: $discoveryHandler,
+            ssrPageHandler: $ssrPageHandler,
+            mcpReadCache: null,
+            projectRoot: $projectRoot,
+            config: $config,
+        );
+    }
+
+    private function createSsrPageHandler(array $config = []): SsrPageHandler
+    {
+        $entityTypeManager = new EntityTypeManager(new EventDispatcher());
+        $database = PdoDatabase::createSqlite();
+        $discoveryHandler = new DiscoveryApiHandler($entityTypeManager, $database);
+        $cacheConfigResolver = new CacheConfigResolver($config);
+
+        return new SsrPageHandler(
+            entityTypeManager: $entityTypeManager,
+            database: $database,
+            renderCache: null,
+            cacheConfigResolver: $cacheConfigResolver,
+            discoveryHandler: $discoveryHandler,
+            projectRoot: '/tmp/test-project',
+            config: $config,
+        );
+    }
 }
 
 final class TestKernelEntity implements EntityInterface

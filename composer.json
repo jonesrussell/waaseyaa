@@ -44,7 +44,7 @@
         { "type": "path", "url": "packages/full" }
     ],
     "require": {
-        "php": ">=8.3",
+        "php": ">=8.4",
         "waaseyaa/access": "@dev",
         "waaseyaa/ai-agent": "@dev",
         "waaseyaa/ai-pipeline": "@dev",
@@ -81,9 +81,10 @@
         "symfony/console": "^7.0"
     },
     "require-dev": {
-        "waaseyaa/testing": "@dev",
+        "friendsofphp/php-cs-fixer": "^3.50",
+        "phpstan/phpstan": "^1.10",
         "phpunit/phpunit": "^10.5",
-        "phpstan/phpstan": "^1.10"
+        "waaseyaa/testing": "@dev"
     },
     "autoload-dev": {
         "psr-4": {
@@ -124,10 +125,13 @@
         }
     },
     "scripts": {
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "php-cs-fixer fix",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "PHP_CLI_SERVER_WORKERS=4 php -S localhost:8081 -t public & npm run dev --prefix packages/admin && kill $!"
-        ]
+        ],
+        "phpstan": "phpstan analyse --memory-limit=512M"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

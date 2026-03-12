@@ -1,0 +1,42 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 5
+    paths:
+        - packages/access/src
+        - packages/ai-agent/src
+        - packages/ai-pipeline/src
+        - packages/ai-schema/src
+        - packages/ai-vector/src
+        - packages/api/src
+        - packages/cache/src
+        - packages/cli/src
+        - packages/config/src
+        - packages/database-legacy/src
+        - packages/entity-storage/src
+        - packages/entity/src
+        - packages/field/src
+        - packages/foundation/src
+        - packages/graphql/src
+        - packages/i18n/src
+        - packages/mcp/src
+        - packages/media/src
+        - packages/menu/src
+        - packages/node/src
+        - packages/note/src
+        - packages/path/src
+        - packages/plugin/src
+        - packages/queue/src
+        - packages/relationship/src
+        - packages/routing/src
+        - packages/search/src
+        - packages/ssr/src
+        - packages/state/src
+        - packages/taxonomy/src
+        - packages/telescope/src
+        - packages/testing/src
+        - packages/typed-data/src
+        - packages/user/src
+        - packages/validation/src
+        - packages/workflows/src

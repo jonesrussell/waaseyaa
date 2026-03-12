@@ -11,6 +11,9 @@ packages/*/composer.lock
 .phpunit.result.cache
 packages/*/.phpunit.result.cache
 
+# PHP CS Fixer
+.php-cs-fixer.cache
+
 # Database
 *.sqlite
 
