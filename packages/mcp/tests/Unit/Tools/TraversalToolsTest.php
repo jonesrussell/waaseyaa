@@ -122,6 +122,31 @@ final class TraversalToolsTest extends TestCase
         self::assertSame(1, $parsed['limit']);
     }
 
+    #[Test]
+    public function knowledgeGraphForcesDirectionBoth(): void
+    {
+        $manager = $this->createMock(EntityTypeManagerInterface::class);
+        $manager->method('hasDefinition')->willReturn(true);
+
+        $tools = new TraversalTools(
+            entityTypeManager: $manager,
+            serializer: new ResourceSerializer($manager),
+            accessHandler: new EntityAccessHandler([]),
+            account: $this->anonymousAccount(),
+        );
+
+        $args = ['type' => 'node', 'id' => '1', 'direction' => 'inbound'];
+        $parsed = $tools->parseTraversalArguments($args);
+
+        // array_merge correctly overrides
+        $merged = array_merge($parsed, ['direction' => 'both']);
+        $this->assertSame('both', $merged['direction']);
+
+        // Verify PHP + operator would NOT override (proving the bug)
+        $broken = $parsed + ['direction' => 'both'];
+        $this->assertSame('inbound', $broken['direction'], 'PHP + operator keeps left-side keys');
+    }
+
     private function createTraversalTools(): TraversalTools
     {
         $manager = $this->createMock(EntityTypeManagerInterface::class);

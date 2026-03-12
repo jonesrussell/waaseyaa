@@ -163,7 +163,7 @@ final class TraversalTools extends McpTool
                 'limit' => $parsed['limit'],
             ]);
         } else {
-            $rows = $this->collectTraversalRows($parsed + ['direction' => 'both']);
+            $rows = $this->collectTraversalRows(array_merge($parsed, ['direction' => 'both']));
             $graph = [
                 'source' => [
                     'type' => $parsed['entity_type'],
