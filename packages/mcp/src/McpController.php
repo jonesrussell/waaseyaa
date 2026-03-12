@@ -14,6 +14,7 @@ use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Cache\CacheBackendInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Mcp\Cache\ReadCache;
 use Waaseyaa\Mcp\Rpc\ResponseFormatter;
 use Waaseyaa\Entity\FieldableInterface;
 use Waaseyaa\Relationship\RelationshipTraversalService;
@@ -26,9 +27,8 @@ final class McpController
 {
     private const string CONTRACT_VERSION = 'v1.0';
     private const string CONTRACT_STABILITY = 'stable';
-    private const int READ_CACHE_MAX_AGE = 120;
-
     private readonly ResponseFormatter $formatter;
+    private readonly ReadCache $readCacheHandler;
     private readonly EditorialWorkflowStateMachine $editorialStateMachine;
     private readonly EditorialTransitionAccessResolver $editorialTransitionResolver;
     private readonly WorkflowVisibility $workflowVisibility;
@@ -45,6 +45,7 @@ final class McpController
         private readonly array $extensionRegistrations = [],
     ) {
         $this->formatter = new ResponseFormatter();
+        $this->readCacheHandler = new ReadCache(account: $this->account, backend: $this->readCache);
         $this->editorialStateMachine = new EditorialWorkflowStateMachine();
         $this->editorialTransitionResolver = new EditorialTransitionAccessResolver($this->editorialStateMachine);
         $this->workflowVisibility = new WorkflowVisibility($this->editorialStateMachine);
@@ -124,7 +125,7 @@ final class McpController
                 $executionPath[] = $hook;
             }
         }
-        $accountContext = $this->readCacheAccountContext();
+        $accountContext = $this->readCacheHandler->accountContext();
         $stableMeta = [
             'contract_version' => self::CONTRACT_VERSION,
             'contract_stability' => self::CONTRACT_STABILITY,
@@ -150,8 +151,8 @@ final class McpController
                 'stable_meta' => $stableMeta,
             ],
             'cache' => [
-                'read_cacheable' => $this->isReadCacheableTool($canonicalTool),
-                'read_cache_enabled' => $this->readCache !== null,
+                'read_cacheable' => $this->readCacheHandler->isCacheableTool($canonicalTool),
+                'read_cache_enabled' => $this->readCacheHandler->isEnabled(),
                 'scope' => $accountContext['authenticated'] ? 'authenticated' : 'anonymous',
                 'account_context' => $accountContext,
                 'cache_key_dimensions' => ['contract_version', 'tool', 'arguments', 'account'],
@@ -185,9 +186,9 @@ final class McpController
             return $this->formatter->error($id, -32602, 'Missing tool name.');
         }
 
-        $cacheKey = $this->buildReadCacheKeyForTool($tool, $arguments);
+        $cacheKey = $this->readCacheHandler->buildKeyForTool($tool, $arguments);
         if ($cacheKey !== null) {
-            $cachedResult = $this->getReadCachedToolResult($cacheKey);
+            $cachedResult = $this->readCacheHandler->get($cacheKey);
             if ($cachedResult !== null) {
                 return $this->formatter->result($id, $this->formatter->formatToolContent($cachedResult));
             }
@@ -220,7 +221,7 @@ final class McpController
         }
         $result = $this->formatter->withStableContractMeta($result, $tool);
         if ($cacheKey !== null) {
-            $this->setReadCachedToolResult($cacheKey, $tool, $arguments, $result);
+            $this->readCacheHandler->set($cacheKey, $tool, $arguments, $result);
         }
 
         return $this->formatter->result($id, $this->formatter->formatToolContent($result));
@@ -1406,181 +1407,4 @@ final class McpController
         };
     }
 
-    /**
-     * @param array<string, mixed> $arguments
-     */
-    private function buildReadCacheKeyForTool(string $tool, array $arguments): ?string
-    {
-        if ($this->readCache === null || !$this->isReadCacheableTool($tool)) {
-            return null;
-        }
-
-        $keyPayload = [
-            'contract_version' => self::CONTRACT_VERSION,
-            'tool' => $tool,
-            'arguments' => $this->normalizeForCacheKey($arguments),
-            'account' => $this->readCacheAccountContext(),
-        ];
-
-        try {
-            $serialized = json_encode($keyPayload, JSON_THROW_ON_ERROR);
-        } catch (\Throwable) {
-            return null;
-        }
-
-        return 'mcp_read:v1:' . hash('sha256', $serialized);
-    }
-
-    private function isReadCacheableTool(string $tool): bool
-    {
-        return in_array($tool, [
-            'search_entities',
-            'search_teachings',
-            'ai_discover',
-            'traverse_relationships',
-            'get_related_entities',
-            'get_knowledge_graph',
-        ], true);
-    }
-
-    /**
-     * @return array{
-     *   authenticated: bool,
-     *   account_id: string,
-     *   roles: list<string>
-     * }
-     */
-    private function readCacheAccountContext(): array
-    {
-        $roles = array_values(array_unique(array_map(
-            static fn(string $role): string => strtolower(trim($role)),
-            $this->account->getRoles(),
-        )));
-        sort($roles);
-
-        return [
-            'authenticated' => $this->account->isAuthenticated(),
-            'account_id' => (string) $this->account->id(),
-            'roles' => $roles,
-        ];
-    }
-
-    private function getReadCachedToolResult(string $cacheKey): ?array
-    {
-        if ($this->readCache === null) {
-            return null;
-        }
-
-        $item = $this->readCache->get($cacheKey);
-        if ($item === false || !$item->valid || !is_array($item->data)) {
-            return null;
-        }
-
-        return $item->data;
-    }
-
-    /**
-     * @param array<string, mixed> $arguments
-     * @param array<string, mixed> $result
-     */
-    private function setReadCachedToolResult(string $cacheKey, string $tool, array $arguments, array $result): void
-    {
-        if ($this->readCache === null) {
-            return;
-        }
-
-        $expire = time() + self::READ_CACHE_MAX_AGE;
-        $tags = $this->buildReadCacheTags($tool, $arguments, $result);
-
-        try {
-            $this->readCache->set($cacheKey, $result, $expire, $tags);
-        } catch (\Throwable $e) {
-            error_log(sprintf('[Waaseyaa] Failed to write MCP read cache: %s', $e->getMessage()));
-        }
-    }
-
-    /**
-     * @param array<string, mixed> $arguments
-     * @param array<string, mixed> $result
-     * @return list<string>
-     */
-    private function buildReadCacheTags(string $tool, array $arguments, array $result): array
-    {
-        $tags = [
-            'mcp_read',
-            'mcp_read:contract:' . self::CONTRACT_VERSION,
-            'mcp_read:tool:' . strtolower($tool),
-            $this->account->isAuthenticated() ? 'mcp_read:scope:authenticated' : 'mcp_read:scope:anonymous',
-        ];
-
-        $sourceType = is_string($arguments['type'] ?? null) ? strtolower(trim($arguments['type'])) : '';
-        $sourceId = is_scalar($arguments['id'] ?? null) ? trim((string) $arguments['id']) : '';
-        if ($sourceType !== '' && $sourceId !== '') {
-            $this->appendEntityTags($tags, $sourceType, $sourceId);
-        }
-
-        $anchorType = is_string($arguments['anchor_type'] ?? null) ? strtolower(trim($arguments['anchor_type'])) : '';
-        $anchorId = is_scalar($arguments['anchor_id'] ?? null) ? trim((string) $arguments['anchor_id']) : '';
-        if ($anchorType !== '' && $anchorId !== '') {
-            $this->appendEntityTags($tags, $anchorType, $anchorId);
-        }
-
-        $this->collectEntityTagsFromPayload($result, $tags);
-
-        return array_values(array_unique($tags));
-    }
-
-    /**
-     * @param list<string> $tags
-     */
-    private function appendEntityTags(array &$tags, string $entityType, string $entityId): void
-    {
-        $tags[] = 'mcp_read:entity:' . $entityType;
-        $tags[] = 'mcp_read:entity:' . $entityType . ':' . $entityId;
-    }
-
-    /**
-     * @param list<string> $tags
-     */
-    private function collectEntityTagsFromPayload(mixed $value, array &$tags): void
-    {
-        if (!is_array($value)) {
-            return;
-        }
-
-        $type = is_string($value['type'] ?? null) ? strtolower(trim($value['type'])) : '';
-        $id = is_scalar($value['id'] ?? null) ? trim((string) $value['id']) : '';
-        if ($type !== '' && $id !== '') {
-            $this->appendEntityTags($tags, $type, $id);
-        }
-
-        $relatedType = is_string($value['related_entity_type'] ?? null) ? strtolower(trim($value['related_entity_type'])) : '';
-        $relatedId = is_scalar($value['related_entity_id'] ?? null) ? trim((string) $value['related_entity_id']) : '';
-        if ($relatedType !== '' && $relatedId !== '') {
-            $this->appendEntityTags($tags, $relatedType, $relatedId);
-        }
-
-        foreach ($value as $item) {
-            $this->collectEntityTagsFromPayload($item, $tags);
-        }
-    }
-
-    private function normalizeForCacheKey(mixed $value): mixed
-    {
-        if (!is_array($value)) {
-            return $value;
-        }
-
-        if (array_is_list($value)) {
-            return array_map(fn(mixed $item): mixed => $this->normalizeForCacheKey($item), $value);
-        }
-
-        $normalized = [];
-        ksort($value);
-        foreach ($value as $key => $item) {
-            $normalized[$key] = $this->normalizeForCacheKey($item);
-        }
-
-        return $normalized;
-    }
 }
