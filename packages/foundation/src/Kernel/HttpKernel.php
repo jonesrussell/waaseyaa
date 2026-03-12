@@ -22,6 +22,7 @@ use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Schema\SchemaPresenter;
 use Waaseyaa\Cache\Backend\DatabaseBackend;
 use Waaseyaa\Cache\CacheBackendInterface;
+use Waaseyaa\Cache\CacheConfigResolver;
 use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\Cache\CacheConfiguration;
 use Waaseyaa\Cache\TagAwareCacheInterface;
@@ -82,10 +83,12 @@ final class HttpKernel extends AbstractKernel
     private ?RenderCache $renderCache = null;
     private ?CacheBackendInterface $discoveryCache = null;
     private ?CacheBackendInterface $mcpReadCache = null;
+    private ?CacheConfigResolver $cacheConfigResolver = null;
 
     public function handle(): never
     {
         $this->boot();
+        $this->cacheConfigResolver = new CacheConfigResolver($this->config);
 
         $this->handleCors();
 
@@ -1130,8 +1133,8 @@ final class HttpKernel extends AbstractKernel
         }
 
         try {
-            $cacheMaxAge = $this->resolveRenderCacheMaxAge();
-            $cacheControlHeader = $this->cacheControlHeaderForRender($account, $cacheMaxAge);
+            $cacheMaxAge = $this->cacheConfigResolver->resolveRenderCacheMaxAge();
+            $cacheControlHeader = $this->cacheConfigResolver->cacheControlHeaderForRender($account, $cacheMaxAge);
 
             $normalizedPath = $path;
             if ($normalizedPath === '' || $normalizedPath === '/') {
@@ -1317,15 +1320,15 @@ final class HttpKernel extends AbstractKernel
         }
 
         if ($response instanceof HttpResponse) {
-            $cacheMaxAge = $this->resolveRenderCacheMaxAge();
-            $response->headers->set('Cache-Control', $this->cacheControlHeaderForRender($account, $cacheMaxAge));
+            $cacheMaxAge = $this->cacheConfigResolver->resolveRenderCacheMaxAge();
+            $response->headers->set('Cache-Control', $this->cacheConfigResolver->cacheControlHeaderForRender($account, $cacheMaxAge));
             $response->send();
             exit;
         }
 
-        $cacheMaxAge = $this->resolveRenderCacheMaxAge();
+        $cacheMaxAge = $this->cacheConfigResolver->resolveRenderCacheMaxAge();
         $headers = $response->headers;
-        $headers['Cache-Control'] = $this->cacheControlHeaderForRender($account, $cacheMaxAge);
+        $headers['Cache-Control'] = $this->cacheConfigResolver->cacheControlHeaderForRender($account, $cacheMaxAge);
         $this->sendHtml($response->statusCode, $response->content, $headers);
     }
 
@@ -1732,45 +1735,6 @@ final class HttpKernel extends AbstractKernel
         );
     }
 
-    private function resolveRenderCacheMaxAge(): int
-    {
-        $ssrConfig = $this->config['ssr'] ?? null;
-        if (is_array($ssrConfig) && isset($ssrConfig['cache_max_age']) && is_numeric($ssrConfig['cache_max_age'])) {
-            return max(0, (int) $ssrConfig['cache_max_age']);
-        }
-
-        return 300;
-    }
-
-    private function resolveRenderSharedCacheMaxAge(int $defaultMaxAge): int
-    {
-        $ssrConfig = $this->config['ssr'] ?? null;
-        if (is_array($ssrConfig) && isset($ssrConfig['cache_shared_max_age']) && is_numeric($ssrConfig['cache_shared_max_age'])) {
-            return max(0, (int) $ssrConfig['cache_shared_max_age']);
-        }
-
-        return max(0, $defaultMaxAge);
-    }
-
-    private function resolveRenderStaleWhileRevalidate(): int
-    {
-        $ssrConfig = $this->config['ssr'] ?? null;
-        if (is_array($ssrConfig) && isset($ssrConfig['cache_stale_while_revalidate']) && is_numeric($ssrConfig['cache_stale_while_revalidate'])) {
-            return max(0, (int) $ssrConfig['cache_stale_while_revalidate']);
-        }
-
-        return 60;
-    }
-
-    private function resolveRenderStaleIfError(): int
-    {
-        $ssrConfig = $this->config['ssr'] ?? null;
-        if (is_array($ssrConfig) && isset($ssrConfig['cache_stale_if_error']) && is_numeric($ssrConfig['cache_stale_if_error'])) {
-            return max(0, (int) $ssrConfig['cache_stale_if_error']);
-        }
-
-        return 600;
-    }
 
     /**
      * @param array<string, mixed> $renderContext
@@ -1829,25 +1793,6 @@ final class HttpKernel extends AbstractKernel
         return $normalized === '' ? $fallback : $normalized;
     }
 
-    private function cacheControlHeaderForRender(AccountInterface $account, int $maxAge): string
-    {
-        if ($account->isAuthenticated()) {
-            return 'private, no-store';
-        }
-
-        $safeMaxAge = max(0, $maxAge);
-        $sharedMaxAge = $this->resolveRenderSharedCacheMaxAge($safeMaxAge);
-        $staleWhileRevalidate = $this->resolveRenderStaleWhileRevalidate();
-        $staleIfError = $this->resolveRenderStaleIfError();
-
-        return sprintf(
-            'public, max-age=%d, s-maxage=%d, stale-while-revalidate=%d, stale-if-error=%d',
-            $safeMaxAge,
-            $sharedMaxAge,
-            $staleWhileRevalidate,
-            $staleIfError,
-        );
-    }
 
     /**
      * @param array<string, mixed> $renderContext

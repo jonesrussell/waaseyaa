@@ -15,6 +15,7 @@ use Waaseyaa\Cache\TagAwareCacheInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
+use Waaseyaa\Cache\CacheConfigResolver;
 use Waaseyaa\Foundation\Http\CorsHandler;
 use Waaseyaa\Foundation\Kernel\AbstractKernel;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
@@ -283,55 +284,39 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function resolves_render_cache_max_age_from_config_or_default(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveRenderCacheMaxAge');
-        $method->setAccessible(true);
+        $resolver = new CacheConfigResolver(['ssr' => ['cache_max_age' => 600]]);
+        $this->assertSame(600, $resolver->resolveRenderCacheMaxAge());
 
-        $configProp->setValue($kernel, ['ssr' => ['cache_max_age' => 600]]);
-        $this->assertSame(600, $method->invoke($kernel));
-
-        $configProp->setValue($kernel, []);
-        $this->assertSame(300, $method->invoke($kernel));
+        $resolverDefault = new CacheConfigResolver([]);
+        $this->assertSame(300, $resolverDefault->resolveRenderCacheMaxAge());
     }
 
     #[Test]
     public function render_cache_control_header_depends_on_authentication(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue($kernel, []);
-        $method = new \ReflectionMethod(HttpKernel::class, 'cacheControlHeaderForRender');
-        $method->setAccessible(true);
+        $resolver = new CacheConfigResolver([]);
 
         $this->assertSame(
             'public, max-age=120, s-maxage=120, stale-while-revalidate=60, stale-if-error=600',
-            $method->invoke($kernel, new AnonymousUser(), 120),
+            $resolver->cacheControlHeaderForRender(new AnonymousUser(), 120),
         );
-        $this->assertSame('private, no-store', $method->invoke($kernel, new DevAdminAccount(), 120));
+        $this->assertSame('private, no-store', $resolver->cacheControlHeaderForRender(new DevAdminAccount(), 120));
     }
 
     #[Test]
     public function render_cache_control_header_honors_shared_and_stale_config(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue($kernel, [
+        $resolver = new CacheConfigResolver([
             'ssr' => [
                 'cache_shared_max_age' => 900,
                 'cache_stale_while_revalidate' => 180,
                 'cache_stale_if_error' => 3600,
             ],
         ]);
-        $method = new \ReflectionMethod(HttpKernel::class, 'cacheControlHeaderForRender');
-        $method->setAccessible(true);
 
         $this->assertSame(
             'public, max-age=300, s-maxage=900, stale-while-revalidate=180, stale-if-error=3600',
-            $method->invoke($kernel, new AnonymousUser(), 300),
+            $resolver->cacheControlHeaderForRender(new AnonymousUser(), 300),
         );
     }
 
