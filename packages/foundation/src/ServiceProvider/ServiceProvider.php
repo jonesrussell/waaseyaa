@@ -17,6 +17,9 @@ abstract class ServiceProvider implements ServiceProviderInterface
     /** @var array<string, array{concrete: string|callable, shared: bool}> */
     private array $bindings = [];
 
+    /** @var array<string, mixed> */
+    private array $resolved = [];
+
     /** @var array<string, list<string>> */
     private array $tags = [];
 
@@ -79,6 +82,31 @@ abstract class ServiceProvider implements ServiceProviderInterface
     {
         $this->tags[$tag] ??= [];
         $this->tags[$tag][] = $abstract;
+    }
+
+    /**
+     * Resolve a binding registered via singleton() or bind().
+     */
+    protected function resolve(string $abstract): mixed
+    {
+        if (isset($this->resolved[$abstract])) {
+            return $this->resolved[$abstract];
+        }
+
+        if (!isset($this->bindings[$abstract])) {
+            throw new \RuntimeException("No binding registered for {$abstract}.");
+        }
+
+        $binding = $this->bindings[$abstract];
+        $concrete = $binding['concrete'];
+
+        $instance = is_callable($concrete) ? $concrete() : new $concrete();
+
+        if ($binding['shared']) {
+            $this->resolved[$abstract] = $instance;
+        }
+
+        return $instance;
     }
 
     protected function entityType(\Waaseyaa\Entity\EntityTypeInterface $entityType): void
