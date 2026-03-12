@@ -20,6 +20,9 @@ use Waaseyaa\Database\PdoDatabase;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Http\CorsHandler;
 use Waaseyaa\Foundation\Http\DiscoveryApiHandler;
+use Waaseyaa\Access\EntityAccessHandler;
+use Waaseyaa\Entity\EntityTypeLifecycleManager;
+use Waaseyaa\Foundation\Http\ControllerDispatcher;
 use Waaseyaa\Foundation\Http\SsrPageHandler;
 use Waaseyaa\Foundation\Kernel\AbstractKernel;
 use Waaseyaa\Foundation\Kernel\BuiltinRouteRegistrar;
@@ -235,59 +238,43 @@ final class HttpKernelTest extends TestCase
     #[Test]
     public function allows_wildcard_upload_mime_types(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'isAllowedMimeType');
-        $method->setAccessible(true);
-
-        $this->assertTrue($method->invoke($kernel, 'image/jpeg', ['image/*']));
-        $this->assertTrue($method->invoke($kernel, 'application/pdf', ['image/*', 'application/pdf']));
-        $this->assertFalse($method->invoke($kernel, 'text/html', ['image/*', 'application/pdf']));
+        $dispatcher = $this->createControllerDispatcher();
+        $this->assertTrue($dispatcher->isAllowedMimeType('image/jpeg', ['image/*']));
+        $this->assertTrue($dispatcher->isAllowedMimeType('application/pdf', ['image/*', 'application/pdf']));
+        $this->assertFalse($dispatcher->isAllowedMimeType('text/html', ['image/*', 'application/pdf']));
     }
 
     #[Test]
     public function resolves_files_root_dir_defaults_to_storage_files(): void
     {
-        $kernel = new HttpKernel('/var/www/myapp');
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveFilesRootDir');
-        $method->setAccessible(true);
-
-        $this->assertSame('/var/www/myapp/storage/files', $method->invoke($kernel));
+        $dispatcher = $this->createControllerDispatcher(projectRoot: '/var/www/myapp');
+        $this->assertSame('/var/www/myapp/storage/files', $dispatcher->resolveFilesRootDir());
     }
 
     #[Test]
     public function resolves_files_root_dir_uses_configured_path_when_set(): void
     {
-        $kernel = new HttpKernel('/var/www/myapp');
-        $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
-        $configProp->setValue($kernel, ['files_dir' => '/mnt/uploads']);
-
-        $method = new \ReflectionMethod(HttpKernel::class, 'resolveFilesRootDir');
-        $method->setAccessible(true);
-
-        $this->assertSame('/mnt/uploads', $method->invoke($kernel));
+        $dispatcher = $this->createControllerDispatcher(
+            projectRoot: '/var/www/myapp',
+            config: ['files_dir' => '/mnt/uploads'],
+        );
+        $this->assertSame('/mnt/uploads', $dispatcher->resolveFilesRootDir());
     }
 
     #[Test]
     public function builds_public_file_url_from_public_uri(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'buildPublicFileUrl');
-        $method->setAccessible(true);
-
-        $this->assertSame('/files/images/photo.jpg', $method->invoke($kernel, 'public://images/photo.jpg'));
-        $this->assertSame('/files/tmp/doc.pdf', $method->invoke($kernel, 'tmp/doc.pdf'));
+        $dispatcher = $this->createControllerDispatcher();
+        $this->assertSame('/files/images/photo.jpg', $dispatcher->buildPublicFileUrl('public://images/photo.jpg'));
+        $this->assertSame('/files/tmp/doc.pdf', $dispatcher->buildPublicFileUrl('tmp/doc.pdf'));
     }
 
     #[Test]
     public function sanitizes_uploaded_filename(): void
     {
-        $kernel = new HttpKernel('/tmp/test-project');
-        $method = new \ReflectionMethod(HttpKernel::class, 'sanitizeUploadFilename');
-        $method->setAccessible(true);
-
-        $this->assertSame('my_photo_.jpg', $method->invoke($kernel, 'my photo?.jpg'));
-        $this->assertSame('upload.bin', $method->invoke($kernel, '../../'));
+        $dispatcher = $this->createControllerDispatcher();
+        $this->assertSame('my_photo_.jpg', $dispatcher->sanitizeUploadFilename('my photo?.jpg'));
+        $this->assertSame('upload.bin', $dispatcher->sanitizeUploadFilename('../../'));
     }
 
     #[Test]
@@ -675,6 +662,37 @@ final class HttpKernelTest extends TestCase
         $this->assertContains('discovery:entity:node:3', $tags);
         $this->assertContains('discovery:status:published', $tags);
         $this->assertContains('discovery:direction:both', $tags);
+    }
+
+    private function createControllerDispatcher(
+        string $projectRoot = '/tmp/test-project',
+        array $config = [],
+    ): ControllerDispatcher {
+        $entityTypeManager = new EntityTypeManager(new EventDispatcher());
+        $database = PdoDatabase::createSqlite();
+        $discoveryHandler = new DiscoveryApiHandler($entityTypeManager, $database);
+        $cacheConfigResolver = new CacheConfigResolver($config);
+        $ssrPageHandler = new SsrPageHandler(
+            entityTypeManager: $entityTypeManager,
+            database: $database,
+            renderCache: null,
+            cacheConfigResolver: $cacheConfigResolver,
+            discoveryHandler: $discoveryHandler,
+            projectRoot: $projectRoot,
+            config: $config,
+        );
+
+        return new ControllerDispatcher(
+            entityTypeManager: $entityTypeManager,
+            database: $database,
+            accessHandler: new EntityAccessHandler(),
+            lifecycleManager: new EntityTypeLifecycleManager($projectRoot),
+            discoveryHandler: $discoveryHandler,
+            ssrPageHandler: $ssrPageHandler,
+            mcpReadCache: null,
+            projectRoot: $projectRoot,
+            config: $config,
+        );
     }
 
     private function createSsrPageHandler(array $config = []): SsrPageHandler
