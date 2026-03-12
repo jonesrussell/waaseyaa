@@ -13,7 +13,7 @@
         {"type": "path", "url": "../config"}
     ],
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "waaseyaa/entity": "@dev",
         "waaseyaa/field": "@dev",
         "waaseyaa/cache": "@dev",

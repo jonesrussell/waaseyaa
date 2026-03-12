@@ -11,7 +11,7 @@
         {"type": "path", "url": "../config"}
     ],
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "waaseyaa/typed-data": "@dev",
         "waaseyaa/entity": "@dev",
         "symfony/validator": "^7.3"

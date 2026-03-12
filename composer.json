@@ -44,7 +44,7 @@
         { "type": "path", "url": "packages/full" }
     ],
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "waaseyaa/access": "@dev",
         "waaseyaa/ai-agent": "@dev",
         "waaseyaa/ai-pipeline": "@dev",

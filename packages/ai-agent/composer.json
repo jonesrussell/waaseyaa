@@ -12,7 +12,7 @@
         {"type": "path", "url": "../config"}
     ],
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "waaseyaa/ai-schema": "@dev",
         "waaseyaa/access": "@dev"
     },

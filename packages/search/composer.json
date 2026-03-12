@@ -4,7 +4,7 @@
     "type": "library",
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "twig/twig": "^3.0"
     },
     "require-dev": {

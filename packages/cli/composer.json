@@ -14,7 +14,7 @@
         {"type": "path", "url": "../routing"}
     ],
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "waaseyaa/entity": "@dev",
         "waaseyaa/config": "@dev",
         "waaseyaa/cache": "@dev",

@@ -21,7 +21,7 @@
         {"type": "path", "url": "../workflows"}
     ],
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "waaseyaa/ai-schema": "@dev",
         "waaseyaa/ai-agent": "@dev",
         "waaseyaa/routing": "@dev",

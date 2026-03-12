@@ -13,7 +13,7 @@
         {"type": "path", "url": "../i18n"}
     ],
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "waaseyaa/entity": "@dev",
         "waaseyaa/access": "@dev",
         "waaseyaa/i18n": "@dev",

@@ -15,7 +15,7 @@
         {"type": "path", "url": "../workflows"}
     ],
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "waaseyaa/entity": "@dev",
         "waaseyaa/queue": "@dev",
         "waaseyaa/api": "@dev",

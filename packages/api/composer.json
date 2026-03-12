@@ -14,7 +14,7 @@
         {"type": "path", "url": "../foundation"}
     ],
     "require": {
-        "php": ">=8.3",
+        "php": "^8.4",
         "waaseyaa/entity": "@dev",
         "waaseyaa/foundation": "@dev",
         "waaseyaa/routing": "@dev",
