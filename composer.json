@@ -46,6 +46,8 @@
     ],
     "require": {
         "php": ">=8.4",
+        "symfony/console": "^7.0",
+        "symfony/html-sanitizer": "^8.0",
         "waaseyaa/access": "@dev",
         "waaseyaa/ai-agent": "@dev",
         "waaseyaa/ai-pipeline": "@dev",
@@ -79,8 +81,7 @@
         "waaseyaa/typed-data": "@dev",
         "waaseyaa/user": "@dev",
         "waaseyaa/validation": "@dev",
-        "waaseyaa/workflows": "@dev",
-        "symfony/console": "^7.0"
+        "waaseyaa/workflows": "@dev"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.50",
