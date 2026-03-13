@@ -28,9 +28,9 @@ $kernel = new Waaseyaa\Foundation\Kernel\HttpKernel(dirname(__DIR__));
 try {
     $kernel->handle();
 } catch (\Throwable $e) {
-    error_log(sprintf('[Waaseyaa] Unhandled top-level exception: %s in %s:%d', $e->getMessage(), $e->getFile(), $e->getLine()));
+    error_log(sprintf('[Waaseyaa] Unhandled top-level exception: %s in %s:%d%s', $e->getMessage(), $e->getFile(), $e->getLine(), PHP_EOL . $e->getTraceAsString()));
     http_response_code(500);
-    header('Content-Type: application/json');
+    header('Content-Type: application/vnd.api+json');
     echo json_encode([
         'jsonapi' => ['version' => '1.1'],
         'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => 'An unexpected error occurred.']],
