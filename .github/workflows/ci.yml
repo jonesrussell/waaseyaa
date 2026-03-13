@@ -104,7 +104,7 @@ jobs:
           done
 
       - name: Run Playwright smoke tests
-        run: cd packages/admin && npx playwright test --project=chromium --grep @smoke
+        run: cd packages/admin && npx playwright test --project=chromium
 
       - name: Upload Playwright artifacts
         uses: actions/upload-artifact@v4

@@ -12,7 +12,7 @@ These three checks must pass before a PR can be merged:
 |---|---|---|
 | `ci/lint` | PHP syntax, CS Fixer (dry-run), PHPStan static analysis | ~1 min |
 | `ci/unit-tests` | PHPUnit unit + integration test suites | ~2 min |
-| `ci/playwright-smoke` | Starts PHP + Nuxt servers, runs `@smoke`-tagged Playwright tests | ~3 min |
+| `ci/playwright-smoke` | Starts PHP + Nuxt servers, runs Playwright e2e tests | ~3 min |
 
 ### Additional Checks (informational)
 
