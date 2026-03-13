@@ -106,6 +106,35 @@ final class ThemeServiceProviderTest extends TestCase
         $this->removeDirectory($projectRoot);
     }
 
+    #[Test]
+    public function twigCacheIsDisabledByDefault(): void
+    {
+        $projectRoot = sys_get_temp_dir() . '/waaseyaa_twig_cache_default_' . uniqid();
+        mkdir($projectRoot . '/packages/ssr/templates', 0755, true);
+
+        $twig = ThemeServiceProvider::createTwigEnvironment($projectRoot);
+
+        $this->assertFalse($twig->getCache(true), 'Cache must be false when no cache_dir is configured.');
+
+        $this->removeDirectory($projectRoot);
+    }
+
+    #[Test]
+    public function twigCacheUsesConfiguredCacheDir(): void
+    {
+        $projectRoot = sys_get_temp_dir() . '/waaseyaa_twig_cache_dir_' . uniqid();
+        $cacheDir = sys_get_temp_dir() . '/waaseyaa_twig_cache_' . uniqid();
+        mkdir($projectRoot . '/packages/ssr/templates', 0755, true);
+
+        $twig = ThemeServiceProvider::createTwigEnvironment($projectRoot, ['ssr' => ['cache_dir' => $cacheDir]]);
+        $cache = $twig->getCache(true);
+
+        $this->assertNotFalse($cache, 'Cache must be enabled when cache_dir is configured.');
+        $this->assertStringContainsString($cacheDir, (string) $cache);
+
+        $this->removeDirectory($projectRoot);
+    }
+
     private function removeDirectory(string $directory): void
     {
         if (!is_dir($directory)) {
