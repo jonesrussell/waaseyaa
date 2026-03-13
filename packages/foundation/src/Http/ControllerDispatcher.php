@@ -29,6 +29,8 @@ use Waaseyaa\AI\Vector\SearchController;
 use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
 use Waaseyaa\Mcp\McpController;
 use Waaseyaa\SSR\SsrPageHandler;
+use Waaseyaa\User\Http\AuthController;
+use Waaseyaa\User\User;
 
 /**
  * Routes a matched controller name to the appropriate handler.
@@ -566,6 +568,57 @@ final class ControllerDispatcher
                         ResponseSender::json($result['status'], $result['content'], $result['headers']);
                     }
                     ResponseSender::html($result['status'], $result['content'], $result['headers']);
+                })(),
+
+                $controller === 'user.me' => (function () use ($account): never {
+                    $authController = new AuthController();
+                    $result = $authController->me($account);
+                    ResponseSender::json($result['statusCode'], array_filter([
+                        'jsonapi' => ['version' => '1.1'],
+                        'data' => $result['data'] ?? null,
+                        'errors' => $result['errors'] ?? null,
+                    ]));
+                })(),
+
+                $controller === 'auth.login' => (function () use ($body): never {
+                    $username = is_string($body['username'] ?? null) ? trim((string) $body['username']) : '';
+                    $password = is_string($body['password'] ?? null) ? (string) $body['password'] : '';
+
+                    if ($username === '' || $password === '') {
+                        ResponseSender::json(400, [
+                            'jsonapi' => ['version' => '1.1'],
+                            'errors' => [['status' => '400', 'title' => 'Bad Request', 'detail' => 'username and password are required.']],
+                        ]);
+                    }
+
+                    $userStorage = $this->entityTypeManager->getStorage('user');
+                    $authController = new AuthController();
+                    $user = $authController->findUserByName($userStorage, $username);
+
+                    if ($user === null || !$user->isActive() || !$user->checkPassword($password)) {
+                        ResponseSender::json(401, [
+                            'jsonapi' => ['version' => '1.1'],
+                            'errors' => [['status' => '401', 'title' => 'Unauthorized', 'detail' => 'Invalid credentials.']],
+                        ]);
+                    }
+
+                    $_SESSION['waaseyaa_uid'] = $user->id();
+                    ResponseSender::json(200, [
+                        'jsonapi' => ['version' => '1.1'],
+                        'data' => [
+                            'id' => $user->id(),
+                            'name' => $user->getName(),
+                            'email' => $user->getEmail(),
+                            'roles' => $user->getRoles(),
+                        ],
+                    ]);
+                })(),
+
+                $controller === 'auth.logout' => (function (): never {
+                    if (isset($_SESSION['waaseyaa_uid'])) {
+                        unset($_SESSION['waaseyaa_uid']);
+                    }
+                    ResponseSender::json(200, ['jsonapi' => ['version' => '1.1'], 'meta' => ['message' => 'Logged out.']]);
                 })(),
 
                 default => (function () use ($controller): never {
