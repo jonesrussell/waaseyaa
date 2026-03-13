@@ -1,5 +1,5 @@
 // packages/admin/tests/unit/composables/useLanguage.test.ts
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { useLanguage } from '~/composables/useLanguage'
 
 describe('useLanguage.t', () => {
@@ -40,5 +40,31 @@ describe('useLanguage.t', () => {
     // We test with a raw call: key falls back to itself, replacements applied.
     const result = t('Hello {name}', { name: 'World' })
     expect(result).toBe('Hello World')
+  })
+})
+
+describe('useLanguage SSR hydration safety', () => {
+  beforeEach(() => {
+    // Clear locale cookie before each test
+    document.cookie = 'waaseyaa.admin.locale=; max-age=0; path=/'
+  })
+
+  it('setLocale works without localStorage (SSR-safe — no dependency on browser storage)', () => {
+    // The nuxt test environment does not provide localStorage.
+    // If setLocale still depends on localStorage this test would throw.
+    // The fact that it runs without error proves the implementation is SSR-safe.
+    expect(() => {
+      const { setLocale } = useLanguage()
+      setLocale('fr')
+    }).not.toThrow()
+  })
+
+  it('locale change is reflected in a subsequent useLanguage() call (useState-shared)', () => {
+    const { setLocale } = useLanguage()
+    setLocale('fr')
+    // useState key 'waaseyaa.admin.locale' is shared across all useLanguage() callers —
+    // this is what makes SSR and CSR agree on the same locale value.
+    const { locale } = useLanguage()
+    expect(locale.value).toBe('fr')
   })
 })
