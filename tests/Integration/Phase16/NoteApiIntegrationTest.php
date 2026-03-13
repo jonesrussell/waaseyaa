@@ -93,7 +93,6 @@ final class NoteApiIntegrationTest extends TestCase
                 'type' => 'note',
                 'attributes' => [
                     'title' => 'My First Note',
-                    'tenant_id' => 'acme',
                     'body' => 'Hello, Waaseyaa.',
                 ],
             ],
@@ -197,9 +196,9 @@ final class NoteApiIntegrationTest extends TestCase
         ]);
     }
 
-    private function seedNote(string $title, string $tenantId = 'acme'): Note
+    private function seedNote(string $title): Note
     {
-        $note = new Note(['title' => $title, 'tenant_id' => $tenantId]);
+        $note = new Note(['title' => $title]);
         $this->storage->save($note);
 
         return $note;
@@ -215,12 +214,14 @@ class NoteInMemoryStorage extends InMemoryEntityStorage
     private array $notes = [];
     private int $nextId = 1;
 
-    public function create(array $values = []): Note
+    /** @return Note */
+    public function create(array $values = []): EntityInterface
     {
         return new Note($values);
     }
 
-    public function load(int|string $id): ?Note
+    /** @return Note|null */
+    public function load(int|string $id): ?EntityInterface
     {
         return $this->notes[$id] ?? null;
     }

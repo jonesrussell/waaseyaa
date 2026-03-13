@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6df63a47ac89dbdf2b6ce91e475bc479",
+    "content-hash": "054419b15ce87acb89694e64143fa307",
     "packages": [
         {
             "name": "doctrine/dbal",
@@ -159,6 +159,188 @@
                 "source": "https://github.com/doctrine/deprecations/tree/1.1.6"
             },
             "time": "2026-02-07T07:09:04+00:00"
+        },
+        {
+            "name": "league/uri",
+            "version": "7.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri.git",
+                "reference": "4436c6ec8d458e4244448b069cc572d088230b76"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri/zipball/4436c6ec8d458e4244448b069cc572d088230b76",
+                "reference": "4436c6ec8d458e4244448b069cc572d088230b76",
+                "shasum": ""
+            },
+            "require": {
+                "league/uri-interfaces": "^7.8",
+                "php": "^8.1",
+                "psr/http-factory": "^1"
+            },
+            "conflict": {
+                "league/uri-schemes": "^1.0"
+            },
+            "suggest": {
+                "ext-bcmath": "to improve IPV4 host parsing",
+                "ext-dom": "to convert the URI into an HTML anchor tag",
+                "ext-fileinfo": "to create Data URI from file contennts",
+                "ext-gmp": "to improve IPV4 host parsing",
+                "ext-intl": "to handle IDN host with the best performance",
+                "ext-uri": "to use the PHP native URI class",
+                "jeremykendall/php-domain-parser": "to further parse the URI host and resolve its Public Suffix and Top Level Domain",
+                "league/uri-components": "to provide additional tools to manipulate URI objects components",
+                "league/uri-polyfill": "to backport the PHP URI extension for older versions of PHP",
+                "php-64bit": "to improve IPV4 host parsing",
+                "rowbot/url": "to handle URLs using the WHATWG URL Living Standard specification",
+                "symfony/polyfill-intl-idn": "to handle IDN host via the Symfony polyfill if ext-intl is not present"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Uri\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://nyamsprod.com"
+                }
+            ],
+            "description": "URI manipulation library",
+            "homepage": "https://uri.thephpleague.com",
+            "keywords": [
+                "URN",
+                "data-uri",
+                "file-uri",
+                "ftp",
+                "hostname",
+                "http",
+                "https",
+                "middleware",
+                "parse_str",
+                "parse_url",
+                "psr-7",
+                "query-string",
+                "querystring",
+                "rfc2141",
+                "rfc3986",
+                "rfc3987",
+                "rfc6570",
+                "rfc8141",
+                "uri",
+                "uri-template",
+                "url",
+                "ws"
+            ],
+            "support": {
+                "docs": "https://uri.thephpleague.com",
+                "forum": "https://thephpleague.slack.com",
+                "issues": "https://github.com/thephpleague/uri-src/issues",
+                "source": "https://github.com/thephpleague/uri/tree/7.8.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/nyamsprod",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-01-14T17:24:56+00:00"
+        },
+        {
+            "name": "league/uri-interfaces",
+            "version": "7.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/uri-interfaces.git",
+                "reference": "c5c5cd056110fc8afaba29fa6b72a43ced42acd4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/uri-interfaces/zipball/c5c5cd056110fc8afaba29fa6b72a43ced42acd4",
+                "reference": "c5c5cd056110fc8afaba29fa6b72a43ced42acd4",
+                "shasum": ""
+            },
+            "require": {
+                "ext-filter": "*",
+                "php": "^8.1",
+                "psr/http-message": "^1.1 || ^2.0"
+            },
+            "suggest": {
+                "ext-bcmath": "to improve IPV4 host parsing",
+                "ext-gmp": "to improve IPV4 host parsing",
+                "ext-intl": "to handle IDN host with the best performance",
+                "php-64bit": "to improve IPV4 host parsing",
+                "rowbot/url": "to handle URLs using the WHATWG URL Living Standard specification",
+                "symfony/polyfill-intl-idn": "to handle IDN host via the Symfony polyfill if ext-intl is not present"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "7.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Uri\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ignace Nyamagana Butera",
+                    "email": "nyamsprod@gmail.com",
+                    "homepage": "https://nyamsprod.com"
+                }
+            ],
+            "description": "Common tools for parsing and resolving RFC3987/RFC3986 URI",
+            "homepage": "https://uri.thephpleague.com",
+            "keywords": [
+                "data-uri",
+                "file-uri",
+                "ftp",
+                "hostname",
+                "http",
+                "https",
+                "parse_str",
+                "parse_url",
+                "psr-7",
+                "query-string",
+                "querystring",
+                "rfc3986",
+                "rfc3987",
+                "rfc6570",
+                "uri",
+                "url",
+                "ws"
+            ],
+            "support": {
+                "docs": "https://uri.thephpleague.com",
+                "forum": "https://thephpleague.slack.com",
+                "issues": "https://github.com/thephpleague/uri-src/issues",
+                "source": "https://github.com/thephpleague/uri-interfaces/tree/7.8.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/sponsors/nyamsprod",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-01-15T06:54:53+00:00"
         },
         {
             "name": "psr/cache",
@@ -361,6 +543,114 @@
             "time": "2019-01-08T18:20:26+00:00"
         },
         {
+            "name": "psr/http-factory",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-factory.git",
+                "reference": "2b4765fddfe3b508ac62f829e852b1501d3f6e8a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-factory/zipball/2b4765fddfe3b508ac62f829e852b1501d3f6e8a",
+                "reference": "2b4765fddfe3b508ac62f829e852b1501d3f6e8a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.1",
+                "psr/http-message": "^1.0 || ^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "PSR-17: Common interfaces for PSR-7 HTTP message factories",
+            "keywords": [
+                "factory",
+                "http",
+                "message",
+                "psr",
+                "psr-17",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/http-factory"
+            },
+            "time": "2024-04-15T12:06:14+00:00"
+        },
+        {
+            "name": "psr/http-message",
+            "version": "2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/402d35bcb92c70c026d1a6a9883f06b2ead23d71",
+                "reference": "402d35bcb92c70c026d1a6a9883f06b2ead23d71",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2 || ^8.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "homepage": "https://github.com/php-fig/http-message",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "support": {
+                "source": "https://github.com/php-fig/http-message/tree/2.0"
+            },
+            "time": "2023-04-04T09:54:51+00:00"
+        },
+        {
             "name": "psr/log",
             "version": "3.0.2",
             "source": {
@@ -540,16 +830,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v7.4.7",
+            "version": "v7.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "e1e6770440fb9c9b0cf725f81d1361ad1835329d"
+                "reference": "6d643a93b47398599124022eb24d97c153c12f27"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/e1e6770440fb9c9b0cf725f81d1361ad1835329d",
-                "reference": "e1e6770440fb9c9b0cf725f81d1361ad1835329d",
+                "url": "https://api.github.com/repos/symfony/console/zipball/6d643a93b47398599124022eb24d97c153c12f27",
+                "reference": "6d643a93b47398599124022eb24d97c153c12f27",
                 "shasum": ""
             },
             "require": {
@@ -614,7 +904,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.4.7"
+                "source": "https://github.com/symfony/console/tree/v7.4.6"
             },
             "funding": [
                 {
@@ -634,20 +924,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-06T14:06:20+00:00"
+            "time": "2026-02-25T17:02:47+00:00"
         },
         {
             "name": "symfony/dependency-injection",
-            "version": "v7.4.7",
+            "version": "v7.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dependency-injection.git",
-                "reference": "0f651e58f4917fb0e2cd261ccbfe3d71e6e0f5db"
+                "reference": "a3f7d594ca53a34a7d39ae683fbca09408b0c598"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/0f651e58f4917fb0e2cd261ccbfe3d71e6e0f5db",
-                "reference": "0f651e58f4917fb0e2cd261ccbfe3d71e6e0f5db",
+                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/a3f7d594ca53a34a7d39ae683fbca09408b0c598",
+                "reference": "a3f7d594ca53a34a7d39ae683fbca09408b0c598",
                 "shasum": ""
             },
             "require": {
@@ -698,7 +988,7 @@
             "description": "Allows you to standardize and centralize the way objects are constructed in your application",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/dependency-injection/tree/v7.4.7"
+                "source": "https://github.com/symfony/dependency-injection/tree/v7.4.6"
             },
             "funding": [
                 {
@@ -718,7 +1008,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-03T07:48:48+00:00"
+            "time": "2026-02-25T16:50:00+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -949,17 +1239,89 @@
             "time": "2024-09-25T14:21:43+00:00"
         },
         {
-            "name": "symfony/http-foundation",
-            "version": "v7.4.7",
+            "name": "symfony/html-sanitizer",
+            "version": "v8.0.7",
             "source": {
                 "type": "git",
-                "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "f94b3e7b7dafd40e666f0c9ff2084133bae41e81"
+                "url": "https://github.com/symfony/html-sanitizer.git",
+                "reference": "555b37caeee3d07af33471e02377d5ff561f8ac2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/f94b3e7b7dafd40e666f0c9ff2084133bae41e81",
-                "reference": "f94b3e7b7dafd40e666f0c9ff2084133bae41e81",
+                "url": "https://api.github.com/repos/symfony/html-sanitizer/zipball/555b37caeee3d07af33471e02377d5ff561f8ac2",
+                "reference": "555b37caeee3d07af33471e02377d5ff561f8ac2",
+                "shasum": ""
+            },
+            "require": {
+                "ext-dom": "*",
+                "league/uri": "^6.5|^7.0",
+                "php": ">=8.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\HtmlSanitizer\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Titouan Galopin",
+                    "email": "galopintitouan@gmail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Provides an object-oriented API to sanitize untrusted HTML input for safe insertion into a document's DOM.",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "Purifier",
+                "html",
+                "sanitizer"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/html-sanitizer/tree/v8.0.7"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2026-03-06T13:17:40+00:00"
+        },
+        {
+            "name": "symfony/http-foundation",
+            "version": "v7.4.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/http-foundation.git",
+                "reference": "fd97d5e926e988a363cef56fbbf88c5c528e9065"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/fd97d5e926e988a363cef56fbbf88c5c528e9065",
+                "reference": "fd97d5e926e988a363cef56fbbf88c5c528e9065",
                 "shasum": ""
             },
             "require": {
@@ -1008,7 +1370,7 @@
             "description": "Defines an object-oriented layer for the HTTP specification",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-foundation/tree/v7.4.7"
+                "source": "https://github.com/symfony/http-foundation/tree/v7.4.6"
             },
             "funding": [
                 {
@@ -1028,20 +1390,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-06T13:15:18+00:00"
+            "time": "2026-02-21T16:25:55+00:00"
         },
         {
             "name": "symfony/messenger",
-            "version": "v7.4.7",
+            "version": "v7.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/messenger.git",
-                "reference": "13a00f01a46ba7d47ac7f0e3d9a901d19f9432f0"
+                "reference": "9da6166eb98937d903ed3685b317b426c82d3496"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/messenger/zipball/13a00f01a46ba7d47ac7f0e3d9a901d19f9432f0",
-                "reference": "13a00f01a46ba7d47ac7f0e3d9a901d19f9432f0",
+                "url": "https://api.github.com/repos/symfony/messenger/zipball/9da6166eb98937d903ed3685b317b426c82d3496",
+                "reference": "9da6166eb98937d903ed3685b317b426c82d3496",
                 "shasum": ""
             },
             "require": {
@@ -1102,7 +1464,7 @@
             "description": "Helps applications send and receive messages to/from other applications or via message queues",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/messenger/tree/v7.4.7"
+                "source": "https://github.com/symfony/messenger/tree/v7.4.6"
             },
             "funding": [
                 {
@@ -1122,7 +1484,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-04T13:54:41+00:00"
+            "time": "2026-02-25T16:50:00+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -2046,16 +2408,16 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v7.4.7",
+            "version": "v7.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/validator.git",
-                "reference": "3a1a460a9f8c5e5611e15c52c4baa5a62fa3c203"
+                "reference": "a1ceaf285712ed8034819a76b5fbba23eaf3e54d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/validator/zipball/3a1a460a9f8c5e5611e15c52c4baa5a62fa3c203",
-                "reference": "3a1a460a9f8c5e5611e15c52c4baa5a62fa3c203",
+                "url": "https://api.github.com/repos/symfony/validator/zipball/a1ceaf285712ed8034819a76b5fbba23eaf3e54d",
+                "reference": "a1ceaf285712ed8034819a76b5fbba23eaf3e54d",
                 "shasum": ""
             },
             "require": {
@@ -2126,7 +2488,7 @@
             "description": "Provides tools to validate values",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/validator/tree/v7.4.7"
+                "source": "https://github.com/symfony/validator/tree/v7.4.6"
             },
             "funding": [
                 {
@@ -2146,7 +2508,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-06T11:10:17+00:00"
+            "time": "2026-02-25T16:50:00+00:00"
         },
         {
             "name": "symfony/var-exporter",
@@ -2385,7 +2747,7 @@
         },
         {
             "name": "waaseyaa/access",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/access",
@@ -2423,7 +2785,7 @@
         },
         {
             "name": "waaseyaa/ai-agent",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-agent",
@@ -2458,7 +2820,7 @@
         },
         {
             "name": "waaseyaa/ai-pipeline",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-pipeline",
@@ -2501,7 +2863,7 @@
         },
         {
             "name": "waaseyaa/ai-schema",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-schema",
@@ -2535,7 +2897,7 @@
         },
         {
             "name": "waaseyaa/ai-vector",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-vector",
@@ -2573,7 +2935,7 @@
         },
         {
             "name": "waaseyaa/api",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/api",
@@ -2610,7 +2972,7 @@
         },
         {
             "name": "waaseyaa/cache",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/cache",
@@ -2649,7 +3011,7 @@
         },
         {
             "name": "waaseyaa/cli",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
@@ -2688,7 +3050,7 @@
         },
         {
             "name": "waaseyaa/config",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/config",
@@ -2723,7 +3085,7 @@
         },
         {
             "name": "waaseyaa/database-legacy",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/database-legacy",
@@ -2756,7 +3118,7 @@
         },
         {
             "name": "waaseyaa/entity",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/entity",
@@ -2796,7 +3158,7 @@
         },
         {
             "name": "waaseyaa/entity-storage",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/entity-storage",
@@ -2834,7 +3196,7 @@
         },
         {
             "name": "waaseyaa/field",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/field",
@@ -2870,11 +3232,11 @@
         },
         {
             "name": "waaseyaa/foundation",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/foundation",
-                "reference": "f8c1367c3ee576f020e31271caed8b951ab0b5dd"
+                "reference": "d1156ac4cf339427e758534bfaf414d544fd37f9"
             },
             "require": {
                 "doctrine/dbal": "^4.0",
@@ -2884,6 +3246,7 @@
                 "symfony/http-foundation": "^7.0",
                 "symfony/messenger": "^7.0",
                 "symfony/uid": "^7.0",
+                "waaseyaa/path": "@dev",
                 "waaseyaa/queue": "@dev"
             },
             "require-dev": {
@@ -2910,7 +3273,7 @@
         },
         {
             "name": "waaseyaa/i18n",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/i18n",
@@ -2943,7 +3306,7 @@
         },
         {
             "name": "waaseyaa/mail",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/mail",
@@ -2981,7 +3344,7 @@
         },
         {
             "name": "waaseyaa/mcp",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/mcp",
@@ -3023,7 +3386,7 @@
         },
         {
             "name": "waaseyaa/media",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/media",
@@ -3064,7 +3427,7 @@
         },
         {
             "name": "waaseyaa/menu",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/menu",
@@ -3105,7 +3468,7 @@
         },
         {
             "name": "waaseyaa/node",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/node",
@@ -3147,7 +3510,7 @@
         },
         {
             "name": "waaseyaa/note",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/note",
@@ -3189,7 +3552,7 @@
         },
         {
             "name": "waaseyaa/path",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/path",
@@ -3230,7 +3593,7 @@
         },
         {
             "name": "waaseyaa/plugin",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/plugin",
@@ -3264,7 +3627,7 @@
         },
         {
             "name": "waaseyaa/queue",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/queue",
@@ -3298,7 +3661,7 @@
         },
         {
             "name": "waaseyaa/routing",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/routing",
@@ -3335,7 +3698,7 @@
         },
         {
             "name": "waaseyaa/search",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/search",
@@ -3369,7 +3732,7 @@
         },
         {
             "name": "waaseyaa/ssr",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/ssr",
@@ -3417,7 +3780,7 @@
         },
         {
             "name": "waaseyaa/state",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/state",
@@ -3451,7 +3814,7 @@
         },
         {
             "name": "waaseyaa/taxonomy",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/taxonomy",
@@ -3493,7 +3856,7 @@
         },
         {
             "name": "waaseyaa/telescope",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/telescope",
@@ -3526,7 +3889,7 @@
         },
         {
             "name": "waaseyaa/typed-data",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/typed-data",
@@ -3560,7 +3923,7 @@
         },
         {
             "name": "waaseyaa/user",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/user",
@@ -3604,7 +3967,7 @@
         },
         {
             "name": "waaseyaa/validation",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/validation",
@@ -3640,7 +4003,7 @@
         },
         {
             "name": "waaseyaa/workflows",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/workflows",
@@ -7014,7 +7377,7 @@
         },
         {
             "name": "waaseyaa/testing",
-            "version": "dev-fix/v1.0-315-foundation-path-dep",
+            "version": "dev-fix/blocker-318-stored-xss",
             "dist": {
                 "type": "path",
                 "url": "packages/testing",

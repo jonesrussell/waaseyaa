@@ -154,6 +154,22 @@ final class CsrfMiddlewareTest extends TestCase
     }
 
     #[Test]
+    public function postToMcpRouteWithCsrfExemptionPassesThrough(): void
+    {
+        $_SESSION['_csrf_token'] = 'valid-token';
+
+        $route = new Route('/mcp');
+        $route->setOption('_csrf', false);
+
+        $request = Request::create('/mcp', 'POST', [], [], [], [], '{"jsonrpc":"2.0","method":"initialize","id":1}');
+        $request->headers->set('Content-Type', 'application/json');
+        $request->attributes->set('_route_object', $route);
+
+        $response = $this->middleware->process($request, $this->passthrough);
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
     public function tokenStaticMethodReturnsConsistentToken(): void
     {
         $_SESSION = [];
@@ -173,5 +189,65 @@ final class CsrfMiddlewareTest extends TestCase
         $regenerated = CsrfMiddleware::token();
 
         $this->assertNotSame($original, $regenerated);
+    }
+
+    #[Test]
+    public function postWithJsonApiContentTypeSkipsCsrf(): void
+    {
+        $_SESSION['_csrf_token'] = 'valid-token';
+
+        $request = Request::create('/api/nodes', 'POST', [], [], [], [], '{"data":{}}');
+        $request->headers->set('Content-Type', 'application/vnd.api+json');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function putWithJsonApiContentTypeSkipsCsrf(): void
+    {
+        $_SESSION['_csrf_token'] = 'valid-token';
+
+        $request = Request::create('/api/nodes/1', 'PUT', [], [], [], [], '{"data":{}}');
+        $request->headers->set('Content-Type', 'application/vnd.api+json');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function deleteWithJsonApiContentTypeSkipsCsrf(): void
+    {
+        $_SESSION['_csrf_token'] = 'valid-token';
+
+        $request = Request::create('/api/nodes/1', 'DELETE');
+        $request->headers->set('Content-Type', 'application/vnd.api+json');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function postWithFormUrlencodedStillRequiresCsrf(): void
+    {
+        $_SESSION['_csrf_token'] = 'valid-token';
+
+        $request = Request::create('/submit', 'POST', ['field' => 'value']);
+        $request->headers->set('Content-Type', 'application/x-www-form-urlencoded');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(403, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function postWithMultipartFormDataStillRequiresCsrf(): void
+    {
+        $_SESSION['_csrf_token'] = 'valid-token';
+
+        $request = Request::create('/upload', 'POST');
+        $request->headers->set('Content-Type', 'multipart/form-data; boundary=----WebKitFormBoundary');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(403, $response->getStatusCode());
     }
 }
