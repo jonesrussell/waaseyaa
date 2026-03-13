@@ -165,4 +165,46 @@ final class RenderController
             statusCode: 404,
         );
     }
+
+    public function renderForbidden(string $path): SsrResponse
+    {
+        $context = ['path' => $path];
+        foreach (['403.html.twig', 'ssr/403.html.twig'] as $template) {
+            try {
+                return new SsrResponse(
+                    content: $this->twig->render($template, $context),
+                    statusCode: 403,
+                );
+            } catch (LoaderError) {
+                continue;
+            }
+        }
+
+        return new SsrResponse(
+            content: sprintf(
+                '<!doctype html><html><head><meta charset="utf-8"><title>403</title></head><body><main><h1>Forbidden</h1><p>%s</p></main></body></html>',
+                htmlspecialchars($path, ENT_QUOTES, 'UTF-8'),
+            ),
+            statusCode: 403,
+        );
+    }
+
+    public function renderServerError(): SsrResponse
+    {
+        foreach (['500.html.twig', 'ssr/500.html.twig'] as $template) {
+            try {
+                return new SsrResponse(
+                    content: $this->twig->render($template),
+                    statusCode: 500,
+                );
+            } catch (LoaderError) {
+                continue;
+            }
+        }
+
+        return new SsrResponse(
+            content: '<!doctype html><html><head><meta charset="utf-8"><title>500</title></head><body><main><h1>Server Error</h1><p>Something went wrong. Please try again later.</p></main></body></html>',
+            statusCode: 500,
+        );
+    }
 }

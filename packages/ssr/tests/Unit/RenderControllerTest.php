@@ -253,6 +253,58 @@ final class RenderControllerTest extends TestCase
         $this->assertSame(404, $response->statusCode);
         $this->assertSame('<h1>Not Found /missing</h1>', $response->content);
     }
+
+    #[Test]
+    public function renderForbiddenReturns403WithTemplate(): void
+    {
+        $twig = new Environment(new ArrayLoader([
+            '403.html.twig' => '<h1>Forbidden {{ path }}</h1>',
+        ]));
+        $controller = new RenderController($twig);
+
+        $response = $controller->renderForbidden('/secret');
+
+        $this->assertSame(403, $response->statusCode);
+        $this->assertSame('<h1>Forbidden /secret</h1>', $response->content);
+    }
+
+    #[Test]
+    public function renderForbiddenFallsBackToInlineHtmlWhenNoTemplate(): void
+    {
+        $twig = new Environment(new ArrayLoader([]));
+        $controller = new RenderController($twig);
+
+        $response = $controller->renderForbidden('/secret');
+
+        $this->assertSame(403, $response->statusCode);
+        $this->assertStringContainsString('403', $response->content);
+    }
+
+    #[Test]
+    public function renderServerErrorReturns500WithTemplate(): void
+    {
+        $twig = new Environment(new ArrayLoader([
+            '500.html.twig' => '<h1>Server Error</h1>',
+        ]));
+        $controller = new RenderController($twig);
+
+        $response = $controller->renderServerError();
+
+        $this->assertSame(500, $response->statusCode);
+        $this->assertSame('<h1>Server Error</h1>', $response->content);
+    }
+
+    #[Test]
+    public function renderServerErrorFallsBackToInlineHtmlWhenNoTemplate(): void
+    {
+        $twig = new Environment(new ArrayLoader([]));
+        $controller = new RenderController($twig);
+
+        $response = $controller->renderServerError();
+
+        $this->assertSame(500, $response->statusCode);
+        $this->assertStringContainsString('500', $response->content);
+    }
 }
 
 final readonly class RenderControllerEntity implements \Waaseyaa\Entity\EntityInterface

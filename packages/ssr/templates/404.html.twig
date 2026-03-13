@@ -2,7 +2,14 @@
 
 {% block title %}404 Not Found{% endblock %}
 
+{% block header %}
+    <nav>
+        <a href="/">Waaseyaa</a>
+    </nav>
+{% endblock %}
+
 {% block body %}
-    <h1>Not Found</h1>
-    <p>{{ path }}</p>
+    <h1>Page Not Found</h1>
+    <p>The page <code>{{ path }}</code> could not be found.</p>
+    <p><a href="/">Return to home</a></p>
 {% endblock %}

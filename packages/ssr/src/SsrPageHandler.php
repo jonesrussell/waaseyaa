@@ -137,7 +137,7 @@ final class SsrPageHandler
             $visibilityResolver = new EditorialVisibilityResolver();
             $visibility = $visibilityResolver->canRender($entity, $account, $previewRequested);
             if ($visibility->isForbidden()) {
-                $response = (new RenderController($twig))->renderNotFound($aliasLookupPath);
+                $response = (new RenderController($twig))->renderForbidden($aliasLookupPath);
                 $headers = $response->headers;
                 $headers['Cache-Control'] = $cacheControlHeader;
                 return $this->htmlResult($response->statusCode, $response->content, $headers);

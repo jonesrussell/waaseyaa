@@ -76,13 +76,6 @@ final class WaaseyaaExtensionTest extends TestCase
         $this->assertSame('localhost', $twig->render('test'));
     }
 
-    #[Test]
-    public function config_returns_empty_string_when_no_factory(): void
-    {
-        $twig = $this->createTwig('{{ config("site.name") }}', configFactory: null);
-
-        $this->assertSame('', $twig->render('test'));
-    }
 
     // ---------------------------------------------------------------
     // env()
@@ -141,16 +134,26 @@ final class WaaseyaaExtensionTest extends TestCase
     // ---------------------------------------------------------------
 
     #[Test]
-    public function extension_registers_three_functions(): void
+    public function extension_registers_only_asset_and_env_when_no_config_factory(): void
     {
         $extension = new WaaseyaaExtension();
-        $functions = $extension->getFunctions();
+        $names = array_map(fn($f) => $f->getName(), $extension->getFunctions());
 
-        $names = array_map(fn($f) => $f->getName(), $functions);
         $this->assertContains('asset', $names);
-        $this->assertContains('config', $names);
         $this->assertContains('env', $names);
-        $this->assertCount(3, $functions);
+        $this->assertNotContains('config', $names, 'config() must not be registered when no factory is wired — it always returned "" and was misleading dead code.');
+        $this->assertCount(2, $extension->getFunctions());
+    }
+
+    #[Test]
+    public function extension_registers_config_function_when_factory_is_provided(): void
+    {
+        $factory = $this->createMock(ConfigFactoryInterface::class);
+        $extension = new WaaseyaaExtension(configFactory: $factory);
+        $names = array_map(fn($f) => $f->getName(), $extension->getFunctions());
+
+        $this->assertContains('config', $names);
+        $this->assertCount(3, $extension->getFunctions());
     }
 
     // ---------------------------------------------------------------

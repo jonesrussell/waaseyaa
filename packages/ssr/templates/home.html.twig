@@ -1,12 +1,14 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Waaseyaa</title>
+{% extends "layouts/base.html.twig" %}
+
+{% block title %}Waaseyaa{% endblock %}
+
+{% block meta %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block styles %}
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -347,10 +349,9 @@
       }
     }
   </style>
-</head>
-<body>
+{% endblock %}
 
-  <main>
+{% block body %}
   <section class="hero">
     <h1 class="wordmark">Waaseyaa</h1>
     <p class="tagline">A light for the modern web</p>
@@ -421,14 +422,13 @@
       </div>
     </div>
   </section>
-  </main>
+{% endblock %}
 
+{% block footer %}
   <footer class="footer">
     <div class="container">
       <p>To replace this page, edit or delete <code>templates/home.html.twig</code></p>
       <p><a href="https://github.com/waaseyaa/framework" target="_blank" rel="noopener noreferrer">github.com/waaseyaa/framework</a></p>
     </div>
   </footer>
-
-</body>
-</html>
+{% endblock %}
