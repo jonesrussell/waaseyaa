@@ -25,4 +25,15 @@ if (!$autoloaded) {
 }
 
 $kernel = new Waaseyaa\Foundation\Kernel\HttpKernel(dirname(__DIR__));
-$kernel->handle();
+try {
+    $kernel->handle();
+} catch (\Throwable $e) {
+    error_log(sprintf('[Waaseyaa] Unhandled top-level exception: %s in %s:%d', $e->getMessage(), $e->getFile(), $e->getLine()));
+    http_response_code(500);
+    header('Content-Type: application/json');
+    echo json_encode([
+        'jsonapi' => ['version' => '1.1'],
+        'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => 'An unexpected error occurred.']],
+    ], JSON_THROW_ON_ERROR);
+    exit(1);
+}
