@@ -1,5 +1,7 @@
 # Waaseyaa
 
+**Current stable:** v1.0.0-final · **Development:** v1.1.0-dev
+
 A modern, entity-first, AI-native content management system built on PHP 8.3+ and Symfony 7.
 
 Waaseyaa replaces Drupal's legacy runtime with a clean, modular architecture organized as independent Composer packages. Every subsystem — entities, fields, config, caching, routing, access control — is a standalone package with explicit interfaces, no global state, and no hidden coupling.
