@@ -15,7 +15,8 @@ export interface ResolvedNavGroup {
   entityTypes: NonEmptyArray<EntityTypeInfo>
 }
 
-function humanize(key: string): string {
+export function humanize(key: string): string {
+  if (!key) return 'Other'
   return key
     .replace(/_/g, ' ')
     .replace(/\b\w/g, c => c.toUpperCase())

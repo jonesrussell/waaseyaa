@@ -1,8 +1,18 @@
 // packages/admin/tests/unit/composables/useNavGroups.test.ts
 import { describe, it, expect } from 'vitest'
-import { groupEntityTypes, type EntityTypeInfo } from '~/composables/useNavGroups'
+import { groupEntityTypes, humanize, type EntityTypeInfo } from '~/composables/useNavGroups'
 
 const K = { id: 'id', label: 'label' }
+
+describe('humanize', () => {
+  it('returns Other for empty string', () => {
+    expect(humanize('')).toBe('Other')
+  })
+
+  it('converts underscore_key to Title Case', () => {
+    expect(humanize('nav_group_elders')).toBe('Nav Group Elders')
+  })
+})
 
 describe('groupEntityTypes', () => {
   it('places user into the people group', () => {
