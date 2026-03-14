@@ -32,6 +32,16 @@ final class JsonApiRouteProvider
      */
     public function registerRoutes(WaaseyaaRouter $router): void
     {
+        // Discovery endpoint: GET /api
+        $router->addRoute(
+            'api.discovery',
+            RouteBuilder::create($this->basePath)
+                ->controller('Waaseyaa\\Api\\ApiDiscoveryController::discover')
+                ->methods('GET')
+                ->allowAll()
+                ->build(),
+        );
+
         foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $definition) {
             $this->registerEntityTypeRoutes($router, $entityTypeId);
         }
