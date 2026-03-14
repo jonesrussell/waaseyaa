@@ -1,0 +1,118 @@
+name: Admin SPA
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/admin/**'
+      - '.github/workflows/admin.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/admin/**'
+      - '.github/workflows/admin.yml'
+
+jobs:
+  contracts:
+    name: admin/contracts
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/admin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: packages/admin/package-lock.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: TypeScript typecheck
+        run: npx nuxi typecheck
+
+      - name: Build contracts
+        run: npm run build:contracts
+
+      - name: Validate bootstrap JSON schema
+        run: |
+          npx --yes ajv-cli validate \
+            --spec=draft2020 \
+            --strict=false \
+            -s contracts/bootstrap.schema.json \
+            -d - <<'PAYLOAD'
+          {
+            "version": "1.0",
+            "auth": { "strategy": "redirect", "loginUrl": "/login" },
+            "account": { "id": "1", "name": "Admin", "roles": ["admin"] },
+            "tenant": { "id": "default", "name": "Test", "scopingStrategy": "server" },
+            "transport": { "strategy": "jsonapi", "apiPath": "/api" },
+            "entities": []
+          }
+          PAYLOAD
+
+      - name: Run Vitest contract tests
+        run: npx vitest run --reporter=verbose
+
+      - name: Upload contracts build
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: contracts-dist
+          path: packages/admin/dist/
+          retention-days: 14
+
+  build:
+    name: admin/build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/admin
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: packages/admin/package-lock.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build Admin SPA
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: admin-build
+          path: packages/admin/.output/
+          retention-days: 14
+
+  integration:
+    name: admin/integration
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: false  # Placeholder — enable when Playwright smoke tests with mock host are ready
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: packages/admin/package-lock.json
+
+      - name: Install dependencies and Playwright
+        run: cd packages/admin && npm install --no-audit --no-fund && npx playwright install --with-deps chromium
+
+      - name: Run Playwright integration tests
+        run: cd packages/admin && npx playwright test
