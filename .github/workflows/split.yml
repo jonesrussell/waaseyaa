@@ -79,7 +79,7 @@ jobs:
 
       - name: Split and push
         env:
-          GITHUB_TOKEN: ${{ secrets.SPLIT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SPLIT_GITHUB_TOKEN }}
           LOCAL_PREFIX: ${{ matrix.package.local }}
           REMOTE_REPO: ${{ matrix.package.remote }}
           REPO_OWNER: ${{ github.repository_owner }}
