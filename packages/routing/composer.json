@@ -14,9 +14,9 @@
     ],
     "require": {
         "php": ">=8.3",
-        "waaseyaa/entity": "^1.1",
-        "waaseyaa/access": "^1.1",
-        "waaseyaa/i18n": "^1.1",
+        "waaseyaa/entity": "^0.1",
+        "waaseyaa/access": "^0.1",
+        "waaseyaa/i18n": "^0.1",
         "symfony/routing": "^7.3"
     },
     "require-dev": {

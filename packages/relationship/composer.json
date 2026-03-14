@@ -10,10 +10,10 @@
     },
     "require": {
         "php": ">=8.3",
-        "waaseyaa/access": "^1.1",
-        "waaseyaa/database-legacy": "^1.1",
-        "waaseyaa/entity": "^1.1",
-        "waaseyaa/workflows": "^1.1"
+        "waaseyaa/access": "^0.1",
+        "waaseyaa/database-legacy": "^0.1",
+        "waaseyaa/entity": "^0.1",
+        "waaseyaa/workflows": "^0.1"
     },
     "extra": {
         "waaseyaa": {

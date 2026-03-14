@@ -16,11 +16,11 @@
     ],
     "require": {
         "php": ">=8.3",
-        "waaseyaa/entity": "^1.1",
-        "waaseyaa/queue": "^1.1",
-        "waaseyaa/api": "^1.1",
-        "waaseyaa/access": "^1.1",
-        "waaseyaa/workflows": "^1.1"
+        "waaseyaa/entity": "^0.1",
+        "waaseyaa/queue": "^0.1",
+        "waaseyaa/api": "^0.1",
+        "waaseyaa/access": "^0.1",
+        "waaseyaa/workflows": "^0.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"

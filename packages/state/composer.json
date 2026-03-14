@@ -7,7 +7,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.3",
-        "waaseyaa/database-legacy": "^1.1"
+        "waaseyaa/database-legacy": "^0.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"

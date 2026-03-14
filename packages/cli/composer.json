@@ -15,11 +15,11 @@
     ],
     "require": {
         "php": ">=8.3",
-        "waaseyaa/entity": "^1.1",
-        "waaseyaa/config": "^1.1",
-        "waaseyaa/cache": "^1.1",
-        "waaseyaa/user": "^1.1",
-        "waaseyaa/access": "^1.1",
+        "waaseyaa/entity": "^0.1",
+        "waaseyaa/config": "^0.1",
+        "waaseyaa/cache": "^0.1",
+        "waaseyaa/user": "^0.1",
+        "waaseyaa/access": "^0.1",
         "symfony/console": "^7.0"
     },
     "require-dev": {

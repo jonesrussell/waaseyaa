@@ -14,9 +14,9 @@
     ],
     "require": {
         "php": ">=8.3",
-        "waaseyaa/entity": "^1.1",
-        "waaseyaa/queue": "^1.1",
-        "waaseyaa/ai-vector": "^1.1"
+        "waaseyaa/entity": "^0.1",
+        "waaseyaa/queue": "^0.1",
+        "waaseyaa/ai-vector": "^0.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"

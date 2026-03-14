@@ -15,12 +15,12 @@
     ],
     "require": {
         "php": ">=8.4",
-        "waaseyaa/access": "^1.1",
-        "waaseyaa/cache": "^1.1",
-        "waaseyaa/config": "^1.1",
-        "waaseyaa/entity": "^1.1",
-        "waaseyaa/field": "^1.1",
-        "waaseyaa/routing": "^1.1",
+        "waaseyaa/access": "^0.1",
+        "waaseyaa/cache": "^0.1",
+        "waaseyaa/config": "^0.1",
+        "waaseyaa/entity": "^0.1",
+        "waaseyaa/field": "^0.1",
+        "waaseyaa/routing": "^0.1",
         "twig/twig": "^3.0"
     },
     "require-dev": {
