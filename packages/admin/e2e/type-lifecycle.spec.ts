@@ -1,8 +1,12 @@
 // packages/admin/e2e/type-lifecycle.spec.ts
 import { test, expect } from '@playwright/test'
-import { mockSchemaRoute, mockEntityListRoute } from './fixtures/routes'
+import { mockSchemaRoute, mockEntityListRoute, mockUserMeRoute } from './fixtures/routes'
 
 test.describe('Content type lifecycle', () => {
+  test.beforeEach(async ({ page }) => {
+    await mockUserMeRoute(page)
+  })
+
   test('warns before disabling the last enabled type', async ({ page }) => {
     let noteDisabled = false
 

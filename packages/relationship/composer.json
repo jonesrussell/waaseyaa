@@ -15,6 +15,11 @@
         "waaseyaa/entity": "@dev",
         "waaseyaa/workflows": "@dev"
     },
+    "extra": {
+        "waaseyaa": {
+            "providers": ["Waaseyaa\\Relationship\\RelationshipServiceProvider"]
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }

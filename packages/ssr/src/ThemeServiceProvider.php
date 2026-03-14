@@ -47,8 +47,16 @@ final class ThemeServiceProvider extends ServiceProvider
 
         $loader = self::createTemplateChainLoader($projectRoot, $activeTheme);
 
+        $cacheDir = false;
+        if (is_array($config['ssr'] ?? null) && is_string($config['ssr']['cache_dir'] ?? null)) {
+            $configured = trim((string) $config['ssr']['cache_dir']);
+            if ($configured !== '' && PHP_SAPI !== 'cli-server') {
+                $cacheDir = $configured;
+            }
+        }
+
         $env = new Environment($loader, [
-            'cache' => false,
+            'cache' => $cacheDir,
             'auto_reload' => true,
             'strict_variables' => false,
         ]);

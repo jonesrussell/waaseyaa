@@ -4,6 +4,17 @@ import { entityTypes } from '../../tests/fixtures/entityTypes'
 import { userSchema, noteSchema } from '../../tests/fixtures/schemas'
 import type { EntitySchema } from '~/composables/useSchema'
 
+export async function mockUserMeRoute(page: Page) {
+  await page.route('**/api/user/me', (route) =>
+    route.fulfill({
+      json: {
+        jsonapi: { version: '1.1' },
+        data: { id: 1, name: 'dev-admin', email: '', roles: ['admin'] },
+      },
+    }),
+  )
+}
+
 export async function mockEntityTypesRoute(page: Page) {
   await page.route('**/api/entity-types', (route) =>
     route.fulfill({ json: { data: entityTypes } }),

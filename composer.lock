@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "054419b15ce87acb89694e64143fa307",
+    "content-hash": "6e776b0a38eab1737a61c9a5878bdb7b",
     "packages": [
         {
             "name": "doctrine/dbal",
@@ -2747,7 +2747,7 @@
         },
         {
             "name": "waaseyaa/access",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/access",
@@ -2785,7 +2785,7 @@
         },
         {
             "name": "waaseyaa/ai-agent",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-agent",
@@ -2820,7 +2820,7 @@
         },
         {
             "name": "waaseyaa/ai-pipeline",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-pipeline",
@@ -2863,7 +2863,7 @@
         },
         {
             "name": "waaseyaa/ai-schema",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-schema",
@@ -2897,7 +2897,7 @@
         },
         {
             "name": "waaseyaa/ai-vector",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/ai-vector",
@@ -2935,7 +2935,7 @@
         },
         {
             "name": "waaseyaa/api",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/api",
@@ -2972,7 +2972,7 @@
         },
         {
             "name": "waaseyaa/cache",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/cache",
@@ -3011,7 +3011,7 @@
         },
         {
             "name": "waaseyaa/cli",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
@@ -3050,7 +3050,7 @@
         },
         {
             "name": "waaseyaa/config",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/config",
@@ -3085,7 +3085,7 @@
         },
         {
             "name": "waaseyaa/database-legacy",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/database-legacy",
@@ -3118,21 +3118,23 @@
         },
         {
             "name": "waaseyaa/entity",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/entity",
-                "reference": "82d5cae1308433f496815bd72fc53b604a03e82c"
+                "reference": "f824300c0019bbd90ea7e5e821b4444a77d5a3b6"
             },
             "require": {
                 "php": ">=8.3",
                 "symfony/event-dispatcher": "^7.3",
                 "symfony/uid": "^7.3",
+                "symfony/validator": "^7.3",
                 "waaseyaa/cache": "@dev",
                 "waaseyaa/config": "@dev",
                 "waaseyaa/foundation": "@dev",
                 "waaseyaa/plugin": "@dev",
-                "waaseyaa/typed-data": "@dev"
+                "waaseyaa/typed-data": "@dev",
+                "waaseyaa/validation": "@dev"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -3158,7 +3160,7 @@
         },
         {
             "name": "waaseyaa/entity-storage",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/entity-storage",
@@ -3196,7 +3198,7 @@
         },
         {
             "name": "waaseyaa/field",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/field",
@@ -3232,11 +3234,11 @@
         },
         {
             "name": "waaseyaa/foundation",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/foundation",
-                "reference": "d1156ac4cf339427e758534bfaf414d544fd37f9"
+                "reference": "f8c1367c3ee576f020e31271caed8b951ab0b5dd"
             },
             "require": {
                 "doctrine/dbal": "^4.0",
@@ -3246,7 +3248,6 @@
                 "symfony/http-foundation": "^7.0",
                 "symfony/messenger": "^7.0",
                 "symfony/uid": "^7.0",
-                "waaseyaa/path": "@dev",
                 "waaseyaa/queue": "@dev"
             },
             "require-dev": {
@@ -3273,7 +3274,7 @@
         },
         {
             "name": "waaseyaa/i18n",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/i18n",
@@ -3306,7 +3307,7 @@
         },
         {
             "name": "waaseyaa/mail",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/mail",
@@ -3344,7 +3345,7 @@
         },
         {
             "name": "waaseyaa/mcp",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/mcp",
@@ -3386,7 +3387,7 @@
         },
         {
             "name": "waaseyaa/media",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/media",
@@ -3427,7 +3428,7 @@
         },
         {
             "name": "waaseyaa/menu",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/menu",
@@ -3468,7 +3469,7 @@
         },
         {
             "name": "waaseyaa/node",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/node",
@@ -3510,7 +3511,7 @@
         },
         {
             "name": "waaseyaa/note",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/note",
@@ -3552,7 +3553,7 @@
         },
         {
             "name": "waaseyaa/path",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/path",
@@ -3593,7 +3594,7 @@
         },
         {
             "name": "waaseyaa/plugin",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/plugin",
@@ -3627,7 +3628,7 @@
         },
         {
             "name": "waaseyaa/queue",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/queue",
@@ -3660,8 +3661,44 @@
             }
         },
         {
+            "name": "waaseyaa/relationship",
+            "version": "dev-fix/v1.0-327-access-policies",
+            "dist": {
+                "type": "path",
+                "url": "packages/relationship",
+                "reference": "247c923afbb953556166c58bdff4b591437e6578"
+            },
+            "require": {
+                "php": ">=8.3",
+                "waaseyaa/access": "@dev",
+                "waaseyaa/database-legacy": "@dev",
+                "waaseyaa/entity": "@dev",
+                "waaseyaa/workflows": "@dev"
+            },
+            "type": "library",
+            "extra": {
+                "waaseyaa": {
+                    "providers": [
+                        "Waaseyaa\\Relationship\\RelationshipServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waaseyaa\\Relationship\\": "src/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Reusable relationship primitives for Waaseyaa applications",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "waaseyaa/routing",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/routing",
@@ -3698,7 +3735,7 @@
         },
         {
             "name": "waaseyaa/search",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/search",
@@ -3732,7 +3769,7 @@
         },
         {
             "name": "waaseyaa/ssr",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/ssr",
@@ -3780,7 +3817,7 @@
         },
         {
             "name": "waaseyaa/state",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/state",
@@ -3814,7 +3851,7 @@
         },
         {
             "name": "waaseyaa/taxonomy",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/taxonomy",
@@ -3856,7 +3893,7 @@
         },
         {
             "name": "waaseyaa/telescope",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/telescope",
@@ -3889,7 +3926,7 @@
         },
         {
             "name": "waaseyaa/typed-data",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/typed-data",
@@ -3923,7 +3960,7 @@
         },
         {
             "name": "waaseyaa/user",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/user",
@@ -3967,16 +4004,15 @@
         },
         {
             "name": "waaseyaa/validation",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/validation",
-                "reference": "771fbc82d51744341f0ec36a3d3754c5cdb015f5"
+                "reference": "8eafeaa996e83007bc1699223f028ead66425459"
             },
             "require": {
                 "php": ">=8.3",
                 "symfony/validator": "^7.3",
-                "waaseyaa/entity": "@dev",
                 "waaseyaa/typed-data": "@dev"
             },
             "require-dev": {
@@ -4003,7 +4039,7 @@
         },
         {
             "name": "waaseyaa/workflows",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/workflows",
@@ -7377,7 +7413,7 @@
         },
         {
             "name": "waaseyaa/testing",
-            "version": "dev-fix/blocker-318-stored-xss",
+            "version": "dev-fix/v1.0-327-access-policies",
             "dist": {
                 "type": "path",
                 "url": "packages/testing",
@@ -7434,6 +7470,7 @@
         "waaseyaa/path": 20,
         "waaseyaa/plugin": 20,
         "waaseyaa/queue": 20,
+        "waaseyaa/relationship": 20,
         "waaseyaa/routing": 20,
         "waaseyaa/search": 20,
         "waaseyaa/ssr": 20,
@@ -7452,5 +7489,5 @@
         "php": ">=8.4"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

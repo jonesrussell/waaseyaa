@@ -142,23 +142,26 @@ TWIG,
     #[Test]
     public function unpublishedWorkflowStatesAreHiddenFromPublicSsr(): void
     {
+        // Since fix #322: access-denied returns 403 (not 404) so the HTTP
+        // response correctly distinguishes forbidden from not-found.
         $draft = $this->request('/node/2');
         $review = $this->request('/node/3');
         $archived = $this->request('/node/4');
 
-        $this->assertSame(404, $draft['status']);
-        $this->assertSame(404, $review['status']);
-        $this->assertSame(404, $archived['status']);
+        $this->assertSame(403, $draft['status']);
+        $this->assertSame(403, $review['status']);
+        $this->assertSame(403, $archived['status']);
     }
 
     #[Test]
     public function unauthenticatedPreviewQueryDoesNotBypassVisibility(): void
     {
+        // Since fix #322: access-denied returns 403 (not 404).
         $draftPreview = $this->request('/node/2?preview=1');
         $reviewPreview = $this->request('/node/3?preview=true');
 
-        $this->assertSame(404, $draftPreview['status']);
-        $this->assertSame(404, $reviewPreview['status']);
+        $this->assertSame(403, $draftPreview['status']);
+        $this->assertSame(403, $reviewPreview['status']);
     }
 
     #[Test]

@@ -33,11 +33,16 @@ final class WaaseyaaExtension extends AbstractExtension
     /** @return TwigFunction[] */
     public function getFunctions(): array
     {
-        return [
+        $functions = [
             new TwigFunction('asset', $this->asset(...)),
-            new TwigFunction('config', $this->config(...)),
             new TwigFunction('env', $this->env(...)),
         ];
+
+        if ($this->configFactory !== null) {
+            $functions[] = new TwigFunction('config', $this->config(...));
+        }
+
+        return $functions;
     }
 
     /**

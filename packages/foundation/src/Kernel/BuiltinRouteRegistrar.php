@@ -145,6 +145,33 @@ final class BuiltinRouteRegistrar
                 ->build(),
         );
 
+        $router->addRoute(
+            'api.user.me',
+            RouteBuilder::create('/api/user/me')
+                ->controller('user.me')
+                ->allowAll()
+                ->methods('GET')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'api.auth.login',
+            RouteBuilder::create('/api/auth/login')
+                ->controller('auth.login')
+                ->allowAll()
+                ->methods('POST')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'api.auth.logout',
+            RouteBuilder::create('/api/auth/logout')
+                ->controller('auth.logout')
+                ->allowAll()
+                ->methods('POST')
+                ->build(),
+        );
+
         // App routes — registered before SSR catchall so they take priority.
         foreach ($this->providers as $provider) {
             $provider->routes($router);

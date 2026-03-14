@@ -4,10 +4,12 @@ import {
   mockEntityTypesRoute,
   mockSchemaRoute,
   mockEntityCreateRoute,
+  mockUserMeRoute,
 } from './fixtures/routes'
 
 test.describe('Entity create form', () => {
   test.beforeEach(async ({ page }) => {
+    await mockUserMeRoute(page)
     await mockEntityTypesRoute(page)
     await mockSchemaRoute(page, 'user')
     await mockEntityCreateRoute(page, 'user')
