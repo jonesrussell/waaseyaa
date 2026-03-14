@@ -3,6 +3,10 @@ name: Trigger Packagist Update
 on:
   workflow_dispatch:
     inputs:
+      packagist_username:
+        description: 'Packagist account username (owner of the API token)'
+        required: true
+        default: 'jonesrussell'
       package:
         description: 'Packagist package name (e.g. waaseyaa/waaseyaa)'
         required: true
@@ -19,10 +23,11 @@ jobs:
       - name: Trigger Packagist crawl
         env:
           PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
+          PACKAGIST_USERNAME: ${{ github.event.inputs.packagist_username }}
           PACKAGE: ${{ github.event.inputs.package }}
           REPO_URL: ${{ github.event.inputs.repo_url }}
         run: |
-          USERNAME="${PACKAGE%%/*}"
+          USERNAME="${PACKAGIST_USERNAME}"
           RESPONSE=$(curl -s -o /tmp/packagist-response.json -w "%{http_code}" \
             -X POST \
             -H "Content-Type: application/json" \
