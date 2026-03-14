@@ -15,6 +15,10 @@ on:
       - 'packages/admin-bridge/**'
       - '.github/workflows/admin.yml'
 
+concurrency:
+  group: admin-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   contracts:
     name: admin/contracts
@@ -68,10 +72,12 @@ jobs:
           coverage: none
 
       - name: Install Composer dependencies
+        if: hashFiles('packages/admin-bridge/composer.json') != ''
         run: composer install --no-interaction --no-progress --prefer-dist
         working-directory: .
 
       - name: Run PHP payload tests
+        if: hashFiles('packages/admin-bridge/composer.json') != ''
         run: ./vendor/bin/phpunit packages/admin-bridge/tests/
         working-directory: .
 
