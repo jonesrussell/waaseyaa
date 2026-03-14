@@ -10,8 +10,15 @@ type NonEmptyArray<T> = [T, ...T[]]
 
 export interface ResolvedNavGroup {
   key: string
+  label: string
   labelKey: string
   entityTypes: NonEmptyArray<EntityTypeInfo>
+}
+
+function humanize(key: string): string {
+  return key
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase())
 }
 
 const groupOrder: string[] = [
@@ -70,6 +77,7 @@ export function groupEntityTypes(entityTypes: EntityTypeInfo[]): ResolvedNavGrou
     const types = grouped.get(key)!
     groups.push({
       key,
+      label: humanize(key),
       labelKey: `nav_group_${key}`,
       entityTypes: types as NonEmptyArray<EntityTypeInfo>,
     })
@@ -78,6 +86,7 @@ export function groupEntityTypes(entityTypes: EntityTypeInfo[]): ResolvedNavGrou
   if (ungrouped.length > 0) {
     groups.push({
       key: 'other',
+      label: 'Other',
       labelKey: 'nav_group_other',
       entityTypes: ungrouped as NonEmptyArray<EntityTypeInfo>,
     })

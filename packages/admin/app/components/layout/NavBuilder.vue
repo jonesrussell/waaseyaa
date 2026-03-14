@@ -32,7 +32,7 @@ const navGroups = computed(() => groupEntityTypes(entityTypes.value))
     </NuxtLink>
     <div v-if="loadError" class="nav-error">{{ t('error_nav') }}</div>
     <template v-for="group in navGroups" :key="group.key">
-      <div class="nav-section">{{ t(group.labelKey) }}</div>
+      <div class="nav-section">{{ t(group.labelKey, group.label) }}</div>
       <NuxtLink
         v-for="et in group.entityTypes"
         :key="et.id"

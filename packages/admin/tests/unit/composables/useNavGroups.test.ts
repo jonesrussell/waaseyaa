@@ -1,6 +1,6 @@
 // packages/admin/tests/unit/composables/useNavGroups.test.ts
 import { describe, it, expect } from 'vitest'
-import { groupEntityTypes } from '~/composables/useNavGroups'
+import { groupEntityTypes, type EntityTypeInfo } from '~/composables/useNavGroups'
 
 const K = { id: 'id', label: 'label' }
 
@@ -37,6 +37,17 @@ describe('groupEntityTypes', () => {
 
   it('returns empty array for empty input', () => {
     expect(groupEntityTypes([])).toEqual([])
+  })
+
+  it('provides humanized fallback label for unknown group key', () => {
+    const types: EntityTypeInfo[] = [
+      { id: 'elder_profile', label: 'Elder Profile', keys: K, group: 'elders' },
+    ]
+    const groups = groupEntityTypes(types)
+    expect(groups).toHaveLength(1)
+    expect(groups[0].key).toBe('elders')
+    expect(groups[0].labelKey).toBe('nav_group_elders')
+    expect(groups[0].label).toBe('Elders') // humanized fallback
   })
 
   it('handles all 12 registered entity types without an other group', () => {
