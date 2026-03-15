@@ -45,7 +45,8 @@
         { "type": "path", "url": "packages/testing" },
         { "type": "path", "url": "packages/telescope" },
         { "type": "path", "url": "packages/full" },
-        { "type": "path", "url": "packages/admin-bridge" }
+        { "type": "path", "url": "packages/admin-bridge" },
+        { "type": "path", "url": "packages/admin-surface" }
     ],
     "require": {
         "php": ">=8.4",
@@ -53,6 +54,7 @@
         "symfony/html-sanitizer": "^8.0",
         "waaseyaa/access": "@dev",
         "waaseyaa/admin-bridge": "@dev",
+        "waaseyaa/admin-surface": "@dev",
         "waaseyaa/ai-agent": "@dev",
         "waaseyaa/ai-pipeline": "@dev",
         "waaseyaa/ai-schema": "@dev",
@@ -132,6 +134,7 @@
             "Waaseyaa\\Testing\\Tests\\": "packages/testing/tests/",
             "Waaseyaa\\Telescope\\Tests\\": "packages/telescope/tests/",
             "Waaseyaa\\AdminBridge\\Tests\\": "packages/admin-bridge/tests/",
+            "Waaseyaa\\AdminSurface\\Tests\\": "packages/admin-surface/tests/",
             "Waaseyaa\\Tests\\": "tests/"
         }
     },

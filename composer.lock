@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "249f0bb8fac3529477282ff47b37a8fa",
+    "content-hash": "4e6f28c2168d268418203f05620b018b",
     "packages": [
         {
             "name": "doctrine/dbal",
@@ -2831,6 +2831,54 @@
                 "GPL-2.0-or-later"
             ],
             "description": "PHP bridge for mounting the Waaseyaa Admin SPA",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "waaseyaa/admin-surface",
+            "version": "dev-develop/v1.1",
+            "dist": {
+                "type": "path",
+                "url": "packages/admin-surface",
+                "reference": "219bca323e15ff2840cb0d220ea23ea7f151a2d0"
+            },
+            "require": {
+                "php": ">=8.3",
+                "waaseyaa/access": "@dev",
+                "waaseyaa/entity": "@dev",
+                "waaseyaa/foundation": "@dev",
+                "waaseyaa/routing": "@dev",
+                "waaseyaa/user": "@dev"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "waaseyaa": {
+                    "providers": [
+                        "Waaseyaa\\AdminSurface\\AdminSurfaceServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-develop/v1.1": "0.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waaseyaa\\AdminSurface\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Waaseyaa\\AdminSurface\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Canonical integration boundary for the Waaseyaa Admin SPA",
             "transport-options": {
                 "relative": true
             }
@@ -7654,6 +7702,7 @@
     "stability-flags": {
         "waaseyaa/access": 20,
         "waaseyaa/admin-bridge": 20,
+        "waaseyaa/admin-surface": 20,
         "waaseyaa/ai-agent": 20,
         "waaseyaa/ai-pipeline": 20,
         "waaseyaa/ai-schema": 20,
