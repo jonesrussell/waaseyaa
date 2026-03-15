@@ -177,4 +177,55 @@ final class AbstractAdminSurfaceHostTest extends TestCase
         self::assertTrue($result['ok']);
         self::assertSame('42', $result['data']['id']);
     }
+
+    #[Test]
+    public function handleActionDelegatesToActionMethod(): void
+    {
+        $session = new AdminSurfaceSessionData(
+            accountId: '1',
+            accountName: 'Admin',
+            roles: [],
+            policies: [],
+        );
+        $host = $this->createHost(session: $session);
+        $request = Request::create(
+            '/admin/surface/node/action/publish',
+            'POST',
+            content: json_encode(['nid' => '7'], JSON_THROW_ON_ERROR),
+        );
+
+        $result = $host->handleAction($request, 'node', 'publish');
+
+        self::assertTrue($result['ok']);
+        self::assertSame('publish', $result['data']['action']);
+    }
+
+    #[Test]
+    public function handleActionReturnsUnauthorizedWhenNoSession(): void
+    {
+        $host = $this->createHost(session: null);
+        $request = Request::create('/admin/surface/node/action/publish', 'POST', content: '{}');
+
+        $result = $host->handleAction($request, 'node', 'publish');
+
+        self::assertFalse($result['ok']);
+        self::assertSame(401, $result['error']['status']);
+    }
+
+    #[Test]
+    public function handleActionThrowsOnInvalidJson(): void
+    {
+        $session = new AdminSurfaceSessionData(
+            accountId: '1',
+            accountName: 'Admin',
+            roles: [],
+            policies: [],
+        );
+        $host = $this->createHost(session: $session);
+        $request = Request::create('/admin/surface/node/action/publish', 'POST', content: '{invalid');
+
+        $this->expectException(\JsonException::class);
+
+        $host->handleAction($request, 'node', 'publish');
+    }
 }

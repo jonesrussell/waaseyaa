@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\AdminSurface;
 
 use Waaseyaa\AdminSurface\Host\AbstractAdminSurfaceHost;
-use Waaseyaa\Foundation\ServiceProvider;
+use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
@@ -21,12 +21,6 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
     {
         // Host binding is the responsibility of the application's service provider.
         // This provider only wires routes.
-    }
-
-    public function boot(): void
-    {
-        // Routes are registered by the application, not by this provider,
-        // because the host instance must be resolved from the app container.
     }
 
     /**
