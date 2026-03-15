@@ -107,6 +107,14 @@ final class HttpKernel extends AbstractKernel
             projectRoot: $this->projectRoot,
             config: $this->config,
             manifest: $this->manifest,
+            serviceResolver: function (string $className): ?object {
+                foreach ($this->providers as $provider) {
+                    if (isset($provider->getBindings()[$className])) {
+                        return $provider->resolve($className);
+                    }
+                }
+                return null;
+            },
         );
 
         // Router setup.

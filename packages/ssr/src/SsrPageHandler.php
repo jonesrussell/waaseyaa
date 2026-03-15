@@ -44,6 +44,8 @@ final class SsrPageHandler
         /** @var array<string, mixed> */
         private readonly array $config,
         private readonly ?object $manifest = null,
+        /** @var (\Closure(string): ?object)|null */
+        private readonly ?\Closure $serviceResolver = null,
     ) {}
 
     /**
@@ -322,6 +324,14 @@ final class SsrPageHandler
                         $matched = true;
                         break;
                     }
+                }
+            }
+
+            if (!$matched && $type instanceof \ReflectionNamedType && !$type->isBuiltin() && $this->serviceResolver !== null) {
+                $resolved = ($this->serviceResolver)($type->getName());
+                if ($resolved !== null) {
+                    $args[] = $resolved;
+                    $matched = true;
                 }
             }
 
