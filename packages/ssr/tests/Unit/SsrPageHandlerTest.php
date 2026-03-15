@@ -286,6 +286,19 @@ final class SsrPageHandlerTest extends TestCase
     }
 
     #[Test]
+    public function resolve_language_manager_throws_when_resolver_returns_wrong_type(): void
+    {
+        // serviceResolver is present but returns something that isn't a LanguageManagerInterface.
+        $handler = $this->createHandler(serviceResolver: static fn(string $class): ?object => new \stdClass());
+        $request = HttpRequest::create('/about');
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('LanguageManagerInterface not registered');
+
+        $handler->resolveRenderLanguageAndAliasPath('/about', $request);
+    }
+
+    #[Test]
     public function accept_language_fallback_when_no_prefix(): void
     {
         [$handler, $manager] = $this->createHandlerWithManager();

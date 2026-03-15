@@ -32,6 +32,11 @@ interface LanguageManagerInterface
     public function getCurrentLanguage(): Language;
 
     /**
+     * Sets the current language. Must be a language known to this manager.
+     */
+    public function setCurrentLanguage(Language $language): void;
+
+    /**
      * Returns the fallback chain for a given langcode.
      *
      * Example: getFallbackChain('fr-CA') might return ['fr-CA', 'fr', 'en'].
