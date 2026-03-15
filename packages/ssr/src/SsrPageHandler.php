@@ -464,7 +464,9 @@ final class SsrPageHandler
             negotiators: [new UrlPrefixNegotiator(), new AcceptHeaderNegotiator()],
             languageManager: $manager,
         ))->negotiate($path, $headers);
-        $langcode = $context->getContentLanguage()->id;
+        $negotiatedLanguage = $context->getContentLanguage();
+        $manager->setCurrentLanguage($negotiatedLanguage);
+        $langcode = $negotiatedLanguage->id;
 
         $aliasPath = $path;
         $prefixLangcode = $this->detectLanguagePrefixFromPath($path, $availableLanguages);
