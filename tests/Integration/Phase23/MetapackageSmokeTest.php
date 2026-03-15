@@ -57,7 +57,7 @@ final class MetapackageSmokeTest extends TestCase
     {
         $this->assertTrue(
             class_exists($class),
-            "Class {$class} (waaseyaa/core dependency) not found in autoloader."
+            "Class {$class} (waaseyaa/core dependency) not found in autoloader.",
         );
     }
 
@@ -67,7 +67,7 @@ final class MetapackageSmokeTest extends TestCase
     {
         $this->assertTrue(
             class_exists($class),
-            "Class {$class} (waaseyaa/cms dependency) not found in autoloader."
+            "Class {$class} (waaseyaa/cms dependency) not found in autoloader.",
         );
     }
 
@@ -77,7 +77,7 @@ final class MetapackageSmokeTest extends TestCase
     {
         $this->assertTrue(
             class_exists($class),
-            "Class {$class} (waaseyaa/full dependency) not found in autoloader."
+            "Class {$class} (waaseyaa/full dependency) not found in autoloader.",
         );
     }
 }

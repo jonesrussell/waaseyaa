@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Waaseyaa\Api;
 
 use Waaseyaa\Entity\EntityTypeManagerInterface;
-use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\Routing\RouteBuilder;
+use Waaseyaa\Routing\WaaseyaaRouter;
 
 /**
  * Automatically registers JSON:API routes for all known entity types.
@@ -59,7 +59,7 @@ final class JsonApiRouteProvider
         $router->addRoute(
             "api.{$entityTypeId}.index",
             RouteBuilder::create($collectionPath)
-                ->controller("Waaseyaa\\Api\\JsonApiController::index")
+                ->controller('Waaseyaa\\Api\\JsonApiController::index')
                 ->methods('GET')
                 ->default('_entity_type', $entityTypeId)
                 ->build(),
@@ -69,7 +69,7 @@ final class JsonApiRouteProvider
         $router->addRoute(
             "api.{$entityTypeId}.show",
             RouteBuilder::create($resourcePath)
-                ->controller("Waaseyaa\\Api\\JsonApiController::show")
+                ->controller('Waaseyaa\\Api\\JsonApiController::show')
                 ->methods('GET')
                 ->default('_entity_type', $entityTypeId)
                 ->build(),
@@ -79,7 +79,7 @@ final class JsonApiRouteProvider
         $router->addRoute(
             "api.{$entityTypeId}.store",
             RouteBuilder::create($collectionPath)
-                ->controller("Waaseyaa\\Api\\JsonApiController::store")
+                ->controller('Waaseyaa\\Api\\JsonApiController::store')
                 ->methods('POST')
                 ->requireAuthentication()
                 ->jsonApi()
@@ -91,7 +91,7 @@ final class JsonApiRouteProvider
         $router->addRoute(
             "api.{$entityTypeId}.update",
             RouteBuilder::create($resourcePath)
-                ->controller("Waaseyaa\\Api\\JsonApiController::update")
+                ->controller('Waaseyaa\\Api\\JsonApiController::update')
                 ->methods('PATCH')
                 ->requireAuthentication()
                 ->jsonApi()
@@ -103,7 +103,7 @@ final class JsonApiRouteProvider
         $router->addRoute(
             "api.{$entityTypeId}.destroy",
             RouteBuilder::create($resourcePath)
-                ->controller("Waaseyaa\\Api\\JsonApiController::destroy")
+                ->controller('Waaseyaa\\Api\\JsonApiController::destroy')
                 ->methods('DELETE')
                 ->requireAuthentication()
                 ->default('_entity_type', $entityTypeId)

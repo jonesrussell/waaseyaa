@@ -12,8 +12,10 @@ final class AdminBridgeServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->singleton(CatalogBuilder::class, fn() =>
-            new CatalogBuilder($this->resolve(\Waaseyaa\Entity\EntityTypeManagerInterface::class))
+        $this->singleton(
+            CatalogBuilder::class,
+            fn() =>
+            new CatalogBuilder($this->resolve(\Waaseyaa\Entity\EntityTypeManagerInterface::class)),
         );
 
         $this->singleton(AdminAuthConfig::class, fn() => new AdminAuthConfig());

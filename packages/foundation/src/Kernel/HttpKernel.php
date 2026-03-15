@@ -10,30 +10,31 @@ use Symfony\Component\Routing\RequestContext;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\Gate\EntityAccessGate;
 use Waaseyaa\Access\Middleware\AuthorizationMiddleware;
+use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
 use Waaseyaa\Api\Controller\BroadcastStorage;
+use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Cache\Backend\DatabaseBackend;
 use Waaseyaa\Cache\CacheBackendInterface;
 use Waaseyaa\Cache\CacheConfigResolver;
-use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\Cache\CacheConfiguration;
+use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\Foundation\Attribute\AsMiddleware;
+use Waaseyaa\Foundation\Http\ControllerDispatcher;
 use Waaseyaa\Foundation\Http\CorsHandler;
 use Waaseyaa\Foundation\Http\ResponseSender;
-use Waaseyaa\Api\Http\DiscoveryApiHandler;
-use Waaseyaa\Foundation\Http\ControllerDispatcher;
-use Waaseyaa\SSR\SsrPageHandler;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
 use Waaseyaa\Routing\AccessChecker;
 use Waaseyaa\Routing\WaaseyaaRouter;
-use Waaseyaa\SSR\TwigErrorPageRenderer;
 use Waaseyaa\SSR\RenderCache;
+use Waaseyaa\SSR\SsrPageHandler;
 use Waaseyaa\SSR\SsrServiceProvider;
-use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
+use Waaseyaa\SSR\TwigErrorPageRenderer;
+use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\BearerAuthMiddleware;
 use Waaseyaa\User\Middleware\CsrfMiddleware;
-use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\SessionMiddleware;
+
 /**
  * HTTP front controller kernel.
  *
@@ -163,7 +164,7 @@ final class HttpKernel extends AbstractKernel
             new AuthorizationMiddleware($accessChecker, $errorPageRenderer),
         ];
 
-        usort($middlewares, fn (object $a, object $b) => $this->getMiddlewarePriority($b) <=> $this->getMiddlewarePriority($a));
+        usort($middlewares, fn(object $a, object $b) => $this->getMiddlewarePriority($b) <=> $this->getMiddlewarePriority($a));
 
         $pipeline = new HttpPipeline();
         foreach ($middlewares as $middleware) {

@@ -47,11 +47,7 @@ jobs:
 
       - name: Validate bootstrap JSON schema
         run: |
-          npx --yes ajv-cli validate \
-            --spec=draft2020 \
-            --strict=false \
-            -s contracts/bootstrap.schema.json \
-            -d - <<'PAYLOAD'
+          cat > /tmp/bootstrap-test.json <<'PAYLOAD'
           {
             "version": "1.0",
             "auth": { "strategy": "redirect", "loginUrl": "/login" },
@@ -61,6 +57,11 @@ jobs:
             "entities": []
           }
           PAYLOAD
+          npx --yes ajv-cli validate \
+            --spec=draft2020 \
+            --strict=false \
+            -s contracts/bootstrap.schema.json \
+            -d /tmp/bootstrap-test.json
 
       - name: Run Vitest contract tests
         run: npx vitest run --reporter=verbose
