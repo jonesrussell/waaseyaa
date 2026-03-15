@@ -8,7 +8,7 @@ export type { EntityResource, ListResult, ListQuery }
 export type { EntityResource as JsonApiResource }
 
 export function useEntity() {
-  const { $admin } = useNuxtApp() as { $admin: AdminRuntime }
+  const { $admin } = useNuxtApp() as unknown as { $admin: AdminRuntime }
   const transport = $admin.transport
 
   async function list(type: string, query?: ListQuery): Promise<ListResult> {

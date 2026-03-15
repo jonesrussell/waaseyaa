@@ -10,7 +10,7 @@ export function useAdmin(): {
   hasCapability: (entityType: string, cap: keyof CatalogCapabilities) => boolean
   getEntity: (type: string) => CatalogEntry | undefined
 } {
-  const { $admin } = useNuxtApp() as { $admin: AdminRuntime }
+  const { $admin } = useNuxtApp() as unknown as { $admin: AdminRuntime }
 
   function hasCapability(entityType: string, cap: keyof CatalogCapabilities): boolean {
     const entry = $admin.catalog.find(e => e.id === entityType)

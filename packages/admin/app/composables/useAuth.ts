@@ -12,7 +12,7 @@ export function useAuth() {
   const isAuthenticated = computed(() => currentUser.value !== null)
 
   function getRuntime(): AdminRuntime {
-    const { $admin } = useNuxtApp() as { $admin: AdminRuntime }
+    const { $admin } = useNuxtApp() as unknown as { $admin: AdminRuntime }
     return $admin
   }
 

@@ -4,10 +4,22 @@
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [
-        {"type": "path", "url": "../entity"},
-        {"type": "path", "url": "../access"},
-        {"type": "path", "url": "../routing"},
-        {"type": "path", "url": "../foundation"}
+        {
+            "type": "path",
+            "url": "../entity"
+        },
+        {
+            "type": "path",
+            "url": "../access"
+        },
+        {
+            "type": "path",
+            "url": "../routing"
+        },
+        {
+            "type": "path",
+            "url": "../foundation"
+        }
     ],
     "require": {
         "php": ">=8.3",
@@ -34,6 +46,9 @@
             "providers": [
                 "Waaseyaa\\AdminBridge\\AdminBridgeServiceProvider"
             ]
+        },
+        "branch-alias": {
+            "dev-develop/v1.1": "0.1.x-dev"
         }
     },
     "minimum-stability": "dev",

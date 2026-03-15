@@ -4,7 +4,7 @@ import { ADMIN_CONTRACT_VERSION } from '../contracts/version'
 import type { AdminBootstrap } from '../contracts/bootstrap'
 import type { AdminRuntime } from '../contracts/runtime'
 
-export default defineNuxtPlugin(async () => {
+export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRuntime | null } }> => {
   const config = useRuntimeConfig()
   const baseUrl = (config.public.baseUrl as string) || ''
 

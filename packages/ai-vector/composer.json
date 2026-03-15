@@ -4,15 +4,42 @@
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [
-        {"type": "path", "url": "../entity"},
-        {"type": "path", "url": "../cache"},
-        {"type": "path", "url": "../plugin"},
-        {"type": "path", "url": "../typed-data"},
-        {"type": "path", "url": "../config"},
-        {"type": "path", "url": "../queue"},
-        {"type": "path", "url": "../api"},
-        {"type": "path", "url": "../access"},
-        {"type": "path", "url": "../workflows"}
+        {
+            "type": "path",
+            "url": "../entity"
+        },
+        {
+            "type": "path",
+            "url": "../cache"
+        },
+        {
+            "type": "path",
+            "url": "../plugin"
+        },
+        {
+            "type": "path",
+            "url": "../typed-data"
+        },
+        {
+            "type": "path",
+            "url": "../config"
+        },
+        {
+            "type": "path",
+            "url": "../queue"
+        },
+        {
+            "type": "path",
+            "url": "../api"
+        },
+        {
+            "type": "path",
+            "url": "../access"
+        },
+        {
+            "type": "path",
+            "url": "../workflows"
+        }
     ],
     "require": {
         "php": ">=8.3",
@@ -36,5 +63,10 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-develop/v1.1": "0.1.x-dev"
+        }
+    }
 }

@@ -21,7 +21,7 @@ export function useSchema(entityType: string) {
     error.value = null
 
     try {
-      const { $admin } = useNuxtApp() as { $admin: AdminRuntime }
+      const { $admin } = useNuxtApp() as unknown as { $admin: AdminRuntime }
       schema.value = await $admin.transport.schema(entityType)
       schemaCache.set(entityType, schema.value)
     } catch (e: any) {

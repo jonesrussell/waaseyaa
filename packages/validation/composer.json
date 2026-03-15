@@ -4,10 +4,22 @@
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [
-        {"type": "path", "url": "../typed-data"},
-        {"type": "path", "url": "../plugin"},
-        {"type": "path", "url": "../cache"},
-        {"type": "path", "url": "../config"}
+        {
+            "type": "path",
+            "url": "../typed-data"
+        },
+        {
+            "type": "path",
+            "url": "../plugin"
+        },
+        {
+            "type": "path",
+            "url": "../cache"
+        },
+        {
+            "type": "path",
+            "url": "../config"
+        }
     ],
     "require": {
         "php": ">=8.3",
@@ -28,5 +40,10 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-develop/v1.1": "0.1.x-dev"
+        }
+    }
 }

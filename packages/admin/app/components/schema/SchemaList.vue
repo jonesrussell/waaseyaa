@@ -179,7 +179,7 @@ watch(messages, (msgs) => {
           </tr>
           <tr v-for="entity in entities" :key="entity.id">
             <td v-for="[fieldName, fieldSchema] in columns" :key="fieldName">
-              {{ formatCellValue(getCellValue(entity, fieldName, fieldSchema), fieldSchema) }}
+              {{ formatCellValue(getCellValue(entity, fieldName, fieldSchema as unknown as Record<string, unknown>), fieldSchema as unknown as Record<string, unknown>) }}
             </td>
             <td class="actions">
               <NuxtLink v-if="canUpdate" :to="`/${entityType}/${entity.id}`" class="btn btn-sm">

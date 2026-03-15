@@ -1,15 +1,33 @@
 {
     "name": "waaseyaa/entity",
-    "description": "Entity type system — types, interfaces, lifecycle, queries. No storage.",
+    "description": "Entity type system \u2014 types, interfaces, lifecycle, queries. No storage.",
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [
-        {"type": "path", "url": "../cache"},
-        {"type": "path", "url": "../plugin"},
-        {"type": "path", "url": "../typed-data"},
-        {"type": "path", "url": "../config"},
-        {"type": "path", "url": "../foundation"},
-        {"type": "path", "url": "../validation"}
+        {
+            "type": "path",
+            "url": "../cache"
+        },
+        {
+            "type": "path",
+            "url": "../plugin"
+        },
+        {
+            "type": "path",
+            "url": "../typed-data"
+        },
+        {
+            "type": "path",
+            "url": "../config"
+        },
+        {
+            "type": "path",
+            "url": "../foundation"
+        },
+        {
+            "type": "path",
+            "url": "../validation"
+        }
     ],
     "require": {
         "php": ">=8.3",
@@ -37,5 +55,10 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-develop/v1.1": "0.1.x-dev"
+        }
+    }
 }
