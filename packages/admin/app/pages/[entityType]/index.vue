@@ -9,7 +9,7 @@ const { catalog, getEntity, hasCapability } = useAdmin()
 
 const entityType = computed(() => route.params.entityType as string)
 const { schema, loading, error, fetch: fetchSchema } = useSchema(entityType.value)
-const canCreate = hasCapability(entityType.value, 'create')
+const canCreate = computed(() => hasCapability(entityType.value, 'create'))
 const typeInfo = computed(() => getEntity(entityType.value) ?? null)
 const actionLoading = ref(false)
 const actionError = ref<string | null>(null)
@@ -22,11 +22,6 @@ const showLifecycleControls = computed(() => isDefaultNote.value && typeInfo.val
 const showDisableWarning = computed(
   () => !typeDisabled.value && enabledTypeCount.value <= 1,
 )
-
-// TODO: move to admin operations adapter
-async function loadTypeInfo() {
-  // Type info now comes from catalog — this function only needed for refresh after enable/disable
-}
 
 // TODO: move to admin operations adapter
 async function disableType(force = false) {

@@ -1,3 +1,5 @@
+import type { AdminRuntime } from '~/contracts'
+
 export default defineNuxtRouteMiddleware(async (to) => {
   // Auth check runs client-side only. The PHP backend is the authoritative
   // security layer; the Nuxt middleware is a UX redirect guard.
@@ -11,7 +13,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // Check if $admin is available — if not, plugin may have redirected already
   const nuxtApp = useNuxtApp()
-  const admin = (nuxtApp as any).$admin
+  const admin = (nuxtApp as unknown as { $admin: AdminRuntime | null }).$admin
   if (!admin) {
     return navigateTo('/login')
   }
