@@ -887,7 +887,7 @@ File: `packages/foundation/src/Http/ControllerDispatcher.php`
 
 Routes a matched controller name to the appropriate handler. Receives controller identifier, route params, and request context, then delegates to JSON:API controllers, discovery endpoints, SSR, MCP, or other handlers. Central dispatch hub for `HttpKernel`.
 
-Handles callable controllers (objects with `__invoke(Request): JsonResponse`) and string controller keys. Callable controllers are invoked directly and their `Response` is sent. String keys are matched via a `match` expression to built-in handlers (JSON:API, SSR, media upload, discovery, MCP, GraphQL, etc.). Auth routes (`login`, `logout`, `me`) were extracted to dedicated controller classes in `packages/auth/src/Controller/` and are now registered as callables via `AuthServiceProvider`.
+Handles callable controllers (objects with `__invoke(Request): Response`) and string controller keys. Callable controllers are invoked directly and their Symfony `Response` is sent. String keys are matched via a `match` expression to built-in handlers (JSON:API, SSR, media upload, discovery, MCP, GraphQL, etc.). All controller return types are Symfony `Response` or `JsonResponse` (no custom response DTOs). Auth routes (`login`, `logout`, `me`) were extracted to dedicated controller classes in `packages/auth/src/Controller/` and are now registered as callables via `AuthServiceProvider`.
 
 ### CorsHandler
 
