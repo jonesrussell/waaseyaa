@@ -14,13 +14,9 @@ use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
-use Waaseyaa\I18n\LanguageManagerInterface;
 use Waaseyaa\Path\PathAliasResolver;
 use Waaseyaa\Relationship\RelationshipDiscoveryService;
 use Waaseyaa\Relationship\RelationshipTraversalService;
-use Waaseyaa\Routing\Language\AcceptHeaderNegotiator;
-use Waaseyaa\Routing\Language\LanguageNegotiator;
-use Waaseyaa\Routing\Language\UrlPrefixNegotiator;
 use Waaseyaa\Workflows\EditorialVisibilityResolver;
 
 /**
@@ -36,6 +32,7 @@ final class SsrPageHandler
     private const string DISCOVERY_CONTRACT_STABILITY = 'stable';
 
     private readonly LoggerInterface $logger;
+    private readonly LanguageResolver $languageResolver;
 
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
@@ -51,8 +48,10 @@ final class SsrPageHandler
         private readonly ?\Closure $serviceResolver = null,
         ?LoggerInterface $logger = null,
         private readonly ?\Waaseyaa\Access\Gate\GateInterface $gate = null,
+        ?LanguageResolver $languageResolver = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
+        $this->languageResolver = $languageResolver ?? new LanguageResolver(serviceResolver: $this->serviceResolver);
     }
 
     /**
@@ -102,7 +101,7 @@ final class SsrPageHandler
             }
 
             // All paths (including '/') flow through language negotiation.
-            $language = $this->resolveRenderLanguageAndAliasPath($normalizedPath, $httpRequest);
+            $language = $this->languageResolver->resolveRenderLanguageAndAliasPath($normalizedPath, $httpRequest);
             $contentLangcode = $language['langcode'];
             $aliasLookupPath = $language['alias_path'];
             if ($aliasLookupPath === '/') {
@@ -462,122 +461,9 @@ final class SsrPageHandler
         }
     }
 
-    /**
-     * @return array{langcode: string, alias_path: string}
-     */
-    public function resolveRenderLanguageAndAliasPath(string $path, HttpRequest $request): array
+    public function getLanguageResolver(): LanguageResolver
     {
-        $manager = $this->resolveLanguageManager();
-        if ($manager === null) {
-            return [
-                'langcode' => 'en',
-                'alias_path' => $path,
-            ];
-        }
-
-        $availableLanguages = array_keys($manager->getLanguages());
-
-        $headers = [];
-        $acceptLanguage = $request->headers->get('Accept-Language');
-        if (is_string($acceptLanguage) && trim($acceptLanguage) !== '') {
-            $headers['accept-language'] = $acceptLanguage;
-        }
-
-        $context = (new LanguageNegotiator(
-            negotiators: [new UrlPrefixNegotiator(), new AcceptHeaderNegotiator()],
-            languageManager: $manager,
-        ))->negotiate($path, $headers);
-        $negotiatedLanguage = $context->getContentLanguage();
-        $manager->setCurrentLanguage($negotiatedLanguage);
-        $langcode = $negotiatedLanguage->id;
-
-        $aliasPath = $path;
-        $prefixLangcode = $this->detectLanguagePrefixFromPath($path, $availableLanguages);
-        if ($prefixLangcode !== null) {
-            $aliasPath = $this->stripLanguagePrefix($path, $prefixLangcode);
-        }
-
-        return [
-            'langcode' => $langcode,
-            'alias_path' => $aliasPath,
-        ];
-    }
-
-    /**
-     * Resolve the app-level LanguageManager via serviceResolver.
-     * Returns null if no manager is registered.
-     */
-    private function resolveLanguageManager(): ?LanguageManagerInterface
-    {
-        if ($this->serviceResolver !== null) {
-            $manager = ($this->serviceResolver)(LanguageManagerInterface::class);
-            if ($manager instanceof LanguageManagerInterface) {
-                return $manager;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Strip a language prefix from the path and activate the language on the
-     * shared LanguageManager. Called by the kernel BEFORE route matching so
-     * that language-prefixed paths like /oj/communities resolve correctly.
-     *
-     * Returns the path with the prefix removed (or unchanged if no prefix).
-     */
-    public function stripLanguagePrefixForRouting(string $path): string
-    {
-        $manager = $this->resolveLanguageManager();
-        if ($manager === null) {
-            return $path;
-        }
-        $availableLanguages = array_keys($manager->getLanguages());
-        $defaultLanguage = $manager->getDefaultLanguage();
-
-        $prefix = $this->detectLanguagePrefixFromPath($path, $availableLanguages);
-        if ($prefix === null || $prefix === $defaultLanguage->id) {
-            return $path;
-        }
-
-        $language = $manager->getLanguage($prefix);
-        if ($language !== null) {
-            $manager->setCurrentLanguage($language);
-        }
-
-        return $this->stripLanguagePrefix($path, $prefix);
-    }
-
-    /**
-     * @param list<string> $availableLanguages
-     */
-    public function detectLanguagePrefixFromPath(string $path, array $availableLanguages): ?string
-    {
-        $segments = explode('/', ltrim($path, '/'));
-        if ($segments === [] || $segments[0] === '') {
-            return null;
-        }
-
-        $prefix = $segments[0];
-        if (in_array($prefix, $availableLanguages, true)) {
-            return $prefix;
-        }
-
-        return null;
-    }
-
-    public function stripLanguagePrefix(string $path, string $langcode): string
-    {
-        $prefix = '/' . ltrim($langcode, '/');
-        if ($path === $prefix) {
-            return '/';
-        }
-        if (str_starts_with($path, $prefix . '/')) {
-            $stripped = substr($path, strlen($prefix));
-            return $stripped !== '' ? $stripped : '/';
-        }
-
-        return $path;
+        return $this->languageResolver;
     }
 
     /**
