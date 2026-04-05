@@ -1,6 +1,6 @@
 # Infrastructure
 
-<!-- Spec reviewed 2026-04-04 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation; SsrResponse removed, all controllers return Symfony Response/JsonResponse; ControllerDispatcher now delegates to DomainRouterInterface chain -->
+<!-- Spec reviewed 2026-04-05 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation; SsrResponse removed, all controllers return Symfony Response/JsonResponse; ControllerDispatcher now delegates to DomainRouterInterface chain; both callable and router dispatch paths wrapped in try-catch returning 500 JSON:API errors; MediaRouter file move wrapped in try-catch -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -998,6 +998,8 @@ Routes a matched controller name to the appropriate handler. Central dispatch hu
 
 Handles callable controllers (objects with `__invoke(Request): Response`) directly. String controller keys are delegated to domain-specific routers in `packages/foundation/src/Http/Router/`. All controller return types are Symfony `Response` or `JsonResponse` (no custom response DTOs).
 
+**Error handling:** Both the callable controller path and the router dispatch path are wrapped in try-catch. Unhandled exceptions produce a 500 JSON:API error response via `handleException()`, which includes stack trace details when debug mode is enabled.
+
 #### DomainRouterInterface
 
 File: `packages/foundation/src/Http/Router/DomainRouterInterface.php`
@@ -1027,7 +1029,7 @@ Typed value object built once from the request via `WaaseyaaContext::fromRequest
 | `SchemaRouter` | `openapi`, `schema.*` | OpenAPI and JSON Schema endpoints |
 | `DiscoveryRouter` | `discovery.topic_hub`, `discovery.cluster`, `discovery.timeline`, `discovery.endpoint` | Discovery API for topic hubs, clusters, timelines |
 | `SearchRouter` | `search.semantic` | Semantic search via embedding storage |
-| `MediaRouter` | `media.upload` | File upload with MIME validation, size limits, sanitization |
+| `MediaRouter` | `media.upload` | File upload with MIME validation, size limits, sanitization, move error handling |
 | `GraphQlRouter` | `graphql.endpoint` | GraphQL query/mutation execution |
 | `McpRouter` | `mcp.endpoint` | MCP JSON-RPC endpoint |
 | `SsrRouter` | `render.page` | Server-side page rendering |
