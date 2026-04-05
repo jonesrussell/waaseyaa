@@ -1,6 +1,6 @@
 # Infrastructure
 
-<!-- Spec reviewed 2026-04-04 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation -->
+<!-- Spec reviewed 2026-04-04 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation; SsrResponse removed, all controllers return Symfony Response/JsonResponse; ControllerDispatcher now delegates to DomainRouterInterface chain -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
