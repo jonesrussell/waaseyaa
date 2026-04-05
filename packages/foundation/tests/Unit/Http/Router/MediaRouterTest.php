@@ -123,6 +123,55 @@ final class MediaRouterTest extends TestCase
     }
 
     #[Test]
+    public function handle_returns_500_when_file_move_fails(): void
+    {
+        $tmpDir = sys_get_temp_dir() . '/waaseyaa_media_test_' . uniqid();
+        mkdir($tmpDir, 0o755, true);
+
+        // Create a small temp file to simulate an upload.
+        $tmpFile = $tmpDir . '/upload.txt';
+        file_put_contents($tmpFile, 'test content');
+
+        // Stub UploadedFile to bypass getMimeType() which needs symfony/mime.
+        $uploadedFile = new class($tmpFile) extends \Symfony\Component\HttpFoundation\File\UploadedFile {
+            public function __construct(string $path)
+            {
+                parent::__construct($path, 'test.txt', 'text/plain', null, true);
+            }
+
+            public function getMimeType(): ?string
+            {
+                return 'text/plain';
+            }
+        };
+
+        $request = Request::create('/api/media/upload', 'POST', server: ['CONTENT_TYPE' => 'multipart/form-data']);
+        $request->attributes->set('_controller', 'media.upload');
+        $request->attributes->set('_account', new class implements \Waaseyaa\Access\AccountInterface {
+            public function id(): string|int { return 0; }
+            public function isAuthenticated(): bool { return false; }
+            public function hasPermission(string $permission): bool { return false; }
+            public function getRoles(): array { return []; }
+        });
+        $request->attributes->set('_broadcast_storage', new \Waaseyaa\Api\Controller\BroadcastStorage(
+            \Waaseyaa\Database\DBALDatabase::createSqlite(),
+        ));
+        $request->files->set('file', $uploadedFile);
+
+        // Point files_root to a non-writable path to force move() failure.
+        $router = $this->createRouter(config: ['files_root' => '/dev/null/impossible']);
+        $response = $router->handle($request);
+
+        self::assertSame(500, $response->getStatusCode());
+        $decoded = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('500', $decoded['errors'][0]['status']);
+        self::assertSame('Failed to store uploaded file.', $decoded['errors'][0]['detail']);
+
+        @unlink($tmpFile);
+        @rmdir($tmpDir);
+    }
+
+    #[Test]
     public function build_public_file_url_from_public_uri(): void
     {
         $router = $this->createRouter();

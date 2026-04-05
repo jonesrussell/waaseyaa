@@ -87,7 +87,15 @@ final class MediaRouter implements DomainRouterInterface
 
         $uri = 'public://' . $safeName;
         $destPath = $filesRoot . '/' . $safeName;
-        $uploadedFile->move(dirname($destPath), basename($destPath));
+
+        try {
+            $uploadedFile->move(dirname($destPath), basename($destPath));
+        } catch (\Throwable $e) {
+            return $this->jsonApiResponse(500, [
+                'jsonapi' => ['version' => '1.1'],
+                'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => 'Failed to store uploaded file.']],
+            ]);
+        }
 
         $file = new \Waaseyaa\Media\File(
             uri: $uri,

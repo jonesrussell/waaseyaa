@@ -41,7 +41,11 @@ final class ControllerDispatcher
 
         // Callable controllers (closures/invokables from service providers).
         if (is_callable($controller)) {
-            return $this->handleCallable($controller, $request);
+            try {
+                return $this->handleCallable($controller, $request);
+            } catch (\Throwable $e) {
+                return $this->handleException($e);
+            }
         }
 
         try {

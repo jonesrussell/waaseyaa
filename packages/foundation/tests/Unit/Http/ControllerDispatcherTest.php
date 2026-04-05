@@ -98,6 +98,21 @@ final class ControllerDispatcherTest extends TestCase
     }
 
     #[Test]
+    public function callable_controller_exception_returns_500(): void
+    {
+        $request = Request::create('/callable-error');
+        $request->attributes->set('_controller', fn(Request $r) => throw new \RuntimeException('callable boom'));
+
+        $dispatcher = new ControllerDispatcher([]);
+        $response = $dispatcher->dispatch($request);
+
+        $this->assertSame(500, $response->getStatusCode());
+        $decoded = json_decode($response->getContent(), true);
+        $this->assertSame('500', $decoded['errors'][0]['status']);
+        $this->assertSame('Internal Server Error', $decoded['errors'][0]['title']);
+    }
+
+    #[Test]
     public function router_exception_returns_500(): void
     {
         $request = Request::create('/error');
