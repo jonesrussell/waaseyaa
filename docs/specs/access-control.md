@@ -4,6 +4,24 @@
 
 Waaseyaa's access control system spans three packages: `packages/access/` (core primitives), `packages/routing/` (route-level checks), and `packages/user/` (session resolution, password reset). This document covers entity-level and route-level access. For field-level access, see `docs/specs/field-access.md`.
 
+## Public Surface
+
+Authoritative dispositions are in `docs/public-surface-map.php`, verified by `PublicSurfaceVerificationTest`.
+
+**Public API** (stable, semver-protected):
+
+| Package | Interfaces/Classes |
+|---------|-------------------|
+| access | `AccountInterface`, `AccessPolicyInterface`, `FieldAccessPolicyInterface`, `PermissionHandlerInterface`, `GateInterface` |
+
+**`@internal`** (implementation details, may change without notice):
+
+| Package | Interface/Class | Reason |
+|---------|----------------|--------|
+| access | `ErrorPageRendererInterface` | Error page rendering detail, not a consumer contract |
+| auth | `AuthTokenRepositoryInterface` | Token storage internals |
+| auth | `RateLimiterInterface` | Auth-specific rate limiter, distinct from Foundation's public `RateLimiterInterface` |
+
 ## Packages
 
 | Package | Path | Provides |
@@ -558,7 +576,7 @@ packages/access/src/
         PolicyAttribute.php          - Maps policy class to entity type
         AccessDeniedException.php    - Thrown by Gate::authorize()
     RedirectValidator.php            - Open-redirect prevention (isSafe/sanitize)
-    ErrorPageRendererInterface.php   - Error page rendering contract (render -> ?Response)
+    ErrorPageRendererInterface.php   - Error page rendering contract (render -> ?Response) [@internal — not a public consumer contract]
     Middleware/
         AuthorizationMiddleware.php  - Route-level access enforcement
 

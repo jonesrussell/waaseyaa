@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Testing\GraphQL;
+namespace Waaseyaa\GraphQL\Testing;
 
 use GraphQL\Type\Definition\NonNull;
 use GraphQL\Type\Definition\Type;
@@ -20,6 +20,8 @@ use Waaseyaa\GraphQL\Schema\SchemaFactory;
 /**
  * Base for integration tests that assert GraphQL schema shape from registered
  * {@see EntityType} definitions via {@see SchemaFactory}, without a full kernel boot.
+ *
+ * @internal
  */
 abstract class AbstractGraphQlSchemaContractTestCase extends TestCase
 {

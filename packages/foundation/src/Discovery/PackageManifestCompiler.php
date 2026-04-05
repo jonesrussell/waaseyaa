@@ -7,7 +7,6 @@ namespace Waaseyaa\Foundation\Discovery;
 use Waaseyaa\Foundation\Attribute\AsEntityType;
 use Waaseyaa\Foundation\Attribute\AsFieldType;
 use Waaseyaa\Foundation\Attribute\AsMiddleware;
-use Waaseyaa\Foundation\Event\Attribute\Listener;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
@@ -18,6 +17,9 @@ final class PackageManifestCompiler
 
     /** @internal Cache file metadata; stripped before {@see PackageManifest::fromArray()} */
     private const MANIFEST_INPUTS_FP_KEY = '_manifest_inputs_fp';
+
+    /** @internal Providers confirmed missing after recompile; prevents repeated recompile on next request */
+    private const KNOWN_MISSING_PROVIDERS_KEY = '_known_missing_providers';
 
     private readonly LoggerInterface $logger;
 
@@ -40,7 +42,6 @@ final class PackageManifestCompiler
         $migrations = [];
         $fieldTypes = [];
         $formatters = [];
-        $listeners = [];
         $middleware = [];
         $permissions = [];
         $policies = [];
@@ -109,27 +110,6 @@ final class PackageManifestCompiler
                 }
             }
 
-            foreach ($ref->getAttributes(Listener::class) as $attr) {
-                try {
-                    $instance = $attr->newInstance();
-                    $invoke = $ref->getMethod('__invoke');
-                    $params = $invoke->getParameters();
-                    if (count($params) > 0) {
-                        $eventType = $params[0]->getType();
-                        if ($eventType instanceof \ReflectionNamedType) {
-                            $eventClass = $eventType->getName();
-                            $listeners[$eventClass][] = [
-                                'class' => $class,
-                                'priority' => $instance->priority,
-                            ];
-                        }
-                    }
-                } catch (\ReflectionException) {
-                    // Skip listeners with missing __invoke or invalid signatures
-                    continue;
-                }
-            }
-
             foreach ($ref->getAttributes(AsMiddleware::class) as $attr) {
                 $instance = $attr->newInstance();
                 $middleware[$instance->pipeline][] = [
@@ -153,11 +133,6 @@ final class PackageManifestCompiler
             usort($stack, fn(array $a, array $b) => $b['priority'] <=> $a['priority']);
         }
 
-        // Sort listeners by priority (descending)
-        foreach ($listeners as &$eventListeners) {
-            usort($eventListeners, fn(array $a, array $b) => $b['priority'] <=> $a['priority']);
-        }
-
         return new PackageManifest(
             providers: $providers,
             commands: $commands,
@@ -165,7 +140,6 @@ final class PackageManifestCompiler
             migrations: $migrations,
             fieldTypes: $fieldTypes,
             formatters: $formatters,
-            listeners: $listeners,
             middleware: $middleware,
             permissions: $permissions,
             policies: $policies,
@@ -277,28 +251,33 @@ final class PackageManifestCompiler
                 $data = require $cachePath;
                 if (is_array($data)) {
                     $cachedFp = $data[self::MANIFEST_INPUTS_FP_KEY] ?? null;
-                    unset($data[self::MANIFEST_INPUTS_FP_KEY]);
+                    $knownMissing = $data[self::KNOWN_MISSING_PROVIDERS_KEY] ?? [];
+                    unset($data[self::MANIFEST_INPUTS_FP_KEY], $data[self::KNOWN_MISSING_PROVIDERS_KEY]);
 
                     if ($cachedFp !== null && $cachedFp !== $this->computeManifestInputsFingerprint()) {
-                        return $this->compileAndCache();
+                        return $this->compileValidateAndCache($cachePath);
                     }
 
                     $manifest = PackageManifest::fromArray($data);
                     $manifest = $this->mergeRootWaaseyaaIntoManifest($manifest);
-                    $this->assertProvidersExist($manifest, $cachePath);
-                    return $manifest;
+
+                    return $this->validateCachedProviders($manifest, $cachePath, $knownMissing);
                 }
-            } catch (StaleManifestException $e) {
-                $this->logger->warning(sprintf(
-                    'Stale package manifest detected (missing: %s). Auto-recompiling.',
-                    implode(', ', $e->missingProviders()),
-                ));
-                // Fall through to compileAndCache()
+            } catch (StaleManifestException) {
+                // New missing providers — fall through to compileAndCache()
             } catch (\Throwable) {
                 // Corrupt cache — recompile
             }
         }
 
+        return $this->compileValidateAndCache($cachePath);
+    }
+
+    /**
+     * Compile, validate providers, stamp known-missing if needed, and return the manifest.
+     */
+    private function compileValidateAndCache(string $cachePath): PackageManifest
+    {
         $manifest = $this->compileAndCache();
 
         try {
@@ -309,9 +288,93 @@ final class PackageManifestCompiler
                 . 'Fix the provider declaration in composer.json or run: php bin/waaseyaa optimize:manifest',
                 implode(', ', $e->missingProviders()),
             ));
+            $this->stampKnownMissing($e->missingProviders());
         }
 
         return $manifest;
+    }
+
+    /**
+     * Validate cached manifest providers, returning the manifest if valid or known-missing,
+     * or throwing to trigger recompile for newly missing providers.
+     *
+     * @param list<string> $knownMissing Providers already identified as permanently missing
+     * @throws StaleManifestException When missing providers are new (not previously known)
+     */
+    private function validateCachedProviders(
+        PackageManifest $manifest,
+        string $cachePath,
+        array $knownMissing,
+    ): PackageManifest {
+        try {
+            $this->assertProvidersExist($manifest, $cachePath);
+            return $manifest;
+        } catch (StaleManifestException $e) {
+            $missing = $e->missingProviders();
+            sort($missing);
+            $known = $knownMissing;
+            sort($known);
+
+            // Strict equality: any change to the missing set (including shrinking)
+            // forces a one-time recompile to re-stamp the updated list.
+            if ($missing === $known) {
+                $this->logger->error(sprintf(
+                    'Provider class(es) still missing (known): %s. '
+                    . 'Fix the provider declaration in composer.json or run: php bin/waaseyaa optimize:manifest',
+                    implode(', ', $missing),
+                ));
+                return $manifest;
+            }
+
+            $this->logger->warning(sprintf(
+                'Stale package manifest detected (missing: %s). Auto-recompiling.',
+                implode(', ', $missing),
+            ));
+            throw $e;
+        }
+    }
+
+    /**
+     * Record permanently missing providers in the cache file so subsequent
+     * requests skip recompilation for the same set of missing classes.
+     *
+     * @param list<string> $missingProviders
+     */
+    private function stampKnownMissing(array $missingProviders): void
+    {
+        $cachePath = $this->storagePath . '/framework/packages.php';
+        if (!is_file($cachePath)) {
+            $this->logger->warning('Cannot stamp known-missing providers: cache file does not exist.');
+            return;
+        }
+
+        try {
+            $data = require $cachePath;
+        } catch (\Throwable $e) {
+            $this->logger->warning(sprintf('Cannot stamp known-missing providers: %s', $e->getMessage()));
+            return;
+        }
+
+        if (!is_array($data)) {
+            $this->logger->warning('Cannot stamp known-missing providers: cache file returned non-array.');
+            return;
+        }
+
+        sort($missingProviders);
+        $data[self::KNOWN_MISSING_PROVIDERS_KEY] = $missingProviders;
+
+        $content = '<?php return ' . var_export($data, true) . ';' . "\n";
+        $tmpPath = $cachePath . '.tmp.' . getmypid();
+
+        if (file_put_contents($tmpPath, $content) === false) {
+            $this->logger->warning(sprintf('Cannot stamp known-missing providers: failed to write %s', $tmpPath));
+            return;
+        }
+
+        if (!rename($tmpPath, $cachePath)) {
+            @unlink($tmpPath);
+            $this->logger->warning(sprintf('Cannot stamp known-missing providers: failed to rename to %s', $cachePath));
+        }
     }
 
     /**
@@ -348,7 +411,7 @@ final class PackageManifestCompiler
 
         // App-namespace classes (e.g. Minoo\) typically aren't in the classmap
         // without --optimize. Always scan PSR-4 directories for non-framework prefixes
-        // so app-level policies, listeners, and middleware are discovered.
+        // so app-level policies and middleware are discovered.
         $appPrefixes = array_values(array_filter($prefixes, static fn(string $p) => $p !== 'Waaseyaa\\'));
         if ($appPrefixes !== []) {
             $appClasses = $this->scanPsr4Classes($appPrefixes);
@@ -502,7 +565,6 @@ final class PackageManifestCompiler
             migrations: $manifest->migrations,
             fieldTypes: $manifest->fieldTypes,
             formatters: $manifest->formatters,
-            listeners: $manifest->listeners,
             middleware: $manifest->middleware,
             permissions: $permissions,
             policies: $manifest->policies,
@@ -616,7 +678,6 @@ final class PackageManifestCompiler
                 }
 
                 $hasDiscoveryAttribute = !empty($ref->getAttributes(AsFieldType::class))
-                    || !empty($ref->getAttributes(Listener::class))
                     || !empty($ref->getAttributes(AsMiddleware::class))
                     || !empty($ref->getAttributes(AsEntityType::class))
                     || !empty($ref->getAttributes(self::POLICY_ATTRIBUTE))
