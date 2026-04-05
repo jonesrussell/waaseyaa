@@ -72,9 +72,6 @@ final class ControllerDispatcher
         $routeParams = array_filter($params, fn($k) => !str_starts_with($k, '_'), ARRAY_FILTER_USE_KEY);
         $result = $controller($request, ...$routeParams);
 
-        if ($result instanceof \Waaseyaa\SSR\SsrResponse) {
-            return $this->htmlResponse($result->statusCode, $result->content, $result->headers);
-        }
         if ($result instanceof \Waaseyaa\Inertia\InertiaResponse) {
             $pageObject = $result->toPageObject();
             $pageObject['url'] = $request->getRequestUri();

@@ -1,6 +1,6 @@
 # Infrastructure
 
-<!-- Spec reviewed 2026-04-04 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation -->
+<!-- Spec reviewed 2026-04-04 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation; SsrResponse removed, all controllers return Symfony Response/JsonResponse; ControllerDispatcher now delegates to DomainRouterInterface chain -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -996,7 +996,7 @@ File: `packages/foundation/src/Http/ControllerDispatcher.php`
 
 Routes a matched controller name to the appropriate handler. Central dispatch hub for `HttpKernel`.
 
-Handles callable controllers (objects with `__invoke(Request): JsonResponse`) directly. String controller keys are delegated to domain-specific routers in `packages/foundation/src/Http/Router/`.
+Handles callable controllers (objects with `__invoke(Request): Response`) directly. String controller keys are delegated to domain-specific routers in `packages/foundation/src/Http/Router/`. All controller return types are Symfony `Response` or `JsonResponse` (no custom response DTOs).
 
 #### DomainRouterInterface
 
