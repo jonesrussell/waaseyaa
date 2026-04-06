@@ -25,9 +25,17 @@ final class JsonApiRouter implements DomainRouterInterface
 
     public function supports(Request $request): bool
     {
-        $controller = $request->attributes->get('_controller', '');
+        $controller = $request->attributes->get('_controller');
 
-        return str_contains($controller, 'JsonApiController');
+        // Symfony routes expose _controller as either a "Class::method" string
+        // or a [Class, method] callable array. Normalize to a searchable string.
+        $controllerString = match (true) {
+            is_string($controller) => $controller,
+            is_array($controller) && is_string($controller[0] ?? null) => $controller[0],
+            default => '',
+        };
+
+        return str_contains($controllerString, 'JsonApiController');
     }
 
     public function handle(Request $request): Response

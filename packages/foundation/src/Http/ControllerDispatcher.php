@@ -39,8 +39,25 @@ final class ControllerDispatcher
     {
         $controller = $request->attributes->get('_controller', '');
 
+        // Normalize Symfony-style [Class, method] array callables to the
+        // "Class::method" string form the router chain expects. Routes
+        // declared via the Symfony Route component commonly use the array
+        // form; the framework's domain routers all match on string form.
+        if (
+            is_array($controller)
+            && count($controller) === 2
+            && is_string($controller[0] ?? null)
+            && is_string($controller[1] ?? null)
+        ) {
+            $controller = $controller[0] . '::' . $controller[1];
+            $request->attributes->set('_controller', $controller);
+        }
+
         // Callable controllers (closures/invokables from service providers).
-        if (is_callable($controller)) {
+        // Only consider actual invokable values here — a Class::method string
+        // for an instance method is *not* callable without an instance, and
+        // must be routed through the domain router chain (AppControllerRouter).
+        if ($controller instanceof \Closure || (is_object($controller) && is_callable($controller))) {
             try {
                 return $this->handleCallable($controller, $request);
             } catch (\Throwable $e) {
