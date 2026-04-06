@@ -81,8 +81,11 @@ final class MediaRouter implements DomainRouterInterface
         $safeName = $this->sanitizeUploadFilename($uploadedFile->getClientOriginalName());
         $filesRoot = $this->resolveFilesRootDir();
 
-        if (!is_dir($filesRoot)) {
-            mkdir($filesRoot, 0o755, true);
+        // Standard "ensure directory exists" idiom: suppress mkdir's PHP
+        // warning (e.g. when an ancestor path is a regular file) and let
+        // the move attempt below produce a clean 500 from the catch block.
+        if (!is_dir($filesRoot) && !@mkdir($filesRoot, 0o755, true) && !is_dir($filesRoot)) {
+            // Directory could not be created; fall through.
         }
 
         $uri = 'public://' . $safeName;
