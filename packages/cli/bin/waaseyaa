@@ -1,0 +1,34 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Supports two layouts:
+//   1. Consumer install: {project}/vendor/waaseyaa/cli/bin/waaseyaa
+//      autoload at       {project}/vendor/autoload.php            (3 levels up)
+//   2. Monorepo dev:     {repo}/packages/cli/bin/waaseyaa
+//      autoload at       {repo}/vendor/autoload.php               (3 levels up + vendor/)
+$autoloadPaths = [
+    __DIR__ . '/../../../autoload.php',          // consumer install
+    __DIR__ . '/../../../vendor/autoload.php',   // monorepo dev
+];
+
+$autoloaderPath = null;
+foreach ($autoloadPaths as $candidate) {
+    if (file_exists($candidate)) {
+        require $candidate;
+        $autoloaderPath = $candidate;
+        break;
+    }
+}
+
+if ($autoloaderPath === null) {
+    fwrite(STDERR, "Could not find Composer autoloader. Run 'composer install' first.\n");
+    exit(1);
+}
+
+// Project root is the directory that contains vendor/ (i.e. parent of vendor/).
+$projectRoot = dirname($autoloaderPath, 2);
+
+$kernel = new Waaseyaa\Foundation\Kernel\ConsoleKernel($projectRoot);
+exit($kernel->handle());

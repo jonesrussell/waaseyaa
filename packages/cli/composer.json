@@ -54,6 +54,9 @@
             "Waaseyaa\\CLI\\": "src/"
         }
     },
+    "bin": [
+        "bin/waaseyaa"
+    ],
     "autoload-dev": {
         "psr-4": {
             "Waaseyaa\\CLI\\Tests\\": "tests/"
