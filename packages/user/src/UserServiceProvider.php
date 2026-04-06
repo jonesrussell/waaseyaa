@@ -70,10 +70,10 @@ final class UserServiceProvider extends ServiceProvider
         $this->singleton(AuthMailer::class, fn() => new AuthMailer(
             driver: fn() => $this->resolve(MailDriverInterface::class),
             twig: \Waaseyaa\SSR\SsrServiceProvider::getTwigEnvironment(),
-            baseUrl: $config['app']['url'] ?? throw new \RuntimeException(
-                "app.url is not configured. Add 'app' => ['url' => 'https://yourapp.com'] to your config/waaseyaa.php.",
-            ),
-            appName: $config['app']['name'] ?? 'Waaseyaa',
+            baseUrl: $config['app']['url']
+                ?? (getenv('APP_URL') !== false && getenv('APP_URL') !== '' ? (string) getenv('APP_URL') : 'http://localhost:8000'),
+            appName: $config['app']['name']
+                ?? (getenv('APP_NAME') !== false && getenv('APP_NAME') !== '' ? (string) getenv('APP_NAME') : 'Waaseyaa'),
         ));
     }
 
