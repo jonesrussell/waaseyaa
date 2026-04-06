@@ -62,4 +62,75 @@ final class RootTemplateRendererTest extends TestCase
         $this->assertStringContainsString('<div id="app"></div>', $html);
         $this->assertStringContainsString('"component":"Test"', $html);
     }
+
+    public function testRendersAssetTagsFromViteAssetManager(): void
+    {
+        $tmpDir = sys_get_temp_dir() . '/vite-renderer-' . uniqid();
+        mkdir($tmpDir . '/build/.vite', 0777, true);
+        file_put_contents($tmpDir . '/build/.vite/manifest.json', json_encode([
+            'resources/js/app.ts' => [
+                'file' => 'assets/app-abc123.js',
+                'css' => ['assets/app-def456.css'],
+                'isEntry' => true,
+            ],
+        ]));
+
+        $assetManager = new \Waaseyaa\Foundation\Asset\ViteAssetManager(
+            basePath: $tmpDir,
+            baseUrl: '/build',
+        );
+        $renderer = new RootTemplateRenderer(assetManager: $assetManager);
+
+        $html = $renderer->render([
+            'component' => 'Home',
+            'props' => ['errors' => []],
+            'url' => '/',
+            'version' => 'v1',
+        ]);
+
+        $this->assertStringContainsString('<script type="module" src="/build/build/assets/app-abc123.js"></script>', $html);
+        $this->assertStringContainsString('<link rel="stylesheet" href="/build/build/assets/app-def456.css">', $html);
+        $this->assertStringContainsString('<div id="app">', $html);
+
+        unlink($tmpDir . '/build/.vite/manifest.json');
+        rmdir($tmpDir . '/build/.vite');
+        rmdir($tmpDir . '/build');
+        rmdir($tmpDir);
+    }
+
+    public function testCustomTemplateOverridesAssetManager(): void
+    {
+        $tmpDir = sys_get_temp_dir() . '/vite-renderer-' . uniqid();
+        mkdir($tmpDir . '/build/.vite', 0777, true);
+        file_put_contents($tmpDir . '/build/.vite/manifest.json', json_encode([
+            'resources/js/app.ts' => [
+                'file' => 'assets/app-abc123.js',
+                'isEntry' => true,
+            ],
+        ]));
+
+        $assetManager = new \Waaseyaa\Foundation\Asset\ViteAssetManager(
+            basePath: $tmpDir,
+            baseUrl: '/build',
+        );
+        $renderer = new RootTemplateRenderer(
+            template: fn(string $pageJson) => "<html><body>{$pageJson}</body></html>",
+            assetManager: $assetManager,
+        );
+
+        $html = $renderer->render([
+            'component' => 'Test',
+            'props' => ['errors' => []],
+            'url' => '/test',
+            'version' => 'v1',
+        ]);
+
+        $this->assertStringNotContainsString('app-abc123.js', $html);
+        $this->assertStringContainsString('"component":"Test"', $html);
+
+        unlink($tmpDir . '/build/.vite/manifest.json');
+        rmdir($tmpDir . '/build/.vite');
+        rmdir($tmpDir . '/build');
+        rmdir($tmpDir);
+    }
 }
