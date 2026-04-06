@@ -1003,6 +1003,8 @@ Routes a matched controller name to the appropriate handler. Central dispatch hu
 
 Handles callable controllers (objects with `__invoke(Request): Response`) directly. String controller keys are delegated to domain-specific routers in `packages/foundation/src/Http/Router/`. All controller return types are Symfony `Response` or `JsonResponse` (no custom response DTOs).
 
+**Controller key normalization:** Routes declared with Symfony's array-callable form (`'_controller' => [FooController::class, 'bar']`) are normalized to `FooController::bar` string form before the domain router chain runs. This keeps downstream routers' `supports()` checks (which use `str_contains()` / `str_starts_with()` against `_controller`) simple — they never have to handle both shapes. `JsonApiRouter::supports()` additionally has a defensive `match()` so any misrouted array callable that slipped through produces a clean miss rather than a string-function type error.
+
 **Inertia response handling:** When a callable controller returns an `InertiaResponse`, the dispatcher checks for the `X-Inertia` request header. XHR requests get a JSON response with the page object. Non-XHR (initial page load) requests are rendered to full HTML via `Inertia::getRenderer()`, which returns the renderer configured by `InertiaServiceProvider` (with Vite asset tags injected).
 
 **Error handling:** Both the callable controller path and the router dispatch path are wrapped in try-catch. Unhandled exceptions produce a 500 JSON:API error response via `handleException()`, which includes stack trace details when debug mode is enabled.

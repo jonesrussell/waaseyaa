@@ -36,7 +36,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Waaseyaa\\GraphQL\\Tests\\": "tests/"
+            "Waaseyaa\\GraphQL\\Tests\\": "tests/",
+            "Waaseyaa\\GraphQL\\Testing\\": "testing/"
         }
     },
     "minimum-stability": "dev",

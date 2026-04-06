@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `waaseyaa/graphql`: move `AbstractGraphQlSchemaContractTestCase` out of the
+  production autoload. The class lived at `src/Testing/` and was reached by
+  the PSR-4 classmap under `Waaseyaa\GraphQL\`, but it `extends
+  PHPUnit\Framework\TestCase` — a dev-only dependency. In consumer production
+  installs (`composer install --no-dev`) the `PackageManifestCompiler` class
+  scan hit this file via Reflection and threw `Class
+  "PHPUnit\Framework\TestCase" not found`, crashing kernel boot with
+  "Application failed to boot." Moved the file to a top-level `testing/`
+  directory registered under `autoload-dev` only. Consumers installing with
+  dev deps still get it via `Waaseyaa\GraphQL\Testing\`; production installs
+  never see it. Discovered via a production outage on waaseyaa/minoo after
+  bumping to alpha.106.
+
 - `waaseyaa/cli`: ship `bin/waaseyaa` entrypoint with the package.
   Previously the package declared commands (`serve`, `migrate`, `install`,
   etc.) and a `WaaseyaaApplication` console class but no bootstrap script, so

@@ -503,7 +503,7 @@ Layer discipline: Foundation (layer 0) uses string constants for attribute class
 
 All auth controllers accept an optional `?LoggerInterface $logger` (defaults to `NullLogger`). DevLog-mode verification/reset URLs and best-effort email failures are logged via this interface rather than `error_log()`.
 
-**Required configuration:** `UserServiceProvider` registers `AuthMailer` with `baseUrl` from `$config['app']['url']`. If `app.url` is not set in `config/waaseyaa.php`, registration throws a `RuntimeException` with remediation guidance. An empty base URL would produce malformed password-reset and email-verification links (e.g., `http:///reset-password?token=...`).
+**Configuration resolution:** `UserServiceProvider` registers `AuthMailer` with `baseUrl` resolved in precedence order: `$config['app']['url']`, then the `APP_URL` environment variable, then the default `http://localhost:8000`. `appName` follows the same order: `$config['app']['name']` → `APP_NAME` env var → `Waaseyaa`. Consumer apps that set neither config nor env var will still boot with a sensible localhost default, which is adequate for dev and CI. Production deployments should set `APP_URL` (typically via `.env` or `config/waaseyaa.php`) so password-reset and email-verification links embed the correct public hostname.
 
 ### Rate Limiting
 
