@@ -10,6 +10,7 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
+use Waaseyaa\GraphQL\GraphQlEndpoint;
 
 final class GraphQlRouter implements DomainRouterInterface
 {
@@ -40,7 +41,7 @@ final class GraphQlRouter implements DomainRouterInterface
             ? $resolvedAccount
             : $ctx->account;
 
-        $endpoint = new \Waaseyaa\GraphQL\GraphQlEndpoint(
+        $endpoint = new GraphQlEndpoint(
             entityTypeManager: $this->entityTypeManager,
             accessHandler: $this->accessHandler,
             account: $graphqlAccount,
