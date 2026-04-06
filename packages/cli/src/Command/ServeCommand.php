@@ -62,7 +62,7 @@ final class ServeCommand extends Command
         if (($env['APP_ENV'] ?? '') === 'development') {
             $output->writeln(
                 '<info>Starting in development mode (APP_ENV=development).</info> '
-                . 'Use <comment>APP_ENV=production vendor/bin/waaseyaa serve</comment> to override.'
+                . 'Use <comment>APP_ENV=production vendor/bin/waaseyaa serve</comment> to override.',
             );
         }
 
