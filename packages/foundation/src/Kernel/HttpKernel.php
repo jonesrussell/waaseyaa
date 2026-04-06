@@ -309,6 +309,7 @@ final class HttpKernel extends AbstractKernel
             new HttpRouter\GraphQlRouter($this->entityTypeManager, $this->accessHandler, $gqlOverrides),
             new HttpRouter\McpRouter($this->entityTypeManager, $this->accessHandler, $this->database, $this->config, $this->mcpReadCache),
             new HttpRouter\SsrRouter($this->ssrPageHandler),
+            new HttpRouter\AppControllerRouter($this->ssrPageHandler),
             new HttpRouter\BroadcastRouter($this->logger),
         ];
 
