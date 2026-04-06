@@ -84,4 +84,21 @@ final class InertiaTest extends TestCase
         $page = $response->toPageObject();
         $this->assertTrue($page['encryptHistory']);
     }
+
+    public function testSetAndGetRenderer(): void
+    {
+        $renderer = new \Waaseyaa\Inertia\RootTemplateRenderer();
+        Inertia::setRenderer($renderer);
+
+        self::assertSame($renderer, Inertia::getRenderer());
+    }
+
+    public function testGetRendererReturnsDefaultWhenNoneSet(): void
+    {
+        Inertia::reset();
+
+        $renderer = Inertia::getRenderer();
+
+        self::assertInstanceOf(\Waaseyaa\Inertia\RootTemplateRenderer::class, $renderer);
+    }
 }

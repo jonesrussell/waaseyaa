@@ -62,4 +62,92 @@ final class RootTemplateRendererTest extends TestCase
         $this->assertStringContainsString('<div id="app"></div>', $html);
         $this->assertStringContainsString('"component":"Test"', $html);
     }
+
+    public function testRendersAssetTagsFromViteAssetManager(): void
+    {
+        $tmpDir = $this->createTmpManifestDir([
+            'resources/js/app.ts' => [
+                'file' => 'assets/app-abc123.js',
+                'css' => ['assets/app-def456.css'],
+                'isEntry' => true,
+            ],
+        ]);
+
+        try {
+            $assetManager = new \Waaseyaa\Foundation\Asset\ViteAssetManager(
+                basePath: $tmpDir,
+                baseUrl: '/build',
+            );
+            $renderer = new RootTemplateRenderer(assetManager: $assetManager);
+
+            $html = $renderer->render([
+                'component' => 'Home',
+                'props' => ['errors' => []],
+                'url' => '/',
+                'version' => 'v1',
+            ]);
+
+            $this->assertStringContainsString('<script type="module" src="/build/build/assets/app-abc123.js"></script>', $html);
+            $this->assertStringContainsString('<link rel="stylesheet" href="/build/build/assets/app-def456.css">', $html);
+            $this->assertStringContainsString('<div id="app">', $html);
+        } finally {
+            $this->removeTmpDir($tmpDir);
+        }
+    }
+
+    public function testCustomTemplateOverridesAssetManager(): void
+    {
+        $tmpDir = $this->createTmpManifestDir([
+            'resources/js/app.ts' => [
+                'file' => 'assets/app-abc123.js',
+                'isEntry' => true,
+            ],
+        ]);
+
+        try {
+            $assetManager = new \Waaseyaa\Foundation\Asset\ViteAssetManager(
+                basePath: $tmpDir,
+                baseUrl: '/build',
+            );
+            $renderer = new RootTemplateRenderer(
+                template: fn(string $pageJson) => "<html><body>{$pageJson}</body></html>",
+                assetManager: $assetManager,
+            );
+
+            $html = $renderer->render([
+                'component' => 'Test',
+                'props' => ['errors' => []],
+                'url' => '/test',
+                'version' => 'v1',
+            ]);
+
+            $this->assertStringNotContainsString('app-abc123.js', $html);
+            $this->assertStringContainsString('"component":"Test"', $html);
+        } finally {
+            $this->removeTmpDir($tmpDir);
+        }
+    }
+
+    private function createTmpManifestDir(array $manifest): string
+    {
+        $tmpDir = sys_get_temp_dir() . '/vite-renderer-' . uniqid();
+        mkdir($tmpDir . '/build/.vite', 0777, true);
+        file_put_contents($tmpDir . '/build/.vite/manifest.json', json_encode($manifest));
+        return $tmpDir;
+    }
+
+    private function removeTmpDir(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $items = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST,
+        );
+        foreach ($items as $item) {
+            $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
+        }
+        rmdir($dir);
+    }
 }

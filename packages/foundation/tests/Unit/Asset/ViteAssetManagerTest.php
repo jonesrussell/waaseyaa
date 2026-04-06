@@ -190,6 +190,96 @@ final class ViteAssetManagerTest extends TestCase
         $this->assertSame('https://cdn.example.com/assets/admin/assets/main-abc.js', $url);
     }
 
+    #[Test]
+    public function asset_tags_returns_script_and_link_for_manifest_entries(): void
+    {
+        $this->writeManifest('build', [
+            'resources/js/app.ts' => [
+                'file' => 'assets/app-abc123.js',
+                'css' => ['assets/app-def456.css'],
+                'isEntry' => true,
+            ],
+        ]);
+
+        $manager = new ViteAssetManager(basePath: $this->fixtureDir, baseUrl: '/build');
+        $tags = $manager->assetTags('build');
+
+        self::assertStringContainsString('<script type="module" src="/build/build/assets/app-abc123.js"></script>', $tags);
+        self::assertStringContainsString('<link rel="stylesheet" href="/build/build/assets/app-def456.css">', $tags);
+    }
+
+    #[Test]
+    public function asset_tags_returns_empty_string_when_no_manifest(): void
+    {
+        $manager = new ViteAssetManager(basePath: '/nonexistent', baseUrl: '/build');
+        $tags = $manager->assetTags('build');
+
+        self::assertSame('', $tags);
+    }
+
+    #[Test]
+    public function asset_tags_returns_dev_server_tags_when_no_manifest_and_dev_url_set(): void
+    {
+        $manager = new ViteAssetManager(
+            basePath: '/nonexistent',
+            baseUrl: '/build',
+            devServerUrl: 'http://localhost:5173',
+        );
+        $tags = $manager->assetTags('build', 'resources/js/app.ts');
+
+        self::assertStringContainsString('<script type="module" src="http://localhost:5173/@vite/client"></script>', $tags);
+        self::assertStringContainsString('<script type="module" src="http://localhost:5173/resources/js/app.ts"></script>', $tags);
+    }
+
+    #[Test]
+    public function asset_tags_prefers_manifest_over_dev_server(): void
+    {
+        $this->writeManifest('build', [
+            'resources/js/app.ts' => [
+                'file' => 'assets/app-abc123.js',
+                'isEntry' => true,
+            ],
+        ]);
+
+        $manager = new ViteAssetManager(
+            basePath: $this->fixtureDir,
+            baseUrl: '/build',
+            devServerUrl: 'http://localhost:5173',
+        );
+        $tags = $manager->assetTags('build');
+
+        self::assertStringContainsString('assets/app-abc123.js', $tags);
+        self::assertStringNotContainsString('localhost:5173', $tags);
+    }
+
+    #[Test]
+    public function asset_tags_handles_multiple_entries(): void
+    {
+        $this->writeManifest('build', [
+            'resources/js/app.ts' => [
+                'file' => 'assets/app-abc.js',
+                'css' => ['assets/app-abc.css'],
+                'isEntry' => true,
+            ],
+            'resources/js/vendor.ts' => [
+                'file' => 'assets/vendor-def.js',
+                'isEntry' => true,
+            ],
+            '_shared-ghi.js' => [
+                'file' => 'assets/shared-ghi.js',
+                'isEntry' => false,
+            ],
+        ]);
+
+        $manager = new ViteAssetManager(basePath: $this->fixtureDir, baseUrl: '/build');
+        $tags = $manager->assetTags('build');
+
+        self::assertStringContainsString('app-abc.js', $tags);
+        self::assertStringContainsString('vendor-def.js', $tags);
+        self::assertStringContainsString('app-abc.css', $tags);
+        self::assertStringNotContainsString('shared-ghi.js', $tags);
+    }
+
     /**
      * @param array<string, mixed> $manifest
      */

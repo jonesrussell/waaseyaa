@@ -11,6 +11,8 @@ final class Inertia
 
     private static string $version = '';
 
+    private static ?RootTemplateRenderer $renderer = null;
+
     public static function setVersion(string $version): void
     {
         self::$version = $version;
@@ -19,6 +21,16 @@ final class Inertia
     public static function getVersion(): string
     {
         return self::$version;
+    }
+
+    public static function setRenderer(RootTemplateRenderer $renderer): void
+    {
+        self::$renderer = $renderer;
+    }
+
+    public static function getRenderer(): RootTemplateRenderer
+    {
+        return self::$renderer ?? new RootTemplateRenderer();
     }
 
     public static function share(string $key, mixed $value): void
@@ -65,5 +77,6 @@ final class Inertia
     {
         self::$shared = [];
         self::$version = '';
+        self::$renderer = null;
     }
 }

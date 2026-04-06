@@ -32,6 +32,7 @@ final class ViteAssetManager implements AssetManagerInterface
     public function __construct(
         private readonly string $basePath,
         private readonly string $baseUrl = '/dist',
+        private readonly ?string $devServerUrl = null,
     ) {}
 
     public function url(string $path, string $bundle = 'admin'): string
@@ -79,6 +80,62 @@ final class ViteAssetManager implements AssetManagerInterface
         }
 
         return $links;
+    }
+
+    /**
+     * Generate HTML script and link tags for a bundle's entry assets.
+     *
+     * In production (manifest exists): emits hashed asset tags.
+     * In dev mode (no manifest, devServerUrl set): emits Vite dev server tags.
+     * Otherwise: returns empty string.
+     */
+    public function assetTags(string $bundle = 'build', string $entrypoint = 'resources/js/app.ts'): string
+    {
+        $manifest = $this->loadManifest($bundle);
+
+        if ($manifest !== []) {
+            return $this->productionTags($manifest, $bundle);
+        }
+
+        if ($this->devServerUrl !== null) {
+            return $this->devTags($entrypoint);
+        }
+
+        return '';
+    }
+
+    private function productionTags(array $manifest, string $bundle): string
+    {
+        $tags = [];
+
+        foreach ($manifest as $entry) {
+            if (!isset($entry['isEntry']) || $entry['isEntry'] !== true) {
+                continue;
+            }
+
+            if (isset($entry['css']) && is_array($entry['css'])) {
+                foreach ($entry['css'] as $cssFile) {
+                    $href = rtrim($this->baseUrl, '/') . '/' . $bundle . '/' . ltrim($cssFile, '/');
+                    $tags[] = '<link rel="stylesheet" href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '">';
+                }
+            }
+
+            if (isset($entry['file'])) {
+                $src = rtrim($this->baseUrl, '/') . '/' . $bundle . '/' . ltrim($entry['file'], '/');
+                $tags[] = '<script type="module" src="' . htmlspecialchars($src, ENT_QUOTES, 'UTF-8') . '"></script>';
+            }
+        }
+
+        return implode("\n        ", $tags);
+    }
+
+    private function devTags(string $entrypoint): string
+    {
+        $base = rtrim($this->devServerUrl, '/');
+
+        return '<script type="module" src="' . htmlspecialchars($base . '/@vite/client', ENT_QUOTES, 'UTF-8') . '"></script>'
+            . "\n        "
+            . '<script type="module" src="' . htmlspecialchars($base . '/' . ltrim($entrypoint, '/'), ENT_QUOTES, 'UTF-8') . '"></script>';
     }
 
     /**

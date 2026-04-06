@@ -87,7 +87,7 @@ final class ControllerDispatcher
                 ]);
             }
 
-            $renderer = new \Waaseyaa\Inertia\RootTemplateRenderer();
+            $renderer = \Waaseyaa\Inertia\Inertia::getRenderer();
             return $this->htmlResponse(200, $renderer->render($pageObject));
         }
         if ($result instanceof \Symfony\Component\HttpFoundation\RedirectResponse

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Inertia;
 
+use Waaseyaa\Foundation\Asset\ViteAssetManager;
+
 final class RootTemplateRenderer
 {
-    private ?\Closure $template;
-
-    public function __construct(?\Closure $template = null)
-    {
-        $this->template = $template;
-    }
+    public function __construct(
+        private readonly ?\Closure $template = null,
+        private readonly ?ViteAssetManager $assetManager = null,
+    ) {}
 
     /** @param array<string, mixed> $pageObject */
     public function render(array $pageObject): string
@@ -32,12 +32,15 @@ final class RootTemplateRenderer
 
     private function defaultTemplate(string $scriptTag): string
     {
+        $assetTags = $this->assetManager?->assetTags() ?? '';
+
         return <<<HTML
         <!DOCTYPE html>
         <html>
         <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
+            {$assetTags}
         </head>
         <body>
             <div id="app"></div>
