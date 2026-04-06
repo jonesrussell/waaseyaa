@@ -34,6 +34,7 @@ use Waaseyaa\CLI\Command\Make\MakeListenerCommand;
 use Waaseyaa\CLI\Command\Make\MakeMigrationCommand;
 use Waaseyaa\CLI\Command\Make\MakePolicyCommand;
 use Waaseyaa\CLI\Command\Make\MakeProviderCommand;
+use Waaseyaa\CLI\Command\Make\MakePublicCommand;
 use Waaseyaa\CLI\Command\Make\MakeTestCommand;
 use Waaseyaa\CLI\Command\MakeEntityTypeCommand;
 use Waaseyaa\CLI\Command\MakePluginCommand;
@@ -130,6 +131,7 @@ final class CliCommandRegistry
             new MakeMigrationCommand($projectRoot, $manifest),
             new MakePolicyCommand(),
             new MakeProviderCommand(),
+            new MakePublicCommand($projectRoot),
             new MakeTestCommand(),
             new ServeCommand(),
             new AboutCommand(info: [

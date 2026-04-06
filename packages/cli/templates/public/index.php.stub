@@ -1,0 +1,13 @@
+<?php
+
+declare(strict_types=1);
+
+use Waaseyaa\Foundation\Kernel\HttpKernel;
+
+$projectRoot = dirname(__DIR__);
+
+require $projectRoot . '/vendor/autoload.php';
+
+$kernel = new HttpKernel($projectRoot);
+$response = $kernel->handle();
+$response->send();
