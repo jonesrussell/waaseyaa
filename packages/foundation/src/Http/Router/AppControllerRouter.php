@@ -56,8 +56,11 @@ final class AppControllerRouter implements DomainRouterInterface
             return false;
         }
 
-        // Class names contain a backslash (namespaced) or start with an
-        // uppercase letter. Reserved sentinels in other routers don't.
+        // Class names start with an uppercase letter (top-level) or contain
+        // a backslash (namespaced). Reserved framework sentinels in other
+        // routers (`render.page`, `broadcast`, `graphql.endpoint`, ...) all
+        // start with a lowercase letter and contain no backslash, so they
+        // are excluded by this rule.
         return str_contains($class, '\\') || ctype_upper($class[0]);
     }
 
@@ -86,15 +89,19 @@ final class AppControllerRouter implements DomainRouterInterface
         }
 
         // Fallback: dispatchAppController returned a structured array
-        // (htmlResult / jsonResult shape) instead of a Response.
+        // (htmlResult / jsonResult shape) instead of a Response. The typed
+        // return shape guarantees `content` matches the `type` discriminator
+        // (string for html, array for json).
         if ($result['type'] === 'json') {
             /** @var array<string, mixed> $content */
-            $content = is_array($result['content']) ? $result['content'] : [];
+            $content = $result['content'];
             return $this->jsonApiResponse($result['status'], $content, $result['headers']);
         }
 
+        /** @var string $content */
+        $content = $result['content'];
         return new Response(
-            is_string($result['content']) ? $result['content'] : '',
+            $content,
             $result['status'],
             array_merge(
                 ['Content-Type' => 'text/html; charset=UTF-8'],

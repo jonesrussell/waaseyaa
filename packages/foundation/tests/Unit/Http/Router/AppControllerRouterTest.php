@@ -78,7 +78,7 @@ final class AppControllerRouterTest extends TestCase
     public function does_not_support_named_sentinels(): void
     {
         $router = $this->createRouter();
-        $sentinels = ['broadcast', 'graphql.endpoint', 'mcp.endpoint', 'openapi', 'media.upload', 'search.semantic', 'entity_types', 'entity_type.disable', 'discovery.hub', 'search.semantic'];
+        $sentinels = ['broadcast', 'graphql.endpoint', 'mcp.endpoint', 'openapi', 'media.upload', 'search.semantic', 'entity_types', 'entity_type.disable', 'discovery.hub'];
         foreach ($sentinels as $controller) {
             self::assertFalse(
                 $router->supports($this->requestWithController($controller)),
@@ -132,7 +132,8 @@ final class AppControllerRouterTest extends TestCase
     #[Test]
     public function does_not_support_string_with_lowercase_top_level_segment(): void
     {
-        // Looks like a config key (e.g. "render.page::method") rather than a class name.
+        // A top-level segment that starts with a lowercase letter and has
+        // no backslash looks like a sentinel/config key, not a class name.
         self::assertFalse(
             $this->createRouter()->supports($this->requestWithController('foo::bar')),
         );
