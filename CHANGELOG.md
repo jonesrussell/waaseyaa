@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `waaseyaa/cli`: ship `bin/waaseyaa` entrypoint with the package.
+  Previously the package declared commands (`serve`, `migrate`, `install`,
+  etc.) and a `WaaseyaaApplication` console class but no bootstrap script, so
+  `vendor/bin/waaseyaa` could not be generated for consumers. Added
+  `packages/cli/bin/waaseyaa` and declared it in the package's composer.json
+  `bin` array. Zero-config `vendor/bin/waaseyaa serve` now works in any
+  consumer project.
+
+- `waaseyaa/user`: `UserServiceProvider` no longer throws a `RuntimeException`
+  during boot when `config.app.url` is absent. Falls back to the `APP_URL`
+  environment variable, then to `http://localhost:8000`. `app.name` falls
+  back to `APP_NAME` then to `Waaseyaa`. Restores zero-config boot for
+  convention-following apps.
+
+- `waaseyaa/foundation`: `ControllerDispatcher` now normalizes Symfony-style
+  array callables (`['_controller' => [Foo::class, 'bar']]`) to `Class::method`
+  string form before the domain router chain runs. Previously, routes declared
+  with the array form crashed inside `str_contains()`/`str_starts_with()` in
+  `JsonApiRouter::supports()`, `EntityTypeLifecycleRouter::supports()`, and
+  other domain routers that match against `_controller`. `JsonApiRouter`
+  additionally gets a defensive `match()` so misrouted arrays cannot explode.
+
 ## [v0.1.0-alpha.36] — 2026-03-20
 
 ### Added
