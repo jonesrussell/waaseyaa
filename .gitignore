@@ -18,6 +18,9 @@ packages/*/.phpunit.cache/
 # PHPStan
 phpstan/
 
+# Background sync tool stray working dirs
+waaseyaa-sync-*/
+
 # Database
 *.sqlite
 
