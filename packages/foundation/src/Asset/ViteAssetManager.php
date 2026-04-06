@@ -116,13 +116,13 @@ final class ViteAssetManager implements AssetManagerInterface
             if (isset($entry['css']) && is_array($entry['css'])) {
                 foreach ($entry['css'] as $cssFile) {
                     $href = rtrim($this->baseUrl, '/') . '/' . $bundle . '/' . ltrim($cssFile, '/');
-                    $tags[] = '<link rel="stylesheet" href="' . $href . '">';
+                    $tags[] = '<link rel="stylesheet" href="' . htmlspecialchars($href, ENT_QUOTES, 'UTF-8') . '">';
                 }
             }
 
             if (isset($entry['file'])) {
                 $src = rtrim($this->baseUrl, '/') . '/' . $bundle . '/' . ltrim($entry['file'], '/');
-                $tags[] = '<script type="module" src="' . $src . '"></script>';
+                $tags[] = '<script type="module" src="' . htmlspecialchars($src, ENT_QUOTES, 'UTF-8') . '"></script>';
             }
         }
 
@@ -133,9 +133,9 @@ final class ViteAssetManager implements AssetManagerInterface
     {
         $base = rtrim($this->devServerUrl, '/');
 
-        return '<script type="module" src="' . $base . '/@vite/client"></script>'
+        return '<script type="module" src="' . htmlspecialchars($base . '/@vite/client', ENT_QUOTES, 'UTF-8') . '"></script>'
             . "\n        "
-            . '<script type="module" src="' . $base . '/' . ltrim($entrypoint, '/') . '"></script>';
+            . '<script type="module" src="' . htmlspecialchars($base . '/' . ltrim($entrypoint, '/'), ENT_QUOTES, 'UTF-8') . '"></script>';
     }
 
     /**

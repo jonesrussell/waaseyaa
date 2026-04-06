@@ -23,7 +23,11 @@ final class InertiaServiceProvider extends ServiceProvider
      */
     public function registerWithRoot(?string $root): void
     {
-        $root = $root ?? (string) getcwd();
+        $cwd = getcwd();
+        if ($root === null && $cwd === false) {
+            return;
+        }
+        $root = $root ?? $cwd;
         $devServerUrl = $_ENV['VITE_DEV_SERVER'] ?? getenv('VITE_DEV_SERVER') ?: null;
 
         $assetManager = new ViteAssetManager(
