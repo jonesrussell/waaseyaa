@@ -352,6 +352,18 @@ Key methods:
 - `getTableName(): string` -- returns entity type id
 - `getTranslationTableName(): string` -- returns `{type}_translations`
 
+### EntitySchemaSync
+
+File: `packages/entity-storage/src/EntitySchemaSync.php`
+Class: `final class EntitySchemaSync`
+
+Constructor: `(DatabaseInterface $database)`
+
+Key methods:
+- `syncAll(iterable $entityTypes): void` -- iterates `EntityTypeInterface` instances and calls `SqlSchemaHandler::ensureTable()` on each
+
+Thin wrapper around `SqlSchemaHandler` so application migrations and install commands can materialize tables for many registered entity types in one call without repeating construction boilerplate. Idempotent by delegation (`ensureTable()` is a no-op when the table exists).
+
 Default table schema (from `buildTableSpec()`):
 - `{idKey}` -- `serial NOT NULL` (auto-increment primary key)
 - `{uuidKey}` -- `varchar(128) NOT NULL DEFAULT ''`
@@ -999,6 +1011,7 @@ class FieldType extends WaaseyaaPlugin
 - `SqlEntityStorage.php` -- SQL storage with _data blob split/merge
 - `SqlEntityQuery.php` -- SQL query builder with CONTAINS/STARTS_WITH operators
 - `SqlSchemaHandler.php` -- table creation and schema management
+- `EntitySchemaSync.php` -- batch wrapper that calls `SqlSchemaHandler::ensureTable()` for a list of entity types
 - `EntityStorageFactory.php` -- factory that creates/caches SqlEntityStorage
 - `EntityRepository.php` -- high-level repository with language fallback
 - `UnitOfWork.php` -- transaction wrapper with event buffering
