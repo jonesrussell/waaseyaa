@@ -1,6 +1,6 @@
 # Infrastructure
 
-<!-- Spec reviewed 2026-04-05 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation; SsrResponse removed, all controllers return Symfony Response/JsonResponse; ControllerDispatcher now delegates to DomainRouterInterface chain; both callable and router dispatch paths wrapped in try-catch returning 500 JSON:API errors; MediaRouter file move wrapped in try-catch -->
+<!-- Spec reviewed 2026-04-05 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation; SsrResponse removed, all controllers return Symfony Response/JsonResponse; ControllerDispatcher now delegates to DomainRouterInterface chain; both callable and router dispatch paths wrapped in try-catch returning 500 JSON:API errors; MediaRouter file move wrapped in try-catch; ViteAssetManager gained assetTags() method with devServerUrl constructor param for dev mode support; ControllerDispatcher uses Inertia::getRenderer() instead of hardcoded new RootTemplateRenderer(); RootTemplateRenderer accepts optional ViteAssetManager and injects Vite asset tags in default template; InertiaServiceProvider auto-configures renderer with ViteAssetManager for zero-config Inertia SPA support -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -882,15 +882,20 @@ Implements: `AssetManagerInterface`
 final class ViteAssetManager implements AssetManagerInterface
 {
     public function __construct(
-        private readonly string $basePath,     // dist directory path
+        private readonly string $basePath,              // dist directory path
         private readonly string $baseUrl = '/dist',
+        private readonly ?string $devServerUrl = null,  // e.g., 'http://localhost:5173'
     );
 
     public function url(string $path, string $bundle = 'admin'): string;
+    public function preloadLinks(string $bundle = 'admin'): array;
+    public function assetTags(string $bundle = 'build', string $entrypoint = 'resources/js/app.ts'): string;
 }
 ```
 
 Reads Vite `manifest.json` files to resolve source paths to hashed asset URLs. Manifests are cached per bundle.
+
+`assetTags()` generates HTML `<script>` and `<link>` tags for a bundle's entry assets. In production (manifest exists), it emits hashed asset tags. In dev mode (no manifest, `devServerUrl` set), it emits Vite dev server HMR tags. All attribute values are escaped via `htmlspecialchars()`. Returns empty string when neither manifest nor dev server is available.
 
 `TenantAssetResolver` (`packages/foundation/src/Asset/TenantAssetResolver.php`) resolves tenant-specific asset paths.
 
@@ -997,6 +1002,8 @@ File: `packages/foundation/src/Http/ControllerDispatcher.php`
 Routes a matched controller name to the appropriate handler. Central dispatch hub for `HttpKernel`.
 
 Handles callable controllers (objects with `__invoke(Request): Response`) directly. String controller keys are delegated to domain-specific routers in `packages/foundation/src/Http/Router/`. All controller return types are Symfony `Response` or `JsonResponse` (no custom response DTOs).
+
+**Inertia response handling:** When a callable controller returns an `InertiaResponse`, the dispatcher checks for the `X-Inertia` request header. XHR requests get a JSON response with the page object. Non-XHR (initial page load) requests are rendered to full HTML via `Inertia::getRenderer()`, which returns the renderer configured by `InertiaServiceProvider` (with Vite asset tags injected).
 
 **Error handling:** Both the callable controller path and the router dispatch path are wrapped in try-catch. Unhandled exceptions produce a 500 JSON:API error response via `handleException()`, which includes stack trace details when debug mode is enabled.
 
@@ -1436,10 +1443,10 @@ RateLimit/
     InMemoryRateLimiter.php      -- sliding-window in-memory implementation
 Asset/
     AssetManagerInterface.php    -- url(path, bundle): string
-    ViteAssetManager.php         -- reads Vite manifest.json for hashed URLs
+    ViteAssetManager.php         -- reads Vite manifest.json for hashed URLs; assetTags() generates HTML script/link tags with dev mode support
     TenantAssetResolver.php      -- tenant-specific asset path resolution
 Http/
-    ControllerDispatcher.php     -- routes controller names to domain routers
+    ControllerDispatcher.php     -- routes controller names to domain routers; Inertia responses use Inertia::getRenderer()
     JsonApiResponseTrait.php     -- shared JSON:API response builder
     CorsHandler.php              -- CORS preflight and header resolution
     Router/
