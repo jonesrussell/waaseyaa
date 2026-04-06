@@ -22,8 +22,8 @@ fi
 # Open issues with no milestone
 echo ""
 echo "--- Open issues with no milestone ---"
-NO_MILESTONE=$(gh issue list --repo "$REPO" --no-milestone --state open --limit 100 --json number,title 2>/dev/null || echo "[]")
-COUNT=$(echo "$NO_MILESTONE" | grep -c '"number"' || true)
+NO_MILESTONE=$(gh issue list --repo "$REPO" --state open --search "no:milestone" --limit 100 --json number,title 2>/dev/null || echo "[]")
+COUNT=$(echo "$NO_MILESTONE" | grep -o '"number":' | wc -l | tr -d ' ')
 
 if [[ "$COUNT" -gt 0 ]]; then
   echo "WARNING: $COUNT open issue(s) without a milestone (incomplete triage):"
