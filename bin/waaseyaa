@@ -1,36 +1,4 @@
-#!/usr/bin/env php
-<?php
-
-declare(strict_types=1);
-
-// Find autoloader.
-$autoloadPaths = [
-    __DIR__ . '/../vendor/autoload.php',
-    __DIR__ . '/../../../autoload.php',
-];
-
-$autoloaded = false;
-foreach ($autoloadPaths as $path) {
-    if (file_exists($path)) {
-        require $path;
-        $autoloaded = true;
-        break;
-    }
-}
-
-if (!$autoloaded) {
-    fwrite(STDERR, "Could not find Composer autoloader. Run 'composer install' first.\n");
-    exit(1);
-}
-
-$projectRoot = dirname(__DIR__);
-try {
-    (new \Symfony\Component\Dotenv\Dotenv())->loadEnv($projectRoot . '/.env');
-} catch (\Symfony\Component\Dotenv\Exception\FormatException|\Symfony\Component\Dotenv\Exception\PathException $e) {
-    fwrite(STDERR, 'Error: Failed to load .env: ' . $e->getMessage() . "\n");
-    fwrite(STDERR, "Check your .env, .env.local, and environment-specific .env files for syntax errors.\n");
-    exit(1);
-}
-
-$kernel = new Waaseyaa\Foundation\Kernel\ConsoleKernel($projectRoot);
-exit($kernel->handle());
+#!/usr/bin/env bash
+# Monorepo dev shim — delegates to the canonical script in packages/cli/.
+# In consumer projects, use vendor/bin/waaseyaa instead (Composer symlinks it).
+exec "$(dirname "$0")/../packages/cli/bin/waaseyaa" "$@"

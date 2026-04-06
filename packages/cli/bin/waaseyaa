@@ -27,7 +27,7 @@ if ($autoloaderPath === null) {
     exit(1);
 }
 
-// Project root is the directory that contains vendor/ (i.e. parent of vendor/).
+// Project root is the directory containing vendor/, i.e., two levels up from autoload.php.
 $projectRoot = dirname($autoloaderPath, 2);
 
 $kernel = new Waaseyaa\Foundation\Kernel\ConsoleKernel($projectRoot);
