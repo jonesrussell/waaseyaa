@@ -6,6 +6,7 @@ namespace Waaseyaa\Foundation\Http\Router;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Waaseyaa\Api\ApiDiscoveryController;
 use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
@@ -34,7 +35,7 @@ final class DiscoveryRouter implements DomainRouterInterface
         $params = $request->attributes->all();
 
         if (str_contains($controller, 'ApiDiscoveryController')) {
-            $discoveryController = new \Waaseyaa\Api\ApiDiscoveryController($this->entityTypeManager);
+            $discoveryController = new ApiDiscoveryController($this->entityTypeManager);
             $result = $discoveryController->discover();
             return $this->jsonApiResponse(200, ['jsonapi' => ['version' => '1.1'], ...$result]);
         }

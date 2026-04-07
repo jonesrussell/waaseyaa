@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
+use Waaseyaa\Media\File;
 use Waaseyaa\Media\LocalFileRepository;
 
 final class MediaRouter implements DomainRouterInterface
@@ -100,7 +101,7 @@ final class MediaRouter implements DomainRouterInterface
             ]);
         }
 
-        $file = new \Waaseyaa\Media\File(
+        $file = new File(
             uri: $uri,
             filename: $safeName,
             mimeType: $mimeType,

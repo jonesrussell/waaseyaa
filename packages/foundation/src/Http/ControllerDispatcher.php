@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Http;
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
+use Waaseyaa\Inertia\InertiaResponse;
+use Waaseyaa\Inertia\Inertia;
 
 /**
  * Routes a matched controller name to the appropriate domain router.
@@ -93,7 +96,7 @@ final class ControllerDispatcher
         $routeParams = array_filter($params, fn($k) => !str_starts_with($k, '_'), ARRAY_FILTER_USE_KEY);
         $result = $controller($request, ...$routeParams);
 
-        if ($result instanceof \Waaseyaa\Inertia\InertiaResponse) {
+        if ($result instanceof InertiaResponse) {
             $pageObject = $result->toPageObject();
             $pageObject['url'] = $request->getRequestUri();
 
@@ -104,10 +107,10 @@ final class ControllerDispatcher
                 ]);
             }
 
-            $renderer = \Waaseyaa\Inertia\Inertia::getRenderer();
+            $renderer = Inertia::getRenderer();
             return $this->htmlResponse(200, $renderer->render($pageObject));
         }
-        if ($result instanceof \Symfony\Component\HttpFoundation\RedirectResponse
+        if ($result instanceof RedirectResponse
             && $request->headers->get('X-Inertia') === 'true'
             && in_array($request->getMethod(), ['PUT', 'PATCH', 'DELETE'], true)
         ) {
