@@ -28,6 +28,12 @@ final class EntitySchemaSync
         foreach ($entityTypes as $entityType) {
             $handler = new SqlSchemaHandler($entityType, $this->database);
             $handler->ensureTable();
+            if ($entityType->isTranslatable()) {
+                $handler->ensureTranslationTable();
+            }
+            if ($entityType->isRevisionable()) {
+                $handler->ensureRevisionTable();
+            }
         }
     }
 }
