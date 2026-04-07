@@ -6,6 +6,7 @@ namespace Waaseyaa\CLI\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -52,6 +53,15 @@ class InstallCommand extends Command
             'slogan' => '',
             'mail' => $siteMail,
         ]);
+
+        // Step 1b: Scaffold the canonical public/index.php front controller.
+        $application = $this->getApplication();
+        if ($application !== null && $application->has('make:public')) {
+            $result = $application->find('make:public')->run(new ArrayInput([]), $output);
+            if ($result !== Command::SUCCESS) {
+                return Command::FAILURE;
+            }
+        }
 
         // Step 2: Create admin user.
         $output->writeln('Creating admin user...');

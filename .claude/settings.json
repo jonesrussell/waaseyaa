@@ -6,6 +6,20 @@
     }
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tools/drift-detector.sh 5 2>&1",
+            "if": "Bash(git push*)",
+            "timeout": 30,
+            "statusMessage": "Checking for spec drift..."
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": "",
@@ -17,7 +31,7 @@
           },
           {
             "type": "command",
-            "command": "tools/drift-detector.sh 20 2>&1",
+            "command": "tools/drift-detector.sh 5 2>&1",
             "show_output": true
           }
         ]
