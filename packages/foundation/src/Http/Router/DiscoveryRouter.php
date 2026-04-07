@@ -6,8 +6,8 @@ namespace Waaseyaa\Foundation\Http\Router;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Api\ApiDiscoveryController;
+use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
 
