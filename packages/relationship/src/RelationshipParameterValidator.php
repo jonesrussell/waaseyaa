@@ -129,7 +129,7 @@ final class RelationshipParameterValidator
     /**
      * @param array<string, mixed> $edge
      */
-    public static function timelineSortDate(array $edge): int
+    public function timelineSortDate(array $edge): int
     {
         $start = is_numeric($edge['start_date'] ?? null) ? (int) $edge['start_date'] : null;
         if ($start !== null) {

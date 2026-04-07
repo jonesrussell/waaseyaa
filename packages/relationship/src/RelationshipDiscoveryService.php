@@ -202,9 +202,10 @@ final class RelationshipDiscoveryService
             fn(array $edge): bool => $this->validator->edgeOverlapsWindow($edge, $from, $to),
         ));
 
-        usort($edges, static function (array $left, array $right): int {
-            $leftTimeline = RelationshipParameterValidator::timelineSortDate($left);
-            $rightTimeline = RelationshipParameterValidator::timelineSortDate($right);
+        $validator = $this->validator;
+        usort($edges, static function (array $left, array $right) use ($validator): int {
+            $leftTimeline = $validator->timelineSortDate($left);
+            $rightTimeline = $validator->timelineSortDate($right);
             $timelineCompare = $leftTimeline <=> $rightTimeline;
             if ($timelineCompare !== 0) {
                 return $timelineCompare;
@@ -236,7 +237,7 @@ final class RelationshipDiscoveryService
 
         $pagedEdges = array_slice($edges, $offset, $limit);
         $items = array_map(function (array $edge): array {
-            $edge['timeline_date'] = RelationshipParameterValidator::timelineSortDate($edge);
+            $edge['timeline_date'] = $this->validator->timelineSortDate($edge);
             return $edge;
         }, $pagedEdges);
 
