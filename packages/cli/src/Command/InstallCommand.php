@@ -57,7 +57,10 @@ class InstallCommand extends Command
         // Step 1b: Scaffold the canonical public/index.php front controller.
         $application = $this->getApplication();
         if ($application !== null && $application->has('make:public')) {
-            $application->find('make:public')->run(new ArrayInput([]), $output);
+            $result = $application->find('make:public')->run(new ArrayInput([]), $output);
+            if ($result !== Command::SUCCESS) {
+                return Command::FAILURE;
+            }
         }
 
         // Step 2: Create admin user.
