@@ -14,8 +14,8 @@ if (!file_exists($envFile) && file_exists($envExample)) {
         $appName = '"' . $appName . '"';
     }
     $content = str_replace('WAASEYAA_JWT_SECRET=', "WAASEYAA_JWT_SECRET={$secret}", $content);
-    if (str_contains($content, 'APP_NAME=My App')) {
-        $content = str_replace('APP_NAME=My App', "APP_NAME={$appName}", $content);
+    if (str_contains($content, 'APP_NAME=Waaseyaa')) {
+        $content = str_replace('APP_NAME=Waaseyaa', "APP_NAME={$appName}", $content);
     } else {
         fwrite(STDERR, "Warning: Could not set APP_NAME — placeholder not found in .env.example.\n");
     }
