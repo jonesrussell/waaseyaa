@@ -133,7 +133,7 @@ final class CliCommandRegistry
             new MakeProviderCommand(),
             new MakePublicCommand($projectRoot),
             new MakeTestCommand(),
-            new ServeCommand(),
+            new ServeCommand($projectRoot),
             new AboutCommand(info: [
                 'name' => 'Waaseyaa',
                 'version' => (static function (): string {

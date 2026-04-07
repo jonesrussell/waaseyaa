@@ -16,6 +16,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class ServeCommand extends Command
 {
+    public function __construct(private readonly string $projectRoot)
+    {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -23,18 +28,58 @@ final class ServeCommand extends Command
             ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port', (string) (getenv('APP_PORT') ?: '8080'));
     }
 
+    /**
+     * Build the environment the PHP child server will run under.
+     *
+     * If the caller hasn't set APP_ENV, default to development and force
+     * APP_DEBUG=1 so dev-mode database auto-creation and boot-error
+     * visibility kick in. All other parent env vars pass through.
+     *
+     * @param array<string, string> $parentEnv
+     * @return array<string, string>
+     */
+    public function resolveChildEnv(array $parentEnv): array
+    {
+        $env = $parentEnv;
+
+        if (!isset($env['APP_ENV']) || $env['APP_ENV'] === '') {
+            $env['APP_ENV'] = 'development';
+            $env['APP_DEBUG'] = '1';
+        }
+
+        return $env;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $host = $input->getOption('host');
         $port = $input->getOption('port');
 
+        $publicIndex = $this->projectRoot . '/public/index.php';
+        if (!file_exists($publicIndex) || filesize($publicIndex) === 0) {
+            $output->writeln('<error>public/index.php is missing or empty.</error>');
+            $output->writeln('<comment>Run: vendor/bin/waaseyaa make:public</comment>');
+            return self::FAILURE;
+        }
+
+        $env = $this->resolveChildEnv(getenv());
+
+        if (($env['APP_ENV'] ?? '') === 'development') {
+            $output->writeln(
+                '<info>Starting in development mode (APP_ENV=development).</info> '
+                . 'Use <comment>APP_ENV=production vendor/bin/waaseyaa serve</comment> to override.',
+            );
+        }
+
         $output->writeln(sprintf('<info>Waaseyaa development server started:</info> http://%s:%s', $host, $port));
         $output->writeln('<comment>Press Ctrl+C to stop.</comment>');
 
         $process = proc_open(
-            [PHP_BINARY, '-S', "{$host}:{$port}", '-t', 'public'],
+            [PHP_BINARY, '-S', "{$host}:{$port}", '-t', $this->projectRoot . '/public'],
             [STDIN, STDOUT, STDERR],
             $pipes,
+            null,
+            $env,
         );
 
         if ($process === false) {
