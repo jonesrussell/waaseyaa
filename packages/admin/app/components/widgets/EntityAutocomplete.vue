@@ -113,7 +113,8 @@ function onKeydown(event: KeyboardEvent) {
     activeIndex.value = Math.max(activeIndex.value - 1, 0)
   } else if (event.key === 'Enter' && activeIndex.value >= 0) {
     event.preventDefault()
-    selectResult(results.value[activeIndex.value])
+    const selected = results.value[activeIndex.value]
+    if (selected !== undefined) selectResult(selected)
   }
 }
 

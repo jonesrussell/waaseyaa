@@ -1,6 +1,6 @@
 # Admin SPA
 
-<!-- Spec reviewed 2026-04-02 - post-M10 admin surface bootstrap via /admin/_surface/*, contract re-exports, C17 test-harness alignment, C18 drift remediation (#1017), F5 deterministic pipeline visibility -->
+<!-- Spec reviewed 2026-04-07 - post-M10 admin surface bootstrap via /admin/_surface/*, contract re-exports, C17 test-harness alignment, C18 drift remediation (#1017), F5 deterministic pipeline visibility, Nuxt 4 upgrade, backendUrl private runtimeConfig -->
 
 ## Package
 
@@ -14,7 +14,7 @@
 
 | Dependency     | Version   | Purpose                         |
 |----------------|-----------|---------------------------------|
-| Nuxt           | ^3.15.0   | SSR/SPA framework, file-based routing, auto-imports |
+| Nuxt           | ^4.4.2    | SSR/SPA framework, file-based routing, auto-imports |
 | Vue            | ^3.5.0    | Composition API, reactivity     |
 | vue-router     | ^4.5.0    | Client-side routing             |
 | TypeScript     | ^5.6.0    | Type checking (devDependency)   |
@@ -51,6 +51,12 @@ Exposed via `useRuntimeConfig().public`:
 | `appName` | `NUXT_PUBLIC_APP_NAME` | `'Waaseyaa'` | Override site name (e.g. "Minoo") |
 | `docsUrl` | `NUXT_PUBLIC_DOCS_URL` | `'https://github.com/jonesrussell/waaseyaa'` | Quickstart docs link used by onboarding prompt |
 | `baseUrl` | `NUXT_PUBLIC_BASE_URL` | `'/admin'` | Base URL for subpath mounting, used by admin plugin to prefix surface API paths |
+
+Private runtimeConfig (server-side only, not exposed to the browser):
+
+| Key | Env Var | Default | Purpose |
+|-----|---------|---------|---------|
+| `backendUrl` | `NUXT_BACKEND_URL` | `'http://127.0.0.1:8080'` | PHP backend URL used by Nitro proxy rules at server startup; not accessible via `useRuntimeConfig().public` |
 
 ### Nitro Prerender
 

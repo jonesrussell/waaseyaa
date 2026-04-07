@@ -22,18 +22,9 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
   }
 
   // ── Skip auth check on public auth pages (prevents redirect loop) ─────
-  if (import.meta.client) {
-    if (isPublicAuthPath(window.location.pathname, baseUrl)) {
-      syncAuthState(null, false)
-      return { provide: { admin: null } }
-    }
-  }
-  if (import.meta.server) {
-    const route = useRoute()
-    if (isPublicAuthPath(route.path, baseUrl)) {
-      syncAuthState(null, false)
-      return { provide: { admin: null } }
-    }
+  if (isPublicAuthPath(window.location.pathname, baseUrl)) {
+    syncAuthState(null, false)
+    return { provide: { admin: null } }
   }
 
   // ── Fetch session from AdminSurface API ──────────────────────────
