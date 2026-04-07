@@ -75,7 +75,7 @@ final class ServeCommand extends Command
         $output->writeln('<comment>Press Ctrl+C to stop.</comment>');
 
         $process = proc_open(
-            [PHP_BINARY, '-S', "{$host}:{$port}", '-t', 'public'],
+            [PHP_BINARY, '-S', "{$host}:{$port}", '-t', $this->projectRoot . '/public'],
             [STDIN, STDOUT, STDERR],
             $pipes,
             null,
