@@ -16,6 +16,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class ServeCommand extends Command
 {
+    public function __construct(private readonly string $projectRoot)
+    {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -50,7 +55,7 @@ final class ServeCommand extends Command
         $host = $input->getOption('host');
         $port = $input->getOption('port');
 
-        $publicIndex = getcwd() . '/public/index.php';
+        $publicIndex = $this->projectRoot . '/public/index.php';
         if (!file_exists($publicIndex) || filesize($publicIndex) === 0) {
             $output->writeln('<error>public/index.php is missing or empty.</error>');
             $output->writeln('<comment>Run: vendor/bin/waaseyaa make:public</comment>');

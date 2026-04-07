@@ -15,7 +15,7 @@ final class ServeCommandTest extends TestCase
     #[Test]
     public function it_defaults_app_env_to_development(): void
     {
-        $command = new ServeCommand();
+        $command = new ServeCommand('/tmp');
 
         $env = $command->resolveChildEnv([]);
 
@@ -26,7 +26,7 @@ final class ServeCommandTest extends TestCase
     #[Test]
     public function it_respects_caller_set_app_env(): void
     {
-        $command = new ServeCommand();
+        $command = new ServeCommand('/tmp');
 
         $env = $command->resolveChildEnv(['APP_ENV' => 'staging']);
 
@@ -38,7 +38,7 @@ final class ServeCommandTest extends TestCase
     #[Test]
     public function it_passes_through_other_env_vars(): void
     {
-        $command = new ServeCommand();
+        $command = new ServeCommand('/tmp');
 
         $env = $command->resolveChildEnv(['PATH' => '/usr/bin', 'HOME' => '/home/test']);
 
