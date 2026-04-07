@@ -294,12 +294,11 @@ RouteBuilder::create('/api/nodes')
 
 **Rule:** After creating the Symfony `Request` object, always use `$httpRequest->getContent()` to read the request body. Never call `file_get_contents('php://input')` afterward.
 
-This is visible in `public/index.php`:
+`HttpRequest::createFromGlobals()` is called inside `HttpKernel::serveHttpRequest()`, not in `public/index.php`. Any code that needs the request body must receive the `Request` object and call `$request->getContent()`:
 
 ```php
-$httpRequest = HttpRequest::createFromGlobals();
-// ... later, in the dispatch section:
-$raw = $httpRequest->getContent();  // Correct: reads from the Request object
+// Inside HttpKernel or middleware — correct pattern:
+$raw = $request->getContent();  // reads from the Request object, not php://input
 ```
 
 ## Built-in HTTP Middleware
