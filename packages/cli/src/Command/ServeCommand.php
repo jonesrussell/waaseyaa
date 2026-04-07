@@ -16,6 +16,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 )]
 final class ServeCommand extends Command
 {
+    public function __construct(private readonly string $projectRoot)
+    {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
