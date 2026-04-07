@@ -9,7 +9,9 @@ $envFile = $root . '/.env';
 if (!file_exists($envFile) && file_exists($envExample)) {
     $content = file_get_contents($envExample);
     $secret = bin2hex(random_bytes(32));
+    $appName = ucwords(str_replace(['-', '_'], ' ', basename($root)));
     $content = str_replace('WAASEYAA_JWT_SECRET=', "WAASEYAA_JWT_SECRET={$secret}", $content);
+    $content = str_replace('APP_NAME=My App', "APP_NAME={$appName}", $content);
     file_put_contents($envFile, $content);
 }
 

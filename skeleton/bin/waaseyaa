@@ -5,5 +5,10 @@ declare(strict_types=1);
 
 require __DIR__ . '/../vendor/autoload.php';
 
-$kernel = new Waaseyaa\Foundation\Kernel\ConsoleKernel(dirname(__DIR__));
+$projectRoot = dirname(__DIR__);
+if (file_exists($projectRoot . '/.env')) {
+    (new \Symfony\Component\Dotenv\Dotenv())->loadEnv($projectRoot . '/.env');
+}
+
+$kernel = new Waaseyaa\Foundation\Kernel\ConsoleKernel($projectRoot);
 exit($kernel->handle());

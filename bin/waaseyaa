@@ -23,5 +23,10 @@ if (!$autoloaded) {
     exit(1);
 }
 
-$kernel = new Waaseyaa\Foundation\Kernel\ConsoleKernel(dirname(__DIR__));
+$projectRoot = dirname(__DIR__);
+if (file_exists($projectRoot . '/.env')) {
+    (new \Symfony\Component\Dotenv\Dotenv())->loadEnv($projectRoot . '/.env');
+}
+
+$kernel = new Waaseyaa\Foundation\Kernel\ConsoleKernel($projectRoot);
 exit($kernel->handle());

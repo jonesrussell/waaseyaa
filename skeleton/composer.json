@@ -22,7 +22,8 @@
         "waaseyaa/cli": "^0.1",
         "waaseyaa/database-legacy": "^0.1",
         "waaseyaa/cache": "^0.1",
-        "waaseyaa/field": "^0.1"
+        "waaseyaa/field": "^0.1",
+        "symfony/dotenv": "^7.0"
     },
     "autoload": {
         "psr-4": {
