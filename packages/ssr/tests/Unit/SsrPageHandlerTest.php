@@ -16,9 +16,11 @@ use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\I18n\Language;
 use Waaseyaa\I18n\LanguageManager;
 use Waaseyaa\I18n\LanguageManagerInterface;
+use Waaseyaa\SSR\LanguageResolver;
 use Waaseyaa\SSR\SsrPageHandler;
 
 #[CoversClass(SsrPageHandler::class)]
+#[CoversClass(LanguageResolver::class)]
 final class SsrPageHandlerTest extends TestCase
 {
     private function createHandler(array $config = [], ?\Closure $serviceResolver = null): SsrPageHandler
@@ -40,14 +42,19 @@ final class SsrPageHandlerTest extends TestCase
         );
     }
 
+    private function createLanguageResolver(?\Closure $serviceResolver = null): LanguageResolver
+    {
+        return new LanguageResolver(serviceResolver: $serviceResolver);
+    }
+
     /**
-     * Create a handler with an app-level LanguageManager injected via serviceResolver.
-     * Returns [$handler, $manager] so tests can assert state on the shared manager.
+     * Create a LanguageResolver with an app-level LanguageManager injected via serviceResolver.
+     * Returns [$resolver, $manager] so tests can assert state on the shared manager.
      *
      * @param list<Language> $languages
-     * @return array{SsrPageHandler, LanguageManager}
+     * @return array{LanguageResolver, LanguageManager}
      */
-    private function createHandlerWithManager(array $languages = []): array
+    private function createResolverWithManager(array $languages = []): array
     {
         if ($languages === []) {
             $languages = [
@@ -65,7 +72,7 @@ final class SsrPageHandlerTest extends TestCase
             return null;
         };
 
-        return [$this->createHandler(serviceResolver: $serviceResolver), $manager];
+        return [$this->createLanguageResolver(serviceResolver: $serviceResolver), $manager];
     }
 
     #[Test]
@@ -111,36 +118,36 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function detect_language_prefix_from_path_finds_known_language(): void
     {
-        $handler = $this->createHandler();
-        $this->assertSame('fr', $handler->detectLanguagePrefixFromPath('/fr/about', ['en', 'fr', 'de']));
+        $resolver = $this->createLanguageResolver();
+        $this->assertSame('fr', $resolver->detectLanguagePrefixFromPath('/fr/about', ['en', 'fr', 'de']));
     }
 
     #[Test]
     public function detect_language_prefix_from_path_returns_null_for_unknown(): void
     {
-        $handler = $this->createHandler();
-        $this->assertNull($handler->detectLanguagePrefixFromPath('/about', ['en', 'fr']));
+        $resolver = $this->createLanguageResolver();
+        $this->assertNull($resolver->detectLanguagePrefixFromPath('/about', ['en', 'fr']));
     }
 
     #[Test]
     public function strip_language_prefix_removes_prefix(): void
     {
-        $handler = $this->createHandler();
-        $this->assertSame('/about', $handler->stripLanguagePrefix('/fr/about', 'fr'));
+        $resolver = $this->createLanguageResolver();
+        $this->assertSame('/about', $resolver->stripLanguagePrefix('/fr/about', 'fr'));
     }
 
     #[Test]
     public function strip_language_prefix_returns_root_for_bare_language_path(): void
     {
-        $handler = $this->createHandler();
-        $this->assertSame('/', $handler->stripLanguagePrefix('/fr', 'fr'));
+        $resolver = $this->createLanguageResolver();
+        $this->assertSame('/', $resolver->stripLanguagePrefix('/fr', 'fr'));
     }
 
     #[Test]
     public function strip_language_prefix_preserves_path_without_prefix(): void
     {
-        $handler = $this->createHandler();
-        $this->assertSame('/about', $handler->stripLanguagePrefix('/about', 'fr'));
+        $resolver = $this->createLanguageResolver();
+        $this->assertSame('/about', $resolver->stripLanguagePrefix('/about', 'fr'));
     }
 
     #[Test]
@@ -234,12 +241,12 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function render_language_resolution_uses_url_prefix(): void
     {
-        [$handler] = $this->createHandlerWithManager([
+        [$resolver] = $this->createResolverWithManager([
             new Language('en', 'English', isDefault: true),
             new Language('fr', 'French'),
         ]);
         $request = HttpRequest::create('/fr/about');
-        $result = $handler->resolveRenderLanguageAndAliasPath('/fr/about', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/fr/about', $request);
 
         $this->assertSame('fr', $result['langcode']);
         $this->assertSame('/about', $result['alias_path']);
@@ -248,9 +255,9 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function render_language_resolution_defaults_to_english(): void
     {
-        [$handler] = $this->createHandlerWithManager();
+        [$resolver] = $this->createResolverWithManager();
         $request = HttpRequest::create('/about');
-        $result = $handler->resolveRenderLanguageAndAliasPath('/about', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/about', $request);
 
         $this->assertSame('en', $result['langcode']);
         $this->assertSame('/about', $result['alias_path']);
@@ -261,12 +268,12 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function resolve_language_manager_falls_back_to_english_when_no_app_manager(): void
     {
-        // Handler created without serviceResolver — no app-level LanguageManager available.
+        // Resolver created without serviceResolver — no app-level LanguageManager available.
         // Falls back to default English langcode and unchanged path.
-        $handler = $this->createHandler();
+        $resolver = $this->createLanguageResolver();
         $request = HttpRequest::create('/about');
 
-        $result = $handler->resolveRenderLanguageAndAliasPath('/about', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/about', $request);
 
         $this->assertSame('en', $result['langcode']);
         $this->assertSame('/about', $result['alias_path']);
@@ -276,10 +283,10 @@ final class SsrPageHandlerTest extends TestCase
     public function resolve_language_manager_returns_app_instance(): void
     {
         // The shared app-level manager is used — verifiable by checking state mutation.
-        [$handler, $manager] = $this->createHandlerWithManager();
+        [$resolver, $manager] = $this->createResolverWithManager();
         $request = HttpRequest::create('/oj/about');
 
-        $result = $handler->resolveRenderLanguageAndAliasPath('/oj/about', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/oj/about', $request);
 
         // The negotiated language was set on the app manager (same instance).
         $this->assertSame('oj', $result['langcode']);
@@ -291,10 +298,10 @@ final class SsrPageHandlerTest extends TestCase
     {
         // serviceResolver is present but returns something that isn't a LanguageManagerInterface.
         // Falls back to default English langcode and unchanged path.
-        $handler = $this->createHandler(serviceResolver: static fn(string $class): ?object => new \stdClass());
+        $resolver = $this->createLanguageResolver(serviceResolver: static fn(string $class): ?object => new \stdClass());
         $request = HttpRequest::create('/about');
 
-        $result = $handler->resolveRenderLanguageAndAliasPath('/about', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/about', $request);
 
         $this->assertSame('en', $result['langcode']);
         $this->assertSame('/about', $result['alias_path']);
@@ -303,13 +310,13 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function accept_language_fallback_when_no_prefix(): void
     {
-        [$handler, $manager] = $this->createHandlerWithManager();
+        [$resolver, $manager] = $this->createResolverWithManager();
         // No URL prefix, but Accept-Language header specifies oj.
         $request = HttpRequest::create('/about', 'GET', [], [], [], [
             'HTTP_ACCEPT_LANGUAGE' => 'oj',
         ]);
 
-        $result = $handler->resolveRenderLanguageAndAliasPath('/about', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/about', $request);
 
         $this->assertSame('oj', $result['langcode']);
         $this->assertSame('/about', $result['alias_path']);
@@ -319,10 +326,10 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function url_prefix_detection_oj_homepage(): void
     {
-        [$handler, $manager] = $this->createHandlerWithManager();
+        [$resolver, $manager] = $this->createResolverWithManager();
         $request = HttpRequest::create('/oj/');
 
-        $result = $handler->resolveRenderLanguageAndAliasPath('/oj/', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/oj/', $request);
 
         $this->assertSame('oj', $result['langcode']);
         $this->assertSame('/', $result['alias_path']);
@@ -332,10 +339,10 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function invalid_prefix_falls_through_to_default(): void
     {
-        [$handler] = $this->createHandlerWithManager();
+        [$resolver] = $this->createResolverWithManager();
         $request = HttpRequest::create('/xx/about');
 
-        $result = $handler->resolveRenderLanguageAndAliasPath('/xx/about', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/xx/about', $request);
 
         // xx is not a registered language — no prefix detected, default en.
         $this->assertSame('en', $result['langcode']);
@@ -345,10 +352,10 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function default_language_no_prefix(): void
     {
-        [$handler, $manager] = $this->createHandlerWithManager();
+        [$resolver, $manager] = $this->createResolverWithManager();
         $request = HttpRequest::create('/about');
 
-        $result = $handler->resolveRenderLanguageAndAliasPath('/about', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/about', $request);
 
         $this->assertSame('en', $result['langcode']);
         $this->assertSame('/about', $result['alias_path']);
@@ -360,12 +367,12 @@ final class SsrPageHandlerTest extends TestCase
     {
         // Bare '/' must flow through negotiation, not bypass it.
         // With Accept-Language: oj, the homepage should activate oj.
-        [$handler, $manager] = $this->createHandlerWithManager();
+        [$resolver, $manager] = $this->createResolverWithManager();
         $request = HttpRequest::create('/', 'GET', [], [], [], [
             'HTTP_ACCEPT_LANGUAGE' => 'oj',
         ]);
 
-        $result = $handler->resolveRenderLanguageAndAliasPath('/', $request);
+        $result = $resolver->resolveRenderLanguageAndAliasPath('/', $request);
 
         $this->assertSame('oj', $result['langcode']);
         $this->assertSame('/', $result['alias_path']);
@@ -375,9 +382,9 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function strip_language_prefix_for_routing_strips_known_prefix(): void
     {
-        [$handler, $manager] = $this->createHandlerWithManager();
+        [$resolver, $manager] = $this->createResolverWithManager();
 
-        $result = $handler->stripLanguagePrefixForRouting('/oj/communities');
+        $result = $resolver->stripLanguagePrefixForRouting('/oj/communities');
 
         $this->assertSame('/communities', $result);
         $this->assertSame('oj', $manager->getCurrentLanguage()->id);
@@ -386,9 +393,9 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function strip_language_prefix_for_routing_preserves_unknown_prefix(): void
     {
-        [$handler] = $this->createHandlerWithManager();
+        [$resolver] = $this->createResolverWithManager();
 
-        $result = $handler->stripLanguagePrefixForRouting('/xx/communities');
+        $result = $resolver->stripLanguagePrefixForRouting('/xx/communities');
 
         $this->assertSame('/xx/communities', $result);
     }
@@ -396,9 +403,9 @@ final class SsrPageHandlerTest extends TestCase
     #[Test]
     public function strip_language_prefix_for_routing_preserves_default_language(): void
     {
-        [$handler, $manager] = $this->createHandlerWithManager();
+        [$resolver, $manager] = $this->createResolverWithManager();
 
-        $result = $handler->stripLanguagePrefixForRouting('/communities');
+        $result = $resolver->stripLanguagePrefixForRouting('/communities');
 
         $this->assertSame('/communities', $result);
         $this->assertSame('en', $manager->getCurrentLanguage()->id);

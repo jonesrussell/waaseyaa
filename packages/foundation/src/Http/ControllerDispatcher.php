@@ -10,8 +10,8 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
-use Waaseyaa\Inertia\InertiaResponse;
 use Waaseyaa\Inertia\Inertia;
+use Waaseyaa\Inertia\InertiaResponse;
 
 /**
  * Routes a matched controller name to the appropriate domain router.

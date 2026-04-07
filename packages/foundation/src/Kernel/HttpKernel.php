@@ -185,7 +185,7 @@ final class HttpKernel extends AbstractKernel
         $routeRegistrar->register($router);
 
         // Strip language prefix before routing so /oj/communities matches /communities.
-        $path = $this->ssrPageHandler->stripLanguagePrefixForRouting($path);
+        $path = $this->ssrPageHandler->getLanguageResolver()->stripLanguagePrefixForRouting($path);
 
         // Route matching.
         try {
