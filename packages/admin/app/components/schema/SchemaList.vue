@@ -145,6 +145,7 @@ watch(messages, (msgs) => {
   if (msgs.length === 0) return
   const latest = msgs[msgs.length - 1]
   if (
+    latest !== undefined &&
     (latest.event === 'entity.saved' || latest.event === 'entity.deleted') &&
     latest.data?.entityType === props.entityType
   ) {

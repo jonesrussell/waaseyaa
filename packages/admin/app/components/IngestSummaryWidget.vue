@@ -45,7 +45,7 @@ async function fetchCounts() {
     for (const item of result.data) {
       const status = item.attributes.status as string
       if (status in fresh) {
-        fresh[status]++
+        (fresh as Record<string, number>)[status]++
       }
     }
     counts.value = fresh
