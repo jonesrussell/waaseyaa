@@ -10,8 +10,15 @@ if (!file_exists($envFile) && file_exists($envExample)) {
     $content = file_get_contents($envExample);
     $secret = bin2hex(random_bytes(32));
     $appName = ucwords(str_replace(['-', '_'], ' ', basename($root)));
+    if (str_contains($appName, ' ')) {
+        $appName = '"' . $appName . '"';
+    }
     $content = str_replace('WAASEYAA_JWT_SECRET=', "WAASEYAA_JWT_SECRET={$secret}", $content);
-    $content = str_replace('APP_NAME=My App', "APP_NAME={$appName}", $content);
+    if (str_contains($content, 'APP_NAME=My App')) {
+        $content = str_replace('APP_NAME=My App', "APP_NAME={$appName}", $content);
+    } else {
+        fwrite(STDERR, "Warning: Could not set APP_NAME — placeholder not found in .env.example.\n");
+    }
     file_put_contents($envFile, $content);
 }
 

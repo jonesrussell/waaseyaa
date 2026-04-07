@@ -42,6 +42,7 @@ final class ServeCommand extends Command
             return self::FAILURE;
         }
 
-        return proc_close($process);
+        $exitCode = proc_close($process);
+        return $exitCode === 0 ? self::SUCCESS : self::FAILURE;
     }
 }
