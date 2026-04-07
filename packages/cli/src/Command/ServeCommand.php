@@ -19,8 +19,8 @@ final class ServeCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('host', null, InputOption::VALUE_OPTIONAL, 'The host address', '127.0.0.1')
-            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port', '8080');
+            ->addOption('host', null, InputOption::VALUE_OPTIONAL, 'The host address', (string) (getenv('APP_HOST') ?: '127.0.0.1'))
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port', (string) (getenv('APP_PORT') ?: '8080'));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -42,6 +42,7 @@ final class ServeCommand extends Command
             return self::FAILURE;
         }
 
-        return proc_close($process);
+        $exitCode = proc_close($process);
+        return $exitCode === 0 ? self::SUCCESS : self::FAILURE;
     }
 }

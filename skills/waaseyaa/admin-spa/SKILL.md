@@ -89,7 +89,7 @@ defineEmits<{ 'update:modelValue': [value: any] }>()
 
 ### API Proxy
 
-All `/api/*` requests are proxied to `http://localhost:8081/api` via Nuxt config. This is configured in `packages/admin/nuxt.config.ts` under both `nitro.devProxy` (dev) and `routeRules` (production).
+All `/api/*` requests are proxied to `http://localhost:8080/api` via Nuxt config. This is configured in `packages/admin/nuxt.config.ts` under both `nitro.devProxy` (dev) and `routeRules` (production).
 
 ### Widget Resolution
 
@@ -181,7 +181,7 @@ This catches type errors, missing imports, and component resolution failures.
 
 ### Manual Testing Workflow
 
-1. Start PHP backend: `php -S localhost:8081 public/index.php`
+1. Start PHP backend: `php -S localhost:8080 public/index.php`
 2. Start Nuxt dev server: `cd packages/admin && npm run dev`
 3. Access admin at `http://localhost:3000/`
 4. Verify: dashboard loads entity types, list views show data, forms render widgets, autocomplete searches, SSE connection indicator appears

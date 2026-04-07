@@ -40,7 +40,7 @@ The scaffold now creates `tests/Unit` and `tests/Integration`, so the default PH
 Create your first content:
 
 ```bash
-curl -X POST http://localhost:8081/api/note \
+curl -X POST http://localhost:8080/api/note \
   -H "Content-Type: application/vnd.api+json" \
   -d '{
     "data": {

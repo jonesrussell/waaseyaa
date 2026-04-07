@@ -150,7 +150,7 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 - `composer phpstan` — static analysis (level 5)
 
 **Development:**
-- `composer dev` — start dev server (PHP 8.4 on :8081 + admin SPA)
+- `composer dev` — start dev server (PHP 8.4 on :8080 + admin SPA)
 - `bin/waaseyaa` — CLI entry point (SQLite + file config)
 - `bin/waaseyaa optimize:manifest` — rebuild attribute-discovery manifest
 
