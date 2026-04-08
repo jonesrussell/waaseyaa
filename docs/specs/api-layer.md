@@ -1,6 +1,6 @@
 # API Layer
 
-<!-- Spec reviewed 2026-04-01 - post-M10 ApiServiceProvider route ownership, package-declared API surfaces, C18 drift remediation (#1017) -->
+<!-- Spec reviewed 2026-04-05 - #598 replace instanceof dispatch with JsonApiDocumentException in TranslationController -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
 
@@ -37,6 +37,7 @@ Foundation still owns the shared HTTP surfaces that are not entity-package speci
 | `src/Cache/ApiCacheMiddleware.php` | `Waaseyaa\Api\Cache` | ETag, If-None-Match, Cache-Control header generation |
 | `src/OpenApi/OpenApiGenerator.php` | `Waaseyaa\Api\OpenApi` | Generates OpenAPI 3.1 spec from entity type definitions |
 | `src/OpenApi/SchemaBuilder.php` | `Waaseyaa\Api\OpenApi` | Builds component schemas for OpenAPI spec |
+| `src/Exception/JsonApiDocumentException.php` | `Waaseyaa\Api\Exception` | Exception carrying a JsonApiDocument error response for controller helpers |
 | `src/MutableTranslatableInterface.php` | `Waaseyaa\Api` | Extension of TranslatableInterface with `addTranslation()` |
 
 ### packages/routing/
@@ -636,6 +637,10 @@ final class TranslationController
 
 Creating a translation requires `MutableTranslatableInterface`. Deleting the original language returns 422.
 
+### Error Handling Pattern
+
+`TranslationController::loadTranslatableEntity()` throws `JsonApiDocumentException` when the entity cannot be loaded or is not translatable, rather than returning a union type. Each CRUD method catches the exception once and returns the error document. This eliminates repeated `instanceof JsonApiDocument` dispatch checks and keeps the return type narrow (`TranslatableInterface`).
+
 ## API Cache Middleware
 
 ```php
@@ -741,6 +746,8 @@ packages/api/
       CodifiedContextController.php
       SchemaController.php
       TranslationController.php
+    Exception/
+      JsonApiDocumentException.php
     Http/
       DiscoveryApiHandler.php
     OpenApi/

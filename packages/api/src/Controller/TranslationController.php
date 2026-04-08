@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Controller;
 
+use Waaseyaa\Api\Exception\JsonApiDocumentException;
 use Waaseyaa\Api\JsonApiDocument;
 use Waaseyaa\Api\JsonApiError;
 use Waaseyaa\Api\JsonApiResource;
@@ -37,9 +38,10 @@ final class TranslationController
      */
     public function index(string $entityTypeId, int|string $id): JsonApiDocument
     {
-        $entity = $this->loadTranslatableEntity($entityTypeId, $id);
-        if ($entity instanceof JsonApiDocument) {
-            return $entity;
+        try {
+            $entity = $this->loadTranslatableEntity($entityTypeId, $id);
+        } catch (JsonApiDocumentException $e) {
+            return $e->document;
         }
 
         $languages = $entity->getTranslationLanguages();
@@ -70,9 +72,10 @@ final class TranslationController
      */
     public function show(string $entityTypeId, int|string $id, string $langcode): JsonApiDocument
     {
-        $entity = $this->loadTranslatableEntity($entityTypeId, $id);
-        if ($entity instanceof JsonApiDocument) {
-            return $entity;
+        try {
+            $entity = $this->loadTranslatableEntity($entityTypeId, $id);
+        } catch (JsonApiDocumentException $e) {
+            return $e->document;
         }
 
         if (!$entity->hasTranslation($langcode)) {
@@ -105,9 +108,10 @@ final class TranslationController
      */
     public function store(string $entityTypeId, int|string $id, string $langcode, array $data): JsonApiDocument
     {
-        $entity = $this->loadTranslatableEntity($entityTypeId, $id);
-        if ($entity instanceof JsonApiDocument) {
-            return $entity;
+        try {
+            $entity = $this->loadTranslatableEntity($entityTypeId, $id);
+        } catch (JsonApiDocumentException $e) {
+            return $e->document;
         }
 
         if ($entity->hasTranslation($langcode)) {
@@ -168,9 +172,10 @@ final class TranslationController
      */
     public function update(string $entityTypeId, int|string $id, string $langcode, array $data): JsonApiDocument
     {
-        $entity = $this->loadTranslatableEntity($entityTypeId, $id);
-        if ($entity instanceof JsonApiDocument) {
-            return $entity;
+        try {
+            $entity = $this->loadTranslatableEntity($entityTypeId, $id);
+        } catch (JsonApiDocumentException $e) {
+            return $e->document;
         }
 
         if (!$entity->hasTranslation($langcode)) {
@@ -212,9 +217,10 @@ final class TranslationController
      */
     public function destroy(string $entityTypeId, int|string $id, string $langcode): JsonApiDocument
     {
-        $entity = $this->loadTranslatableEntity($entityTypeId, $id);
-        if ($entity instanceof JsonApiDocument) {
-            return $entity;
+        try {
+            $entity = $this->loadTranslatableEntity($entityTypeId, $id);
+        } catch (JsonApiDocumentException $e) {
+            return $e->document;
         }
 
         // Cannot delete the original language.
@@ -250,24 +256,24 @@ final class TranslationController
     /**
      * Load an entity and validate it supports translations.
      *
-     * @return TranslatableInterface|JsonApiDocument The entity if translatable, or an error document.
+     * @throws JsonApiDocumentException When the entity cannot be loaded or is not translatable.
      */
-    private function loadTranslatableEntity(string $entityTypeId, int|string $id): TranslatableInterface|JsonApiDocument
+    private function loadTranslatableEntity(string $entityTypeId, int|string $id): TranslatableInterface
     {
         if (!$this->entityTypeManager->hasDefinition($entityTypeId)) {
-            return $this->errorDocument(
-                JsonApiError::notFound("Unknown entity type: {$entityTypeId}."),
+            throw new JsonApiDocumentException(
+                $this->errorDocument(JsonApiError::notFound("Unknown entity type: {$entityTypeId}.")),
             );
         }
 
         $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
         if (!$entityType->isTranslatable()) {
-            return $this->errorDocument(
-                new JsonApiError(
+            throw new JsonApiDocumentException(
+                $this->errorDocument(new JsonApiError(
                     status: '422',
                     title: 'Unprocessable Entity',
                     detail: "Entity type '{$entityTypeId}' does not support translations.",
-                ),
+                )),
             );
         }
 
@@ -275,18 +281,18 @@ final class TranslationController
         $entity = $storage->load($id);
 
         if ($entity === null) {
-            return $this->errorDocument(
-                JsonApiError::notFound("Entity of type '{$entityTypeId}' with ID '{$id}' not found."),
+            throw new JsonApiDocumentException(
+                $this->errorDocument(JsonApiError::notFound("Entity of type '{$entityTypeId}' with ID '{$id}' not found.")),
             );
         }
 
         if (!$entity instanceof TranslatableInterface) {
-            return $this->errorDocument(
-                new JsonApiError(
+            throw new JsonApiDocumentException(
+                $this->errorDocument(new JsonApiError(
                     status: '422',
                     title: 'Unprocessable Entity',
                     detail: "Entity '{$id}' does not implement TranslatableInterface.",
-                ),
+                )),
             );
         }
 
