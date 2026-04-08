@@ -1,6 +1,7 @@
 import { joinURL } from 'ufo'
 import type { AdminRuntime } from '~/contracts'
 import { isPublicAuthPath } from '~/runtime/publicAuthPaths'
+import { normalizeAppBaseURL } from '~/runtime/normalizeAppBaseURL'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   // Auth check runs client-side only. The PHP backend is the authoritative
@@ -8,9 +9,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!import.meta.client) return
 
   const config = useRuntimeConfig()
-  const appBaseURL = (config.app.baseURL as string) || '/'
-  const normalizedAppBase = appBaseURL.endsWith('/') ? appBaseURL : `${appBaseURL}/`
-  const adminPathBase = appBaseURL.replace(/\/+$/, '') || ''
+  const normalizedAppBase = normalizeAppBaseURL(config.app.baseURL)
+  const adminPathBase = normalizedAppBase.replace(/\/+$/, '') || ''
   if (isPublicAuthPath(to.path, adminPathBase)) return
 
   // Embedded auth strategy guard — check session via adapter

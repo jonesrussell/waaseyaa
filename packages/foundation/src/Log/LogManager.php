@@ -77,8 +77,7 @@ final class LogManager implements LoggerInterface
         $channelProcessorMap = [];
         $stackConfigs = [];
         foreach ($channelConfigs as $name => $channelConfig) {
-            $typeRaw = $channelConfig['type'] ?? $channelConfig['handler'] ?? 'errorlog';
-            $type = is_string($typeRaw) ? strtolower($typeRaw) : 'errorlog';
+            $type = self::handlerTypeFromConfig($channelConfig);
             if ($type === 'stack') {
                 $stackConfigs[$name] = $channelConfig;
                 continue;
@@ -180,8 +179,7 @@ final class LogManager implements LoggerInterface
 
     private static function buildHandler(array $config): HandlerInterface
     {
-        $typeRaw = $config['type'] ?? $config['handler'] ?? 'errorlog';
-        $type = is_string($typeRaw) ? strtolower($typeRaw) : 'errorlog';
+        $type = self::handlerTypeFromConfig($config);
         $level = LogLevel::fromName((string) ($config['level'] ?? 'debug')) ?? LogLevel::DEBUG;
         $formatter = self::buildFormatter($config['formatter'] ?? 'text');
 
@@ -200,6 +198,7 @@ final class LogManager implements LoggerInterface
             'fingers_crossed', 'fingerscrossed' => new FingersCrossedHandler(
                 self::buildHandler(self::normalizeNestedHandlerConfig($config)),
                 LogLevel::fromName((string) ($config['action_level'] ?? 'error')) ?? LogLevel::ERROR,
+                self::fingersCrossedBufferLimit($config),
             ),
             'stream' => new StreamHandler(
                 stream: fopen($config['path'] ?? 'php://stderr', 'a') ?: fopen('php://stderr', 'a'),
@@ -216,17 +215,38 @@ final class LogManager implements LoggerInterface
      */
     private static function normalizeNestedHandlerConfig(array $config): array
     {
-        $nested = $config['handler'] ?? null;
-        if (is_array($nested)) {
-            return $nested;
-        }
-
-        $inner = $config['inner'] ?? [];
-        if (is_array($inner)) {
-            return $inner;
+        foreach (['nested', 'inner', 'handler'] as $key) {
+            $nested = $config[$key] ?? null;
+            if (is_array($nested)) {
+                return $nested;
+            }
         }
 
         return [];
+    }
+
+    /**
+     * Handler kind: {@see $config['type']}, or {@see $config['handler']} when it is a non-empty string
+     * (Synonym for {@see type}; array {@see handler} is reserved for fingers_crossed nested config only).
+     */
+    private static function handlerTypeFromConfig(array $config): string
+    {
+        $typeRaw = $config['type'] ?? null;
+        if ($typeRaw === null && isset($config['handler']) && is_string($config['handler']) && $config['handler'] !== '') {
+            $typeRaw = $config['handler'];
+        }
+        if (!is_string($typeRaw) || $typeRaw === '') {
+            return 'errorlog';
+        }
+
+        return strtolower($typeRaw);
+    }
+
+    private static function fingersCrossedBufferLimit(array $config): int
+    {
+        $limit = (int) ($config['buffer_limit'] ?? 10000);
+
+        return $limit < 0 ? 0 : $limit;
     }
 
     private static function buildFormatter(string $name): FormatterInterface

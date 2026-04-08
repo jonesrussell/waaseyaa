@@ -13,12 +13,19 @@ use Waaseyaa\Foundation\Log\LogRecord;
  */
 final class FingersCrossedHandler implements HandlerInterface
 {
+    private const int DEFAULT_BUFFER_LIMIT = 10000;
+
     /** @var list<LogRecord> */
     private array $buffer = [];
 
+    /**
+     * @param int $bufferLimit Max records to retain below the action level; oldest dropped when full.
+     *                        Use 0 for no limit (not recommended in production).
+     */
     public function __construct(
         private readonly HandlerInterface $handler,
         private readonly LogLevel $actionLevel = LogLevel::ERROR,
+        private readonly int $bufferLimit = self::DEFAULT_BUFFER_LIMIT,
     ) {}
 
     public function handle(LogRecord $record): void
@@ -33,6 +40,9 @@ final class FingersCrossedHandler implements HandlerInterface
             return;
         }
 
+        if ($this->bufferLimit > 0 && count($this->buffer) >= $this->bufferLimit) {
+            array_shift($this->buffer);
+        }
         $this->buffer[] = $record;
     }
 }

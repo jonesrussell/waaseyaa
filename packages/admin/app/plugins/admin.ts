@@ -9,12 +9,12 @@ import type {
   AdminSurfaceResult as SurfaceResult,
   AdminSurfaceSession as SurfaceSession,
 } from '../../../admin-surface/contract/types'
+import { normalizeAppBaseURL } from '../runtime/normalizeAppBaseURL'
 
 export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRuntime | null } }> => {
   const config = useRuntimeConfig()
-  const appBaseURL = (config.app.baseURL as string) || '/'
-  const normalizedAppBase = appBaseURL.endsWith('/') ? appBaseURL : `${appBaseURL}/`
-  const adminPathBase = appBaseURL.replace(/\/+$/, '') || ''
+  const normalizedAppBase = normalizeAppBaseURL(config.app.baseURL)
+  const adminPathBase = normalizedAppBase.replace(/\/+$/, '') || ''
   const surfacePath = joinURL(normalizedAppBase, '_surface').replace(/\/+$/, '') || '/_surface'
   const currentUser = useState<SurfaceSession['account'] | null>('waaseyaa.auth.user', () => null)
   const authChecked = useState<boolean>('waaseyaa.auth.checked', () => false)
@@ -36,20 +36,24 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
   let surfaceCatalog: SurfaceCatalogEntry[] | null = null
 
   try {
-    const sessionRes = await $fetch<SurfaceResult<SurfaceSession>>('_surface/session', {
-      baseURL: normalizedAppBase,
-      ignoreResponseError: true,
-      credentials: 'include',
-    })
+    const sessionRes = await $fetch<SurfaceResult<SurfaceSession>>(
+      joinURL(normalizedAppBase, '_surface/session'),
+      {
+        ignoreResponseError: true,
+        credentials: 'include',
+      },
+    )
 
     if (sessionRes && sessionRes.ok && sessionRes.data) {
       surfaceSession = sessionRes.data
 
-      const catalogRes = await $fetch<SurfaceResult<{ entities: SurfaceCatalogEntry[] }>>('_surface/catalog', {
-        baseURL: normalizedAppBase,
-        ignoreResponseError: true,
-        credentials: 'include',
-      })
+      const catalogRes = await $fetch<SurfaceResult<{ entities: SurfaceCatalogEntry[] }>>(
+        joinURL(normalizedAppBase, '_surface/catalog'),
+        {
+          ignoreResponseError: true,
+          credentials: 'include',
+        },
+      )
       if (catalogRes && catalogRes.ok && catalogRes.data) {
         surfaceCatalog = catalogRes.data.entities
       }

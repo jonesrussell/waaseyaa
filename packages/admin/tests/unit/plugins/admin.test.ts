@@ -138,6 +138,29 @@ describe('admin plugin degraded bootstrap paths', () => {
     expect(authChecked.value).toBe(true)
   })
 
+  it('collapses duplicate slashes in app baseURL for surface requests', async () => {
+    vi.resetModules()
+
+    window.history.replaceState({}, '', '/admin/entities')
+
+    const fetchSpy = vi.fn(async () => ({ ok: false, error: { status: 401 } }))
+    vi.stubGlobal('defineNuxtPlugin', (plugin: unknown) => plugin)
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      app: { baseURL: '//admin//' },
+      public: { baseUrl: '/admin' },
+    }))
+    vi.stubGlobal('$fetch', fetchSpy)
+    vi.stubGlobal('navigateTo', vi.fn(async () => {}))
+
+    const plugin = (await import('~/plugins/admin')).default as () => Promise<{ provide: { admin: AdminRuntime | null } }>
+    await plugin()
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/admin/_surface/session',
+      expect.objectContaining({ credentials: 'include' }),
+    )
+  })
+
   it('throws a fatal 503 when the surface API is unreachable', async () => {
     vi.resetModules()
     window.history.replaceState({}, '', '/admin')
