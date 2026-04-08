@@ -1,6 +1,7 @@
 # Relationship Modeling (v0.6)
 
 <!-- Spec reviewed 2026-04-07 - RelationshipParameterValidator extracted from RelationshipDiscoveryService (579→442 lines); validation/normalization helpers in dedicated class, injected as constructor dependency; timelineSortDate converted to instance method for consistent injection -->
+<!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/relationship; no relationship runtime behavior change -->
 
 ## Decision
 
