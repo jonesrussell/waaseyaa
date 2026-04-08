@@ -119,7 +119,7 @@ final class PublicSurfaceVerificationTest extends TestCase
                     continue;
                 }
                 $content = file_get_contents($file->getPathname());
-                if (preg_match('/^(interface|abstract class|trait)\s+(\w+)/m', $content, $match)) {
+                if (preg_match('/^(interface|abstract class|trait|enum)\s+(\w+)/m', $content, $match)) {
                     if (preg_match('/^namespace\s+([^;]+);/m', $content, $nsMatch)) {
                         $fqn = $nsMatch[1] . '\\' . $match[2];
                         $elements[] = $fqn;

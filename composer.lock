@@ -3661,13 +3661,13 @@
             "dist": {
                 "type": "path",
                 "url": "packages/entity",
-                "reference": "1cddf1b2940e2c866e9662496691a315d286a79e"
+                "reference": "c6cede5d4614f710eded842d9c46e8dcd3174d7b"
             },
             "require": {
                 "php": ">=8.4",
-                "symfony/event-dispatcher": "^7.3",
-                "symfony/uid": "^7.3",
-                "symfony/validator": "^7.3",
+                "symfony/event-dispatcher": "^7.0",
+                "symfony/uid": "^7.0",
+                "symfony/validator": "^7.0",
                 "waaseyaa/cache": "^0.1",
                 "waaseyaa/config": "^0.1",
                 "waaseyaa/foundation": "^0.1",
@@ -3709,11 +3709,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/entity-storage",
-                "reference": "7ba9833bc502bcc10db684f3c2f33879aea62286"
+                "reference": "8f32ceb9d85bf82abc65f09e282040130d1ead55"
             },
             "require": {
                 "php": ">=8.4",
-                "symfony/event-dispatcher": "^7.3",
+                "symfony/event-dispatcher": "^7.0",
                 "waaseyaa/cache": "^0.1",
                 "waaseyaa/database-legacy": "^0.1",
                 "waaseyaa/entity": "^0.1",
@@ -3886,7 +3886,7 @@
         },
         {
             "name": "waaseyaa/github",
-            "version": "dev-feat/composer-policy-gates-1149",
+            "version": "dev-feat/phpstan2-clean-setup-1149",
             "dist": {
                 "type": "path",
                 "url": "packages/github",
@@ -4685,11 +4685,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/queue",
-                "reference": "591d3f8f5a9375990f031c8e10569fa8ad205516"
+                "reference": "6887c40f6bdb97513dc3e183b4b1c80b01fbcd7e"
             },
             "require": {
                 "php": ">=8.4",
-                "symfony/messenger": "^7.3",
+                "symfony/messenger": "^7.0",
                 "waaseyaa/database-legacy": "^0.1",
                 "waaseyaa/foundation": "^0.1"
             },
@@ -4776,11 +4776,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/routing",
-                "reference": "861310baadebad5943cc1c028c360bf1ab5599b9"
+                "reference": "71356019b20c6552f517005cf4a245dd86f02137"
             },
             "require": {
                 "php": ">=8.4",
-                "symfony/routing": "^7.3",
+                "symfony/routing": "^7.0",
                 "waaseyaa/access": "^0.1",
                 "waaseyaa/entity": "^0.1",
                 "waaseyaa/i18n": "^0.1"
@@ -5093,11 +5093,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/typed-data",
-                "reference": "0daf964f6f07621377da233f9eed441a9f25bfa8"
+                "reference": "f88697f1af06005bf3c4b84aee5f416c708a2a9f"
             },
             "require": {
                 "php": ">=8.4",
-                "symfony/validator": "^7.3"
+                "symfony/validator": "^7.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -5183,11 +5183,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/validation",
-                "reference": "1980513ddac853d7cdf421b6393d5c6ad0072de1"
+                "reference": "81094b287676654630ae080654b6b4cdb375a5e1"
             },
             "require": {
                 "php": ">=8.4",
-                "symfony/validator": "^7.3",
+                "symfony/validator": "^7.0",
                 "waaseyaa/typed-data": "^0.1"
             },
             "require-dev": {

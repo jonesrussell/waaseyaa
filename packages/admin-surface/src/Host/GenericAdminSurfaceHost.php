@@ -7,7 +7,7 @@ namespace Waaseyaa\AdminSurface\Host;
 use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
-use Waaseyaa\AdminSurface\Action\SurfaceActionHandler;
+use Waaseyaa\AdminSurface\Action\SurfaceActionHandlerInterface;
 use Waaseyaa\AdminSurface\Catalog\CatalogBuilder;
 use Waaseyaa\AdminSurface\Query\SurfaceFilterOperator;
 use Waaseyaa\AdminSurface\Query\SurfaceQuery;
@@ -34,7 +34,7 @@ class GenericAdminSurfaceHost extends AbstractAdminSurfaceHost
 {
     private ?AccountInterface $currentAccount = null;
 
-    /** @var array<string, SurfaceActionHandler> */
+    /** @var array<string, SurfaceActionHandlerInterface> */
     protected array $actions = [];
 
     /**
@@ -255,7 +255,7 @@ class GenericAdminSurfaceHost extends AbstractAdminSurfaceHost
         // Check custom actions first
         if (isset($this->actions[$action])) {
             $handler = $this->actions[$action];
-            if ($handler instanceof SurfaceActionHandler) {
+            if ($handler instanceof SurfaceActionHandlerInterface) {
                 return $handler->handle($type, $payload);
             }
         }
