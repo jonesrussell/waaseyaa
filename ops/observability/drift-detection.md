@@ -2,7 +2,7 @@
 
 Documents the drift detection strategy for specs, templates, config, and policies.
 
-For steady-state drift scans and C17+ logging, follow [docs/governance/m11-periodic-drift-scan-protocol.md](../../docs/governance/m11-periodic-drift-scan-protocol.md) and the [M11 drift-scan log issue template](../../.github/ISSUE_TEMPLATE/m11-drift-scan-log.md).
+For steady-state drift scans and C17+ logging, follow [m11-periodic-drift-scan-protocol.md](../../docs/specs/m11-periodic-drift-scan-protocol.md) and the [M11 drift-scan log issue template](../../.github/ISSUE_TEMPLATE/m11-drift-scan-log.md).
 
 ## What is Drift?
 
@@ -45,6 +45,15 @@ Access policies registered in `PackageManifest` diverge from `#[PolicyAttribute]
 Database schema differs from what `SqlSchemaHandler` would generate.
 
 **Detection:** Planned — compare live schema vs. generated DDL (v1.1).
+
+## Operating cadence (M11 steady-state)
+
+| When | Action |
+|------|--------|
+| Every development session | Run `bin/check-milestones` (session-start hook per `docs/specs/workflow.md`). |
+| Weekly (or before each release tag) | Run `bash tools/drift-detector.sh`; if output lists stale specs, update specs or touching code; log exceptional batch results via `.github/ISSUE_TEMPLATE/m11-drift-scan-log.md`. |
+| Intentional architecture or contract change | Open a governed-change issue from `.github/ISSUE_TEMPLATE/m11-governed-change.md` before large diffs. |
+| Composer/manifest edits | Run `composer check-composer-policy` (CI gate). |
 
 ## v1.1 Goals
 

@@ -4,6 +4,13 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Sovereignty;
 
+/**
+ * Profile-specific defaults for sovereignty-related subsystems.
+ *
+ * SelfHosted intentionally mirrors Local except queue_backend today; when real
+ * self-hosted deployments need clearer separation (object storage, non-SQLite
+ * embeddings/vector_store), extend the self_hosted row—see #1098.
+ */
 final class SovereigntyDefaults
 {
     /** @var array<string, array<string, string>> */

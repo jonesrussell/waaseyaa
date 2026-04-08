@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
-use Waaseyaa\AdminSurface\Action\SurfaceActionHandler;
+use Waaseyaa\AdminSurface\Action\SurfaceActionHandlerInterface;
 use Waaseyaa\AdminSurface\Catalog\CatalogBuilder;
 use Waaseyaa\AdminSurface\Host\AdminSurfaceResultData;
 use Waaseyaa\AdminSurface\Host\AdminSurfaceSessionData;
@@ -672,7 +672,7 @@ final class GenericAdminSurfaceHostTest extends TestCase
     {
         $expectedResult = AdminSurfaceResultData::success(['custom' => true]);
 
-        $handler = new class($expectedResult) implements SurfaceActionHandler {
+        $handler = new class($expectedResult) implements SurfaceActionHandlerInterface {
             public function __construct(private readonly AdminSurfaceResultData $result) {}
 
             public function handle(string $type, array $payload): AdminSurfaceResultData
@@ -686,7 +686,7 @@ final class GenericAdminSurfaceHostTest extends TestCase
 
         // Use a test subclass to set the protected $actions property
         $host = new class($etm, $handler) extends GenericAdminSurfaceHost {
-            public function __construct(EntityTypeManager $etm, SurfaceActionHandler $handler)
+            public function __construct(EntityTypeManager $etm, SurfaceActionHandlerInterface $handler)
             {
                 parent::__construct($etm);
                 $this->actions['transition-stage'] = $handler;
@@ -742,7 +742,7 @@ final class GenericAdminSurfaceHostTest extends TestCase
         );
 
         // Register a custom action to confirm it doesn't interfere with built-ins
-        $handler = new class() implements SurfaceActionHandler {
+        $handler = new class() implements SurfaceActionHandlerInterface {
             public function handle(string $type, array $payload): AdminSurfaceResultData
             {
                 return AdminSurfaceResultData::success(['should_not_see' => true]);
@@ -750,7 +750,7 @@ final class GenericAdminSurfaceHostTest extends TestCase
         };
 
         $host = new class($etm, $handler) extends GenericAdminSurfaceHost {
-            public function __construct(EntityTypeManager $etm, SurfaceActionHandler $handler)
+            public function __construct(EntityTypeManager $etm, SurfaceActionHandlerInterface $handler)
             {
                 parent::__construct($etm);
                 $this->actions['my-custom'] = $handler;

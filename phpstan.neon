@@ -1,8 +1,14 @@
 includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
     - phpstan-baseline.neon
 
 parameters:
     level: 5
+    tmpDir: tmp/phpstan
+    checkUninitializedProperties: true
+    checkBenevolentUnionTypes: true
+    reportPossiblyNonexistentGeneralArrayOffset: true
+    reportPossiblyNonexistentConstantArrayOffset: true
     paths:
         - packages/access/src
         - packages/ai-agent/src

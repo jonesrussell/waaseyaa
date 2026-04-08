@@ -166,7 +166,7 @@ Code quality:
 ```bash
 composer cs-check    # Check code style (PHP-CS-Fixer dry-run)
 composer cs-fix      # Auto-fix code style
-composer phpstan     # Static analysis (level 5)
+composer phpstan     # Static analysis (level 5, PHPStan 2)
 ```
 
 ## Key Design Principles

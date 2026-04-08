@@ -273,7 +273,7 @@ Machine-readable source: `docs/public-surface-map.php`.
 
 | Element | Type | Purpose |
 |---------|------|---------|
-| `SurfaceActionHandler` | interface | Handles a custom admin surface action for a given entity type and payload |
+| `SurfaceActionHandlerInterface` | interface | Handles a custom admin surface action for a given entity type and payload |
 | `AbstractAdminSurfaceHost` | abstract class | Base class applications extend to integrate with the admin SPA (session, catalog, entity ops) |
 
 ### mcp

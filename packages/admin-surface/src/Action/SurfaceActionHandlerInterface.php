@@ -6,7 +6,7 @@ namespace Waaseyaa\AdminSurface\Action;
 
 use Waaseyaa\AdminSurface\Host\AdminSurfaceResultData;
 
-interface SurfaceActionHandler
+interface SurfaceActionHandlerInterface
 {
     /**
      * Handle a custom surface action.

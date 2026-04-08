@@ -48,7 +48,7 @@ final class IngestRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $inputPath = trim((string) $input->getOption('input'));
+        $inputPath = trim($this->stringify($input->getOption('input')));
         if ($inputPath === '') {
             $output->writeln('<error>--input is required.</error>');
             return Command::INVALID;
@@ -58,23 +58,23 @@ final class IngestRunCommand extends Command
             return Command::FAILURE;
         }
 
-        $format = strtolower(trim((string) $input->getOption('format')));
+        $format = strtolower(trim($this->stringify($input->getOption('format'))));
         if (!in_array($format, ['auto', 'structured', 'unstructured'], true)) {
             $output->writeln('<error>Invalid --format. Allowed: auto, structured, unstructured.</error>');
             return Command::INVALID;
         }
 
-        $defaultBundle = trim((string) $input->getOption('default-bundle'));
-        $defaultState = strtolower(trim((string) $input->getOption('default-workflow-state')));
+        $defaultBundle = trim($this->stringify($input->getOption('default-bundle')));
+        $defaultState = strtolower(trim($this->stringify($input->getOption('default-workflow-state'))));
         if (!in_array($defaultState, self::VALID_STATES, true)) {
             $output->writeln(sprintf('<error>Invalid --default-workflow-state "%s".</error>', $defaultState));
             return Command::INVALID;
         }
 
-        $timestamp = max(0, (int) $input->getOption('timestamp'));
-        $authorId = max(0, (int) $input->getOption('author-id'));
-        $policy = strtolower(trim((string) $input->getOption('policy')));
-        $source = trim((string) $input->getOption('source'));
+        $timestamp = max(0, $this->intify($input->getOption('timestamp')));
+        $authorId = max(0, $this->intify($input->getOption('author-id')));
+        $policy = strtolower(trim($this->stringify($input->getOption('policy'))));
+        $source = trim($this->stringify($input->getOption('source')));
         $inferRelationships = (bool) $input->getOption('infer-relationships');
         $authoringAssistEnabled = (bool) $input->getOption('authoring-assist');
         if ($source === '') {
@@ -92,7 +92,7 @@ final class IngestRunCommand extends Command
         if ($resolvedFormat === 'auto') {
             $resolvedFormat = str_ends_with(strtolower($inputPath), '.json') ? 'structured' : 'unstructured';
         }
-        $batchId = trim((string) $input->getOption('batch-id'));
+        $batchId = trim($this->stringify($input->getOption('batch-id')));
         if ($batchId === '') {
             $batchId = 'batch_' . substr(sha1($inputPath . '|' . $source . '|' . $raw), 0, 16);
         }
@@ -167,7 +167,7 @@ final class IngestRunCommand extends Command
             itemCount: count((array) ($normalizedEnvelope['envelope']['items'] ?? [])),
         );
         $baselineRefreshSnapshot = $this->readRefreshBaseline(
-            trim((string) ($input->getOption('refresh-baseline') ?? '')),
+            trim($this->stringify($input->getOption('refresh-baseline') ?? '')),
             $diagnostics,
         );
         $refreshPlan = (new SemanticRefreshTriggerPlanner())->plan($currentRefreshSnapshot, $baselineRefreshSnapshot);
@@ -231,7 +231,7 @@ final class IngestRunCommand extends Command
 
         $encoded = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL;
 
-        $outputPath = trim((string) ($input->getOption('output') ?? ''));
+        $outputPath = trim($this->stringify($input->getOption('output') ?? ''));
         if ($outputPath !== '') {
             if (!$this->writeFile($outputPath, $encoded, $output)) {
                 return Command::FAILURE;
@@ -241,7 +241,7 @@ final class IngestRunCommand extends Command
             $output->writeln($encoded);
         }
 
-        $diagnosticsPath = trim((string) ($input->getOption('diagnostics-output') ?? ''));
+        $diagnosticsPath = trim($this->stringify($input->getOption('diagnostics-output') ?? ''));
         if ($diagnosticsPath !== '') {
             $diagnosticPayload = json_encode([
                 'meta' => $result['meta'],
@@ -253,7 +253,7 @@ final class IngestRunCommand extends Command
             $output->writeln(sprintf('Ingest diagnostics written: %s', $diagnosticsPath));
         }
 
-        $refreshSnapshotOutputPath = trim((string) ($input->getOption('refresh-snapshot-output') ?? ''));
+        $refreshSnapshotOutputPath = trim($this->stringify($input->getOption('refresh-snapshot-output') ?? ''));
         if ($refreshSnapshotOutputPath !== '') {
             $refreshSnapshotPayload = json_encode($currentRefreshSnapshot, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL;
             if (!$this->writeFile($refreshSnapshotOutputPath, $refreshSnapshotPayload, $output)) {
@@ -787,5 +787,31 @@ final class IngestRunCommand extends Command
         }
 
         return true;
+    }
+
+    private function stringify(mixed $value): string
+    {
+        if (is_string($value)) {
+            return $value;
+        }
+
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+
+        return '';
+    }
+
+    private function intify(mixed $value): int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_numeric($value)) {
+            return (int) $value;
+        }
+
+        return 0;
     }
 }
