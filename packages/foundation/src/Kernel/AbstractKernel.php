@@ -16,11 +16,12 @@ use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
-use Waaseyaa\Foundation\Diagnostic\DiagnosticCode;
-use Waaseyaa\Foundation\Diagnostic\DiagnosticEmitter;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Kernel\Bootstrap\AccessPolicyRegistry;
+use Waaseyaa\Foundation\Kernel\Bootstrap\AppEntityTypeLoader;
+use Waaseyaa\Foundation\Kernel\Bootstrap\ContentTypeValidator;
 use Waaseyaa\Foundation\Kernel\Bootstrap\DatabaseBootstrapper;
+use Waaseyaa\Foundation\Kernel\Bootstrap\KnowledgeExtensionBootstrapper;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ManifestBootstrapper;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ProviderRegistry;
 use Waaseyaa\Foundation\Log\Handler\ErrorLogHandler as HandlerErrorLogHandler;
@@ -31,9 +32,6 @@ use Waaseyaa\Foundation\Migration\MigrationLoader;
 use Waaseyaa\Foundation\Migration\MigrationRepository;
 use Waaseyaa\Foundation\Migration\Migrator;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
-use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
-use Waaseyaa\Plugin\DefaultPluginManager;
-use Waaseyaa\Plugin\Discovery\AttributeDiscovery;
 use Waaseyaa\Plugin\Extension\KnowledgeToolingExtensionRunner;
 
 /**
@@ -179,68 +177,15 @@ abstract class AbstractKernel
 
     protected function loadAppEntityTypes(): void
     {
-        $path = $this->projectRoot . '/config/entity-types.php';
-        $types = ConfigLoader::load($path);
-
-        foreach ($types as $index => $typeData) {
-            if (!$typeData instanceof \Waaseyaa\Entity\EntityTypeInterface) {
-                $this->logger->warning(sprintf(
-                    'config/entity-types.php item at index %s is not an EntityTypeInterface (got %s).',
-                    $index,
-                    get_debug_type($typeData),
-                ));
-                continue;
-            }
-
-            try {
-                $this->entityTypeManager->registerEntityType($typeData);
-            } catch (\RuntimeException | \InvalidArgumentException $e) {
-                $this->logger->error(sprintf(
-                    'Failed to register app entity type "%s": %s',
-                    $typeData->id(),
-                    $e->getMessage(),
-                ));
-            }
-        }
+        (new AppEntityTypeLoader($this->logger))->load($this->projectRoot, $this->entityTypeManager);
     }
 
-    /**
-     * Validate that at least one content type is registered and enabled.
-     *
-     * Throws DEFAULT_TYPE_MISSING if no types are registered at all.
-     * Throws DEFAULT_TYPE_DISABLED if all registered types have been disabled
-     * via the lifecycle manager.
-     *
-     * @throws \RuntimeException
-     */
     protected function validateContentTypes(): void
     {
-        $emitter     = new DiagnosticEmitter();
-        $definitions = $this->entityTypeManager->getDefinitions();
-
-        if ($definitions === []) {
-            $entry = $emitter->emit(
-                DiagnosticCode::DEFAULT_TYPE_MISSING,
-                DiagnosticCode::DEFAULT_TYPE_MISSING->defaultMessage(),
-                ['registered_type_count' => 0],
-            );
-            throw new \RuntimeException('[CRITICAL] ' . $entry->code->value . ': ' . $entry->message);
-        }
-
-        $disabledIds  = $this->lifecycleManager->getDisabledTypeIds();
-        $enabledTypes = array_filter(
-            $definitions,
-            static fn(\Waaseyaa\Entity\EntityTypeInterface $def): bool => !in_array($def->id(), $disabledIds, true),
+        (new ContentTypeValidator())->validate(
+            $this->entityTypeManager,
+            $this->lifecycleManager->getDisabledTypeIds(),
         );
-
-        if ($enabledTypes === []) {
-            $entry = $emitter->emit(
-                DiagnosticCode::DEFAULT_TYPE_DISABLED,
-                DiagnosticCode::DEFAULT_TYPE_DISABLED->defaultMessage(),
-                ['disabled_ids' => $disabledIds, 'registered_type_count' => count($definitions)],
-            );
-            throw new \RuntimeException('[CRITICAL] ' . $entry->code->value . ': ' . $entry->message);
-        }
     }
 
     protected function bootProviders(): void
@@ -255,55 +200,8 @@ abstract class AbstractKernel
 
     protected function bootKnowledgeExtensionRunner(): void
     {
-        $config = is_array($this->config['extensions'] ?? null) ? $this->config['extensions'] : [];
-        $rawDirectories = $config['plugin_directories'] ?? [];
-        if (is_string($rawDirectories)) {
-            $rawDirectories = [$rawDirectories];
-        }
-        if (!is_array($rawDirectories)) {
-            $rawDirectories = [];
-        }
-
-        $directories = [];
-        foreach ($rawDirectories as $directory) {
-            if (!is_string($directory)) {
-                continue;
-            }
-            $trimmed = trim($directory);
-            if ($trimmed === '') {
-                continue;
-            }
-            if (!str_starts_with($trimmed, '/')) {
-                $trimmed = $this->projectRoot . '/' . ltrim($trimmed, '/');
-            }
-            $directories[] = $trimmed;
-        }
-        $directories = array_values(array_unique($directories));
-        sort($directories);
-
-        if ($directories === []) {
-            $this->knowledgeExtensionRunner = new KnowledgeToolingExtensionRunner([]);
-            return;
-        }
-
-        $attributeClass = is_string($config['plugin_attribute'] ?? null)
-            ? trim((string) $config['plugin_attribute'])
-            : WaaseyaaPlugin::class;
-        if ($attributeClass === '') {
-            $attributeClass = WaaseyaaPlugin::class;
-        }
-
-        try {
-            $discovery = new AttributeDiscovery(
-                directories: $directories,
-                attributeClass: $attributeClass,
-            );
-            $manager = new DefaultPluginManager($discovery);
-            $this->knowledgeExtensionRunner = KnowledgeToolingExtensionRunner::fromPluginManager($manager);
-        } catch (\Throwable $e) {
-            $this->logger->warning(sprintf('Failed to boot knowledge extension runner: %s', $e->getMessage()));
-            $this->knowledgeExtensionRunner = new KnowledgeToolingExtensionRunner([]);
-        }
+        $this->knowledgeExtensionRunner = (new KnowledgeExtensionBootstrapper($this->logger))
+            ->boot($this->projectRoot, $this->config);
     }
 
     public function getKnowledgeToolingExtensionRunner(): KnowledgeToolingExtensionRunner
