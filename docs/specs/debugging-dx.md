@@ -1,5 +1,7 @@
 # Debugging & Developer Experience
 
+<!-- Spec reviewed 2026-04-08 — waaseyaa/error-handler + waaseyaa/debug packages; logging daily/fingers_crossed handlers; drift mappings -->
+
 ## Overview
 
 First-class debugging, logging, and developer experience for Waaseyaa. Strategic integration approach: use existing excellent libraries (Symfony VarDumper) where reinvention is wasteful, build Waaseyaa-native solutions for error pages, toolbar, and logging config.

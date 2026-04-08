@@ -1,5 +1,7 @@
 # Admin SPA
 
+<!-- Spec reviewed 2026-04-08 - normalizeAppBaseURL (ufo cleanDoubleSlashes + joinURL): shared by admin plugin and auth.global so adminPathBase matches normalized base; surface $fetch uses joinURL paths; packages/admin/app/runtime/normalizeAppBaseURL.ts -->
+<!-- Spec reviewed 2026-04-08 - Admin fetch baseURL: useRuntimeConfig().app.baseURL (trailing slash) for $fetch/apiFetch and auth.global navigateTo; plugins/admin tests stub app.baseURL (#814); ufo joinURL for path joins -->
 <!-- Spec reviewed 2026-04-08 - Admin SPA DX alignment; vue-router ^5 for Volar `sfc-route-blocks` + `nuxi typecheck`; IngestSummaryWidget typed ingest_log status guard for strict JSON:API attributes -->
 <!-- Spec reviewed 2026-04-08 - merge-conflict resolution kept @types/node at ^25.5.2 in packages/admin/package.json and package-lock.json; no runtime/admin contract change -->
 

@@ -1,5 +1,7 @@
+import { joinURL } from 'ufo'
 import type { AdminRuntime } from '~/contracts'
 import { isPublicAuthPath } from '~/runtime/publicAuthPaths'
+import { normalizeAppBaseURL } from '~/runtime/normalizeAppBaseURL'
 
 export default defineNuxtRouteMiddleware(async (to) => {
   // Auth check runs client-side only. The PHP backend is the authoritative
@@ -7,14 +9,15 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!import.meta.client) return
 
   const config = useRuntimeConfig()
-  const baseUrl = (config.public.baseUrl as string) || ''
-  if (isPublicAuthPath(to.path, baseUrl)) return
+  const normalizedAppBase = normalizeAppBaseURL(config.app.baseURL)
+  const adminPathBase = normalizedAppBase.replace(/\/+$/, '') || ''
+  if (isPublicAuthPath(to.path, adminPathBase)) return
 
   // Embedded auth strategy guard — check session via adapter
   const nuxtApp = useNuxtApp()
   const admin = (nuxtApp as unknown as { $admin: AdminRuntime | null }).$admin
   if (!admin) {
-    return navigateTo('/login')
+    return navigateTo(joinURL(normalizedAppBase, 'login'))
   }
 
   const strategy = admin.authConfig?.strategy
@@ -22,7 +25,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const { isAuthenticated, checkAuth } = useAuth()
     await checkAuth()
     if (!isAuthenticated.value) {
-      return navigateTo('/login')
+      return navigateTo(joinURL(normalizedAppBase, 'login'))
     }
   }
 
@@ -34,7 +37,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (requireVerified) {
     const { currentUser } = useAuth()
     if (currentUser.value && !currentUser.value.emailVerified) {
-      return navigateTo('/verify-email')
+      return navigateTo(joinURL(normalizedAppBase, 'verify-email'))
     }
   }
 })

@@ -282,6 +282,154 @@ final class LogManagerTest extends TestCase
     }
 
     #[Test]
+    public function from_config_daily_writes_dated_file(): void
+    {
+        $dir = sys_get_temp_dir() . '/waaseyaa_daily_' . uniqid();
+        mkdir($dir, 0o775, true);
+        $basePath = $dir . '/app.log';
+
+        try {
+            $config = [
+                'default' => 'daily',
+                'channels' => [
+                    'daily' => [
+                        'type' => 'daily',
+                        'path' => $basePath,
+                        'level' => 'debug',
+                        'formatter' => 'text',
+                    ],
+                ],
+            ];
+
+            $manager = LogManager::fromConfig($config);
+            $manager->info('daily line');
+
+            $glob = glob($dir . '/app-*.log');
+            $this->assertIsArray($glob);
+            $this->assertCount(1, $glob);
+            $this->assertStringContainsString('daily line', (string) file_get_contents($glob[0]));
+        } finally {
+            if (is_dir($dir)) {
+                $files = glob($dir . '/*') ?: [];
+                foreach ($files as $f) {
+                    if (is_file($f)) {
+                        unlink($f);
+                    }
+                }
+                rmdir($dir);
+            }
+        }
+    }
+
+    #[Test]
+    public function from_config_handler_string_is_type_alias_for_file_channel(): void
+    {
+        $tmpFile = sys_get_temp_dir() . '/waaseyaa_handler_alias_' . uniqid() . '.log';
+
+        try {
+            $config = [
+                'default' => 'log',
+                'channels' => [
+                    'log' => [
+                        'handler' => 'file',
+                        'path' => $tmpFile,
+                        'level' => 'debug',
+                        'formatter' => 'text',
+                    ],
+                ],
+            ];
+
+            $manager = LogManager::fromConfig($config);
+            $manager->info('alias handler key');
+
+            $this->assertFileExists($tmpFile);
+            $this->assertStringContainsString('alias handler key', (string) file_get_contents($tmpFile));
+        } finally {
+            if (file_exists($tmpFile)) {
+                unlink($tmpFile);
+            }
+        }
+    }
+
+    #[Test]
+    public function from_config_fingers_crossed_accepts_nested_key_for_child_handler(): void
+    {
+        $tmpFile = sys_get_temp_dir() . '/waaseyaa_fc_nested_' . uniqid() . '.log';
+
+        try {
+            $config = [
+                'default' => 'fc',
+                'channels' => [
+                    'fc' => [
+                        'type' => 'fingers_crossed',
+                        'action_level' => 'error',
+                        'level' => 'debug',
+                        'formatter' => 'text',
+                        'nested' => [
+                            'type' => 'file',
+                            'path' => $tmpFile,
+                            'level' => 'debug',
+                            'formatter' => 'text',
+                        ],
+                    ],
+                ],
+            ];
+
+            $manager = LogManager::fromConfig($config);
+            $manager->info('via nested key');
+            $manager->error('fire');
+
+            $this->assertFileExists($tmpFile);
+            $content = file_get_contents($tmpFile);
+            $this->assertStringContainsString('via nested key', $content);
+            $this->assertStringContainsString('fire', $content);
+        } finally {
+            if (file_exists($tmpFile)) {
+                unlink($tmpFile);
+            }
+        }
+    }
+
+    #[Test]
+    public function from_config_fingers_crossed_flushes_on_action_level(): void
+    {
+        $tmpFile = sys_get_temp_dir() . '/waaseyaa_fingers_' . uniqid() . '.log';
+
+        try {
+            $config = [
+                'default' => 'fc',
+                'channels' => [
+                    'fc' => [
+                        'type' => 'fingers_crossed',
+                        'action_level' => 'error',
+                        'level' => 'debug',
+                        'formatter' => 'text',
+                        'handler' => [
+                            'type' => 'file',
+                            'path' => $tmpFile,
+                            'level' => 'debug',
+                            'formatter' => 'text',
+                        ],
+                    ],
+                ],
+            ];
+
+            $manager = LogManager::fromConfig($config);
+            $manager->info('buffered');
+            $this->assertFileDoesNotExist($tmpFile);
+            $manager->error('trigger');
+            $this->assertFileExists($tmpFile);
+            $content = file_get_contents($tmpFile);
+            $this->assertStringContainsString('buffered', $content);
+            $this->assertStringContainsString('trigger', $content);
+        } finally {
+            if (file_exists($tmpFile)) {
+                unlink($tmpFile);
+            }
+        }
+    }
+
+    #[Test]
     public function add_global_processor_at_runtime(): void
     {
         $tmpFile = sys_get_temp_dir() . '/waaseyaa_addproc_test_' . uniqid() . '.log';

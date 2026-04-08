@@ -46,6 +46,17 @@ final class ControllerDispatcher
     {
         $controller = $request->attributes->get('_controller', '');
 
+        if ($controller === 'render.page' && !\class_exists(\Waaseyaa\SSR\SsrPageHandler::class)) {
+            return $this->jsonApiResponse(501, [
+                'jsonapi' => ['version' => '1.1'],
+                'errors' => [[
+                    'status' => '501',
+                    'title' => 'Not Implemented',
+                    'detail' => 'SSR rendering is not available. Install waaseyaa/ssr to enable HTML routes.',
+                ]],
+            ]);
+        }
+
         // Normalize Symfony-style [Class, method] array callables to the
         // "Class::method" string form the router chain expects. Routes
         // declared via the Symfony Route component commonly use the array

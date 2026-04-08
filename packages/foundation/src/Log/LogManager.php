@@ -7,8 +7,10 @@ namespace Waaseyaa\Foundation\Log;
 use Waaseyaa\Foundation\Log\Formatter\FormatterInterface;
 use Waaseyaa\Foundation\Log\Formatter\JsonFormatter;
 use Waaseyaa\Foundation\Log\Formatter\TextFormatter;
+use Waaseyaa\Foundation\Log\Handler\DailyFileHandler;
 use Waaseyaa\Foundation\Log\Handler\ErrorLogHandler;
 use Waaseyaa\Foundation\Log\Handler\FileHandler;
+use Waaseyaa\Foundation\Log\Handler\FingersCrossedHandler;
 use Waaseyaa\Foundation\Log\Handler\HandlerInterface;
 use Waaseyaa\Foundation\Log\Handler\NullHandler;
 use Waaseyaa\Foundation\Log\Handler\StackHandler;
@@ -75,7 +77,7 @@ final class LogManager implements LoggerInterface
         $channelProcessorMap = [];
         $stackConfigs = [];
         foreach ($channelConfigs as $name => $channelConfig) {
-            $type = $channelConfig['type'] ?? 'errorlog';
+            $type = self::handlerTypeFromConfig($channelConfig);
             if ($type === 'stack') {
                 $stackConfigs[$name] = $channelConfig;
                 continue;
@@ -177,16 +179,26 @@ final class LogManager implements LoggerInterface
 
     private static function buildHandler(array $config): HandlerInterface
     {
-        $type = $config['type'] ?? 'errorlog';
+        $type = self::handlerTypeFromConfig($config);
         $level = LogLevel::fromName((string) ($config['level'] ?? 'debug')) ?? LogLevel::DEBUG;
         $formatter = self::buildFormatter($config['formatter'] ?? 'text');
 
         return match ($type) {
-            'errorlog' => new ErrorLogHandler(formatter: $formatter, minimumLevel: $level),
+            'errorlog', 'error_log' => new ErrorLogHandler(formatter: $formatter, minimumLevel: $level),
             'file' => new FileHandler(
                 filePath: $config['path'] ?? 'storage/logs/waaseyaa.log',
                 formatter: $formatter,
                 minimumLevel: $level,
+            ),
+            'daily' => new DailyFileHandler(
+                filePathPattern: $config['path'] ?? 'storage/logs/waaseyaa.log',
+                formatter: $formatter,
+                minimumLevel: $level,
+            ),
+            'fingers_crossed', 'fingerscrossed' => new FingersCrossedHandler(
+                self::buildHandler(self::normalizeNestedHandlerConfig($config)),
+                LogLevel::fromName((string) ($config['action_level'] ?? 'error')) ?? LogLevel::ERROR,
+                self::fingersCrossedBufferLimit($config),
             ),
             'stream' => new StreamHandler(
                 stream: fopen($config['path'] ?? 'php://stderr', 'a') ?: fopen('php://stderr', 'a'),
@@ -196,6 +208,45 @@ final class LogManager implements LoggerInterface
             'null' => new NullHandler(),
             default => new ErrorLogHandler(formatter: $formatter, minimumLevel: $level),
         };
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function normalizeNestedHandlerConfig(array $config): array
+    {
+        foreach (['nested', 'inner', 'handler'] as $key) {
+            $nested = $config[$key] ?? null;
+            if (is_array($nested)) {
+                return $nested;
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Handler kind: {@see $config['type']}, or {@see $config['handler']} when it is a non-empty string
+     * (Synonym for {@see type}; array {@see handler} is reserved for fingers_crossed nested config only).
+     */
+    private static function handlerTypeFromConfig(array $config): string
+    {
+        $typeRaw = $config['type'] ?? null;
+        if ($typeRaw === null && isset($config['handler']) && is_string($config['handler']) && $config['handler'] !== '') {
+            $typeRaw = $config['handler'];
+        }
+        if (!is_string($typeRaw) || $typeRaw === '') {
+            return 'errorlog';
+        }
+
+        return strtolower($typeRaw);
+    }
+
+    private static function fingersCrossedBufferLimit(array $config): int
+    {
+        $limit = (int) ($config['buffer_limit'] ?? 10000);
+
+        return $limit < 0 ? 0 : $limit;
     }
 
     private static function buildFormatter(string $name): FormatterInterface

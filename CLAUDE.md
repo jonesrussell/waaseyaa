@@ -39,6 +39,8 @@ When working on files matching these patterns, retrieve the spec for deep contex
 | `packages/graphql/*` | — | — |
 | `packages/search/*` | — | — |
 | `packages/ssr/*` | — | — |
+| `packages/error-handler/*` | — | `docs/specs/debugging-dx.md` |
+| `packages/debug/*` | — | `docs/specs/debugging-dx.md` |
 | `packages/telescope/*` | — | — |
 | `packages/workflows/*` | — | — |
 | `packages/billing/*` | — | — |
@@ -67,13 +69,13 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 
 | Layer | Name | Packages |
 |---|---|---|
-| 0 | Foundation | foundation, cache, plugin, typed-data, database-legacy, testing, i18n, queue, scheduler, state, validation, mail, http-client, ingestion |
+| 0 | Foundation | foundation, cache, plugin, typed-data, database-legacy, testing, i18n, queue, scheduler, state, validation, mail, http-client, ingestion, error-handler |
 | 1 | Core Data | entity, entity-storage, access, user, config, field, auth |
 | 2 | Content Types | node, taxonomy, media, path, menu, note, relationship |
 | 3 | Services | workflows, search, notification, billing, github |
 | 4 | API | api, routing |
 | 5 | AI | ai-schema, ai-agent, ai-pipeline, ai-vector |
-| 6 | Interfaces | cli, admin, admin-surface, graphql, mcp, ssr, telescope, deployer, inertia |
+| 6 | Interfaces | cli, admin, admin-surface, graphql, mcp, ssr, telescope, deployer, inertia, debug |
 
 **Rule:** Packages can only import from their own layer or lower. Upward communication via DomainEvents.
 

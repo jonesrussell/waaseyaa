@@ -6,19 +6,21 @@ vi.stubGlobal('$fetch', mockFetch)
 
 describe('useApi', () => {
   it('passes baseURL and credentials by default', async () => {
+    vi.stubGlobal('useRuntimeConfig', () => ({ app: { baseURL: '/admin/' } }))
     const { apiFetch } = useApi()
     await apiFetch('/api/user/me')
     expect(mockFetch).toHaveBeenCalledWith('/api/user/me', {
-      baseURL: '/',
+      baseURL: '/admin/',
       credentials: 'include',
     })
   })
 
   it('merges caller options', async () => {
+    vi.stubGlobal('useRuntimeConfig', () => ({ app: { baseURL: '/admin/' } }))
     const { apiFetch } = useApi()
     await apiFetch('/api/auth/login', { method: 'POST', body: { user: 'a' } })
     expect(mockFetch).toHaveBeenCalledWith('/api/auth/login', {
-      baseURL: '/',
+      baseURL: '/admin/',
       credentials: 'include',
       method: 'POST',
       body: { user: 'a' },

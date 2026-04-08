@@ -70,7 +70,6 @@ final class LoginController
 
         $_SESSION['waaseyaa_uid'] = $user->id();
         session_regenerate_id(true);
-        session_write_close();
 
         return new JsonResponse([
             'jsonapi' => ['version' => '1.1'],

@@ -1,0 +1,43 @@
+{
+    "name": "waaseyaa/debug",
+    "description": "Debug toolbar, dump helpers, and dev-only diagnostics for Waaseyaa",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=8.4",
+        "symfony/var-dumper": "^7.0",
+        "waaseyaa/foundation": "^0.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Waaseyaa\\Debug\\": "src/"
+        },
+        "files": [
+            "src/functions.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Waaseyaa\\Debug\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev",
+            "dev-develop/v1.1": "0.1.x-dev"
+        },
+        "waaseyaa": {
+            "providers": [
+                "Waaseyaa\\Debug\\DebugServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

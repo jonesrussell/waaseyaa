@@ -67,7 +67,10 @@ describe('admin plugin degraded bootstrap paths', () => {
     window.history.replaceState({}, '', '/admin/login/')
 
     vi.stubGlobal('defineNuxtPlugin', (plugin: unknown) => plugin)
-    vi.stubGlobal('useRuntimeConfig', () => ({ public: { baseUrl: '/admin' } }))
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      app: { baseURL: '/admin/' },
+      public: { baseUrl: '/admin' },
+    }))
     vi.stubGlobal('$fetch', fetchSpy)
 
     const plugin = (await import('~/plugins/admin')).default as () => Promise<{ provide: { admin: AdminRuntime | null } }>
@@ -87,7 +90,10 @@ describe('admin plugin degraded bootstrap paths', () => {
     window.history.replaceState({}, '', '/admin')
 
     vi.stubGlobal('defineNuxtPlugin', (plugin: unknown) => plugin)
-    vi.stubGlobal('useRuntimeConfig', () => ({ public: { baseUrl: '/admin' } }))
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      app: { baseURL: '/admin/' },
+      public: { baseUrl: '/admin' },
+    }))
     vi.stubGlobal('$fetch', vi.fn(async () => ({ ok: false, error: { status: 401 } })))
 
     const plugin = (await import('~/plugins/admin')).default as () => Promise<{ provide: { admin: AdminRuntime | null } }>
@@ -106,7 +112,10 @@ describe('admin plugin degraded bootstrap paths', () => {
     window.history.replaceState({}, '', '/admin')
 
     vi.stubGlobal('defineNuxtPlugin', (plugin: unknown) => plugin)
-    vi.stubGlobal('useRuntimeConfig', () => ({ public: { baseUrl: '/admin' } }))
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      app: { baseURL: '/admin/' },
+      public: { baseUrl: '/admin' },
+    }))
     vi.stubGlobal('$fetch', vi.fn()
       .mockResolvedValueOnce({
         ok: true,
@@ -129,12 +138,38 @@ describe('admin plugin degraded bootstrap paths', () => {
     expect(authChecked.value).toBe(true)
   })
 
+  it('collapses duplicate slashes in app baseURL for surface requests', async () => {
+    vi.resetModules()
+
+    window.history.replaceState({}, '', '/admin/entities')
+
+    const fetchSpy = vi.fn(async () => ({ ok: false, error: { status: 401 } }))
+    vi.stubGlobal('defineNuxtPlugin', (plugin: unknown) => plugin)
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      app: { baseURL: '//admin//' },
+      public: { baseUrl: '/admin' },
+    }))
+    vi.stubGlobal('$fetch', fetchSpy)
+    vi.stubGlobal('navigateTo', vi.fn(async () => {}))
+
+    const plugin = (await import('~/plugins/admin')).default as () => Promise<{ provide: { admin: AdminRuntime | null } }>
+    await plugin()
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      '/admin/_surface/session',
+      expect.objectContaining({ credentials: 'include' }),
+    )
+  })
+
   it('throws a fatal 503 when the surface API is unreachable', async () => {
     vi.resetModules()
     window.history.replaceState({}, '', '/admin')
 
     vi.stubGlobal('defineNuxtPlugin', (plugin: unknown) => plugin)
-    vi.stubGlobal('useRuntimeConfig', () => ({ public: { baseUrl: '/admin' } }))
+    vi.stubGlobal('useRuntimeConfig', () => ({
+      app: { baseURL: '/admin/' },
+      public: { baseUrl: '/admin' },
+    }))
     vi.stubGlobal('$fetch', vi.fn(async () => {
       throw new Error('network down')
     }))
