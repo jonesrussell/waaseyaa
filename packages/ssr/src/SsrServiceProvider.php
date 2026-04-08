@@ -137,7 +137,7 @@ final class SsrServiceProvider extends ServiceProvider implements LanguagePathSt
 
     public function stripLanguagePrefixForRouting(string $path): string
     {
-        return $this->ssrPageHandler?->getLanguageResolver()->stripLanguagePrefixForRouting($path) ?? $path;
+        return $this->ssrPageHandler?->getLanguageResolver()?->stripLanguagePrefixForRouting($path) ?? $path;
     }
 
     public static function getTwigEnvironment(): ?Environment
