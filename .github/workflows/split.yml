@@ -66,6 +66,14 @@ jobs:
           - { local: 'packages/ssr', remote: 'ssr' }
           - { local: 'packages/telescope', remote: 'telescope' }
           - { local: 'packages/admin-surface', remote: 'admin-surface' }
+          # Split parity — packages with composer.json that were missing from the matrix (#1137)
+          - { local: 'packages/engagement', remote: 'engagement' }
+          - { local: 'packages/geo', remote: 'geo' }
+          - { local: 'packages/mercure', remote: 'mercure' }
+          - { local: 'packages/messaging', remote: 'messaging' }
+          - { local: 'packages/notification', remote: 'notification' }
+          - { local: 'packages/oauth-provider', remote: 'oauth-provider' }
+          - { local: 'packages/scheduler', remote: 'scheduler' }
           # Meta-packages
           - { local: 'packages/cms', remote: 'cms' }
           - { local: 'packages/core', remote: 'core' }
@@ -100,7 +108,7 @@ jobs:
             echo "::error::SPLIT_GITHUB_TOKEN secret is empty or not set."
             exit 1
           fi
-          echo "Token present (length: ${#SPLIT_GH_TOKEN})"
+          echo "SPLIT_GITHUB_TOKEN is configured."
 
       - name: Split and push
         env:

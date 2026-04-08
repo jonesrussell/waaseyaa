@@ -8,7 +8,7 @@
     ],
     "require": {
         "php": ">=8.4",
-        "waaseyaa/foundation": "@dev"
+        "waaseyaa/foundation": "^0.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"

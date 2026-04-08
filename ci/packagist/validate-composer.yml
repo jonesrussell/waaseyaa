@@ -1,7 +1,7 @@
 name: Validate subpackage composer.json files
 
 # Runs on every PR and push to develop/v* branches.
-# Validates all 40 subpackage composer.json files and produces a JSON report.
+# Validates all split-eligible subpackage composer.json files and produces a JSON report.
 # This is a GATE that must pass before the split-and-publish workflow can run.
 
 on:
@@ -36,24 +36,31 @@ jobs:
           - config
           - core
           - database-legacy
+          - engagement
           - entity
           - entity-storage
           - field
           - foundation
           - full
+          - geo
           - graphql
           - i18n
           - mail
-          - media
-          - menu
           - mcp
+          - media
+          - mercure
+          - menu
+          - messaging
           - node
           - note
+          - notification
+          - oauth-provider
           - path
           - plugin
           - queue
           - relationship
           - routing
+          - scheduler
           - search
           - ssr
           - state
