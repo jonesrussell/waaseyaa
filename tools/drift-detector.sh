@@ -42,7 +42,7 @@ else
 fi
 
 # Exclude files that don't affect spec accuracy
-CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -vE '(_test|Test)\.php$|\.claude/|composer\.lock$|CLAUDE\.md$|/vendor/|\.layers$|phpunit\.xml|phpstan\.neon' || true)
+CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -vE '(_test|Test)\.php$|\.claude/|composer\.lock$|package-lock\.json$|CLAUDE\.md$|/vendor/|\.layers$|phpunit\.xml|phpstan\.neon' || true)
 
 if [ -z "$CHANGED_FILES" ]; then
   echo "No spec-affecting changes in last ${N} commits."
@@ -64,7 +64,9 @@ declare -A PATTERN_TO_SPEC=(
   ["packages/routing/"]="docs/specs/api-layer.md"
   ["packages/foundation/"]="docs/specs/infrastructure.md"
   ["packages/cache/"]="docs/specs/infrastructure.md"
+  ["packages/debug/"]="docs/specs/debugging-dx.md"
   ["packages/database-legacy/"]="docs/specs/infrastructure.md"
+  ["packages/error-handler/"]="docs/specs/debugging-dx.md"
   ["packages/plugin/"]="docs/specs/infrastructure.md"
   ["packages/i18n/"]="docs/specs/infrastructure.md"
   ["packages/queue/"]="docs/specs/infrastructure.md"

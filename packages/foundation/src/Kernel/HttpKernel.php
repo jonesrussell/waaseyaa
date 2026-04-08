@@ -59,10 +59,22 @@ final class HttpKernel extends AbstractKernel
         } catch (\Throwable $e) {
             $this->logger->critical(sprintf("Boot failed: %s in %s:%d\n%s", $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString()));
 
-            return $this->jsonApiResponse(500, [
-                'jsonapi' => ['version' => '1.1'],
-                'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => 'Application failed to boot.']],
-            ]);
+            if (\class_exists(\Waaseyaa\ErrorHandler\DevExceptionRenderer::class)) {
+                try {
+                    $debug = $this->isDebugMode();
+                } catch (\Throwable) {
+                    $appDebugEnv = getenv('APP_DEBUG');
+                    $debug = filter_var($appDebugEnv === false ? '' : $appDebugEnv, FILTER_VALIDATE_BOOLEAN);
+                }
+                if ($debug) {
+                    /** @var class-string<\Waaseyaa\ErrorHandler\DevExceptionRenderer> $class */
+                    $class = \Waaseyaa\ErrorHandler\DevExceptionRenderer::class;
+
+                    return new HttpResponse((new $class())->render($e), 500, ['Content-Type' => 'text/html; charset=UTF-8']);
+                }
+            }
+
+            return $this->bootFailureJsonResponse($e);
         }
 
         try {
@@ -433,6 +445,32 @@ final class HttpKernel extends AbstractKernel
         }
 
         return $instance->priority;
+    }
+
+    private function bootFailureJsonResponse(\Throwable $e): HttpResponse
+    {
+        $showDetail = false;
+        try {
+            $showDetail = $this->isDebugMode();
+        } catch (\Throwable) {
+            $appDebugEnv = getenv('APP_DEBUG');
+            $showDetail = filter_var($appDebugEnv === false ? '' : $appDebugEnv, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        $detail = $showDetail
+            ? $e->getMessage()
+            : 'Application failed to boot.';
+
+        try {
+            $body = json_encode([
+                'jsonapi' => ['version' => '1.1'],
+                'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => $detail]],
+            ], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            $body = '{"jsonapi":{"version":"1.1"},"errors":[{"status":"500","title":"Internal Server Error","detail":"Application failed to boot."}]}';
+        }
+
+        return new HttpResponse($body, 500, ['Content-Type' => 'application/vnd.api+json']);
     }
 
     private function handleCors(): ?HttpResponse

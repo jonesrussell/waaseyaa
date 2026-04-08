@@ -41,6 +41,8 @@ Optional qualifiers:
 
 ## Validation Contract
 
+- **`Waaseyaa\Relationship\RelationshipParameterValidator`** — centralizes normalization and validation of relationship discovery inputs (filter shape, pagination limits, field allowlists) before `RelationshipDiscoveryService` runs graph reads, so the service stays orchestration-only.
+
 - All required fields must be present.
 - Endpoint entity references must resolve.
 - `start_date <= end_date` when both are set.

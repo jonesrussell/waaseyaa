@@ -7,8 +7,10 @@ namespace Waaseyaa\Foundation\Log;
 use Waaseyaa\Foundation\Log\Formatter\FormatterInterface;
 use Waaseyaa\Foundation\Log\Formatter\JsonFormatter;
 use Waaseyaa\Foundation\Log\Formatter\TextFormatter;
+use Waaseyaa\Foundation\Log\Handler\DailyFileHandler;
 use Waaseyaa\Foundation\Log\Handler\ErrorLogHandler;
 use Waaseyaa\Foundation\Log\Handler\FileHandler;
+use Waaseyaa\Foundation\Log\Handler\FingersCrossedHandler;
 use Waaseyaa\Foundation\Log\Handler\HandlerInterface;
 use Waaseyaa\Foundation\Log\Handler\NullHandler;
 use Waaseyaa\Foundation\Log\Handler\StackHandler;
@@ -75,7 +77,8 @@ final class LogManager implements LoggerInterface
         $channelProcessorMap = [];
         $stackConfigs = [];
         foreach ($channelConfigs as $name => $channelConfig) {
-            $type = $channelConfig['type'] ?? 'errorlog';
+            $typeRaw = $channelConfig['type'] ?? $channelConfig['handler'] ?? 'errorlog';
+            $type = is_string($typeRaw) ? strtolower($typeRaw) : 'errorlog';
             if ($type === 'stack') {
                 $stackConfigs[$name] = $channelConfig;
                 continue;
@@ -177,16 +180,26 @@ final class LogManager implements LoggerInterface
 
     private static function buildHandler(array $config): HandlerInterface
     {
-        $type = $config['type'] ?? 'errorlog';
+        $typeRaw = $config['type'] ?? $config['handler'] ?? 'errorlog';
+        $type = is_string($typeRaw) ? strtolower($typeRaw) : 'errorlog';
         $level = LogLevel::fromName((string) ($config['level'] ?? 'debug')) ?? LogLevel::DEBUG;
         $formatter = self::buildFormatter($config['formatter'] ?? 'text');
 
         return match ($type) {
-            'errorlog' => new ErrorLogHandler(formatter: $formatter, minimumLevel: $level),
+            'errorlog', 'error_log' => new ErrorLogHandler(formatter: $formatter, minimumLevel: $level),
             'file' => new FileHandler(
                 filePath: $config['path'] ?? 'storage/logs/waaseyaa.log',
                 formatter: $formatter,
                 minimumLevel: $level,
+            ),
+            'daily' => new DailyFileHandler(
+                filePathPattern: $config['path'] ?? 'storage/logs/waaseyaa.log',
+                formatter: $formatter,
+                minimumLevel: $level,
+            ),
+            'fingers_crossed', 'fingerscrossed' => new FingersCrossedHandler(
+                self::buildHandler(self::normalizeNestedHandlerConfig($config)),
+                LogLevel::fromName((string) ($config['action_level'] ?? 'error')) ?? LogLevel::ERROR,
             ),
             'stream' => new StreamHandler(
                 stream: fopen($config['path'] ?? 'php://stderr', 'a') ?: fopen('php://stderr', 'a'),
@@ -196,6 +209,24 @@ final class LogManager implements LoggerInterface
             'null' => new NullHandler(),
             default => new ErrorLogHandler(formatter: $formatter, minimumLevel: $level),
         };
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function normalizeNestedHandlerConfig(array $config): array
+    {
+        $nested = $config['handler'] ?? null;
+        if (is_array($nested)) {
+            return $nested;
+        }
+
+        $inner = $config['inner'] ?? [];
+        if (is_array($inner)) {
+            return $inner;
+        }
+
+        return [];
     }
 
     private static function buildFormatter(string $name): FormatterInterface

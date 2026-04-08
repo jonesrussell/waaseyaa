@@ -39,6 +39,14 @@
         },
         {
             "type": "path",
+            "url": "packages/debug"
+        },
+        {
+            "type": "path",
+            "url": "packages/error-handler"
+        },
+        {
+            "type": "path",
             "url": "packages/access"
         },
         {
@@ -245,10 +253,12 @@
         "waaseyaa/cli": "@dev",
         "waaseyaa/config": "@dev",
         "waaseyaa/database-legacy": "@dev",
+        "waaseyaa/debug": "@dev",
         "waaseyaa/deployer": "@dev",
         "waaseyaa/engagement": "@dev",
         "waaseyaa/entity": "@dev",
         "waaseyaa/entity-storage": "@dev",
+        "waaseyaa/error-handler": "@dev",
         "waaseyaa/field": "@dev",
         "waaseyaa/foundation": "@dev",
         "waaseyaa/geo": "@dev",
@@ -312,7 +322,9 @@
             "Waaseyaa\\GitHub\\Tests\\": "packages/github/tests/",
             "Waaseyaa\\I18n\\Tests\\": "packages/i18n/tests/",
             "Waaseyaa\\Database\\Tests\\": "packages/database-legacy/tests/",
+            "Waaseyaa\\Debug\\Tests\\": "packages/debug/tests/",
             "Waaseyaa\\EntityStorage\\Tests\\": "packages/entity-storage/tests/",
+            "Waaseyaa\\ErrorHandler\\Tests\\": "packages/error-handler/tests/",
             "Waaseyaa\\Access\\Tests\\": "packages/access/tests/",
             "Waaseyaa\\Api\\Tests\\": "packages/api/tests/",
             "Waaseyaa\\Queue\\Tests\\": "packages/queue/tests/",
