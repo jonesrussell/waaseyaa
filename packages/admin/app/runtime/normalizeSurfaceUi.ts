@@ -2,7 +2,7 @@ import type {
   AdminSurfaceHeaderLink,
   AdminSurfaceSidebarItem,
   AdminSurfaceUiCustomization,
-} from '../../../admin-surface/contract/types'
+} from '../contracts/surface-ui'
 
 function normalizeHeaderLinks(raw: unknown): AdminSurfaceHeaderLink[] {
   if (!Array.isArray(raw)) {

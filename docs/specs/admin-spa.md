@@ -6,6 +6,7 @@
 <!-- Spec reviewed 2026-04-08 - merge-conflict resolution kept @types/node at ^25.5.2 in packages/admin/package.json and package-lock.json; no runtime/admin contract change -->
 <!-- Spec reviewed 2026-04-08 - AdminSurfaceRoutePaths (waaseyaa/admin-surface PHP) + adminSurfaceRoutes.ts: named routes admin_surface.session|catalog|list|get|action; plugin bootstrap uses adminSurfaceFetchUrl(base, name); paths must stay aligned with WaaseyaaRouter registration (#815) -->
 <!-- Spec reviewed 2026-04-08 - Optional session `ui` (headerLinks, sidebarItems): AdminSurfaceUiPayload + AdminSurfaceSessionData; GenericAdminSurfaceHost::buildAdminUi(); SPA maps via normalizeSurfaceUi into AdminRuntime.ui; AdminShell + NavBuilder (#756) -->
+<!-- Spec reviewed 2026-04-08 - Session UI TypeScript mirror: `packages/admin/app/contracts/surface-ui.ts` duplicates admin-surface `contract/types.ts` ui shapes for `npm run build:contracts` (rootDir app only); keep in sync with PHP/contract (#756) -->
 
 ## Optionality
 
