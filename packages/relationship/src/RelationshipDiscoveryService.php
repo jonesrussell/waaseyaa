@@ -8,6 +8,7 @@ final class RelationshipDiscoveryService
 {
     public function __construct(
         private readonly RelationshipTraversalService $traversalService,
+        private readonly RelationshipParameterValidator $validator = new RelationshipParameterValidator(),
     ) {}
 
     /**
@@ -22,12 +23,12 @@ final class RelationshipDiscoveryService
      */
     public function topicHub(string $entityType, int|string $entityId, array $options = []): array
     {
-        $limit = $this->normalizeLimit($options['limit'] ?? null, 20);
-        $offset = $this->normalizeOffset($options['offset'] ?? null);
+        $limit = $this->validator->normalizeLimit($options['limit'] ?? null, 20);
+        $offset = $this->validator->normalizeOffset($options['offset'] ?? null);
 
         $browse = $this->traversalService->browse($entityType, $entityId, [
-            'relationship_types' => $this->normalizeRelationshipTypes($options['relationship_types'] ?? []),
-            'status' => $this->normalizeStatus($options['status'] ?? 'published'),
+            'relationship_types' => $this->validator->normalizeRelationshipTypes($options['relationship_types'] ?? []),
+            'status' => $this->validator->normalizeStatus($options['status'] ?? 'published'),
             'at' => $options['at'] ?? null,
         ]);
 
@@ -62,12 +63,12 @@ final class RelationshipDiscoveryService
      */
     public function clusterPage(string $entityType, int|string $entityId, array $options = []): array
     {
-        $limit = $this->normalizeLimit($options['limit'] ?? null, 12);
-        $offset = $this->normalizeOffset($options['offset'] ?? null);
+        $limit = $this->validator->normalizeLimit($options['limit'] ?? null, 12);
+        $offset = $this->validator->normalizeOffset($options['offset'] ?? null);
 
         $browse = $this->traversalService->browse($entityType, $entityId, [
-            'relationship_types' => $this->normalizeRelationshipTypes($options['relationship_types'] ?? []),
-            'status' => $this->normalizeStatus($options['status'] ?? 'published'),
+            'relationship_types' => $this->validator->normalizeRelationshipTypes($options['relationship_types'] ?? []),
+            'status' => $this->validator->normalizeStatus($options['status'] ?? 'published'),
             'at' => $options['at'] ?? null,
         ]);
 
@@ -175,16 +176,16 @@ final class RelationshipDiscoveryService
      */
     public function timeline(string $entityType, int|string $entityId, array $options = []): array
     {
-        $limit = $this->normalizeLimit($options['limit'] ?? null, 20);
-        $offset = $this->normalizeOffset($options['offset'] ?? null);
-        $direction = $this->normalizeDirection($options['direction'] ?? 'both');
-        $from = $this->normalizeTemporal($options['from'] ?? null);
-        $to = $this->normalizeTemporal($options['to'] ?? null);
-        $at = $this->normalizeTemporal($options['at'] ?? null);
+        $limit = $this->validator->normalizeLimit($options['limit'] ?? null, 20);
+        $offset = $this->validator->normalizeOffset($options['offset'] ?? null);
+        $direction = $this->validator->normalizeDirection($options['direction'] ?? 'both');
+        $from = $this->validator->normalizeTemporal($options['from'] ?? null);
+        $to = $this->validator->normalizeTemporal($options['to'] ?? null);
+        $at = $this->validator->normalizeTemporal($options['at'] ?? null);
 
         $browse = $this->traversalService->browse($entityType, $entityId, [
-            'relationship_types' => $this->normalizeRelationshipTypes($options['relationship_types'] ?? []),
-            'status' => $this->normalizeStatus($options['status'] ?? 'published'),
+            'relationship_types' => $this->validator->normalizeRelationshipTypes($options['relationship_types'] ?? []),
+            'status' => $this->validator->normalizeStatus($options['status'] ?? 'published'),
             'at' => $at,
         ]);
 
@@ -198,12 +199,13 @@ final class RelationshipDiscoveryService
 
         $edges = array_values(array_filter(
             $edges,
-            fn(array $edge): bool => $this->edgeOverlapsWindow($edge, $from, $to),
+            fn(array $edge): bool => $this->validator->edgeOverlapsWindow($edge, $from, $to),
         ));
 
-        usort($edges, static function (array $left, array $right): int {
-            $leftTimeline = self::timelineSortDate($left);
-            $rightTimeline = self::timelineSortDate($right);
+        $validator = $this->validator;
+        usort($edges, static function (array $left, array $right) use ($validator): int {
+            $leftTimeline = $validator->timelineSortDate($left);
+            $rightTimeline = $validator->timelineSortDate($right);
             $timelineCompare = $leftTimeline <=> $rightTimeline;
             if ($timelineCompare !== 0) {
                 return $timelineCompare;
@@ -235,7 +237,7 @@ final class RelationshipDiscoveryService
 
         $pagedEdges = array_slice($edges, $offset, $limit);
         $items = array_map(function (array $edge): array {
-            $edge['timeline_date'] = self::timelineSortDate($edge);
+            $edge['timeline_date'] = $this->validator->timelineSortDate($edge);
             return $edge;
         }, $pagedEdges);
 
@@ -269,10 +271,10 @@ final class RelationshipDiscoveryService
     public function endpointPage(string $entityType, int|string $entityId, array $options = []): array
     {
         $browse = $this->traversalService->browse($entityType, $entityId, [
-            'relationship_types' => $this->normalizeRelationshipTypes($options['relationship_types'] ?? []),
-            'status' => $this->normalizeStatus($options['status'] ?? 'published'),
+            'relationship_types' => $this->validator->normalizeRelationshipTypes($options['relationship_types'] ?? []),
+            'status' => $this->validator->normalizeStatus($options['status'] ?? 'published'),
             'at' => $options['at'] ?? null,
-            'limit' => $this->normalizeLimit($options['limit'] ?? null, 12),
+            'limit' => $this->validator->normalizeLimit($options['limit'] ?? null, 12),
         ]);
 
         return [
@@ -306,10 +308,10 @@ final class RelationshipDiscoveryService
             return [];
         }
 
-        $status = $this->normalizeStatus($options['status'] ?? 'published');
-        $relationshipTypes = $this->normalizeRelationshipTypes($options['relationship_types'] ?? []);
+        $status = $this->validator->normalizeStatus($options['status'] ?? 'published');
+        $relationshipTypes = $this->validator->normalizeRelationshipTypes($options['relationship_types'] ?? []);
         $at = $options['at'] ?? null;
-        $limit = $this->normalizeLimit($options['limit'] ?? null, 8);
+        $limit = $this->validator->normalizeLimit($options['limit'] ?? null, 8);
 
         return [
             'from_endpoint' => $this->endpointPage($fromType, $fromId, [
@@ -330,8 +332,8 @@ final class RelationshipDiscoveryService
                 'status' => is_numeric($relationshipValues['status'] ?? null) ? (int) $relationshipValues['status'] : 0,
                 'weight' => is_numeric($relationshipValues['weight'] ?? null) ? (float) $relationshipValues['weight'] : null,
                 'confidence' => is_numeric($relationshipValues['confidence'] ?? null) ? (float) $relationshipValues['confidence'] : null,
-                'start_date' => $this->normalizeTemporal($relationshipValues['start_date'] ?? null),
-                'end_date' => $this->normalizeTemporal($relationshipValues['end_date'] ?? null),
+                'start_date' => $this->validator->normalizeTemporal($relationshipValues['start_date'] ?? null),
+                'end_date' => $this->validator->normalizeTemporal($relationshipValues['end_date'] ?? null),
             ],
         ];
     }
@@ -437,143 +439,5 @@ final class RelationshipDiscoveryService
         });
 
         return $facets;
-    }
-
-    /**
-     * @param mixed $relationshipTypes
-     * @return list<string>
-     */
-    private function normalizeRelationshipTypes(mixed $relationshipTypes): array
-    {
-        if (!is_array($relationshipTypes)) {
-            return [];
-        }
-
-        $normalized = [];
-        foreach ($relationshipTypes as $relationshipType) {
-            if (!is_string($relationshipType)) {
-                continue;
-            }
-            $value = trim($relationshipType);
-            if ($value === '') {
-                continue;
-            }
-            $normalized[] = $value;
-        }
-
-        return array_values(array_unique($normalized));
-    }
-
-    private function normalizeStatus(mixed $status): string
-    {
-        if (!is_string($status)) {
-            return 'published';
-        }
-        $value = strtolower(trim($status));
-
-        return in_array($value, ['published', 'unpublished', 'all'], true) ? $value : 'published';
-    }
-
-    private function normalizeLimit(mixed $limit, int $default): int
-    {
-        if (!is_numeric($limit)) {
-            return $default;
-        }
-
-        return max(1, min(100, (int) $limit));
-    }
-
-    private function normalizeOffset(mixed $offset): int
-    {
-        if (!is_numeric($offset)) {
-            return 0;
-        }
-
-        return max(0, (int) $offset);
-    }
-
-    private function normalizeDirection(mixed $direction): string
-    {
-        if (!is_string($direction)) {
-            return 'both';
-        }
-        $value = strtolower(trim($direction));
-        if (!in_array($value, ['outbound', 'inbound', 'both'], true)) {
-            return 'both';
-        }
-
-        return $value;
-    }
-
-    private function normalizeTemporal(mixed $value): ?int
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-        if (is_int($value)) {
-            return $value;
-        }
-        if (is_numeric($value)) {
-            return (int) $value;
-        }
-        if (!is_string($value)) {
-            return null;
-        }
-
-        $trimmed = trim($value);
-        if ($trimmed === '') {
-            return null;
-        }
-        if (ctype_digit($trimmed)) {
-            return (int) $trimmed;
-        }
-
-        $parsed = strtotime($trimmed);
-        if ($parsed === false) {
-            return null;
-        }
-
-        return $parsed;
-    }
-
-    /**
-     * @param array<string, mixed> $edge
-     */
-    private function edgeOverlapsWindow(array $edge, ?int $from, ?int $to): bool
-    {
-        if ($from === null && $to === null) {
-            return true;
-        }
-
-        $start = is_numeric($edge['start_date'] ?? null) ? (int) $edge['start_date'] : null;
-        $end = is_numeric($edge['end_date'] ?? null) ? (int) $edge['end_date'] : null;
-
-        if ($to !== null && $start !== null && $start > $to) {
-            return false;
-        }
-
-        if ($from !== null && $end !== null && $end < $from) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param array<string, mixed> $edge
-     */
-    private static function timelineSortDate(array $edge): int
-    {
-        $start = is_numeric($edge['start_date'] ?? null) ? (int) $edge['start_date'] : null;
-        if ($start !== null) {
-            return $start;
-        }
-
-        $end = is_numeric($edge['end_date'] ?? null) ? (int) $edge['end_date'] : null;
-        if ($end !== null) {
-            return $end;
-        }
-
-        return PHP_INT_MAX;
     }
 }
