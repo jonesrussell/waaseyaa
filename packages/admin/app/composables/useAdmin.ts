@@ -1,10 +1,12 @@
 import type { CatalogEntry, CatalogCapabilities } from '../contracts/catalog'
 import type { AdminTenant } from '../contracts/auth'
+import type { AdminRuntime } from '../contracts/runtime'
 import { requireAdminRuntime } from './useAdminRuntime'
 
 export function useAdmin(): {
   catalog: CatalogEntry[]
   tenant: AdminTenant
+  ui: AdminRuntime['ui']
   hasCapability: (entityType: string, cap: keyof CatalogCapabilities) => boolean
   getEntity: (type: string) => CatalogEntry | undefined
 } {
@@ -22,6 +24,7 @@ export function useAdmin(): {
   return {
     catalog: $admin.catalog,
     tenant: $admin.tenant,
+    ui: $admin.ui,
     hasCapability,
     getEntity,
   }

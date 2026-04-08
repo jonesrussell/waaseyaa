@@ -1,12 +1,53 @@
 <script setup lang="ts">
+import type { AdminSurfaceSidebarItem } from '../../../../admin-surface/contract/types'
 import { useLanguage } from '~/composables/useLanguage'
 import { useAdmin } from '~/composables/useAdmin'
 import { groupEntityTypes } from '~/composables/useNavGroups'
+import { adminNavLinkIsExternal } from '~/runtime/navLinkExternal'
 
 const { t, entityLabel } = useLanguage()
-const { catalog } = useAdmin()
+const { catalog, ui } = useAdmin()
 
 const navGroups = computed(() => groupEntityTypes(catalog))
+
+/** Group key → items (sorted by weight). Empty key = default “custom” bucket. */
+const customNavSections = computed((): Array<[string, AdminSurfaceSidebarItem[]]> => {
+  const map = new Map<string, AdminSurfaceSidebarItem[]>()
+  for (const item of ui.sidebarItems) {
+    const key = item.group ?? ''
+    if (!map.has(key)) {
+      map.set(key, [])
+    }
+    map.get(key)!.push(item)
+  }
+  for (const list of map.values()) {
+    list.sort((a, b) => (a.weight ?? 0) - (b.weight ?? 0))
+  }
+  const entries = [...map.entries()]
+  entries.sort((a, b) => {
+    if (a[0] === '') {
+      return -1
+    }
+    if (b[0] === '') {
+      return 1
+    }
+
+    return a[0].localeCompare(b[0])
+  })
+
+  return entries
+})
+
+function customSectionHeading(groupKey: string): string {
+  if (groupKey === '') {
+    return t('nav_group_custom')
+  }
+  if (groupKey.startsWith('nav_')) {
+    return t(groupKey)
+  }
+
+  return groupKey
+}
 </script>
 
 <template>
@@ -14,6 +55,23 @@ const navGroups = computed(() => groupEntityTypes(catalog))
     <NuxtLink to="/" class="nav-item">
       {{ t('dashboard') }}
     </NuxtLink>
+    <template v-for="[groupKey, items] in customNavSections" :key="'cu-' + groupKey">
+      <div class="nav-section">{{ customSectionHeading(groupKey) }}</div>
+      <template v-for="it in items" :key="it.id">
+        <a
+          v-if="adminNavLinkIsExternal(it)"
+          :href="it.href"
+          class="nav-item"
+          target="_blank"
+          rel="noopener noreferrer"
+        >{{ it.label }}</a>
+        <NuxtLink
+          v-else
+          :to="it.href"
+          class="nav-item"
+        >{{ it.label }}</NuxtLink>
+      </template>
+    </template>
     <template v-for="group in navGroups" :key="group.key">
       <div class="nav-section">{{ t(group.labelKey) }}</div>
       <template v-for="et in group.entityTypes" :key="et.id">

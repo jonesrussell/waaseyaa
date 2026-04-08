@@ -15,6 +15,12 @@ describe('useAdmin', () => {
     expect(tenant.name).toBe('Waaseyaa')
   })
 
+  it('returns ui with header and sidebar arrays from runtime', () => {
+    const { ui } = useAdmin()
+    expect(ui.headerLinks).toEqual([])
+    expect(ui.sidebarItems).toEqual([])
+  })
+
   it('hasCapability returns true for existing capability', () => {
     const { hasCapability } = useAdmin()
     expect(hasCapability('node', 'create')).toBe(true)

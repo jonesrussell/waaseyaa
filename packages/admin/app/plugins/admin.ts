@@ -11,6 +11,7 @@ import type {
 } from '../../../admin-surface/contract/types'
 import { normalizeAppBaseURL } from '../runtime/normalizeAppBaseURL'
 import { adminSurfaceFetchUrl } from '../runtime/adminSurfaceRoutes'
+import { normalizeSurfaceUi } from '../runtime/normalizeSurfaceUi'
 
 export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRuntime | null } }> => {
   const config = useRuntimeConfig()
@@ -118,6 +119,7 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
     tenant,
     account,
     features: surfaceSession.features,
+    ui: normalizeSurfaceUi(surfaceSession.ui),
   }
 
   return { provide: { admin: runtime } }

@@ -11,6 +11,7 @@ describe('requireAdminRuntime', () => {
       auth: {} as AdminRuntime['auth'],
       authConfig: { strategy: 'redirect' as const, loginUrl: '/login' },
       transport: {} as AdminRuntime['transport'],
+      ui: { headerLinks: [], sidebarItems: [] },
     } satisfies AdminRuntime
 
     expect(requireAdminRuntime({ $admin: runtime })).toBe(runtime)

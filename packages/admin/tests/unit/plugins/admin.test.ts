@@ -12,6 +12,8 @@ describe('admin plugin', () => {
     expect($admin.catalog).toBeInstanceOf(Array)
     expect($admin.tenant).toBeTruthy()
     expect($admin.account).toBeTruthy()
+    expect($admin.ui.headerLinks).toEqual([])
+    expect($admin.ui.sidebarItems).toEqual([])
   })
 
   it('catalog contains entity types from surface API', () => {

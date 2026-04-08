@@ -15,6 +15,7 @@ use Waaseyaa\AdminSurface\Action\SurfaceActionHandlerInterface;
 use Waaseyaa\AdminSurface\Catalog\CatalogBuilder;
 use Waaseyaa\AdminSurface\Host\AdminSurfaceResultData;
 use Waaseyaa\AdminSurface\Host\AdminSurfaceSessionData;
+use Waaseyaa\AdminSurface\Host\AdminSurfaceUiPayload;
 use Waaseyaa\AdminSurface\Host\GenericAdminSurfaceHost;
 use Waaseyaa\Entity\ConfigEntityBase;
 use Waaseyaa\Entity\EntityInterface;
@@ -74,6 +75,37 @@ final class GenericAdminSurfaceHostTest extends TestCase
         $this->assertSame('myapp', $session->tenantId);
         $this->assertSame('My App', $session->tenantName);
         $this->assertContains('administrator', $session->roles);
+        $this->assertNull($session->ui);
+    }
+
+    #[Test]
+    public function resolve_session_includes_ui_from_buildAdminUi(): void
+    {
+        $account = $this->createStub(AccountInterface::class);
+        $account->method('id')->willReturn(7);
+        $account->method('hasPermission')->willReturn(true);
+        $account->method('getRoles')->willReturn(['administrator']);
+
+        $host = new class($this->createMock(EntityTypeManager::class)) extends GenericAdminSurfaceHost {
+            protected function buildAdminUi(AccountInterface $account): ?AdminSurfaceUiPayload
+            {
+                return AdminSurfaceUiPayload::fromArrays(
+                    headerLinks: [['label' => 'Docs', 'href' => 'https://docs.example']],
+                );
+            }
+        };
+
+        $request = Request::create('/admin/_surface/session');
+        $request->attributes->set('_account', $account);
+
+        $session = $host->resolveSession($request);
+
+        $this->assertNotNull($session);
+        $this->assertNotNull($session->ui);
+        $this->assertSame(
+            [['label' => 'Docs', 'href' => 'https://docs.example']],
+            $session->ui->headerLinks,
+        );
     }
 
     #[Test]

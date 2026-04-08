@@ -88,6 +88,8 @@
   "nc_sync_view_events": "Voir les événements",
   "na": "N/D",
   "nav_group_other": "Autre",
+  "nav_group_custom": "Raccourcis",
+  "topbar_links": "Liens rapides",
 
   "entity_type_user": "Utilisateur",
   "entity_type_node": "Contenu",

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useLanguage } from '~/composables/useLanguage'
 import { useAdmin } from '~/composables/useAdmin'
+import { adminNavLinkIsExternal } from '~/runtime/navLinkExternal'
 
 const { t, locale, locales, setLocale } = useLanguage()
 const config = useRuntimeConfig()
-const { tenant } = useAdmin()
+const { tenant, ui } = useAdmin()
 const appName = tenant?.name ?? (config.public.appName as string)
 const sidebarOpen = ref(false)
 
@@ -31,6 +32,27 @@ function onLocaleChange(event: Event) {
         <span class="topbar-toggle-icon">&#9776;</span>
       </button>
       <NuxtLink to="/" class="topbar-brand">{{ appName }}</NuxtLink>
+      <nav
+        v-if="ui.headerLinks.length > 0"
+        class="topbar-links"
+        :aria-label="t('topbar_links')"
+      >
+        <template v-for="(link, idx) in ui.headerLinks" :key="idx">
+          <a
+            v-if="adminNavLinkIsExternal(link)"
+            :href="link.href"
+            class="topbar-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >{{ link.label }}</a>
+          <NuxtLink
+            v-else
+            :to="link.href"
+            class="topbar-link"
+          >{{ link.label }}</NuxtLink>
+        </template>
+      </nav>
+      <div class="topbar-spacer" aria-hidden="true" />
       <ClientOnly>
         <label class="topbar-locale">
           <span class="sr-only">{{ t('language') }}</span>
@@ -108,7 +130,31 @@ body {
   text-decoration: none;
   font-weight: 600;
   font-size: 16px;
-  margin-right: auto;
+  margin-right: 12px;
+}
+
+.topbar-spacer {
+  flex: 1 1 auto;
+  min-width: 8px;
+}
+
+.topbar-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.topbar-link {
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.topbar-link:hover {
+  text-decoration: underline;
 }
 
 .topbar-toggle {
