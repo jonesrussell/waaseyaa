@@ -7,6 +7,15 @@ on:
     branches: [main]
 
 jobs:
+  composer-policy:
+    name: composer-policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Enforce composer policy
+        run: bash bin/check-composer-policy
+
   spec-drift:
     name: spec-drift
     runs-on: ubuntu-latest

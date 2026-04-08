@@ -20,5 +20,8 @@
         "waaseyaa": {
             "layer": 6
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }

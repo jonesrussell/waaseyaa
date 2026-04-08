@@ -44,5 +44,8 @@
                 "Waaseyaa\\Queue\\QueueServiceProvider"
             ]
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }

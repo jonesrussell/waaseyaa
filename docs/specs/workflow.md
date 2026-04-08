@@ -85,4 +85,20 @@ At session start, `bin/check-milestones` runs automatically. Claude must read th
 
 The script exits 0 always. Output is a warning surface for Claude and contributors, not a CI gate.
 
+## Composer Manifest Policy (Codified + Gated)
+
+`composer.json` consistency is a hard policy enforced by `bin/check-composer-policy` in hooks and CI.
+
+Policy rules:
+
+1. `config.sort-packages` is required and must be `true` in all first-party `composer.json` manifests.
+2. `@dev` constraints for `waaseyaa/*` are allowed only in root `composer.json` (monorepo local development aggregator with path repositories).
+3. Wildcard constraints for internal `waaseyaa/*` packages are forbidden (for example `*`).
+
+Failure format is machine- and human-readable, including:
+- file path
+- violated rule id
+- current value
+- expected value
+
 The top-level M11 post-execution governance baseline is [m11-post-execution-governance-bootstrap.md](../governance/m11-post-execution-governance-bootstrap.md). Governed changes enter that loop through [the governed-change issue template](../../.github/ISSUE_TEMPLATE/m11-governed-change.md), and this workflow spec serves as the repo-local backlink to that front-door artifact. The operating loop itself is [m11-steady-state-conformance-loop.md](../governance/m11-steady-state-conformance-loop.md), and steady-state drift scans and C17+ logging use [m11-periodic-drift-scan-protocol.md](../governance/m11-periodic-drift-scan-protocol.md) and the [M11 drift-scan log issue template](../../.github/ISSUE_TEMPLATE/m11-drift-scan-log.md).

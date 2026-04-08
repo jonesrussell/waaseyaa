@@ -5,6 +5,10 @@
 - 7-layer architecture (Foundation → Core Data → Content Types → Services → API → AI → Interfaces)
 - Each package has its own `composer.json` with path repository references
 - Root `composer.json` uses `@dev` constraints for all waaseyaa/* packages
+- Composer policy is codified and gated via `bin/check-composer-policy`:
+  - `config.sort-packages` must be `true` in all first-party `composer.json` files
+  - `@dev` is allowed only in root `composer.json` (local monorepo aggregator)
+  - wildcard internal constraints for `waaseyaa/*` are forbidden
 - Authorization pipeline in `public/index.php`: SessionMiddleware → AuthorizationMiddleware. Session always sets `_account` on request; authorization reads it.
 - Route access control via route options: `_public`, `_authenticated`, `_session`, `_permission`, `_role`, `_gate` — checked by `AccessChecker`
 - Field-level access: `FieldAccessPolicyInterface` (companion to `AccessPolicyInterface`). Classes must implement both — `EntityAccessHandler` finds field policies via `instanceof` check. Open-by-default: Neutral = accessible, only Forbidden restricts.
@@ -148,6 +152,7 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 - `composer cs-check` — check code style (dry-run PHP-CS-Fixer)
 - `composer cs-fix` — auto-fix code style
 - `composer phpstan` — static analysis (level 5)
+- `composer check-composer-policy` — enforce codified Composer manifest policy
 
 **Development:**
 - `composer dev` — start dev server (PHP built-in server + admin SPA)

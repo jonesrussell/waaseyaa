@@ -1,21 +1,57 @@
 {
     "name": "waaseyaa/graphql",
-    "description": "GraphQL endpoint for Waaseyaa — auto-generated schema from entity types",
+    "description": "GraphQL endpoint for Waaseyaa \u2014 auto-generated schema from entity types",
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [
-        { "type": "path", "url": "../routing" },
-        { "type": "path", "url": "../access" },
-        { "type": "path", "url": "../entity" },
-        { "type": "path", "url": "../entity-storage" },
-        { "type": "path", "url": "../field" },
-        { "type": "path", "url": "../api" },
-        { "type": "path", "url": "../plugin" },
-        { "type": "path", "url": "../cache" },
-        { "type": "path", "url": "../typed-data" },
-        { "type": "path", "url": "../config" },
-        { "type": "path", "url": "../database-legacy" },
-        { "type": "path", "url": "../foundation" }
+        {
+            "type": "path",
+            "url": "../routing"
+        },
+        {
+            "type": "path",
+            "url": "../access"
+        },
+        {
+            "type": "path",
+            "url": "../entity"
+        },
+        {
+            "type": "path",
+            "url": "../entity-storage"
+        },
+        {
+            "type": "path",
+            "url": "../field"
+        },
+        {
+            "type": "path",
+            "url": "../api"
+        },
+        {
+            "type": "path",
+            "url": "../plugin"
+        },
+        {
+            "type": "path",
+            "url": "../cache"
+        },
+        {
+            "type": "path",
+            "url": "../typed-data"
+        },
+        {
+            "type": "path",
+            "url": "../config"
+        },
+        {
+            "type": "path",
+            "url": "../database-legacy"
+        },
+        {
+            "type": "path",
+            "url": "../foundation"
+        }
     ],
     "require": {
         "php": ">=8.4",
@@ -52,5 +88,8 @@
             "dev-main": "0.1.x-dev",
             "dev-develop/v1.1": "0.1.x-dev"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }

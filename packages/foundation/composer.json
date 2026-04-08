@@ -7,10 +7,10 @@
         "php": ">=8.4",
         "doctrine/dbal": "^4.0",
         "symfony/dependency-injection": "^7.0",
-        "symfony/event-dispatcher": "^7.0",
+        "symfony/event-dispatcher": "^7.3",
         "symfony/http-foundation": "^7.0",
-        "symfony/messenger": "^7.0",
-        "symfony/uid": "^7.0",
+        "symfony/messenger": "^7.3",
+        "symfony/uid": "^7.3",
         "waaseyaa/queue": "^0.1"
     },
     "require-dev": {
@@ -38,5 +38,8 @@
             "dev-main": "0.1.x-dev",
             "dev-develop/v1.1": "0.1.x-dev"
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }

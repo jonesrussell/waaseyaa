@@ -4,10 +4,22 @@
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [
-        { "type": "path", "url": "../foundation" },
-        { "type": "path", "url": "../queue" },
-        { "type": "path", "url": "../mail" },
-        { "type": "path", "url": "../database-legacy" }
+        {
+            "type": "path",
+            "url": "../foundation"
+        },
+        {
+            "type": "path",
+            "url": "../queue"
+        },
+        {
+            "type": "path",
+            "url": "../mail"
+        },
+        {
+            "type": "path",
+            "url": "../database-legacy"
+        }
     ],
     "require": {
         "php": ">=8.4",
@@ -40,5 +52,8 @@
                 "Waaseyaa\\Notification\\NotificationServiceProvider"
             ]
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
