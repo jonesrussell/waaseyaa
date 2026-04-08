@@ -1,6 +1,6 @@
 # Admin SPA
 
-<!-- Spec reviewed 2026-04-08 - Admin SPA DX alignment (fallback, CLI admin:dev/build, path resolution, WSL dev:wsl); IngestSummaryWidget uses a typed ingest_log status guard so `nuxi typecheck` (admin/contracts CI) stays strict on JSON:API attributes -->
+<!-- Spec reviewed 2026-04-08 - Admin SPA DX alignment; vue-router ^5 for Volar `sfc-route-blocks` + `nuxi typecheck`; IngestSummaryWidget typed ingest_log status guard for strict JSON:API attributes -->
 
 ## Optionality
 
@@ -35,7 +35,7 @@ Use **`npm run dev:wsl`** in `packages/admin` (Nuxt listens on `0.0.0.0`) when y
 |----------------|-----------|---------------------------------|
 | Nuxt           | ^4.4.2    | SSR/SPA framework, file-based routing, auto-imports |
 | Vue            | ^3.5.0    | Composition API, reactivity     |
-| vue-router     | ^4.5.0    | Client-side routing             |
+| vue-router     | ^5.0.0    | Client-side routing (v5 exports Volar `sfc-route-blocks`; required for `nuxi typecheck` with Nuxt 4) |
 | TypeScript     | ^5.6.0    | Type checking (devDependency)   |
 | @types/node    | ^22.0.0   | Node type definitions           |
 
