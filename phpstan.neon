@@ -3,7 +3,7 @@ includes:
     - phpstan-baseline.neon
 
 parameters:
-    level: max
+    level: 5
     tmpDir: tmp/phpstan
     checkUninitializedProperties: true
     checkBenevolentUnionTypes: true

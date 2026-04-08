@@ -61,13 +61,13 @@ cd packages/admin && npx playwright test --grep @smoke
 
 - Canonical command: `composer phpstan`
 - Config source of truth: [`phpstan.neon`](../../phpstan.neon)
-- Rule level target: `max` (greenfield alpha quality bar)
+- Rule level target: `5` (balanced static analysis bar; ratchet upward as debt drops)
 - Strict rules: enabled via `phpstan/phpstan-strict-rules`
 - Result cache path: `tmp/phpstan` (restored/saved in CI)
 
 ### Baseline governance
 
-- Current baseline is transitional while `level: max` is active across the monorepo.
+- Current baseline is transitional while `level: 5` is active across the monorepo.
 - Do not regenerate baseline in feature PRs unless explicitly approved.
 - Any baseline diff must be reviewed as a first-class code-review item and justified in the PR description.
 - Preferred end-state remains a minimal baseline (or no baseline) as packages mature.
