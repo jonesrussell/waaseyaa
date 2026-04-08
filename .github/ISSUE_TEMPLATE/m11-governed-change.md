@@ -4,7 +4,7 @@ about: Record an intentional governed change under the M11 steady-state conforma
 labels: governance, conformance
 ---
 
-Note: consult [m11-steady-state-conformance-loop.md](../../docs/governance/m11-steady-state-conformance-loop.md) for the full governance model; use this template only as the intentional-change front door.
+Note: consult [m11-steady-state-conformance-loop.md](../../docs/specs/m11-steady-state-conformance-loop.md) for the full governance model; use this template only as the intentional-change front door.
 
 ## Change Summary
 
