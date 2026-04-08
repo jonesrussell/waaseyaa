@@ -4,6 +4,7 @@
 <!-- Spec reviewed 2026-04-08 - Admin fetch baseURL: useRuntimeConfig().app.baseURL (trailing slash) for $fetch/apiFetch and auth.global navigateTo; plugins/admin tests stub app.baseURL (#814); ufo joinURL for path joins -->
 <!-- Spec reviewed 2026-04-08 - Admin SPA DX alignment; vue-router ^5 for Volar `sfc-route-blocks` + `nuxi typecheck`; IngestSummaryWidget typed ingest_log status guard for strict JSON:API attributes -->
 <!-- Spec reviewed 2026-04-08 - merge-conflict resolution kept @types/node at ^25.5.2 in packages/admin/package.json and package-lock.json; no runtime/admin contract change -->
+<!-- Spec reviewed 2026-04-08 - AdminSurfaceRoutePaths (waaseyaa/admin-surface PHP) + adminSurfaceRoutes.ts: named routes admin_surface.session|catalog|list|get|action; plugin bootstrap uses adminSurfaceFetchUrl(base, name); paths must stay aligned with WaaseyaaRouter registration (#815) -->
 
 ## Optionality
 
@@ -99,7 +100,7 @@ function useApi(): {
 }
 ```
 
-**All `/api/*` calls must use `apiFetch`** — raw `$fetch` breaks when `app.baseURL` is set to a subpath like `/admin/`. Surface API calls are handled separately by the admin plugin, which builds the full path from `runtimeConfig.public.baseUrl` (for example `/admin/_surface/session` and `/admin/_surface/catalog`). The plugin uses `$fetch` with explicit `baseURL: '/'` since async Nuxt plugins can't call composables.
+**All `/api/*` calls must use `apiFetch`** — raw `$fetch` breaks when `app.baseURL` is set to a subpath like `/admin/`. Surface API calls are handled separately by the admin plugin, which resolves bootstrap URLs via `adminSurfaceFetchUrl(normalizedAppBase, 'admin_surface.session' | 'admin_surface.catalog')` in `packages/admin/app/runtime/adminSurfaceRoutes.ts`, aligned with `Waaseyaa\AdminSurface\AdminSurfaceRoutePaths` and the `admin_surface.*` route names on the PHP router. The plugin uses `$fetch` with implicit absolute paths from `joinURL` (equivalent to `baseURL: '/'`) since async Nuxt plugins can't call composables.
 
 ### useEntity (`packages/admin/app/composables/useEntity.ts`)
 
@@ -171,9 +172,9 @@ interface EntitySchema {
 
 The root Nuxt plugin is the authoritative bootstrap for `$admin`. On non-public auth pages it:
 
-1. Reads `runtimeConfig.public.baseUrl` (default `/admin`) and derives a `surfacePath` such as `/admin/_surface`.
-2. Fetches `SurfaceResult<AdminSurfaceSession>` from `${surfacePath}/session`.
-3. Fetches `SurfaceResult<{ entities: AdminSurfaceCatalogEntry[] }>` from `${surfacePath}/catalog` after a successful session.
+1. Normalizes `useRuntimeConfig().app.baseURL` and derives `surfacePath` (`joinURL(base, '_surface')`) for `AdminSurfaceTransportAdapter`, plus uses `adminSurfaceFetchUrl` with named routes `admin_surface.session` and `admin_surface.catalog` for bootstrap `$fetch` URLs (single contract with PHP `AdminSurfaceRoutePaths`).
+2. Fetches `SurfaceResult<AdminSurfaceSession>` from the session route URL.
+3. Fetches `SurfaceResult<{ entities: AdminSurfaceCatalogEntry[] }>` from the catalog route URL after a successful session.
 4. Hydrates the shared auth-state keys `waaseyaa.auth.user` and `waaseyaa.auth.checked` from the authoritative session bootstrap before returning the runtime.
 5. Builds `AdminRuntime` from `SessionAuthAdapter`, `AdminSurfaceTransportAdapter`, the resolved account/tenant, and a local admin runtime catalog contract derived from the surface bootstrap payload.
 6. Returns `{ provide: { admin: runtime } }`, or `{ provide: { admin: null } }` for public auth pages and unauthenticated redirects.
@@ -506,7 +507,7 @@ The `returnTo` value comes from the `returnTo` query parameter, falling back to 
 
 **File:** `packages/admin/app/plugins/admin.ts`
 
-The admin plugin fetches `{baseUrl}/_surface/session` (default: `/admin/_surface/session`) on every page load to resolve the current user. Pages that must be reachable before authentication are listed in a `publicAuthPaths` array:
+The admin plugin fetches the admin surface session endpoint (same path as PHP route `admin_surface.session`, default `/admin/_surface/session` under the normalized app base) on every page load to resolve the current user. Pages that must be reachable before authentication are listed in a `publicAuthPaths` array:
 
 ```ts
 const publicAuthPaths = ['/login', '/register', '/forgot-password', '/reset-password', '/verify-email']
@@ -641,6 +642,7 @@ Test files live in `packages/admin/tests/`:
 - `tests/composables/useAuth.spec.ts` — auth composable state and methods
 - `tests/unit/composables/useAuth.test.ts` — auth composable unit tests
 - `tests/unit/plugins/admin.test.ts` — runtime bootstrap shape, shared auth-state hydration invariant, and degraded bootstrap branches
+- `tests/unit/runtime/adminSurfaceRoutes.test.ts` — admin surface named-route path helpers vs normalized app base
 - `tests/unit/composables/useAdmin.test.ts` — runtime-backed admin catalog access and missing-runtime invariant
 - `tests/unit/composables/useEntity.test.ts` — transport delegation and missing-runtime invariant
 - `tests/unit/composables/useSchema.test.ts` — schema caching/error handling and missing-runtime invariant
@@ -704,6 +706,8 @@ Backend JSON:API and schema endpoints are tested via PHPUnit integration tests i
 | `packages/admin/app/pages/verify-email.vue` | Email verification page |
 | `packages/admin/app/middleware/auth.global.ts` | Global auth + ensureVerifiedEmail middleware |
 | `packages/admin/app/plugins/admin.ts` | Admin plugin with publicAuthPaths auth skip |
+| `packages/admin/app/runtime/adminSurfaceRoutes.ts` | Named `admin_surface.*` fetch URL builders (mirror PHP paths) |
+| `packages/admin-surface/src/AdminSurfaceRoutePaths.php` | Canonical `/admin/_surface/*` patterns and `generate()` for PHP |
 | `packages/admin/app/i18n/en.json` | English translation strings |
 | `packages/admin/app/i18n/fr.json` | French translation strings |
 | `packages/admin/playwright.config.ts` | Playwright E2E test configuration |
