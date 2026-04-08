@@ -38,6 +38,7 @@ Use **`npm run dev:wsl`** in `packages/admin` (Nuxt listens on `0.0.0.0`) when y
 | vue-router     | ^5.0.0    | Client-side routing (v5 exports Volar `sfc-route-blocks`; required for `nuxi typecheck` with Nuxt 4) |
 | TypeScript     | ^5.6.0    | Type checking (devDependency)   |
 | @types/node    | ^22.0.0   | Node type definitions           |
+| @playwright/test | ^1.59.1 | E2E browser testing in CI and local `test:e2e` runs |
 
 No CSS framework. Styles are defined in `packages/admin/app/components/layout/AdminShell.vue` as global CSS using CSS custom properties (`--color-primary`, `--color-surface`, etc.).
 
