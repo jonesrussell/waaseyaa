@@ -36,5 +36,8 @@
                 "Waaseyaa\\Search\\SearchServiceProvider"
             ]
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }

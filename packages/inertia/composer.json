@@ -4,7 +4,10 @@
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [
-        { "type": "path", "url": "../foundation" }
+        {
+            "type": "path",
+            "url": "../foundation"
+        }
     ],
     "require": {
         "php": ">=8.4",
@@ -14,18 +17,29 @@
         "phpunit/phpunit": "^10.5"
     },
     "autoload": {
-        "psr-4": { "Waaseyaa\\Inertia\\": "src/" }
+        "psr-4": {
+            "Waaseyaa\\Inertia\\": "src/"
+        }
     },
     "autoload-dev": {
-        "psr-4": { "Waaseyaa\\Inertia\\Tests\\": "tests/" }
+        "psr-4": {
+            "Waaseyaa\\Inertia\\Tests\\": "tests/"
+        }
     },
     "extra": {
         "waaseyaa": {
             "layer": 6,
-            "providers": ["Waaseyaa\\Inertia\\InertiaServiceProvider"]
+            "providers": [
+                "Waaseyaa\\Inertia\\InertiaServiceProvider"
+            ]
         },
-        "branch-alias": { "dev-main": "0.1.x-dev" }
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
 }

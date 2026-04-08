@@ -40,7 +40,8 @@
     },
     "config": {
         "optimize-autoloader": true,
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {}
     },
     "scripts": {
         "audit-site": "./bin/waaseyaa-audit-site",

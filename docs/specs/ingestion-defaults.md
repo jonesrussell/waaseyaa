@@ -1,6 +1,7 @@
 # Ingestion Defaults
 
 <!-- Spec reviewed 2026-04-04a - @internal annotations added to EnvelopeValidator and PayloadValidatorInterface, no behavioral changes -->
+<!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/ingestion and packages/note; no ingestion runtime behavior change -->
 
 ## Purpose
 

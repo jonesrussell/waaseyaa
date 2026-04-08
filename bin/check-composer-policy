@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+export ROOT_DIR
+
+python3 - <<'PY'
+import json
+import os
+import pathlib
+import re
+import sys
+
+root = pathlib.Path(os.environ["ROOT_DIR"])
+
+policy_id = {
+    "sort_packages": "CP001",
+    "dev_scope": "CP002",
+    "no_wildcard_internal": "CP003",
+}
+
+def fail(rule_key: str, rel_path: str, current: str, expected: str) -> None:
+    rid = policy_id[rule_key]
+    print(f"FAIL [{rid}] {rel_path}")
+    print(f"  current: {current}")
+    print(f"  expected: {expected}")
+
+manifest_paths = sorted(
+    [
+        p for p in root.rglob("composer.json")
+        if "vendor/" not in p.as_posix()
+        and "node_modules/" not in p.as_posix()
+        and "/.worktrees/" not in p.as_posix()
+    ]
+)
+
+in_scope = []
+for path in manifest_paths:
+    rel = path.relative_to(root).as_posix()
+    if (
+        rel == "composer.json"
+        or rel.startswith("packages/")
+        or rel.startswith("examples/")
+        or rel.startswith("docs/examples/")
+        or rel == "skeleton/composer.json"
+    ):
+        in_scope.append(path)
+
+errors = 0
+
+for path in in_scope:
+    rel = path.relative_to(root).as_posix()
+    data = json.loads(path.read_text())
+
+    config = data.get("config", {})
+    sort_packages = config.get("sort-packages")
+    if sort_packages is not True:
+        errors += 1
+        fail(
+            "sort_packages",
+            rel,
+            f"config.sort-packages={sort_packages!r}",
+            "config.sort-packages=true",
+        )
+
+    package_sections = []
+    for sec in ("require", "require-dev"):
+        section = data.get(sec, {})
+        if isinstance(section, dict):
+            package_sections.append(section)
+
+    for section in package_sections:
+        for pkg, version in section.items():
+            if not isinstance(version, str):
+                continue
+
+            if pkg.startswith("waaseyaa/"):
+                # @dev policy: forbidden in publishable package manifests.
+                if version == "@dev" and rel.startswith("packages/"):
+                    errors += 1
+                    fail(
+                        "dev_scope",
+                        rel,
+                        f'{pkg}={version}',
+                        '@dev forbidden in packages/*; use an explicit semver range',
+                    )
+
+                # Wildcard internal constraints forbidden everywhere.
+                if "*" in version:
+                    errors += 1
+                    fail(
+                        "no_wildcard_internal",
+                        rel,
+                        f'{pkg}={version}',
+                        "use an explicit semver range (for example ^0.1)",
+                    )
+
+if errors == 0:
+    print("OK: Composer policy checks passed")
+    sys.exit(0)
+
+print(f"Composer policy check failed with {errors} violation(s)")
+sys.exit(1)
+PY

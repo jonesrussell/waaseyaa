@@ -1,10 +1,13 @@
 {
     "name": "waaseyaa/billing",
-    "description": "Stripe billing for Waaseyaa — subscriptions, checkout, portal, plan tiers",
+    "description": "Stripe billing for Waaseyaa \u2014 subscriptions, checkout, portal, plan tiers",
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [
-        { "type": "path", "url": "../foundation" }
+        {
+            "type": "path",
+            "url": "../foundation"
+        }
     ],
     "require": {
         "php": ">=8.4",
@@ -15,18 +18,29 @@
         "phpunit/phpunit": "^10.5"
     },
     "autoload": {
-        "psr-4": { "Waaseyaa\\Billing\\": "src/" }
+        "psr-4": {
+            "Waaseyaa\\Billing\\": "src/"
+        }
     },
     "autoload-dev": {
-        "psr-4": { "Waaseyaa\\Billing\\Tests\\": "tests/" }
+        "psr-4": {
+            "Waaseyaa\\Billing\\Tests\\": "tests/"
+        }
     },
     "extra": {
         "waaseyaa": {
             "layer": 6,
-            "providers": ["Waaseyaa\\Billing\\BillingServiceProvider"]
+            "providers": [
+                "Waaseyaa\\Billing\\BillingServiceProvider"
+            ]
         },
-        "branch-alias": { "dev-main": "0.1.x-dev" }
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
 }

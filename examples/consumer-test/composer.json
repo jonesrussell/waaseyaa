@@ -34,5 +34,8 @@
     ],
     "minimum-stability": "dev",
     "prefer-stable": true,
-    "_comment": "POC ONLY — path repos simulate what Packagist will serve after monorepo split. Replace path repos with packagist.org entries once packages are registered."
+    "_comment": "POC ONLY \u2014 path repos simulate what Packagist will serve after monorepo split. Replace path repos with packagist.org entries once packages are registered.",
+    "config": {
+        "sort-packages": true
+    }
 }

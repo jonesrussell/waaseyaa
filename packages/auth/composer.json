@@ -1,12 +1,21 @@
 {
     "name": "waaseyaa/auth",
-    "description": "Headless authentication for Waaseyaa — login, registration, 2FA, password reset",
+    "description": "Headless authentication for Waaseyaa \u2014 login, registration, 2FA, password reset",
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [
-        { "type": "path", "url": "../foundation" },
-        { "type": "path", "url": "../user" },
-        { "type": "path", "url": "../mail" }
+        {
+            "type": "path",
+            "url": "../foundation"
+        },
+        {
+            "type": "path",
+            "url": "../user"
+        },
+        {
+            "type": "path",
+            "url": "../mail"
+        }
     ],
     "require": {
         "php": ">=8.4",
@@ -18,18 +27,29 @@
         "phpunit/phpunit": "^10.5"
     },
     "autoload": {
-        "psr-4": { "Waaseyaa\\Auth\\": "src/" }
+        "psr-4": {
+            "Waaseyaa\\Auth\\": "src/"
+        }
     },
     "autoload-dev": {
-        "psr-4": { "Waaseyaa\\Auth\\Tests\\": "tests/" }
+        "psr-4": {
+            "Waaseyaa\\Auth\\Tests\\": "tests/"
+        }
     },
     "extra": {
         "waaseyaa": {
             "layer": 6,
-            "providers": ["Waaseyaa\\Auth\\AuthServiceProvider"]
+            "providers": [
+                "Waaseyaa\\Auth\\AuthServiceProvider"
+            ]
         },
-        "branch-alias": { "dev-main": "0.1.x-dev" }
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
 }

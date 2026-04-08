@@ -1,6 +1,7 @@
 # Admin SPA
 
 <!-- Spec reviewed 2026-04-08 - Admin SPA DX alignment; vue-router ^5 for Volar `sfc-route-blocks` + `nuxi typecheck`; IngestSummaryWidget typed ingest_log status guard for strict JSON:API attributes -->
+<!-- Spec reviewed 2026-04-08 - merge-conflict resolution kept @types/node at ^25.5.2 in packages/admin/package.json and package-lock.json; no runtime/admin contract change -->
 
 ## Optionality
 

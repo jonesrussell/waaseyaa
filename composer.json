@@ -1,66 +1,230 @@
 {
     "name": "waaseyaa/framework",
-    "description": "Waaseyaa monorepo — a modern, entity-first, AI-native CMS",
+    "description": "Waaseyaa monorepo \u2014 a modern, entity-first, AI-native CMS",
     "type": "project",
     "license": "GPL-2.0-or-later",
     "version": "1.1.0",
     "repositories": [
-        { "type": "path", "url": "packages/cache" },
-        { "type": "path", "url": "packages/plugin" },
-        { "type": "path", "url": "packages/typed-data" },
-        { "type": "path", "url": "packages/config" },
-        { "type": "path", "url": "packages/entity" },
-        { "type": "path", "url": "packages/field" },
-        { "type": "path", "url": "packages/entity-storage" },
-        { "type": "path", "url": "packages/database-legacy" },
-        { "type": "path", "url": "packages/access" },
-        { "type": "path", "url": "packages/user" },
-        { "type": "path", "url": "packages/routing" },
-        { "type": "path", "url": "packages/queue" },
-        { "type": "path", "url": "packages/state" },
-        { "type": "path", "url": "packages/validation" },
-        { "type": "path", "url": "packages/node" },
-        { "type": "path", "url": "packages/note" },
-        { "type": "path", "url": "packages/taxonomy" },
-        { "type": "path", "url": "packages/media" },
-        { "type": "path", "url": "packages/path" },
-        { "type": "path", "url": "packages/menu" },
-        { "type": "path", "url": "packages/relationship" },
-        { "type": "path", "url": "packages/workflows" },
-        { "type": "path", "url": "packages/api" },
-
-        { "type": "path", "url": "packages/ai-schema" },
-        { "type": "path", "url": "packages/ai-agent" },
-        { "type": "path", "url": "packages/ai-vector" },
-        { "type": "path", "url": "packages/ai-pipeline" },
-        { "type": "path", "url": "packages/ssr" },
-        { "type": "path", "url": "packages/cli" },
-        { "type": "path", "url": "packages/core" },
-        { "type": "path", "url": "packages/cms" },
-        { "type": "path", "url": "packages/mcp" },
-        { "type": "path", "url": "packages/graphql" },
-        { "type": "path", "url": "packages/foundation" },
-        { "type": "path", "url": "packages/geo" },
-        { "type": "path", "url": "packages/mail" },
-        { "type": "path", "url": "packages/mercure" },
-        { "type": "path", "url": "packages/search" },
-        { "type": "path", "url": "packages/i18n" },
-        { "type": "path", "url": "packages/testing" },
-        { "type": "path", "url": "packages/telescope" },
-        { "type": "path", "url": "packages/full" },
-        { "type": "path", "url": "packages/admin-surface" },
-        { "type": "path", "url": "packages/github" },
-        { "type": "path", "url": "packages/ingestion" },
-        { "type": "path", "url": "packages/inertia" },
-        { "type": "path", "url": "packages/auth" },
-        { "type": "path", "url": "packages/billing" },
-        { "type": "path", "url": "packages/scheduler" },
-        { "type": "path", "url": "packages/notification" },
-        { "type": "path", "url": "packages/http-client" },
-        { "type": "path", "url": "packages/oauth-provider" },
-        { "type": "path", "url": "packages/messaging" },
-        { "type": "path", "url": "packages/deployer" },
-        { "type": "path", "url": "packages/engagement" }
+        {
+            "type": "path",
+            "url": "packages/cache"
+        },
+        {
+            "type": "path",
+            "url": "packages/plugin"
+        },
+        {
+            "type": "path",
+            "url": "packages/typed-data"
+        },
+        {
+            "type": "path",
+            "url": "packages/config"
+        },
+        {
+            "type": "path",
+            "url": "packages/entity"
+        },
+        {
+            "type": "path",
+            "url": "packages/field"
+        },
+        {
+            "type": "path",
+            "url": "packages/entity-storage"
+        },
+        {
+            "type": "path",
+            "url": "packages/database-legacy"
+        },
+        {
+            "type": "path",
+            "url": "packages/access"
+        },
+        {
+            "type": "path",
+            "url": "packages/user"
+        },
+        {
+            "type": "path",
+            "url": "packages/routing"
+        },
+        {
+            "type": "path",
+            "url": "packages/queue"
+        },
+        {
+            "type": "path",
+            "url": "packages/state"
+        },
+        {
+            "type": "path",
+            "url": "packages/validation"
+        },
+        {
+            "type": "path",
+            "url": "packages/node"
+        },
+        {
+            "type": "path",
+            "url": "packages/note"
+        },
+        {
+            "type": "path",
+            "url": "packages/taxonomy"
+        },
+        {
+            "type": "path",
+            "url": "packages/media"
+        },
+        {
+            "type": "path",
+            "url": "packages/path"
+        },
+        {
+            "type": "path",
+            "url": "packages/menu"
+        },
+        {
+            "type": "path",
+            "url": "packages/relationship"
+        },
+        {
+            "type": "path",
+            "url": "packages/workflows"
+        },
+        {
+            "type": "path",
+            "url": "packages/api"
+        },
+        {
+            "type": "path",
+            "url": "packages/ai-schema"
+        },
+        {
+            "type": "path",
+            "url": "packages/ai-agent"
+        },
+        {
+            "type": "path",
+            "url": "packages/ai-vector"
+        },
+        {
+            "type": "path",
+            "url": "packages/ai-pipeline"
+        },
+        {
+            "type": "path",
+            "url": "packages/ssr"
+        },
+        {
+            "type": "path",
+            "url": "packages/cli"
+        },
+        {
+            "type": "path",
+            "url": "packages/core"
+        },
+        {
+            "type": "path",
+            "url": "packages/cms"
+        },
+        {
+            "type": "path",
+            "url": "packages/mcp"
+        },
+        {
+            "type": "path",
+            "url": "packages/graphql"
+        },
+        {
+            "type": "path",
+            "url": "packages/foundation"
+        },
+        {
+            "type": "path",
+            "url": "packages/geo"
+        },
+        {
+            "type": "path",
+            "url": "packages/mail"
+        },
+        {
+            "type": "path",
+            "url": "packages/mercure"
+        },
+        {
+            "type": "path",
+            "url": "packages/search"
+        },
+        {
+            "type": "path",
+            "url": "packages/i18n"
+        },
+        {
+            "type": "path",
+            "url": "packages/testing"
+        },
+        {
+            "type": "path",
+            "url": "packages/telescope"
+        },
+        {
+            "type": "path",
+            "url": "packages/full"
+        },
+        {
+            "type": "path",
+            "url": "packages/admin-surface"
+        },
+        {
+            "type": "path",
+            "url": "packages/github"
+        },
+        {
+            "type": "path",
+            "url": "packages/ingestion"
+        },
+        {
+            "type": "path",
+            "url": "packages/inertia"
+        },
+        {
+            "type": "path",
+            "url": "packages/auth"
+        },
+        {
+            "type": "path",
+            "url": "packages/billing"
+        },
+        {
+            "type": "path",
+            "url": "packages/scheduler"
+        },
+        {
+            "type": "path",
+            "url": "packages/notification"
+        },
+        {
+            "type": "path",
+            "url": "packages/http-client"
+        },
+        {
+            "type": "path",
+            "url": "packages/oauth-provider"
+        },
+        {
+            "type": "path",
+            "url": "packages/messaging"
+        },
+        {
+            "type": "path",
+            "url": "packages/deployer"
+        },
+        {
+            "type": "path",
+            "url": "packages/engagement"
+        }
     ],
     "require": {
         "php": ">=8.4",
@@ -187,6 +351,7 @@
         }
     },
     "scripts": {
+        "check-composer-policy": "bash bin/check-composer-policy",
         "cs-check": "php-cs-fixer fix --dry-run --diff",
         "cs-fix": "php-cs-fixer fix",
         "dev": [
@@ -198,7 +363,8 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {}
     },
     "extra": {
         "waaseyaa": {

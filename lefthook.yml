@@ -8,6 +8,8 @@ pre-commit:
 pre-push:
   parallel: true
   commands:
+    composer-policy:
+      run: bash bin/check-composer-policy
     spec-drift:
       run: tools/drift-detector.sh 5
     phpstan:
