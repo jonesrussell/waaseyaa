@@ -23,6 +23,7 @@
     ],
     "scripts": {
         "dev": "nuxt dev",
+        "dev:wsl": "nuxt dev --host 0.0.0.0",
         "build": "nuxt build",
         "build:contracts": "tsc -p tsconfig.contracts.json",
         "generate": "nuxt generate",

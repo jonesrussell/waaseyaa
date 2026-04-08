@@ -27,6 +27,7 @@
     ],
     "require": {
         "php": ">=8.4",
+        "symfony/http-foundation": "^7.0",
         "waaseyaa/entity": "@dev",
         "waaseyaa/access": "@dev",
         "waaseyaa/routing": "@dev",

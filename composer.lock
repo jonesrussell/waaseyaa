@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a4fb8611a97d8a77a6eff145ebcd158",
+    "content-hash": "1499ef0211a4f8c52461f5975b228061",
     "packages": [
         {
             "name": "deployer/deployer",
@@ -3116,10 +3116,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/admin-surface",
-                "reference": "00f43e3b8377ee69e7384e864be3242e80174425"
+                "reference": "8dd965cc7920dd2b42175cc7e5a0a049e15d5861"
             },
             "require": {
                 "php": ">=8.4",
+                "symfony/http-foundation": "^7.0",
                 "waaseyaa/access": "@dev",
                 "waaseyaa/api": "@dev",
                 "waaseyaa/entity": "@dev",
@@ -3954,7 +3955,7 @@
         },
         {
             "name": "waaseyaa/github",
-            "version": "dev-main",
+            "version": "dev-feat/admin-spa-dx-alignment",
             "dist": {
                 "type": "path",
                 "url": "packages/github",
@@ -4625,7 +4626,7 @@
         },
         {
             "name": "waaseyaa/oauth-provider",
-            "version": "dev-main",
+            "version": "dev-feat/admin-spa-dx-alignment",
             "dist": {
                 "type": "path",
                 "url": "packages/oauth-provider",
@@ -9020,5 +9021,5 @@
         "php": ">=8.4"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

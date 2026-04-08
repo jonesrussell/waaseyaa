@@ -191,7 +191,7 @@
         "cs-fix": "php-cs-fixer fix",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "PHP_CLI_SERVER_WORKERS=4 bin/waaseyaa serve & NUXT_BACKEND_URL=http://127.0.0.1:${APP_PORT:-8080} npm run dev --prefix packages/admin && kill $!"
+            "PHP_CLI_SERVER_WORKERS=4 bin/waaseyaa serve & NUXT_BACKEND_URL=http://127.0.0.1:${APP_PORT:-8080} bin/waaseyaa admin:dev && kill $!"
         ],
         "phpstan": "phpstan analyse --memory-limit=512M"
     },
@@ -199,5 +199,10 @@
     "prefer-stable": true,
     "config": {
         "sort-packages": true
+    },
+    "extra": {
+        "waaseyaa": {
+            "admin_path": "packages/admin"
+        }
     }
 }

@@ -2,6 +2,25 @@
 
 <!-- Spec reviewed 2026-04-07 - post-M10 admin surface bootstrap via /admin/_surface/*, contract re-exports, C17 test-harness alignment, C18 drift remediation (#1017), F5 deterministic pipeline visibility, Nuxt 4 upgrade, backendUrl private runtimeConfig; npm lock-file update (3a4bfdf2) has no architectural impact -->
 
+## Optionality
+
+- **`waaseyaa/admin-surface` (PHP)** is optional. Add it when you want the HTTP admin surface at **`/admin/_surface/*`** (fixed prefix, not configurable). Apps can omit it for headless or API-only setups.
+- **The Nuxt admin UI** (`packages/admin`, `@waaseyaa/admin`) is optional. You may run **`admin-surface`** API routes without building or serving the SPA; production can use **`nuxt generate`** output copied to `public/admin/` when you want the UI.
+- **When the SPA is not built**, visiting the app’s admin HTML route shows fallback HTML owned by **`admin-surface`** (`AdminSpaFallback`), which documents `/admin/_surface/*` endpoints and links to this spec. Apps should not duplicate that fallback unless intentionally overriding.
+
+### Admin package path (CLI and CI)
+
+Resolution order:
+
+1. **`WAASEYAA_ADMIN_PATH`** — absolute path, or relative to the PHP project root; overrides Composer.
+2. **`composer.json` → `extra.waaseyaa.admin_path`** — e.g. `packages/admin` in the framework monorepo, or `../waaseyaa/packages/admin` for a sibling checkout (Minoo).
+
+**CLI** (from the Waaseyaa app root): `vendor/bin/waaseyaa admin:dev` runs `npm run dev` in the resolved admin directory; `vendor/bin/waaseyaa admin:build` runs `npm run generate`. For `admin:dev`, set **`NUXT_BACKEND_URL`** to the PHP app’s base URL (e.g. `http://127.0.0.1:8081`). If unset, it defaults to `http://{APP_HOST}:{APP_PORT}` (`127.0.0.1` and `8080` when those env vars are empty).
+
+### WSL / Windows browser against a WSL-hosted dev server
+
+Use **`npm run dev:wsl`** in `packages/admin` (Nuxt listens on `0.0.0.0`) when you need to open the admin dev UI from a Windows browser while Node runs in WSL. Equivalent: `nuxt dev --host 0.0.0.0` with your usual `NUXT_BACKEND_URL` pointing at the PHP server.
+
 ## Package
 
 - Path: `packages/admin/`

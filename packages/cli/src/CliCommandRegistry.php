@@ -9,6 +9,8 @@ use Waaseyaa\Access\PermissionHandler;
 use Waaseyaa\AI\Vector\SemanticIndexWarmer;
 use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\Command\AboutCommand;
+use Waaseyaa\CLI\Command\AdminBuildCommand;
+use Waaseyaa\CLI\Command\AdminDevCommand;
 use Waaseyaa\CLI\Command\AuditLogCommand;
 use Waaseyaa\CLI\Command\BundleScaffoldCommand;
 use Waaseyaa\CLI\Command\CacheClearCommand;
@@ -134,6 +136,8 @@ final class CliCommandRegistry
             new MakePublicCommand($projectRoot),
             new MakeTestCommand(),
             new ServeCommand($projectRoot),
+            new AdminDevCommand($projectRoot),
+            new AdminBuildCommand($projectRoot),
             new AboutCommand(info: [
                 'name' => 'Waaseyaa',
                 'version' => (static function (): string {
