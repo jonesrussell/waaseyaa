@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { AdminSurfaceSidebarItem } from '../../../../admin-surface/contract/types'
+import type { AdminSurfaceSidebarItem } from '~/contracts/surface-ui'
 import { useLanguage } from '~/composables/useLanguage'
 import { useAdmin } from '~/composables/useAdmin'
 import { groupEntityTypes } from '~/composables/useNavGroups'

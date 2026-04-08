@@ -4,3 +4,8 @@ export type { TransportAdapter, ListQuery, ListResult, EntityResource } from './
 export { TransportError } from './transport'
 export type { SchemaProperty, EntitySchema } from './schema'
 export type { AdminRuntime, AdminAuthConfig } from './runtime'
+export type {
+  AdminSurfaceHeaderLink,
+  AdminSurfaceSidebarItem,
+  AdminSurfaceUiCustomization,
+} from './surface-ui'

@@ -2,10 +2,7 @@ import type { AuthAdapter } from './auth'
 import type { TransportAdapter } from './transport'
 import type { CatalogEntry } from './catalog'
 import type { AdminTenant, AdminAccount } from './auth'
-import type {
-  AdminSurfaceHeaderLink,
-  AdminSurfaceSidebarItem,
-} from '../../../admin-surface/contract/types'
+import type { AdminSurfaceHeaderLink, AdminSurfaceSidebarItem } from './surface-ui'
 
 export interface AdminAuthConfig {
   strategy: 'redirect' | 'embedded'
