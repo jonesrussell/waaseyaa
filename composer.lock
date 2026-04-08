@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fab553fe2549b01bd7983e75a3f7afbb",
+    "content-hash": "451f56fb628a02d67ac88d3f47fe74a5",
     "packages": [
         {
             "name": "deployer/deployer",
@@ -3003,7 +3003,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/access",
-                "reference": "6af78cef0fa681054b3d52dd4dba5d347b5b7112"
+                "reference": "af33460a0aea2fc159f61c5bbe77f1e095585a81"
             },
             "require": {
                 "php": ">=8.4",
@@ -3047,7 +3047,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/admin-surface",
-                "reference": "d5507ea6b3bdf2529f1d9cac47f525f7f3128c90"
+                "reference": "ab5d2b0c066069a8bce3da742262db2e7779807c"
             },
             "require": {
                 "php": ">=8.4",
@@ -3097,7 +3097,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/ai-agent",
-                "reference": "8d066d6b4156efb734fad9900fac28ced43857ac"
+                "reference": "aeb4b1379624d950b5a9aba0d32d8150c0852839"
             },
             "require": {
                 "php": ">=8.4",
@@ -3138,7 +3138,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/ai-pipeline",
-                "reference": "1b5980ff3b37147c4d1a3c542f3f1c8e647c000e"
+                "reference": "868647ff136afa3083adbfa28e2efe959a64581b"
             },
             "require": {
                 "php": ">=8.4",
@@ -3185,7 +3185,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/ai-schema",
-                "reference": "15deb722db6cc77fa1d3f3465807334f2eb81f1a"
+                "reference": "37fe26b7228e5740d238ba8b962d0e5e4759fec8"
             },
             "require": {
                 "php": ">=8.4",
@@ -3225,7 +3225,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/ai-vector",
-                "reference": "52b5748ec30496aee3241e551eb1bfb0d83705a3"
+                "reference": "0fb46aba9ba318dc37f4e0e1634c4338308778a9"
             },
             "require": {
                 "php": ">=8.4",
@@ -3269,7 +3269,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/api",
-                "reference": "0e08d0e3db438c3b22d3e463c56f9aa1e7163ff7"
+                "reference": "3cf3ee11b0aaba1a41fe8f99590914be3824f09c"
             },
             "require": {
                 "php": ">=8.4",
@@ -3317,7 +3317,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/auth",
-                "reference": "8f4f53671d3bb094e36de585d8c625b5412e9227"
+                "reference": "c6173a56340abd7afae1be61c2a781b35e9d6628"
             },
             "require": {
                 "php": ">=8.4",
@@ -3364,7 +3364,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/billing",
-                "reference": "20d6024cf0c2736d2e6dc0d64bc979ece4d9c963"
+                "reference": "79dd96489c8a2821c7bc5b3192c198f9ee1eaacb"
             },
             "require": {
                 "php": ">=8.4",
@@ -3410,7 +3410,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cache",
-                "reference": "fc42e826917e653dda318d043ee1ba11bcbcc43b"
+                "reference": "b5a1a6fd7eb9f50b8dd88d3ab3ece23014e9d5df"
             },
             "require": {
                 "php": ">=8.4",
@@ -3455,7 +3455,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "efe5c39793544ce98f3bf2208754d6ee56a4510a"
+                "reference": "d0d2f75abe650b778396fcaafa74b0db63595bf9"
             },
             "require": {
                 "php": ">=8.4",
@@ -3508,7 +3508,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/config",
-                "reference": "d6977f52b6962f9b78150b76d283e5cb438f6c5e"
+                "reference": "929349bf61c5adfa8efb9ac0115db0deccb49a02"
             },
             "require": {
                 "php": ">=8.4",
@@ -3549,7 +3549,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/database-legacy",
-                "reference": "5c2fe650f3622008fcaac12ddfc6d8d6fdd512e7"
+                "reference": "50bfee153678b627e502cfb4eadee95230c41324"
             },
             "require": {
                 "doctrine/dbal": "^4.0",
@@ -3589,7 +3589,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/deployer",
-                "reference": "1c089709fde529e36061134e62cfcd5fe901b29b"
+                "reference": "ca0319417ac5decf49b83f7c450e9c27b73f8fb6"
             },
             "require": {
                 "deployer/deployer": "^7.0",
@@ -3615,7 +3615,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/engagement",
-                "reference": "1310cc6ee926149ea5eb71dec87b61b1bab91c3b"
+                "reference": "8b5c53ec8d19116dad06f06288cd362119011735"
             },
             "require": {
                 "php": ">=8.4",
@@ -3661,7 +3661,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/entity",
-                "reference": "425eaf6877549a1b891f97689958141cb734627b"
+                "reference": "1cddf1b2940e2c866e9662496691a315d286a79e"
             },
             "require": {
                 "php": ">=8.4",
@@ -3709,7 +3709,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/entity-storage",
-                "reference": "371e8674912009f646c20adbfa9d06a195c54450"
+                "reference": "7ba9833bc502bcc10db684f3c2f33879aea62286"
             },
             "require": {
                 "php": ">=8.4",
@@ -3753,7 +3753,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/field",
-                "reference": "a294c1ba3bdc8b3c990aaea58ae4d9217f400ac7"
+                "reference": "8cdcb982578b34cf12b8530389663e228f810efb"
             },
             "require": {
                 "php": ">=8.4",
@@ -3795,7 +3795,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/foundation",
-                "reference": "badd272af306babc31e95c256a68e31304161343"
+                "reference": "ea180e7a976a5f21a675fc7571e5802734d14dab"
             },
             "require": {
                 "doctrine/dbal": "^4.0",
@@ -3846,7 +3846,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/geo",
-                "reference": "4ee43393b32914e88457e49fa44f20bb2e700936"
+                "reference": "c95dd8c8f1d05e13f3e92a2daa080ca8d76d7df0"
             },
             "require": {
                 "php": ">=8.4",
@@ -3886,11 +3886,11 @@
         },
         {
             "name": "waaseyaa/github",
-            "version": "dev-feat/admin-spa-dx-alignment",
+            "version": "dev-feat/composer-policy-gates-1149",
             "dist": {
                 "type": "path",
                 "url": "packages/github",
-                "reference": "c9a2820a3c8098b91524d81066f2d579e8969cfa"
+                "reference": "e049d8bcb804cfc39b996fafb39ae18004280ded"
             },
             "require": {
                 "php": ">=8.4"
@@ -3925,7 +3925,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/graphql",
-                "reference": "908b2b2b4375a8bb7e5cafc81bc92bd9ff6551a5"
+                "reference": "5fbad1cce00f14612bfbf49fda113d2fe7295b4c"
             },
             "require": {
                 "php": ">=8.4",
@@ -3976,7 +3976,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/http-client",
-                "reference": "a37ba508654c6c2785bcdeb8f3ee3aa56ff1cc7c"
+                "reference": "c1ea3a00a7b9b531c01f4fb7cb2294b9c3f9597d"
             },
             "require": {
                 "php": ">=8.4"
@@ -4015,7 +4015,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/i18n",
-                "reference": "f4ed833cb85371bb3ee73a77fdeebd56a46cd89d"
+                "reference": "80d14ca67438e8ec8ad2a55f03ae75fd350f1575"
             },
             "require": {
                 "php": ">=8.4",
@@ -4055,7 +4055,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/inertia",
-                "reference": "84bed738e4f52c44de26dc68ef700b6cad72f0c6"
+                "reference": "3405eb01cbd6a83fe2a65dfeafa511c5f457fe2c"
             },
             "require": {
                 "php": ">=8.4",
@@ -4100,7 +4100,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/ingestion",
-                "reference": "706425f3b625ff8771cbc2795146b827b8c684ce"
+                "reference": "9d67269bdd41ed89c14e0b53f522f43416fae0c9"
             },
             "require": {
                 "php": ">=8.4"
@@ -4141,7 +4141,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mail",
-                "reference": "1e9f74ece5f7d52ab748d9daf364f810459167af"
+                "reference": "04f2372393b91f95b6f5e73ef73b6158d95d1c4e"
             },
             "require": {
                 "php": ">=8.4",
@@ -4191,7 +4191,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mcp",
-                "reference": "cfb734ad4974fdbcc05cbb56b589ddbe4eff1ff4"
+                "reference": "5d858ef7801fd2164562fae2c29058f74561594c"
             },
             "require": {
                 "php": ">=8.4",
@@ -4244,7 +4244,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/media",
-                "reference": "644dc399989f40a1b7c298844f85db16282e9f9b"
+                "reference": "cbbe63367bc4ba073ff25d24545e0813b52ca21c"
             },
             "require": {
                 "php": ">=8.4",
@@ -4289,7 +4289,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/menu",
-                "reference": "f95df3b95f8dec5e69026e998cf67233325a4e3b"
+                "reference": "fc2011cf3524aafe82e83a97292edd5156d5f30e"
             },
             "require": {
                 "php": ">=8.4",
@@ -4334,7 +4334,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mercure",
-                "reference": "a4d940aa57e0577d56120ef9a8f461dad6570eac"
+                "reference": "c30a243ab800f65e2adb0992bb0fbf42b4efee43"
             },
             "require": {
                 "php": ">=8.4"
@@ -4377,7 +4377,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/messaging",
-                "reference": "f2f2bf9e8e06ebb0929169ecdde94a0b2bc474c3"
+                "reference": "1cda70478e579e3d949909fba9662999213210cc"
             },
             "require": {
                 "php": ">=8.4",
@@ -4422,7 +4422,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/node",
-                "reference": "b99df05e1683c30fbf64b694f43a1857eec98ee4"
+                "reference": "8118b8dee9441b290899fb6fd1c2bdace318260b"
             },
             "require": {
                 "php": ">=8.4",
@@ -4468,7 +4468,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/note",
-                "reference": "4091b9d849e902bfca7febadba9cdbd037ed5f1c"
+                "reference": "1f3ad89898247a46b9a9aaa5893fe04231c82f85"
             },
             "require": {
                 "php": ">=8.4",
@@ -4514,7 +4514,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/notification",
-                "reference": "b2c8a96501bb1a88c3eabb0aea991547fcda5539"
+                "reference": "898827f0ccdb9be24b2260a6b8e746448aa19436"
             },
             "require": {
                 "php": ">=8.4",
@@ -4557,11 +4557,11 @@
         },
         {
             "name": "waaseyaa/oauth-provider",
-            "version": "dev-feat/admin-spa-dx-alignment",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/oauth-provider",
-                "reference": "74677454f4095718f9cd711e6a0108b12529bafc"
+                "reference": "82c17513660be81946112a6b15947551e28ad370"
             },
             "require": {
                 "php": ">=8.4",
@@ -4600,7 +4600,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/path",
-                "reference": "4255efb9a0cb81a2781065e12a95d2474f646f2a"
+                "reference": "60de60cbc8a30ce7a85ba2b99dcc6ade42f35583"
             },
             "require": {
                 "php": ">=8.4",
@@ -4645,11 +4645,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/plugin",
-                "reference": "33cc09e8c304e104fd21f3bd11f96dc2f9e5756b"
+                "reference": "e6bee03dbe7713e0a7a1652d7a1d7cfbf509d87e"
             },
             "require": {
                 "php": ">=8.4",
-                "waaseyaa/cache": "*"
+                "waaseyaa/cache": "^0.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -4685,7 +4685,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/queue",
-                "reference": "24b656459b87b34811bbc07092b564ed5feef4e9"
+                "reference": "591d3f8f5a9375990f031c8e10569fa8ad205516"
             },
             "require": {
                 "php": ">=8.4",
@@ -4732,7 +4732,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/relationship",
-                "reference": "da701eb247fb4b117a3872b07dbb345ebf7ea566"
+                "reference": "2f21fa6e35181723a50c022022984f4062c85696"
             },
             "require": {
                 "php": ">=8.4",
@@ -4776,7 +4776,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/routing",
-                "reference": "c5104cad9760cb5d0ace671c2b25cadab018cbc6"
+                "reference": "861310baadebad5943cc1c028c360bf1ab5599b9"
             },
             "require": {
                 "php": ">=8.4",
@@ -4819,7 +4819,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/scheduler",
-                "reference": "ae2de67c9bd82e97d4f950234f7b5e50f68fc633"
+                "reference": "9318aca72cab7030f8c2a3860f6769fbfdfd6bc5"
             },
             "require": {
                 "dragonmantank/cron-expression": "^3.0",
@@ -4866,7 +4866,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/search",
-                "reference": "7f17e0b2c0a253dfe194b6799461b71354279033"
+                "reference": "4b7b3e51e5036edd466310dbc84600e1dbb091e5"
             },
             "require": {
                 "php": ">=8.4",
@@ -4915,7 +4915,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/ssr",
-                "reference": "eac86ff945f71a148c9be9562d9a9c07cfeb72b9"
+                "reference": "84c1d5a0dcd1f750b3440ae9324f0a55512a71ab"
             },
             "require": {
                 "php": ">=8.4",
@@ -4968,7 +4968,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/state",
-                "reference": "c6181040b0aa059739655c3c2cf14203cdc1f66d"
+                "reference": "ddc9df036035da6b690137e6243b5ce5a138e69d"
             },
             "require": {
                 "php": ">=8.4",
@@ -5008,7 +5008,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/taxonomy",
-                "reference": "ee43f9d92f1d7502b374912532da26a70f485f05"
+                "reference": "05638e9bc7c0ca4125972493ca00d718be875165"
             },
             "require": {
                 "php": ">=8.4",
@@ -5054,7 +5054,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/telescope",
-                "reference": "67db1bf614f24aab3fd46dfe6cd4ebb1040f7165"
+                "reference": "2f99bb7f311e9a781d78b0adb11f552a1bff1a9b"
             },
             "require": {
                 "php": ">=8.4"
@@ -5093,7 +5093,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/typed-data",
-                "reference": "dc1e7bd63530436a61caadac23121005dc39613a"
+                "reference": "0daf964f6f07621377da233f9eed441a9f25bfa8"
             },
             "require": {
                 "php": ">=8.4",
@@ -5133,7 +5133,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/user",
-                "reference": "258d304e429f54a19b91f06fb1f2665df21b9da8"
+                "reference": "b673d44cb5ffa9b00c74a6ecef56f15327d023d1"
             },
             "require": {
                 "php": ">=8.4",
@@ -5183,7 +5183,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/validation",
-                "reference": "8d4790e84fc6525a29c66674948e18c23015b4f0"
+                "reference": "1980513ddac853d7cdf421b6393d5c6ad0072de1"
             },
             "require": {
                 "php": ">=8.4",
@@ -5224,7 +5224,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/workflows",
-                "reference": "9e367f2d8f308c14d98b36be162d4b855e968cc7"
+                "reference": "cb2275772438153c1ef4e4d3c436eb506d2d2c72"
             },
             "require": {
                 "php": ">=8.4",
@@ -6082,15 +6082,15 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.12.33",
+            "version": "2.1.46",
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/37982d6fc7cbb746dda7773530cda557cdf119e1",
-                "reference": "37982d6fc7cbb746dda7773530cda557cdf119e1",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/a193923fc2d6325ef4e741cf3af8c3e8f54dbf25",
+                "reference": "a193923fc2d6325ef4e741cf3af8c3e8f54dbf25",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2|^8.0"
+                "php": "^7.4|^8.0"
             },
             "conflict": {
                 "phpstan/phpstan-shim": "*"
@@ -6131,7 +6131,58 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-02-28T20:30:03+00:00"
+            "time": "2026-04-01T09:25:14+00:00"
+        },
+        {
+            "name": "phpstan/phpstan-strict-rules",
+            "version": "2.0.10",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpstan/phpstan-strict-rules.git",
+                "reference": "1aba28b697c1e3b6bbec8a1725f8b11b6d3e5a5f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpstan/phpstan-strict-rules/zipball/1aba28b697c1e3b6bbec8a1725f8b11b6d3e5a5f",
+                "reference": "1aba28b697c1e3b6bbec8a1725f8b11b6d3e5a5f",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4 || ^8.0",
+                "phpstan/phpstan": "^2.1.39"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "phpunit/phpunit": "^9.6"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "rules.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PHPStan\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Extra strict and opinionated rules for PHPStan",
+            "keywords": [
+                "static analysis"
+            ],
+            "support": {
+                "issues": "https://github.com/phpstan/phpstan-strict-rules/issues",
+                "source": "https://github.com/phpstan/phpstan-strict-rules/tree/2.0.10"
+            },
+            "time": "2026-02-11T14:17:32+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -8862,7 +8913,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/testing",
-                "reference": "1ab39317213577a31e8b88ac465340d18dcc7785"
+                "reference": "51594667ba85ba75420c62ced9b2ff2dfad91d55"
             },
             "require": {
                 "php": ">=8.4",

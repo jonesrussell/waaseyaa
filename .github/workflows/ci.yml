@@ -63,8 +63,23 @@ jobs:
       - name: Run CS Fixer (dry-run)
         run: composer cs-check
 
+      - name: Restore PHPStan result cache
+        uses: actions/cache/restore@v5
+        with:
+          path: tmp/phpstan
+          key: phpstan-result-cache-${{ github.run_id }}
+          restore-keys: |
+            phpstan-result-cache-
+
       - name: Run PHPStan
         run: composer phpstan
+
+      - name: Save PHPStan result cache
+        uses: actions/cache/save@v5
+        if: ${{ !cancelled() }}
+        with:
+          path: tmp/phpstan
+          key: phpstan-result-cache-${{ github.run_id }}
 
   ci-unit-tests:
     name: ci/unit-tests

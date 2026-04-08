@@ -57,6 +57,21 @@ cd packages/admin && npm run dev
 cd packages/admin && npx playwright test --grep @smoke
 ```
 
+## Static Analysis Policy (PHPStan 2)
+
+- Canonical command: `composer phpstan`
+- Config source of truth: [`phpstan.neon`](../../phpstan.neon)
+- Rule level target: `max` (greenfield alpha quality bar)
+- Strict rules: enabled via `phpstan/phpstan-strict-rules`
+- Result cache path: `tmp/phpstan` (restored/saved in CI)
+
+### Baseline governance
+
+- Current baseline is transitional while `level: max` is active across the monorepo.
+- Do not regenerate baseline in feature PRs unless explicitly approved.
+- Any baseline diff must be reviewed as a first-class code-review item and justified in the PR description.
+- Preferred end-state remains a minimal baseline (or no baseline) as packages mature.
+
 ## Release Pipeline (`.github/workflows/release.yml`)
 
 Triggers on every push to `main`:
