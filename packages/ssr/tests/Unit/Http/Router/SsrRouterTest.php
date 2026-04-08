@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Foundation\Tests\Unit\Http\Router;
+namespace Waaseyaa\SSR\Tests\Unit\Http\Router;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -13,7 +13,7 @@ use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Cache\CacheConfigResolver;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityTypeManager;
-use Waaseyaa\Foundation\Http\Router\SsrRouter;
+use Waaseyaa\SSR\Http\Router\SsrRouter;
 use Waaseyaa\SSR\SsrPageHandler;
 
 #[CoversClass(SsrRouter::class)]

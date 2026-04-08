@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Foundation\Tests\Unit\Http\Router;
+namespace Waaseyaa\SSR\Tests\Unit\Http\Router;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -13,16 +13,9 @@ use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Cache\CacheConfigResolver;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityTypeManager;
-use Waaseyaa\Foundation\Http\Router\AppControllerRouter;
+use Waaseyaa\SSR\Http\Router\AppControllerRouter;
 use Waaseyaa\SSR\SsrPageHandler;
 
-/**
- * Covers the routing decision (`supports()`) for app-controller strings.
- *
- * `handle()` delegation is exercised end-to-end by integration tests via
- * the kernel boot — `SsrPageHandler` is `final` and not mockable, and the
- * delegation itself is a one-line forward to `dispatchAppController`.
- */
 #[CoversClass(AppControllerRouter::class)]
 final class AppControllerRouterTest extends TestCase
 {
@@ -47,6 +40,7 @@ final class AppControllerRouterTest extends TestCase
     {
         $request = Request::create('/some/path');
         $request->attributes->set('_controller', $controller);
+
         return $request;
     }
 
@@ -90,9 +84,6 @@ final class AppControllerRouterTest extends TestCase
     #[Test]
     public function does_not_support_substring_class_names(): void
     {
-        // Routers like JsonApiRouter and SchemaRouter match by substring on
-        // class names like JsonApiController/SchemaController and own those
-        // routes. Without `::method`, the AppControllerRouter must NOT claim them.
         $router = $this->createRouter();
         foreach (['Waaseyaa\\Api\\Controller\\JsonApiController', 'Waaseyaa\\Api\\Controller\\SchemaController', 'ApiDiscoveryController'] as $controller) {
             self::assertFalse(
@@ -132,8 +123,6 @@ final class AppControllerRouterTest extends TestCase
     #[Test]
     public function does_not_support_string_with_lowercase_top_level_segment(): void
     {
-        // A top-level segment that starts with a lowercase letter and has
-        // no backslash looks like a sentinel/config key, not a class name.
         self::assertFalse(
             $this->createRouter()->supports($this->requestWithController('foo::bar')),
         );

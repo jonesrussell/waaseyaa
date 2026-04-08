@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\ServiceProvider;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
+use Waaseyaa\Foundation\Kernel\HttpKernel;
+
 abstract class ServiceProvider implements ServiceProviderInterface
 {
     protected string $projectRoot = '';
@@ -75,6 +79,27 @@ abstract class ServiceProvider implements ServiceProviderInterface
     {
         return [];
     }
+
+    /**
+     * Contribute domain routers after foundation built-ins up to MCP and before BroadcastRouter.
+     *
+     * @return iterable<DomainRouterInterface>
+     */
+    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
+    {
+        return [];
+    }
+
+    /**
+     * Register render-cache entity listeners. The second argument is the render bin backend
+     * from the kernel (CacheBackendInterface); SSR wraps it in RenderCache.
+     */
+    public function registerRenderCacheListeners(EventDispatcherInterface $dispatcher, mixed $renderCacheBackend): void {}
+
+    /**
+     * Late HTTP wiring after database caches exist (e.g. SsrPageHandler construction).
+     */
+    public function configureHttpKernel(HttpKernel $kernel): void {}
 
     public function provides(): array
     {

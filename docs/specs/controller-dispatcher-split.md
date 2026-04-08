@@ -1,7 +1,7 @@
 # Controller Dispatcher Split
 
 ## Status
-Proposed — implements #571 (ControllerDispatcher Split P1 milestone)
+Active — domain router chain implemented (#571); SSR and auxiliary routers decoupled from foundation `Http/` via #1129/#1134 (`httpDomainRouters()`, `DiscoveryRouter` / `GraphQlRouter` / `MediaRouter` in owning packages; `ControllerDispatcher` uses foundation Inertia interfaces).
 
 ## Problem
 `ControllerDispatcher` is 1,001 lines with a 638-line `match(true)` statement routing 18 controller cases across 10 domains. Its constructor takes 11 parameters. This violates SRP, resists testing, and couples every domain to a single dispatch point.

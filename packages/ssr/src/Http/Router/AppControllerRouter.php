@@ -2,26 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Foundation\Http\Router;
+namespace Waaseyaa\SSR\Http\Router;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
+use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
+use Waaseyaa\Foundation\Http\Router\WaaseyaaContext;
 use Waaseyaa\SSR\SsrPageHandler;
 
 /**
  * Routes app-level controllers registered via ServiceProvider::routes()
  * with the `Class::method` controller string format.
- *
- * Delegates to SsrPageHandler::dispatchAppController, which already
- * implements reflection-based constructor injection (EntityTypeManager,
- * Twig, HttpRequest, AccountInterface, plus the kernel's serviceResolver
- * fallback) and method invocation with ($params, $query, $account,
- * $httpRequest).
- *
- * Wired into ControllerDispatcher's router chain after SsrRouter so
- * `render.page` retains its existing precedence; this router only claims
- * controllers that look like fully-qualified Class::method strings.
  *
  * @see SsrPageHandler::dispatchAppController()
  */
@@ -41,9 +33,6 @@ final class AppControllerRouter implements DomainRouterInterface
             return false;
         }
 
-        // Class::method format: must contain `::`, no whitespace, and the
-        // segment before `::` must look like a class name (not a named
-        // sentinel like 'render.page' or 'graphql.endpoint').
         if (!str_contains($controller, '::')) {
             return false;
         }
@@ -56,11 +45,6 @@ final class AppControllerRouter implements DomainRouterInterface
             return false;
         }
 
-        // Class names start with an uppercase letter (top-level) or contain
-        // a backslash (namespaced). Reserved framework sentinels in other
-        // routers (`render.page`, `broadcast`, `graphql.endpoint`, ...) all
-        // start with a lowercase letter and contain no backslash, so they
-        // are excluded by this rule.
         return str_contains($class, '\\') || ctype_upper($class[0]);
     }
 
@@ -69,7 +53,6 @@ final class AppControllerRouter implements DomainRouterInterface
         $controller = (string) $request->attributes->get('_controller', '');
         $ctx = WaaseyaaContext::fromRequest($request);
 
-        // Strip framework-internal `_*` attributes; pass route params only.
         $params = array_filter(
             $request->attributes->all(),
             static fn(string $key): bool => !str_starts_with($key, '_'),
@@ -88,10 +71,6 @@ final class AppControllerRouter implements DomainRouterInterface
             return $result;
         }
 
-        // Fallback: dispatchAppController returned a structured array
-        // (htmlResult / jsonResult shape) instead of a Response. The typed
-        // return shape guarantees `content` matches the `type` discriminator
-        // (string for html, array for json).
         if ($result['type'] === 'json') {
             /** @var array<string, mixed> $content */
             $content = $result['content'];

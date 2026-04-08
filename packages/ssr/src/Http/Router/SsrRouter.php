@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Foundation\Http\Router;
+namespace Waaseyaa\SSR\Http\Router;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
+use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
+use Waaseyaa\Foundation\Http\Router\WaaseyaaContext;
 use Waaseyaa\SSR\SsrPageHandler;
 
 final class SsrRouter implements DomainRouterInterface
@@ -26,9 +28,8 @@ final class SsrRouter implements DomainRouterInterface
     {
         $ctx = WaaseyaaContext::fromRequest($request);
         $params = $request->attributes->all();
-        $requestedViewMode = is_string($ctx->query['view_mode'] ?? null)
-            ? trim((string) $ctx->query['view_mode'])
-            : 'full';
+        $viewModeRaw = $ctx->query['view_mode'] ?? null;
+        $requestedViewMode = is_string($viewModeRaw) ? trim($viewModeRaw) : 'full';
 
         $result = $this->ssrPageHandler->handleRenderPage(
             (string) ($params['path'] ?? '/'),

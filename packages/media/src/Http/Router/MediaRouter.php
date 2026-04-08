@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Foundation\Http\Router;
+namespace Waaseyaa\Media\Http\Router;
 
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
+use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
+use Waaseyaa\Foundation\Http\Router\WaaseyaaContext;
 use Waaseyaa\Media\File;
 use Waaseyaa\Media\LocalFileRepository;
 

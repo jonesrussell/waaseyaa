@@ -7,11 +7,11 @@ namespace Waaseyaa\Foundation\Http;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
+use Waaseyaa\Foundation\Http\Inertia\InertiaPageResultInterface;
 use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
-use Waaseyaa\Inertia\Inertia;
-use Waaseyaa\Inertia\InertiaResponse;
 
 /**
  * Routes a matched controller name to the appropriate domain router.
@@ -26,6 +26,8 @@ final class ControllerDispatcher
 
     private readonly LoggerInterface $logger;
 
+    private readonly ?InertiaFullPageRendererInterface $inertiaFullPageRenderer;
+
     /**
      * @param iterable<DomainRouterInterface> $routers
      * @param array<string, mixed> $config
@@ -34,8 +36,10 @@ final class ControllerDispatcher
         private readonly iterable $routers,
         private readonly array $config = [],
         ?LoggerInterface $logger = null,
+        ?InertiaFullPageRendererInterface $inertiaFullPageRenderer = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
+        $this->inertiaFullPageRenderer = $inertiaFullPageRenderer;
     }
 
     public function dispatch(HttpRequest $request): HttpResponse
@@ -96,7 +100,7 @@ final class ControllerDispatcher
         $routeParams = array_filter($params, fn($k) => !str_starts_with($k, '_'), ARRAY_FILTER_USE_KEY);
         $result = $controller($request, ...$routeParams);
 
-        if ($result instanceof InertiaResponse) {
+        if ($result instanceof InertiaPageResultInterface) {
             $pageObject = $result->toPageObject();
             $pageObject['url'] = $request->getRequestUri();
 
@@ -107,8 +111,18 @@ final class ControllerDispatcher
                 ]);
             }
 
-            $renderer = Inertia::getRenderer();
-            return $this->htmlResponse(200, $renderer->render($pageObject));
+            if ($this->inertiaFullPageRenderer === null) {
+                return $this->jsonApiResponse(500, [
+                    'jsonapi' => ['version' => '1.1'],
+                    'errors' => [[
+                        'status' => '500',
+                        'title' => 'Internal Server Error',
+                        'detail' => 'Inertia full-page renderer is not configured.',
+                    ]],
+                ]);
+            }
+
+            return $this->htmlResponse(200, $this->inertiaFullPageRenderer->render($pageObject));
         }
         if ($result instanceof RedirectResponse
             && $request->headers->get('X-Inertia') === 'true'

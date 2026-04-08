@@ -121,8 +121,15 @@ abstract class AbstractKernel
         $this->discoverAccessPolicies();
         $this->bootKnowledgeExtensionRunner();
 
+        $this->finalizeBoot();
+
         $this->booted = true;
     }
+
+    /**
+     * Last hook before the booted flag is set. HttpKernel overrides to wire HTTP caches and runtime.
+     */
+    protected function finalizeBoot(): void {}
 
     protected function bootDatabase(): void
     {
@@ -312,6 +319,32 @@ abstract class AbstractKernel
     public function getMigrationLoader(): MigrationLoader
     {
         return $this->migrationLoader;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
+
+    public function getManifest(): PackageManifest
+    {
+        return $this->manifest;
+    }
+
+    public function getAccessHandler(): EntityAccessHandler
+    {
+        return $this->accessHandler;
+    }
+
+    /**
+     * @return list<ServiceProvider>
+     */
+    public function getProviders(): array
+    {
+        return $this->providers;
     }
 
     /**

@@ -59,6 +59,7 @@
         "waaseyaa/entity": "^0.1",
         "waaseyaa/field": "^0.1",
         "waaseyaa/access": "^0.1",
+        "waaseyaa/foundation": "^0.1",
         "waaseyaa/routing": "^0.1",
         "waaseyaa/api": "^0.1"
     },

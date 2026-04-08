@@ -52,4 +52,52 @@ final class LayerDependencyTest extends TestCase
             );
         }
     }
+
+    #[Test]
+    public function foundationHttpLayerOutsideRouterDoesNotImportNonFoundationWaaseyaaPackages(): void
+    {
+        $httpSrc = dirname(__DIR__, 2) . '/src/Http';
+        $httpRouterDir = $httpSrc . '/Router';
+        $violations = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($httpSrc, \FilesystemIterator::SKIP_DOTS),
+        );
+
+        foreach ($iterator as $file) {
+            if (!$file instanceof \SplFileInfo || !$file->isFile()) {
+                continue;
+            }
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+            $path = $file->getPathname();
+            if (str_starts_with($path, $httpRouterDir . \DIRECTORY_SEPARATOR)) {
+                continue;
+            }
+
+            $contents = file_get_contents($path);
+            if ($contents === false) {
+                continue;
+            }
+
+            if (preg_match_all('/^\s*use\s+Waaseyaa\\\\(?!Foundation\\\\)[^;]+;/m', $contents, $matches)) {
+                foreach ($matches[0] as $line) {
+                    $violations[] = str_replace(dirname(__DIR__, 2) . '/src/', '', $path) . ': ' . trim($line);
+                }
+            }
+            if (preg_match_all('/^\s*use\s+function\s+Waaseyaa\\\\(?!Foundation\\\\)[^;]+;/m', $contents, $fnMatches)) {
+                foreach ($fnMatches[0] as $line) {
+                    $violations[] = str_replace(dirname(__DIR__, 2) . '/src/', '', $path) . ': ' . trim($line);
+                }
+            }
+        }
+
+        $this->assertSame(
+            [],
+            $violations,
+            "Foundation Http/ outside Http/Router/ must not import Waaseyaa namespaces other than Waaseyaa\\Foundation\\\n"
+            . implode("\n", $violations),
+        );
+    }
 }

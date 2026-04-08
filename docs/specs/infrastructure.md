@@ -8,6 +8,7 @@
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization across infrastructure-layer packages; no infrastructure runtime behavior change -->
 <!-- Spec reviewed 2026-04-08b - restored packages/foundation, packages/search, and packages/testing Symfony floors (^7.3 -> ^7.0) where no runtime/API requirement justified tighter constraints -->
 <!-- Spec reviewed 2026-04-08c - entity, entity-storage, queue, routing, typed-data, validation Symfony floors to ^7.0; see symfony-version-floors.md (#1151) -->
+<!-- Spec reviewed 2026-04-08 - #1129/#1134: HttpKernel::finalizeBoot() wires DB cache bins and discovery handler; SSR owns RenderCache listeners + SsrPageHandler via SsrServiceProvider::configureHttpKernel; ErrorPageRendererInterface bound in SSR; provider httpDomainRouters() merged after foundation routers through McpRouter and before BroadcastRouter; DiscoveryRouter/GraphQlRouter/MediaRouter live in api/graphql/media packages; ControllerDispatcher uses Inertia foundation interfaces + optional InertiaFullPageRendererInterface; LayerDependencyTest gates non-Router Foundation Http/ against non-Foundation Waaseyaa imports -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -19,7 +20,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| foundation | `AssetManagerInterface`, `BroadcasterInterface`, `HealthCheckerInterface`, `LoggerInterface`, `HandlerInterface`, `FormatterInterface`, `ProcessorInterface`, `LoggerTrait`, `HttpHandlerInterface`, `HttpMiddlewareInterface`, `JobHandlerInterface`, `JobMiddlewareInterface`, `RateLimiterInterface`, `SchemaRegistryInterface`, `ServiceProviderInterface`, `ServiceProvider`, `DomainEvent`, `WaaseyaaException`, `JsonApiResponseTrait`, `DomainRouterInterface`, `Migration` |
+| foundation | `AssetManagerInterface`, `BroadcasterInterface`, `HealthCheckerInterface`, `LoggerInterface`, `HandlerInterface`, `FormatterInterface`, `ProcessorInterface`, `LoggerTrait`, `HttpHandlerInterface`, `HttpMiddlewareInterface`, `JobHandlerInterface`, `JobMiddlewareInterface`, `RateLimiterInterface`, `SchemaRegistryInterface`, `ServiceProviderInterface`, `ServiceProvider`, `DomainEvent`, `WaaseyaaException`, `JsonApiResponseTrait`, `DomainRouterInterface`, `LanguagePathStripperInterface`, `InertiaPageResultInterface`, `InertiaFullPageRendererInterface`, `Migration` |
 | cache | `CacheBackendInterface`, `CacheFactoryInterface`, `CacheTagsInvalidatorInterface`, `TagAwareCacheInterface` |
 | database-legacy | `DatabaseInterface`, `SelectInterface`, `InsertInterface`, `UpdateInterface`, `DeleteInterface`, `SchemaInterface`, `TransactionInterface` |
 | plugin | `PluginInspectionInterface`, `PluginManagerInterface`, `PluginBase` |
@@ -1012,7 +1013,7 @@ Handles callable controllers (objects with `__invoke(Request): Response`) direct
 
 **Controller key normalization:** Routes declared with Symfony's array-callable form (`'_controller' => [FooController::class, 'bar']`) are normalized to `FooController::bar` string form before the domain router chain runs. This keeps downstream routers' `supports()` checks (which use `str_contains()` / `str_starts_with()` against `_controller`) simple — they never have to handle both shapes. `JsonApiRouter::supports()` additionally has a defensive `match()` so any misrouted array callable that slipped through produces a clean miss rather than a string-function type error.
 
-**Inertia response handling:** When a callable controller returns an `InertiaResponse`, the dispatcher checks for the `X-Inertia` request header. XHR requests get a JSON response with the page object. Non-XHR (initial page load) requests are rendered to full HTML via `Inertia::getRenderer()`, which returns the renderer configured by `InertiaServiceProvider` (with Vite asset tags injected).
+**Inertia response handling:** When a callable controller returns a value implementing `InertiaPageResultInterface`, the dispatcher checks for the `X-Inertia` request header. XHR requests get a JSON response with the page object. Non-XHR (initial page load) requests are rendered to full HTML via the injected `InertiaFullPageRendererInterface` (bound by `InertiaServiceProvider`). If that interface is not registered, full-page Inertia requests return 500.
 
 **Error handling:** Both the callable controller path and the router dispatch path are wrapped in try-catch. Unhandled exceptions produce a 500 JSON:API error response via `handleException()`, which includes stack trace details when debug mode is enabled.
 
@@ -1030,6 +1031,10 @@ interface DomainRouterInterface
 
 Deterministic chain: `HttpKernel` iterates routers in order; first `supports()` match wins.
 
+**Merge order:** Built-in foundation routers end at `McpRouter`. Each discovered `ServiceProvider` may implement `httpDomainRouters(?HttpKernel $httpKernel)` to return additional `DomainRouterInterface` instances; those run in **package manifest order** (same order as provider registration). `BroadcastRouter` is always appended last. Example contributors: `ApiServiceProvider` (`DiscoveryRouter` in `Waaseyaa\Api\Http\Router`), `MediaServiceProvider` (`MediaRouter`), `GraphQlServiceProvider` (`GraphQlRouter`, merging `graphqlMutationOverrides()` from all providers), `SsrServiceProvider` (`SsrRouter`, `AppControllerRouter`).
+
+**Kernel hooks:** After access policies are registered and before `$kernel->booted` is set, `HttpKernel::finalizeBoot()` prepares shared cache backends, discovery handler, MCP/render cache listeners from `EventListenerRegistrar`, per-provider `registerRenderCacheListeners()` and `configureHttpKernel()` (SSR builds `SsrPageHandler` there so `EntityAccessGate` sees a fully wired `EntityAccessHandler`).
+
 #### WaaseyaaContext
 
 File: `packages/foundation/src/Http/Router/WaaseyaaContext.php`
@@ -1043,13 +1048,13 @@ Typed value object built once from the request via `WaaseyaaContext::fromRequest
 | `JsonApiRouter` | `jsonapi.*` | JSON:API CRUD delegation to `JsonApiController` |
 | `EntityTypeLifecycleRouter` | `entity_types`, `entity_type.disable`, `entity_type.enable` | Entity type listing and lifecycle management |
 | `SchemaRouter` | `openapi`, `schema.*` | OpenAPI and JSON Schema endpoints |
-| `DiscoveryRouter` | `discovery.topic_hub`, `discovery.cluster`, `discovery.timeline`, `discovery.endpoint` | Discovery API for topic hubs, clusters, timelines |
+| `DiscoveryRouter` (`Waaseyaa\Api\Http\Router`) | `discovery.topic_hub`, `discovery.cluster`, `discovery.timeline`, `discovery.endpoint` | Discovery API for topic hubs, clusters, timelines (registered from `ApiServiceProvider::httpDomainRouters()`) |
 | `SearchRouter` | `search.semantic` | Semantic search via embedding storage |
-| `MediaRouter` | `media.upload` | File upload with MIME validation, size limits, sanitization, move error handling |
-| `GraphQlRouter` | `graphql.endpoint` | GraphQL query/mutation execution |
+| `MediaRouter` (`Waaseyaa\Media\Http\Router`) | `media.upload` | File upload with MIME validation, size limits, sanitization, move error handling (`MediaServiceProvider`) |
+| `GraphQlRouter` (`Waaseyaa\GraphQL\Http\Router`) | `graphql.endpoint` | GraphQL query/mutation execution (`GraphQlServiceProvider`) |
 | `McpRouter` | `mcp.endpoint` | MCP JSON-RPC endpoint |
-| `SsrRouter` | `render.page` | Server-side page rendering |
-| `AppControllerRouter` | `Class::method` strings | App-level controllers registered via `ServiceProvider::routes()`. Delegates to `SsrPageHandler::dispatchAppController()` which uses reflection-based constructor injection (EntityTypeManager, Twig, HttpRequest, AccountInterface, plus the kernel's `serviceResolver` fallback). Wired after `SsrRouter` so `render.page` retains its existing precedence. `supports()` claims a controller only when it contains `::`, has no whitespace, both class and method segments are non-empty, and the class segment is namespaced or starts with an uppercase letter. |
+| `SsrRouter` (`Waaseyaa\SSR\Http\Router`) | `render.page` | Server-side page rendering (`SsrServiceProvider`) |
+| `AppControllerRouter` (`Waaseyaa\SSR\Http\Router`) | `Class::method` strings | App-level controllers registered via `ServiceProvider::routes()`. Delegates to `SsrPageHandler::dispatchAppController()` which uses reflection-based constructor injection (EntityTypeManager, Twig, HttpRequest, AccountInterface, plus the kernel's `serviceResolver` fallback). Wired after `SsrRouter` so `render.page` retains its existing precedence. `supports()` claims a controller only when it contains `::`, has no whitespace, both class and method segments are non-empty, and the class segment is namespaced or starts with an uppercase letter. |
 | `BroadcastRouter` | `broadcast.stream` | SSE broadcast stream via `StreamedResponse` |
 
 ### CorsHandler
