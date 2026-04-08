@@ -5,10 +5,23 @@ declare(strict_types=1);
 namespace Waaseyaa\Media;
 
 use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Foundation\Kernel\HttpKernel;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
+use Waaseyaa\Media\Http\Router\MediaRouter;
 
 final class MediaServiceProvider extends ServiceProvider
 {
+    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
+    {
+        if ($httpKernel === null) {
+            return [];
+        }
+
+        return [
+            new MediaRouter($httpKernel->getProjectRoot(), $httpKernel->getConfig()),
+        ];
+    }
+
     public function register(): void
     {
         $this->singleton(UploadHandler::class, fn() => new UploadHandler(

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Foundation\Tests\Unit\Http\Router;
+namespace Waaseyaa\Media\Tests\Unit\Http\Router;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Waaseyaa\Entity\EntityTypeManager;
-use Waaseyaa\Foundation\Http\Router\MediaRouter;
+use Waaseyaa\Api\Controller\BroadcastStorage;
+use Waaseyaa\Database\DBALDatabase;
+use Waaseyaa\Media\Http\Router\MediaRouter;
 
 #[CoversClass(MediaRouter::class)]
 final class MediaRouterTest extends TestCase
@@ -19,8 +19,7 @@ final class MediaRouterTest extends TestCase
         string $projectRoot = '/tmp/test-project',
         array $config = [],
     ): MediaRouter {
-        $etm = new EntityTypeManager(new EventDispatcher());
-        return new MediaRouter($projectRoot, $config, $etm);
+        return new MediaRouter($projectRoot, $config);
     }
 
     #[Test]
@@ -153,8 +152,8 @@ final class MediaRouterTest extends TestCase
             public function hasPermission(string $permission): bool { return false; }
             public function getRoles(): array { return []; }
         });
-        $request->attributes->set('_broadcast_storage', new \Waaseyaa\Api\Controller\BroadcastStorage(
-            \Waaseyaa\Database\DBALDatabase::createSqlite(),
+        $request->attributes->set('_broadcast_storage', new BroadcastStorage(
+            DBALDatabase::createSqlite(),
         ));
         $request->files->set('file', $uploadedFile);
 

@@ -6,6 +6,7 @@ namespace Waaseyaa\Inertia;
 
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Asset\ViteAssetManager;
+use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
 use Waaseyaa\Foundation\Middleware\HttpMiddlewareInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
@@ -38,6 +39,7 @@ final class InertiaServiceProvider extends ServiceProvider
 
         $renderer = new RootTemplateRenderer(assetManager: $assetManager);
         Inertia::setRenderer($renderer);
+        $this->singleton(InertiaFullPageRendererInterface::class, static fn(): InertiaFullPageRendererInterface => $renderer);
     }
 
     /** @return list<HttpMiddlewareInterface> */

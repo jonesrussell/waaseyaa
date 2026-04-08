@@ -165,7 +165,7 @@ TWIG,
     }
 
     #[Test]
-    public function secondRequestUsesRenderCacheForSameEntity(): void
+    public function entity_save_invalidates_render_cache_for_subsequent_http_request(): void
     {
         $first = $this->request('/node/1');
         $this->assertSame(200, $first['status']);
@@ -180,8 +180,8 @@ TWIG,
 
         $second = $this->request('/node/1');
         $this->assertSame(200, $second['status']);
-        $this->assertStringContainsString('Water Is Life', $second['body']);
-        $this->assertStringNotContainsString('CHANGED TITLE', $second['body']);
+        $this->assertStringContainsString('CHANGED TITLE', $second['body']);
+        $this->assertStringNotContainsString('Water Is Life', $second['body']);
     }
 
     #[Test]

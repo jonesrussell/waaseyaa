@@ -198,7 +198,7 @@ Behavior:
 1. Reads `Route` from `$request->attributes->get('_route_object')`. If null, passes through.
 2. Reads `AccountInterface` from `$request->attributes->get('_account')`. If missing/invalid, returns 403.
 3. Delegates to `AccessChecker::check($route, $account)`.
-4. If `$result->isForbidden()`, returns 403 JSON:API response.
+4. If `$result->isForbidden()`, attempts HTML error output via optional `ErrorPageRendererInterface` (e.g. Twig in `SsrServiceProvider`); otherwise returns a 403 JSON:API response.
 5. Otherwise (allowed or neutral), calls `$next->handle($request)`.
 
 This middleware can short-circuit with a 403 response.

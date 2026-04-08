@@ -4,6 +4,7 @@
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/api and packages/routing; no API/runtime behavior change -->
 <!-- Spec reviewed 2026-04-09 - packages/routing/composer.json churn (manifest policy); routing and JSON:API behavior unchanged -->
 <!-- Spec reviewed 2026-04-08g - symfony/routing require ^7.0 (#1151); no routing behavior change — symfony-version-floors.md -->
+<!-- Spec reviewed 2026-04-09 - Discovery API dispatch: `DiscoveryRouter` lives in `Waaseyaa\Api\Http\Router` and is registered via `ApiServiceProvider::httpDomainRouters()`; foundation `HttpKernel` merges provider routers after built-in routers through `McpRouter` (#1129) -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
 
@@ -13,7 +14,7 @@ Technical specification for the Waaseyaa JSON:API layer and routing system. This
 
 `Waaseyaa\Api\ApiServiceProvider` is declared in `packages/api/composer.json` under `extra.waaseyaa.providers`. Its `routes()` method is the authoritative entry point for JSON:API CRUD route registration and delegates to `JsonApiRouteProvider` when an `EntityTypeManager` is available.
 
-Foundation still owns the shared HTTP surfaces that are not entity-package specific, including `/api/schema/{entity_type}`, `/api/openapi.json`, `/api/entity-types`, discovery endpoints, broadcast, and the SSR catch-all.
+Foundation still wires several shared HTTP surfaces that are not entity-package specific (routes and foundation routers), including `/api/schema/{entity_type}`, `/api/openapi.json`, `/api/entity-types`, broadcast, MCP, and SSR catch-all routing. **Discovery** read models are implemented in the API package: `Waaseyaa\Api\Http\Router\DiscoveryRouter` implements `DomainRouterInterface` and is registered from `ApiServiceProvider::httpDomainRouters()` so discovery stays co-located with `DiscoveryApiHandler` and JSON:API tooling.
 
 ### packages/api/
 
@@ -42,6 +43,7 @@ Foundation still owns the shared HTTP surfaces that are not entity-package speci
 | `src/OpenApi/SchemaBuilder.php` | `Waaseyaa\Api\OpenApi` | Builds component schemas for OpenAPI spec |
 | `src/Exception/JsonApiDocumentException.php` | `Waaseyaa\Api\Exception` | Exception carrying a JsonApiDocument error response for controller helpers |
 | `src/MutableTranslatableInterface.php` | `Waaseyaa\Api` | Extension of TranslatableInterface with `addTranslation()` |
+| `src/Http/Router/DiscoveryRouter.php` | `Waaseyaa\Api\Http\Router` | Discovery topic hub, cluster, timeline, and endpoint pages (`discovery.*` controllers); uses `DiscoveryApiHandler` |
 
 ### packages/routing/
 

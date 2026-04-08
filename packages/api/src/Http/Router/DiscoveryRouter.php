@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Foundation\Http\Router;
+namespace Waaseyaa\Api\Http\Router;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,6 +10,8 @@ use Waaseyaa\Api\ApiDiscoveryController;
 use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
+use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
+use Waaseyaa\Foundation\Http\Router\WaaseyaaContext;
 
 final class DiscoveryRouter implements DomainRouterInterface
 {
@@ -37,6 +39,7 @@ final class DiscoveryRouter implements DomainRouterInterface
         if (str_contains($controller, 'ApiDiscoveryController')) {
             $discoveryController = new ApiDiscoveryController($this->entityTypeManager);
             $result = $discoveryController->discover();
+
             return $this->jsonApiResponse(200, ['jsonapi' => ['version' => '1.1'], ...$result]);
         }
 
@@ -205,6 +208,7 @@ final class DiscoveryRouter implements DomainRouterInterface
         if ($entityType !== 'relationship') {
             $payload = $service->endpointPage($entityType, $resolvedId, $resolvedOptions);
             [$dPayload, $dHeaders] = $this->discoveryHandler->prepareDiscoveryResponse(200, ['data' => $payload], $cacheKey, $ctx->account);
+
             return $this->jsonApiResponse(200, $dPayload, $dHeaders);
         }
 
@@ -233,6 +237,7 @@ final class DiscoveryRouter implements DomainRouterInterface
             'limit' => $resolvedOptions['limit'],
         ]);
         [$dPayload, $dHeaders] = $this->discoveryHandler->prepareDiscoveryResponse(200, ['data' => $payload], $cacheKey, $ctx->account);
+
         return $this->jsonApiResponse(200, $dPayload, $dHeaders);
     }
 }

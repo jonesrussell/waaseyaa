@@ -16,7 +16,6 @@ use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
-use Waaseyaa\SSR\RenderCache;
 
 /**
  * Registers all event listeners used by the HTTP kernel.
@@ -63,30 +62,6 @@ final class EventListenerRegistrar
                 $logger->warning(sprintf('Failed to broadcast entity.deleted: %s', $e->getMessage()));
             }
         });
-    }
-
-    public function registerRenderCacheListeners(RenderCache $renderCache): void
-    {
-        $invalidate = function (object $event) use ($renderCache): void {
-            if (!$event instanceof EntityEvent) {
-                return;
-            }
-
-            $entityType = $event->entity->getEntityTypeId();
-            $renderCache->invalidateEntity(
-                $entityType,
-                $event->entity->id(),
-            );
-
-            // Relationship and node updates can affect relationship-navigation SSR context across many pages.
-            if (in_array($entityType, ['relationship', 'node'], true)) {
-                $renderCache->invalidateEntity('node', null);
-                $renderCache->invalidateEntity('relationship', null);
-            }
-        };
-
-        $this->dispatcher->addListener(EntityEvents::POST_SAVE->value, $invalidate);
-        $this->dispatcher->addListener(EntityEvents::POST_DELETE->value, $invalidate);
     }
 
     public function registerDiscoveryCacheListeners(CacheBackendInterface $cache): void

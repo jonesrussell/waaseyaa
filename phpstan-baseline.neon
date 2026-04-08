@@ -1195,28 +1195,22 @@ parameters:
 			path: packages/foundation/src/Http/ControllerDispatcher.php
 
 		-
-			message: '#^Casting to string something that''s already string\.$#'
-			identifier: cast.useless
-			count: 9
-			path: packages/foundation/src/Http/Router/DiscoveryRouter.php
-
-		-
 			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
-			path: packages/foundation/src/Http/Router/MediaRouter.php
+			path: packages/media/src/Http/Router/MediaRouter.php
+
+		-
+			message: '#^Casting to string something that''s already string\.$#'
+			identifier: cast.useless
+			count: 9
+			path: packages/api/src/Http/Router/DiscoveryRouter.php
 
 		-
 			message: '#^Casting to string something that''s already string\.$#'
 			identifier: cast.useless
 			count: 2
 			path: packages/foundation/src/Http/Router/SearchRouter.php
-
-		-
-			message: '#^Casting to string something that''s already string\.$#'
-			identifier: cast.useless
-			count: 1
-			path: packages/foundation/src/Http/Router/SsrRouter.php
 
 		-
 			message: '#^Casting to string something that''s already string\.$#'
@@ -1323,7 +1317,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface\:\:addListener\(\)\.$#'
 			identifier: method.notFound
-			count: 10
+			count: 8
 			path: packages/foundation/src/Kernel/EventListenerRegistrar.php
 
 		-

@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Waaseyaa\Inertia;
 
 use Waaseyaa\Foundation\Asset\ViteAssetManager;
+use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
 
-final class RootTemplateRenderer
+final class RootTemplateRenderer implements InertiaFullPageRendererInterface
 {
     public function __construct(
         private readonly ?\Closure $template = null,

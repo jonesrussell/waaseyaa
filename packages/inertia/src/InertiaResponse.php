@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Inertia;
 
-final class InertiaResponse
+use Waaseyaa\Foundation\Http\Inertia\InertiaPageResultInterface;
+
+final class InertiaResponse implements InertiaPageResultInterface
 {
     /**
      * @param array<string, mixed> $props

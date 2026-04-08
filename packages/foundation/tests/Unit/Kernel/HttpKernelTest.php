@@ -832,8 +832,8 @@ final class HttpKernelTest extends TestCase
     private function createMediaRouter(
         string $projectRoot = '/tmp/test-project',
         array $config = [],
-    ): \Waaseyaa\Foundation\Http\Router\MediaRouter {
-        return new \Waaseyaa\Foundation\Http\Router\MediaRouter($projectRoot, $config);
+    ): \Waaseyaa\Media\Http\Router\MediaRouter {
+        return new \Waaseyaa\Media\Http\Router\MediaRouter($projectRoot, $config);
     }
 
     private function createLanguageResolver(array $config = []): LanguageResolver

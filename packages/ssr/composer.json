@@ -38,11 +38,16 @@
         },
         {
             "type": "path",
+            "url": "../api"
+        },
+        {
+            "type": "path",
             "url": "../foundation"
         }
     ],
     "require": {
         "php": ">=8.4",
+        "waaseyaa/api": "^0.1",
         "waaseyaa/access": "^0.1",
         "waaseyaa/cache": "^0.1",
         "waaseyaa/config": "^0.1",
