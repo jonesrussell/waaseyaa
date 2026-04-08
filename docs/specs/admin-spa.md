@@ -1,6 +1,6 @@
 # Admin SPA
 
-<!-- Spec reviewed 2026-04-07 - post-M10 admin surface bootstrap via /admin/_surface/*, contract re-exports, C17 test-harness alignment, C18 drift remediation (#1017), F5 deterministic pipeline visibility, Nuxt 4 upgrade, backendUrl private runtimeConfig; npm lock-file update (3a4bfdf2) has no architectural impact -->
+<!-- Spec reviewed 2026-04-08 - Admin SPA DX alignment (fallback, CLI admin:dev/build, path resolution, WSL dev:wsl); IngestSummaryWidget uses a typed ingest_log status guard so `nuxi typecheck` (admin/contracts CI) stays strict on JSON:API attributes -->
 
 ## Optionality
 

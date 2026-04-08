@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useLanguage } from '~/composables/useLanguage'
-import { useEntity, type JsonApiResource } from '~/composables/useEntity'
+import { useEntity } from '~/composables/useEntity'
 import { useAdmin } from '~/composables/useAdmin'
 import { useApi } from '~/composables/useApi'
 
@@ -28,6 +28,17 @@ const ncSync = ref<{
   fetch_failed?: boolean
 } | null>(null)
 
+type IngestLogStatus = 'pending_review' | 'approved' | 'rejected' | 'failed'
+
+function isIngestLogStatus(value: string | undefined): value is IngestLogStatus {
+  return (
+    value === 'pending_review' ||
+    value === 'approved' ||
+    value === 'rejected' ||
+    value === 'failed'
+  )
+}
+
 async function fetchCounts() {
   if (!catalog.some(e => e.id === 'ingest_log')) {
     hidden.value = true
@@ -36,16 +47,16 @@ async function fetchCounts() {
   }
   try {
     const result = await list('ingest_log', { page: { offset: 0, limit: 1000 } })
-    const fresh: Record<string, number> = {
+    const fresh: Record<IngestLogStatus, number> = {
       pending_review: 0,
       approved: 0,
       rejected: 0,
       failed: 0,
     }
     for (const item of result.data) {
-      const status = item.attributes.status as string
-      if (status in fresh) {
-        (fresh as Record<string, number>)[status]++
+      const status = item.attributes?.status
+      if (isIngestLogStatus(status)) {
+        fresh[status]++
       }
     }
     counts.value = fresh
