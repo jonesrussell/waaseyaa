@@ -6,9 +6,9 @@
     "require": {
         "php": ">=8.4",
         "twig/twig": "^3.0",
-        "waaseyaa/foundation": "@dev",
-        "waaseyaa/database-legacy": "@dev",
-        "waaseyaa/entity": "@dev",
+        "waaseyaa/foundation": "^0.1",
+        "waaseyaa/database-legacy": "^0.1",
+        "waaseyaa/entity": "^0.1",
         "symfony/event-dispatcher": "^7.0"
     },
     "require-dev": {
@@ -24,7 +24,8 @@
             "Waaseyaa\\Search\\Tests\\": "tests/"
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "extra": {
         "branch-alias": {
             "dev-main": "0.1.x-dev",

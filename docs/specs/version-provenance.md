@@ -15,6 +15,12 @@ Published consumers resolve packages as:
 
 Split tags are produced from the monorepo; **all `waaseyaa/*` packages installed for one app should correspond to a single monorepo SHA** (either via path checkout or via a coherent lockfile from one split publish).
 
+### Path `repositories` blocks in split mirrors
+
+Many subpackage `composer.json` files declare `repositories` entries with `"type": "path"` and relative URLs (for example `../foundation`). Those entries exist so **`composer install` works inside a full monorepo checkout** when sibling packages are resolved from disk.
+
+Split subtree repositories on GitHub contain the same manifests. **Cloning a split mirror alone** can leave those `path` URLs pointing at directories that do not exist in that clone. In practice, consumers should install **`waaseyaa/*` from Packagist (or VCS)** and treat internal path blocks as monorepo-only ergonomics; if a standalone clone of a split repo fails to resolve dependencies, remove or override the `repositories` section locally, or depend on the package via Packagist instead of the raw split tree. Future release automation may strip or rewrite `repositories` during split publish if that proves necessary for standalone clones.
+
 ## Golden SHA (apps and CI)
 
 Apps may pin an expected framework revision for drift detection:
