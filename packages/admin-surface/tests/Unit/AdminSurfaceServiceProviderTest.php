@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Waaseyaa\AdminSurface\AdminSurfaceRoutePaths;
 use Waaseyaa\AdminSurface\AdminSurfaceServiceProvider;
 use Waaseyaa\AdminSurface\Catalog\CatalogBuilder;
 use Waaseyaa\AdminSurface\Host\AbstractAdminSurfaceHost;
@@ -16,6 +17,7 @@ use Waaseyaa\AdminSurface\Host\AdminSurfaceSessionData;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 #[CoversClass(AdminSurfaceServiceProvider::class)]
+#[CoversClass(AdminSurfaceRoutePaths::class)]
 #[CoversClass(AbstractAdminSurfaceHost::class)]
 final class AdminSurfaceServiceProviderTest extends TestCase
 {
@@ -65,11 +67,33 @@ final class AdminSurfaceServiceProviderTest extends TestCase
 
         $collection = $router->getRouteCollection();
 
-        $this->assertSame('/admin/_surface/session', $collection->get('admin_surface.session')->getPath());
-        $this->assertSame('/admin/_surface/catalog', $collection->get('admin_surface.catalog')->getPath());
-        $this->assertSame('/admin/_surface/{type}', $collection->get('admin_surface.list')->getPath());
-        $this->assertSame('/admin/_surface/{type}/{id}', $collection->get('admin_surface.get')->getPath());
-        $this->assertSame('/admin/_surface/{type}/action/{action}', $collection->get('admin_surface.action')->getPath());
+        $this->assertSame(AdminSurfaceRoutePaths::PATH_SESSION, $collection->get('admin_surface.session')->getPath());
+        $this->assertSame(AdminSurfaceRoutePaths::PATH_CATALOG, $collection->get('admin_surface.catalog')->getPath());
+        $this->assertSame(AdminSurfaceRoutePaths::PATH_LIST, $collection->get('admin_surface.list')->getPath());
+        $this->assertSame(AdminSurfaceRoutePaths::PATH_GET, $collection->get('admin_surface.get')->getPath());
+        $this->assertSame(AdminSurfaceRoutePaths::PATH_ACTION, $collection->get('admin_surface.action')->getPath());
+    }
+
+    #[Test]
+    public function urlGeneratorOutputMatchesAdminSurfaceRoutePaths(): void
+    {
+        $router = new WaaseyaaRouter();
+        AdminSurfaceServiceProvider::registerRoutes($router, $this->host);
+
+        $this->assertSame(AdminSurfaceRoutePaths::generate('admin_surface.session'), $router->generate('admin_surface.session'));
+        $this->assertSame(AdminSurfaceRoutePaths::generate('admin_surface.catalog'), $router->generate('admin_surface.catalog'));
+        $this->assertSame(
+            AdminSurfaceRoutePaths::generate('admin_surface.list', ['type' => 'article']),
+            $router->generate('admin_surface.list', ['type' => 'article']),
+        );
+        $this->assertSame(
+            AdminSurfaceRoutePaths::generate('admin_surface.get', ['type' => 'article', 'id' => '1']),
+            $router->generate('admin_surface.get', ['type' => 'article', 'id' => '1']),
+        );
+        $this->assertSame(
+            AdminSurfaceRoutePaths::generate('admin_surface.action', ['type' => 'article', 'action' => 'create']),
+            $router->generate('admin_surface.action', ['type' => 'article', 'action' => 'create']),
+        );
     }
 
     #[Test]

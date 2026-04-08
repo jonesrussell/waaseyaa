@@ -68,31 +68,31 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
         // SPA can distinguish "not logged in" (SurfaceResult with ok:false) from
         // "endpoint not available" (network error). The host's resolveSession()
         // checks the account and returns null for unauthorized users.
-        $router->addRoute('admin_surface.session', RouteBuilder::create('/admin/_surface/session')
+        $router->addRoute('admin_surface.session', RouteBuilder::create(AdminSurfaceRoutePaths::PATH_SESSION)
             ->methods('GET')
             ->requireSession()
             ->controller(fn($request) => $host->handleSession($request))
             ->build());
 
-        $router->addRoute('admin_surface.catalog', RouteBuilder::create('/admin/_surface/catalog')
+        $router->addRoute('admin_surface.catalog', RouteBuilder::create(AdminSurfaceRoutePaths::PATH_CATALOG)
             ->methods('GET')
             ->requireAuthentication()
             ->controller(fn($request) => $host->handleCatalog($request))
             ->build());
 
-        $router->addRoute('admin_surface.list', RouteBuilder::create('/admin/_surface/{type}')
+        $router->addRoute('admin_surface.list', RouteBuilder::create(AdminSurfaceRoutePaths::PATH_LIST)
             ->methods('GET')
             ->requireAuthentication()
             ->controller(fn($request, $type) => $host->handleList($request, $type))
             ->build());
 
-        $router->addRoute('admin_surface.get', RouteBuilder::create('/admin/_surface/{type}/{id}')
+        $router->addRoute('admin_surface.get', RouteBuilder::create(AdminSurfaceRoutePaths::PATH_GET)
             ->methods('GET')
             ->requireAuthentication()
             ->controller(fn($request, $type, $id) => $host->handleGet($request, $type, $id))
             ->build());
 
-        $router->addRoute('admin_surface.action', RouteBuilder::create('/admin/_surface/{type}/action/{action}')
+        $router->addRoute('admin_surface.action', RouteBuilder::create(AdminSurfaceRoutePaths::PATH_ACTION)
             ->methods('POST')
             ->requireAuthentication()
             ->controller(fn($request, $type, $action) => $host->handleAction($request, $type, $action))

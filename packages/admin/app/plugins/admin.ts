@@ -10,6 +10,7 @@ import type {
   AdminSurfaceSession as SurfaceSession,
 } from '../../../admin-surface/contract/types'
 import { normalizeAppBaseURL } from '../runtime/normalizeAppBaseURL'
+import { adminSurfaceFetchUrl } from '../runtime/adminSurfaceRoutes'
 
 export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRuntime | null } }> => {
   const config = useRuntimeConfig()
@@ -37,7 +38,7 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
 
   try {
     const sessionRes = await $fetch<SurfaceResult<SurfaceSession>>(
-      joinURL(normalizedAppBase, '_surface/session'),
+      adminSurfaceFetchUrl(normalizedAppBase, 'admin_surface.session'),
       {
         ignoreResponseError: true,
         credentials: 'include',
@@ -48,7 +49,7 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
       surfaceSession = sessionRes.data
 
       const catalogRes = await $fetch<SurfaceResult<{ entities: SurfaceCatalogEntry[] }>>(
-        joinURL(normalizedAppBase, '_surface/catalog'),
+        adminSurfaceFetchUrl(normalizedAppBase, 'admin_surface.catalog'),
         {
           ignoreResponseError: true,
           credentials: 'include',

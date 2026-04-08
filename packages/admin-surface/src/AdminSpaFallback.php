@@ -20,6 +20,11 @@ final class AdminSpaFallback
     {
         $title = htmlspecialchars($appDisplayName, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $spec = htmlspecialchars(self::SPEC_URL, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $pSession = htmlspecialchars(AdminSurfaceRoutePaths::PATH_SESSION, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $pCatalog = htmlspecialchars(AdminSurfaceRoutePaths::PATH_CATALOG, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $pList = htmlspecialchars(AdminSurfaceRoutePaths::PATH_LIST, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $pGet = htmlspecialchars(AdminSurfaceRoutePaths::PATH_GET, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $pAction = htmlspecialchars(AdminSurfaceRoutePaths::PATH_ACTION, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
         $html = <<<HTML
         <!doctype html>
@@ -42,15 +47,15 @@ final class AdminSpaFallback
             <h1>{$title} — Admin</h1>
             <p>The admin SPA is not built yet (no <code>public/admin/index.html</code>). The admin surface API is available:</p>
             <dl class="endpoints">
-                <dt>GET /admin/_surface/session</dt>
+                <dt>GET {$pSession}</dt>
                 <dd>Session resolution (requires session)</dd>
-                <dt>GET /admin/_surface/catalog</dt>
+                <dt>GET {$pCatalog}</dt>
                 <dd>Entity type catalog</dd>
-                <dt>GET /admin/_surface/{type}</dt>
+                <dt>GET {$pList}</dt>
                 <dd>Entity listing</dd>
-                <dt>GET /admin/_surface/{type}/{id}</dt>
+                <dt>GET {$pGet}</dt>
                 <dd>Entity detail</dd>
-                <dt>POST /admin/_surface/{type}/action/{action}</dt>
+                <dt>POST {$pAction}</dt>
                 <dd>Action dispatch</dd>
             </dl>
             <p>Developer UI (optional): run <code>vendor/bin/waaseyaa admin:dev</code> from the app, or see the <a href="{$spec}">Admin SPA spec</a>.</p>
