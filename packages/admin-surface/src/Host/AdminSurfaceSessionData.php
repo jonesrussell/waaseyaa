@@ -21,6 +21,7 @@ final readonly class AdminSurfaceSessionData
      * @param string   $tenantId
      * @param string   $tenantName
      * @param array<string, bool> $features
+     * @param AdminSurfaceUiPayload|null $ui Optional SPA chrome (header links, sidebar items)
      */
     public function __construct(
         public string $accountId,
@@ -32,6 +33,7 @@ final readonly class AdminSurfaceSessionData
         public string $tenantId = 'default',
         public string $tenantName = 'Default',
         public array $features = [],
+        public ?AdminSurfaceUiPayload $ui = null,
     ) {}
 
     /**
@@ -39,7 +41,7 @@ final readonly class AdminSurfaceSessionData
      */
     public function toArray(): array
     {
-        return [
+        $base = [
             'account' => [
                 'id' => $this->accountId,
                 'name' => $this->accountName,
@@ -52,7 +54,13 @@ final readonly class AdminSurfaceSessionData
                 'name' => $this->tenantName,
             ],
             'policies' => $this->policies,
-            'features' => $this->features ?: new \stdClass(),
+            'features' => $this->features !== [] ? $this->features : new \stdClass(),
         ];
+
+        if ($this->ui !== null && !$this->ui->isEmpty()) {
+            $base['ui'] = $this->ui->toArray();
+        }
+
+        return $base;
     }
 }

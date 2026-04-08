@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\AdminSurface\Host\AdminSurfaceSessionData;
+use Waaseyaa\AdminSurface\Host\AdminSurfaceUiPayload;
 
 #[CoversClass(AdminSurfaceSessionData::class)]
 final class AdminSurfaceSessionDataTest extends TestCase
@@ -36,6 +37,48 @@ final class AdminSurfaceSessionDataTest extends TestCase
         self::assertSame('Test Org', $result['tenant']['name']);
         self::assertSame(['administer content', 'edit any content'], $result['policies']);
         self::assertSame(['ai_assist' => true], $result['features']);
+        self::assertArrayNotHasKey('ui', $result);
+    }
+
+    #[Test]
+    public function toArrayIncludesUiWhenNonEmpty(): void
+    {
+        $ui = AdminSurfaceUiPayload::fromArrays(
+            headerLinks: [['label' => 'Help', 'href' => '/help']],
+            sidebarItems: [['id' => 'c', 'label' => 'Custom', 'href' => '/custom']],
+        );
+        $session = new AdminSurfaceSessionData(
+            accountId: '1',
+            accountName: 'Admin',
+            roles: [],
+            policies: [],
+            ui: $ui,
+        );
+
+        $result = $session->toArray();
+
+        self::assertArrayHasKey('ui', $result);
+        self::assertSame(
+            [
+                'headerLinks' => [['label' => 'Help', 'href' => '/help']],
+                'sidebarItems' => [['id' => 'c', 'label' => 'Custom', 'href' => '/custom']],
+            ],
+            $result['ui'],
+        );
+    }
+
+    #[Test]
+    public function toArrayOmitsUiWhenPayloadIsEmpty(): void
+    {
+        $session = new AdminSurfaceSessionData(
+            accountId: '1',
+            accountName: 'Admin',
+            roles: [],
+            policies: [],
+            ui: AdminSurfaceUiPayload::fromArrays(),
+        );
+
+        self::assertArrayNotHasKey('ui', $session->toArray());
     }
 
     #[Test]

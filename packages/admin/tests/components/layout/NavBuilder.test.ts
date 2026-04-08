@@ -4,10 +4,14 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import NavBuilder from '~/components/layout/NavBuilder.vue'
 
-const { catalogRef, runActionSpy } = vi.hoisted(() => {
+const { catalogRef, uiRef, runActionSpy } = vi.hoisted(() => {
   const { ref } = require('vue') as typeof import('vue')
   return {
     catalogRef: ref<CatalogEntry[]>([]),
+    uiRef: ref<{ headerLinks: unknown[]; sidebarItems: unknown[] }>({
+      headerLinks: [],
+      sidebarItems: [],
+    }),
     runActionSpy: vi.fn(),
   }
 })
@@ -15,6 +19,7 @@ const { catalogRef, runActionSpy } = vi.hoisted(() => {
 vi.mock('~/composables/useAdmin', () => ({
   useAdmin: () => ({
     catalog: catalogRef.value,
+    ui: uiRef.value,
   }),
 }))
 
@@ -41,6 +46,7 @@ function entry(overrides: Partial<CatalogEntry> & Pick<CatalogEntry, 'id' | 'lab
 describe('NavBuilder', () => {
   beforeEach(() => {
     runActionSpy.mockReset()
+    uiRef.value = { headerLinks: [], sidebarItems: [] }
     catalogRef.value = [
       entry({ id: 'user', label: 'User', group: 'system' }),
       entry({ id: 'node', label: 'Content', group: 'content' }),
@@ -104,6 +110,42 @@ describe('NavBuilder', () => {
 
     expect(wrapper.text()).not.toContain('Content Pipeline')
     expect(wrapper.findAll('a').some(link => link.text() === 'Content Pipeline')).toBe(false)
+  })
+
+  it('renders custom sidebar items from ui before catalog groups', async () => {
+    uiRef.value = {
+      headerLinks: [],
+      sidebarItems: [
+        { id: 'app-home', label: 'Site home', href: 'https://example.com', external: true },
+        { id: 'in-app', label: 'Reports', href: '/reports' },
+      ],
+    }
+    catalogRef.value = [
+      entry({ id: 'user', label: 'User', group: 'system' }),
+    ]
+
+    const wrapper = await mountSuspended(NavBuilder)
+
+    const html = wrapper.html()
+    expect(html).toContain('Site home')
+    expect(html).toContain('Reports')
+    expect(html).toContain('Shortcuts')
+    expect(wrapper.text().indexOf('Shortcuts')).toBeLessThan(wrapper.text().indexOf('User'))
+  })
+
+  it('uses i18n for custom section when group is a nav_* key', async () => {
+    uiRef.value = {
+      headerLinks: [],
+      sidebarItems: [
+        { id: 'x', label: 'Media link', href: '/m', group: 'nav_group_media' },
+      ],
+    }
+    catalogRef.value = []
+
+    const wrapper = await mountSuspended(NavBuilder)
+
+    expect(wrapper.text()).toContain('Media')
+    expect(wrapper.text()).toContain('Media link')
   })
 
   it('does not perform mount-time action execution to decide pipeline visibility', async () => {

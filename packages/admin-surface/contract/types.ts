@@ -7,11 +7,32 @@
 
 // ── Session ──────────────────────────────────────────────────────
 
+export interface AdminSurfaceHeaderLink {
+  label: string
+  href: string
+  external?: boolean
+}
+
+export interface AdminSurfaceSidebarItem {
+  id: string
+  label: string
+  href: string
+  group?: string
+  weight?: number
+}
+
+/** Optional chrome injected by the PHP host (see GenericAdminSurfaceHost::buildAdminUi). */
+export interface AdminSurfaceUiCustomization {
+  headerLinks?: AdminSurfaceHeaderLink[]
+  sidebarItems?: AdminSurfaceSidebarItem[]
+}
+
 export interface AdminSurfaceSession {
   account: AdminSurfaceAccount
   tenant: AdminSurfaceTenant
   policies: string[]
   features?: Record<string, boolean>
+  ui?: AdminSurfaceUiCustomization
 }
 
 export interface AdminSurfaceAccount {

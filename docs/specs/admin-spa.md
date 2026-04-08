@@ -5,6 +5,7 @@
 <!-- Spec reviewed 2026-04-08 - Admin SPA DX alignment; vue-router ^5 for Volar `sfc-route-blocks` + `nuxi typecheck`; IngestSummaryWidget typed ingest_log status guard for strict JSON:API attributes -->
 <!-- Spec reviewed 2026-04-08 - merge-conflict resolution kept @types/node at ^25.5.2 in packages/admin/package.json and package-lock.json; no runtime/admin contract change -->
 <!-- Spec reviewed 2026-04-08 - AdminSurfaceRoutePaths (waaseyaa/admin-surface PHP) + adminSurfaceRoutes.ts: named routes admin_surface.session|catalog|list|get|action; plugin bootstrap uses adminSurfaceFetchUrl(base, name); paths must stay aligned with WaaseyaaRouter registration (#815) -->
+<!-- Spec reviewed 2026-04-08 - Optional session `ui` (headerLinks, sidebarItems): AdminSurfaceUiPayload + AdminSurfaceSessionData; GenericAdminSurfaceHost::buildAdminUi(); SPA maps via normalizeSurfaceUi into AdminRuntime.ui; AdminShell + NavBuilder (#756) -->
 
 ## Optionality
 
@@ -176,8 +177,10 @@ The root Nuxt plugin is the authoritative bootstrap for `$admin`. On non-public 
 2. Fetches `SurfaceResult<AdminSurfaceSession>` from the session route URL.
 3. Fetches `SurfaceResult<{ entities: AdminSurfaceCatalogEntry[] }>` from the catalog route URL after a successful session.
 4. Hydrates the shared auth-state keys `waaseyaa.auth.user` and `waaseyaa.auth.checked` from the authoritative session bootstrap before returning the runtime.
-5. Builds `AdminRuntime` from `SessionAuthAdapter`, `AdminSurfaceTransportAdapter`, the resolved account/tenant, and a local admin runtime catalog contract derived from the surface bootstrap payload.
+5. Builds `AdminRuntime` from `SessionAuthAdapter`, `AdminSurfaceTransportAdapter`, the resolved account/tenant, a local admin runtime catalog contract derived from the surface bootstrap payload, and **`ui`** — normalized from optional session `ui` (`headerLinks`, `sidebarItems`) via `normalizeSurfaceUi()` in `packages/admin/app/runtime/normalizeSurfaceUi.ts` (defensive filtering; defaults to empty arrays when absent).
 6. Returns `{ provide: { admin: runtime } }`, or `{ provide: { admin: null } }` for public auth pages and unauthenticated redirects.
+
+**Session UI customization (PHP → SPA):** Hosts extend `GenericAdminSurfaceHost` and override `buildAdminUi(AccountInterface): ?AdminSurfaceUiPayload` to attach non-empty `AdminSurfaceUiPayload` to `AdminSurfaceSessionData`. JSON includes a top-level `ui` object only when the payload has at least one valid header link or sidebar item. Sidebar `group` values that look like i18n keys (`nav_*`) are passed through `t()` in `NavBuilder`; an empty/missing `group` uses `nav_group_custom` (“Shortcuts”). External targets use `external: true` or absolute URLs (`http(s):`, `//`, `mailto:`, `tel:`) and render as `<a target="_blank" rel="noopener noreferrer">`.
 
 This plugin is the source of truth for `$admin` injection and for composables that call `useAdmin()`.
 

@@ -71,7 +71,18 @@ class GenericAdminSurfaceHost extends AbstractAdminSurfaceHost
             policies: [],
             tenantId: $this->tenantId,
             tenantName: $this->tenantName,
+            ui: $this->buildAdminUi($account),
         );
+    }
+
+    /**
+     * Override to inject header links and/or sidebar items into the admin SPA session.
+     *
+     * Return null or an empty payload to omit the `ui` key from JSON.
+     */
+    protected function buildAdminUi(AccountInterface $account): ?AdminSurfaceUiPayload
+    {
+        return null;
     }
 
     public function buildCatalog(AdminSurfaceSessionData $session): CatalogBuilder
