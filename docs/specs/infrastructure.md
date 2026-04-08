@@ -6,6 +6,7 @@
 <!-- Spec reviewed 2026-04-07 - ControllerDispatcher and DiscoveryRouter: import ordering corrected to satisfy PHP-CS-Fixer alphabetical rule (no behavior change). ControllerDispatcher now uses `use Waaseyaa\Inertia\Inertia` import instead of inline FQCN for `Inertia::getRenderer()` call. LanguageResolver extracted from SsrPageHandler (#572): language detection, negotiation, and path prefix stripping now live in a dedicated service; HttpKernel delegates to SsrPageHandler::getLanguageResolver()->stripLanguagePrefixForRouting(). -->
 <!-- Spec reviewed 2026-04-07 - packages/billing and packages/inertia composer.json: waaseyaa/foundation requires use ^0.1 for split/Packagist consumers (#1138); no runtime change -->
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization across infrastructure-layer packages; no infrastructure runtime behavior change -->
+<!-- Spec reviewed 2026-04-08b - restored packages/foundation, packages/search, and packages/testing Symfony floors (^7.3 -> ^7.0) where no runtime/API requirement justified tighter constraints -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
