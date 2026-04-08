@@ -97,6 +97,8 @@ final class CliCommandRegistryTest extends TestCase
             $this->assertContains('route:list', $names);
             $this->assertContains('optimize:manifest', $names);
             $this->assertContains('waaseyaa:version', $names);
+            $this->assertContains('admin:dev', $names);
+            $this->assertContains('admin:build', $names);
         } finally {
             $items = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($projectRoot, \RecursiveDirectoryIterator::SKIP_DOTS),
