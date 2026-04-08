@@ -66,6 +66,8 @@ return [
     'Waaseyaa\Testing\Traits\InteractsWithAuth' => 'public',
     'Waaseyaa\Testing\Traits\InteractsWithEvents' => 'public',
     'Waaseyaa\Testing\Traits\RefreshDatabase' => 'public',
+    'Waaseyaa\ErrorHandler\SolutionInterface' => 'public',
+    'Waaseyaa\ErrorHandler\SolutionProviderInterface' => 'public',
 
     // Layer 0: Foundation — internal
     'Waaseyaa\Foundation\Kernel\AbstractKernel' => 'internal',
