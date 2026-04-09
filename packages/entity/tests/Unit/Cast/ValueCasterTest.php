@@ -1,0 +1,344 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Entity\Tests\Unit\Cast;
+
+use DateMalformedStringException;
+use DateTimeImmutable;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Waaseyaa\Entity\Cast\Exception\CastException;
+use Waaseyaa\Entity\Cast\ValueCaster;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleIntEnum;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleStringEnum;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleUnitEnum;
+
+/**
+ * @covers \Waaseyaa\Entity\Cast\ValueCaster
+ */
+final class ValueCasterTest extends TestCase
+{
+    private const FIELD = 'f';
+
+    #[Test]
+    public function cast_in_returns_null_for_null_for_each_builtin(): void
+    {
+        $c = new ValueCaster();
+        foreach (['int', 'float', 'bool', 'string', 'array', 'datetime_immutable'] as $spec) {
+            self::assertNull($c->castIn(self::FIELD, null, $spec));
+        }
+    }
+
+    #[Test]
+    public function cast_out_returns_null_for_null_for_each_builtin(): void
+    {
+        $c = new ValueCaster();
+        foreach (['int', 'float', 'bool', 'string', 'array', 'datetime_immutable'] as $spec) {
+            self::assertNull($c->castOut(self::FIELD, null, $spec));
+        }
+    }
+
+    #[Test]
+    #[DataProvider('intRoundTripProvider')]
+    public function int_round_trip(mixed $stored, int $expectedDomain): void
+    {
+        $c = new ValueCaster();
+        self::assertSame($expectedDomain, $c->castIn(self::FIELD, $stored, 'int'));
+        self::assertSame($expectedDomain, $c->castOut(self::FIELD, $expectedDomain, 'int'));
+    }
+
+    /**
+     * @return iterable<string, array{mixed, int}>
+     */
+    public static function intRoundTripProvider(): iterable
+    {
+        yield 'int' => [7, 7];
+        yield 'numeric string' => ['7', 7];
+        yield 'float truncates' => [7.9, 7];
+        yield 'true' => [true, 1];
+        yield 'false' => [false, 0];
+    }
+
+    #[Test]
+    public function int_cast_in_rejects_empty_string(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '', 'int');
+    }
+
+    #[Test]
+    public function int_cast_in_rejects_non_numeric_string(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, 'nope', 'int');
+    }
+
+    #[Test]
+    #[DataProvider('floatRoundTripProvider')]
+    public function float_round_trip(mixed $stored, float $expectedDomain): void
+    {
+        $c = new ValueCaster();
+        self::assertSame($expectedDomain, $c->castIn(self::FIELD, $stored, 'float'));
+        self::assertSame($expectedDomain, $c->castOut(self::FIELD, $expectedDomain, 'float'));
+    }
+
+    /**
+     * @return iterable<string, array{mixed, float}>
+     */
+    public static function floatRoundTripProvider(): iterable
+    {
+        yield 'float' => [1.5, 1.5];
+        yield 'int widens' => [2, 2.0];
+        yield 'numeric string' => ['2.5', 2.5];
+        yield 'true' => [true, 1.0];
+        yield 'false' => [false, 0.0];
+    }
+
+    #[Test]
+    public function float_cast_in_rejects_empty_string(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '', 'float');
+    }
+
+    #[Test]
+    #[DataProvider('boolRoundTripProvider')]
+    public function bool_round_trip(mixed $stored, bool $expected): void
+    {
+        $c = new ValueCaster();
+        self::assertSame($expected, $c->castIn(self::FIELD, $stored, 'bool'));
+        self::assertSame($expected, $c->castOut(self::FIELD, $expected, 'bool'));
+    }
+
+    /**
+     * @return iterable<string, array{mixed, bool}>
+     */
+    public static function boolRoundTripProvider(): iterable
+    {
+        yield 'bool true' => [true, true];
+        yield 'bool false' => [false, false];
+        yield 'int 1' => [1, true];
+        yield 'int 0' => [0, false];
+        yield 'string 1' => ['1', true];
+        yield 'string 0' => ['0', false];
+        yield 'string true' => ['true', true];
+        yield 'string false' => ['false', false];
+        yield 'empty string is false' => ['', false];
+    }
+
+    #[Test]
+    public function bool_cast_in_rejects_float(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, 0.5, 'bool');
+    }
+
+    #[Test]
+    public function bool_cast_out_rejects_float(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castOut(self::FIELD, 0.5, 'bool');
+    }
+
+    #[Test]
+    public function string_round_trip(): void
+    {
+        $c = new ValueCaster();
+        self::assertSame('hello', $c->castIn(self::FIELD, 'hello', 'string'));
+        self::assertSame('7', $c->castIn(self::FIELD, 7, 'string'));
+        self::assertSame('hello', $c->castOut(self::FIELD, 'hello', 'string'));
+        self::assertSame('7', $c->castOut(self::FIELD, 7, 'string'));
+    }
+
+    #[Test]
+    public function string_cast_in_rejects_array(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, [], 'string');
+    }
+
+    #[Test]
+    public function array_round_trip_json_string(): void
+    {
+        $c = new ValueCaster();
+        $json = '{"a":1,"b":[2,3]}';
+        $domain = $c->castIn(self::FIELD, $json, 'array');
+        self::assertSame(['a' => 1, 'b' => [2, 3]], $domain);
+        $out = $c->castOut(self::FIELD, $domain, 'array');
+        self::assertSame($json, $out);
+    }
+
+    #[Test]
+    public function array_cast_in_passes_through_array(): void
+    {
+        $c = new ValueCaster();
+        $arr = ['x' => 1];
+        self::assertSame($arr, $c->castIn(self::FIELD, $arr, 'array'));
+    }
+
+    #[Test]
+    public function array_cast_in_empty_string_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '', 'array');
+    }
+
+    #[Test]
+    public function array_cast_in_invalid_json_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '{', 'array');
+    }
+
+    #[Test]
+    public function array_cast_in_json_scalar_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '42', 'array');
+    }
+
+    #[Test]
+    public function array_spec_type_json_alias(): void
+    {
+        $c = new ValueCaster();
+        self::assertSame(
+            ['k' => 'v'],
+            $c->castIn(self::FIELD, '{"k":"v"}', ['type' => 'json']),
+        );
+    }
+
+    #[Test]
+    public function datetime_immutable_round_trip_atom(): void
+    {
+        $c = new ValueCaster();
+        $dt = new DateTimeImmutable('2024-01-15T12:30:45+00:00');
+        $stored = $c->castOut(self::FIELD, $dt, 'datetime_immutable');
+        self::assertIsString($stored);
+        $again = $c->castIn(self::FIELD, $stored, 'datetime_immutable');
+        self::assertEquals($dt, $again);
+    }
+
+    #[Test]
+    public function datetime_immutable_cast_in_unix_timestamp_int(): void
+    {
+        $c = new ValueCaster();
+        $ts = 1700000000;
+        $dt = $c->castIn(self::FIELD, $ts, 'datetime_immutable');
+        self::assertSame($ts, $dt->getTimestamp());
+    }
+
+    #[Test]
+    public function datetime_immutable_cast_in_numeric_string_timestamp(): void
+    {
+        $c = new ValueCaster();
+        $ts = 1700000000;
+        $dt = $c->castIn(self::FIELD, (string) $ts, 'datetime_immutable');
+        self::assertSame($ts, $dt->getTimestamp());
+    }
+
+    #[Test]
+    public function datetime_immutable_cast_in_empty_string_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '', 'datetime_immutable');
+    }
+
+    #[Test]
+    public function datetime_immutable_cast_in_invalid_string_wraps_exception(): void
+    {
+        $c = new ValueCaster();
+        try {
+            $c->castIn(self::FIELD, 'not-a-datetime', 'datetime_immutable');
+            self::fail('Expected ' . CastException::class);
+        } catch (CastException $e) {
+            self::assertNotNull($e->getPrevious());
+            self::assertInstanceOf(DateMalformedStringException::class, $e->getPrevious());
+        }
+    }
+
+    #[Test]
+    public function backed_string_enum_round_trip(): void
+    {
+        $c = new ValueCaster();
+        $spec = SampleStringEnum::class;
+        self::assertSame(
+            SampleStringEnum::Alpha,
+            $c->castIn(self::FIELD, 'a', $spec),
+        );
+        self::assertSame('a', $c->castOut(self::FIELD, SampleStringEnum::Alpha, $spec));
+    }
+
+    #[Test]
+    public function backed_string_enum_try_from_miss_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, 'z', SampleStringEnum::class);
+    }
+
+    #[Test]
+    public function backed_int_enum_round_trip(): void
+    {
+        $c = new ValueCaster();
+        $spec = SampleIntEnum::class;
+        self::assertSame(SampleIntEnum::One, $c->castIn(self::FIELD, 1, $spec));
+        self::assertSame(1, $c->castOut(self::FIELD, SampleIntEnum::One, $spec));
+    }
+
+    #[Test]
+    public function backed_int_enum_numeric_string(): void
+    {
+        $c = new ValueCaster();
+        self::assertSame(
+            SampleIntEnum::Two,
+            $c->castIn(self::FIELD, '2', SampleIntEnum::class),
+        );
+    }
+
+    #[Test]
+    public function backed_enum_instance_pass_through_on_cast_in(): void
+    {
+        $c = new ValueCaster();
+        self::assertSame(
+            SampleStringEnum::Beta,
+            $c->castIn(self::FIELD, SampleStringEnum::Beta, SampleStringEnum::class),
+        );
+    }
+
+    #[Test]
+    public function non_backed_enum_spec_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, 'A', SampleUnitEnum::class);
+    }
+
+    #[Test]
+    public function plain_class_string_throws_value_object_not_supported(): void
+    {
+        $this->expectException(CastException::class);
+        $this->expectExceptionMessage('#1184');
+        (new ValueCaster())->castIn(self::FIELD, 'x', \stdClass::class);
+    }
+
+    #[Test]
+    public function unknown_builtin_token_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '1', 'unknown_cast');
+    }
+
+    #[Test]
+    public function invalid_array_cast_spec_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '[]', []);
+    }
+
+    #[Test]
+    public function invalid_array_cast_spec_missing_type_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '[]', ['foo' => 'bar']);
+    }
+}
