@@ -10,8 +10,9 @@ function mockFetchResponse(data: any, status = 200) {
   } as unknown as Response)
 }
 
-function makeAdapter(fetchFn: typeof fetch, basePath = '/_surface') {
-  return new AdminSurfaceTransportAdapter(basePath, fetchFn)
+/** @param normalizedAppBase Same as `normalizeAppBaseURL(app.baseURL)` (trailing slash). */
+function makeAdapter(fetchFn: typeof fetch, normalizedAppBase = '/') {
+  return new AdminSurfaceTransportAdapter(normalizedAppBase, fetchFn)
 }
 
 describe('AdminSurfaceTransportAdapter', () => {

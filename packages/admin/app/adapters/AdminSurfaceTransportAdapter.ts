@@ -6,20 +6,38 @@ import type {
   AdminSurfaceListResult as SurfaceListResult,
   AdminSurfaceResult as SurfaceResult,
 } from '../contracts/adminSurface'
+import {
+  adminSurfaceFetchUrl,
+  type AdminSurfaceRouteName,
+  type AdminSurfaceRouteParams,
+} from '../runtime/adminSurfaceRoutes'
 
 /**
- * Transport adapter that talks to the /admin/surface/* endpoints.
+ * Transport adapter for admin surface JSON endpoints.
+ *
+ * URLs are built with {@link adminSurfaceFetchUrl} so paths stay aligned with
+ * `admin_surface.*` routes and PHP `AdminSurfaceRoutePaths`.
  */
 export class AdminSurfaceTransportAdapter implements TransportAdapter {
   constructor(
-    private readonly basePath: string,
+    /** Same normalization as the admin plugin (`normalizeAppBaseURL(app.baseURL)`). */
+    private readonly normalizedAppBase: string,
     private readonly fetchFn: typeof fetch = (...args) => fetch(...args),
   ) {}
+
+  private surfaceUrl(
+    name: AdminSurfaceRouteName,
+    params: AdminSurfaceRouteParams,
+    queryString: string = '',
+  ): string {
+    const base = adminSurfaceFetchUrl(this.normalizedAppBase, name, params)
+    return queryString !== '' ? `${base}?${queryString}` : base
+  }
 
   async list(type: string, query?: ListQuery): Promise<ListResult> {
     const params = this.buildQueryParams(query)
     const qs = params.toString()
-    const url = `${this.basePath}/${type}${qs ? '?' + qs : ''}`
+    const url = this.surfaceUrl('admin_surface.list', { type }, qs)
     const result = await this.request<SurfaceListResult>(url, { method: 'GET' })
     return {
       data: result.entities.map(this.normalizeEntity),
@@ -33,7 +51,7 @@ export class AdminSurfaceTransportAdapter implements TransportAdapter {
 
   async get(type: string, id: string): Promise<EntityResource> {
     const entity = await this.request<SurfaceEntity>(
-      `${this.basePath}/${type}/${id}`,
+      this.surfaceUrl('admin_surface.get', { type, id }),
       { method: 'GET' },
     )
     return this.normalizeEntity(entity)
@@ -41,7 +59,7 @@ export class AdminSurfaceTransportAdapter implements TransportAdapter {
 
   async create(type: string, attributes: Record<string, any>): Promise<EntityResource> {
     const entity = await this.request<SurfaceEntity>(
-      `${this.basePath}/${type}/action/create`,
+      this.surfaceUrl('admin_surface.action', { type, action: 'create' }),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,7 +71,7 @@ export class AdminSurfaceTransportAdapter implements TransportAdapter {
 
   async update(type: string, id: string, attributes: Record<string, any>): Promise<EntityResource> {
     const entity = await this.request<SurfaceEntity>(
-      `${this.basePath}/${type}/action/update`,
+      this.surfaceUrl('admin_surface.action', { type, action: 'update' }),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,7 +83,7 @@ export class AdminSurfaceTransportAdapter implements TransportAdapter {
 
   async remove(type: string, id: string): Promise<void> {
     await this.request(
-      `${this.basePath}/${type}/action/delete`,
+      this.surfaceUrl('admin_surface.action', { type, action: 'delete' }),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,7 +94,7 @@ export class AdminSurfaceTransportAdapter implements TransportAdapter {
 
   async schema(type: string): Promise<EntitySchema> {
     return this.request<EntitySchema>(
-      `${this.basePath}/${type}/action/schema`,
+      this.surfaceUrl('admin_surface.action', { type, action: 'schema' }),
       { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' },
     )
   }
@@ -93,7 +111,7 @@ export class AdminSurfaceTransportAdapter implements TransportAdapter {
 
   async runAction(type: string, action: string, payload?: Record<string, unknown>): Promise<unknown> {
     return this.request(
-      `${this.basePath}/${type}/action/${action}`,
+      this.surfaceUrl('admin_surface.action', { type, action }),
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

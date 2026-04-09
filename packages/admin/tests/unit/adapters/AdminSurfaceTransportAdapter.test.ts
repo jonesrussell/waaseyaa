@@ -23,7 +23,7 @@ describe('AdminSurfaceTransportAdapter', () => {
       }),
     })
 
-    const adapter = new AdminSurfaceTransportAdapter('/admin/_surface', fetchFn as typeof fetch)
+    const adapter = new AdminSurfaceTransportAdapter('/admin/', fetchFn as typeof fetch)
     const result = await adapter.list('user', {
       page: { offset: 0, limit: 25 },
       sort: 'name',
@@ -60,7 +60,7 @@ describe('AdminSurfaceTransportAdapter', () => {
       }),
     })
 
-    const adapter = new AdminSurfaceTransportAdapter('/admin/_surface', fetchFn as typeof fetch)
+    const adapter = new AdminSurfaceTransportAdapter('/admin/', fetchFn as typeof fetch)
 
     await expect(adapter.get('user', '42')).rejects.toMatchObject({
       status: 403,

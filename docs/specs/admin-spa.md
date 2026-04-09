@@ -7,6 +7,7 @@
 <!-- Spec reviewed 2026-04-08 - AdminSurfaceRoutePaths (waaseyaa/admin-surface PHP) + adminSurfaceRoutes.ts: named routes admin_surface.session|catalog|list|get|action; plugin bootstrap uses adminSurfaceFetchUrl(base, name); paths must stay aligned with WaaseyaaRouter registration (#815) -->
 <!-- Spec reviewed 2026-04-08 - Optional session `ui` (headerLinks, sidebarItems): AdminSurfaceUiPayload + AdminSurfaceSessionData; GenericAdminSurfaceHost::buildAdminUi(); SPA maps via normalizeSurfaceUi into AdminRuntime.ui; AdminShell + NavBuilder (#756) -->
 <!-- Spec reviewed 2026-04-08 - Session UI TypeScript mirror: `packages/admin/app/contracts/surface-ui.ts` duplicates admin-surface `contract/types.ts` ui shapes for `npm run build:contracts` (rootDir app only); keep in sync with PHP/contract (#756) -->
+<!-- Spec reviewed 2026-04-09 - AdminSurfaceTransportAdapter: constructor takes normalizedAppBase; all CRUD/action URLs via adminSurfaceFetchUrl (parity with plugin bootstrap; #1161) -->
 
 ## Optionality
 
@@ -174,7 +175,7 @@ interface EntitySchema {
 
 The root Nuxt plugin is the authoritative bootstrap for `$admin`. On non-public auth pages it:
 
-1. Normalizes `useRuntimeConfig().app.baseURL` and derives `surfacePath` (`joinURL(base, '_surface')`) for `AdminSurfaceTransportAdapter`, plus uses `adminSurfaceFetchUrl` with named routes `admin_surface.session` and `admin_surface.catalog` for bootstrap `$fetch` URLs (single contract with PHP `AdminSurfaceRoutePaths`).
+1. Normalizes `useRuntimeConfig().app.baseURL` and uses `adminSurfaceFetchUrl` for bootstrap `$fetch` URLs (`admin_surface.session`, `admin_surface.catalog`) and for **`AdminSurfaceTransportAdapter`** (list, get, and `admin_surface.action` for create/update/delete/schema/custom actions) — single path contract with PHP `AdminSurfaceRoutePaths` (#1161).
 2. Fetches `SurfaceResult<AdminSurfaceSession>` from the session route URL.
 3. Fetches `SurfaceResult<{ entities: AdminSurfaceCatalogEntry[] }>` from the catalog route URL after a successful session.
 4. Hydrates the shared auth-state keys `waaseyaa.auth.user` and `waaseyaa.auth.checked` from the authoritative session bootstrap before returning the runtime.

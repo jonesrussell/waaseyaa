@@ -17,7 +17,6 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
   const config = useRuntimeConfig()
   const normalizedAppBase = normalizeAppBaseURL(config.app.baseURL)
   const adminPathBase = normalizedAppBase.replace(/\/+$/, '') || ''
-  const surfacePath = joinURL(normalizedAppBase, '_surface').replace(/\/+$/, '') || '/_surface'
   const currentUser = useState<SurfaceSession['account'] | null>('waaseyaa.auth.user', () => null)
   const authChecked = useState<boolean>('waaseyaa.auth.checked', () => false)
 
@@ -109,7 +108,7 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
   const authConfig: AdminAuthConfig = { strategy: 'redirect', loginUrl: joinURL(normalizedAppBase, 'login') }
 
   const auth = new SessionAuthAdapter(account, tenant, authConfig, surfaceSession.features)
-  const transport = new AdminSurfaceTransportAdapter(surfacePath)
+  const transport = new AdminSurfaceTransportAdapter(normalizedAppBase)
 
   const runtime: AdminRuntime = {
     auth,
