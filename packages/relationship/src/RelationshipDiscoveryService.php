@@ -187,6 +187,8 @@ final class RelationshipDiscoveryService
             'relationship_types' => $this->validator->normalizeRelationshipTypes($options['relationship_types'] ?? []),
             'status' => $this->validator->normalizeStatus($options['status'] ?? 'published'),
             'at' => $at,
+            'temporal_from' => $from,
+            'temporal_to' => $to,
         ]);
 
         $edges = [];
@@ -196,11 +198,6 @@ final class RelationshipDiscoveryService
         if (in_array($direction, ['inbound', 'both'], true)) {
             $edges = array_merge($edges, is_array($browse['inbound'] ?? null) ? $browse['inbound'] : []);
         }
-
-        $edges = array_values(array_filter(
-            $edges,
-            fn(array $edge): bool => $this->validator->edgeOverlapsWindow($edge, $from, $to),
-        ));
 
         $validator = $this->validator;
         usort($edges, static function (array $left, array $right) use ($validator): int {

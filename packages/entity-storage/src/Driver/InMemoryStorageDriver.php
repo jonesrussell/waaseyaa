@@ -60,6 +60,25 @@ final class InMemoryStorageDriver implements EntityStorageDriverInterface
         return $base;
     }
 
+    public function readMultiple(string $entityType, array $ids, ?string $langcode = null): array
+    {
+        $seen = [];
+        $byId = [];
+        foreach ($ids as $id) {
+            $sid = (string) $id;
+            if ($sid === '' || isset($seen[$sid])) {
+                continue;
+            }
+            $seen[$sid] = true;
+            $row = $this->read($entityType, $sid, $langcode);
+            if ($row !== null) {
+                $byId[$sid] = $row;
+            }
+        }
+
+        return $byId;
+    }
+
     public function write(string $entityType, string $id, array $values): void
     {
         $this->store[$entityType][$id] = $values;

@@ -3,6 +3,7 @@
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/config, packages/entity-storage, packages/entity, packages/field; no entity runtime behavior change -->
 <!-- Spec reviewed 2026-04-08b - restored packages/config symfony/event-dispatcher floor from ^7.3 back to ^7.0; no entity/config runtime behavior change -->
 <!-- Spec reviewed 2026-04-09 - packages/entity and packages/entity-storage composer.json (manifest policy); storage and entity semantics unchanged -->
+<!-- Spec reviewed 2026-04-09c - readMultiple/findMany, SqlEntityQuery request-scoped result cache + save/delete invalidation (milestone 45) -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
@@ -188,6 +189,7 @@ Higher-level API with language fallback:
 interface EntityRepositoryInterface
 {
     public function find(string $id, ?string $langcode = null, bool $fallback = false): ?EntityInterface;
+    public function findMany(array $ids, ?string $langcode = null, bool $fallback = false): array;
     public function findBy(array $criteria, ?array $orderBy = null, ?int $limit = null): array;
     public function save(EntityInterface $entity, bool $validate = true): int;
     public function delete(EntityInterface $entity): void;
@@ -318,10 +320,13 @@ public function __construct(
     private readonly EventDispatcherInterface $eventDispatcher,
     ?LoggerInterface $logger = null,
     ?EntityEventFactoryInterface $eventFactory = null,
+    ?SqlEntityQueryResultCache $queryResultCache = null,
 )
 ```
 
 `$logger` defaults to `NullLogger`. `$eventFactory` defaults to `DefaultEntityEventFactory`. The logger is from `Waaseyaa\Foundation\Log\LoggerInterface` (not PSR-3).
+
+**Query result cache**: Each storage instance holds a request-scoped `SqlEntityQueryResultCache`. `getQuery()` wires it into `SqlEntityQuery` so repeated identical `EntityQueryInterface::execute()` calls avoid round-trips. After a successful `save()` or `delete()` that touches the table, the cache for that entity type is invalidated (all fingerprints for the type), so list/count queries see new mutations.
 
 **`loadByKey()`**: Implements `EntityStorageInterface::loadByKey()` using the query+load pattern.
 
@@ -412,6 +417,7 @@ Higher-level layer that handles:
 - Pre-save validation via `EntityValidator` (when injected and `validate: true`)
 - Entity lifecycle hooks (`preSave`, `postSave`, `preDelete`, `postDelete` on `EntityBase`)
 - Batch operations via `saveMany()`/`deleteMany()` with `UnitOfWork` transaction wrapping
+- Batch reads via `findMany(array $ids, ...)` delegating to `EntityStorageDriverInterface::readMultiple()`
 - Revision management via `loadRevision()` and `rollback()`
 - Automatic revision creation based on `EntityType::getRevisionDefault()` and per-entity `isNewRevision()` override (via `shouldCreateRevision()` internal method)
 
@@ -436,6 +442,7 @@ Low-level I/O SPI without entity hydration or events:
 
 ```php
 public function read(string $entityType, string $id, ?string $langcode = null): ?array;
+public function readMultiple(string $entityType, array $ids, ?string $langcode = null): array;
 public function write(string $entityType, string $id, array $values): void;
 public function remove(string $entityType, string $id): void;
 public function exists(string $entityType, string $id): bool;
@@ -448,7 +455,7 @@ public function findBy(string $entityType, array $criteria = [], ?array $orderBy
 File: `packages/entity-storage/src/Driver/SqlStorageDriver.php`
 Constructor: `(ConnectionResolverInterface $connectionResolver, string $idKey = 'id', ?CommunityScope $communityScope = null)`
 
-Handles raw SQL I/O. Supports translation tables: if `{entityType}_translations` table exists, `read()` merges translation data over base values.
+Handles raw SQL I/O. Supports translation tables: if `{entityType}_translations` table exists, `read()` merges translation data over base values. `readMultiple()` loads many IDs in one `IN` query with the same translation merge rules as repeated `read()` calls.
 
 When `$communityScope` is injected and active, all read/findBy/count/exists/remove operations add `WHERE community_id = ?` automatically. The `write()` method uses a scope-unaware existence check (raw ID lookup) to avoid duplicate INSERTs when the active community differs from the stored row's community, but scopes the UPDATE path to prevent cross-community overwrites. See **Community Scoping** section below.
 
@@ -607,9 +614,9 @@ Bundle defaults to `$this->entityTypeId` when no bundle value exists.
 File: `packages/entity-storage/src/SqlEntityQuery.php`
 Class: `final class SqlEntityQuery implements EntityQueryInterface`
 
-Constructor: `(EntityTypeInterface $entityType, DatabaseInterface $database)`
+Constructor: `(EntityTypeInterface $entityType, DatabaseInterface $database, ?SqlEntityQueryResultCache $resultCache = null)`
 
-Table and ID key derived from entity type. Fluent API builds conditions, sorts, and ranges.
+Table and ID key derived from entity type. Fluent API builds conditions, sorts, and ranges. When `$resultCache` is null (direct construction in tests), results are never memoized. `SqlEntityStorage::getQuery()` passes the storage’s cache instance.
 
 **JSON field resolution**: `resolveField()` checks if a field exists as a real table column (cached in `$columnCache`). Fields stored in the `_data` JSON blob are wrapped in `json_extract()` so they can be used in conditions, sorts, and counts transparently.
 
@@ -626,6 +633,8 @@ LIKE wildcard escaping: `str_replace(['%', '_'], ['\\%', '\\_'], $value)` before
 Count mode: `count()` switches `execute()` to return `[(int) $count]` instead of IDs.
 
 `accessCheck()` is a no-op in v0.1.0.
+
+**Memoization**: When a `SqlEntityQueryResultCache` is provided, `execute()` fingerprints conditions, sorts, range, and count mode (`xxh128` of a normalized payload), stores `{entityTypeId, fingerprint} → result`, and returns cached ID lists or `[(int)count]` on hits. There is no cross-table invalidation: cache entries for a type are dropped only when that type’s `SqlEntityStorage` completes `save()` or `delete()` that performs a write.
 
 Usage pattern:
 ```php
@@ -1014,7 +1023,8 @@ class FieldType extends WaaseyaaPlugin
 
 ### packages/entity-storage/src/
 - `SqlEntityStorage.php` -- SQL storage with _data blob split/merge
-- `SqlEntityQuery.php` -- SQL query builder with CONTAINS/STARTS_WITH operators
+- `SqlEntityQuery.php` -- SQL query builder with CONTAINS/STARTS_WITH operators; optional `SqlEntityQueryResultCache`
+- `SqlEntityQueryResultCache.php` -- per-entity-type memoization for `SqlEntityQuery::execute()` results
 - `SqlSchemaHandler.php` -- table creation and schema management
 - `EntitySchemaSync.php` -- batch wrapper that calls `SqlSchemaHandler::ensureTable()` for a list of entity types
 - `EntityStorageFactory.php` -- factory that creates/caches SqlEntityStorage

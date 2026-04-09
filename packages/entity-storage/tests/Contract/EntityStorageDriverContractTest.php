@@ -53,6 +53,26 @@ abstract class EntityStorageDriverContractTest extends TestCase
     }
 
     #[Test]
+    public function readMultipleReturnsKeyedRowsInOneTrip(): void
+    {
+        $this->driver->write('test_entity', '1', ['id' => '1', 'title' => 'A']);
+        $this->driver->write('test_entity', '2', ['id' => '2', 'title' => 'B']);
+        $this->driver->write('test_entity', '3', ['id' => '3', 'title' => 'C']);
+
+        $rows = $this->driver->readMultiple('test_entity', ['3', '1', 'missing', '3']);
+
+        self::assertSame(['A', 'C'], [$rows['1']['title'], $rows['3']['title']]);
+        self::assertArrayNotHasKey('missing', $rows);
+        self::assertCount(2, $rows);
+    }
+
+    #[Test]
+    public function readMultipleEmptyIdsReturnsEmptyArray(): void
+    {
+        self::assertSame([], $this->driver->readMultiple('test_entity', []));
+    }
+
+    #[Test]
     public function writeOverwritesExistingRow(): void
     {
         $this->driver->write('test_entity', '1', ['id' => '1', 'title' => 'Original']);

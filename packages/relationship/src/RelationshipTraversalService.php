@@ -33,89 +33,17 @@ final class RelationshipTraversalService
         $at = $this->normalizeTemporal($options['at'] ?? null);
         $limit = $this->normalizeLimit($options['limit'] ?? null);
 
-        $conditions = [];
-        $args = [];
-        $id = (string) $entityId;
+        $relationships = $this->queryRelationshipsForDirection(
+            $entityType,
+            (string) $entityId,
+            $direction,
+            $status,
+            $relationshipTypes,
+            null,
+            null,
+        );
 
-        if ($direction === 'outbound') {
-            $conditions[] = '((from_entity_type = ? AND from_entity_id = ?) OR (directionality = ? AND to_entity_type = ? AND to_entity_id = ?))';
-            array_push($args, $entityType, $id, 'bidirectional', $entityType, $id);
-        } elseif ($direction === 'inbound') {
-            $conditions[] = '((to_entity_type = ? AND to_entity_id = ?) OR (directionality = ? AND from_entity_type = ? AND from_entity_id = ?))';
-            array_push($args, $entityType, $id, 'bidirectional', $entityType, $id);
-        } else {
-            $conditions[] = '((from_entity_type = ? AND from_entity_id = ?) OR (to_entity_type = ? AND to_entity_id = ?))';
-            array_push($args, $entityType, $id, $entityType, $id);
-        }
-
-        if ($status === 'published') {
-            $conditions[] = 'status = ?';
-            $args[] = 1;
-        } elseif ($status === 'unpublished') {
-            $conditions[] = 'status = ?';
-            $args[] = 0;
-        }
-
-        if ($relationshipTypes !== []) {
-            $placeholders = implode(', ', array_fill(0, count($relationshipTypes), '?'));
-            $conditions[] = "relationship_type IN ({$placeholders})";
-            array_push($args, ...$relationshipTypes);
-        }
-
-        $sql = 'SELECT rid FROM relationship';
-        if ($conditions !== []) {
-            $sql .= ' WHERE ' . implode(' AND ', $conditions);
-        }
-        $sql .= ' ORDER BY rid ASC';
-
-        $rows = iterator_to_array($this->database->query($sql, $args), false);
-        if ($rows === []) {
-            return [];
-        }
-
-        $ids = array_map(static fn(array $row): int => (int) ($row['rid'] ?? 0), $rows);
-        $storage = $this->entityTypeManager->getStorage('relationship');
-        $loaded = $storage->loadMultiple($ids);
-
-        $result = [];
-        foreach ($ids as $idValue) {
-            $entity = $loaded[$idValue] ?? null;
-            if ($entity instanceof Relationship) {
-                $result[] = $entity;
-            }
-        }
-
-        if ($at !== null) {
-            $result = array_values(array_filter(
-                $result,
-                fn(Relationship $relationship): bool => $this->isActiveAt($relationship, $at),
-            ));
-        }
-
-        usort($result, function (Relationship $a, Relationship $b): int {
-            $statusCmp = $this->statusSortValue($b) <=> $this->statusSortValue($a);
-            if ($statusCmp !== 0) {
-                return $statusCmp;
-            }
-
-            $weightCmp = $this->compareOptionalNumbersDesc($a->get('weight'), $b->get('weight'));
-            if ($weightCmp !== 0) {
-                return $weightCmp;
-            }
-
-            $startCmp = $this->compareOptionalTemporalsAsc($a->get('start_date'), $b->get('start_date'));
-            if ($startCmp !== 0) {
-                return $startCmp;
-            }
-
-            return (int) $a->id() <=> (int) $b->id();
-        });
-
-        if ($limit !== null) {
-            $result = array_slice($result, 0, $limit);
-        }
-
-        return $result;
+        return $this->applyTemporalActiveFilterSortAndLimit($relationships, $at, $limit);
     }
 
     /**
@@ -125,7 +53,9 @@ final class RelationshipTraversalService
      *   relationship_types?: list<string>,
      *   status?: 'published'|'unpublished'|'all',
      *   at?: int|string|null,
-     *   limit?: int|null
+     *   limit?: int|null,
+     *   temporal_from?: int|string|null,
+     *   temporal_to?: int|string|null
      * } $options
      * @return array{
      *   source: array{type: string, id: string},
@@ -173,11 +103,48 @@ final class RelationshipTraversalService
             'at' => $this->normalizeTemporal($options['at'] ?? null),
             'limit' => $this->normalizeLimit($options['limit'] ?? null),
         ];
+        $temporalFrom = $this->normalizeTemporal($options['temporal_from'] ?? null);
+        $temporalTo = $this->normalizeTemporal($options['temporal_to'] ?? null);
         /** @var array<string, array{label: string, is_public: bool}> $entitySummaryCache */
         $entitySummaryCache = [];
 
+        $allRelationships = $this->queryRelationshipsForDirection(
+            $entityType,
+            $sourceId,
+            'both',
+            $normalized['status'],
+            $normalized['relationship_types'],
+            $temporalFrom,
+            $temporalTo,
+        );
+
+        $outboundRels = [];
+        $inboundRels = [];
+        foreach ($allRelationships as $relationship) {
+            if ($this->relationshipMatchesOutboundEndpoint($relationship, $entityType, $sourceId)) {
+                $outboundRels[(string) $relationship->id()] = $relationship;
+            }
+            if ($this->relationshipMatchesInboundEndpoint($relationship, $entityType, $sourceId)) {
+                $inboundRels[(string) $relationship->id()] = $relationship;
+            }
+        }
+
+        $outboundOrdered = $this->orderRelationshipsByRid(array_values($outboundRels));
+        $inboundOrdered = $this->orderRelationshipsByRid(array_values($inboundRels));
+
+        $outboundProcessed = $this->applyTemporalActiveFilterSortAndLimit(
+            $outboundOrdered,
+            $normalized['at'],
+            $normalized['limit'],
+        );
+        $inboundProcessed = $this->applyTemporalActiveFilterSortAndLimit(
+            $inboundOrdered,
+            $normalized['at'],
+            $normalized['limit'],
+        );
+
         $outboundEdges = $this->mapTraversalRelationships(
-            relationships: $this->traverse($entityType, $sourceId, $normalized + ['direction' => 'outbound']),
+            relationships: $outboundProcessed,
             sourceEntityType: $entityType,
             sourceEntityId: $sourceId,
             direction: 'outbound',
@@ -186,7 +153,7 @@ final class RelationshipTraversalService
         );
 
         $inboundEdges = $this->mapTraversalRelationships(
-            relationships: $this->traverse($entityType, $sourceId, $normalized + ['direction' => 'inbound']),
+            relationships: $inboundProcessed,
             sourceEntityType: $entityType,
             sourceEntityId: $sourceId,
             direction: 'inbound',
@@ -207,6 +174,189 @@ final class RelationshipTraversalService
                 'total' => count($outboundEdges) + count($inboundEdges),
             ],
         ];
+    }
+
+    /**
+     * @param list<Relationship> $relationships
+     * @return list<Relationship>
+     */
+    private function orderRelationshipsByRid(array $relationships): array
+    {
+        usort($relationships, static fn(Relationship $a, Relationship $b): int => (int) $a->id() <=> (int) $b->id());
+
+        return $relationships;
+    }
+
+    /**
+     * @param list<Relationship> $relationships
+     * @return list<Relationship>
+     */
+    private function applyTemporalActiveFilterSortAndLimit(
+        array $relationships,
+        ?int $at,
+        ?int $limit,
+    ): array {
+        $result = $relationships;
+        if ($at !== null) {
+            $result = array_values(array_filter(
+                $result,
+                fn(Relationship $relationship): bool => $this->isActiveAt($relationship, $at),
+            ));
+        }
+
+        usort($result, function (Relationship $a, Relationship $b): int {
+            $statusCmp = $this->statusSortValue($b) <=> $this->statusSortValue($a);
+            if ($statusCmp !== 0) {
+                return $statusCmp;
+            }
+
+            $weightCmp = $this->compareOptionalNumbersDesc($a->get('weight'), $b->get('weight'));
+            if ($weightCmp !== 0) {
+                return $weightCmp;
+            }
+
+            $startCmp = $this->compareOptionalTemporalsAsc($a->get('start_date'), $b->get('start_date'));
+            if ($startCmp !== 0) {
+                return $startCmp;
+            }
+
+            return (int) $a->id() <=> (int) $b->id();
+        });
+
+        if ($limit !== null) {
+            return array_slice($result, 0, $limit);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param list<string> $relationshipTypes
+     * @return list<Relationship>
+     */
+    private function queryRelationshipsForDirection(
+        string $entityType,
+        string $entityId,
+        string $direction,
+        string $status,
+        array $relationshipTypes,
+        ?int $temporalFrom,
+        ?int $temporalTo,
+    ): array {
+        $conditions = [];
+        $args = [];
+
+        if ($direction === 'outbound') {
+            $conditions[] = '((from_entity_type = ? AND from_entity_id = ?) OR (directionality = ? AND to_entity_type = ? AND to_entity_id = ?))';
+            array_push($args, $entityType, $entityId, 'bidirectional', $entityType, $entityId);
+        } elseif ($direction === 'inbound') {
+            $conditions[] = '((to_entity_type = ? AND to_entity_id = ?) OR (directionality = ? AND from_entity_type = ? AND from_entity_id = ?))';
+            array_push($args, $entityType, $entityId, 'bidirectional', $entityType, $entityId);
+        } else {
+            $conditions[] = '((from_entity_type = ? AND from_entity_id = ?) OR (to_entity_type = ? AND to_entity_id = ?))';
+            array_push($args, $entityType, $entityId, $entityType, $entityId);
+        }
+
+        if ($status === 'published') {
+            $conditions[] = 'status = ?';
+            $args[] = 1;
+        } elseif ($status === 'unpublished') {
+            $conditions[] = 'status = ?';
+            $args[] = 0;
+        }
+
+        if ($relationshipTypes !== []) {
+            $placeholders = implode(', ', array_fill(0, count($relationshipTypes), '?'));
+            $conditions[] = "relationship_type IN ({$placeholders})";
+            array_push($args, ...$relationshipTypes);
+        }
+
+        $this->appendTimelineOverlapSql($temporalFrom, $temporalTo, $conditions, $args);
+
+        $sql = 'SELECT rid FROM relationship';
+        if ($conditions !== []) {
+            $sql .= ' WHERE ' . implode(' AND ', $conditions);
+        }
+        $sql .= ' ORDER BY rid ASC';
+
+        $rows = iterator_to_array($this->database->query($sql, $args), false);
+        if ($rows === []) {
+            return [];
+        }
+
+        $ids = array_map(static fn(array $row): int => (int) ($row['rid'] ?? 0), $rows);
+        $storage = $this->entityTypeManager->getStorage('relationship');
+        $loaded = $storage->loadMultiple($ids);
+
+        $result = [];
+        foreach ($ids as $idValue) {
+            $entity = $loaded[$idValue] ?? null;
+            if ($entity instanceof Relationship) {
+                $result[] = $entity;
+            }
+        }
+
+        return $result;
+    }
+
+    private function appendTimelineOverlapSql(?int $from, ?int $to, array &$conditions, array &$args): void
+    {
+        if ($from === null && $to === null) {
+            return;
+        }
+
+        if ($from !== null && $to !== null) {
+            $conditions[] = '(start_date IS NULL OR start_date <= ?) AND (end_date IS NULL OR end_date >= ?)';
+            array_push($args, $to, $from);
+
+            return;
+        }
+
+        if ($from !== null) {
+            $conditions[] = '(end_date IS NULL OR end_date >= ?)';
+            $args[] = $from;
+
+            return;
+        }
+
+        $conditions[] = '(start_date IS NULL OR start_date <= ?)';
+        $args[] = $to;
+    }
+
+    private function relationshipMatchesOutboundEndpoint(
+        Relationship $relationship,
+        string $entityType,
+        string $entityId,
+    ): bool {
+        $fromType = (string) ($relationship->get('from_entity_type') ?? '');
+        $fromId = (string) ($relationship->get('from_entity_id') ?? '');
+        $toType = (string) ($relationship->get('to_entity_type') ?? '');
+        $toId = (string) ($relationship->get('to_entity_id') ?? '');
+        $directionality = strtolower(trim((string) ($relationship->get('directionality') ?? 'directed')));
+
+        if ($fromType === $entityType && $fromId === $entityId) {
+            return true;
+        }
+
+        return $directionality === 'bidirectional' && $toType === $entityType && $toId === $entityId;
+    }
+
+    private function relationshipMatchesInboundEndpoint(
+        Relationship $relationship,
+        string $entityType,
+        string $entityId,
+    ): bool {
+        $fromType = (string) ($relationship->get('from_entity_type') ?? '');
+        $fromId = (string) ($relationship->get('from_entity_id') ?? '');
+        $toType = (string) ($relationship->get('to_entity_type') ?? '');
+        $toId = (string) ($relationship->get('to_entity_id') ?? '');
+        $directionality = strtolower(trim((string) ($relationship->get('directionality') ?? 'directed')));
+
+        if ($toType === $entityType && $toId === $entityId) {
+            return true;
+        }
+
+        return $directionality === 'bidirectional' && $fromType === $entityType && $fromId === $entityId;
     }
 
     /**

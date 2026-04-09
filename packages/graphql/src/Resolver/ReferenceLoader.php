@@ -9,11 +9,18 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\GraphQL\Access\GraphQlAccessGuard;
 
 /**
- * Deferred batched loader for entity_reference fields.
+ * DataLoader-style deferred batching for `entity_reference` GraphQL fields.
  *
- * Accumulates reference IDs during field resolution, then batch-loads
- * via loadMultiple() per entity type when Deferred::runQueue() fires.
- * Prevents N+1 queries on nested entity references.
+ * Matches the usual DataLoader contract at a high level: enqueue many
+ * independent loads during the same resolver wave, flush once per entity
+ * type when {@see Deferred} completes, then satisfy each deferred callback
+ * from an in-memory map. Uses {@see EntityTypeManagerInterface::getStorage()}
+ * and {@see \Waaseyaa\Entity\Storage\EntityStorageInterface::loadMultiple()}
+ * so each type sees one SQL round-trip per queue flush instead of N.
+ *
+ * Lifecycle: construct a new instance per GraphQL request (see
+ * {@see \Waaseyaa\GraphQL\GraphQlEndpoint::handle}) so buffers do not leak
+ * across operations or users.
  */
 final class ReferenceLoader
 {

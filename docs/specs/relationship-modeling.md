@@ -1,7 +1,7 @@
 # Relationship Modeling (v0.6)
 
 <!-- Spec reviewed 2026-04-07 - RelationshipParameterValidator extracted from RelationshipDiscoveryService (579→442 lines); validation/normalization helpers in dedicated class, injected as constructor dependency; timelineSortDate converted to instance method for consistent injection -->
-<!-- Spec reviewed 2026-04-08 - RelationshipTraversalService browse warms related-entity summaries via per-type loadMultiple batching (in-request cache unchanged) -->
+<!-- Spec reviewed 2026-04-09 - RelationshipTraversalService: combined relationship queries where applicable; timeline active-window predicates pushed into SQL; browse still merges/sorts hub/cluster slices in PHP with batched entity loads -->
 
 ## Decision
 
@@ -57,6 +57,8 @@ Traversal must support:
 - type filter (`relationship_type` in set)
 - temporal filtering
 - status visibility filtering
+
+Implementation note: timeline-style browse applies temporal window constraints in SQL (overlap with `start_date` / `end_date`) where possible so PHP does not filter full edge sets only to discard them. Hub/cluster surfaces may still merge outbound and inbound slices before deterministic sort and pagination; facet totals should be interpreted with the cost/accuracy trade-offs documented on the issue/milestone for paged discovery.
 
 Deterministic ordering contract:
 
