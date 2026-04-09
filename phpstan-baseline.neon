@@ -253,12 +253,6 @@ parameters:
 			path: packages/api/src/Query/QueryParser.php
 
 		-
-			message: '#^Parameter \#2 \$fieldNames of method Waaseyaa\\Access\\EntityAccessHandler\:\:filterFields\(\) expects array\<string\>, list\<\(int\|string\)\> given\.$#'
-			identifier: argument.type
-			count: 1
-			path: packages/api/src/ResourceSerializer.php
-
-		-
 			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
 			identifier: empty.notAllowed
 			count: 2

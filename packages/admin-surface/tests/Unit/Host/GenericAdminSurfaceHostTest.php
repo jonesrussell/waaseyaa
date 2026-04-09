@@ -301,6 +301,9 @@ final class GenericAdminSurfaceHostTest extends TestCase
     {
         $entity = $this->createStub(EntityInterface::class);
         $entity->method('toArray')->willReturn(['id' => '1']);
+        $entity->method('get')->willReturnCallback(
+            fn(string $field) => match ($field) { 'id' => '1', default => null },
+        );
 
         $storage = $this->createMock(EntityStorageInterface::class);
         $storage->method('load')->willReturn($entity);
@@ -346,10 +349,24 @@ final class GenericAdminSurfaceHostTest extends TestCase
         $allowed->method('uuid')->willReturn('');
         $allowed->method('id')->willReturn(1);
         $allowed->method('toArray')->willReturn(['eid' => 1, 'title' => 'Visible']);
+        $allowed->method('get')->willReturnCallback(
+            fn(string $field) => match ($field) {
+                'eid' => 1,
+                'title' => 'Visible',
+                default => null,
+            },
+        );
 
         $denied = $this->createMock(EntityInterface::class);
         $denied->method('getEntityTypeId')->willReturn('event');
         $denied->method('toArray')->willReturn(['eid' => 2, 'title' => 'Hidden']);
+        $denied->method('get')->willReturnCallback(
+            fn(string $field) => match ($field) {
+                'eid' => 2,
+                'title' => 'Hidden',
+                default => null,
+            },
+        );
 
         $storage = $this->createMock(EntityStorageInterface::class);
         $storage->method('loadMultiple')->willReturn([$allowed, $denied]);
@@ -667,12 +684,26 @@ final class GenericAdminSurfaceHostTest extends TestCase
         $entity1->method('uuid')->willReturn('');
         $entity1->method('id')->willReturn(1);
         $entity1->method('toArray')->willReturn(['eid' => 1, 'title' => 'First']);
+        $entity1->method('get')->willReturnCallback(
+            fn(string $field) => match ($field) {
+                'eid' => 1,
+                'title' => 'First',
+                default => null,
+            },
+        );
 
         $entity2 = $this->createMock(EntityInterface::class);
         $entity2->method('getEntityTypeId')->willReturn('event');
         $entity2->method('uuid')->willReturn('');
         $entity2->method('id')->willReturn(2);
         $entity2->method('toArray')->willReturn(['eid' => 2, 'title' => 'Second']);
+        $entity2->method('get')->willReturnCallback(
+            fn(string $field) => match ($field) {
+                'eid' => 2,
+                'title' => 'Second',
+                default => null,
+            },
+        );
 
         $storage = $this->createMock(EntityStorageInterface::class);
         $storage->method('loadMultiple')->willReturn([$entity1, $entity2]);
