@@ -14,6 +14,7 @@
 <!-- Spec reviewed 2026-04-09 - Monorepo toolchain: PHPStan 2.x + phpstan-strict-rules 2.x; symfony/html-sanitizer ^8 required by waaseyaa/ssr (HtmlFormatter) and root composer (#1158 / #808/#809) -->
 <!-- Spec reviewed 2026-04-09 - InboundHttpRequestInterface + InboundHttpRequest snapshot DTO in foundation Http/Inbound for SSR app-controller boundary; body merge from Request bag + _parsed_body; public-surface map lists interface -->
 <!-- Spec reviewed 2026-04-09 - App controller Inertia: SsrPageHandler::dispatchAppController handles InertiaPageResultInterface (X-Inertia JSON + full HTML via InertiaFullPageRendererInterface, matching ControllerDispatcher); HttpKernel::getInertiaFullPageRenderer(); SsrServiceProvider injects that renderer when constructing SsrPageHandler in configureHttpKernel() -->
+<!-- Spec reviewed 2026-04-09 - HttpKernel::serveHttpRequest: auth middleware short-circuit — return pipeline response whenever status !== 200 (302 login redirect, 401/403 JSON), not only when status >= 400, so unauthenticated SSR routes cannot fall through to controller dispatch -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -1097,6 +1098,12 @@ CORS origin resolution in `HttpKernel::handleCors()`:
 1. Reads `cors_origins` from config (defaults to `localhost:3000` and `127.0.0.1:3000`).
 2. Checks `WAASEYAA_CORS_ORIGIN` env var — if set, overrides the config array with a single-origin list.
 3. Passes `allowDevLocalhostPorts: true` when the kernel is in development mode (env is `dev`, `development`, or `local`), allowing any localhost port.
+
+### HTTP authorization pipeline (`HttpKernel::serveHttpRequest`)
+
+After routing matches, `HttpKernel` builds an `HttpPipeline` of HTTP middleware (Bearer auth, session, CSRF, `AuthorizationMiddleware`, provider middleware). The inner handler is a stub that returns **200** with an empty body when the entire chain allows the request through.
+
+If any middleware short-circuits — for example `AuthorizationMiddleware` returning **302** to `/login` for unauthenticated `_authenticated` render routes, or **401** JSON:API for API routes — that response **must** be returned to the client immediately. The kernel treats any pipeline response whose status is **not 200** as final and does not continue to `ControllerDispatcher`. Only **200** from the pipeline means proceed to dispatch.
 
 ### Dev fallback account
 
