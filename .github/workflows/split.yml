@@ -18,6 +18,8 @@ jobs:
           - { local: 'packages/plugin', remote: 'plugin' }
           - { local: 'packages/typed-data', remote: 'typed-data' }
           - { local: 'packages/database-legacy', remote: 'database-legacy' }
+          - { local: 'packages/debug', remote: 'debug' }
+          - { local: 'packages/error-handler', remote: 'error-handler' }
           - { local: 'packages/testing', remote: 'testing' }
           - { local: 'packages/i18n', remote: 'i18n' }
           - { local: 'packages/queue', remote: 'queue' }
@@ -125,3 +127,19 @@ jobs:
           git remote add split "${REMOTE_URL}" 2>/dev/null || true
           git push split "${SHA}:refs/heads/main" --force
           git push split "${SHA}:refs/tags/${TAG_NAME}" --force
+
+  verify-tag-parity:
+    needs: split
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Verify split tag parity across package repos
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+          REPO_OWNER: ${{ github.repository_owner }}
+          GITHUB_TOKEN: ${{ secrets.SPLIT_GITHUB_TOKEN }}
+        run: |
+          bash bin/check-release-tag-parity "${TAG_NAME}"

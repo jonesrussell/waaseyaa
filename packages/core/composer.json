@@ -8,7 +8,6 @@
         "waaseyaa/cache": "^0.1",
         "waaseyaa/config": "^0.1",
         "waaseyaa/database-legacy": "^0.1",
-        "waaseyaa/debug": "^0.1",
         "waaseyaa/entity": "^0.1",
         "waaseyaa/entity-storage": "^0.1",
         "waaseyaa/error-handler": "^0.1",
@@ -19,11 +18,14 @@
         "waaseyaa/queue": "^0.1",
         "waaseyaa/routing": "^0.1",
         "waaseyaa/state": "^0.1",
-        "waaseyaa/telescope": "^0.1",
-        "waaseyaa/testing": "^0.1",
         "waaseyaa/typed-data": "^0.1",
         "waaseyaa/user": "^0.1",
         "waaseyaa/validation": "^0.1"
+    },
+    "suggest": {
+        "waaseyaa/debug": "Enable dev-only debug helpers and toolbar integration.",
+        "waaseyaa/telescope": "Enable runtime observability dashboards and inspection tooling.",
+        "waaseyaa/testing": "Install in-memory testing fixtures and framework test helpers."
     },
     "minimum-stability": "stable",
     "extra": {
