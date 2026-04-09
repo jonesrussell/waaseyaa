@@ -25,6 +25,15 @@ interface EntityStorageDriverInterface
     public function read(string $entityType, string $id, ?string $langcode = null): ?array;
 
     /**
+     * Read multiple rows by ID in one round-trip.
+     *
+     * @param list<int|string> $ids Entity IDs (empty IDs are ignored, duplicates collapsed).
+     * @param string|null $langcode Optional language (same semantics as {@see read()}).
+     * @return array<string, array<string, mixed>> Rows keyed by string ID; missing IDs omitted.
+     */
+    public function readMultiple(string $entityType, array $ids, ?string $langcode = null): array;
+
+    /**
      * Write (insert or update) a row.
      *
      * @param string $entityType The entity type machine name.

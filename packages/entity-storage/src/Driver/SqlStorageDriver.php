@@ -65,6 +65,55 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
         return null;
     }
 
+    public function readMultiple(string $entityType, array $ids, ?string $langcode = null): array
+    {
+        $db = $this->getDatabase();
+        $unique = [];
+        foreach ($ids as $id) {
+            $sid = (string) $id;
+            if ($sid === '') {
+                continue;
+            }
+            $unique[$sid] = true;
+        }
+        $idList = array_keys($unique);
+        if ($idList === []) {
+            return [];
+        }
+
+        if ($langcode !== null) {
+            $translationTable = $entityType . '_translations';
+            if ($db->schema()->tableExists($translationTable)) {
+                return $this->readMultipleWithTranslation($db, $entityType, $idList, $langcode);
+            }
+        }
+
+        $query = $db->select($entityType)
+            ->fields($entityType)
+            ->condition($this->idKey, $idList, 'IN');
+
+        if ($this->communityScope?->isActive()) {
+            $query->condition('community_id', $this->communityScope->getCommunityId());
+        }
+
+        $byId = [];
+        foreach ($query->execute() as $row) {
+            $row = (array) $row;
+            $pk = $row[$this->idKey] ?? null;
+            if ($pk === null) {
+                continue;
+            }
+            $key = (string) $pk;
+            if ($langcode !== null && $db->schema()->fieldExists($entityType, 'langcode')
+                && isset($row['langcode']) && $row['langcode'] !== $langcode) {
+                continue;
+            }
+            $byId[$key] = $row;
+        }
+
+        return $byId;
+    }
+
     public function write(string $entityType, string $id, array $values): void
     {
         $db = $this->getDatabase();
@@ -261,6 +310,65 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
         // Remove join keys from translation before merge.
         unset($translation['entity_id']);
         $merged = array_merge($base, $translation);
+
+        return $merged;
+    }
+
+    /**
+     * @param list<string> $idList
+     * @return array<string, array<string, mixed>>
+     */
+    private function readMultipleWithTranslation(
+        DatabaseInterface $db,
+        string $entityType,
+        array $idList,
+        string $langcode,
+    ): array {
+        $baseQuery = $db->select($entityType)
+            ->fields($entityType)
+            ->condition($this->idKey, $idList, 'IN');
+
+        if ($this->communityScope?->isActive()) {
+            $baseQuery->condition('community_id', $this->communityScope->getCommunityId());
+        }
+
+        $bases = [];
+        foreach ($baseQuery->execute() as $row) {
+            $row = (array) $row;
+            $pk = $row[$this->idKey] ?? null;
+            if ($pk !== null) {
+                $bases[(string) $pk] = $row;
+            }
+        }
+
+        if ($bases === []) {
+            return [];
+        }
+
+        $translationTable = $entityType . '_translations';
+        $transQuery = $db->select($translationTable)
+            ->fields($translationTable)
+            ->condition('entity_id', $idList, 'IN')
+            ->condition('langcode', $langcode);
+
+        $translations = [];
+        foreach ($transQuery->execute() as $row) {
+            $row = (array) $row;
+            $entityId = $row['entity_id'] ?? null;
+            if ($entityId !== null) {
+                $translations[(string) $entityId] = $row;
+            }
+        }
+
+        $merged = [];
+        foreach ($bases as $sid => $base) {
+            if (!isset($translations[$sid])) {
+                continue;
+            }
+            $translation = $translations[$sid];
+            unset($translation['entity_id']);
+            $merged[$sid] = array_merge($base, $translation);
+        }
 
         return $merged;
     }

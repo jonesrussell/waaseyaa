@@ -84,6 +84,7 @@ final class GraphQlEndpoint
         }
 
         $guard = new GraphQlAccessGuard($this->accessHandler, $this->account);
+        // New ReferenceLoader per request — buffers entity_reference IDs for DataLoader-style batching.
         $referenceLoader = new ReferenceLoader(
             $this->entityTypeManager,
             $guard,

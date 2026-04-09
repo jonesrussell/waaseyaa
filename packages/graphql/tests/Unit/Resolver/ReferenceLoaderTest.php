@@ -17,6 +17,7 @@ use Waaseyaa\Access\FieldAccessPolicyInterface;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\GraphQL\Access\GraphQlAccessGuard;
 use Waaseyaa\GraphQL\Resolver\ReferenceLoader;
@@ -251,5 +252,58 @@ final class ReferenceLoaderTest extends TestCase
         Deferred::runQueue();
 
         self::assertNull($deferred->result);
+    }
+
+    #[Test]
+    public function loadUsesSingleLoadMultiplePerEntityTypePerDeferredQueue(): void
+    {
+        $articleStorage = new CountingInMemoryStorage('article');
+
+        $manager = new EntityTypeManager(
+            new EventDispatcher(),
+            static fn (EntityTypeInterface $_def): CountingInMemoryStorage => $articleStorage,
+        );
+        $manager->registerCoreEntityType(new EntityType(
+            id: 'article',
+            label: 'Article',
+            class: \Waaseyaa\Api\Tests\Fixtures\TestEntity::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
+        ));
+
+        foreach (['A', 'B', 'C'] as $title) {
+            $e = $articleStorage->create(['title' => $title]);
+            $e->enforceIsNew();
+            $articleStorage->save($e);
+        }
+
+        $guard = $this->openAccessGuard();
+        $loader = new ReferenceLoader($manager, $guard);
+
+        $d1 = $loader->load('article', 1, 0);
+        $d2 = $loader->load('article', 2, 0);
+        $d3 = $loader->load('article', 3, 0);
+        Deferred::runQueue();
+
+        self::assertSame(1, $articleStorage->loadMultipleInvocations);
+        self::assertNotNull($d1->result);
+        self::assertNotNull($d2->result);
+        self::assertNotNull($d3->result);
+    }
+}
+
+final class CountingInMemoryStorage extends InMemoryEntityStorage
+{
+    public int $loadMultipleInvocations = 0;
+
+    public function __construct(string $entityTypeId = 'article')
+    {
+        parent::__construct($entityTypeId);
+    }
+
+    public function loadMultiple(array $ids = []): array
+    {
+        ++$this->loadMultipleInvocations;
+
+        return parent::loadMultiple($ids);
     }
 }

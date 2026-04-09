@@ -109,6 +109,29 @@ final class EntityRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function findManyPreservesOrderAndSkipsMissing(): void
+    {
+        $this->driver->write('test_entity', '1', [
+            'id' => '1',
+            'label' => 'First',
+            'bundle' => 'article',
+            'langcode' => 'en',
+        ]);
+        $this->driver->write('test_entity', '2', [
+            'id' => '2',
+            'label' => 'Second',
+            'bundle' => 'article',
+            'langcode' => 'en',
+        ]);
+
+        $entities = $this->repository->findMany(['2', '9', '1']);
+
+        $this->assertCount(2, $entities);
+        $this->assertSame('Second', $entities[0]->label());
+        $this->assertSame('First', $entities[1]->label());
+    }
+
+    #[Test]
     public function findByReturnMatchingEntities(): void
     {
         $this->driver->write('test_entity', '1', [

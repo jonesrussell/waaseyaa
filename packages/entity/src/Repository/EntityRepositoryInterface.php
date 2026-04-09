@@ -26,6 +26,16 @@ interface EntityRepositoryInterface
     public function find(string $id, ?string $langcode = null, bool $fallback = false): ?EntityInterface;
 
     /**
+     * Find many entities by ID in one driver round-trip (when not using language fallback).
+     *
+     * Preserves the order of the first occurrence of each non-empty ID in $ids; omits missing IDs.
+     *
+     * @param list<int|string> $ids
+     * @return list<EntityInterface>
+     */
+    public function findMany(array $ids, ?string $langcode = null, bool $fallback = false): array;
+
+    /**
      * Find entities matching criteria.
      *
      * @param array<string, mixed> $criteria Field => value pairs to match.

@@ -35,6 +35,7 @@ final class SqlEntityQuery implements EntityQueryInterface
     public function __construct(
         private readonly EntityTypeInterface $entityType,
         private readonly DatabaseInterface $database,
+        private readonly ?SqlEntityQueryResultCache $resultCache = null,
     ) {
         $this->tableName = $this->entityType->id();
         $keys = $this->entityType->getKeys();
@@ -125,6 +126,22 @@ final class SqlEntityQuery implements EntityQueryInterface
     }
 
     /**
+     * Deterministic fingerprint for {@see SqlEntityQueryResultCache}.
+     */
+    private function buildCacheFingerprint(): string
+    {
+        $payload = [
+            'conditions' => $this->conditions,
+            'sorts' => $this->sorts,
+            'rangeOffset' => $this->rangeOffset,
+            'rangeLimit' => $this->rangeLimit,
+            'isCount' => $this->isCount,
+        ];
+
+        return hash('xxh128', json_encode($payload, JSON_THROW_ON_ERROR));
+    }
+
+    /**
      * Execute the query and return entity IDs.
      *
      * When count() has been called, returns a single-element array with the count.
@@ -133,6 +150,16 @@ final class SqlEntityQuery implements EntityQueryInterface
      */
     public function execute(): array
     {
+        $entityTypeId = $this->entityType->id();
+        $fingerprint = $this->resultCache !== null ? $this->buildCacheFingerprint() : null;
+
+        if ($fingerprint !== null) {
+            $cached = $this->resultCache->get($entityTypeId, $fingerprint);
+            if ($cached !== null) {
+                return $cached;
+            }
+        }
+
         $select = $this->database->select($this->tableName);
 
         if ($this->isCount) {
@@ -177,11 +204,17 @@ final class SqlEntityQuery implements EntityQueryInterface
         $result = $select->execute();
 
         if ($this->isCount) {
+            $countResult = [0];
             foreach ($result as $row) {
                 $row = (array) $row;
-                return [(int) ($row['count'] ?? 0)];
+                $countResult = [(int) ($row['count'] ?? 0)];
+                break;
             }
-            return [0];
+            if ($fingerprint !== null) {
+                $this->resultCache->set($entityTypeId, $fingerprint, $countResult);
+            }
+
+            return $countResult;
         }
 
         $ids = [];
@@ -193,6 +226,10 @@ final class SqlEntityQuery implements EntityQueryInterface
                 $id = (int) $id;
             }
             $ids[] = $id;
+        }
+
+        if ($fingerprint !== null) {
+            $this->resultCache->set($entityTypeId, $fingerprint, $ids);
         }
 
         return $ids;

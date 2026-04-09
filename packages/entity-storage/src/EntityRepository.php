@@ -85,6 +85,52 @@ final class EntityRepository implements EntityRepositoryInterface
         return $this->hydrate($row);
     }
 
+    public function findMany(array $ids, ?string $langcode = null, bool $fallback = false): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        $entityTypeId = $this->entityType->id();
+        $orderedKeys = [];
+        foreach ($ids as $id) {
+            $sid = (string) $id;
+            if ($sid === '') {
+                continue;
+            }
+            if (!in_array($sid, $orderedKeys, true)) {
+                $orderedKeys[] = $sid;
+            }
+        }
+
+        if ($orderedKeys === []) {
+            return [];
+        }
+
+        if ($langcode !== null && $fallback) {
+            $entities = [];
+            foreach ($orderedKeys as $id) {
+                $entity = $this->find($id, $langcode, true);
+                if ($entity !== null) {
+                    $entities[] = $entity;
+                }
+            }
+
+            return $entities;
+        }
+
+        $rowsById = $this->driver->readMultiple($entityTypeId, $orderedKeys, $langcode);
+        $entities = [];
+        foreach ($orderedKeys as $id) {
+            $row = $rowsById[$id] ?? null;
+            if ($row !== null) {
+                $entities[] = $this->hydrate($row);
+            }
+        }
+
+        return $entities;
+    }
+
     public function findBy(array $criteria, ?array $orderBy = null, ?int $limit = null): array
     {
         $entityTypeId = $this->entityType->id();

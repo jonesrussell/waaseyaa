@@ -503,6 +503,60 @@ final class PackageManifestCompilerTest extends TestCase
     }
 
     #[Test]
+    public function load_merges_root_commands_and_routes_when_cache_incomplete_but_fingerprint_matches(): void
+    {
+        $composer = [
+            'name' => 'test/root',
+            'extra' => [
+                'waaseyaa' => [
+                    'commands' => [\Iterator::class],
+                    'routes' => [\Stringable::class],
+                ],
+            ],
+        ];
+        file_put_contents($this->tempDir . '/composer.json', json_encode($composer, JSON_THROW_ON_ERROR));
+
+        $installed = ['packages' => []];
+        file_put_contents(
+            $this->tempDir . '/vendor/composer/installed.json',
+            json_encode($installed, JSON_THROW_ON_ERROR),
+        );
+
+        $fingerprint = hash(
+            'xxh128',
+            (string) file_get_contents($this->tempDir . '/composer.json')
+            . "\0"
+            . (string) file_get_contents($this->tempDir . '/vendor/composer/installed.json'),
+        );
+
+        $storagePath = $this->tempDir . '/storage';
+        mkdir($storagePath . '/framework', 0o755, true);
+
+        $data = [
+            'providers' => [],
+            'commands' => [],
+            'routes' => [],
+            'migrations' => [],
+            'field_types' => [],
+            'middleware' => [],
+            'permissions' => [],
+            'policies' => [],
+            '_manifest_inputs_fp' => $fingerprint,
+        ];
+
+        file_put_contents(
+            $storagePath . '/framework/packages.php',
+            '<?php return ' . var_export($data, true) . ';' . "\n",
+        );
+
+        $compiler = new PackageManifestCompiler($this->tempDir, $storagePath);
+        $manifest = $compiler->load();
+
+        $this->assertSame([\Iterator::class], $manifest->commands);
+        $this->assertSame([\Stringable::class], $manifest->routes);
+    }
+
+    #[Test]
     public function compile_collects_permissions_from_installed_json(): void
     {
         $installed = [

@@ -1537,12 +1537,6 @@ parameters:
 			path: packages/relationship/src/RelationshipDiscoveryService.php
 
 		-
-			message: '#^Strict comparison using \!\=\= between list\{0\: ''\(\(from_entity_type …''\|''\(\(to_entity_type \= …'', 1\?\: literal\-string&non\-falsy\-string, 2\?\: literal\-string&non\-falsy\-string\} and array\{\} will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: packages/relationship/src/RelationshipTraversalService.php
-
-		-
 			message: '#^Casting to int something that''s already int\.$#'
 			identifier: cast.useless
 			count: 1

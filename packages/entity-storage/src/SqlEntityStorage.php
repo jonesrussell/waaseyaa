@@ -43,12 +43,15 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     private readonly EntityEventFactoryInterface $eventFactory;
 
+    private readonly SqlEntityQueryResultCache $queryResultCache;
+
     public function __construct(
         private readonly EntityTypeInterface $entityType,
         private readonly DatabaseInterface $database,
         private readonly EventDispatcherInterface $eventDispatcher,
         ?LoggerInterface $logger = null,
         ?EntityEventFactoryInterface $eventFactory = null,
+        ?SqlEntityQueryResultCache $queryResultCache = null,
     ) {
         $this->tableName = $this->entityType->id();
         $keys = $this->entityType->getKeys();
@@ -56,6 +59,7 @@ final class SqlEntityStorage implements EntityStorageInterface
         $this->entityKeys = $keys;
         $this->logger = $logger ?? new NullLogger();
         $this->eventFactory = $eventFactory ?? new DefaultEntityEventFactory();
+        $this->queryResultCache = $queryResultCache ?? new SqlEntityQueryResultCache();
     }
 
     public function create(array $values = []): EntityInterface
@@ -212,6 +216,8 @@ final class SqlEntityStorage implements EntityStorageInterface
             $result = EntityConstants::SAVED_UPDATED;
         }
 
+        $this->queryResultCache->invalidate($this->tableName);
+
         // Dispatch POST_SAVE event.
         $this->eventDispatcher->dispatch(
             $this->eventFactory->create($entity),
@@ -251,6 +257,7 @@ final class SqlEntityStorage implements EntityStorageInterface
             $this->database->delete($this->tableName)
                 ->condition($this->idKey, $ids, 'IN')
                 ->execute();
+            $this->queryResultCache->invalidate($this->tableName);
         }
 
         // Dispatch POST_DELETE events.
@@ -264,7 +271,7 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     public function getQuery(): EntityQueryInterface
     {
-        return new SqlEntityQuery($this->entityType, $this->database);
+        return new SqlEntityQuery($this->entityType, $this->database, $this->queryResultCache);
     }
 
     public function getEntityTypeId(): string
