@@ -38,6 +38,7 @@ parameters:
         - packages/relationship/src
         - packages/routing/src
         - packages/search/src
+        - packages/seo/src
         - packages/ssr/src
         - packages/state/src
         - packages/taxonomy/src

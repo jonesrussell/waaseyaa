@@ -81,6 +81,7 @@ declare -A PATTERN_TO_SPEC=(
   ["packages/relationship/"]="docs/specs/relationship-modeling.md"
   ["packages/ai-"]="docs/specs/ai-integration.md"
   ["packages/mcp/"]="docs/specs/mcp-endpoint.md"
+  ["packages/seo/"]="docs/specs/seo.md"
   ["packages/user/"]="docs/specs/access-control.md"
   ["packages/ingestion/"]="docs/specs/ingestion-defaults.md"
   ["packages/auth/"]="docs/specs/access-control.md"

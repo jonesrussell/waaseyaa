@@ -167,6 +167,10 @@
         },
         {
             "type": "path",
+            "url": "packages/seo"
+        },
+        {
+            "type": "path",
             "url": "packages/i18n"
         },
         {
@@ -285,6 +289,7 @@
         "waaseyaa/routing": "@dev",
         "waaseyaa/scheduler": "@dev",
         "waaseyaa/search": "@dev",
+        "waaseyaa/seo": "@dev",
         "waaseyaa/ssr": "@dev",
         "waaseyaa/state": "@dev",
         "waaseyaa/taxonomy": "@dev",
@@ -343,6 +348,7 @@
             "Waaseyaa\\Relationship\\Tests\\": "packages/relationship/tests/",
             "Waaseyaa\\Routing\\Tests\\": "packages/routing/tests/",
             "Waaseyaa\\Search\\Tests\\": "packages/search/tests/",
+            "Waaseyaa\\Seo\\Tests\\": "packages/seo/tests/",
             "Waaseyaa\\SSR\\Tests\\": "packages/ssr/tests/",
             "Waaseyaa\\Taxonomy\\Tests\\": "packages/taxonomy/tests/",
             "Waaseyaa\\User\\Tests\\": "packages/user/tests/",

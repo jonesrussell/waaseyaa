@@ -84,6 +84,25 @@ final class SqlStorageDriverTest extends TestCase
     }
 
     #[Test]
+    public function readAndReadMultipleAreConsistentForMissingBaseLangcodeMatch(): void
+    {
+        $this->driver->write('test_entity', '1', [
+            'id' => 1,
+            'uuid' => 'test-uuid-1',
+            'label' => 'Hello World',
+            'bundle' => 'article',
+            'langcode' => 'en',
+            '_data' => '{}',
+        ]);
+
+        $single = $this->driver->read('test_entity', '1', 'fr');
+        $multiple = $this->driver->readMultiple('test_entity', ['1'], 'fr');
+
+        $this->assertNull($single);
+        $this->assertSame([], $multiple);
+    }
+
+    #[Test]
     public function writeUpdatesExisting(): void
     {
         $this->driver->write('test_entity', '1', [
