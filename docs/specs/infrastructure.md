@@ -12,6 +12,7 @@
 <!-- Spec reviewed 2026-04-08 - DX P2: HttpKernel boot catch returns HTML via DevExceptionRenderer when debug+package present else JSON:API bootFailureJsonResponse (non-empty body, #1117); ControllerDispatcher render.page returns 501 JSON when SsrPageHandler class unavailable (#1130); LogManager gains daily + fingers_crossed channel types -->
 <!-- Spec reviewed 2026-04-08 - LogManager: handler key string = type synonym only; fingers_crossed nested config via nested, inner, or array handler; channel buffer_limit caps FingersCrossedHandler in-memory buffer (drops oldest); handlerTypeFromConfig + fingersCrossedBufferLimit helpers -->
 <!-- Spec reviewed 2026-04-09 - Monorepo toolchain: PHPStan 2.x + phpstan-strict-rules 2.x; symfony/html-sanitizer ^8 required by waaseyaa/ssr (HtmlFormatter) and root composer (#1158 / #808/#809) -->
+<!-- Spec reviewed 2026-04-09 - InboundHttpRequestInterface + InboundHttpRequest snapshot DTO in foundation Http/Inbound for SSR app-controller boundary; body merge from Request bag + _parsed_body; public-surface map lists interface -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -23,7 +24,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| foundation | `AssetManagerInterface`, `BroadcasterInterface`, `HealthCheckerInterface`, `LoggerInterface`, `HandlerInterface`, `FormatterInterface`, `ProcessorInterface`, `LoggerTrait`, `HttpHandlerInterface`, `HttpMiddlewareInterface`, `JobHandlerInterface`, `JobMiddlewareInterface`, `RateLimiterInterface`, `SchemaRegistryInterface`, `ServiceProviderInterface`, `ServiceProvider`, `DomainEvent`, `WaaseyaaException`, `JsonApiResponseTrait`, `DomainRouterInterface`, `LanguagePathStripperInterface`, `InertiaPageResultInterface`, `InertiaFullPageRendererInterface`, `Migration` |
+| foundation | `AssetManagerInterface`, `BroadcasterInterface`, `HealthCheckerInterface`, `LoggerInterface`, `HandlerInterface`, `FormatterInterface`, `ProcessorInterface`, `LoggerTrait`, `HttpHandlerInterface`, `HttpMiddlewareInterface`, `JobHandlerInterface`, `JobMiddlewareInterface`, `RateLimiterInterface`, `SchemaRegistryInterface`, `ServiceProviderInterface`, `ServiceProvider`, `DomainEvent`, `WaaseyaaException`, `JsonApiResponseTrait`, `InboundHttpRequestInterface`, `DomainRouterInterface`, `LanguagePathStripperInterface`, `InertiaPageResultInterface`, `InertiaFullPageRendererInterface`, `Migration` |
 | cache | `CacheBackendInterface`, `CacheFactoryInterface`, `CacheTagsInvalidatorInterface`, `TagAwareCacheInterface` |
 | database-legacy | `DatabaseInterface`, `SelectInterface`, `InsertInterface`, `UpdateInterface`, `DeleteInterface`, `SchemaInterface`, `TransactionInterface` |
 | plugin | `PluginInspectionInterface`, `PluginManagerInterface`, `PluginBase` |
@@ -1043,6 +1044,16 @@ Deterministic chain: `HttpKernel` iterates routers in order; first `supports()` 
 File: `packages/foundation/src/Http/Router/WaaseyaaContext.php`
 
 Typed value object built once from the request via `WaaseyaaContext::fromRequest()`. Provides `account`, `parsedBody`, `query`, `method`, and `broadcastStorage` to routers.
+
+#### SSR app controllers: inbound HTTP boundary
+
+`SsrPageHandler::dispatchAppController()` invokes app methods as `($params, $query, $account, $httpRequest)` where `$httpRequest` is Symfony’s `Request`. That fourth argument stays the dispatcher contract.
+
+Below the controller entrypoint, **do not** pass `Symfony\Component\HttpFoundation\Request` into application or domain services. Build **`InboundHttpRequest::fromSymfonyRequest($httpRequest, $params, $query)`** once per action and pass **`InboundHttpRequestInterface`** (or the concrete snapshot for construction only) downward.
+
+`InboundHttpRequest` is an immutable snapshot: route and query bags are the arrays the router already extracted (not re-read from the request); the body merges `$request->request->all()` with the `_parsed_body` attribute when it is an array (JSON keys overlay form keys). Headers and cookies are copied at construction time.
+
+Optional follow-ups (full header map API, lazy adapter, JSON:API adoption) are tracked as [#1174](https://github.com/waaseyaa/framework/issues/1174), [#1175](https://github.com/waaseyaa/framework/issues/1175), and [#1176](https://github.com/waaseyaa/framework/issues/1176) and do not block this convention.
 
 #### Domain Routers
 

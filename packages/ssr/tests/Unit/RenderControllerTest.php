@@ -77,6 +77,95 @@ final class RenderControllerTest extends TestCase
     }
 
     #[Test]
+    public function renderPathFallbackUsesAppNameFromEnvironment(): void
+    {
+        $hadKey = array_key_exists('APP_NAME', $_ENV);
+        $previous = $hadKey ? $_ENV['APP_NAME'] : null;
+        $_ENV['APP_NAME'] = 'Custom Site';
+
+        try {
+            $twig = new Environment(new ArrayLoader([]));
+            $controller = new RenderController($twig);
+            $response = $controller->renderPath('/missing');
+
+            $this->assertSame(200, $response->getStatusCode());
+            $this->assertStringContainsString('<title>Custom Site</title>', $response->getContent());
+            $this->assertStringContainsString('<h1>Custom Site</h1>', $response->getContent());
+        } finally {
+            if ($hadKey) {
+                $_ENV['APP_NAME'] = $previous;
+            } else {
+                unset($_ENV['APP_NAME']);
+            }
+        }
+    }
+
+    #[Test]
+    public function renderPathFallbackAcceptsExplicitSiteName(): void
+    {
+        $twig = new Environment(new ArrayLoader([]));
+        $controller = new RenderController($twig, null, 'Explicit Brand');
+        $response = $controller->renderPath('/other');
+
+        $this->assertStringContainsString('<title>Explicit Brand</title>', $response->getContent());
+        $this->assertStringContainsString('<h1>Explicit Brand</h1>', $response->getContent());
+    }
+
+    #[Test]
+    public function emptyStringSiteNameArgumentFallsBackToResolveDefaultSiteName(): void
+    {
+        $hadKey = array_key_exists('APP_NAME', $_ENV);
+        $previous = $hadKey ? $_ENV['APP_NAME'] : null;
+        $_ENV['APP_NAME'] = 'Resolved From Env';
+
+        try {
+            $twig = new Environment(new ArrayLoader([]));
+            $controller = new RenderController($twig, null, '');
+            $response = $controller->renderPath('/missing');
+
+            $this->assertStringContainsString('<title>Resolved From Env</title>', $response->getContent());
+        } finally {
+            if ($hadKey) {
+                $_ENV['APP_NAME'] = $previous;
+            } else {
+                unset($_ENV['APP_NAME']);
+            }
+        }
+    }
+
+    #[Test]
+    public function renderPathFallbackFallsThroughEmptyEnvAppNameToServer(): void
+    {
+        $hadEnvKey = array_key_exists('APP_NAME', $_ENV);
+        $prevEnv = $hadEnvKey ? $_ENV['APP_NAME'] : null;
+        $hadServerKey = array_key_exists('APP_NAME', $_SERVER);
+        $prevServer = $hadServerKey ? $_SERVER['APP_NAME'] : null;
+
+        $_ENV['APP_NAME'] = '';
+        $_SERVER['APP_NAME'] = 'From Server';
+
+        try {
+            $twig = new Environment(new ArrayLoader([]));
+            $controller = new RenderController($twig);
+            $response = $controller->renderPath('/missing');
+
+            $this->assertStringContainsString('<title>From Server</title>', $response->getContent());
+            $this->assertStringContainsString('<h1>From Server</h1>', $response->getContent());
+        } finally {
+            if ($hadEnvKey) {
+                $_ENV['APP_NAME'] = $prevEnv;
+            } else {
+                unset($_ENV['APP_NAME']);
+            }
+            if ($hadServerKey) {
+                $_SERVER['APP_NAME'] = $prevServer;
+            } else {
+                unset($_SERVER['APP_NAME']);
+            }
+        }
+    }
+
+    #[Test]
     public function renderPathTriesHomeTemplateForRootPath(): void
     {
         $twig = new Environment(new ArrayLoader([
