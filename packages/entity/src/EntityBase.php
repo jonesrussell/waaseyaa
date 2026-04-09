@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity;
 
 use Symfony\Component\Uid\Uuid;
+use Waaseyaa\Entity\Cast\ValueCaster;
 
 /**
  * Abstract base class for all entity types.
  *
  * Provides default implementations of EntityInterface methods.
  * Subclasses must define their entity type ID.
+ *
+ * Subclasses may declare a {@see $casts} map (Laravel-style). Incoming constructor
+ * `$values` remain storage-canonical (no casting on construct); {@see get()} and
+ * {@see set()} apply {@see ValueCaster} when a field has an entry in `$casts`.
  */
 abstract class EntityBase implements EntityInterface
 {
@@ -39,6 +44,13 @@ abstract class EntityBase implements EntityInterface
      * @var array<string, string>
      */
     protected array $entityKeys = [];
+
+    /**
+     * Per-field cast specifications (string token, backed enum class-string, or `['type' => ...]`).
+     *
+     * @var array<string, string|array<string, mixed>>
+     */
+    protected array $casts = [];
 
     /**
      * @param array<string, mixed> $values Initial entity values.
@@ -115,14 +127,31 @@ abstract class EntityBase implements EntityInterface
         return $this;
     }
 
+    /**
+     * Resolves the caster used by {@see get()} / {@see set()}. Override in tests to inject a custom caster.
+     */
+    protected function valueCaster(): ValueCaster
+    {
+        return new ValueCaster();
+    }
+
     public function get(string $name): mixed
     {
-        return $this->values[$name] ?? null;
+        $raw = \array_key_exists($name, $this->values) ? $this->values[$name] : null;
+
+        if (isset($this->casts[$name])) {
+            return $this->valueCaster()->castIn($name, $raw, $this->casts[$name]);
+        }
+
+        return $raw;
     }
 
     public function set(string $name, mixed $value): static
     {
-        $this->values[$name] = $value;
+        $stored = isset($this->casts[$name])
+            ? $this->valueCaster()->castOut($name, $value, $this->casts[$name])
+            : $value;
+        $this->values[$name] = $stored;
 
         return $this;
     }
