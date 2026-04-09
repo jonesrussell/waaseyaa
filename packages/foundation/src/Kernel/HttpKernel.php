@@ -338,7 +338,9 @@ final class HttpKernel extends AbstractKernel
             return $this->jsonApiResponse(500, ['jsonapi' => ['version' => '1.1'], 'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => 'An authorization error occurred.']]]);
         }
 
-        if ($authResponse->getStatusCode() >= 400) {
+        // The pipeline's inner handler returns 200 with an empty body on success.
+        // Short-circuit responses (302 login redirect, 401/403 JSON, etc.) must be returned as-is.
+        if ($authResponse->getStatusCode() !== 200) {
             return $authResponse;
         }
 
