@@ -30,6 +30,7 @@ jobs:
           - ai-schema
           - ai-vector
           - api
+          - bimaaji
           - cache
           - cli
           - cms
