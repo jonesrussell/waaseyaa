@@ -1,7 +1,7 @@
 # Waaseyaa
 
 ## Project Structure
-- Monorepo: 52 PHP packages in `packages/`, 3 meta-packages (core, cms, full), 1 JS admin SPA
+- Monorepo: 53 PHP packages in `packages/`, 3 meta-packages (core, cms, full), 1 JS admin SPA
 - 7-layer architecture (Foundation → Core Data → Content Types → Services → API → AI → Interfaces)
 - Each package has its own `composer.json` with path repository references
 - Root `composer.json` uses `@dev` constraints for all waaseyaa/* packages
@@ -38,6 +38,7 @@ When working on files matching these patterns, retrieve the spec for deep contex
 | `packages/relationship/*` | — | `docs/specs/relationship-modeling.md`, `docs/specs/relationship-inference-contract.md` |
 | `packages/graphql/*` | — | — |
 | `packages/search/*` | — | — |
+| `packages/seo/*` | — | `docs/specs/seo.md` |
 | `packages/ssr/*` | — | — |
 | `packages/error-handler/*` | — | `docs/specs/debugging-dx.md` |
 | `packages/debug/*` | — | `docs/specs/debugging-dx.md` |
@@ -72,7 +73,7 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 | 0 | Foundation | foundation, cache, plugin, typed-data, database-legacy, testing, i18n, queue, scheduler, state, validation, mail, http-client, ingestion, error-handler |
 | 1 | Core Data | entity, entity-storage, access, user, config, field, auth |
 | 2 | Content Types | node, taxonomy, media, path, menu, note, relationship |
-| 3 | Services | workflows, search, notification, billing, github |
+| 3 | Services | workflows, search, seo, notification, billing, github |
 | 4 | API | api, routing |
 | 5 | AI | ai-schema, ai-agent, ai-pipeline, ai-vector |
 | 6 | Interfaces | cli, admin, admin-surface, graphql, mcp, ssr, telescope, deployer, inertia, debug |

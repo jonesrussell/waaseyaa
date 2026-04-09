@@ -62,6 +62,7 @@ jobs:
           - routing
           - scheduler
           - search
+          - seo
           - ssr
           - state
           - taxonomy
