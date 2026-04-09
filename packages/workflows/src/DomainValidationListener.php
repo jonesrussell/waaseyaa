@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Workflows;
 
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\FieldableInterface;
 
@@ -34,7 +35,7 @@ final class DomainValidationListener
             return;
         }
 
-        $this->validateNode($entity->toArray(), $entity->id(), $entity);
+        $this->validateNode(EntityValues::toCastAwareMap($entity), $entity->id(), $entity);
     }
 
     /**
@@ -107,7 +108,7 @@ final class DomainValidationListener
             return;
         }
 
-        $previousValues = $existing->toArray();
+        $previousValues = EntityValues::toCastAwareMap($existing);
         $previousState = EditorialWorkflowPreset::normalizeState(
             workflowState: $previousValues['workflow_state'] ?? null,
             status: $previousValues['status'] ?? 0,
@@ -144,7 +145,7 @@ final class DomainValidationListener
                 continue;
             }
 
-            $existingTitle = mb_strtolower(trim((string) ($node->toArray()['title'] ?? '')));
+            $existingTitle = mb_strtolower(trim((string) ($node->get('title') ?? '')));
             if ($existingTitle !== '' && $existingTitle === $normalized) {
                 throw new \InvalidArgumentException(
                     sprintf('Validation failed for node bundle "%s": title "%s" must be unique.', $bundle, $title),
@@ -157,6 +158,10 @@ final class DomainValidationListener
     {
         if ($value === null || $value === '') {
             return null;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->getTimestamp();
         }
 
         if (is_int($value)) {

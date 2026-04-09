@@ -6,6 +6,7 @@ namespace Waaseyaa\SSR;
 
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Field\ViewModeConfigInterface;
 
 final class EntityRenderer
@@ -39,7 +40,7 @@ final class EntityRenderer
         $definition = $this->entityTypeManager->getDefinition($entityTypeId);
         $fieldDefinitions = $definition->getFieldDefinitions();
         $display = $this->viewModeConfig->getDisplay($entityTypeId, $mode);
-        $values = $entity->toArray();
+        $values = EntityValues::toCastAwareMap($entity);
 
         if ($display === []) {
             $display = $this->buildDefaultDisplay($fieldDefinitions, $values, $definition->getKeys());

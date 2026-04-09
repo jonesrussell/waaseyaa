@@ -9,6 +9,7 @@ use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\EntityValues;
 
 /**
  * @internal
@@ -94,7 +95,7 @@ abstract class McpTool
                 continue;
             }
 
-            $values = $relationship->toArray();
+            $values = EntityValues::toCastAwareMap($relationship);
             $fromType = strtolower((string) ($values['from_entity_type'] ?? ''));
             $fromId = (string) ($values['from_entity_id'] ?? '');
             $toType = strtolower((string) ($values['to_entity_type'] ?? ''));
@@ -103,7 +104,7 @@ abstract class McpTool
                 continue;
             }
 
-            $status = (int) ($values['status'] ?? 0);
+            $status = EntityValues::statusToInt($values['status'] ?? 0);
             if ($parsed['status'] === 'published' && $status !== 1) {
                 continue;
             }

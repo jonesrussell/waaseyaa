@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Relationship;
 
+use Waaseyaa\Entity\EntityValues;
+
 final class RelationshipDiscoveryService
 {
     public function __construct(
@@ -326,7 +328,7 @@ final class RelationshipDiscoveryService
             'edge_context' => [
                 'relationship_type' => (string) ($relationshipValues['relationship_type'] ?? ''),
                 'directionality' => (string) ($relationshipValues['directionality'] ?? 'directed'),
-                'status' => is_numeric($relationshipValues['status'] ?? null) ? (int) $relationshipValues['status'] : 0,
+                'status' => EntityValues::statusToInt($relationshipValues['status'] ?? 0),
                 'weight' => is_numeric($relationshipValues['weight'] ?? null) ? (float) $relationshipValues['weight'] : null,
                 'confidence' => is_numeric($relationshipValues['confidence'] ?? null) ? (float) $relationshipValues['confidence'] : null,
                 'start_date' => $this->validator->normalizeTemporal($relationshipValues['start_date'] ?? null),

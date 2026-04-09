@@ -9,6 +9,7 @@ use Waaseyaa\Cache\CacheBackendInterface;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Foundation\Cache\DiscoveryCachePrimitives;
 use Waaseyaa\Relationship\RelationshipDiscoveryService;
 use Waaseyaa\Relationship\RelationshipTraversalService;
@@ -159,8 +160,8 @@ final class DiscoveryApiHandler
             return false;
         }
 
-        return $this->isDiscoveryEntityPublic($fromType, $from->toArray())
-            && $this->isDiscoveryEntityPublic($toType, $to->toArray());
+        return $this->isDiscoveryEntityPublic($fromType, EntityValues::toCastAwareMap($from))
+            && $this->isDiscoveryEntityPublic($toType, EntityValues::toCastAwareMap($to));
     }
 
     public function loadDiscoveryEntity(string $entityType, string $entityId): ?EntityInterface

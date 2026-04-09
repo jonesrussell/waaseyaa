@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Relationship;
 
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\FieldableInterface;
 
@@ -19,7 +20,7 @@ final class RelationshipPreSaveListener
             return;
         }
 
-        $normalized = $this->validator->normalize($event->entity->toArray());
+        $normalized = $this->validator->normalize(EntityValues::toCastAwareMap($event->entity));
         $this->validator->assertValid($normalized);
 
         if ($event->entity instanceof FieldableInterface) {

@@ -8,6 +8,7 @@ use Waaseyaa\AI\Vector\EmbeddingProviderFactory;
 use Waaseyaa\AI\Vector\EmbeddingProviderInterface;
 use Waaseyaa\AI\Vector\EmbeddingStorageInterface;
 use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
@@ -60,7 +61,7 @@ final class EmbeddingPipeline
 
     private function extractText(EntityInterface $entity): string
     {
-        $values = $entity->toArray();
+        $values = EntityValues::toCastAwareMap($entity);
         $fields = $this->configuredFieldsForEntity($entity);
         if ($fields === []) {
             $fields = ['title', 'name', 'body'];

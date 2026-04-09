@@ -8,6 +8,7 @@ use Waaseyaa\Access\AccessPolicyInterface;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityValues;
 
 final class PermissionAwareNodeVisibilityPolicy implements AccessPolicyInterface
 {
@@ -22,7 +23,7 @@ final class PermissionAwareNodeVisibilityPolicy implements AccessPolicyInterface
             return AccessResult::neutral('Not used.');
         }
 
-        if ((int) ($entity->toArray()['status'] ?? 0) === 1) {
+        if (EntityValues::statusToInt($entity->get('status')) === 1) {
             return AccessResult::allowed('Published');
         }
 

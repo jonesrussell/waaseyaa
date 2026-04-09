@@ -7,6 +7,7 @@ namespace Waaseyaa\Workflows\Tests\Unit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Workflows\WorkflowVisibility;
 
 #[CoversClass(WorkflowVisibility::class)]
@@ -48,5 +49,28 @@ final class WorkflowVisibilityTest extends TestCase
         $this->assertFalse($visibility->isEntityPublic('relationship', ['status' => 0]));
         $this->assertTrue($visibility->isEntityPublic('relationship', ['status' => 'yes']));
         $this->assertTrue($visibility->isEntityPublic('taxonomy_term', []));
+    }
+
+    #[Test]
+    public function isNodePublicForEntityUsesCastAwareStatus(): void
+    {
+        $entity = new class (['type' => 'article', 'status' => 1]) extends ContentEntityBase {
+            /** @var array<string, string> */
+            protected array $casts = ['status' => 'bool'];
+
+            public function __construct(array $values = [])
+            {
+                parent::__construct($values, 'node', [
+                    'id' => 'nid',
+                    'uuid' => 'uuid',
+                    'label' => 'title',
+                    'bundle' => 'type',
+                ]);
+            }
+        };
+
+        $visibility = new WorkflowVisibility();
+
+        $this->assertTrue($visibility->isNodePublicForEntity($entity));
     }
 }

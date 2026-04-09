@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Workflows;
 
+use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityValues;
+
 final class WorkflowVisibility
 {
     /**
@@ -31,6 +34,11 @@ final class WorkflowVisibility
     public function isNodePublic(array $values): bool
     {
         return $this->nodeState($values) === EditorialWorkflowPreset::STATE_PUBLISHED;
+    }
+
+    public function isNodePublicForEntity(EntityInterface $entity): bool
+    {
+        return $this->isNodePublic(EntityValues::toCastAwareMap($entity));
     }
 
     /**

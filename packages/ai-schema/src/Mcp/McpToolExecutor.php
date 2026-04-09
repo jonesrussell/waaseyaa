@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\AI\Schema\Mcp;
 
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Entity\FieldableInterface;
 
 /**
@@ -84,7 +85,7 @@ final class McpToolExecutor
             'operation' => 'create',
             'entity_type' => $entityTypeId,
             'id' => $entity->id(),
-            'data' => $entity->toArray(),
+            'data' => EntityValues::toCastAwareMap($entity),
         ]);
     }
 
@@ -108,7 +109,7 @@ final class McpToolExecutor
             'operation' => 'read',
             'entity_type' => $entityTypeId,
             'id' => $entity->id(),
-            'data' => $entity->toArray(),
+            'data' => EntityValues::toCastAwareMap($entity),
         ]);
     }
 
@@ -148,7 +149,7 @@ final class McpToolExecutor
             'operation' => 'update',
             'entity_type' => $entityTypeId,
             'id' => $entity->id(),
-            'data' => $entity->toArray(),
+            'data' => EntityValues::toCastAwareMap($entity),
         ]);
     }
 
@@ -225,7 +226,7 @@ final class McpToolExecutor
             foreach ($entities as $entity) {
                 $results[] = [
                     'id' => $entity->id(),
-                    'data' => $entity->toArray(),
+                    'data' => EntityValues::toCastAwareMap($entity),
                 ];
             }
         }
