@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity\Tests\Unit\Validation;
 
-use Waaseyaa\Entity\EntityInterface;
-use Waaseyaa\Entity\FieldableInterface;
-use Waaseyaa\Validation\Constraint\AllowedValues;
-use Waaseyaa\Validation\Constraint\NotEmpty;
-use Waaseyaa\Entity\Validation\EntityValidator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Constraints\Type;
+use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\FieldableInterface;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleStringEnum;
+use Waaseyaa\Entity\Tests\Unit\Validation\Fixture\BackedEnumCastEntity;
+use Waaseyaa\Entity\Validation\EntityValidator;
+use Waaseyaa\Validation\Constraint\AllowedValues;
+use Waaseyaa\Validation\Constraint\NotEmpty;
 
 final class EntityValidatorTest extends TestCase
 {
@@ -108,12 +112,13 @@ final class EntityValidatorTest extends TestCase
         $this->assertCount(1, $violations);
     }
 
-    public function testValidateNonFieldableEntityUsesToArray(): void
+    public function testValidateUsesEntityGetForFieldValues(): void
     {
         $entity = $this->createMock(EntityInterface::class);
-        $entity->method('toArray')->willReturn([
-            'title' => 'Hello',
-        ]);
+        $entity->method('get')
+            ->willReturnMap([
+                ['title', 'Hello'],
+            ]);
 
         $symfonyValidator = $this->createMock(ValidatorInterface::class);
         $symfonyValidator->expects($this->once())
@@ -169,6 +174,31 @@ final class EntityValidatorTest extends TestCase
 
         // Root should be remapped to the entity.
         $this->assertSame($entity, $violations->get(0)->getRoot());
+    }
+
+    public function testValidateUsesCastAwareGetSoBackedEnumTypeConstraintPassesForScalarStorage(): void
+    {
+        $entity = new BackedEnumCastEntity(['status' => 'a']);
+
+        $validator = new EntityValidator(Validation::createValidator());
+        $violations = $validator->validate($entity, [
+            'status' => [new Type(SampleStringEnum::class)],
+        ]);
+
+        $this->assertCount(0, $violations);
+    }
+
+    public function testValidateWithoutCastRawStringFailsBackedEnumTypeConstraint(): void
+    {
+        $entity = $this->createFieldableEntity(['status' => 'a']);
+
+        $validator = new EntityValidator(Validation::createValidator());
+        $violations = $validator->validate($entity, [
+            'status' => [new Type(SampleStringEnum::class)],
+        ]);
+
+        $this->assertGreaterThan(0, $violations->count());
+        $this->assertSame('status', $violations->get(0)->getPropertyPath());
     }
 
     /**

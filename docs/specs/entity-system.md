@@ -8,6 +8,7 @@
 <!-- Spec reviewed 2026-04-09e - packages/entity Cast kernel (#1181 ST-1): ValueCaster, CastDefinition, CastException -->
 <!-- Spec reviewed 2026-04-09f - EntityBase $casts + cast-aware get/set (#1181 ST-2); ContentEntityBase delegates to EntityBase -->
 <!-- Spec reviewed 2026-04-09g - ST-4/ST-5 persistence: hydrate + toArray remain raw; integration tests in entity-storage -->
+<!-- Spec reviewed 2026-04-09h - EntityValidator uses EntityInterface::get() for all entities (#1181 ST-6); cast-aware validation -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
@@ -55,6 +56,8 @@ interface EntityInterface
     public function getEntityTypeId(): string;
     public function bundle(): string;
     public function isNew(): bool;
+    public function get(string $name): mixed;
+    public function set(string $name, mixed $value): static;
     public function toArray(): array;
     public function language(): string;
 }
@@ -783,7 +786,7 @@ final class EntityValidator
 }
 ```
 
-Validates entity field values against per-field Symfony Validator constraints. `$constraints` is keyed by field name. For `FieldableInterface` entities, uses `get($field)` for proper resolution; otherwise falls back to `toArray()`. Violations are remapped to include the field path.
+Validates entity field values against per-field Symfony Validator constraints. `$constraints` is keyed by field name. Values are always read with `EntityInterface::get($field)` so Symfony sees **cast-aware domain types** when the entity defines `$casts` (e.g. `Type(BackedEnum::class)` constraints). Do not use `toArray()` slices here — storage scalars would bypass casts (#1181 ST-6). `FieldableInterface` adds field metadata only; `get()`/`set()` are part of the core `EntityInterface` contract. Violations are remapped to include the field path.
 
 File: `packages/entity/src/Validation/EntityValidationException.php`
 
