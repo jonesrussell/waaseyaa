@@ -117,6 +117,7 @@ final class SsrServiceProvider extends ServiceProvider implements LanguagePathSt
             manifest: $kernel->getManifest(),
             serviceResolver: $kernel->getHttpServiceResolver(),
             gate: new EntityAccessGate($kernel->getAccessHandler()),
+            inertiaFullPageRenderer: $kernel->getInertiaFullPageRenderer(),
         );
     }
 
