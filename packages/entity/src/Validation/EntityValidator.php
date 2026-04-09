@@ -8,14 +8,13 @@ use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Waaseyaa\Entity\EntityInterface;
-use Waaseyaa\Entity\FieldableInterface;
 
 /**
  * Validates entity field values against provided constraints.
  *
  * The EntityValidator takes a Symfony ValidatorInterface and applies
- * per-field constraints to entity values, collecting all violations
- * across all fields into a single violation list.
+ * per-field constraints to values from {@see EntityInterface::get()} (cast-aware),
+ * collecting all violations across all fields into a single violation list.
  */
 final class EntityValidator
 {
@@ -25,6 +24,11 @@ final class EntityValidator
 
     /**
      * Validate an entity's values against the provided constraints.
+     *
+     * Values are read via {@see EntityInterface::get()}, which is part of the core
+     * entity contract (not limited to {@see \Waaseyaa\Entity\FieldableInterface}).
+     * {@see \Waaseyaa\Entity\FieldableInterface} adds field metadata ({@see \Waaseyaa\Entity\FieldableInterface::hasField},
+     * {@see \Waaseyaa\Entity\FieldableInterface::getFieldDefinitions}) on top of the same {@see EntityInterface::get()}.
      *
      * @param EntityInterface $entity The entity to validate.
      * @param array<string, \Symfony\Component\Validator\Constraint[]|\Symfony\Component\Validator\Constraint> $constraints
@@ -37,21 +41,15 @@ final class EntityValidator
     {
         $violations = new ConstraintViolationList();
 
-        $values = $entity->toArray();
-
         foreach ($constraints as $field => $fieldConstraints) {
             // Normalize single constraint to array.
             if (!is_array($fieldConstraints)) {
                 $fieldConstraints = [$fieldConstraints];
             }
 
-            // Get the field value: prefer FieldableInterface::get() for proper resolution,
-            // otherwise fall back to the toArray() output.
-            if ($entity instanceof FieldableInterface) {
-                $value = $entity->get($field);
-            } else {
-                $value = $values[$field] ?? null;
-            }
+            // EntityInterface::get() is the cast-aware boundary (#1181 ST-6); do not use
+            // toArray() slices here or validation sees storage scalars instead of domain types.
+            $value = $entity->get($field);
 
             $fieldViolations = $this->validator->validate($value, $fieldConstraints);
 

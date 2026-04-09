@@ -17,11 +17,14 @@ use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\EntityStorage\Tests\Fixtures\HydratableFromStorageTestEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\LifecycleTrackingEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\SpyEntityEventFactory;
+use Waaseyaa\EntityStorage\Tests\Fixtures\TestEnumCastStorageEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestStorageEntity;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Validator\Constraints\Type;
+use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceStringEnum;
 
 #[CoversClass(EntityRepository::class)]
 final class EntityRepositoryTest extends TestCase
@@ -732,6 +735,90 @@ final class EntityRepositoryTest extends TestCase
 
         $result = $repository->save($entity);
         $this->assertSame(EntityConstants::SAVED_NEW, $result);
+    }
+
+    #[Test]
+    public function savePassesWhenEntityTypeExpectsBackedEnumAndEntityCastsScalarStorage(): void
+    {
+        $enumConstrainedType = new EntityType(
+            id: 'test_entity',
+            label: 'Test Entity',
+            class: TestEnumCastStorageEntity::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
+            constraints: [
+                'flag' => [new Type(CastPersistenceStringEnum::class)],
+            ],
+        );
+
+        $driver = new InMemoryStorageDriver();
+        $validator = new \Waaseyaa\Entity\Validation\EntityValidator(
+            \Symfony\Component\Validator\Validation::createValidator(),
+        );
+
+        $repository = new EntityRepository(
+            $enumConstrainedType,
+            $driver,
+            $this->eventDispatcher,
+            validator: $validator,
+        );
+
+        $entity = new TestEnumCastStorageEntity(
+            values: [
+                'id' => '1',
+                'label' => 'Valid',
+                'bundle' => 'article',
+                'langcode' => 'en',
+                'flag' => 'on',
+            ],
+            entityTypeId: 'test_entity',
+            entityKeys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
+        );
+        $entity->enforceIsNew(true);
+
+        $result = $repository->save($entity);
+        $this->assertSame(EntityConstants::SAVED_NEW, $result);
+    }
+
+    #[Test]
+    public function saveThrowsWhenEntityTypeExpectsBackedEnumButEntityHasNoCast(): void
+    {
+        $enumConstrainedType = new EntityType(
+            id: 'test_entity',
+            label: 'Test Entity',
+            class: TestStorageEntity::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
+            constraints: [
+                'flag' => [new Type(CastPersistenceStringEnum::class)],
+            ],
+        );
+
+        $driver = new InMemoryStorageDriver();
+        $validator = new \Waaseyaa\Entity\Validation\EntityValidator(
+            \Symfony\Component\Validator\Validation::createValidator(),
+        );
+
+        $repository = new EntityRepository(
+            $enumConstrainedType,
+            $driver,
+            $this->eventDispatcher,
+            validator: $validator,
+        );
+
+        $entity = new TestStorageEntity(
+            values: [
+                'id' => '1',
+                'label' => 'Valid',
+                'bundle' => 'article',
+                'langcode' => 'en',
+                'flag' => 'on',
+            ],
+            entityTypeId: 'test_entity',
+            entityKeys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
+        );
+        $entity->enforceIsNew(true);
+
+        $this->expectException(\Waaseyaa\Entity\Validation\EntityValidationException::class);
+        $repository->save($entity);
     }
 
     #[Test]
