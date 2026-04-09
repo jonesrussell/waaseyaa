@@ -16,6 +16,7 @@ use Waaseyaa\Entity\Event\EntityEventFactoryInterface;
 use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 use Waaseyaa\Entity\RevisionableInterface;
+use Waaseyaa\Entity\Validation\EntityTypeValidationConstraints;
 use Waaseyaa\Entity\Validation\EntityValidationException;
 use Waaseyaa\Entity\Validation\EntityValidator;
 use Waaseyaa\EntityStorage\Driver\EntityStorageDriverInterface;
@@ -203,7 +204,7 @@ final class EntityRepository implements EntityRepositoryInterface
         $entityTypeId = $this->entityType->id();
 
         if ($validate && $this->validator !== null) {
-            $constraints = $this->entityType->getConstraints();
+            $constraints = EntityTypeValidationConstraints::forEntityType($this->entityType);
             if ($constraints !== []) {
                 $violations = $this->validator->validate($entity, $constraints);
                 if ($violations->count() > 0) {

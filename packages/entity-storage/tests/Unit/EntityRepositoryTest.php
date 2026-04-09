@@ -738,6 +738,90 @@ final class EntityRepositoryTest extends TestCase
     }
 
     #[Test]
+    public function saveThrowsWhenOnlyFieldDefinitionsRequireLabel(): void
+    {
+        $type = new EntityType(
+            id: 'test_entity',
+            label: 'Test Entity',
+            class: TestStorageEntity::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
+            constraints: [],
+            fieldDefinitions: [
+                'label' => ['type' => 'string', 'required' => true],
+            ],
+        );
+
+        $db = DBALDatabase::createSqlite();
+        $driver = new SqlStorageDriver(new SingleConnectionResolver($db));
+        (new SqlSchemaHandler($type, $db))->ensureTable();
+
+        $validator = new \Waaseyaa\Entity\Validation\EntityValidator(
+            \Symfony\Component\Validator\Validation::createValidator(),
+        );
+
+        $repository = new EntityRepository(
+            $type,
+            $driver,
+            $this->eventDispatcher,
+            database: $db,
+            validator: $validator,
+        );
+
+        $entity = new TestStorageEntity(
+            values: ['id' => '1', 'label' => '', 'bundle' => 'article', 'langcode' => 'en'],
+            entityTypeId: 'test_entity',
+            entityKeys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
+        );
+        $entity->enforceIsNew(true);
+
+        $this->expectException(\Waaseyaa\Entity\Validation\EntityValidationException::class);
+        $repository->save($entity);
+    }
+
+    #[Test]
+    public function saveReplacesDerivedFieldConstraintsWhenManualConstraintsPresentForField(): void
+    {
+        $type = new EntityType(
+            id: 'test_entity',
+            label: 'Test Entity',
+            class: TestStorageEntity::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
+            fieldDefinitions: [
+                'label' => ['type' => 'string', 'required' => true],
+            ],
+            constraints: [
+                'label' => [new \Symfony\Component\Validator\Constraints\Length(max: 80)],
+            ],
+        );
+
+        $db = DBALDatabase::createSqlite();
+        $driver = new SqlStorageDriver(new SingleConnectionResolver($db));
+        (new SqlSchemaHandler($type, $db))->ensureTable();
+
+        $validator = new \Waaseyaa\Entity\Validation\EntityValidator(
+            \Symfony\Component\Validator\Validation::createValidator(),
+        );
+
+        $repository = new EntityRepository(
+            $type,
+            $driver,
+            $this->eventDispatcher,
+            database: $db,
+            validator: $validator,
+        );
+
+        $entity = new TestStorageEntity(
+            values: ['id' => '1', 'label' => '', 'bundle' => 'article', 'langcode' => 'en'],
+            entityTypeId: 'test_entity',
+            entityKeys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
+        );
+        $entity->enforceIsNew(true);
+
+        $result = $repository->save($entity);
+        $this->assertSame(EntityConstants::SAVED_NEW, $result);
+    }
+
+    #[Test]
     public function savePassesWhenEntityTypeExpectsBackedEnumAndEntityCastsScalarStorage(): void
     {
         $enumConstrainedType = new EntityType(

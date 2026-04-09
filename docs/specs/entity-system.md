@@ -13,6 +13,7 @@
 <!-- Spec reviewed 2026-04-09j - EntityValues helper, presentation layers use cast-aware maps (#1181 ST-8) -->
 <!-- Spec reviewed 2026-04-09 ST-9 - casting + hydration architecture finalization: diagrams, invariants, EntityValues/get/set/toArray/config rules (#1181) -->
 <!-- Spec reviewed 2026-04-09 ST-10 - layering: EntityValues::toJsonReadyMap / normalizeValueForJson; AI vector uses cast-aware paths (#1181) -->
+<!-- Spec reviewed 2026-04-09 - field-definition → Symfony constraints + save merge (#1182) -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
@@ -25,7 +26,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException` |
+| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
 | field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
@@ -364,7 +365,7 @@ interface EntityRepositoryInterface
 }
 ```
 
-`save()` accepts `bool $validate = true`. When true and an `EntityValidator` is injected, validates against `EntityType::getConstraints()` before persisting. Throws `EntityValidationException` on failure.
+`save()` accepts `bool $validate = true`. When true and an `EntityValidator` is injected, validates against the merged map from `EntityTypeValidationConstraints::forEntityType()` (field definitions + `getConstraints()`, see “Field definitions → constraints” below) before persisting. Throws `EntityValidationException` on failure.
 
 `saveMany()`/`deleteMany()` wrap all operations in a `UnitOfWork` transaction. Events are buffered and dispatched only after successful commit. Requires `$database` to be non-null (throws `\LogicException` otherwise).
 
@@ -430,7 +431,7 @@ PHP attribute `#[EntityTypeAttribute(...)]` for class-level discovery. Extends `
 
 The `EntityRepository::save()` pipeline (used for all high-level persistence):
 
-1. Validates entity against `EntityType::getConstraints()` if `$validate === true` and `EntityValidator` is injected
+1. Validates entity against the combined constraint map (`EntityTypeValidationConstraints::forEntityType()`) if `$validate === true` and `EntityValidator` is injected
 2. Calls `$entity->preSave($isNew)` lifecycle hook (if entity extends `EntityBase`)
 3. Dispatches `EntityEvents::PRE_SAVE` event (via `EntityEventFactoryInterface`)
 4. Writes to storage driver (`$driver->write()`)
@@ -576,7 +577,7 @@ Higher-level layer that handles:
 - Entity hydration (`hydrate()` method with `_data` merge and constructor adaptation)
 - Language fallback via `setFallbackChain(string[] $chain)` (default: `['en']`)
 - Event dispatch via `EntityEventFactoryInterface` (defaults to `DefaultEntityEventFactory`)
-- Pre-save validation via `EntityValidator` (when injected and `validate: true`)
+- Pre-save validation via `EntityValidator` (when injected and `validate: true`) using `EntityTypeValidationConstraints::forEntityType()` (derived from field definitions plus manual `getConstraints()` per-field override)
 - Entity lifecycle hooks (`preSave`, `postSave`, `preDelete`, `postDelete` on `EntityBase`)
 - Batch operations via `saveMany()`/`deleteMany()` with `UnitOfWork` transaction wrapping
 - Batch reads via `findMany(array $ids, ...)` delegating to `EntityStorageDriverInterface::readMultiple()`
@@ -927,6 +928,33 @@ final class EntityValidationException extends \RuntimeException
 ```
 
 Thrown by `EntityRepository::save()` when validation fails. The `$violations` property provides programmatic access to all constraint violations.
+
+#### Field definitions → constraints (#1182)
+
+File: `packages/entity/src/Validation/FieldDefinitionConstraintBuilder.php`
+
+Maps `EntityType::getFieldDefinitions()` metadata to per-field Symfony `Constraint` lists (same key shape as `getConstraints()`). Supported keys on each field array:
+
+| Metadata | Symfony constraints | Notes |
+|----------|---------------------|--------|
+| `required` / `required: true` | `NotBlank` for string-like `type` (`string`, `email`, `text`, `slug`, default) | |
+| `required` + `boolean` / `integer` / `entity_reference` / `timestamp` / `datetime`_* | `NotNull` | So `false` and `0` remain valid when a field is required. |
+| `max_length` / `maxLength`, `min_length` / `minLength` | `Length` | Single constraint when either bound is set. |
+| `type: email` | `Email` | In addition to string typing when applicable. |
+| `allowed_values` / `allowedValues` | `Choice` | Non-empty list only. |
+| `enum_class` / `enumClass` (`BackedEnum`) | `Choice` on backing values | PHP enum class name. |
+| `type` scalar | `Type` | `bool`, `int`, `float`, `string` (incl. `email`/`text`/`slug`), `array`/`json`. Omitted for `entity_reference` and `timestamp` (storage shape varies). |
+
+File: `packages/entity/src/Validation/EntityTypeValidationConstraints.php`
+
+`EntityTypeValidationConstraints::forEntityType(EntityTypeInterface)` builds the map used by `EntityRepository::doSave()` when a validator is configured:
+
+1. Derive constraints from `getFieldDefinitions()` via `FieldDefinitionConstraintBuilder::build()`.
+2. Merge `getConstraints()`: **for each field name present in `getConstraints()`, the manual value replaces the derived list entirely** for that field. Manual-only fields are included. Derived-only fields keep builder output.
+
+Opt-out: `EntityRepository::save($entity, validate: false)` (and `saveMany`) skips validation entirely; there is no separate flag for “manual only.”
+
+Invalid data raises `EntityValidationException` with property paths equal to field names (plus nested paths when a constraint reports a sub-path), unchanged from `EntityValidator` behavior.
 
 ### Entity Lifecycle Hooks
 
