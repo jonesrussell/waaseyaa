@@ -5,6 +5,7 @@
 <!-- Spec reviewed 2026-04-09 - packages/entity and packages/entity-storage composer.json (manifest policy); storage and entity semantics unchanged -->
 <!-- Spec reviewed 2026-04-09c - readMultiple/findMany, SqlEntityQuery request-scoped result cache + save/delete invalidation (milestone 45) -->
 <!-- Spec reviewed 2026-04-09d - HydratableFromStorageInterface, HydrationContext, EntityInstantiator (#1188) -->
+<!-- Spec reviewed 2026-04-09e - packages/entity Cast kernel (#1181 ST-1): ValueCaster, CastDefinition, CastException -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
@@ -17,7 +18,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext` |
+| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `CastDefinition`, `ValueCaster`, `CastException` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
 | field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
@@ -70,6 +71,27 @@ interface FieldableInterface
     public function getFieldDefinitions(): array; // array<string, mixed>
 }
 ```
+
+### Field value casting (kernel)
+
+Files: `packages/entity/src/Cast/`
+
+`CastDefinition` is a small readonly value object wrapping a cast spec: either a **string token** (`int`, `float`, `bool`, `string`, `array`, `datetime_immutable`, or a **backed enum** class-string) or an array escape hatch `['type' => 'json']` (equivalent to `array` — JSON in storage).
+
+`ValueCaster` performs **storage → domain** (`castIn`) and **domain → storage** (`castOut`) for those specs. P0 built-ins:
+
+| Spec | `castIn` (stored → domain) | `castOut` (domain → stored) |
+|------|---------------------------|------------------------------|
+| `int` / `float` / `bool` / `string` | Normalization with documented rejection rules (e.g. empty string → error for numeric casts) | Canonical scalars |
+| `array` | JSON string decoded with `JSON_THROW_ON_ERROR`, or pass-through when already an array | `json_encode` with `JSON_THROW_ON_ERROR` |
+| `datetime_immutable` | `DateTimeImmutable` (ISO-8601 strings, integer / all-digit string Unix timestamps, `DateTimeInterface`) | ISO-8601 via `DateTimeInterface::ATOM` (no Carbon dependency; #1183) |
+| Backed enum class-string | `tryFrom` on backing value; miss → `CastException` | Enum instance or backing value → `->value` |
+
+Non-backed enums and unknown class-strings (non-enum classes) are rejected (`CastException`). Value-object class casts are reserved for #1184.
+
+**Storage invariant (full pipeline in #1181):** entity internal `values` remain storage-canonical; `EntityBase::get()` / `set()` will apply casts in a follow-up subtask (ST-2). `castIn` / `castOut` are the shared kernel used there.
+
+**Interaction with hydration (#1188):** rows merged into `$values` at load time stay raw; casting applies when reading through the cast-aware API, not inside `EntityInstantiator`.
 
 ### ContentEntityInterface
 
