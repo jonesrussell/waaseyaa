@@ -14,6 +14,7 @@ use Waaseyaa\EntityStorage\Driver\InMemoryStorageDriver;
 use Waaseyaa\EntityStorage\Driver\SqlStorageDriver;
 use Waaseyaa\EntityStorage\EntityRepository;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\EntityStorage\Tests\Fixtures\HydratableFromStorageTestEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\LifecycleTrackingEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\SpyEntityEventFactory;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestStorageEntity;
@@ -106,6 +107,39 @@ final class EntityRepositoryTest extends TestCase
     public function findReturnsNullForMissing(): void
     {
         $this->assertNull($this->repository->find('999'));
+    }
+
+    #[Test]
+    public function findUsesHydratableFromStorageWhenEntityImplementsInterface(): void
+    {
+        $driver = new InMemoryStorageDriver();
+        $entityType = new EntityType(
+            id: 'hydratable_test_entity',
+            label: 'Hydratable Test',
+            class: HydratableFromStorageTestEntity::class,
+            keys: [
+                'id' => 'id',
+                'uuid' => 'uuid',
+                'bundle' => 'bundle',
+                'label' => 'label',
+                'langcode' => 'langcode',
+            ],
+        );
+        $repository = new EntityRepository($entityType, $driver, new EventDispatcher());
+        $driver->write('hydratable_test_entity', '1', [
+            'id' => '1',
+            'label' => 'From row',
+            'bundle' => 'article',
+            'langcode' => 'en',
+        ]);
+
+        $found = $repository->find('1');
+
+        $this->assertNotNull($found);
+        $this->assertInstanceOf(HydratableFromStorageTestEntity::class, $found);
+        $this->assertTrue($found->get('_rehydrated_via_storage'));
+        $this->assertSame('hydratable_test_entity', $found->get('_context_type'));
+        $this->assertSame('From row', $found->label());
     }
 
     #[Test]

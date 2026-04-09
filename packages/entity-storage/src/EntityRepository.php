@@ -490,29 +490,6 @@ final class EntityRepository implements EntityRepositoryInterface
      */
     private function instantiateEntity(string $class, array $values): EntityInterface
     {
-        $ref = new \ReflectionClass($class);
-        $constructor = $ref->getConstructor();
-        $hasEntityTypeId = false;
-
-        if ($constructor !== null) {
-            foreach ($constructor->getParameters() as $param) {
-                if ($param->getName() === 'entityTypeId') {
-                    $hasEntityTypeId = true;
-                    break;
-                }
-            }
-        }
-
-        $keys = $this->entityType->getKeys();
-
-        if ($hasEntityTypeId) {
-            return new $class(
-                values: $values,
-                entityTypeId: $this->entityType->id(),
-                entityKeys: $keys,
-            );
-        }
-
-        return new $class(values: $values);
+        return (new Hydration\EntityInstantiator($this->entityType))->instantiate($class, $values);
     }
 }

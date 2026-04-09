@@ -4,6 +4,7 @@
 <!-- Spec reviewed 2026-04-08b - restored packages/config symfony/event-dispatcher floor from ^7.3 back to ^7.0; no entity/config runtime behavior change -->
 <!-- Spec reviewed 2026-04-09 - packages/entity and packages/entity-storage composer.json (manifest policy); storage and entity semantics unchanged -->
 <!-- Spec reviewed 2026-04-09c - readMultiple/findMany, SqlEntityQuery request-scoped result cache + save/delete invalidation (milestone 45) -->
+<!-- Spec reviewed 2026-04-09d - HydratableFromStorageInterface, HydrationContext, EntityInstantiator (#1188) -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
@@ -16,7 +17,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface` |
+| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
 | field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
@@ -301,7 +302,7 @@ The `EntityRepository::save()` pipeline (used for all high-level persistence):
 1. `SqlEntityStorage::load($id)` executes `SELECT` on entity table
 2. `mapRowToEntity()` casts numeric IDs to `int`
 3. Merges `_data` JSON blob back into the values array
-4. Instantiates entity via `instantiateEntity()` (adapts to constructor signature)
+4. Instantiates entity via `EntityInstantiator` (see **Hydration from storage** below)
 5. Calls `$entity->enforceIsNew(false)` on loaded entities
 
 ## Storage Layer
@@ -569,9 +570,34 @@ final class Node extends ContentEntityBase
 }
 ```
 
-### SqlEntityStorage constructor detection
+### Hydration from storage (`HydratableFromStorageInterface`)
 
-`SqlEntityStorage::instantiateEntity()` uses reflection to detect the constructor shape:
+File: `packages/entity/src/Hydration/HydratableFromStorageInterface.php`  
+File: `packages/entity/src/Hydration/HydrationContext.php` (readonly value object: `entityTypeId`, `entityKeys`)
+
+Entities that use a **domain constructor** (not `__construct(array $values)` alone) may implement `HydratableFromStorageInterface` and implement:
+
+```php
+public static function fromStorage(array $values, HydrationContext $context): static;
+```
+
+`$values` is the same normalized bag the legacy path would pass as `values:` (numeric id cast, `_data` merged, json-typed columns decoded in `SqlEntityStorage::mapRowToEntity()` where applicable). `$context` carries `EntityTypeInterface::id()` and `getKeys()` so implementations can call `ContentEntityBase::__construct($values, $context->entityTypeId, $context->entityKeys, …)`.
+
+File: `packages/entity-storage/src/Hydration/EntityInstantiator.php` (`@internal` in public surface map)
+
+`EntityRepository` and `SqlEntityStorage` delegate construction to `EntityInstantiator::instantiate(string $class, array $values)`:
+
+1. If the class implements `HydratableFromStorageInterface`, invoke `ClassName::fromStorage($values, new HydrationContext(...))`. The result must implement `EntityInterface` or a `RuntimeException` is thrown.
+2. Otherwise **legacy** reflection (same as pre-#1188): detect constructor parameter `entityTypeId`; if present, `new $class(values: …, entityTypeId: …, entityKeys: …)`; else `new $class(values: …)`.
+
+Application-level naming: consumers may add `public static function make(array $values): self` that delegates to `fromStorage` for tests or manual hydration, using a `HydrationContext` built from the app’s registered `EntityType` keys.
+
+**Interaction with field casting (#1181):** `fromStorage` should populate the internal values bag with **storage-canonical** scalars; cast-aware `get()`/`set()` apply afterward.
+
+### SqlEntityStorage constructor detection (legacy path)
+
+When `HydratableFromStorageInterface` is **not** implemented, `EntityInstantiator` uses reflection on the entity class constructor:
+
 1. Reflects the entity class constructor
 2. Checks if a parameter named `'entityTypeId'` exists
 3. If yes, passes `(values: $values, entityTypeId: ..., entityKeys: ...)`
