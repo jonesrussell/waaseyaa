@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+TAG_NAME="${1:-${TAG_NAME:-}}"
+REPO_OWNER="${REPO_OWNER:-waaseyaa}"
+GITHUB_TOKEN="${GITHUB_TOKEN:-}"
+
+if [[ -z "${TAG_NAME}" ]]; then
+  echo "FAIL [RP001] Missing tag name."
+  echo "  usage: bin/check-release-tag-parity <tag>"
+  echo "  or set TAG_NAME environment variable."
+  exit 1
+fi
+
+if [[ ! "${TAG_NAME}" =~ ^v ]]; then
+  echo "FAIL [RP002] Tag must start with 'v'."
+  echo "  current: ${TAG_NAME}"
+  echo "  expected: v<semver-or-alpha>"
+  exit 1
+fi
+
+export ROOT_DIR TAG_NAME REPO_OWNER GITHUB_TOKEN
+
+python3 - <<'PY'
+import json
+import os
+import pathlib
+import subprocess
+import sys
+
+root = pathlib.Path(os.environ["ROOT_DIR"])
+tag = os.environ["TAG_NAME"]
+owner = os.environ["REPO_OWNER"]
+token = os.environ["GITHUB_TOKEN"]
+
+composer_files = sorted((root / "packages").glob("*/composer.json"))
+repos: list[str] = []
+
+for composer_file in composer_files:
+    data = json.loads(composer_file.read_text())
+    name = data.get("name", "")
+    if not isinstance(name, str) or not name.startswith("waaseyaa/"):
+        continue
+    repos.append(name.split("/", 1)[1])
+
+missing: list[str] = []
+
+for repo in sorted(set(repos)):
+    if token:
+        remote = f"https://x-access-token:{token}@github.com/{owner}/{repo}.git"
+    else:
+        remote = f"https://github.com/{owner}/{repo}.git"
+
+    result = subprocess.run(
+        ["git", "ls-remote", "--tags", remote, f"refs/tags/{tag}"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0 or not result.stdout.strip():
+        missing.append(repo)
+
+if missing:
+    print(f"FAIL [RP003] Missing split package tag parity for {tag}")
+    print(f"  owner: {owner}")
+    print("  missing repos:")
+    for repo in missing:
+        print(f"    - {repo}")
+    sys.exit(1)
+
+print(f"OK: Release tag parity verified for {tag} across {len(set(repos))} split repos.")
+PY

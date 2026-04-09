@@ -17,6 +17,7 @@ policy_id = {
     "sort_packages": "CP001",
     "dev_scope": "CP002",
     "no_wildcard_internal": "CP003",
+    "core_runtime_surface": "CP004",
 }
 
 def fail(rule_key: str, rel_path: str, current: str, expected: str) -> None:
@@ -93,6 +94,19 @@ for path in in_scope:
                         rel,
                         f'{pkg}={version}',
                         "use an explicit semver range (for example ^0.1)",
+                    )
+
+    if rel == "packages/core/composer.json":
+        require_section = data.get("require", {})
+        if isinstance(require_section, dict):
+            for forbidden_pkg in ("waaseyaa/debug", "waaseyaa/telescope", "waaseyaa/testing"):
+                if forbidden_pkg in require_section:
+                    errors += 1
+                    fail(
+                        "core_runtime_surface",
+                        rel,
+                        f'{forbidden_pkg} in require',
+                        f"move {forbidden_pkg} to suggest (core runtime must remain install-safe)",
                     )
 
 if errors == 0:

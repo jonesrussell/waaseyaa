@@ -94,6 +94,17 @@ Policy rules:
 1. `config.sort-packages` is required and must be `true` in all first-party `composer.json` manifests.
 2. `@dev` constraints for `waaseyaa/*` are allowed only in root `composer.json` (monorepo local development aggregator with path repositories).
 3. Wildcard constraints for internal `waaseyaa/*` packages are forbidden (for example `*`).
+4. `waaseyaa/core` must keep optional observability/dev packages (`waaseyaa/debug`, `waaseyaa/telescope`, `waaseyaa/testing`) out of `require`; they belong in `suggest`.
+
+## Release Tag Parity
+
+Release tags must split to every package repo that is represented under `packages/*/composer.json`.
+
+- Guard script: `bin/check-release-tag-parity`
+- Primary enforcement: `.github/workflows/split.yml` (`verify-tag-parity` job after split push)
+- Secondary enforcement: `.github/workflows/github-release.yml` preflight check before creating the monorepo GitHub Release
+
+This prevents publishing a framework tag where a required split package tag is missing (the failure class that left consumers unable to resolve `waaseyaa/core` when one required package had not been published).
 
 Failure format is machine- and human-readable, including:
 - file path
