@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `waaseyaa/ssr` / `waaseyaa/foundation`: `SsrPageHandler::dispatchAppController()`
+  now accepts `InertiaPageResultInterface`, matching `ControllerDispatcher`:
+  full HTML via `InertiaFullPageRendererInterface` on first visit, JSON with
+  Inertia headers when `X-Inertia: true`, and a JSON error if the full-page
+  renderer is not registered. App routes registered via
+  `ServiceProvider::routes()` that return `InertiaResponse` no longer fall
+  through to a generic 500 HTML body. `HttpKernel::getInertiaFullPageRenderer()`
+  exposes the shared renderer; `SsrServiceProvider::configureHttpKernel()`
+  injects it into `SsrPageHandler`. (#1179)
+
 ## [0.1.0-alpha.107] - 2026-04-06
 
 ### Fixed
