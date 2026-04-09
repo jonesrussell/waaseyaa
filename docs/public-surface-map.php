@@ -30,6 +30,7 @@ return [
     'Waaseyaa\Foundation\Ingestion\IngestionErrorCode' => 'public',
     'Waaseyaa\Foundation\Exception\WaaseyaaException' => 'public',
     'Waaseyaa\Foundation\Http\JsonApiResponseTrait' => 'public',
+    'Waaseyaa\Foundation\Http\Inbound\InboundHttpRequestInterface' => 'public',
     'Waaseyaa\Foundation\Http\Router\DomainRouterInterface' => 'public',
     'Waaseyaa\Foundation\Http\LanguagePathStripperInterface' => 'public',
     'Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface' => 'public',
