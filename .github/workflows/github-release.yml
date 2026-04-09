@@ -1,9 +1,17 @@
-name: GitHub Release
+# Monorepo GitHub Releases for version tags are created by the `publish-github-release`
+# job in split.yml (after split + verify-tag-parity). This file is workflow_dispatch-only
+# so tag pushes do not race parity checks before split repos have the tag.
+#
+# Use when split + parity succeeded but the release step failed, or to backfill a release.
+name: GitHub Release (manual)
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag (e.g. v0.1.0-alpha.115)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -15,11 +23,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ inputs.tag }}
           fetch-depth: 0
 
       - name: Verify split tag parity before release
         env:
-          TAG_NAME: ${{ github.ref_name }}
+          TAG_NAME: ${{ inputs.tag }}
           REPO_OWNER: ${{ github.repository_owner }}
           GITHUB_TOKEN: ${{ secrets.SPLIT_GITHUB_TOKEN }}
         run: |
@@ -28,7 +37,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
+          tag_name: ${{ inputs.tag }}
+          name: ${{ inputs.tag }}
           generate_release_notes: true
-          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+          prerelease: ${{ contains(inputs.tag, 'alpha') || contains(inputs.tag, 'beta') || contains(inputs.tag, 'rc') }}

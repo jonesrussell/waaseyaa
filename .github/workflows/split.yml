@@ -143,3 +143,23 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.SPLIT_GITHUB_TOKEN }}
         run: |
           bash bin/check-release-tag-parity "${TAG_NAME}"
+
+  # Publish only after split matrix + parity — avoids racing github-release.yml on tag push.
+  publish-github-release:
+    name: Publish GitHub Release
+    needs: [verify-tag-parity]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
