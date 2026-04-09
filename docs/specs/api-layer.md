@@ -5,6 +5,7 @@
 <!-- Spec reviewed 2026-04-09 - packages/routing/composer.json churn (manifest policy); routing and JSON:API behavior unchanged -->
 <!-- Spec reviewed 2026-04-08g - symfony/routing require ^7.0 (#1151); no routing behavior change — symfony-version-floors.md -->
 <!-- Spec reviewed 2026-04-09 - Discovery API dispatch: `DiscoveryRouter` lives in `Waaseyaa\Api\Http\Router` and is registered via `ApiServiceProvider::httpDomainRouters()`; foundation `HttpKernel` merges provider routers after built-in routers through `McpRouter` (#1129) -->
+<!-- Spec reviewed 2026-04-08 - JSON:API sparse fieldsets filter relationships via `SparseFieldsetApplicator` (#794) -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
 
@@ -24,6 +25,7 @@ Foundation still wires several shared HTTP surfaces that are not entity-package 
 | `src/ResourceSerializer.php` | `Waaseyaa\Api` | Entity-to-JsonApiResource conversion with field access filtering |
 | `src/JsonApiDocument.php` | `Waaseyaa\Api` | JSON:API document value object (data, errors, meta, links, included) |
 | `src/JsonApiResource.php` | `Waaseyaa\Api` | JSON:API resource value object (type, id, attributes, relationships) |
+| `src/SparseFieldsetApplicator.php` | `Waaseyaa\Api` | Applies `fields[type]` sparse fieldsets to attributes and relationships |
 | `src/JsonApiError.php` | `Waaseyaa\Api` | JSON:API error value object with static factory methods |
 | `src/JsonResponseTrait.php` | `Waaseyaa\Api` | Trait providing `json()` helper (returns Symfony `JsonResponse`) and `jsonBody()` request parser |
 | `src/JsonApiRouteProvider.php` | `Waaseyaa\Api` | Auto-registers five CRUD routes per entity type |
@@ -164,7 +166,7 @@ The `$accessHandler` and `$account` follow the **paired nullable** pattern: both
 5. Loads entities via `$storage->loadMultiple($ids)`.
 6. **Post-fetch access filter**: if access handler is available, filters entities where `$accessHandler->check($entity, 'view', $account)->isAllowed()` is false.
 7. Serializes via `$serializer->serializeCollection()`.
-8. Applies sparse fieldsets if `fields[type]` is in the query.
+8. Applies sparse fieldsets if `fields[type]` is in the query via `SparseFieldsetApplicator::apply()` (filters both `attributes` and `relationships` per JSON:API).
 9. Generates pagination links and meta (`total`, `offset`, `limit`).
 10. Returns `JsonApiDocument::fromCollection()`.
 
@@ -173,7 +175,7 @@ The `$accessHandler` and `$account` follow the **paired nullable** pattern: both
 1. Loads entity by ID or UUID via `loadByIdOrUuid()`.
 2. Checks view access. Returns 403 if denied.
 3. Serializes via `$serializer->serialize()`.
-4. Applies sparse fieldsets if `fields[type]` is in the query (filters attributes via `array_intersect_key`, matching `index()` behavior).
+4. Applies sparse fieldsets if `fields[type]` is in the query (`SparseFieldsetApplicator`, same as `index()`).
 5. Returns `JsonApiDocument::fromResource()`.
 
 **`store(string $entityTypeId, array $data): JsonApiDocument`**
