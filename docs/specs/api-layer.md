@@ -7,8 +7,11 @@
 <!-- Spec reviewed 2026-04-09 - Discovery API dispatch: `DiscoveryRouter` lives in `Waaseyaa\Api\Http\Router` and is registered via `ApiServiceProvider::httpDomainRouters()`; foundation `HttpKernel` merges provider routers after built-in routers through `McpRouter` (#1129) -->
 <!-- Spec reviewed 2026-04-08 - JSON:API sparse fieldsets filter relationships via `SparseFieldsetApplicator` (#794) -->
 <!-- Spec reviewed 2026-04-09k - `ResourceSerializer`, `DiscoveryRouter`, and `DiscoveryApiHandler` build attribute/visibility maps via `EntityValues::toCastAwareMap()` (#1181 ST-8) -->
+<!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute pipeline cross-linked to docs/specs/jsonapi.md; ResourceSerializer uses toCastAwareMap (#1181) -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
+
+**Cast-aware attributes (#1181):** How `$casts` interact with JSON:API `attributes` (diagrams, invariants, write path) is specified in **`docs/specs/jsonapi.md`**. Entity-level casting and hydration are in **`docs/specs/entity-system.md`**.
 
 ## Packages
 
@@ -232,8 +235,8 @@ final class ResourceSerializer
 
 ### Serialization Logic
 
-1. Uses UUID as resource ID if available, otherwise falls back to numeric ID.
-2. Builds attributes from each key present in `$entity->toArray()` except entity keys (`id`, `uuid`), reading values with `$entity->get($field)` so `EntityBase::$casts` apply (#1181 ST-7).
+1. Uses UUID as resource ID if available, otherwise falls back to numeric ID (config entities: string machine name when UUID is empty).
+2. Builds attributes via **`EntityValues::toCastAwareMap($entity)`**, then drops keys that map to entity keys `id` and `uuid` (storage column names from `EntityType::getKeys()`), so every attribute value passes through `EntityInterface::get()` and `EntityBase::$casts` apply (#1181 ST-7 / ST-9). See `docs/specs/jsonapi.md` for the pipeline diagram.
 3. When access handler + account are provided, calls `$accessHandler->filterFields($entity, array_keys($attributes), 'view', $account)` to remove view-denied fields.
 4. Applies field-definition coercions (`boolean`, `timestamp` / `datetime`): timestamps accept integers or `DateTimeInterface` (e.g. after a `datetime_immutable` cast).
 5. Normalizes values to JSON-serializable shapes: backed enums → backing value, `DateTimeInterface` → ISO-8601 (`ATOM`), `JsonSerializable` → `jsonSerialize()` then recurse, arrays → recurse.

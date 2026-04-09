@@ -11,6 +11,7 @@
 <!-- Spec reviewed 2026-04-09h - EntityValidator uses EntityInterface::get() for all entities (#1181 ST-6); cast-aware validation -->
 <!-- Spec reviewed 2026-04-09i - packages/api ResourceSerializer attributes via get() + JSON normalization (#1181 ST-7) -->
 <!-- Spec reviewed 2026-04-09j - EntityValues helper, presentation layers use cast-aware maps (#1181 ST-8) -->
+<!-- Spec reviewed 2026-04-09 ST-9 - casting + hydration architecture finalization: diagrams, invariants, EntityValues/get/set/toArray/config rules (#1181) -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
@@ -23,7 +24,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException` |
+| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `CastDefinition`, `ValueCaster`, `CastException` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
 | field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
@@ -42,6 +43,111 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 | entity-storage | `packages/entity-storage/` | `Waaseyaa\EntityStorage\` | SQL storage, schema handler, query builder, repository, unit of work. |
 | field | `packages/field/` | `Waaseyaa\Field\` | Field type plugins, field definitions, field item lists. |
 | config | `packages/config/` | `Waaseyaa\Config\` | Config objects, config factory, import/export, storage backends. |
+
+## Casting & hydration architecture (ST-9, #1181)
+
+This section is the canonical contract for **storage-shaped values** vs **domain-shaped values**, where each applies, and how presentation layers stay consistent. Deeper package references: `packages/entity/src/Cast/`, `packages/entity/src/EntityBase.php`, `packages/entity/src/EntityValues.php`, `packages/entity-storage/src/Hydration/EntityInstantiator.php`.
+
+### Hydration pipeline (row → instance)
+
+No casting runs at the storage boundary. Rows are merged into a single PHP array (`_data` decoded, numeric id normalized), then the entity is constructed.
+
+```mermaid
+flowchart TD
+  A[SQL row + _data JSON] --> B[mapRowToEntity / EntityRepository::hydrate]
+  B --> C["values bag (storage-canonical)"]
+  C --> D{Class implements HydratableFromStorageInterface?}
+  D -->|yes| E["fromStorage(values, HydrationContext)"]
+  D -->|no| F["legacy reflection ctor (values ± entityTypeId/keys)"]
+  E --> G[Entity instance]
+  F --> G
+  G --> H["get() applies castIn only when field in $casts"]
+```
+
+### Read vs write within an entity
+
+```mermaid
+flowchart LR
+  subgraph persistence["Persistence snapshot"]
+    V[values array] --> TA[toArray]
+    TA --> W[splitForStorage / driver write]
+  end
+  subgraph domain["Domain access"]
+    G[get] --> CI[ValueCaster::castIn]
+    SO[set] --> CO[ValueCaster::castOut]
+    CO --> V
+  end
+  CI --> DV[Domain type in PHP]
+```
+
+### Storage vs domain value (examples)
+
+| Field kind | Stored in `$values` / `toArray()` | Returned by `get()` when `$casts` set | Notes |
+|------------|-----------------------------------|----------------------------------------|-------|
+| Backed enum | Backing scalar (`string`/`int`) | Enum instance | `set()` accepts instance or backing value; `castOut` persists scalar |
+| `datetime_immutable` | ISO string, Unix int, or string digits | `DateTimeImmutable` | `castOut` → ISO-8601 `ATOM` |
+| `array` / `json` | JSON string | `array` | `castOut` re-encodes with `JSON_THROW_ON_ERROR` |
+| `int` / `float` / `bool` / `string` | Normalized scalar | Same PHP scalar (validated) | Empty string → error for numeric casts per `ValueCaster` rules |
+| No `$casts` entry | Any | Same as stored | Pass-through |
+
+### Invariants
+
+1. **Constructor / hydration:** `$values` assigned in `EntityBase::__construct()` (or `fromStorage()`) are **never** passed through `ValueCaster`; they must already be storage-safe.
+2. **`toArray()`:** Returns the internal `$values` array **without** `castIn`; callers MUST NOT treat it as domain-typed if the entity uses `$casts`.
+3. **`get($name)`:** If `$casts[$name]` exists, return `castIn($name, $raw, $spec)`; otherwise return raw (or `null` if key missing).
+4. **`set($name, $value)`:** If `$casts[$name]` exists, store `castOut(...)`; otherwise store the value as-is. After `set()`, `toArray()` must remain JSON- and SQL-driver-safe.
+5. **Save path:** `EntityRepository::doSave()` / `SqlEntityStorage::save()` use `toArray()` only — never `get()` — so the invariant in (4) must hold for all cast fields.
+6. **Load path:** `EntityInstantiator` does not invoke `ValueCaster`; casting is lazy on `get()` / presentation helpers.
+7. **Tests:** Override `protected function valueCaster(): ValueCaster` on an entity subclass to inject fakes; default is `new ValueCaster()`.
+
+### Rules for `EntityValues`
+
+File: `packages/entity/src/EntityValues.php`
+
+- **`toCastAwareMap(EntityInterface $entity): array`** — For each key in `array_keys($entity->toArray())`, set `$map[$key] = $entity->get($key)`. Same keys as the persistence bag, values as domain types where casts apply. Use for GraphQL, SSR field bags, MCP payloads, discovery visibility, workflow validation listeners, relationship traversal summaries, and any code that previously iterated `toArray()` expecting “real” types.
+- **`statusToInt(mixed $status): int`** — Normalizes bool/int/string/`BackedEnum` to `0|1` for strict published checks; use with `$entity->get('status')` or values taken from a cast-aware map.
+- **Do not use** `EntityValues` for: persistence, `SqlEntityStorage`, repository `save()`, or low-level drivers.
+
+### Rules for `get()` / `set()`
+
+- **`get()`** — The only supported way to read cast fields as domain objects (enums, `DateTimeImmutable`, decoded arrays) without duplicating cast logic.
+- **`set()`** — Accepts domain input for cast fields; always persists storage shape into `$values`.
+- Direct mutation of `$values` from outside the entity class is unsupported; subclasses that override `get`/`set` must preserve cast semantics or document exceptions.
+
+### Rules for `toArray()`
+
+- **Purpose:** Persistence and structural cloning of the storage bag.
+- **Anti-pattern:** Building user-facing or API attributes solely from `toArray()` when `$casts` is non-empty — use `get()` per field or `EntityValues::toCastAwareMap()`.
+- **OK uses:** `SqlEntityStorage::splitForStorage()`, export pipelines that intentionally emit raw YAML/JSON matching the DB, tests asserting stored scalars.
+
+### Typed config entities (`ConfigEntityBase`)
+
+`ConfigEntityBase` extends `EntityBase`, so **`$casts` applies to keys in the values bag** the same as content entities.
+
+Additional rules specific to config:
+
+- **`status` / `dependencies`:** The constructor copies `status` and `dependencies` from `$values` into protected properties **and** leaves them in `$values` for the parent bag. `enable()` / `disable()` / `setDependencies()` keep the object and `$values` in sync for persistence.
+- **`toConfig()`:** Starts from `toArray()` (raw), then overwrites `status` with the object’s `status()` and injects `dependencies` when non-empty — export remains stable even if only the typed properties were mutated.
+- **`get('status')`:** If `status` is listed in `$casts` (e.g. `bool`), `get()` returns the cast domain value; `status()` still reflects the boolean property (they should agree after `enable()`/`disable()`/`set()`).
+- **JSON:API:** Config entities use string machine name as resource id when UUID is empty; attribute building still goes through cast-aware reads (`ResourceSerializer` → `EntityValues::toCastAwareMap()`).
+
+### Worked example (content entity)
+
+```php
+// $casts includes 'published_at' => 'datetime_immutable'
+$entity = $storage->load(1); // row has published_at as ISO string in _data
+$entity->get('published_at'); // DateTimeImmutable
+$entity->toArray()['published_at']; // still string (storage shape)
+
+$entity->set('published_at', new DateTimeImmutable('2026-04-09T12:00:00+00:00'));
+$storage->save($entity); // toArray() carries ISO string suitable for _data
+```
+
+### Cross-references
+
+- JSON:API attribute pipeline: `docs/specs/jsonapi.md` and `docs/specs/api-layer.md` (Resource Serialization).
+- Admin SPA consumes JSON:API — attributes are already normalized for JSON: `docs/specs/admin-spa.md`.
+- AI/MCP/SSR/GraphQL: `docs/specs/ai-integration.md`, `docs/specs/relationship-modeling.md`.
 
 ## Core Interfaces (packages/entity/src/)
 
@@ -81,6 +187,8 @@ interface FieldableInterface
 
 ### Field value casting (kernel)
 
+**Diagrams, full invariant list, `EntityValues` / `get` / `set` / `toArray` / config rules:** see [Casting & hydration architecture (ST-9, #1181)](#casting--hydration-architecture-st-9-1181).
+
 Files: `packages/entity/src/Cast/`
 
 `CastDefinition` is a small readonly value object wrapping a cast spec: either a **string token** (`int`, `float`, `bool`, `string`, `array`, `datetime_immutable`, or a **backed enum** class-string) or an array escape hatch `['type' => 'json']` (equivalent to `array` — JSON in storage).
@@ -108,9 +216,7 @@ Non-backed enums and unknown class-strings (non-enum classes) are rejected (`Cas
 
 Integration coverage: `packages/entity-storage/tests/Unit/CastPersistenceIntegrationTest.php` (in-memory `EntityRepository` + SQLite `SqlEntityStorage`).
 
-**JSON:API serialization (ST-7, #1181):** `Waaseyaa\Api\ResourceSerializer` builds attributes with `EntityInterface::get($field)` for each key from `toArray()` (minus `id`/`uuid` storage keys), then applies field-definition boolean/timestamp formatting and JSON normalization (enums, `DateTimeInterface`, nested arrays). Do not read attributes from `toArray()` alone — that bypasses `$casts`.
-
-**Presentation map (ST-8, #1181):** `Waaseyaa\Entity\EntityValues::toCastAwareMap()` returns all keys from `toArray()` with values from `get()` — use this (or `get()` per field) in GraphQL resolvers, discovery visibility, relationship policies, SSR field bags, MCP tool payloads, embedding text extraction, and workflow visibility helpers. `WorkflowVisibility::isNodePublicForEntity()` wraps the same idea for nodes. `EntityValues::statusToInt()` normalizes boolean/string/numeric status flags to `0|1` for strict published checks. Persistence, `SqlEntityStorage`, and `EntityRepository::doSave()` continue to use raw `toArray()` only.
+**JSON:API serialization (ST-7, #1181):** `Waaseyaa\Api\ResourceSerializer` builds attributes from `EntityValues::toCastAwareMap($entity)` (same keys as `toArray()`, values from `get()`), excluding `id`/`uuid` storage keys, then applies field-definition boolean/timestamp coercions and JSON normalization (enums, `DateTimeInterface`, nested arrays). See `docs/specs/jsonapi.md`. Do not build attributes from `toArray()` alone — that bypasses `$casts`.
 
 ### ContentEntityInterface
 
