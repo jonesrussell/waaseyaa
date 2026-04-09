@@ -2,6 +2,7 @@
 
 <!-- Spec reviewed 2026-04-09k - `EmbeddingPipeline`, `McpToolExecutor`, and `SearchController` read entity fields through `EntityValues::toCastAwareMap()` / `WorkflowVisibility::isNodePublicForEntity()` (#1181 ST-8) -->
 <!-- Spec reviewed 2026-04-09 ST-9 - embedding text extraction vs EntityEmbedder; MCP cast-aware payloads (#1181) -->
+<!-- Spec reviewed 2026-04-09 ST-10 - EntityEmbedder / EntityEmbeddingListener / SemanticIndexWarmer use EntityValues + WorkflowVisibility::isNodePublicForEntity (#1181) -->
 
 Waaseyaa's AI layer (architecture layer 5) provides four packages that enable AI agents to introspect, mutate, and search CMS content. All four packages sit in the `packages/` directory and follow the standard `Waaseyaa\AI\*` namespace pattern.
 
@@ -644,17 +645,21 @@ public function searchSimilar(string $query, int $limit = 10, ?string $entityTyp
 public function removeEntity(string $entityTypeId, int|string $entityId): void;
 ```
 
-`embedEntity()` uses `buildEntityText()`: **`$entity->label() . ' ' . json_encode($entity->toArray(), JSON_THROW_ON_ERROR)`** — a **storage-canonical** snapshot (same as `toArray()`), not `EntityValues::toCastAwareMap()`. This path is legacy/simple; it does not expand enums to labels or reformat dates for embedding.
+`embedEntity()` uses `buildEntityText()`: **`$entity->label() . ' ' . json_encode(EntityValues::toJsonReadyMap($entity), JSON_THROW_ON_ERROR)`** — cast-aware keys with JSON-safe scalars (backed enums → backing value, `DateTimeInterface` → ISO-8601 ATOM, nested arrays normalized). Same layering rule as JSON:API attributes (`ResourceSerializer` delegates recursive normalization to **`EntityValues::normalizeValueForJson()`**).
 
-**`EmbeddingPipeline` (preferred for configured field extraction):** `packages/ai-pipeline/src/EmbeddingPipeline.php` builds text from **`EntityValues::toCastAwareMap($entity)`** and configurable field lists (`ai.embedding_fields`), concatenating string/int/float parts only. Use this pipeline when `$casts` must affect what the embedder sees (e.g. enum → backing string is already scalar; future label hooks stay centralized).
+**`EmbeddingPipeline` (field-focused extraction):** `packages/ai-pipeline/src/EmbeddingPipeline.php` builds text from **`EntityValues::toCastAwareMap($entity)`** and configurable field lists (`ai.embedding_fields`), concatenating string/int/float parts only. Use this pipeline when only specific fields should contribute to the embedding string.
+
+**`EntityEmbeddingListener`:** node publish checks use **`WorkflowVisibility::isNodePublicForEntity()`**; embedding text uses **`EntityValues::toCastAwareMap()`** with the same scalar fragment rules as `EmbeddingPipeline` for `title` / `name` / `body` / `description`.
+
+**`SemanticIndexWarmer`:** node gating uses **`isNodePublicForEntity()`** (not raw `toArray()`).
 
 ```mermaid
 flowchart LR
-  subgraph legacy["EntityEmbedder"]
-    L[label] --> T1[toArray JSON]
+  subgraph embedder["EntityEmbedder"]
+    L[label] --> T1["toJsonReadyMap JSON"]
     T1 --> E1[embed]
   end
-  subgraph modern["EmbeddingPipeline"]
+  subgraph pipeline["EmbeddingPipeline"]
     M[EntityValues::toCastAwareMap] --> F[configured fields]
     F --> E2[embed]
   end

@@ -12,6 +12,7 @@
 <!-- Spec reviewed 2026-04-09i - packages/api ResourceSerializer attributes via get() + JSON normalization (#1181 ST-7) -->
 <!-- Spec reviewed 2026-04-09j - EntityValues helper, presentation layers use cast-aware maps (#1181 ST-8) -->
 <!-- Spec reviewed 2026-04-09 ST-9 - casting + hydration architecture finalization: diagrams, invariants, EntityValues/get/set/toArray/config rules (#1181) -->
+<!-- Spec reviewed 2026-04-09 ST-10 - layering: EntityValues::toJsonReadyMap / normalizeValueForJson; AI vector uses cast-aware paths (#1181) -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
@@ -24,7 +25,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `CastDefinition`, `ValueCaster`, `CastException` |
+| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `CastDefinition`, `ValueCaster`, `CastException`, `EntityValues` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
 | field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
@@ -105,8 +106,19 @@ flowchart LR
 File: `packages/entity/src/EntityValues.php`
 
 - **`toCastAwareMap(EntityInterface $entity): array`** — For each key in `array_keys($entity->toArray())`, set `$map[$key] = $entity->get($key)`. Same keys as the persistence bag, values as domain types where casts apply. Use for GraphQL, SSR field bags, MCP payloads, discovery visibility, workflow validation listeners, relationship traversal summaries, and any code that previously iterated `toArray()` expecting “real” types.
+- **`toJsonReadyMap(EntityInterface $entity): array`** — `toCastAwareMap()` plus recursive JSON normalization (backed enums → scalar, `DateTimeInterface` → ISO-8601 ATOM, `JsonSerializable`, nested arrays). Use for embedding text construction, MCP/logging payloads, and anywhere `json_encode` must not receive raw storage scalars when casts exist. `ResourceSerializer` delegates attribute normalization to **`normalizeValueForJson(mixed $value): mixed`** (same implementation) so JSON:API and other sinks stay aligned (#1181 ST-10).
 - **`statusToInt(mixed $status): int`** — Normalizes bool/int/string/`BackedEnum` to `0|1` for strict published checks; use with `$entity->get('status')` or values taken from a cast-aware map.
 - **Do not use** `EntityValues` for: persistence, `SqlEntityStorage`, repository `save()`, or low-level drivers.
+
+### Layering rules (ST-10, #1181)
+
+| Concern | Allowed reads | Forbidden for domain semantics |
+|--------|----------------|----------------------------------|
+| Persistence (`entity-storage`, `EntityRepository`) | `toArray()` for save / `splitForStorage` | Calling `ValueCaster` or `EntityValues` inside drivers — hydration stays raw at the row boundary |
+| Presentation (JSON:API, GraphQL, SSR, MCP, discovery, `ai-*` pipelines, workflow listeners, relationship) | `get($field)`, `EntityValues::toCastAwareMap()`, `EntityValues::toJsonReadyMap()` | `toArray()` for attribute/visibility/embedding text when the entity defines `$casts` |
+| Workflow visibility | `WorkflowVisibility::isNodePublicForEntity(EntityInterface)` or an array already built with `toCastAwareMap` | `isNodePublic($entity->toArray())` for nodes with enum/bool `status` casts |
+
+**Circular dependencies:** Package `composer.json` `require` must respect the Layer Architecture table in root `CLAUDE.md` (lower layers never depend on higher layers). `waaseyaa/entity` must not require `waaseyaa/api`; shared JSON shaping lives on `EntityValues` in `entity`.
 
 ### Rules for `get()` / `set()`
 

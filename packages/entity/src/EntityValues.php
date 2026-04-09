@@ -62,4 +62,56 @@ final class EntityValues
 
         return 0;
     }
+
+    /**
+     * Cast-aware field map with each value normalized for {@see \json_encode()} (ST-10, #1181).
+     *
+     * Use for embedding payloads, diagnostics, and other JSON sinks that must reflect
+     * {@see EntityBase::$casts} (enums, datetimes, nested structures) without reading raw
+     * {@see EntityInterface::toArray()} storage scalars.
+     *
+     * @return array<string, mixed>
+     */
+    public static function toJsonReadyMap(EntityInterface $entity): array
+    {
+        $out = [];
+        foreach (self::toCastAwareMap($entity) as $key => $value) {
+            $out[$key] = self::normalizeValueForJson($value);
+        }
+
+        return $out;
+    }
+
+    /**
+     * Recursively normalize a cast-aware value for JSON encoding (shared with JSON:API attributes).
+     */
+    public static function normalizeValueForJson(mixed $value): mixed
+    {
+        if ($value instanceof \BackedEnum) {
+            return $value->value;
+        }
+
+        if ($value instanceof \UnitEnum) {
+            return $value->name;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format(\DateTimeInterface::ATOM);
+        }
+
+        if ($value instanceof \JsonSerializable) {
+            return self::normalizeValueForJson($value->jsonSerialize());
+        }
+
+        if (\is_array($value)) {
+            $normalized = [];
+            foreach ($value as $key => $item) {
+                $normalized[$key] = self::normalizeValueForJson($item);
+            }
+
+            return $normalized;
+        }
+
+        return $value;
+    }
 }

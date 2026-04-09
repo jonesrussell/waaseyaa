@@ -114,12 +114,16 @@ final class EntityEmbedderTest extends TestCase
         $entity->method('id')->willReturn($id);
         $entity->method('label')->willReturn($label);
         $entity->method('bundle')->willReturn($bundle);
-        $entity->method('toArray')->willReturn([
+        $values = [
             'id' => $id,
             'type' => $entityTypeId,
             'label' => $label,
             'bundle' => $bundle,
-        ]);
+        ];
+        $entity->method('toArray')->willReturn($values);
+        $entity->method('get')->willReturnCallback(
+            static fn(string $name): mixed => $values[$name] ?? null,
+        );
 
         return $entity;
     }
