@@ -153,7 +153,7 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 **Code quality:**
 - `composer cs-check` — check code style (dry-run PHP-CS-Fixer)
 - `composer cs-fix` — auto-fix code style
-- `composer phpstan` — static analysis (level 5)
+- `composer phpstan` — static analysis (PHPStan 2.x, level 5)
 - `composer check-composer-policy` — enforce codified Composer manifest policy
 
 **Development:**

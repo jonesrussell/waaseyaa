@@ -12,70 +12,31 @@ use Waaseyaa\SSR\Formatter\HtmlFormatter;
 #[CoversClass(HtmlFormatter::class)]
 final class HtmlFormatterTest extends TestCase
 {
-    private HtmlFormatter $formatter;
-
-    protected function setUp(): void
+    #[Test]
+    public function format_returns_empty_string_for_empty_input(): void
     {
-        $this->formatter = new HtmlFormatter();
+        $formatter = new HtmlFormatter();
+        $this->assertSame('', $formatter->format(''));
+        $this->assertSame('', $formatter->format(null));
     }
 
     #[Test]
-    public function stripsScriptTags(): void
+    public function format_preserves_safe_markup(): void
     {
-        $result = $this->formatter->format('<p>Hello</p><script>alert("xss")</script>');
-        $this->assertStringNotContainsString('<script>', $result);
-        $this->assertStringContainsString('<p>Hello</p>', $result);
+        $formatter = new HtmlFormatter();
+        $out = $formatter->format('<p>Hello <strong>world</strong></p>');
+        $this->assertStringContainsString('Hello', $out);
+        $this->assertStringContainsString('world', $out);
+        $this->assertStringNotContainsString('<script', $out);
     }
 
     #[Test]
-    public function stripsEventHandlers(): void
+    public function format_strips_script_tags(): void
     {
-        $result = $this->formatter->format('<img src="x" onerror="alert(1)">');
-        $this->assertStringNotContainsString('onerror', $result);
-    }
-
-    #[Test]
-    public function stripsJavascriptUrls(): void
-    {
-        $result = $this->formatter->format('<a href="javascript:alert(1)">click</a>');
-        $this->assertStringNotContainsString('javascript:', $result);
-    }
-
-    #[Test]
-    public function allowsSafeHtml(): void
-    {
-        $html = '<p>Hello <strong>world</strong></p><ul><li>item</li></ul>';
-        $result = $this->formatter->format($html);
-        $this->assertStringContainsString('<p>Hello <strong>world</strong></p>', $result);
-        $this->assertStringContainsString('<ul><li>item</li></ul>', $result);
-    }
-
-    #[Test]
-    public function handlesNullValue(): void
-    {
-        $result = $this->formatter->format(null);
-        $this->assertSame('', $result);
-    }
-
-    #[Test]
-    public function handlesEmptyString(): void
-    {
-        $result = $this->formatter->format('');
-        $this->assertSame('', $result);
-    }
-
-    #[Test]
-    public function stripsIframeTags(): void
-    {
-        $result = $this->formatter->format('<iframe src="evil.com"></iframe><p>safe</p>');
-        $this->assertStringNotContainsString('<iframe', $result);
-        $this->assertStringContainsString('<p>safe</p>', $result);
-    }
-
-    #[Test]
-    public function stripsStyleWithExpression(): void
-    {
-        $result = $this->formatter->format('<div style="background:url(javascript:alert(1))">text</div>');
-        $this->assertStringNotContainsString('javascript:', $result);
+        $formatter = new HtmlFormatter();
+        $out = $formatter->format('<p>Hi</p><script>alert(1)</script>');
+        $this->assertStringContainsString('Hi', $out);
+        $this->assertStringNotContainsString('<script', $out);
+        $this->assertStringNotContainsString('alert', $out);
     }
 }

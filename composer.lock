@@ -4325,7 +4325,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/mail",
-                "reference": "04f2372393b91f95b6f5e73ef73b6158d95d1c4e"
+                "reference": "7f337c9d95b7c44470e055d5234fba972c0028e5"
             },
             "require": {
                 "php": ">=8.4",
@@ -4336,7 +4336,7 @@
                 "twig/twig": "^3.0"
             },
             "suggest": {
-                "sendgrid/sendgrid": "Required for SendGridDriver mail transport (^8.1)",
+                "sendgrid/sendgrid": "Required for SendGrid API transport when using mail.sendgrid_api_key (^8.1)",
                 "twig/twig": "Required for TwigMailRenderer template support"
             },
             "type": "library",
@@ -5103,10 +5103,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/ssr",
-                "reference": "b04a08650b5d887059ebe504bcd34c2295b232e9"
+                "reference": "7f58e2b36068cab6ff61ac182ad4b11a5d63caf8"
             },
             "require": {
                 "php": ">=8.4",
+                "symfony/html-sanitizer": "^8.0",
                 "twig/twig": "^3.0",
                 "waaseyaa/access": "^0.1",
                 "waaseyaa/api": "^0.1",
