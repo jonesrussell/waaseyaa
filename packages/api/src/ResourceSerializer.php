@@ -15,6 +15,10 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
  * Maps entity fields to JSON:API attributes, excluding entity keys
  * which become the resource's top-level id/type. Content entities use
  * UUID as the resource ID; config entities use their string machine name.
+ *
+ * Attribute values are read with {@see EntityInterface::get()} so entity
+ * {@see \Waaseyaa\Entity\EntityBase::$casts} apply (#1181 ST-7); they are then
+ * coerced to JSON-serializable scalars/arrays (enums, {@see \DateTimeInterface}, etc.).
  */
 final class ResourceSerializer
 {
@@ -41,10 +45,7 @@ final class ResourceSerializer
         // Content entities use UUID as resource ID; config entities use their string ID.
         $resourceId = $entity->uuid() !== '' ? $entity->uuid() : (string) $entity->id();
 
-        // Build attributes from entity values, excluding entity keys (id, uuid).
-        $allValues = $entity->toArray();
-        $excludedFields = $this->getExcludedFields($keys);
-        $attributes = array_diff_key($allValues, array_flip($excludedFields));
+        $attributes = $this->attributesFromEntity($entity, $keys);
 
         // Filter out fields the account cannot view.
         if ($accessHandler !== null && $account !== null) {
@@ -53,6 +54,7 @@ final class ResourceSerializer
         }
 
         $attributes = $this->castAttributes($attributes, $entityType->getFieldDefinitions());
+        $attributes = $this->normalizeAttributesForJson($attributes);
 
         // Build self link.
         $selfLink = $this->basePath . '/' . $entityTypeId . '/' . $resourceId;
@@ -107,6 +109,30 @@ final class ResourceSerializer
     }
 
     /**
+     * Build the attributes map using {@see EntityInterface::get()} per stored field name
+     * so {@see \Waaseyaa\Entity\EntityBase::$casts} apply. Keys follow {@see EntityInterface::toArray()}.
+     *
+     * @param array<string, string> $keys
+     *
+     * @return array<string, mixed>
+     */
+    private function attributesFromEntity(EntityInterface $entity, array $keys): array
+    {
+        $excluded = array_flip($this->getExcludedFields($keys));
+        $attributes = [];
+
+        foreach (array_keys($entity->toArray()) as $name) {
+            $fieldName = (string) $name;
+            if (isset($excluded[$fieldName])) {
+                continue;
+            }
+            $attributes[$fieldName] = $entity->get($fieldName);
+        }
+
+        return $attributes;
+    }
+
+    /**
      * Cast attribute values based on field type definitions.
      *
      * @param array<string, mixed> $attributes
@@ -129,12 +155,62 @@ final class ResourceSerializer
     }
 
     /**
+     * Ensure attribute values are JSON-serializable (enums, dates, nested arrays).
+     *
+     * @param array<string, mixed> $attributes
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeAttributesForJson(array $attributes): array
+    {
+        foreach ($attributes as $name => $value) {
+            $attributes[$name] = $this->normalizeValueForJson($value);
+        }
+
+        return $attributes;
+    }
+
+    private function normalizeValueForJson(mixed $value): mixed
+    {
+        if ($value instanceof \BackedEnum) {
+            return $value->value;
+        }
+
+        if ($value instanceof \UnitEnum) {
+            return $value->name;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format(\DateTimeInterface::ATOM);
+        }
+
+        if ($value instanceof \JsonSerializable) {
+            return $this->normalizeValueForJson($value->jsonSerialize());
+        }
+
+        if (\is_array($value)) {
+            $normalized = [];
+            foreach ($value as $key => $item) {
+                $normalized[$key] = $this->normalizeValueForJson($item);
+            }
+
+            return $normalized;
+        }
+
+        return $value;
+    }
+
+    /**
      * Convert a Unix timestamp to ISO 8601 string, or null if zero/empty.
      */
     private function formatTimestamp(mixed $value): ?string
     {
         if ($value === null) {
             return null;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format(\DateTimeInterface::ATOM);
         }
 
         $ts = (int) $value;

@@ -9,6 +9,7 @@
 <!-- Spec reviewed 2026-04-09f - EntityBase $casts + cast-aware get/set (#1181 ST-2); ContentEntityBase delegates to EntityBase -->
 <!-- Spec reviewed 2026-04-09g - ST-4/ST-5 persistence: hydrate + toArray remain raw; integration tests in entity-storage -->
 <!-- Spec reviewed 2026-04-09h - EntityValidator uses EntityInterface::get() for all entities (#1181 ST-6); cast-aware validation -->
+<!-- Spec reviewed 2026-04-09i - packages/api ResourceSerializer attributes via get() + JSON normalization (#1181 ST-7) -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
@@ -105,6 +106,8 @@ Non-backed enums and unknown class-strings (non-enum classes) are rejected (`Cas
 - `SqlEntityStorage::splitForStorage()` requires no change when the invariant holds.
 
 Integration coverage: `packages/entity-storage/tests/Unit/CastPersistenceIntegrationTest.php` (in-memory `EntityRepository` + SQLite `SqlEntityStorage`).
+
+**JSON:API serialization (ST-7, #1181):** `Waaseyaa\Api\ResourceSerializer` builds attributes with `EntityInterface::get($field)` for each key from `toArray()` (minus `id`/`uuid` storage keys), then applies field-definition boolean/timestamp formatting and JSON normalization (enums, `DateTimeInterface`, nested arrays). Do not read attributes from `toArray()` alone — that bypasses `$casts`.
 
 ### ContentEntityInterface
 

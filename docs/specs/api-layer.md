@@ -232,10 +232,11 @@ final class ResourceSerializer
 ### Serialization Logic
 
 1. Uses UUID as resource ID if available, otherwise falls back to numeric ID.
-2. Calls `$entity->toArray()` for all values.
-3. Excludes entity keys (`id`, `uuid`) from attributes -- they become top-level `type`/`id`.
-4. When access handler + account are provided, calls `$accessHandler->filterFields($entity, array_keys($attributes), 'view', $account)` to remove view-denied fields.
-5. Generates a `self` link: `{basePath}/{entityTypeId}/{resourceId}`.
+2. Builds attributes from each key present in `$entity->toArray()` except entity keys (`id`, `uuid`), reading values with `$entity->get($field)` so `EntityBase::$casts` apply (#1181 ST-7).
+3. When access handler + account are provided, calls `$accessHandler->filterFields($entity, array_keys($attributes), 'view', $account)` to remove view-denied fields.
+4. Applies field-definition coercions (`boolean`, `timestamp` / `datetime`): timestamps accept integers or `DateTimeInterface` (e.g. after a `datetime_immutable` cast).
+5. Normalizes values to JSON-serializable shapes: backed enums → backing value, `DateTimeInterface` → ISO-8601 (`ATOM`), `JsonSerializable` → `jsonSerialize()` then recurse, arrays → recurse.
+6. Generates a `self` link: `{basePath}/{entityTypeId}/{resourceId}`.
 
 ### Paired Nullable Pattern
 
