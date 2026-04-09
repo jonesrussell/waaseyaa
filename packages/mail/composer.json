@@ -12,7 +12,7 @@
         "twig/twig": "^3.0"
     },
     "suggest": {
-        "sendgrid/sendgrid": "Required for SendGridDriver mail transport (^8.1)",
+        "sendgrid/sendgrid": "Required for SendGrid API transport when using mail.sendgrid_api_key (^8.1)",
         "twig/twig": "Required for TwigMailRenderer template support"
     },
     "autoload": {

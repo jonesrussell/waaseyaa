@@ -9,32 +9,34 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
-use Waaseyaa\Mail\MailDriverInterface;
-use Waaseyaa\Mail\MailMessage;
-use Waaseyaa\User\AuthMailer;
 use Waaseyaa\Entity\FieldableInterface;
+use Waaseyaa\Mail\Envelope;
+use Waaseyaa\Mail\MailerInterface;
+use Waaseyaa\User\AuthMailer;
 
 #[CoversClass(AuthMailer::class)]
 final class AuthMailerTest extends TestCase
 {
-    /** @var list<MailMessage> */
-    public array $sentMessages = [];
-    private MailDriverInterface $driver;
+    /** @var list<Envelope> */
+    public array $sentEnvelopes = [];
+
+    private MailerInterface $mailer;
+
     private Environment $twig;
-    private AuthMailer $mailer;
+
+    private AuthMailer $authMailer;
 
     protected function setUp(): void
     {
-        $this->sentMessages = [];
+        $this->sentEnvelopes = [];
 
-        $this->driver = new class($this) implements MailDriverInterface {
+        $this->mailer = new class($this) implements MailerInterface {
             public function __construct(private readonly AuthMailerTest $test) {}
-            public function send(MailMessage $message): int
+
+            public function send(Envelope $envelope): void
             {
-                $this->test->sentMessages[] = $message;
-                return 202;
+                $this->test->sentEnvelopes[] = $envelope;
             }
-            public function isConfigured(): bool { return true; }
         };
 
         $this->twig = new Environment(new ArrayLoader([
@@ -46,8 +48,9 @@ final class AuthMailerTest extends TestCase
             'email/welcome.txt.twig' => 'Welcome {{ user_name }}',
         ]));
 
-        $this->mailer = new AuthMailer(
-            driver: $this->driver,
+        $this->authMailer = new AuthMailer(
+            mailer: $this->mailer,
+            authEmailConfigured: true,
             twig: $this->twig,
             baseUrl: 'https://example.com',
             appName: 'TestApp',
@@ -63,13 +66,13 @@ final class AuthMailerTest extends TestCase
             ['mail', 'alice@example.com'],
         ]);
 
-        $this->mailer->sendPasswordReset($user, 'abc123');
+        $this->authMailer->sendPasswordReset($user, 'abc123');
 
-        $this->assertCount(1, $this->sentMessages);
-        $msg = $this->sentMessages[0];
-        $this->assertSame('alice@example.com', $msg->to);
-        $this->assertSame('Reset your TestApp password', $msg->subject);
-        $this->assertStringContainsString('reset-password?token=abc123', $msg->htmlBody);
+        $this->assertCount(1, $this->sentEnvelopes);
+        $env = $this->sentEnvelopes[0];
+        $this->assertSame(['alice@example.com'], $env->to);
+        $this->assertSame('Reset your TestApp password', $env->subject);
+        $this->assertStringContainsString('reset-password?token=abc123', $env->htmlBody);
     }
 
     #[Test]
@@ -81,12 +84,12 @@ final class AuthMailerTest extends TestCase
             ['mail', 'bob@example.com'],
         ]);
 
-        $this->mailer->sendEmailVerification($user, 'xyz789');
+        $this->authMailer->sendEmailVerification($user, 'xyz789');
 
-        $this->assertCount(1, $this->sentMessages);
-        $msg = $this->sentMessages[0];
-        $this->assertSame('Verify your email for TestApp', $msg->subject);
-        $this->assertStringContainsString('verify-email?token=xyz789', $msg->htmlBody);
+        $this->assertCount(1, $this->sentEnvelopes);
+        $env = $this->sentEnvelopes[0];
+        $this->assertSame('Verify your email for TestApp', $env->subject);
+        $this->assertStringContainsString('verify-email?token=xyz789', $env->htmlBody);
     }
 
     #[Test]
@@ -98,57 +101,51 @@ final class AuthMailerTest extends TestCase
             ['mail', 'carol@example.com'],
         ]);
 
-        $this->mailer->sendWelcome($user);
+        $this->authMailer->sendWelcome($user);
 
-        $this->assertCount(1, $this->sentMessages);
-        $msg = $this->sentMessages[0];
-        $this->assertSame('Welcome to TestApp', $msg->subject);
-        $this->assertStringContainsString('Welcome Carol', $msg->htmlBody);
+        $this->assertCount(1, $this->sentEnvelopes);
+        $env = $this->sentEnvelopes[0];
+        $this->assertSame('Welcome to TestApp', $env->subject);
+        $this->assertStringContainsString('Welcome Carol', $env->htmlBody);
     }
 
     #[Test]
-    public function lazily_resolves_closure_driver_on_first_use(): void
+    public function skips_sending_when_not_configured(): void
     {
-        $resolved = false;
-        $driver = new class($this) implements MailDriverInterface {
-            public function __construct(private readonly AuthMailerTest $test) {}
-            public function send(MailMessage $message): int
-            {
-                $this->test->sentMessages[] = $message;
-                return 202;
-            }
-            public function isConfigured(): bool { return true; }
-        };
+        $mailer = $this->createMock(MailerInterface::class);
+        $mailer->expects($this->never())->method('send');
 
-        $mailer = new AuthMailer(
-            driver: function () use (&$resolved, $driver): MailDriverInterface {
-                $resolved = true;
-                return $driver;
-            },
+        $authMailer = new AuthMailer(
+            mailer: $mailer,
+            authEmailConfigured: false,
             twig: $this->twig,
             baseUrl: 'https://example.com',
-            appName: 'TestApp',
+            appName: 'App',
         );
+        $user = $this->createMock(FieldableInterface::class);
 
-        $this->assertFalse($resolved, 'Closure should not be resolved until first use');
-
-        $mailer->isConfigured();
-
-        $this->assertTrue($resolved, 'Closure should be resolved after first use');
+        $authMailer->sendPasswordReset($user, 'token');
     }
 
     #[Test]
-    public function skips_sending_when_driver_not_configured(): void
+    public function is_configured_reflects_constructor_flag(): void
     {
-        $unconfigured = new class implements MailDriverInterface {
-            public function send(MailMessage $message): int { return 202; }
-            public function isConfigured(): bool { return false; }
-        };
+        $configured = new AuthMailer(
+            mailer: $this->mailer,
+            authEmailConfigured: true,
+            twig: $this->twig,
+            baseUrl: 'https://example.com',
+            appName: 'App',
+        );
+        $this->assertTrue($configured->isConfigured());
 
-        $mailer = new AuthMailer($unconfigured, $this->twig, 'https://example.com', 'App');
-        $user = $this->createMock(FieldableInterface::class);
-
-        $mailer->sendPasswordReset($user, 'token');
-        $this->assertCount(0, $this->sentMessages);
+        $notConfigured = new AuthMailer(
+            mailer: $this->mailer,
+            authEmailConfigured: false,
+            twig: $this->twig,
+            baseUrl: 'https://example.com',
+            appName: 'App',
+        );
+        $this->assertFalse($notConfigured->isConfigured());
     }
 }

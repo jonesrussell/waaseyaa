@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Waaseyaa\Mail;
 
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
-use Waaseyaa\Mail\Driver\NullMailDriver;
-use Waaseyaa\Mail\Driver\SendGridDriver;
 use Waaseyaa\Mail\Transport\ArrayTransport;
 use Waaseyaa\Mail\Transport\LocalTransport;
+use Waaseyaa\Mail\Transport\SendGridTransport;
 use Waaseyaa\Mail\Transport\TransportInterface;
 
 final class MailServiceProvider extends ServiceProvider
@@ -17,14 +16,18 @@ final class MailServiceProvider extends ServiceProvider
     {
         $mailConfig = $this->config['mail'] ?? [];
         $transportType = $mailConfig['transport'] ?? 'local';
-        $fromAddress = $mailConfig['from_address'] ?? '';
+        $fromAddress = trim((string) ($mailConfig['from_address'] ?? ''));
+        $fromName = (string) ($mailConfig['from_name'] ?? '');
+        $sendgridKey = trim((string) ($mailConfig['sendgrid_api_key'] ?? ''));
 
-        $this->singleton(TransportInterface::class, match ($transportType) {
-            'array' => fn(): ArrayTransport => new ArrayTransport(),
-            'local' => fn(): LocalTransport => new LocalTransport(
-                $mailConfig['log_path'] ?? $this->projectRoot . '/var/mail.log',
+        $this->singleton(TransportInterface::class, fn(): TransportInterface => match (true) {
+            $sendgridKey !== '' && $fromAddress !== '' => new SendGridTransport(
+                apiKey: $sendgridKey,
+                fromAddress: $fromAddress,
+                fromName: $fromName,
             ),
-            default => fn(): LocalTransport => new LocalTransport(
+            $transportType === 'array' => new ArrayTransport(),
+            default => new LocalTransport(
                 $mailConfig['log_path'] ?? $this->projectRoot . '/var/mail.log',
             ),
         });
@@ -33,13 +36,5 @@ final class MailServiceProvider extends ServiceProvider
             transport: $this->resolve(TransportInterface::class),
             defaultFrom: $fromAddress,
         ));
-
-        $sendgridKey = $mailConfig['sendgrid_api_key'] ?? '';
-        $fromName = $mailConfig['from_name'] ?? '';
-
-        $this->singleton(MailDriverInterface::class, fn(): MailDriverInterface => match (true) {
-            $sendgridKey !== '' => new SendGridDriver($sendgridKey, $fromAddress, $fromName),
-            default => new NullMailDriver(),
-        });
     }
 }

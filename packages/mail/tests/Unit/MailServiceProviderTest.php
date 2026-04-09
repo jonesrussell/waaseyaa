@@ -11,6 +11,7 @@ use Waaseyaa\Mail\Mailer;
 use Waaseyaa\Mail\MailerInterface;
 use Waaseyaa\Mail\MailServiceProvider;
 use Waaseyaa\Mail\Transport\ArrayTransport;
+use Waaseyaa\Mail\Transport\SendGridTransport;
 use Waaseyaa\Mail\Transport\TransportInterface;
 
 #[CoversClass(MailServiceProvider::class)]
@@ -61,5 +62,23 @@ final class MailServiceProviderTest extends TestCase
         $bindings = $provider->getBindings();
         $mailer = ($bindings[MailerInterface::class]['concrete'])();
         $this->assertInstanceOf(Mailer::class, $mailer);
+    }
+
+    #[Test]
+    public function register_prefers_sendgrid_when_key_and_from_present(): void
+    {
+        $provider = new MailServiceProvider();
+        $provider->setKernelContext('/tmp/test', [
+            'mail' => [
+                'transport' => 'array',
+                'sendgrid_api_key' => 'sg-key',
+                'from_address' => 'noreply@example.com',
+            ],
+        ]);
+        $provider->register();
+
+        $bindings = $provider->getBindings();
+        $transport = ($bindings[TransportInterface::class]['concrete'])();
+        $this->assertInstanceOf(SendGridTransport::class, $transport);
     }
 }

@@ -83,7 +83,6 @@ return [
     'Waaseyaa\Scheduler\ScheduleInterface' => 'internal',
     'Waaseyaa\State\StateInterface' => 'internal',
     'Waaseyaa\Mail\MailerInterface' => 'internal',
-    'Waaseyaa\Mail\MailDriverInterface' => 'internal',
     'Waaseyaa\Mail\Transport\TransportInterface' => 'internal',
     'Waaseyaa\HttpClient\HttpClientInterface' => 'internal',
     'Waaseyaa\Ingestion\PayloadValidatorInterface' => 'internal',
