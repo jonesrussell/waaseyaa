@@ -19,18 +19,6 @@ class TestConfigEntity extends ConfigEntityBase
         parent::__construct($values, $entityTypeId, $entityKeys);
     }
 
-    public function get(string $name): mixed
-    {
-        return $this->values[$name] ?? null;
-    }
-
-    public function set(string $name, mixed $value): static
-    {
-        $this->values[$name] = $value;
-
-        return $this;
-    }
-
     public function hasField(string $name): bool
     {
         return \array_key_exists($name, $this->values);

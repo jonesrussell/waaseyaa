@@ -8,9 +8,10 @@ namespace Waaseyaa\Entity;
  * Abstract base class for content entities (nodes, users, terms, etc.).
  *
  * Content entities are fieldable: they support dynamic fields that can be
- * added and removed through configuration. For v0.1.0, field values are
- * stored as raw values in the values array. Full FieldItemList integration
- * will come with the waaseyaa/field package.
+ * added and removed through configuration. Field values live in the values array
+ * in storage-canonical form; optional {@see EntityBase::$casts} on subclasses make
+ * {@see get()} / {@see set()} cast-aware. Full FieldItemList integration will come
+ * with the waaseyaa/field package.
  *
  * Unlike Drupal, a ContentEntityBase object represents ONE language at a time.
  * getTranslation() returns a separate entity object for the requested language.
@@ -44,18 +45,6 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
     {
         return \array_key_exists($name, $this->values)
             || \array_key_exists($name, $this->fieldDefinitions);
-    }
-
-    public function get(string $name): mixed
-    {
-        return $this->values[$name] ?? null;
-    }
-
-    public function set(string $name, mixed $value): static
-    {
-        $this->values[$name] = $value;
-
-        return $this;
     }
 
     /** @return array<string, mixed> */
