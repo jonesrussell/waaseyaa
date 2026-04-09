@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\SSR;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use Waaseyaa\Access\AccountInterface;
@@ -12,6 +13,8 @@ use Waaseyaa\Cache\CacheConfigResolver;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
+use Waaseyaa\Foundation\Http\Inertia\InertiaPageResultInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 use Waaseyaa\Path\PathAliasResolver;
@@ -49,6 +52,7 @@ final class SsrPageHandler
         ?LoggerInterface $logger = null,
         private readonly ?\Waaseyaa\Access\Gate\GateInterface $gate = null,
         ?LanguageResolver $languageResolver = null,
+        private readonly ?InertiaFullPageRendererInterface $inertiaFullPageRenderer = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
         $this->languageResolver = $languageResolver ?? new LanguageResolver(serviceResolver: $this->serviceResolver);
@@ -266,27 +270,77 @@ final class SsrPageHandler
         $instance = $this->resolveControllerInstance($class, $twig, $account, $httpRequest);
         $response = $instance->{$method}($params, $query, $account, $httpRequest);
 
-        if (!$response instanceof HttpResponse) {
+        if (!$response instanceof HttpResponse && !$response instanceof InertiaPageResultInterface) {
             $route = $httpRequest->attributes->get('_route_object');
             $isRenderRoute = $route instanceof \Symfony\Component\Routing\Route
                 && $route->getOption('_render') === true;
             if (!$isRenderRoute) {
                 $this->logger->warning(sprintf(
-                    'Controller %s::%s returned HttpResponse on a non-render route. '
-                    . 'Add ->render() to the RouteBuilder chain to fix SSR dispatch.',
+                    'Controller %s::%s returned an unsupported value (expected HttpResponse or Inertia page). '
+                    . 'For legacy Twig SSR, add the _render route option or return a Response.',
                     $class,
                     $method,
                 ));
             }
         }
 
+        if ($response instanceof InertiaPageResultInterface) {
+            $pageObject = $response->toPageObject();
+            $pageObject['url'] = $httpRequest->getRequestUri();
+
+            if ($httpRequest->headers->get('X-Inertia') === 'true') {
+                $json = new JsonResponse($pageObject, 200, [
+                    'X-Inertia' => 'true',
+                    'Vary' => 'X-Inertia',
+                ]);
+                $json->setEncodingOptions(JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+                $json->headers->set('Content-Type', 'application/vnd.api+json');
+                $this->applyRenderCacheControlHeader($json, $account);
+
+                return $json;
+            }
+
+            if ($this->inertiaFullPageRenderer === null) {
+                $err = new JsonResponse([
+                    'jsonapi' => ['version' => '1.1'],
+                    'errors' => [[
+                        'status' => '500',
+                        'title' => 'Internal Server Error',
+                        'detail' => 'Inertia full-page renderer is not configured.',
+                    ]],
+                ], 500);
+                $err->setEncodingOptions(JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+                $err->headers->set('Content-Type', 'application/vnd.api+json');
+
+                return $err;
+            }
+
+            $html = new HttpResponse(
+                $this->inertiaFullPageRenderer->render($pageObject),
+                200,
+                ['Content-Type' => 'text/html; charset=UTF-8'],
+            );
+            $this->applyRenderCacheControlHeader($html, $account);
+
+            return $html;
+        }
+
         if ($response instanceof HttpResponse) {
-            $cacheMaxAge = $this->cacheConfigResolver->resolveRenderCacheMaxAge();
-            $response->headers->set('Cache-Control', $this->cacheConfigResolver->cacheControlHeaderForRender($account, $cacheMaxAge));
+            $this->applyRenderCacheControlHeader($response, $account);
+
             return $response;
         }
 
         return $this->htmlResult(500, '<h1>Internal Server Error</h1>', []);
+    }
+
+    private function applyRenderCacheControlHeader(HttpResponse $response, AccountInterface $account): void
+    {
+        $cacheMaxAge = $this->cacheConfigResolver->resolveRenderCacheMaxAge();
+        $response->headers->set(
+            'Cache-Control',
+            $this->cacheConfigResolver->cacheControlHeaderForRender($account, $cacheMaxAge),
+        );
     }
 
     /**

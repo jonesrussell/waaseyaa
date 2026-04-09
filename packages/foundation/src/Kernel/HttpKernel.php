@@ -146,6 +146,14 @@ final class HttpKernel extends AbstractKernel
     }
 
     /**
+     * Inertia full-document renderer when waaseyaa/inertia is installed, else null.
+     */
+    public function getInertiaFullPageRenderer(): ?InertiaFullPageRendererInterface
+    {
+        return $this->resolveInertiaFullPageRenderer();
+    }
+
+    /**
      * @return \Closure(string): ?object
      */
     public function getHttpServiceResolver(): \Closure

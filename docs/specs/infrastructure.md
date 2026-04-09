@@ -13,6 +13,7 @@
 <!-- Spec reviewed 2026-04-08 - LogManager: handler key string = type synonym only; fingers_crossed nested config via nested, inner, or array handler; channel buffer_limit caps FingersCrossedHandler in-memory buffer (drops oldest); handlerTypeFromConfig + fingersCrossedBufferLimit helpers -->
 <!-- Spec reviewed 2026-04-09 - Monorepo toolchain: PHPStan 2.x + phpstan-strict-rules 2.x; symfony/html-sanitizer ^8 required by waaseyaa/ssr (HtmlFormatter) and root composer (#1158 / #808/#809) -->
 <!-- Spec reviewed 2026-04-09 - InboundHttpRequestInterface + InboundHttpRequest snapshot DTO in foundation Http/Inbound for SSR app-controller boundary; body merge from Request bag + _parsed_body; public-surface map lists interface -->
+<!-- Spec reviewed 2026-04-09 - App controller Inertia: SsrPageHandler::dispatchAppController handles InertiaPageResultInterface (X-Inertia JSON + full HTML via InertiaFullPageRendererInterface, matching ControllerDispatcher); HttpKernel::getInertiaFullPageRenderer(); SsrServiceProvider injects that renderer when constructing SsrPageHandler in configureHttpKernel() -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -1048,6 +1049,8 @@ Typed value object built once from the request via `WaaseyaaContext::fromRequest
 #### SSR app controllers: inbound HTTP boundary
 
 `SsrPageHandler::dispatchAppController()` invokes app methods as `($params, $query, $account, $httpRequest)` where `$httpRequest` is Symfony’s `Request`. That fourth argument stays the dispatcher contract.
+
+Return values: **`HttpResponse`** is returned as-is (with render `Cache-Control` applied). **`InertiaPageResultInterface`** is converted like `ControllerDispatcher`: when `X-Inertia: true`, respond with JSON:API content type and Inertia headers; otherwise render full HTML via `InertiaFullPageRendererInterface` from `HttpKernel::getInertiaFullPageRenderer()` (wired from `SsrServiceProvider::configureHttpKernel()`). If Inertia is returned but no full-page renderer is registered, dispatch yields a 500 JSON:API error. Any other return type still produces the legacy 500 HTML snippet.
 
 Below the controller entrypoint, **do not** pass `Symfony\Component\HttpFoundation\Request` into application or domain services. Build **`InboundHttpRequest::fromSymfonyRequest($httpRequest, $params, $query)`** once per action and pass **`InboundHttpRequestInterface`** (or the concrete snapshot for construction only) downward.
 
