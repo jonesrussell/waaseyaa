@@ -8,6 +8,7 @@
 <!-- Spec reviewed 2026-04-08 - Optional session `ui` (headerLinks, sidebarItems): AdminSurfaceUiPayload + AdminSurfaceSessionData; GenericAdminSurfaceHost::buildAdminUi(); SPA maps via normalizeSurfaceUi into AdminRuntime.ui; AdminShell + NavBuilder (#756) -->
 <!-- Spec reviewed 2026-04-08 - Session UI TypeScript mirror: `packages/admin/app/contracts/surface-ui.ts` duplicates admin-surface `contract/types.ts` ui shapes for `npm run build:contracts` (rootDir app only); keep in sync with PHP/contract (#756) -->
 <!-- Spec reviewed 2026-04-09 - AdminSurfaceTransportAdapter: constructor takes normalizedAppBase; all CRUD/action URLs via adminSurfaceFetchUrl (parity with plugin bootstrap; #1161) -->
+<!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute contract: SPA consumes cast-aware payloads from ResourceSerializer (#1181) -->
 
 ## Optionality
 
@@ -63,6 +64,18 @@ routeRules: {
 ```
 
 All `/api/*` requests and `/admin/_surface/*` requests proxy directly to the PHP backend defined by `NUXT_BACKEND_URL`. The admin runtime no longer bootstraps through a bare `/_surface/` alias. The default backend is `http://127.0.0.1:8080`, matching the repo's PHP dev server and CI workflows.
+
+### Cast-aware entity attributes (#1181)
+
+Entity CRUD and catalog responses under `/api/*` use **`ResourceSerializer`**, which builds `attributes` from **`EntityValues::toCastAwareMap()`** (see `docs/specs/jsonapi.md` and `docs/specs/entity-system.md`). Implications for the SPA:
+
+| Concern | Contract |
+|---------|----------|
+| **Read** | JSON `attributes` reflect domain types after server-side normalization (e.g. ISO-8601 strings for datetimes, backing scalars for enums). Do not assume the raw SQLite/JSON blob shape the entity stores internally. |
+| **Write** | `PATCH`/`POST` bodies use JSON-native scalars; the PHP `set()` path runs `castOut` so the client does not send PHP objects. |
+| **Forms / widgets** | Align displayed values with JSON:API types returned by the API; when adding new entity fields with `$casts`, extend serializers only if a new JSON shape is required beyond `normalizeAttributesForJson()`. |
+
+Presentation map (server): `EntityValues::toCastAwareMap` → `ResourceSerializer` → admin `useApi` / generated clients. Persistence map stays `toArray()` on the server only — the SPA never receives that shape for standard CRUD.
 
 ### Base URL
 

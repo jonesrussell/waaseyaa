@@ -9,6 +9,7 @@
     <testsuites>
         <testsuite name="Unit">
             <directory>packages/*/tests/Unit</directory>
+            <file>packages/bimaaji/tests/SmokeTest.php</file>
         </testsuite>
         <testsuite name="GitHub">
             <directory>packages/github/tests</directory>

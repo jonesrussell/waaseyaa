@@ -1,6 +1,8 @@
 # AI Integration
 
 <!-- Spec reviewed 2026-04-09k - `EmbeddingPipeline`, `McpToolExecutor`, and `SearchController` read entity fields through `EntityValues::toCastAwareMap()` / `WorkflowVisibility::isNodePublicForEntity()` (#1181 ST-8) -->
+<!-- Spec reviewed 2026-04-09 ST-9 - embedding text extraction vs EntityEmbedder; MCP cast-aware payloads (#1181) -->
+<!-- Spec reviewed 2026-04-09 ST-10 - EntityEmbedder / EntityEmbeddingListener / SemanticIndexWarmer use EntityValues + WorkflowVisibility::isNodePublicForEntity (#1181) -->
 
 Waaseyaa's AI layer (architecture layer 5) provides four packages that enable AI agents to introspect, mutate, and search CMS content. All four packages sit in the `packages/` directory and follow the standard `Waaseyaa\AI\*` namespace pattern.
 
@@ -128,6 +130,8 @@ Returns MCP-compliant result arrays: `{content: [{type: 'text', text: JSON}]}` o
 **Important:** The query operation calls `$query->accessCheck(false)` because MCP tool calls run in an AI agent context where access is managed at the agent level, not the query level.
 
 **Important:** The update operation checks `$entity instanceof FieldableInterface` before calling `set()`. Non-fieldable entities return an error.
+
+**Cast-aware payloads (#1181):** Successful `read`, `update`, and `query` results embed entity rows under **`data` using `EntityValues::toCastAwareMap($entity)`** so MCP clients see the same domain-shaped field values as `get()` (enums, datetimes, decoded JSON arrays). See `docs/specs/entity-system.md` and `docs/specs/jsonapi.md`.
 
 ## SchemaRegistry
 
@@ -641,7 +645,31 @@ public function searchSimilar(string $query, int $limit = 10, ?string $entityTyp
 public function removeEntity(string $entityTypeId, int|string $entityId): void;
 ```
 
-`embedEntity()` builds text from `$entity->label() . ' ' . json_encode($entity->toArray(), JSON_THROW_ON_ERROR)`, generates a vector, stores it with metadata `{label, bundle}`, and returns the embedding.
+`embedEntity()` uses `buildEntityText()`: **`$entity->label() . ' ' . json_encode(EntityValues::toJsonReadyMap($entity), JSON_THROW_ON_ERROR)`** — cast-aware keys with JSON-safe scalars (backed enums → backing value, `DateTimeInterface` → ISO-8601 ATOM, nested arrays normalized). Same layering rule as JSON:API attributes (`ResourceSerializer` delegates recursive normalization to **`EntityValues::normalizeValueForJson()`**).
+
+**`EmbeddingPipeline` (field-focused extraction):** `packages/ai-pipeline/src/EmbeddingPipeline.php` builds text from **`EntityValues::toCastAwareMap($entity)`** and configurable field lists (`ai.embedding_fields`), concatenating string/int/float parts only. Use this pipeline when only specific fields should contribute to the embedding string.
+
+**`EntityEmbeddingListener`:** node publish checks use **`WorkflowVisibility::isNodePublicForEntity()`**; embedding text uses **`EntityValues::toCastAwareMap()`** with the same scalar fragment rules as `EmbeddingPipeline` for `title` / `name` / `body` / `description`.
+
+**`SemanticIndexWarmer`:** node gating uses **`isNodePublicForEntity()`** (not raw `toArray()`).
+
+```mermaid
+flowchart LR
+  subgraph embedder["EntityEmbedder"]
+    L[label] --> T1["toJsonReadyMap JSON"]
+    T1 --> E1[embed]
+  end
+  subgraph pipeline["EmbeddingPipeline"]
+    M[EntityValues::toCastAwareMap] --> F[configured fields]
+    F --> E2[embed]
+  end
+```
+
+**MCP tool responses:** `McpToolExecutor` includes **`'data' => EntityValues::toCastAwareMap($entity)`** in read/update/query results so agents see cast-aware shapes aligned with JSON:API.
+
+**Vector search guards:** `SearchController` uses **`EntityValues::toCastAwareMap`** + **`statusToInt`** when filtering relationship/public context — do not switch those paths to raw `toArray()`.
+
+Canonical rules: `docs/specs/entity-system.md` (Casting & hydration architecture).
 
 ### InMemoryVectorStore
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AI\Vector;
 
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
@@ -76,18 +77,21 @@ final class EntityEmbeddingListener
             return true;
         }
 
-        return $this->workflowVisibility->isNodePublic($event->entity->toArray());
+        return $this->workflowVisibility->isNodePublicForEntity($event->entity);
     }
 
     private function buildEmbeddingText(EntityEvent $event): string
     {
-        $values = $event->entity->toArray();
+        $values = EntityValues::toCastAwareMap($event->entity);
         $parts = [];
 
         foreach (['title', 'name', 'body', 'description'] as $field) {
-            $value = $values[$field] ?? null;
-            if (\is_string($value)) {
-                $trimmed = trim($value);
+            if (!\array_key_exists($field, $values)) {
+                continue;
+            }
+            $value = $values[$field];
+            if (\is_string($value) || \is_int($value) || \is_float($value)) {
+                $trimmed = trim((string) $value);
                 if ($trimmed !== '') {
                     $parts[] = $trimmed;
                 }

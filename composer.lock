@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2c029debe875b86fff4f0b23804f0806",
+    "content-hash": "0bbbe2346ee10035eeb0d29fa5c9e125",
     "packages": [
         {
             "name": "deployer/deployer",
@@ -3488,6 +3488,45 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Stripe billing for Waaseyaa — subscriptions, checkout, portal, plan tiers",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "waaseyaa/bimaaji",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/bimaaji",
+                "reference": "a4331692b725cbe6b1a68834607d9ecf6598ae05"
+            },
+            "require": {
+                "php": ">=8.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "0.1.x-dev",
+                    "dev-develop/v1.1": "0.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waaseyaa\\Bimaaji\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Waaseyaa\\Bimaaji\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Bimaaji — graph and knowledge utilities for Waaseyaa (skeleton)",
             "transport-options": {
                 "relative": true
             }
@@ -9195,6 +9234,7 @@
         "waaseyaa/api": 20,
         "waaseyaa/auth": 20,
         "waaseyaa/billing": 20,
+        "waaseyaa/bimaaji": 20,
         "waaseyaa/cache": 20,
         "waaseyaa/cli": 20,
         "waaseyaa/config": 20,
