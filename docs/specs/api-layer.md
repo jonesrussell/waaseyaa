@@ -8,6 +8,7 @@
 <!-- Spec reviewed 2026-04-08 - JSON:API sparse fieldsets filter relationships via `SparseFieldsetApplicator` (#794) -->
 <!-- Spec reviewed 2026-04-09k - `ResourceSerializer`, `DiscoveryRouter`, and `DiscoveryApiHandler` build attribute/visibility maps via `EntityValues::toCastAwareMap()` (#1181 ST-8) -->
 <!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute pipeline cross-linked to docs/specs/jsonapi.md; ResourceSerializer uses toCastAwareMap (#1181) -->
+<!-- Spec reviewed 2026-04-09 ST-10 - ResourceSerializer delegates JSON value normalization to EntityValues::normalizeValueForJson() (#1181) -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
 
@@ -239,7 +240,7 @@ final class ResourceSerializer
 2. Builds attributes via **`EntityValues::toCastAwareMap($entity)`**, then drops keys that map to entity keys `id` and `uuid` (storage column names from `EntityType::getKeys()`), so every attribute value passes through `EntityInterface::get()` and `EntityBase::$casts` apply (#1181 ST-7 / ST-9). See `docs/specs/jsonapi.md` for the pipeline diagram.
 3. When access handler + account are provided, calls `$accessHandler->filterFields($entity, array_keys($attributes), 'view', $account)` to remove view-denied fields.
 4. Applies field-definition coercions (`boolean`, `timestamp` / `datetime`): timestamps accept integers or `DateTimeInterface` (e.g. after a `datetime_immutable` cast).
-5. Normalizes values to JSON-serializable shapes: backed enums → backing value, `DateTimeInterface` → ISO-8601 (`ATOM`), `JsonSerializable` → `jsonSerialize()` then recurse, arrays → recurse.
+5. Normalizes values to JSON-serializable shapes via **`EntityValues::normalizeValueForJson()`** (backed enums → backing value, `DateTimeInterface` → ISO-8601 `ATOM`, `JsonSerializable` → `jsonSerialize()` then recurse, arrays → recurse) — shared with `EntityValues::toJsonReadyMap()` for other presentation sinks (#1181 ST-10).
 6. Generates a `self` link: `{basePath}/{entityTypeId}/{resourceId}`.
 
 ### Paired Nullable Pattern

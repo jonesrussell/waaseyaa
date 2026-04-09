@@ -172,32 +172,7 @@ final class ResourceSerializer
 
     private function normalizeValueForJson(mixed $value): mixed
     {
-        if ($value instanceof \BackedEnum) {
-            return $value->value;
-        }
-
-        if ($value instanceof \UnitEnum) {
-            return $value->name;
-        }
-
-        if ($value instanceof \DateTimeInterface) {
-            return $value->format(\DateTimeInterface::ATOM);
-        }
-
-        if ($value instanceof \JsonSerializable) {
-            return $this->normalizeValueForJson($value->jsonSerialize());
-        }
-
-        if (\is_array($value)) {
-            $normalized = [];
-            foreach ($value as $key => $item) {
-                $normalized[$key] = $this->normalizeValueForJson($item);
-            }
-
-            return $normalized;
-        }
-
-        return $value;
+        return EntityValues::normalizeValueForJson($value);
     }
 
     /**

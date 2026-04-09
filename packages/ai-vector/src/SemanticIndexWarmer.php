@@ -226,7 +226,7 @@ final class SemanticIndexWarmer
             return true;
         }
 
-        return $this->workflowVisibility->isNodePublic($entity->toArray());
+        return $this->workflowVisibility->isNodePublicForEntity($entity);
     }
 
     /**

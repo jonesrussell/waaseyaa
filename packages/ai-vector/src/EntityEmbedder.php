@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\AI\Vector;
 
 use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityValues;
 
 /**
  * Service that generates and manages embeddings for entities.
@@ -69,7 +70,7 @@ final class EntityEmbedder
     private function buildEntityText(EntityInterface $entity): string
     {
         $label = $entity->label();
-        $data = json_encode($entity->toArray(), JSON_THROW_ON_ERROR);
+        $data = json_encode(EntityValues::toJsonReadyMap($entity), JSON_THROW_ON_ERROR);
 
         return $label . ' ' . $data;
     }
