@@ -1,7 +1,7 @@
 # Relationship Modeling (v0.6)
 
 <!-- Spec reviewed 2026-04-07 - RelationshipParameterValidator extracted from RelationshipDiscoveryService (579→442 lines); validation/normalization helpers in dedicated class, injected as constructor dependency; timelineSortDate converted to instance method for consistent injection -->
-<!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/relationship; no relationship runtime behavior change -->
+<!-- Spec reviewed 2026-04-08 - RelationshipTraversalService browse warms related-entity summaries via per-type loadMultiple batching (in-request cache unchanged) -->
 
 ## Decision
 
@@ -100,6 +100,7 @@ Relationship traversal powers reusable discovery composition primitives:
 - Endpoint pages: public endpoint contract exposing directional/inverse edge metadata and relationship edge context.
 - Public discovery route payloads must preserve deterministic ordering under identical fixture input.
 - Traversal browse composition reuses an in-request related-entity summary cache keyed by `{entity_type}:{entity_id}` so repeated edges to the same endpoint do not trigger duplicate entity loads.
+- Browse edge materialization warms that cache by grouping distinct referenced endpoint IDs per `related_entity_type` and calling `EntityStorage::loadMultiple()` once per type per directional pass (outbound vs inbound), instead of `load()` per edge, so query count scales with distinct endpoints per type rather than raw edge count.
 
 Deterministic ordering for hub/cluster composition:
 

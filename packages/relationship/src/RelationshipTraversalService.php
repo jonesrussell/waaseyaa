@@ -238,6 +238,22 @@ final class RelationshipTraversalService
         string $statusMode,
         array &$entitySummaryCache,
     ): array {
+        $pendingPairs = [];
+
+        foreach ($relationships as $relationship) {
+            $pair = $this->resolveRelatedEndpointPair(
+                $relationship,
+                $sourceEntityType,
+                $sourceEntityId,
+                $direction,
+            );
+            if ($pair !== null) {
+                $pendingPairs[] = $pair;
+            }
+        }
+
+        $this->warmEntitySummariesForKeys($pendingPairs, $entitySummaryCache);
+
         $edges = [];
 
         foreach ($relationships as $relationship) {
@@ -310,6 +326,141 @@ final class RelationshipTraversalService
         }
 
         return $edges;
+    }
+
+    /**
+     * @return array{0: string, 1: string}|null Related entity type and id, or null if this relationship does not
+     *                                       contribute an edge for the given source and direction.
+     */
+    private function resolveRelatedEndpointPair(
+        Relationship $relationship,
+        string $sourceEntityType,
+        string $sourceEntityId,
+        string $direction,
+    ): ?array {
+        $fromType = (string) ($relationship->get('from_entity_type') ?? '');
+        $fromId = (string) ($relationship->get('from_entity_id') ?? '');
+        $toType = (string) ($relationship->get('to_entity_type') ?? '');
+        $toId = (string) ($relationship->get('to_entity_id') ?? '');
+        $directionality = strtolower(trim((string) ($relationship->get('directionality') ?? 'directed')));
+
+        if ($direction === 'outbound') {
+            if ($fromType === $sourceEntityType && $fromId === $sourceEntityId) {
+                return [$toType, $toId];
+            }
+            if (
+                $directionality === 'bidirectional'
+                && $toType === $sourceEntityType
+                && $toId === $sourceEntityId
+            ) {
+                return [$fromType, $fromId];
+            }
+
+            return null;
+        }
+
+        if ($toType === $sourceEntityType && $toId === $sourceEntityId) {
+            return [$fromType, $fromId];
+        }
+        if (
+            $directionality === 'bidirectional'
+            && $fromType === $sourceEntityType
+            && $fromId === $sourceEntityId
+        ) {
+            return [$toType, $toId];
+        }
+
+        return null;
+    }
+
+    /**
+     * Batch-load entity summaries by type so relationship browsing does one query per
+     * entity type instead of one per edge (N+1 avoidance).
+     *
+     * @param list<array{0: string, 1: string}> $pairs
+     * @param array<string, array{label: string, is_public: bool}> $summaryCache
+     */
+    private function warmEntitySummariesForKeys(array $pairs, array &$summaryCache): void
+    {
+        $missingByType = [];
+
+        foreach ($pairs as [$entityType, $entityId]) {
+            if ($entityType === '' || $entityId === '') {
+                continue;
+            }
+
+            $cacheKey = strtolower($entityType) . ':' . $entityId;
+            if (isset($summaryCache[$cacheKey])) {
+                continue;
+            }
+
+            if (!$this->entityTypeManager->hasDefinition($entityType)) {
+                $summaryCache[$cacheKey] = [
+                    'label' => sprintf('%s:%s', $entityType, $entityId),
+                    'is_public' => false,
+                ];
+
+                continue;
+            }
+
+            $missingByType[$entityType][$entityId] = true;
+        }
+
+        foreach ($missingByType as $entityType => $idSet) {
+            $entityIds = array_keys($idSet);
+            $resolvedIds = [];
+            foreach ($entityIds as $eid) {
+                $resolvedIds[] = ctype_digit($eid) ? (int) $eid : $eid;
+            }
+
+            try {
+                $storage = $this->entityTypeManager->getStorage($entityType);
+                $loaded = $storage->loadMultiple($resolvedIds);
+            } catch (\Throwable) {
+                foreach ($entityIds as $entityId) {
+                    $cacheKey = strtolower($entityType) . ':' . $entityId;
+                    if (!isset($summaryCache[$cacheKey])) {
+                        $summaryCache[$cacheKey] = [
+                            'label' => sprintf('%s:%s', $entityType, $entityId),
+                            'is_public' => false,
+                        ];
+                    }
+                }
+
+                continue;
+            }
+
+            foreach ($entityIds as $entityId) {
+                $cacheKey = strtolower($entityType) . ':' . $entityId;
+                if (isset($summaryCache[$cacheKey])) {
+                    continue;
+                }
+
+                $resolvedId = ctype_digit($entityId) ? (int) $entityId : $entityId;
+                $entity = $loaded[$resolvedId] ?? null;
+                if ($entity === null && is_int($resolvedId)) {
+                    $entity = $loaded[(string) $resolvedId] ?? null;
+                }
+                if ($entity === null && is_string($resolvedId) && ctype_digit($resolvedId)) {
+                    $entity = $loaded[(int) $resolvedId] ?? null;
+                }
+
+                if ($entity !== null) {
+                    $label = trim($entity->label()) !== ''
+                        ? $entity->label()
+                        : sprintf('%s:%s', $entityType, $entityId);
+                    $summaryCache[$cacheKey] = [
+                        'label' => $label,
+                        'is_public' => $this->isEntityPublic($entityType, $entity->toArray()),
+                    ];
+                } else {
+                    $summaryCache[$cacheKey] = [
+                        'label' => sprintf('%s:%s', $entityType, $entityId),
+                        'is_public' => false,
+                    ];
+                }
+            }
+        }
     }
 
     /**

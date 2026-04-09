@@ -199,7 +199,55 @@ final class RelationshipTraversalServiceTest extends TestCase
         $result = $service->browse('node', 1, ['status' => 'published']);
 
         $this->assertSame(3, $result['counts']['total']);
-        $this->assertSame(1, $nodeStorage->loadCalls);
+        $this->assertSame(0, $nodeStorage->loadCalls);
+        $this->assertSame(1, $nodeStorage->loadMultipleCalls);
+    }
+
+    public function testBrowseUsesSingleLoadMultipleForManyDistinctRelatedNodes(): void
+    {
+        $database = DBALDatabase::createSqlite();
+        $this->createRelationshipTable($database);
+
+        $relationshipStorageMap = [];
+        $rid = 1;
+        foreach (['2', '3', '4', '5'] as $targetId) {
+            $this->insertRelationship($database, $rid, 'node', '1', 'node', $targetId, 1);
+            $relationshipStorageMap[$rid] = new Relationship([
+                'rid' => $rid,
+                'relationship_type' => 'references',
+                'from_entity_type' => 'node',
+                'from_entity_id' => '1',
+                'to_entity_type' => 'node',
+                'to_entity_id' => $targetId,
+                'directionality' => 'directed',
+                'status' => 1,
+            ]);
+            $rid++;
+        }
+
+        $relationshipStorage = new TraversalRelationshipStorage($relationshipStorageMap);
+        $nodeEntities = [];
+        foreach (['2', '3', '4', '5'] as $targetId) {
+            $nodeEntities[$targetId] = new TraversalTestEntity('node', 'article', (int) $targetId, 'Node ' . $targetId, [
+                'nid' => (int) $targetId,
+                'type' => 'article',
+                'status' => 1,
+                'workflow_state' => 'published',
+            ]);
+        }
+        $nodeStorage = new TraversalEntityStorage($nodeEntities);
+        $manager = new TraversalEntityTypeManager([
+            'relationship' => $relationshipStorage,
+            'node' => $nodeStorage,
+        ]);
+
+        $service = new RelationshipTraversalService($manager, $database, new TraversalVisibilityFilter());
+        $result = $service->browse('node', 1, ['status' => 'published']);
+
+        $this->assertSame(4, $result['counts']['total']);
+        $this->assertSame(0, $nodeStorage->loadCalls);
+        $this->assertSame(1, $nodeStorage->loadMultipleCalls);
+        $this->assertSame([4], $nodeStorage->loadMultipleBatchSizes);
     }
 
     private function createRelationshipTable(DBALDatabase $database): void
@@ -342,6 +390,11 @@ final class TraversalEntityStorage implements EntityStorageInterface
 {
     public int $loadCalls = 0;
 
+    public int $loadMultipleCalls = 0;
+
+    /** @var list<int> */
+    public array $loadMultipleBatchSizes = [];
+
     /**
      * @param array<string, TraversalTestEntity> $entities
      */
@@ -362,6 +415,8 @@ final class TraversalEntityStorage implements EntityStorageInterface
 
     public function loadMultiple(array $ids = []): array
     {
+        $this->loadMultipleCalls++;
+        $this->loadMultipleBatchSizes[] = count($ids);
         $result = [];
         foreach ($ids as $id) {
             $stringId = (string) $id;
