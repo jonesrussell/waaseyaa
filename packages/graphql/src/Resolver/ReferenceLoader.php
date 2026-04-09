@@ -6,6 +6,7 @@ namespace Waaseyaa\GraphQL\Resolver;
 
 use GraphQL\Deferred;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\GraphQL\Access\GraphQlAccessGuard;
 
 /**
@@ -65,7 +66,7 @@ final class ReferenceLoader
                 return null;
             }
 
-            $values = $entity->toArray();
+            $values = EntityValues::toCastAwareMap($entity);
             $allowed = $this->guard->filterFields($entity, array_keys($values), 'view');
             $data = array_intersect_key($values, array_flip($allowed));
             $data['_graphql_depth'] = $currentDepth;

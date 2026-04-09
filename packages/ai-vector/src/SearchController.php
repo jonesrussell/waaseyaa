@@ -10,6 +10,7 @@ use Waaseyaa\Api\JsonApiDocument;
 use Waaseyaa\Api\JsonApiError;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
@@ -195,8 +196,8 @@ final class SearchController
         }
 
         foreach ($relationshipEntities as $relationship) {
-            $values = $relationship->toArray();
-            if ((int) ($values['status'] ?? 0) !== 1) {
+            $values = EntityValues::toCastAwareMap($relationship);
+            if (EntityValues::statusToInt($values['status'] ?? 0) !== 1) {
                 continue;
             }
 
@@ -330,6 +331,6 @@ final class SearchController
             return true;
         }
 
-        return $this->workflowVisibility->isNodePublic($entity->toArray());
+        return $this->workflowVisibility->isNodePublicForEntity($entity);
     }
 }

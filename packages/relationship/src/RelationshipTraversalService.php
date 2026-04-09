@@ -6,6 +6,7 @@ namespace Waaseyaa\Relationship;
 
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\EntityValues;
 
 final class RelationshipTraversalService
 {
@@ -601,7 +602,7 @@ final class RelationshipTraversalService
                         : sprintf('%s:%s', $entityType, $entityId);
                     $summaryCache[$cacheKey] = [
                         'label' => $label,
-                        'is_public' => $this->isEntityPublic($entityType, $entity->toArray()),
+                        'is_public' => $this->isEntityPublic($entityType, EntityValues::toCastAwareMap($entity)),
                     ];
                 } else {
                     $summaryCache[$cacheKey] = [
@@ -636,7 +637,7 @@ final class RelationshipTraversalService
 
                 return [
                     'label' => $label,
-                    'is_public' => $this->isEntityPublic($entityType, $entity->toArray()),
+                    'is_public' => $this->isEntityPublic($entityType, EntityValues::toCastAwareMap($entity)),
                 ];
             }
         } catch (\Throwable) {

@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Api\ApiDiscoveryController;
 use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
 use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
 use Waaseyaa\Foundation\Http\Router\WaaseyaaContext;
@@ -179,7 +180,7 @@ final class DiscoveryRouter implements DomainRouterInterface
 
         $resolvedId = (string) $entityId;
         $resolvedEntity = $this->discoveryHandler->loadDiscoveryEntity($entityType, $resolvedId);
-        if ($resolvedEntity === null || !$this->discoveryHandler->isDiscoveryEntityPublic($entityType, $resolvedEntity->toArray())) {
+        if ($resolvedEntity === null || !$this->discoveryHandler->isDiscoveryEntityPublic($entityType, EntityValues::toCastAwareMap($resolvedEntity))) {
             return $this->jsonApiResponse(404, [
                 'jsonapi' => ['version' => '1.1'],
                 'errors' => [['status' => '404', 'title' => 'Not Found', 'detail' => sprintf('Discovery endpoint not publicly visible: %s:%s', $entityType, $resolvedId)]],
@@ -212,7 +213,7 @@ final class DiscoveryRouter implements DomainRouterInterface
             return $this->jsonApiResponse(200, $dPayload, $dHeaders);
         }
 
-        $values = $resolvedEntity->toArray();
+        $values = EntityValues::toCastAwareMap($resolvedEntity);
         $fromType = trim((string) ($values['from_entity_type'] ?? ''));
         $fromId = trim((string) ($values['from_entity_id'] ?? ''));
         $toType = trim((string) ($values['to_entity_type'] ?? ''));

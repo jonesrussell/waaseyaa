@@ -7,6 +7,7 @@ namespace Waaseyaa\Workflows;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityValues;
 
 final class EditorialVisibilityResolver
 {
@@ -44,9 +45,9 @@ final class EditorialVisibilityResolver
             return AccessResult::allowed('User has administer nodes permission.');
         }
 
-        $values = $entity->toArray();
         $bundle = $this->bundleForEntity($entity);
-        $authorId = isset($values['uid']) ? (string) $values['uid'] : '';
+        $uid = $entity->get('uid');
+        $authorId = ($uid !== null && $uid !== '') ? (string) $uid : '';
         if ($authorId !== '' && (string) $account->id() === $authorId && $account->hasPermission('view own unpublished content')) {
             return AccessResult::allowed('Author can preview own unpublished content.');
         }
@@ -90,7 +91,7 @@ final class EditorialVisibilityResolver
 
     public function stateForEntity(EntityInterface $entity): string
     {
-        $values = $entity->toArray();
+        $values = EntityValues::toCastAwareMap($entity);
 
         return EditorialWorkflowPreset::normalizeState(
             workflowState: $values['workflow_state'] ?? null,
@@ -105,8 +106,8 @@ final class EditorialVisibilityResolver
             return $bundle;
         }
 
-        $values = $entity->toArray();
+        $type = $entity->get('type');
 
-        return trim((string) ($values['type'] ?? ''));
+        return trim((string) ($type ?? ''));
     }
 }

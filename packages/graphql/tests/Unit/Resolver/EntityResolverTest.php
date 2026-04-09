@@ -123,9 +123,7 @@ final class EntityResolverTest extends TestCase
         $policy = new class implements AccessPolicyInterface, FieldAccessPolicyInterface {
             public function access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResult
             {
-                $values = $entity->toArray();
-
-                return ($values['title'] ?? '') === 'Visible'
+                return ($entity->get('title') ?? '') === 'Visible'
                     ? AccessResult::allowed()
                     : AccessResult::neutral();
             }

@@ -8,6 +8,7 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\EntityValues;
 
 /**
  * Converts EntityInterface objects to JsonApiResource value objects.
@@ -121,12 +122,11 @@ final class ResourceSerializer
         $excluded = array_flip($this->getExcludedFields($keys));
         $attributes = [];
 
-        foreach (array_keys($entity->toArray()) as $name) {
-            $fieldName = (string) $name;
+        foreach (EntityValues::toCastAwareMap($entity) as $fieldName => $value) {
             if (isset($excluded[$fieldName])) {
                 continue;
             }
-            $attributes[$fieldName] = $entity->get($fieldName);
+            $attributes[$fieldName] = $value;
         }
 
         return $attributes;

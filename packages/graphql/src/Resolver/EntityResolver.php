@@ -12,6 +12,7 @@ use Waaseyaa\Api\Query\QueryFilter;
 use Waaseyaa\Api\Query\QuerySort;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Entity\FieldableInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
@@ -87,7 +88,7 @@ final class EntityResolver
             if (!$this->guard->canView($entity)) {
                 continue;
             }
-            $values = $entity->toArray();
+            $values = EntityValues::toCastAwareMap($entity);
             $allowed = $this->guard->filterFields($entity, array_keys($values), 'view');
             $data = array_intersect_key($values, array_flip($allowed));
             $data['_graphql_depth'] = 0;
@@ -112,7 +113,7 @@ final class EntityResolver
             return null;
         }
 
-        $values = $entity->toArray();
+        $values = EntityValues::toCastAwareMap($entity);
         $allowed = $this->guard->filterFields($entity, array_keys($values), 'view');
         $data = array_intersect_key($values, array_flip($allowed));
         $data['_graphql_depth'] = 0;
@@ -140,7 +141,7 @@ final class EntityResolver
         $entity->enforceIsNew();
         $storage->save($entity);
 
-        $values = $entity->toArray();
+        $values = EntityValues::toCastAwareMap($entity);
         $values['_graphql_depth'] = 0;
 
         return $values;
@@ -173,7 +174,7 @@ final class EntityResolver
         $storage = $this->entityTypeManager->getStorage($entityTypeId);
         $storage->save($entity);
 
-        $values = $entity->toArray();
+        $values = EntityValues::toCastAwareMap($entity);
         $values['_graphql_depth'] = 0;
 
         return $values;

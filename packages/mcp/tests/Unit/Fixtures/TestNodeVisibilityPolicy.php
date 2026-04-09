@@ -8,6 +8,7 @@ use Waaseyaa\Access\AccessPolicyInterface;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityValues;
 
 final class TestNodeVisibilityPolicy implements AccessPolicyInterface
 {
@@ -22,7 +23,7 @@ final class TestNodeVisibilityPolicy implements AccessPolicyInterface
             return AccessResult::neutral('Not used.');
         }
 
-        return (int) ($entity->toArray()['status'] ?? 0) === 1
+        return EntityValues::statusToInt($entity->get('status')) === 1
             ? AccessResult::allowed('Published')
             : AccessResult::forbidden('Unpublished');
     }

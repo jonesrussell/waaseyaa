@@ -317,7 +317,12 @@ final readonly class SearchEntity implements EntityInterface
     public function getEntityTypeId(): string { return $this->entityTypeId; }
     public function bundle(): string { return 'default'; }
     public function isNew(): bool { return false; }
-    public function get(string $name): mixed { return $this->values[$name] ?? null; }
+    public function get(string $name): mixed
+    {
+        $all = $this->toArray();
+
+        return $all[$name] ?? null;
+    }
     public function set(string $name, mixed $value): static { throw new \LogicException('Readonly'); }
     public function toArray(): array
     {

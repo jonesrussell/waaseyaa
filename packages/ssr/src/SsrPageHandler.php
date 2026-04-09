@@ -13,6 +13,7 @@ use Waaseyaa\Cache\CacheConfigResolver;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
 use Waaseyaa\Foundation\Http\Inertia\InertiaPageResultInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
@@ -477,7 +478,7 @@ final class SsrPageHandler
                 return [];
             }
 
-            $values = $entity->toArray();
+            $values = EntityValues::toCastAwareMap($entity);
             $endpoint = $discovery->relationshipEntityPage($values, [
                 'status' => 'published',
                 'limit' => 8,

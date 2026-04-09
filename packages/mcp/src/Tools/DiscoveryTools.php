@@ -241,6 +241,6 @@ final class DiscoveryTools extends McpTool
 
     private function isNodePublicForDiscovery(EntityInterface $entity): bool
     {
-        return $this->workflowVisibility->isNodePublic($entity->toArray());
+        return $this->workflowVisibility->isNodePublicForEntity($entity);
     }
 }

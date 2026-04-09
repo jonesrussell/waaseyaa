@@ -6,6 +6,7 @@
 <!-- Spec reviewed 2026-04-08g - symfony/routing require ^7.0 (#1151); no routing behavior change — symfony-version-floors.md -->
 <!-- Spec reviewed 2026-04-09 - Discovery API dispatch: `DiscoveryRouter` lives in `Waaseyaa\Api\Http\Router` and is registered via `ApiServiceProvider::httpDomainRouters()`; foundation `HttpKernel` merges provider routers after built-in routers through `McpRouter` (#1129) -->
 <!-- Spec reviewed 2026-04-08 - JSON:API sparse fieldsets filter relationships via `SparseFieldsetApplicator` (#794) -->
+<!-- Spec reviewed 2026-04-09k - `ResourceSerializer`, `DiscoveryRouter`, and `DiscoveryApiHandler` build attribute/visibility maps via `EntityValues::toCastAwareMap()` (#1181 ST-8) -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
 

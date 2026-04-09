@@ -9,6 +9,7 @@ use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\Gate\PolicyAttribute;
 use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityValues;
 
 #[PolicyAttribute(entityType: 'relationship')]
 final class RelationshipAccessPolicy implements AccessPolicyInterface
@@ -24,7 +25,7 @@ final class RelationshipAccessPolicy implements AccessPolicyInterface
             return AccessResult::allowed('User has administer nodes permission.');
         }
 
-        $status = (int) ($entity->toArray()['status'] ?? 0);
+        $status = EntityValues::statusToInt($entity->get('status'));
 
         return match ($operation) {
             'view' => $status === 1 && $account->hasPermission('access content')
