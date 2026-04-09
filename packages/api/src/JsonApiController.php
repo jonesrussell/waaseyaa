@@ -79,20 +79,13 @@ final class JsonApiController
 
         $resources = $this->serializer->serializeCollection($entities, $this->accessHandler, $this->account);
 
-        // Apply sparse fieldsets if requested.
+        // Apply sparse fieldsets if requested (attributes and relationships per JSON:API).
         if (isset($parsedQuery->sparseFieldsets[$entityTypeId])) {
             $allowedFields = $parsedQuery->sparseFieldsets[$entityTypeId];
             $resources = array_map(
-                static fn(JsonApiResource $resource): JsonApiResource => new JsonApiResource(
-                    type: $resource->type,
-                    id: $resource->id,
-                    attributes: array_intersect_key(
-                        $resource->attributes,
-                        array_flip($allowedFields),
-                    ),
-                    relationships: $resource->relationships,
-                    links: $resource->links,
-                    meta: $resource->meta,
+                static fn(JsonApiResource $resource): JsonApiResource => SparseFieldsetApplicator::apply(
+                    $resource,
+                    $allowedFields,
                 ),
                 $resources,
             );
@@ -152,21 +145,11 @@ final class JsonApiController
 
         $resource = $this->serializer->serialize($entity, $this->accessHandler, $this->account);
 
-        // Apply sparse fieldsets per JSON:API spec.
+        // Apply sparse fieldsets per JSON:API spec (attributes and relationships).
         $parsedQuery = (new QueryParser())->parse($query);
         if (isset($parsedQuery->sparseFieldsets[$entityTypeId])) {
             $allowedFields = $parsedQuery->sparseFieldsets[$entityTypeId];
-            $resource = new JsonApiResource(
-                type: $resource->type,
-                id: $resource->id,
-                attributes: array_intersect_key(
-                    $resource->attributes,
-                    array_flip($allowedFields),
-                ),
-                relationships: $resource->relationships,
-                links: $resource->links,
-                meta: $resource->meta,
-            );
+            $resource = SparseFieldsetApplicator::apply($resource, $allowedFields);
         }
 
         return JsonApiDocument::fromResource(

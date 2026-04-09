@@ -173,7 +173,7 @@ final class JsonApiControllerSparseFieldsetsTest extends TestCase
     }
 
     #[Test]
-    public function indexWithSparseFieldsetsPreservesRelationships(): void
+    public function indexWithSparseFieldsetsFiltersRelationshipKeysPerJsonApi(): void
     {
         $this->createAndSaveEntity(['title' => 'Post', 'body' => 'Content']);
 
@@ -183,10 +183,9 @@ final class JsonApiControllerSparseFieldsetsTest extends TestCase
         $array = $doc->toArray();
 
         $this->assertCount(1, $array['data']);
-        // Sparse fieldsets filter only applies to attributes, not relationships.
-        // Verify attributes are filtered to only the requested field.
+        // Sparse fieldsets apply to attributes and relationships; ResourceSerializer
+        // does not emit relationships for this fixture, so the key stays absent.
         $this->assertSame(['title' => 'Post'], $array['data'][0]['attributes']);
-        // Relationships key is omitted when entity has no relationships (TestEntity has none).
         $this->assertArrayNotHasKey('relationships', $array['data'][0]);
     }
 
