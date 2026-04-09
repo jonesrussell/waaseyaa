@@ -45,7 +45,11 @@ final class PublicSurfaceVerificationTest extends TestCase
 
         $stale = [];
         foreach (array_keys($surfaceMap) as $fqn) {
-            if (!in_array($fqn, $discoveredElements, true)) {
+            $exists = class_exists($fqn)
+                || interface_exists($fqn)
+                || trait_exists($fqn)
+                || enum_exists($fqn);
+            if (!$exists) {
                 $stale[] = $fqn;
             }
         }

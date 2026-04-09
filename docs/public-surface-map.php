@@ -113,6 +113,8 @@ return [
     'Waaseyaa\Entity\Audit\EntityAuditKey' => 'public',
     'Waaseyaa\Entity\Audit\LifecycleAuditKey' => 'public',
     'Waaseyaa\Entity\Event\EntityEvents' => 'public',
+    'Waaseyaa\Entity\Hydration\HydratableFromStorageInterface' => 'public',
+    'Waaseyaa\Entity\Hydration\HydrationContext' => 'public',
     'Waaseyaa\EntityStorage\Driver\EntityStorageDriverInterface' => 'public',
     'Waaseyaa\EntityStorage\Connection\ConnectionResolverInterface' => 'public',
     'Waaseyaa\Access\AccountInterface' => 'public',
@@ -138,6 +140,7 @@ return [
     'Waaseyaa\Field\ViewModeConfigInterface' => 'public',
 
     // Layer 1: Core Data — internal
+    'Waaseyaa\EntityStorage\Hydration\EntityInstantiator' => 'internal',
     'Waaseyaa\Access\ErrorPageRendererInterface' => 'internal',
     'Waaseyaa\Field\ComputedFieldInterface' => 'internal',
     'Waaseyaa\Auth\Token\AuthTokenRepositoryInterface' => 'internal',
