@@ -101,8 +101,8 @@ Policy rules:
 Release tags must split to every package repo that is represented under `packages/*/composer.json`.
 
 - Guard script: `bin/check-release-tag-parity`
-- Primary enforcement: `.github/workflows/split.yml` (`verify-tag-parity` job after split push)
-- Secondary enforcement: `.github/workflows/github-release.yml` preflight check before creating the monorepo GitHub Release
+- Primary enforcement: `.github/workflows/split.yml` — `verify-tag-parity` after the split matrix, then `publish-github-release` (so parity always runs before the monorepo GitHub Release exists)
+- Recovery / backfill: `.github/workflows/github-release.yml` (`workflow_dispatch` only; optional parity preflight + release for an existing tag)
 
 This prevents publishing a framework tag where a required split package tag is missing (the failure class that left consumers unable to resolve `waaseyaa/core` when one required package had not been published).
 
