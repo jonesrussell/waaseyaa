@@ -12,10 +12,40 @@ use Waaseyaa\Entity\EntityInterface;
 
 final class RenderController
 {
+    private readonly string $siteName;
+
     public function __construct(
         private readonly Environment $twig,
         private readonly ?EntityRenderer $entityRenderer = null,
-    ) {}
+        ?string $siteName = null,
+    ) {
+        $this->siteName = ($siteName !== null && $siteName !== '')
+            ? $siteName
+            : self::resolveDefaultSiteName();
+    }
+
+    private static function resolveDefaultSiteName(): string
+    {
+        // Do not chain $_ENV ?? $_SERVER: if APP_NAME is present in $_ENV but empty, we must
+        // still evaluate $_SERVER (and then getenv), matching explicit getenv()-style semantics
+        // where false/empty are not usable values.
+        $fromEnv = $_ENV['APP_NAME'] ?? null;
+        if (is_string($fromEnv) && $fromEnv !== '') {
+            return $fromEnv;
+        }
+
+        $fromServer = $_SERVER['APP_NAME'] ?? null;
+        if (is_string($fromServer) && $fromServer !== '') {
+            return $fromServer;
+        }
+
+        $fromGetenv = getenv('APP_NAME');
+        if ($fromGetenv !== false && $fromGetenv !== '') {
+            return $fromGetenv;
+        }
+
+        return 'Waaseyaa';
+    }
 
     public function renderPath(string $path = '/', ?AccountInterface $account = null): Response
     {
@@ -28,7 +58,7 @@ final class RenderController
         }
 
         $context = $this->mergeAccountIntoContext([
-            'title' => 'Waaseyaa',
+            'title' => $this->siteName,
             'path' => $normalizedPath,
         ], $account);
 
@@ -53,9 +83,13 @@ final class RenderController
             }
         }
 
-        // Safe fallback while theme/templates are still being introduced.
+        // Safe fallback while theme/templates are still being introduced. Uses APP_NAME when set.
+        $escapedName = htmlspecialchars($this->siteName, ENT_QUOTES, 'UTF-8');
+
         return new Response(sprintf(
-            '<!doctype html><html><head><meta charset="utf-8"><title>Waaseyaa</title></head><body><main><h1>Waaseyaa</h1><p>Path: %s</p></main></body></html>',
+            '<!doctype html><html><head><meta charset="utf-8"><title>%s</title></head><body><main><h1>%s</h1><p>Path: %s</p></main></body></html>',
+            $escapedName,
+            $escapedName,
             htmlspecialchars($normalizedPath, ENT_QUOTES, 'UTF-8'),
         ));
     }
@@ -106,7 +140,7 @@ final class RenderController
         }
 
         $context = $this->mergeAccountIntoContext([
-            'title' => 'Waaseyaa',
+            'title' => $this->siteName,
             'path' => $normalizedPath,
         ], $account);
 
