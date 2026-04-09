@@ -41,7 +41,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 | queue | `HandlerInterface`, `TransportInterface`, `FailedJobRepositoryInterface`, `Job` | Queue backend internals |
 | scheduler | `LockInterface`, `ScheduleInterface` | Scheduler internals |
 | state | `StateInterface` | State machine internals |
-| mail | `MailerInterface`, `MailDriverInterface`, `TransportInterface` | Consolidation pending (#798) |
+| mail | `MailerInterface`, `TransportInterface` | `@internal` foundation seam (#798 closed — single `Mailer` + transport stack) |
 | http-client | `HttpClientInterface` | Minimal wrapper, not yet stable |
 | ingestion | `PayloadValidatorInterface`, `EnvelopeValidator` | Ingestion validation internals |
 | testing | `WaaseyaaTestCase`, `AbstractGraphQlSchemaContractTestCase` | Test base classes, not consumer API |
@@ -54,7 +54,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 | `packages/cache/` | `Waaseyaa\Cache\` | 0 (Foundation) | CacheBackendInterface, MemoryBackend, DatabaseBackend, NullBackend, tag invalidation |
 | `packages/database-legacy/` | `Waaseyaa\Database\` | 0 (Foundation) | DatabaseInterface, DBALDatabase (Doctrine DBAL), query builder (select/insert/update/delete), schema, transactions |
 | `packages/plugin/` | `Waaseyaa\Plugin\` | 0 (Foundation) | PluginManager, attribute-based plugin discovery, plugin factory |
-| `packages/mail/` | `Waaseyaa\Mail\` | 0 (Foundation) | Transport-agnostic mail API with Twig templating, pluggable transports (ArrayTransport for tests, LocalTransport for file-based delivery) |
+| `packages/mail/` | `Waaseyaa\Mail\` | 0 (Foundation) | `MailerInterface` + `Envelope`; pluggable `TransportInterface` (array, local file, SendGrid API when configured) |
 | `packages/http-client/` | `Waaseyaa\HttpClient\` | 0 (Foundation) | Minimal HTTP client for JSON APIs and webhooks, zero external dependencies |
 
 ## Domain Events
@@ -1168,9 +1168,9 @@ File: `packages/foundation/src/Tenant/TenantResolverInterface.php`
 
 ### Mail interfaces
 
-Files: `packages/mail/src/MailerInterface.php`, `packages/mail/src/MailDriverInterface.php`, `packages/mail/src/Transport/TransportInterface.php`
+Files: `packages/mail/src/MailerInterface.php`, `packages/mail/src/Transport/TransportInterface.php`
 
-`@internal` — the mail package currently has two parallel APIs (`MailDriverInterface` used by `AuthMailer`; `MailerInterface` used by `MailChannel` in the notification package). These will be consolidated in #798. Until consolidation is complete, these interfaces are internal implementation details. Application code should not depend on them directly — use the higher-level `AuthMailer` or notification channels instead.
+`@internal` — foundation seam. **`AuthMailer`**, **`MailChannel`** (notifications), and app commands send mail via **`MailerInterface::send(Envelope)`**. **`MailServiceProvider`** binds `TransportInterface`: when `mail.sendgrid_api_key` and `mail.from_address` are both non-empty after trim, **`SendGridTransport`** is used; otherwise `mail.transport` selects **`ArrayTransport`** or **`LocalTransport`**. Application code should not depend on these interfaces directly where a higher-level API exists — use **`AuthMailer`**, notification channels, or the shared mailer binding.
 
 ## Queue System
 

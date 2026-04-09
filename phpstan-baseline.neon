@@ -1405,12 +1405,6 @@ parameters:
 			path: packages/i18n/src/Translator.php
 
 		-
-			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-			identifier: ternary.shortNotAllowed
-			count: 2
-			path: packages/mail/src/Driver/SendGridDriver.php
-
-		-
 			message: '#^Class Waaseyaa\\Workflows\\WorkflowVisibility does not have a constructor and must be instantiated without any parameters\.$#'
 			identifier: new.noConstructor
 			count: 1
