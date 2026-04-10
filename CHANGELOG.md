@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.120] - 2026-04-10
+
+### Added
+
+- `HydratableFromStorageInterface` on `User` and `Node` with `make()`, `fromStorage()`,
+  and `duplicateInstance()` preserving field definitions where required. (#1222)
+- Integration tests for shipped-entity `duplicate()` / `with()` re-entry and for
+  `EntityInstantiator` hydration of `User` / `Node`. (#1222)
+- `make:entity-type` scaffolds content entities with widened constructors and
+  hydratable stubs. (#1222)
+
+### Changed
+
+- All shipped `ContentEntityBase` / `ConfigEntityBase` subclasses (engagement,
+  media, menu, messaging, node, note, path, relationship, taxonomy, user,
+  workflows, `Pipeline`, etc.) accept optional `entityTypeId`, `entityKeys`, and
+  `fieldDefinitions` so `duplicate()` / `with()` / `withValues()` no longer hit
+  `ArgumentCountError`. (#1222)
+- `Node` and `Media`: `datetime_immutable` casts with Unix storage for
+  created/changed fields; SSR `DateFormatter` accepts `DateTimeInterface`.
+  (#1222)
+- `User`: `email_verified` bool cast; `status` remains int for validation.
+  (#1222)
+- `Term` accessors route through `get()` / `set()` only. (#1222)
+- `entity-system.md` and related specs: P3 constructor arity / hydratable
+  notes. (#1222)
+
+### Fixed
+
+- `phpstan-baseline.neon`: drop stale `MakeEntityTypeCommand` ignores after
+  boolean cast on `--content`. (#1222)
+
 ## [0.1.0-alpha.119] - 2026-04-10
 
 ### Added
