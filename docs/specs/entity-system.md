@@ -19,6 +19,7 @@
 <!-- Spec reviewed 2026-04-09 - P3 branching: duplicate/with/withValues, duplicateInstance hook, EntityValuesSnapshot, shallow-copy invariant -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 <!-- Spec reviewed 2026-04-09 - backed enum invalid-value policy + value_object casts (#1184), FromArrayEntityValueInterface, EntityValues VO JSON normalization; cross-links #1181 -->
+<!-- Spec reviewed 2026-04-10 - waaseyaa/testing EntityTypeFixtureValues + EntityFactory::defineFromEntityType (#1186) -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
 
@@ -994,6 +995,20 @@ File: `packages/entity/src/Validation/EntityTypeValidationConstraints.php`
 Opt-out: `EntityRepository::save($entity, validate: false)` (and `saveMany`) skips validation entirely; there is no separate flag for “manual only.”
 
 Invalid data raises `EntityValidationException` with property paths equal to field names (plus nested paths when a constraint reports a sub-path), unchanged from `EntityValidator` behavior.
+
+#### Entity fixture values for tests and seeds (#1186)
+
+Files: `packages/testing/src/Factory/EntityTypeFixtureValues.php`, `packages/testing/src/Factory/EntityFactory.php` (`defineFromEntityType`).
+
+**Purpose:** Generate **storage-shaped** value arrays for PHPUnit, in-memory fixtures, and app seed scripts (non-goal: framework CLI seed commands). Optional `fakerphp/faker` improves human-like strings/emails when installed; otherwise small deterministic defaults are used.
+
+**Constraint source:** `EntityTypeFixtureValues::values()` uses the same merged map as persistence validation — `EntityTypeValidationConstraints::forEntityType()` (derived field definitions + manual `getConstraints()`, identical merge semantics to `EntityRepository::doSave()`). Generated samples are intended to satisfy `EntityValidator` for that map when values are loaded on an entity whose `get()` semantics match storage (no `$casts` surprises).
+
+**Distinction vs production hydration (#1188):** Factories are **not** `HydratableFromStorageInterface` / `EntityInstantiator` / static `make()` rehydration. They synthesize dummy data from metadata; production paths merge **real** storage or API rows. A future domain `make()` may wrap a compatible value bag, but factories remain test/seed-only.
+
+**API surface:** `EntityTypeFixtureValues` accepts a sequence index (for `Choice` cycling and uniqueness) and an optional per-field resolver: `callable(string $field, list<Constraint> $constraints): mixed|null` — return `null` to fall back to built-in generation for that field; use `values(..., $overrides)` for explicit nulls or replacements. `EntityType::getKeys()` triggers defaults for `uuid` (RFC 4122 via `symfony/uid`), `label`, `bundle`, and `langcode` when those mappings exist. `EntityFactory::defineFromEntityType()` registers those defaults so existing `sequence()` / `createMany()` usage keeps working.
+
+**Extension:** Unknown Symfony `Constraint` subclasses are not synthesized — supply values via overrides or the custom resolver. Cast-heavy entities should keep fixtures storage-canonical (same rule as constructor values in #1181).
 
 ### Entity Lifecycle Hooks
 
