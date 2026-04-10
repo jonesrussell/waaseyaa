@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Testing\Tests\Unit;
 
+use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Testing\Factory\EntityFactory;
+use Waaseyaa\Testing\Tests\Fixture\StubFieldableEntity;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -226,5 +228,32 @@ final class EntityFactoryTest extends TestCase
 
         $this->assertSame('user1', $user['name']);
         $this->assertSame('user1@example.com', $user['mail']);
+    }
+
+    #[Test]
+    public function defineFromEntityTypeRegistersDefaults(): void
+    {
+        $type = new EntityType(
+            id: 'article',
+            label: 'Article',
+            class: StubFieldableEntity::class,
+            fieldDefinitions: [
+                'title' => ['type' => 'string', 'required' => true],
+                'status' => [
+                    'type' => 'string',
+                    'required' => true,
+                    'allowed_values' => ['draft', 'published'],
+                ],
+            ],
+        );
+
+        $this->factory->defineFromEntityType($type, ['title' => 'Seeded title']);
+
+        $this->assertTrue($this->factory->hasDefinition('article'));
+
+        $values = $this->factory->create('article', []);
+
+        $this->assertSame('Seeded title', $values['title']);
+        $this->assertContains($values['status'], ['draft', 'published']);
     }
 }

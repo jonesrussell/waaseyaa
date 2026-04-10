@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Testing\Factory;
 
+use Waaseyaa\Entity\EntityTypeInterface;
+
 /**
  * Test data generator for entity values.
  *
@@ -59,6 +61,27 @@ final class EntityFactory
         $this->counters[$entityTypeId] = 0;
 
         return $this;
+    }
+
+    /**
+     * Register defaults from {@see EntityTypeFixtureValues} (field definitions + merged validation constraints).
+     *
+     * @param array<string, mixed> $overrides Merged into generated defaults before registering.
+     * @param (callable(string, list<\Symfony\Component\Validator\Constraint>): mixed|null)|null $customResolver
+     *   Passed to {@see EntityTypeFixtureValues}; return null to use built-in generation for that field.
+     */
+    public function defineFromEntityType(
+        EntityTypeInterface $type,
+        array $overrides = [],
+        ?int $sequence = null,
+        ?callable $customResolver = null,
+    ): self {
+        $generator = new EntityTypeFixtureValues(
+            sequence: $sequence ?? 1,
+            customResolver: $customResolver,
+        );
+
+        return $this->define($type->id(), $generator->values($type, $overrides));
     }
 
     /**
