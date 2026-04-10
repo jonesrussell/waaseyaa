@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Derive Symfony validation constraints from `EntityType` field definitions
+  (`EntityTypeValidationConstraints`). (#1216)
+- Pluggable entity clock and timestamp population on save. (#1218)
+- `ContentEntityBase::duplicate()`, `with()`, and `EntityValuesSnapshot` for
+  snapshot/immutable-style workflows. (#1187, #1217)
+- Bridge typed-data coercion with `ValueCaster` at the entity boundary.
+  (#1185, #1219)
+- Value-object field casts: `CastDefinition`, `ValueCaster` pipeline updates,
+  and related `entity` / `typed-data` support. (#1184, #1220)
+- `waaseyaa/testing`: `EntityTypeFixtureValues` and
+  `EntityFactory::defineFromEntityType()` for fixtures and seeds. (#1186,
+  #1221)
+
+### Fixed
+
+- Root `composer.lock`: resolve `waaseyaa/access` to `dev-main` so monorepo
+  `composer install` satisfies internal `^0.1` constraints (restores CI and
+  release `composer install`).
+
 ## [0.1.0-alpha.116] - 2026-04-09
 
 ### Fixed
