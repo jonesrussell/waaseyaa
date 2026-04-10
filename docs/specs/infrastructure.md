@@ -9,6 +9,7 @@
 <!-- Spec reviewed 2026-04-08b - restored packages/foundation, packages/search, and packages/testing Symfony floors (^7.3 -> ^7.0) where no runtime/API requirement justified tighter constraints -->
 <!-- Spec reviewed 2026-04-08c - entity, entity-storage, queue, routing, typed-data, validation Symfony floors to ^7.0; see symfony-version-floors.md (#1151) -->
 <!-- Spec reviewed 2026-04-09 - typed-data: EntityCastCoercion, CoercionException, CastTokenMapper; entity ValueCaster delegates builtins (#1185); public surface map extended -->
+<!-- Spec reviewed 2026-04-10 - testing package EntityTypeFixtureValues + EntityFactory::defineFromEntityType (#1186) -->
 <!-- Spec reviewed 2026-04-08 - #1129/#1134: HttpKernel::finalizeBoot() wires DB cache bins and discovery handler; SSR owns RenderCache listeners + SsrPageHandler via SsrServiceProvider::configureHttpKernel; ErrorPageRendererInterface bound in SSR; provider httpDomainRouters() merged after foundation routers through McpRouter and before BroadcastRouter; DiscoveryRouter/GraphQlRouter/MediaRouter live in api/graphql/media packages; ControllerDispatcher uses Inertia foundation interfaces + optional InertiaFullPageRendererInterface; LayerDependencyTest gates non-Router Foundation Http/ against non-Foundation Waaseyaa imports -->
 <!-- Spec reviewed 2026-04-08 - DX P2: HttpKernel boot catch returns HTML via DevExceptionRenderer when debug+package present else JSON:API bootFailureJsonResponse (non-empty body, #1117); ControllerDispatcher render.page returns 501 JSON when SsrPageHandler class unavailable (#1130); LogManager gains daily + fingers_crossed channel types -->
 <!-- Spec reviewed 2026-04-08 - LogManager: handler key string = type synonym only; fingers_crossed nested config via nested, inner, or array handler; channel buffer_limit caps FingersCrossedHandler in-memory buffer (drops oldest); handlerTypeFromConfig + fingersCrossedBufferLimit helpers -->
@@ -34,7 +35,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 | typed-data | `TypedDataInterface`, `DataDefinitionInterface`, `ComplexDataInterface`, `ListInterface`, `PrimitiveInterface`, `TypedDataManagerInterface`, `CastTokenMapper`, `CoercionException`, `EntityCastCoercion` |
 | i18n | `LanguageManagerInterface`, `TranslatorInterface` |
 | queue | `QueueInterface` |
-| testing | `CreatesApplication`, `InteractsWithApi`, `InteractsWithAuth`, `InteractsWithEvents`, `RefreshDatabase` |
+| testing | `CreatesApplication`, `InteractsWithApi`, `InteractsWithAuth`, `InteractsWithEvents`, `RefreshDatabase`, `EntityFactory`, `EntityTypeFixtureValues` |
 
 **`@internal`** (implementation details, may change without notice):
 
@@ -61,6 +62,14 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 | `packages/plugin/` | `Waaseyaa\Plugin\` | 0 (Foundation) | PluginManager, attribute-based plugin discovery, plugin factory |
 | `packages/mail/` | `Waaseyaa\Mail\` | 0 (Foundation) | `MailerInterface` + `Envelope`; pluggable `TransportInterface` (array, local file, SendGrid API when configured) |
 | `packages/http-client/` | `Waaseyaa\HttpClient\` | 0 (Foundation) | Minimal HTTP client for JSON APIs and webhooks, zero external dependencies |
+
+### Testing fixture factories (`packages/testing/`)
+
+`EntityFactory` remains the lightweight defaults/overrides + sequence helper for value arrays.
+`EntityTypeFixtureValues` adds metadata-aware dummy generation for tests/seeds by reading
+`EntityTypeValidationConstraints::forEntityType()` from `waaseyaa/entity`, so generated values
+follow the same merged field-definition + manual constraint map used by `EntityRepository` save
+validation. This is explicitly a fixture path (not production hydration via `EntityInstantiator`).
 
 ## Domain Events
 
