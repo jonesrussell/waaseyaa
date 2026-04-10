@@ -16,6 +16,7 @@
 <!-- Spec reviewed 2026-04-09 - Monorepo toolchain: PHPStan 2.x + phpstan-strict-rules 2.x; symfony/html-sanitizer ^8 required by waaseyaa/ssr (HtmlFormatter) and root composer (#1158 / #808/#809) -->
 <!-- Spec reviewed 2026-04-09 - InboundHttpRequestInterface + InboundHttpRequest snapshot DTO in foundation Http/Inbound for SSR app-controller boundary; body merge from Request bag + _parsed_body; public-surface map lists interface -->
 <!-- Spec reviewed 2026-04-09 - App controller Inertia: SsrPageHandler::dispatchAppController handles InertiaPageResultInterface (X-Inertia JSON + full HTML via InertiaFullPageRendererInterface, matching ControllerDispatcher); HttpKernel::getInertiaFullPageRenderer(); SsrServiceProvider injects that renderer when constructing SsrPageHandler in configureHttpKernel() -->
+<!-- Spec reviewed 2026-04-10 - inertia RootTemplateRenderer: JSON script tag uses data-page="app" (mount id) so @inertiajs/core getInitialPageFromDOM finds the initial page -->
 <!-- Spec reviewed 2026-04-09 - HttpKernel::serveHttpRequest: auth middleware short-circuit — return pipeline response whenever status !== 200 (302 login redirect, 401/403 JSON), not only when status >= 400, so unauthenticated SSR routes cannot fall through to controller dispatch -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
@@ -1030,6 +1031,8 @@ Handles callable controllers (objects with `__invoke(Request): Response`) direct
 **Controller key normalization:** Routes declared with Symfony's array-callable form (`'_controller' => [FooController::class, 'bar']`) are normalized to `FooController::bar` string form before the domain router chain runs. This keeps downstream routers' `supports()` checks (which use `str_contains()` / `str_starts_with()` against `_controller`) simple — they never have to handle both shapes. `JsonApiRouter::supports()` additionally has a defensive `match()` so any misrouted array callable that slipped through produces a clean miss rather than a string-function type error.
 
 **Inertia response handling:** When a callable controller returns a value implementing `InertiaPageResultInterface`, the dispatcher checks for the `X-Inertia` request header. XHR requests get a JSON response with the page object. Non-XHR (initial page load) requests are rendered to full HTML via the injected `InertiaFullPageRendererInterface` (bound by `InertiaServiceProvider`). If that interface is not registered, full-page Inertia requests return 500.
+
+**RootTemplateRenderer default HTML:** `packages/inertia/src/RootTemplateRenderer.php` emits `<div id="app"></div>` and a following `<script type="application/json" data-page="app">` whose text content is the JSON page object. The `data-page` attribute value must match the root element id (default `app`) so `@inertiajs/core` `getInitialPageFromDOM()` can load the initial page on the first visit.
 
 **Error handling:** Both the callable controller path and the router dispatch path are wrapped in try-catch. Unhandled exceptions produce a 500 JSON:API error response via `handleException()`, which includes stack trace details when debug mode is enabled.
 

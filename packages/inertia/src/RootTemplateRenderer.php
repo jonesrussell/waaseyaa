@@ -22,7 +22,7 @@ final class RootTemplateRenderer implements InertiaFullPageRendererInterface
             JSON_THROW_ON_ERROR | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE,
         );
 
-        $scriptTag = '<script type="application/json" data-page="true">' . $json . '</script>';
+        $scriptTag = '<script type="application/json" data-page="app">' . $json . '</script>';
 
         if ($this->template !== null) {
             return ($this->template)($scriptTag);

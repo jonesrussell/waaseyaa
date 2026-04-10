@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `inertia` `RootTemplateRenderer`: emit `data-page="app"` so the Inertia client
+  (`getInitialPageFromDOM`) resolves the initial page from the JSON script tag.
+  The previous `data-page="true"` value did not match the default app id and
+  yielded a null initial page.
+
+### Changed
+
+- Project skeleton `composer.json`: set `process-timeout` to `0` so long-running
+  Composer scripts (e.g. dev servers) are not stopped after 300 seconds.
+
 ## [0.1.0-alpha.120] - 2026-04-10
 
 ### Added

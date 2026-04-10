@@ -25,7 +25,7 @@ final class RootTemplateRendererTest extends TestCase
 
         $this->assertStringContainsString('<!DOCTYPE html>', $html);
         $this->assertStringContainsString('<div id="app">', $html);
-        $this->assertStringContainsString('<script type="application/json" data-page="true">', $html);
+        $this->assertStringContainsString('<script type="application/json" data-page="app">', $html);
         $this->assertStringContainsString('"component":"Home"', $html);
     }
 
