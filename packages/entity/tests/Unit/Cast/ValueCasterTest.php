@@ -12,8 +12,11 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\Entity\Cast\Exception\CastException;
 use Waaseyaa\Entity\Cast\ValueCaster;
 use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleIntEnum;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleNestedChildVo;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleNestedParentVo;
 use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleStringEnum;
 use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleUnitEnum;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleValueObject;
 
 /**
  * @covers \Waaseyaa\Entity\Cast\ValueCaster
@@ -363,11 +366,83 @@ final class ValueCasterTest extends TestCase
     }
 
     #[Test]
-    public function plain_class_string_throws_value_object_not_supported(): void
+    public function plain_class_string_requires_value_object_interface(): void
     {
         $this->expectException(CastException::class);
-        $this->expectExceptionMessage('#1184');
+        $this->expectExceptionMessage('Value object cast requires class implementing FromArrayEntityValueInterface');
         (new ValueCaster())->castIn(self::FIELD, 'x', \stdClass::class);
+    }
+
+    #[Test]
+    public function value_object_round_trip_json_string_storage(): void
+    {
+        $c = new ValueCaster();
+        $spec = SampleValueObject::class;
+        $vo = new SampleValueObject(title: 'Hello');
+        $json = $c->castOut(self::FIELD, $vo, $spec);
+        self::assertSame('{"title":"Hello"}', $json);
+        $round = $c->castIn(self::FIELD, $json, $spec);
+        self::assertInstanceOf(SampleValueObject::class, $round);
+        self::assertSame('Hello', $round->title);
+    }
+
+    #[Test]
+    public function value_object_cast_in_accepts_php_array_like_hydrate(): void
+    {
+        $c = new ValueCaster();
+        $spec = SampleValueObject::class;
+        $vo = $c->castIn(self::FIELD, ['title' => 'Arr'], $spec);
+        self::assertInstanceOf(SampleValueObject::class, $vo);
+        self::assertSame('Arr', $vo->title);
+    }
+
+    #[Test]
+    public function value_object_cast_out_accepts_array_domain(): void
+    {
+        $c = new ValueCaster();
+        $spec = SampleValueObject::class;
+        $json = $c->castOut(self::FIELD, ['title' => 'From array'], $spec);
+        self::assertSame('{"title":"From array"}', $json);
+    }
+
+    #[Test]
+    public function value_object_cast_out_rejects_scalar_domain(): void
+    {
+        $this->expectException(CastException::class);
+        $this->expectExceptionMessage('scalars are not accepted');
+        (new ValueCaster())->castOut(self::FIELD, 'nope', SampleValueObject::class);
+    }
+
+    #[Test]
+    public function value_object_nested_round_trip(): void
+    {
+        $c = new ValueCaster();
+        $spec = SampleNestedParentVo::class;
+        $vo = new SampleNestedParentVo(
+            child: new SampleNestedChildVo(code: 'inner'),
+        );
+        $json = $c->castOut(self::FIELD, $vo, $spec);
+        self::assertSame('{"child":{"code":"inner"}}', $json);
+        $in = $c->castIn(self::FIELD, $json, $spec);
+        self::assertInstanceOf(SampleNestedParentVo::class, $in);
+        self::assertSame('inner', $in->child->code);
+    }
+
+    #[Test]
+    public function value_object_array_cast_spec_with_class_key(): void
+    {
+        $c = new ValueCaster();
+        $spec = ['type' => 'value_object', 'class' => SampleValueObject::class];
+        $vo = $c->castIn(self::FIELD, '{"title":"Spec"}', $spec);
+        self::assertInstanceOf(SampleValueObject::class, $vo);
+        self::assertSame('Spec', $vo->title);
+    }
+
+    #[Test]
+    public function value_object_array_spec_missing_class_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castIn(self::FIELD, '{}', ['type' => 'value_object']);
     }
 
     #[Test]

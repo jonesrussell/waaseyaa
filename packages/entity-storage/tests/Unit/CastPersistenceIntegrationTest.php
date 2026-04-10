@@ -15,6 +15,8 @@ use Waaseyaa\EntityStorage\Driver\InMemoryStorageDriver;
 use Waaseyaa\EntityStorage\EntityRepository;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceLeafVo;
+use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceOuterVo;
 use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceStringEnum;
 use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceTestEntity;
 
@@ -111,6 +113,38 @@ final class CastPersistenceIntegrationTest extends TestCase
     }
 
     #[Test]
+    public function repository_round_trip_nested_value_object(): void
+    {
+        [, $driver, $repository] = $this->createRepositoryFixture();
+
+        $entity = new CastPersistenceTestEntity(
+            values: [
+                'id' => 10,
+                'uuid' => '10101010-1010-4101-8101-101010101010',
+                'label' => 'Ten',
+                'bundle' => 'article',
+                'langcode' => 'en',
+            ],
+            entityKeys: self::ENTITY_KEYS,
+        );
+        $entity->enforceIsNew(true);
+        $entity->set(
+            'nested_profile',
+            new CastPersistenceOuterVo(leaf: new CastPersistenceLeafVo(code: 'persisted')),
+        );
+        $repository->save($entity);
+
+        $found = $repository->find('10');
+        self::assertInstanceOf(CastPersistenceTestEntity::class, $found);
+        $profile = $found->get('nested_profile');
+        self::assertInstanceOf(CastPersistenceOuterVo::class, $profile);
+        self::assertSame('persisted', $profile->leaf->code);
+
+        $row = $this->readInMemoryRow($driver, 'cast_persist_entity', '10');
+        self::assertSame('{"leaf":{"code":"persisted"}}', $row['nested_profile']);
+    }
+
+    #[Test]
     public function repository_find_casts_numeric_string_from_driver_like_sqlite(): void
     {
         [, $driver, $repository] = $this->createRepositoryFixture();
@@ -201,6 +235,54 @@ final class CastPersistenceIntegrationTest extends TestCase
         self::assertIsString($internal['tags']);
         self::assertSame('on', $internal['mode']);
         self::assertSame(7, $internal['score']);
+    }
+
+    #[Test]
+    public function sql_storage_nested_value_object_round_trip_in_data_blob(): void
+    {
+        $database = DBALDatabase::createSqlite();
+        $entityType = new EntityType(
+            id: 'cast_persist_entity',
+            label: 'Cast Persist',
+            class: CastPersistenceTestEntity::class,
+            keys: self::ENTITY_KEYS,
+            fieldDefinitions: [
+                'created' => ['type' => 'timestamp'],
+                'changed' => ['type' => 'timestamp'],
+            ],
+        );
+        $schemaHandler = new SqlSchemaHandler($entityType, $database);
+        $schemaHandler->ensureTable();
+
+        $storage = new SqlEntityStorage(
+            $entityType,
+            $database,
+            new EventDispatcher(),
+        );
+
+        $entity = $storage->create([
+            'label' => 'Sql nested vo',
+            'bundle' => 'page',
+        ]);
+        $entity->set(
+            'nested_profile',
+            new CastPersistenceOuterVo(leaf: new CastPersistenceLeafVo(code: 'sql-leaf')),
+        );
+        $storage->save($entity);
+
+        $id = $entity->id();
+        self::assertNotNull($id);
+
+        $loaded = $storage->load($id);
+        self::assertNotNull($loaded);
+        self::assertInstanceOf(CastPersistenceTestEntity::class, $loaded);
+        $profile = $loaded->get('nested_profile');
+        self::assertInstanceOf(CastPersistenceOuterVo::class, $profile);
+        self::assertSame('sql-leaf', $profile->leaf->code);
+
+        $internal = $loaded->toArray();
+        self::assertIsString($internal['nested_profile']);
+        self::assertSame('{"leaf":{"code":"sql-leaf"}}', $internal['nested_profile']);
     }
 
     /**

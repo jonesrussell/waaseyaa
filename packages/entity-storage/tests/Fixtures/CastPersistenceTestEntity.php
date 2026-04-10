@@ -18,6 +18,7 @@ class CastPersistenceTestEntity extends ContentEntityBase
         'score' => 'int',
         'tags' => 'array',
         'mode' => CastPersistenceStringEnum::class,
+        'nested_profile' => CastPersistenceOuterVo::class,
     ];
 
     public function __construct(
