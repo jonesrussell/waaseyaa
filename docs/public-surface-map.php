@@ -116,6 +116,7 @@ return [
     'Waaseyaa\Entity\Hydration\HydratableFromStorageInterface' => 'public',
     'Waaseyaa\Entity\Hydration\HydrationContext' => 'public',
     'Waaseyaa\Entity\EntityValues' => 'public',
+    'Waaseyaa\Entity\Snapshot\EntityValuesSnapshot' => 'public',
     'Waaseyaa\Entity\DateTime\EntityClockInterface' => 'public',
     'Waaseyaa\Entity\DateTime\UtcEntityClock' => 'public',
     'Waaseyaa\Entity\DateTime\FixedEntityClock' => 'public',

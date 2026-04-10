@@ -171,6 +171,62 @@ abstract class EntityBase implements EntityInterface
         return $this->values;
     }
 
+    /**
+     * Shallow copy of this entity: new instance via {@see duplicateInstance()} with the same storage bag,
+     * identity keys (id, uuid, …), and {@see $enforceIsNew} flag.
+     *
+     * Nested structures inside {@see $values} are not deep-cloned; they remain reference-shared with
+     * the source entity (formal invariant — see docs/specs/entity-system.md, P3 branching).
+     */
+    public function duplicate(): static
+    {
+        $shallowValues = [];
+        foreach ($this->values as $key => $value) {
+            $shallowValues[$key] = $value;
+        }
+
+        $copy = $this->duplicateInstance($shallowValues);
+        $copy->enforceIsNew($this->enforceIsNew);
+
+        return $copy;
+    }
+
+    /**
+     * Reconstruct {@see static} from a shallow-copied value bag. Subclasses with extra constructor
+     * parameters MUST override this so {@see duplicate()} re-enters their constructor chain (P3).
+     *
+     * @param array<string, mixed> $values
+     */
+    protected function duplicateInstance(array $values): static
+    {
+        $class = static::class;
+
+        return new $class($values, $this->entityTypeId, $this->entityKeys);
+    }
+
+    /**
+     * Immutable-style update: {@see duplicate()} then {@see set()}. Throws the same exceptions as {@see set()}.
+     */
+    public function with(string $name, mixed $value): static
+    {
+        return $this->duplicate()->set($name, $value);
+    }
+
+    /**
+     * @param array<string, mixed> $overrides Field name => value (domain-shaped; same as {@see set()}).
+     *
+     * @return static Later keys in the array win if the same field appears twice (PHP array semantics).
+     */
+    public function withValues(array $overrides): static
+    {
+        $copy = $this->duplicate();
+        foreach ($overrides as $key => $value) {
+            $copy->set($key, $value);
+        }
+
+        return $copy;
+    }
+
     public function language(): string
     {
         $langcodeKey = $this->entityKeys['langcode'] ?? 'langcode';

@@ -158,4 +158,18 @@ class ContentEntityBaseTest extends TestCase
         // array_key_exists returns true even for null values.
         $this->assertTrue($entity->hasField('field'));
     }
+
+    public function testDuplicatePreservesFieldDefinitions(): void
+    {
+        $definitions = ['body' => ['type' => 'text']];
+        $entity = new TestContentEntity(
+            values: ['title' => 'T'],
+            fieldDefinitions: $definitions,
+        );
+        $dup = $entity->duplicate();
+
+        $this->assertNotSame($entity, $dup);
+        $this->assertSame($definitions, $dup->getFieldDefinitions());
+        $this->assertSame('T', $dup->get('title'));
+    }
 }

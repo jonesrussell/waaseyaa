@@ -408,6 +408,42 @@ final class EntityRepositoryTest extends TestCase
         $this->assertGreaterThan(0, $factory->callCount, 'Custom event factory should be called during save');
     }
 
+    #[Test]
+    public function preSaveOriginalEntityReflectsStoredRowNotInMemoryDuplicate(): void
+    {
+        $factory = new SpyEntityEventFactory();
+        $repository = new EntityRepository(
+            $this->entityType,
+            $this->driver,
+            $this->eventDispatcher,
+            eventFactory: $factory,
+        );
+
+        $this->driver->write('test_entity', '1', [
+            'id' => '1',
+            'uuid' => 'aaaaaaaa-bbbb-4ccc-dddd-eeeeeeeeeeee',
+            'label' => 'Stored',
+            'bundle' => 'article',
+            'langcode' => 'en',
+        ]);
+
+        $entity = $repository->find('1');
+        $this->assertNotNull($entity);
+        $entity->set('label', 'ChangedInMemory');
+
+        $inMemoryDuplicate = $entity->duplicate();
+        $this->assertSame('ChangedInMemory', $inMemoryDuplicate->label());
+
+        $repository->save($entity);
+
+        $this->assertGreaterThanOrEqual(1, $factory->callCount);
+        $first = $factory->calls[0];
+        $this->assertSame($entity, $first['entity']);
+        $this->assertNotNull($first['originalEntity']);
+        $this->assertSame('Stored', $first['originalEntity']->label());
+        $this->assertNotSame($inMemoryDuplicate, $first['originalEntity']);
+    }
+
     // -----------------------------------------------------------------------
     // Batch operations
     // -----------------------------------------------------------------------

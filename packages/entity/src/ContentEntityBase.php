@@ -52,4 +52,14 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
     {
         return $this->fieldDefinitions;
     }
+
+    /**
+     * @param array<string, mixed> $values
+     */
+    protected function duplicateInstance(array $values): static
+    {
+        $class = static::class;
+
+        return new $class($values, $this->entityTypeId, $this->entityKeys, $this->fieldDefinitions);
+    }
 }

@@ -15,6 +15,7 @@
 <!-- Spec reviewed 2026-04-09 ST-9 - casting + hydration architecture finalization: diagrams, invariants, EntityValues/get/set/toArray/config rules (#1181) -->
 <!-- Spec reviewed 2026-04-09 ST-10 - layering: EntityValues::toJsonReadyMap / normalizeValueForJson; AI vector uses cast-aware paths (#1181) -->
 <!-- Spec reviewed 2026-04-09 - field-definition → Symfony constraints + save merge (#1182) -->
+<!-- Spec reviewed 2026-04-09 - P3 branching: duplicate/with/withValues, duplicateInstance hook, EntityValuesSnapshot, shallow-copy invariant -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
@@ -233,6 +234,28 @@ Integration coverage: `packages/entity-storage/tests/Unit/CastPersistenceIntegra
 **JSON:API serialization (ST-7, #1181):** `Waaseyaa\Api\ResourceSerializer` builds attributes from `EntityValues::toCastAwareMap($entity)` (same keys as `toArray()`, values from `get()`), excluding `id`/`uuid` storage keys, then applies field-definition boolean/timestamp coercions and JSON normalization (enums, `DateTimeInterface`, nested arrays). See `docs/specs/jsonapi.md`. Do not build attributes from `toArray()` alone — that bypasses `$casts`.
 
 **Presentation map (ST-8, #1181):** `Waaseyaa\Entity\EntityValues::toCastAwareMap()` returns all keys from `toArray()` with values from `get()` — use this (or `get()` per field) in GraphQL resolvers, discovery visibility, relationship policies, SSR field bags, MCP tool payloads, embedding text extraction, and workflow visibility helpers. `WorkflowVisibility::isNodePublicForEntity()` wraps the same idea for nodes. `EntityValues::statusToInt()` normalizes boolean/string/numeric status flags to `0|1` for strict published checks. Persistence, `SqlEntityStorage`, and `EntityRepository::doSave()` continue to use raw `toArray()` only.
+
+### Branching and snapshots (P3)
+
+Files: `packages/entity/src/EntityBase.php`, `packages/entity/src/ContentEntityBase.php`, `packages/entity/src/Snapshot/EntityValuesSnapshot.php`
+
+**Public API:** `EntityBase::duplicate()`, `with()`, `withValues()`; readonly `EntityValuesSnapshot`. **Extension hook:** `protected function duplicateInstance(array $values): static` (not listed as public semver surface in `docs/public-surface-map.php`).
+
+**Constructor re-entry:** `duplicate()` builds a shallow copy of the internal value bag and reconstructs the instance via `duplicateInstance()`, which must call `new $class(...)` so subclass / `ConfigEntityBase` / `ContentEntityBase` constructors run (status, dependencies, `fieldDefinitions`, etc.). Subclasses with exotic constructors may override `duplicate()` or `duplicateInstance()` explicitly; that is not the default.
+
+**Shallow-copy invariant:** `duplicate()` copies top-level keys only; nested arrays / JSON-shaped structures are **not** deep-cloned and remain **reference-shared** with the source entity’s bag. Deep clone is **out of scope** for P3 and needs a dedicated design (blobs, relationship metadata, performance).
+
+**Identity:** Duplicates preserve `id`, `uuid`, and other keys in the copied bag, and preserve `enforceIsNew` from the source. `duplicate()` does not mean “blank new row” unless the source already represented that state.
+
+**`with()` / `withValues()`:** `duplicate()` then `set()` per field. They throw the **same** exceptions as `set()` (e.g. `CastException`). When P2 enum / value-object field types land (#1184 / #1185), `with()` must accept the same domain-shaped values as `set()` and rely on `castOut` — no second error model.
+
+**Readonly snapshot vs fork vs live entity:**
+
+- `EntityValuesSnapshot` — storage-canonical bag at a point in time; `get()` / `has()` / `toStorageArray()` are not cast-aware. Optional **injected** cast map enables `getCastAware()` via `ValueCaster` for keys in that map only. No mutation and no rehydration helpers on the snapshot type; build a live entity via `EntityInstantiator` or entity constructors when needed.
+- `duplicate()` — mutable fork sharing nested references per the shallow invariant.
+- Live entity — ordinary `get()` / `set()` / `toArray()` semantics (#1181).
+
+**Events:** `EntityRepository::doSave()` continues to pass PRE_SAVE / POST_SAVE `originalEntity` from `find($id)` (DB truth), not an in-memory `duplicate()` of the working copy. Regression coverage: `EntityRepositoryTest::preSaveOriginalEntityReflectsStoredRowNotInMemoryDuplicate`.
 
 ### ContentEntityInterface
 
