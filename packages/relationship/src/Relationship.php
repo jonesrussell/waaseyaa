@@ -20,14 +20,22 @@ final class Relationship extends ContentEntityBase
 
     /**
      * @param array<string, mixed> $values
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
      */
-    public function __construct(array $values = [])
-    {
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
         $values += [
             'directionality' => 'directed',
             'status' => 1,
         ];
 
-        parent::__construct($values, self::ENTITY_TYPE_ID, self::ENTITY_KEYS);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : self::ENTITY_TYPE_ID;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : self::ENTITY_KEYS;
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 }

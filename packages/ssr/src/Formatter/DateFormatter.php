@@ -18,6 +18,10 @@ final class DateFormatter implements FieldFormatterInterface
             return '';
         }
 
+        if ($value instanceof \DateTimeInterface) {
+            return \DateTimeImmutable::createFromInterface($value)->format($format);
+        }
+
         try {
             $date = is_numeric($value)
                 ? new \DateTimeImmutable('@' . (int) $value)

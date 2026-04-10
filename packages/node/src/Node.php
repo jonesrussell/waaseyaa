@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Node;
 
+use DateTimeInterface;
 use Waaseyaa\Entity\ContentEntityBase;
+use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
+use Waaseyaa\Entity\Hydration\HydrationContext;
 
 /**
  * Represents a piece of content (a node).
@@ -13,7 +16,7 @@ use Waaseyaa\Entity\ContentEntityBase;
  * to a node type (bundle) and has properties like title, author, status,
  * and timestamps.
  */
-final class Node extends ContentEntityBase
+final class Node extends ContentEntityBase implements HydratableFromStorageInterface
 {
     protected string $entityTypeId = 'node';
 
@@ -25,10 +28,23 @@ final class Node extends ContentEntityBase
     ];
 
     /**
-     * @param array<string, mixed> $values Initial entity values.
+     * @var array<string, string|array<string, mixed>>
      */
-    public function __construct(array $values = [])
-    {
+    protected array $casts = [
+        'created' => ['type' => 'datetime_immutable', 'storage' => 'unix'],
+        'changed' => ['type' => 'datetime_immutable', 'storage' => 'unix'],
+    ];
+
+    /**
+     * @param array<string, mixed> $values Initial entity values.
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
+     */
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
         // Ensure defaults for optional properties.
         if (!array_key_exists('status', $values)) {
             $values['status'] = 1;
@@ -46,7 +62,38 @@ final class Node extends ContentEntityBase
             $values['changed'] = 0;
         }
 
-        parent::__construct($values, $this->entityTypeId, $this->entityKeys);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
+    }
+
+    /**
+     * @param array<string, mixed> $values
+     */
+    public static function make(array $values): self
+    {
+        return new self($values);
+    }
+
+    public static function fromStorage(array $values, HydrationContext $context): static
+    {
+        return new self(
+            values: $values,
+            entityTypeId: $context->entityTypeId,
+            entityKeys: $context->entityKeys,
+            fieldDefinitions: [],
+        );
+    }
+
+    protected function duplicateInstance(array $values): static
+    {
+        return new static(
+            values: $values,
+            entityTypeId: $this->getEntityTypeId(),
+            entityKeys: $this->entityKeys,
+            fieldDefinitions: $this->getFieldDefinitions(),
+        );
     }
 
     /**
@@ -152,7 +199,12 @@ final class Node extends ContentEntityBase
      */
     public function getCreatedTime(): int
     {
-        return (int) ($this->get('created') ?? 0);
+        $v = $this->get('created');
+        if ($v instanceof DateTimeInterface) {
+            return $v->getTimestamp();
+        }
+
+        return (int) ($v ?? 0);
     }
 
     /**
@@ -170,7 +222,12 @@ final class Node extends ContentEntityBase
      */
     public function getChangedTime(): int
     {
-        return (int) ($this->get('changed') ?? 0);
+        $v = $this->get('changed');
+        if ($v instanceof DateTimeInterface) {
+            return $v->getTimestamp();
+        }
+
+        return (int) ($v ?? 0);
     }
 
     /**

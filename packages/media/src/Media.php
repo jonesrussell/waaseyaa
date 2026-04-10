@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Media;
 
+use DateTimeInterface;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
@@ -15,18 +16,32 @@ use Waaseyaa\Entity\ContentEntityBase;
  */
 final class Media extends ContentEntityBase
 {
-    public function __construct(array $values = [])
-    {
-        parent::__construct(
-            values: $values,
-            entityTypeId: 'media',
-            entityKeys: [
-                'id' => 'mid',
-                'uuid' => 'uuid',
-                'label' => 'name',
-                'bundle' => 'bundle',
-            ],
-        );
+    /**
+     * @var array<string, string|array<string, mixed>>
+     */
+    protected array $casts = [
+        'created' => ['type' => 'datetime_immutable', 'storage' => 'unix'],
+        'changed' => ['type' => 'datetime_immutable', 'storage' => 'unix'],
+    ];
+
+    /**
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
+     */
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'media';
+        $entityKeys = $entityKeys !== [] ? $entityKeys : [
+            'id' => 'mid',
+            'uuid' => 'uuid',
+            'label' => 'name',
+            'bundle' => 'bundle',
+        ];
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 
     /**
@@ -99,8 +114,14 @@ final class Media extends ContentEntityBase
     public function getCreatedTime(): ?int
     {
         $created = $this->get('created');
+        if ($created === null) {
+            return null;
+        }
+        if ($created instanceof DateTimeInterface) {
+            return $created->getTimestamp();
+        }
 
-        return $created !== null ? (int) $created : null;
+        return (int) $created;
     }
 
     /**
@@ -119,8 +140,14 @@ final class Media extends ContentEntityBase
     public function getChangedTime(): ?int
     {
         $changed = $this->get('changed');
+        if ($changed === null) {
+            return null;
+        }
+        if ($changed instanceof DateTimeInterface) {
+            return $changed->getTimestamp();
+        }
 
-        return $changed !== null ? (int) $changed : null;
+        return (int) $changed;
     }
 
     /**

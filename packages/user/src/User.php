@@ -6,6 +6,8 @@ namespace Waaseyaa\User;
 
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\ContentEntityBase;
+use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
+use Waaseyaa\Entity\Hydration\HydrationContext;
 
 /**
  * The User content entity.
@@ -19,7 +21,7 @@ use Waaseyaa\Entity\ContentEntityBase;
  * service) is responsible for populating the permissions from role
  * definitions.
  */
-final class User extends ContentEntityBase implements AccountInterface
+final class User extends ContentEntityBase implements AccountInterface, HydratableFromStorageInterface
 {
     /**
      * The entity type machine name.
@@ -36,10 +38,23 @@ final class User extends ContentEntityBase implements AccountInterface
     ];
 
     /**
-     * @param array<string, mixed> $values Initial entity values.
+     * @var array<string, string|array<string, mixed>>
      */
-    public function __construct(array $values = [])
-    {
+    protected array $casts = [
+        // status stays 0/1 in storage and in get()/validate(); use isActive() for booleans.
+        'email_verified' => 'bool',
+    ];
+
+    /**
+     * @param array<string, mixed> $values Initial entity values.
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
+     */
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
         // Ensure sensible defaults.
         $hasUid = isset($values['uid']);
 
@@ -49,13 +64,44 @@ final class User extends ContentEntityBase implements AccountInterface
             'status' => 1,
         ];
 
-        parent::__construct($values, self::ENTITY_TYPE_ID, self::ENTITY_KEYS);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : self::ENTITY_TYPE_ID;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : self::ENTITY_KEYS;
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
 
         // Since id() always returns int (never null), EntityBase::isNew()
         // can never detect "new" via id() === null. Mark explicitly.
         if (!$hasUid) {
             $this->enforceIsNew();
         }
+    }
+
+    /**
+     * @param array<string, mixed> $values
+     */
+    public static function make(array $values): self
+    {
+        return new self($values);
+    }
+
+    public static function fromStorage(array $values, HydrationContext $context): static
+    {
+        return new self(
+            values: $values,
+            entityTypeId: $context->entityTypeId,
+            entityKeys: $context->entityKeys,
+            fieldDefinitions: [],
+        );
+    }
+
+    protected function duplicateInstance(array $values): static
+    {
+        return new static(
+            values: $values,
+            entityTypeId: $this->getEntityTypeId(),
+            entityKeys: $this->entityKeys,
+            fieldDefinitions: $this->getFieldDefinitions(),
+        );
     }
 
     // -----------------------------------------------------------------
@@ -252,7 +298,7 @@ final class User extends ContentEntityBase implements AccountInterface
      */
     public function isActive(): bool
     {
-        return (int) ($this->get('status') ?? 0) === 1;
+        return (bool) ($this->get('status') ?? false);
     }
 
     /**
@@ -272,7 +318,7 @@ final class User extends ContentEntityBase implements AccountInterface
      */
     public function isEmailVerified(): bool
     {
-        return (int) ($this->get('email_verified') ?? 0) === 1;
+        return (bool) ($this->get('email_verified') ?? false);
     }
 
     /**

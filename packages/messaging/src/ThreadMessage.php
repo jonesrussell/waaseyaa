@@ -16,9 +16,16 @@ final class ThreadMessage extends ContentEntityBase
         'label' => 'body',
     ];
 
-    /** @param array<string, mixed> $values */
-    public function __construct(array $values = [])
-    {
+    /**
+     * @param array<string, mixed> $values
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
+     */
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
         foreach (['thread_id', 'sender_id', 'body'] as $field) {
             if (!isset($values[$field])) {
                 throw new \InvalidArgumentException("Missing required field: {$field}");
@@ -44,6 +51,9 @@ final class ThreadMessage extends ContentEntityBase
             $values['deleted_at'] = null;
         }
 
-        parent::__construct($values, $this->entityTypeId, $this->entityKeys);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 }

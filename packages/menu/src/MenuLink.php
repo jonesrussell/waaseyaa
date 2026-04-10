@@ -16,9 +16,14 @@ final class MenuLink extends ContentEntityBase
 {
     /**
      * @param array<string, mixed> $values Initial entity values.
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
      */
-    public function __construct(array $values = [])
-    {
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
         // Set defaults for optional values.
         $values += [
             'enabled' => true,
@@ -27,16 +32,15 @@ final class MenuLink extends ContentEntityBase
             'parent_id' => null,
         ];
 
-        parent::__construct(
-            values: $values,
-            entityTypeId: 'menu_link',
-            entityKeys: [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'title',
-                'bundle' => 'menu_name',
-            ],
-        );
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'menu_link';
+        $entityKeys = $entityKeys !== [] ? $entityKeys : [
+            'id' => 'id',
+            'uuid' => 'uuid',
+            'label' => 'title',
+            'bundle' => 'menu_name',
+        ];
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 
     /**

@@ -20,6 +20,7 @@
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
 <!-- Spec reviewed 2026-04-09 - backed enum invalid-value policy + value_object casts (#1184), FromArrayEntityValueInterface, EntityValues VO JSON normalization; cross-links #1181 -->
 <!-- Spec reviewed 2026-04-10 - waaseyaa/testing EntityTypeFixtureValues + EntityFactory::defineFromEntityType (#1186) -->
+<!-- Spec reviewed 2026-04-10b - P3 duplicate constructor arity contract; Hydratable scaffold; core User/Node hydration (#1188 follow-up) -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
 
@@ -252,6 +253,10 @@ Files: `packages/entity/src/EntityBase.php`, `packages/entity/src/ContentEntityB
 **Public API:** `EntityBase::duplicate()`, `with()`, `withValues()`; readonly `EntityValuesSnapshot`. **Extension hook:** `protected function duplicateInstance(array $values): static` (not listed as public semver surface in `docs/public-surface-map.php`).
 
 **Constructor re-entry:** `duplicate()` builds a shallow copy of the internal value bag and reconstructs the instance via `duplicateInstance()`, which must call `new $class(...)` so subclass / `ConfigEntityBase` / `ContentEntityBase` constructors run (status, dependencies, `fieldDefinitions`, etc.). Subclasses with exotic constructors may override `duplicate()` or `duplicateInstance()` explicitly; that is not the default.
+
+**Subclass constructor arity:** `ContentEntityBase::duplicateInstance()` calls `new static($values, $entityTypeId, $entityKeys, $fieldDefinitions)`. `ConfigEntityBase` inherits `EntityBase::duplicateInstance()`, which passes `($values, $entityTypeId, $entityKeys)`. A subclass that declares only `__construct(array $values = [])` will receive **too many arguments** under PHP 8+, and `duplicate()` / `with()` / `withValues()` will throw `ArgumentCountError`. Remedies: (1) **widen** `__construct` with optional `$entityTypeId`, `$entityKeys`, and (for content) `$fieldDefinitions`, defaulting to the type’s canonical id/keys and forwarding to `parent::__construct`; (2) **override** `duplicateInstance()` to reconstruct safely (e.g. `HydratableFromStorageInterface::fromStorage()` for types that implement it, plus any extra state such as `fieldDefinitions` not carried in `HydrationContext`). Regression coverage: `tests/Integration/ShippedEntityDuplicateReentryTest.php`.
+
+**Scaffold / greenfield content entities:** Prefer `HydratableFromStorageInterface` + `public static function fromStorage(array $values, HydrationContext $context): static` for storage hydration (`EntityInstantiator`), optional `public static function make(array $values): self` for tests, `$casts` for domain-shaped fields, and `get()`/`set()` in accessors (not raw `$this->values[…]`). Framework references: `packages/user/src/User.php`, `packages/node/src/Node.php`. CLI: `make:entity-type --content` emits a widening constructor stub and interface imports — adjust the machine name and keys to match your `EntityType` registration.
 
 **Shallow-copy invariant:** `duplicate()` copies top-level keys only; nested arrays / JSON-shaped structures are **not** deep-cloned and remain **reference-shared** with the source entity’s bag. Deep clone is **out of scope** for P3 and needs a dedicated design (blobs, relationship metadata, performance).
 

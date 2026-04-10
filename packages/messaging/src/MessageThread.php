@@ -16,9 +16,16 @@ final class MessageThread extends ContentEntityBase
         'label' => 'title',
     ];
 
-    /** @param array<string, mixed> $values */
-    public function __construct(array $values = [])
-    {
+    /**
+     * @param array<string, mixed> $values
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
+     */
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
         if (!isset($values['created_by'])) {
             throw new \InvalidArgumentException('Missing required field: created_by');
         }
@@ -42,6 +49,9 @@ final class MessageThread extends ContentEntityBase
             $values['last_message_at'] = $values['created_at'];
         }
 
-        parent::__construct($values, $this->entityTypeId, $this->entityKeys);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 }

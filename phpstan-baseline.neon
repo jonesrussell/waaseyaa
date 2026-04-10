@@ -547,12 +547,6 @@ parameters:
 			path: packages/cli/src/Command/Make/MakeTestCommand.php
 
 		-
-			message: '#^Only booleans are allowed in a ternary operator condition, mixed given\.$#'
-			identifier: ternary.condNotBoolean
-			count: 2
-			path: packages/cli/src/Command/MakeEntityTypeCommand.php
-
-		-
 			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
 			identifier: booleanNot.exprNotBoolean
 			count: 2

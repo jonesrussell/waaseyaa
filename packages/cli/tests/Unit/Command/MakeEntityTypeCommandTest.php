@@ -29,6 +29,8 @@ class MakeEntityTypeCommandTest extends TestCase
         $this->assertStringContainsString('class Event extends ConfigEntityBase', $output);
         $this->assertStringContainsString('use Waaseyaa\\Entity\\ConfigEntityBase;', $output);
         $this->assertStringContainsString('declare(strict_types=1);', $output);
+        $this->assertStringContainsString('string $entityTypeId = \'\'', $output);
+        $this->assertStringContainsString('CHANGE_ME', $output);
     }
 
     #[Test]
@@ -44,5 +46,8 @@ class MakeEntityTypeCommandTest extends TestCase
         $output = $tester->getDisplay();
         $this->assertStringContainsString('class Article extends ContentEntityBase', $output);
         $this->assertStringContainsString('use Waaseyaa\\Entity\\ContentEntityBase;', $output);
+        $this->assertStringContainsString('HydratableFromStorageInterface', $output);
+        $this->assertStringContainsString('function fromStorage', $output);
+        $this->assertStringContainsString('function make', $output);
     }
 }

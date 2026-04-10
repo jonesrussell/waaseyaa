@@ -17,25 +17,29 @@ final class PathAlias extends ContentEntityBase
 {
     /**
      * @param array<string, mixed> $values Initial entity values.
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
      */
-    public function __construct(array $values = [])
-    {
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
         // Set defaults before passing to parent.
         $values += [
             'langcode' => 'en',
             'status' => true,
         ];
 
-        parent::__construct(
-            values: $values,
-            entityTypeId: 'path_alias',
-            entityKeys: [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'alias',
-                'langcode' => 'langcode',
-            ],
-        );
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'path_alias';
+        $entityKeys = $entityKeys !== [] ? $entityKeys : [
+            'id' => 'id',
+            'uuid' => 'uuid',
+            'label' => 'alias',
+            'langcode' => 'langcode',
+        ];
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 
     /**

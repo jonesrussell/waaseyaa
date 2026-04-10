@@ -27,9 +27,15 @@ final class Pipeline extends ConfigEntityBase
 
     /**
      * @param array<string, mixed> $values Initial entity values.
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see EntityBase::duplicateInstance()}.
      */
-    public function __construct(array $values = [])
-    {
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+    ) {
+        $this->steps = [];
+
         if (\array_key_exists('description', $values)) {
             $this->description = (string) $values['description'];
         }
@@ -52,11 +58,10 @@ final class Pipeline extends ConfigEntityBase
 
         $this->syncStepsToValues();
 
-        parent::__construct(
-            values: $values,
-            entityTypeId: 'pipeline',
-            entityKeys: ['id' => 'id', 'label' => 'label'],
-        );
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'pipeline';
+        $entityKeys = $entityKeys !== [] ? $entityKeys : ['id' => 'id', 'label' => 'label'];
+
+        parent::__construct($values, $entityTypeId, $entityKeys);
     }
 
     /**
