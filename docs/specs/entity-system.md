@@ -5,6 +5,7 @@
 <!-- Spec reviewed 2026-04-09 - packages/entity and packages/entity-storage composer.json (manifest policy); storage and entity semantics unchanged -->
 <!-- Spec reviewed 2026-04-09c - readMultiple/findMany, SqlEntityQuery request-scoped result cache + save/delete invalidation (milestone 45) -->
 <!-- Spec reviewed 2026-04-09d - HydratableFromStorageInterface, HydrationContext, EntityInstantiator (#1188) -->
+<!-- Spec reviewed 2026-04-09k - pluggable timestamps + datetime cast storage / optional Carbon domain (#1183) -->
 <!-- Spec reviewed 2026-04-09e - packages/entity Cast kernel (#1181 ST-1): ValueCaster, CastDefinition, CastException -->
 <!-- Spec reviewed 2026-04-09f - EntityBase $casts + cast-aware get/set (#1181 ST-2); ContentEntityBase delegates to EntityBase -->
 <!-- Spec reviewed 2026-04-09g - ST-4/ST-5 persistence: hydrate + toArray remain raw; integration tests in entity-storage -->
@@ -213,7 +214,7 @@ Files: `packages/entity/src/Cast/`
 |------|---------------------------|------------------------------|
 | `int` / `float` / `bool` / `string` | Normalization with documented rejection rules (e.g. empty string → error for numeric casts) | Canonical scalars |
 | `array` | JSON string decoded with `JSON_THROW_ON_ERROR`, or pass-through when already an array | `json_encode` with `JSON_THROW_ON_ERROR` |
-| `datetime_immutable` | `DateTimeImmutable` (ISO-8601 strings, integer / all-digit string Unix timestamps, `DateTimeInterface`) | ISO-8601 via `DateTimeInterface::ATOM` (no Carbon dependency; #1183) |
+| `datetime_immutable` | `DateTimeImmutable` (or `Carbon\CarbonImmutable` when `domain` is `carbon_immutable` and Carbon is installed); storage accepts ISO-8601 strings, integer / all-digit string Unix timestamps, `DateTimeInterface` | Default storage: ISO-8601 `ATOM`. Array spec `['type' => 'datetime_immutable', 'storage' => 'unix']` persists UTC Unix integers; `['type' => 'datetime_immutable', 'domain' => 'carbon_immutable']` maps domain to Carbon (optional `nesbot/carbon`) (#1183) |
 | Backed enum class-string | `tryFrom` on backing value; miss → `CastException` | Enum instance or backing value → `->value` |
 
 Non-backed enums and unknown class-strings (non-enum classes) are rejected (`CastException`). Value-object class casts are reserved for #1184.
@@ -507,6 +508,7 @@ public function __construct(
     ?LoggerInterface $logger = null,
     ?EntityEventFactoryInterface $eventFactory = null,
     ?SqlEntityQueryResultCache $queryResultCache = null,
+    ?\Waaseyaa\Entity\DateTime\EntityClockInterface $clock = null,
 )
 ```
 
@@ -516,7 +518,12 @@ public function __construct(
 
 **`loadByKey()`**: Implements `EntityStorageInterface::loadByKey()` using the query+load pattern.
 
-**Automatic timestamp population**: `SqlEntityStorage::save()` calls `populateTimestamps()` which inspects `EntityType::getFieldDefinitions()` for fields with `'type' => 'timestamp'`. On new entities, sets `created` to `time()` if not already set. Always updates `changed` to `time()`.
+**Automatic timestamp population (#1183):** `SqlEntityStorage::save()` calls `populateTimestamps()` before PRE_SAVE. It uses an injectable {@see \Waaseyaa\Entity\DateTime\EntityClockInterface} (default {@see \Waaseyaa\Entity\DateTime\UtcEntityClock}) so tests and jobs can freeze time. For each field with `'type' => 'timestamp'`, {@see \Waaseyaa\Entity\DateTime\TimestampFieldConvention} resolves:
+
+- **Role:** `auto_populate` in the field definition (`create`, `update`, or `false` to disable). If omitted, names `created` / `created_at` imply `create` (only when the raw storage value is unset), and `changed` / `updated_at` / `modified_at` imply `update` (every save). Other timestamp fields do not auto-fill unless `auto_populate` is set.
+- **Scalar shape:** If the entity defines a `datetime_immutable` cast for that field, storage passes `DateTimeImmutable` through `set()` so `ValueCaster::castOut` applies (including `storage` unix vs iso8601). Otherwise `storage_format` on the field definition selects `unix` (int) vs `iso8601` (`DateTimeInterface::ATOM` string), with defaults: `created` / `changed` → unix; `*_at` suffix → iso8601; other names → unix.
+
+Unset detection for the `create` role uses the raw `toArray()` bag (not cast-aware `get()`), so `0` / missing key / empty string still count as unset.
 
 Table name derived from `$entityType->id()` (e.g., entity type `'node'` maps to table `node`).
 

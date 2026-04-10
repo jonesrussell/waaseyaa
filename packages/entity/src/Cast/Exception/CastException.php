@@ -59,4 +59,21 @@ final class CastException extends \InvalidArgumentException
     {
         return new self(sprintf('Unknown built-in cast "%s" for field "%s".', $token, $field));
     }
+
+    public static function invalidDatetimeStorage(string $field, string $storage): self
+    {
+        return new self(sprintf(
+            'Invalid datetime storage format "%s" for field "%s" (expected "unix" or "iso8601").',
+            $storage,
+            $field,
+        ));
+    }
+
+    public static function carbonImmutableNotInstalled(string $field): self
+    {
+        return new self(sprintf(
+            'Field "%s" uses cast domain "carbon_immutable" but nesbot/carbon is not installed.',
+            $field,
+        ));
+    }
 }

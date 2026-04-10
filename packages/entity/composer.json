@@ -44,6 +44,9 @@
     "require-dev": {
         "phpunit/phpunit": "^10.5"
     },
+    "suggest": {
+        "nesbot/carbon": "Optional domain for datetime_immutable cast with domain carbon_immutable (#1183)."
+    },
     "autoload": {
         "psr-4": {
             "Waaseyaa\\Entity\\": "src/"

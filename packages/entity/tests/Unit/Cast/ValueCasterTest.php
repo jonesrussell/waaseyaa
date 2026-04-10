@@ -221,6 +221,55 @@ final class ValueCasterTest extends TestCase
     }
 
     #[Test]
+    public function datetime_immutable_array_spec_default_storage_is_iso8601(): void
+    {
+        $c = new ValueCaster();
+        $spec = ['type' => 'datetime_immutable'];
+        $dt = new DateTimeImmutable('2024-06-01T10:00:00+00:00');
+        $out = $c->castOut(self::FIELD, $dt, $spec);
+        self::assertSame('2024-06-01T10:00:00+00:00', $out);
+    }
+
+    #[Test]
+    public function datetime_immutable_storage_unix_round_trip(): void
+    {
+        $c = new ValueCaster();
+        $spec = ['type' => 'datetime_immutable', 'storage' => 'unix'];
+        $dt = new DateTimeImmutable('@1700000000');
+        self::assertSame(1700000000, $c->castOut(self::FIELD, $dt, $spec));
+        $again = $c->castIn(self::FIELD, 1700000000, $spec);
+        self::assertSame(1700000000, $again->getTimestamp());
+    }
+
+    #[Test]
+    public function datetime_immutable_invalid_storage_throws(): void
+    {
+        $this->expectException(CastException::class);
+        (new ValueCaster())->castOut(
+            self::FIELD,
+            new DateTimeImmutable('@0'),
+            ['type' => 'datetime_immutable', 'storage' => 'bogus'],
+        );
+    }
+
+    #[Test]
+    public function datetime_immutable_carbon_immutable_domain_round_trip(): void
+    {
+        if (!class_exists(\Carbon\CarbonImmutable::class)) {
+            self::markTestSkipped('nesbot/carbon not installed');
+        }
+
+        $c = new ValueCaster();
+        $spec = ['type' => 'datetime_immutable', 'domain' => 'carbon_immutable', 'storage' => 'unix'];
+        $carbon = \Carbon\CarbonImmutable::parse('2024-03-10T15:00:00Z');
+        $stored = $c->castOut(self::FIELD, $carbon, $spec);
+        self::assertIsInt($stored);
+        $in = $c->castIn(self::FIELD, $stored, $spec);
+        self::assertInstanceOf(\Carbon\CarbonImmutable::class, $in);
+        self::assertSame($stored, $in->getTimestamp());
+    }
+
+    #[Test]
     public function datetime_immutable_cast_in_unix_timestamp_int(): void
     {
         $c = new ValueCaster();

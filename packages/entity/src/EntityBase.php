@@ -135,6 +135,16 @@ abstract class EntityBase implements EntityInterface
         return new ValueCaster();
     }
 
+    /**
+     * Cast specification for a field, if any (used by storage / tooling; #1183).
+     *
+     * @return string|array<string, mixed>|null
+     */
+    public function getCastSpecForField(string $field): string|array|null
+    {
+        return $this->casts[$field] ?? null;
+    }
+
     public function get(string $name): mixed
     {
         $raw = \array_key_exists($name, $this->values) ? $this->values[$name] : null;
