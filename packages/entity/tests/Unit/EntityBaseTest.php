@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity\Tests\Unit;
 
+use Waaseyaa\Entity\Cast\Exception\CastException;
+use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityBase;
 use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleStringEnum;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -253,5 +256,125 @@ class EntityBaseTest extends TestCase
             '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/',
             $entity->uuid(),
         );
+    }
+
+    public function testDuplicatePreservesIdentityAndEntityKeys(): void
+    {
+        $entity = new TestEntity(
+            values: ['id' => 9, 'label' => 'Orig'],
+            entityTypeId: 'custom_type',
+            entityKeys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label'],
+        );
+        $dup = $entity->duplicate();
+
+        $this->assertNotSame($entity, $dup);
+        $this->assertSame(9, $dup->id());
+        $this->assertSame($entity->uuid(), $dup->uuid());
+        $this->assertSame('Orig', $dup->label());
+        $this->assertSame('custom_type', $dup->getEntityTypeId());
+    }
+
+    public function testDuplicatePreservesEnforceIsNew(): void
+    {
+        $entity = new TestEntity(['id' => 1]);
+        $entity->enforceIsNew(true);
+        $dup = $entity->duplicate();
+
+        $this->assertTrue($dup->isNew());
+    }
+
+    public function testDuplicateShallowCopySharesNestedArrayByReference(): void
+    {
+        $entity = new TestEntity(['id' => 1, 'meta' => ['x' => 1]]);
+        $dup = $entity->duplicate();
+
+        $ref = new \ReflectionProperty(EntityBase::class, 'values');
+        $ref->setAccessible(true);
+        /** @var array<string, mixed> $srcBag */
+        $srcBag = $ref->getValue($entity);
+        /** @var array<string, mixed> $dupBag */
+        $dupBag = $ref->getValue($dup);
+
+        $this->assertArrayHasKey('meta', $srcBag);
+        $this->assertArrayHasKey('meta', $dupBag);
+        $this->assertSame($srcBag['meta'], $dupBag['meta'], 'Nested array must be reference-shared (shallow copy invariant).');
+    }
+
+    public function testWithReturnsNewInstanceAndDoesNotMutateOriginal(): void
+    {
+        $entity = new TestEntity(['id' => 1, 'label' => 'A']);
+        $next = $entity->with('label', 'B');
+
+        $this->assertNotSame($entity, $next);
+        $this->assertSame('A', $entity->label());
+        $this->assertSame('B', $next->label());
+    }
+
+    public function testWithValuesAppliesSetsInOrder(): void
+    {
+        $entity = new TestEntity(['id' => 1, 'label' => 'A', 'bundle' => 'b']);
+        $next = $entity->withValues(['label' => 'B', 'bundle' => 'page']);
+
+        $this->assertSame('B', $next->label());
+        $this->assertSame('page', $next->bundle());
+    }
+
+    public function testWithThrowsSameAsSetOnCastFailure(): void
+    {
+        $entity = new class (['id' => 1, 'n' => '1']) extends ContentEntityBase {
+            protected array $casts = ['n' => 'int'];
+
+            public function __construct(
+                array $values = [],
+                string $entityTypeId = 't',
+                array $entityKeys = ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label', 'bundle' => 'bundle'],
+                array $fieldDefinitions = [],
+            ) {
+                parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
+            }
+        };
+
+        $this->expectException(CastException::class);
+        $entity->with('n', 'not-int');
+    }
+
+    public function testWithAcceptsBackedEnumDomainValueP2ForwardCompatible(): void
+    {
+        $entity = new class (['id' => 1, 'flag' => 'a']) extends ContentEntityBase {
+            protected array $casts = ['flag' => SampleStringEnum::class];
+
+            public function __construct(
+                array $values = [],
+                string $entityTypeId = 't',
+                array $entityKeys = ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label', 'bundle' => 'bundle'],
+                array $fieldDefinitions = [],
+            ) {
+                parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
+            }
+        };
+
+        $next = $entity->with('flag', SampleStringEnum::Beta);
+
+        $this->assertSame(SampleStringEnum::Beta, $next->get('flag'));
+        $this->assertSame('b', $next->toArray()['flag']);
+    }
+
+    public function testConfigEntityDuplicateReentersConstructorForStatus(): void
+    {
+        $entity = new TestConfigEntity(
+            values: [
+                'id' => 'my_config',
+                'label' => 'L',
+                'status' => false,
+                'dependencies' => ['package' => ['core']],
+            ],
+            entityTypeId: 'test_config',
+            entityKeys: ['id' => 'id', 'label' => 'label'],
+        );
+
+        $dup = $entity->duplicate();
+
+        $this->assertFalse($dup->status());
+        $this->assertSame(['package' => ['core']], $dup->getDependencies());
     }
 }

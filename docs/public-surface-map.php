@@ -116,6 +116,7 @@ return [
     'Waaseyaa\Entity\Hydration\HydratableFromStorageInterface' => 'public',
     'Waaseyaa\Entity\Hydration\HydrationContext' => 'public',
     'Waaseyaa\Entity\EntityValues' => 'public',
+    'Waaseyaa\Entity\Snapshot\EntityValuesSnapshot' => 'public',
     'Waaseyaa\EntityStorage\Driver\EntityStorageDriverInterface' => 'public',
     'Waaseyaa\EntityStorage\Connection\ConnectionResolverInterface' => 'public',
     'Waaseyaa\Access\AccountInterface' => 'public',

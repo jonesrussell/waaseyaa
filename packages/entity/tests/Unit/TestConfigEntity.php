@@ -7,9 +7,9 @@ namespace Waaseyaa\Entity\Tests\Unit;
 use Waaseyaa\Entity\ConfigEntityBase;
 
 /**
- * Concrete config entity subclass for testing ConfigEntityBase.
+ * Concrete config entity for ConfigEntityBase / duplicate() tests (P3).
  */
-class TestConfigEntity extends ConfigEntityBase
+final class TestConfigEntity extends ConfigEntityBase
 {
     protected string $entityTypeId = 'test_config';
 }
