@@ -35,6 +35,10 @@ final class FieldFormatterRegistryTest extends TestCase
         $registry = new FieldFormatterRegistry();
 
         $this->assertSame('2026-01-05', $registry->format('datetime', 1767571200, ['format' => 'Y-m-d']));
+        $this->assertSame(
+            '2025-01-01',
+            $registry->format('datetime', new \DateTimeImmutable('@1735689600'), ['format' => 'Y-m-d']),
+        );
         $this->assertSame('Published', $registry->format('boolean', true, ['true_label' => 'Published']));
         $this->assertSame('<img src="/files/a.jpg" alt="Hero" class="image-style-large">', $registry->format('image', '/files/a.jpg', ['alt' => 'Hero', 'image_style' => 'large']));
     }

@@ -16,9 +16,16 @@ final class UserBlock extends ContentEntityBase
         'label' => 'blocker_id',
     ];
 
-    /** @param array<string, mixed> $values */
-    public function __construct(array $values = [])
-    {
+    /**
+     * @param array<string, mixed> $values
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
+     */
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
         foreach (['blocker_id', 'blocked_id'] as $field) {
             if (!isset($values[$field])) {
                 throw new \InvalidArgumentException("Missing required field: {$field}");
@@ -33,6 +40,9 @@ final class UserBlock extends ContentEntityBase
             $values['created_at'] = time();
         }
 
-        parent::__construct($values, $this->entityTypeId, $this->entityKeys);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 }

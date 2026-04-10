@@ -26,9 +26,14 @@ final class Term extends ContentEntityBase
 
     /**
      * @param array<string, mixed> $values Initial entity values.
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
      */
-    public function __construct(array $values = [])
-    {
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
         // Ensure defaults for optional properties.
         if (!array_key_exists('description', $values)) {
             $values['description'] = '';
@@ -43,7 +48,10 @@ final class Term extends ContentEntityBase
             $values['status'] = true;
         }
 
-        parent::__construct($values, $this->entityTypeId, $this->entityKeys);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 
     /**
@@ -59,9 +67,7 @@ final class Term extends ContentEntityBase
      */
     public function setName(string $name): static
     {
-        $this->values['name'] = $name;
-
-        return $this;
+        return $this->set('name', $name);
     }
 
     /**
@@ -77,7 +83,7 @@ final class Term extends ContentEntityBase
      */
     public function getDescription(): string
     {
-        return (string) ($this->values['description'] ?? '');
+        return (string) ($this->get('description') ?? '');
     }
 
     /**
@@ -85,9 +91,7 @@ final class Term extends ContentEntityBase
      */
     public function setDescription(string $description): static
     {
-        $this->values['description'] = $description;
-
-        return $this;
+        return $this->set('description', $description);
     }
 
     /**
@@ -95,7 +99,7 @@ final class Term extends ContentEntityBase
      */
     public function getWeight(): int
     {
-        return (int) ($this->values['weight'] ?? 0);
+        return (int) ($this->get('weight') ?? 0);
     }
 
     /**
@@ -103,9 +107,7 @@ final class Term extends ContentEntityBase
      */
     public function setWeight(int $weight): static
     {
-        $this->values['weight'] = $weight;
-
-        return $this;
+        return $this->set('weight', $weight);
     }
 
     /**
@@ -113,7 +115,7 @@ final class Term extends ContentEntityBase
      */
     public function getParentId(): ?int
     {
-        $parentId = $this->values['parent_id'] ?? null;
+        $parentId = $this->get('parent_id');
 
         if ($parentId === null || $parentId === 0) {
             return $parentId === 0 ? 0 : null;
@@ -129,9 +131,7 @@ final class Term extends ContentEntityBase
      */
     public function setParentId(?int $parentId): static
     {
-        $this->values['parent_id'] = $parentId;
-
-        return $this;
+        return $this->set('parent_id', $parentId);
     }
 
     /**
@@ -139,7 +139,7 @@ final class Term extends ContentEntityBase
      */
     public function isRoot(): bool
     {
-        $parentId = $this->values['parent_id'] ?? null;
+        $parentId = $this->get('parent_id');
 
         return $parentId === null || $parentId === 0;
     }
@@ -149,7 +149,7 @@ final class Term extends ContentEntityBase
      */
     public function isPublished(): bool
     {
-        return (bool) ($this->values['status'] ?? true);
+        return (bool) ($this->get('status') ?? true);
     }
 
     /**
@@ -157,8 +157,6 @@ final class Term extends ContentEntityBase
      */
     public function setPublished(bool $published): static
     {
-        $this->values['status'] = $published;
-
-        return $this;
+        return $this->set('status', $published);
     }
 }

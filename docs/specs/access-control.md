@@ -1,5 +1,6 @@
 # Access Control
 
+<!-- Spec reviewed 2026-04-11 - User/UserBlock: widened constructors (optional entityTypeId, entityKeys, fieldDefinitions) for ContentEntityBase::duplicateInstance re-entry; no change to gate or policy semantics (#alpha-119) -->
 <!-- Spec reviewed 2026-04-08 - LoginController: removed session_write_close() after successful JSON login so Set-Cookie is emitted with the response (#813); no change to gate/session access semantics -->
 <!-- Spec reviewed 2026-04-07 - packages/auth composer.json: waaseyaa/* requires use ^0.1 for split/Packagist consumers (#1138); no access API change -->
 <!-- Spec reviewed 2026-04-03c - auth controller review fixes: JSON_THROW_ON_ERROR, session guard, AccountInterface null check (#571) -->

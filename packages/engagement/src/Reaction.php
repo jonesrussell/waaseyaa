@@ -18,10 +18,16 @@ final class Reaction extends ContentEntityBase
 
     /**
      * @param array<string, mixed> $values
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
      * @param list<string>|null $allowedReactionTypes Allowed types (null = accept any non-empty string)
      */
-    public function __construct(array $values = [], ?array $allowedReactionTypes = null)
-    {
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+        ?array $allowedReactionTypes = null,
+    ) {
         foreach (['user_id', 'target_type', 'target_id', 'reaction_type'] as $field) {
             if (!isset($values[$field])) {
                 throw new \InvalidArgumentException("Missing required field: {$field}");
@@ -38,6 +44,9 @@ final class Reaction extends ContentEntityBase
             $values['created_at'] = time();
         }
 
-        parent::__construct($values, $this->entityTypeId, $this->entityKeys);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 }

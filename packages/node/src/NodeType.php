@@ -24,9 +24,13 @@ final class NodeType extends ConfigEntityBase
 
     /**
      * @param array<string, mixed> $values Initial config values.
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see EntityBase::duplicateInstance()}.
      */
-    public function __construct(array $values = [])
-    {
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+    ) {
         // Ensure defaults for optional properties.
         if (!array_key_exists('description', $values)) {
             $values['description'] = '';
@@ -38,7 +42,10 @@ final class NodeType extends ConfigEntityBase
             $values['display_submitted'] = true;
         }
 
-        parent::__construct($values, $this->entityTypeId, $this->entityKeys);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
+
+        parent::__construct($values, $entityTypeId, $entityKeys);
     }
 
     /**

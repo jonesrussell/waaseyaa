@@ -32,8 +32,14 @@ final class MediaType extends ConfigEntityBase
      */
     protected array $sourceConfiguration = [];
 
-    public function __construct(array $values = [])
-    {
+    /**
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see EntityBase::duplicateInstance()}.
+     */
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+    ) {
         // Extract media-type-specific values before passing to parent.
         if (isset($values['source']) && \is_string($values['source'])) {
             $this->source = $values['source'];
@@ -47,11 +53,10 @@ final class MediaType extends ConfigEntityBase
             $this->sourceConfiguration = $values['source_configuration'];
         }
 
-        parent::__construct(
-            values: $values,
-            entityTypeId: 'media_type',
-            entityKeys: ['id' => 'id', 'label' => 'label'],
-        );
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'media_type';
+        $entityKeys = $entityKeys !== [] ? $entityKeys : ['id' => 'id', 'label' => 'label'];
+
+        parent::__construct($values, $entityTypeId, $entityKeys);
     }
 
     /**

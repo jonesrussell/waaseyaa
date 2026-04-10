@@ -41,9 +41,16 @@ final class Workflow extends ConfigEntityBase
     /**
      * @param array<string, mixed> $values Initial entity values. May include
      *   'states' and 'transitions' arrays for hydration from config.
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see EntityBase::duplicateInstance()}.
      */
-    public function __construct(array $values = [])
-    {
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+    ) {
+        $this->states = [];
+        $this->transitions = [];
+
         // Extract and hydrate states from values before passing to parent.
         if (isset($values['states']) && \is_array($values['states'])) {
             foreach ($values['states'] as $stateId => $stateData) {
@@ -77,7 +84,10 @@ final class Workflow extends ConfigEntityBase
             }
         }
 
-        parent::__construct($values, $this->entityTypeId, $this->entityKeys);
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
+
+        parent::__construct($values, $entityTypeId, $entityKeys);
     }
 
     /**

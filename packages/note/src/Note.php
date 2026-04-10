@@ -24,10 +24,18 @@ final class Note extends ContentEntityBase
 
     /**
      * @param array<string, mixed> $values Initial entity values.
+     * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
      */
-    public function __construct(array $values = [])
-    {
-        parent::__construct($values, $this->entityTypeId, $this->entityKeys);
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
+        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
+        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
+
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 
     public function getTitle(): string
