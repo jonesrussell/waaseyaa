@@ -14,6 +14,7 @@
 <!-- Spec reviewed 2026-04-09j - EntityValues helper, presentation layers use cast-aware maps (#1181 ST-8) -->
 <!-- Spec reviewed 2026-04-09 ST-9 - casting + hydration architecture finalization: diagrams, invariants, EntityValues/get/set/toArray/config rules (#1181) -->
 <!-- Spec reviewed 2026-04-09 ST-10 - layering: EntityValues::toJsonReadyMap / normalizeValueForJson; AI vector uses cast-aware paths (#1181) -->
+<!-- Spec reviewed 2026-04-09 - typed-data EntityCastCoercion + CastTokenMapper; ValueCaster delegates builtins (#1185) -->
 <!-- Spec reviewed 2026-04-09 - field-definition → Symfony constraints + save merge (#1182) -->
 <!-- Spec reviewed 2026-04-09 - P3 branching: duplicate/with/withValues, duplicateInstance hook, EntityValuesSnapshot, shallow-copy invariant -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
@@ -208,11 +209,13 @@ Files: `packages/entity/src/Cast/`
 
 `CastDefinition` is a small readonly value object wrapping a cast spec: either a **string token** (`int`, `float`, `bool`, `string`, `array`, `datetime_immutable`, or a **backed enum** class-string) or an array escape hatch `['type' => 'json']` (equivalent to `array` — JSON in storage).
 
-`ValueCaster` performs **storage → domain** (`castIn`) and **domain → storage** (`castOut`) for those specs. P0 built-ins:
+`ValueCaster` performs **storage → domain** (`castIn`) and **domain → storage** (`castOut`) for those specs. For **`int`**, **`float`**, **`bool`**, **`string`**, and **`array`** / **`json`**, the implementation delegates to **`Waaseyaa\TypedData\Coercion\EntityCastCoercion`** in `waaseyaa/typed-data` (#1185); **`CoercionException`** is wrapped as **`CastException`** so callers see one exception type. **`CastTokenMapper::toDataType()`** maps entity cast tokens to `TypedDataManager` data types for `int`/`float`/`bool`/`string` only (`array`/`json` → `null` — not a typed-data `map`/`list` without schema).
+
+P0 built-ins:
 
 | Spec | `castIn` (stored → domain) | `castOut` (domain → stored) |
 |------|---------------------------|------------------------------|
-| `int` / `float` / `bool` / `string` | Normalization with documented rejection rules (e.g. empty string → error for numeric casts) | Canonical scalars |
+| `int` / `float` / `bool` / `string` | Normalization with documented rejection rules (e.g. empty string → error for numeric casts) via `EntityCastCoercion` | Canonical scalars via `EntityCastCoercion` |
 | `array` | JSON string decoded with `JSON_THROW_ON_ERROR`, or pass-through when already an array | `json_encode` with `JSON_THROW_ON_ERROR` |
 | `datetime_immutable` | `DateTimeImmutable` (or `Carbon\CarbonImmutable` when `domain` is `carbon_immutable` and Carbon is installed); storage accepts ISO-8601 strings, integer / all-digit string Unix timestamps, `DateTimeInterface` | Default storage: ISO-8601 `ATOM`. Array spec `['type' => 'datetime_immutable', 'storage' => 'unix']` persists UTC Unix integers; `['type' => 'datetime_immutable', 'domain' => 'carbon_immutable']` maps domain to Carbon (optional `nesbot/carbon`) (#1183) |
 | Backed enum class-string | `tryFrom` on backing value; miss → `CastException` | Enum instance or backing value → `->value` |

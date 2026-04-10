@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\TypedData\Tests\Unit\Type;
 
+use Waaseyaa\TypedData\Coercion\CoercionException;
 use Waaseyaa\TypedData\DataDefinition;
 use Waaseyaa\TypedData\PrimitiveInterface;
 use Waaseyaa\TypedData\Type\IntegerData;
@@ -168,5 +169,13 @@ final class IntegerDataTest extends TestCase
         $this->assertSame(-5, $data->getValue());
         $this->assertSame(-5, $data->getCastedValue());
         $this->assertSame('-5', $data->getString());
+    }
+
+    public function testGetCastedValueEmptyStringThrows(): void
+    {
+        $data = new IntegerData($this->definition, '');
+
+        $this->expectException(CoercionException::class);
+        $data->getCastedValue();
     }
 }

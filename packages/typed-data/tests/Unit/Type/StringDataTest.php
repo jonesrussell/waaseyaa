@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\TypedData\Tests\Unit\Type;
 
+use Waaseyaa\TypedData\Coercion\CoercionException;
 use Waaseyaa\TypedData\DataDefinition;
 use Waaseyaa\TypedData\PrimitiveInterface;
 use Waaseyaa\TypedData\Type\StringData;
@@ -102,6 +103,15 @@ final class StringDataTest extends TestCase
 
         $this->assertSame('123', $data->getCastedValue());
         $this->assertIsString($data->getCastedValue());
+    }
+
+    public function testGetCastedValueRejectsArray(): void
+    {
+        $data = new StringData($this->definition);
+        $data->setValue([]);
+
+        $this->expectException(CoercionException::class);
+        $data->getCastedValue();
     }
 
     public function testValidateWithNoConstraints(): void

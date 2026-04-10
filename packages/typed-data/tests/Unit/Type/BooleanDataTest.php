@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\TypedData\Tests\Unit\Type;
 
+use Waaseyaa\TypedData\Coercion\CoercionException;
 use Waaseyaa\TypedData\DataDefinition;
 use Waaseyaa\TypedData\PrimitiveInterface;
 use Waaseyaa\TypedData\Type\BooleanData;
@@ -125,6 +126,14 @@ final class BooleanDataTest extends TestCase
 
         $this->assertFalse($data->getCastedValue());
         $this->assertIsBool($data->getCastedValue());
+    }
+
+    public function testGetCastedValueRejectsAmbiguousString(): void
+    {
+        $data = new BooleanData($this->definition, 'maybe');
+
+        $this->expectException(CoercionException::class);
+        $data->getCastedValue();
     }
 
     public function testValidateWithNoConstraints(): void
