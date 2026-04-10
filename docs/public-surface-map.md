@@ -74,6 +74,9 @@ Machine-readable source: `docs/public-surface-map.php`.
 | `ListInterface` | interface | Ordered, typed list of `TypedDataInterface` items |
 | `PrimitiveInterface` | interface | Typed scalar value with cast accessor |
 | `TypedDataManagerInterface` | interface | Creates typed data definitions and instances by data type name |
+| `CastTokenMapper` | final class | Maps entity `$casts` tokens to `TypedDataManager` data type names (#1185) |
+| `CoercionException` | final class | Thrown when entity-parity primitive/JSON-array coercion fails (#1185) |
+| `EntityCastCoercion` | final class | Storage ↔ domain coercion for `int`/`float`/`bool`/`string`/`array` casts (#1185) |
 
 ### i18n
 

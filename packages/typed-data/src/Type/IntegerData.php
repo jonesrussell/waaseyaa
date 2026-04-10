@@ -7,11 +7,14 @@ namespace Waaseyaa\TypedData\Type;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Waaseyaa\TypedData\Coercion\EntityCastCoercion;
 use Waaseyaa\TypedData\DataDefinitionInterface;
 use Waaseyaa\TypedData\PrimitiveInterface;
 
 final class IntegerData implements PrimitiveInterface
 {
+    private const COERCION_FIELD = 'value';
+
     private static ?ValidatorInterface $validator = null;
 
     private mixed $value;
@@ -56,6 +59,6 @@ final class IntegerData implements PrimitiveInterface
             return null;
         }
 
-        return (int) $this->value;
+        return EntityCastCoercion::castInInt(self::COERCION_FIELD, $this->value);
     }
 }

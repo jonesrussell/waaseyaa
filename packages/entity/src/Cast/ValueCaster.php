@@ -8,12 +8,16 @@ use BackedEnum;
 use DateMalformedStringException;
 use DateTimeImmutable;
 use DateTimeInterface;
-use JsonException;
 use ReflectionEnum;
 use Waaseyaa\Entity\Cast\Exception\CastException;
+use Waaseyaa\TypedData\Coercion\CoercionException;
+use Waaseyaa\TypedData\Coercion\EntityCastCoercion;
 
 /**
  * Converts values between storage shapes and PHP domain types for entity field casts.
+ *
+ * Builtin scalar and JSON-array casts delegate to {@see EntityCastCoercion} in `waaseyaa/typed-data` (#1185).
+ * {@code datetime_immutable} and backed enums remain here (#1183 / enum handling).
  *
  * Optional Carbon: array spec `['type' => 'datetime_immutable', 'domain' => 'carbon_immutable']` requires
  * `nesbot/carbon` (#1183).
@@ -145,11 +149,21 @@ final class ValueCaster
     private function castInBuiltin(string $field, mixed $stored, string $token, string|array $originalSpec): mixed
     {
         return match ($token) {
-            self::BUILTIN_INT => $this->castInInt($field, $stored),
-            self::BUILTIN_FLOAT => $this->castInFloat($field, $stored),
-            self::BUILTIN_BOOL => $this->castInBool($field, $stored),
-            self::BUILTIN_STRING => $this->castInString($field, $stored),
-            self::BUILTIN_ARRAY => $this->castInArray($field, $stored),
+            self::BUILTIN_INT => $this->typedCastIn(
+                static fn() => EntityCastCoercion::castInInt($field, $stored),
+            ),
+            self::BUILTIN_FLOAT => $this->typedCastIn(
+                static fn() => EntityCastCoercion::castInFloat($field, $stored),
+            ),
+            self::BUILTIN_BOOL => $this->typedCastIn(
+                static fn() => EntityCastCoercion::castInBool($field, $stored),
+            ),
+            self::BUILTIN_STRING => $this->typedCastIn(
+                static fn() => EntityCastCoercion::castInString($field, $stored),
+            ),
+            self::BUILTIN_ARRAY => $this->typedCastIn(
+                static fn() => EntityCastCoercion::castInArray($field, $stored),
+            ),
             self::BUILTIN_DATETIME_IMMUTABLE => $this->castInDateTimeImmutable($field, $stored, $originalSpec),
             default => throw CastException::unknownBuiltinCast($field, $token),
         };
@@ -161,263 +175,51 @@ final class ValueCaster
     private function castOutBuiltin(string $field, mixed $domain, string $token, string|array $originalSpec): mixed
     {
         return match ($token) {
-            self::BUILTIN_INT => $this->castOutInt($field, $domain),
-            self::BUILTIN_FLOAT => $this->castOutFloat($field, $domain),
-            self::BUILTIN_BOOL => $this->castOutBool($field, $domain),
-            self::BUILTIN_STRING => $this->castOutString($field, $domain),
-            self::BUILTIN_ARRAY => $this->castOutArray($field, $domain),
+            self::BUILTIN_INT => $this->typedCastOut(
+                static fn() => EntityCastCoercion::castOutInt($field, $domain),
+            ),
+            self::BUILTIN_FLOAT => $this->typedCastOut(
+                static fn() => EntityCastCoercion::castOutFloat($field, $domain),
+            ),
+            self::BUILTIN_BOOL => $this->typedCastOut(
+                static fn() => EntityCastCoercion::castOutBool($field, $domain),
+            ),
+            self::BUILTIN_STRING => $this->typedCastOut(
+                static fn() => EntityCastCoercion::castOutString($field, $domain),
+            ),
+            self::BUILTIN_ARRAY => $this->typedCastOut(
+                static fn() => EntityCastCoercion::castOutArray($field, $domain),
+            ),
             self::BUILTIN_DATETIME_IMMUTABLE => $this->castOutDateTimeImmutable($field, $domain, $originalSpec),
             default => throw CastException::unknownBuiltinCast($field, $token),
         };
     }
 
-    private function castInInt(string $field, mixed $stored): int
+    /**
+     * @template T
+     * @param callable(): T $run
+     * @return T
+     */
+    private function typedCastIn(callable $run): mixed
     {
-        if (is_int($stored)) {
-            return $stored;
+        try {
+            return $run();
+        } catch (CoercionException $e) {
+            throw new CastException($e->getMessage(), 0, $e);
         }
-
-        if (is_float($stored)) {
-            return (int) $stored;
-        }
-
-        if (is_string($stored)) {
-            if ($stored === '') {
-                throw CastException::invalidStoredValue($field, self::BUILTIN_INT, $stored, 'Empty string is not a valid integer.');
-            }
-
-            if (!is_numeric($stored)) {
-                throw CastException::invalidStoredValue($field, self::BUILTIN_INT, $stored, 'Value is not numeric.');
-            }
-
-            return (int) $stored;
-        }
-
-        if (is_bool($stored)) {
-            return $stored ? 1 : 0;
-        }
-
-        throw CastException::invalidStoredValue($field, self::BUILTIN_INT, $stored);
-    }
-
-    private function castOutInt(string $field, mixed $domain): int
-    {
-        if (is_int($domain)) {
-            return $domain;
-        }
-
-        if (is_float($domain)) {
-            return (int) $domain;
-        }
-
-        if (is_string($domain) && is_numeric($domain)) {
-            return (int) $domain;
-        }
-
-        if (is_bool($domain)) {
-            return $domain ? 1 : 0;
-        }
-
-        throw CastException::invalidDomainValue($field, self::BUILTIN_INT, $domain);
-    }
-
-    private function castInFloat(string $field, mixed $stored): float
-    {
-        if (is_float($stored)) {
-            return $stored;
-        }
-
-        if (is_int($stored)) {
-            return (float) $stored;
-        }
-
-        if (is_string($stored)) {
-            if ($stored === '') {
-                throw CastException::invalidStoredValue($field, self::BUILTIN_FLOAT, $stored, 'Empty string is not a valid float.');
-            }
-
-            if (!is_numeric($stored)) {
-                throw CastException::invalidStoredValue($field, self::BUILTIN_FLOAT, $stored, 'Value is not numeric.');
-            }
-
-            return (float) $stored;
-        }
-
-        if (is_bool($stored)) {
-            return $stored ? 1.0 : 0.0;
-        }
-
-        throw CastException::invalidStoredValue($field, self::BUILTIN_FLOAT, $stored);
-    }
-
-    private function castOutFloat(string $field, mixed $domain): float
-    {
-        if (is_float($domain)) {
-            return $domain;
-        }
-
-        if (is_int($domain)) {
-            return (float) $domain;
-        }
-
-        if (is_string($domain) && is_numeric($domain)) {
-            return (float) $domain;
-        }
-
-        if (is_bool($domain)) {
-            return $domain ? 1.0 : 0.0;
-        }
-
-        throw CastException::invalidDomainValue($field, self::BUILTIN_FLOAT, $domain);
-    }
-
-    private function castInBool(string $field, mixed $stored): bool
-    {
-        if (is_bool($stored)) {
-            return $stored;
-        }
-
-        if (is_int($stored)) {
-            return $stored !== 0;
-        }
-
-        if (is_string($stored)) {
-            $normalized = strtolower($stored);
-            if (in_array($normalized, ['1', 'true', 'yes', 'on'], true)) {
-                return true;
-            }
-
-            if (in_array($normalized, ['0', 'false', 'no', 'off', ''], true)) {
-                return false;
-            }
-        }
-
-        throw CastException::invalidStoredValue($field, self::BUILTIN_BOOL, $stored);
-    }
-
-    private function castOutBool(string $field, mixed $domain): bool
-    {
-        if (is_bool($domain)) {
-            return $domain;
-        }
-
-        if (is_int($domain)) {
-            return $domain !== 0;
-        }
-
-        if (is_string($domain)) {
-            $normalized = strtolower($domain);
-            if (in_array($normalized, ['1', 'true', 'yes', 'on'], true)) {
-                return true;
-            }
-
-            if (in_array($normalized, ['0', 'false', 'no', 'off', ''], true)) {
-                return false;
-            }
-        }
-
-        throw CastException::invalidDomainValue($field, self::BUILTIN_BOOL, $domain);
-    }
-
-    private function castInString(string $field, mixed $stored): string
-    {
-        if (is_string($stored)) {
-            return $stored;
-        }
-
-        if (is_scalar($stored)) {
-            return (string) $stored;
-        }
-
-        throw CastException::invalidStoredValue(
-            $field,
-            self::BUILTIN_STRING,
-            $stored,
-            'Only strings and scalars are supported.',
-        );
-    }
-
-    private function castOutString(string $field, mixed $domain): string
-    {
-        if (is_string($domain)) {
-            return $domain;
-        }
-
-        if (is_scalar($domain)) {
-            return (string) $domain;
-        }
-
-        if ($domain instanceof BackedEnum) {
-            return (string) $domain->value;
-        }
-
-        throw CastException::invalidDomainValue($field, self::BUILTIN_STRING, $domain);
     }
 
     /**
-     * @return array<mixed>
+     * @template T
+     * @param callable(): T $run
+     * @return T
      */
-    private function castInArray(string $field, mixed $stored): array
+    private function typedCastOut(callable $run): mixed
     {
-        if (is_array($stored)) {
-            return $stored;
-        }
-
-        if (!is_string($stored)) {
-            throw CastException::invalidStoredValue($field, self::BUILTIN_ARRAY, $stored);
-        }
-
-        if ($stored === '') {
-            throw CastException::invalidStoredValue(
-                $field,
-                self::BUILTIN_ARRAY,
-                $stored,
-                'Empty string is not valid JSON for an array cast.',
-            );
-        }
-
         try {
-            $decoded = json_decode($stored, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            throw CastException::invalidStoredValue(
-                $field,
-                self::BUILTIN_ARRAY,
-                $stored,
-                'Invalid JSON: ' . $e->getMessage(),
-                $e,
-            );
-        }
-
-        if (!is_array($decoded)) {
-            throw CastException::invalidStoredValue(
-                $field,
-                self::BUILTIN_ARRAY,
-                $stored,
-                'JSON must decode to an array.',
-            );
-        }
-
-        return $decoded;
-    }
-
-    /**
-     * @return non-falsy-string
-     */
-    private function castOutArray(string $field, mixed $domain): string
-    {
-        if (!is_array($domain)) {
-            throw CastException::invalidDomainValue($field, self::BUILTIN_ARRAY, $domain);
-        }
-
-        try {
-            return json_encode($domain, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            throw CastException::invalidDomainValue(
-                $field,
-                self::BUILTIN_ARRAY,
-                $domain,
-                $e->getMessage(),
-            );
+            return $run();
+        } catch (CoercionException $e) {
+            throw new CastException($e->getMessage(), 0, $e);
         }
     }
 
