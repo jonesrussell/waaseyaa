@@ -3086,7 +3086,7 @@
         },
         {
             "name": "waaseyaa/access",
-            "version": "dev-feat/1187-entity-p3-immutability",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/access",
