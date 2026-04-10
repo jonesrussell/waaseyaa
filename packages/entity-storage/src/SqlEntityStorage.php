@@ -6,6 +6,10 @@ namespace Waaseyaa\EntityStorage;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Entity\DateTime\EntityClockInterface;
+use Waaseyaa\Entity\DateTime\TimestampFieldConvention;
+use Waaseyaa\Entity\DateTime\UtcEntityClock;
+use Waaseyaa\Entity\EntityBase;
 use Waaseyaa\Entity\EntityConstants;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
@@ -45,6 +49,8 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     private readonly SqlEntityQueryResultCache $queryResultCache;
 
+    private readonly EntityClockInterface $clock;
+
     public function __construct(
         private readonly EntityTypeInterface $entityType,
         private readonly DatabaseInterface $database,
@@ -52,6 +58,7 @@ final class SqlEntityStorage implements EntityStorageInterface
         ?LoggerInterface $logger = null,
         ?EntityEventFactoryInterface $eventFactory = null,
         ?SqlEntityQueryResultCache $queryResultCache = null,
+        ?EntityClockInterface $clock = null,
     ) {
         $this->tableName = $this->entityType->id();
         $keys = $this->entityType->getKeys();
@@ -60,6 +67,7 @@ final class SqlEntityStorage implements EntityStorageInterface
         $this->logger = $logger ?? new NullLogger();
         $this->eventFactory = $eventFactory ?? new DefaultEntityEventFactory();
         $this->queryResultCache = $queryResultCache ?? new SqlEntityQueryResultCache();
+        $this->clock = $clock ?? new UtcEntityClock();
     }
 
     public function create(array $values = []): EntityInterface
@@ -383,27 +391,56 @@ final class SqlEntityStorage implements EntityStorageInterface
     }
 
     /**
-     * Auto-populate timestamp fields on save.
-     *
-     * Sets `created` to current time on new entities (if not already set).
-     * Always updates `changed` to current time.
+     * Auto-fills timestamp fields from definitions and optional casts (#1183).
      */
     private function populateTimestamps(EntityInterface $entity, bool $isNew): void
     {
         $fieldDefs = $this->entityType->getFieldDefinitions();
-        $now = time();
+        $now = $this->clock->now();
 
         foreach ($fieldDefs as $fieldName => $def) {
             if (($def['type'] ?? null) !== 'timestamp') {
                 continue;
             }
 
-            if ($fieldName === 'created' && $isNew && (int) ($entity->get('created') ?? 0) === 0) {
-                $entity->set('created', $now);
-            } elseif ($fieldName === 'changed') {
-                $entity->set('changed', $now);
+            $role = TimestampFieldConvention::inferAutoPopulate($fieldName, $def);
+            if ($role === null) {
+                continue;
             }
+
+            if ($role === 'create') {
+                if (!$isNew || !TimestampFieldConvention::isRawTimestampUnset($entity, $fieldName)) {
+                    continue;
+                }
+            }
+
+            $castSpec = $entity instanceof EntityBase ? $entity->getCastSpecForField($fieldName) : null;
+            if (self::isDatetimeImmutableCastSpec($castSpec)) {
+                $entity->set($fieldName, $now);
+
+                continue;
+            }
+
+            $format = TimestampFieldConvention::resolveStorageFormat($fieldName, $def);
+            $scalar = $format === 'unix'
+                ? $now->getTimestamp()
+                : $now->format(\DateTimeInterface::ATOM);
+            $entity->set($fieldName, $scalar);
         }
+    }
+
+    /**
+     * @param string|array<string, mixed>|null $spec
+     */
+    private static function isDatetimeImmutableCastSpec(string|array|null $spec): bool
+    {
+        if ($spec === null) {
+            return false;
+        }
+
+        $token = is_string($spec) ? $spec : (string) ($spec['type'] ?? '');
+
+        return $token === 'datetime_immutable';
     }
 
     /** @var array<string, true>|null Cached json field names for this entity type. */

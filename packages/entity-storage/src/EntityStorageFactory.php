@@ -6,6 +6,7 @@ namespace Waaseyaa\EntityStorage;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Entity\DateTime\EntityClockInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\Event\EntityEventFactoryInterface;
 
@@ -25,6 +26,7 @@ final class EntityStorageFactory
         private readonly DatabaseInterface $database,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly ?EntityEventFactoryInterface $eventFactory = null,
+        private readonly ?EntityClockInterface $clock = null,
     ) {}
 
     /**
@@ -42,6 +44,7 @@ final class EntityStorageFactory
                 $this->database,
                 $this->eventDispatcher,
                 eventFactory: $this->eventFactory,
+                clock: $this->clock,
             );
         }
 

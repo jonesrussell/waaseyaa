@@ -15,7 +15,8 @@ use Waaseyaa\Entity\Cast\Exception\CastException;
 /**
  * Converts values between storage shapes and PHP domain types for entity field casts.
  *
- * Does not depend on Carbon; datetime handling stays on {@see DateTimeImmutable} until #1183.
+ * Optional Carbon: array spec `['type' => 'datetime_immutable', 'domain' => 'carbon_immutable']` requires
+ * `nesbot/carbon` (#1183).
  */
 final class ValueCaster
 {
@@ -57,7 +58,7 @@ final class ValueCaster
         $resolved = $this->resolveCastTarget($field, $castSpec);
 
         if ($resolved['kind'] === 'builtin') {
-            return $this->castInBuiltin($field, $stored, $resolved['token']);
+            return $this->castInBuiltin($field, $stored, $resolved['token'], $castSpec);
         }
 
         /** @var class-string<BackedEnum> $enumClass */
@@ -80,7 +81,7 @@ final class ValueCaster
         $resolved = $this->resolveCastTarget($field, $castSpec);
 
         if ($resolved['kind'] === 'builtin') {
-            return $this->castOutBuiltin($field, $domain, $resolved['token']);
+            return $this->castOutBuiltin($field, $domain, $resolved['token'], $castSpec);
         }
 
         /** @var class-string<BackedEnum> $enumClass */
@@ -138,7 +139,10 @@ final class ValueCaster
         return $type === 'json' ? self::BUILTIN_ARRAY : $type;
     }
 
-    private function castInBuiltin(string $field, mixed $stored, string $token): mixed
+    /**
+     * @param string|array<string, mixed> $originalSpec
+     */
+    private function castInBuiltin(string $field, mixed $stored, string $token, string|array $originalSpec): mixed
     {
         return match ($token) {
             self::BUILTIN_INT => $this->castInInt($field, $stored),
@@ -146,12 +150,15 @@ final class ValueCaster
             self::BUILTIN_BOOL => $this->castInBool($field, $stored),
             self::BUILTIN_STRING => $this->castInString($field, $stored),
             self::BUILTIN_ARRAY => $this->castInArray($field, $stored),
-            self::BUILTIN_DATETIME_IMMUTABLE => $this->castInDateTimeImmutable($field, $stored),
+            self::BUILTIN_DATETIME_IMMUTABLE => $this->castInDateTimeImmutable($field, $stored, $originalSpec),
             default => throw CastException::unknownBuiltinCast($field, $token),
         };
     }
 
-    private function castOutBuiltin(string $field, mixed $domain, string $token): mixed
+    /**
+     * @param string|array<string, mixed> $originalSpec
+     */
+    private function castOutBuiltin(string $field, mixed $domain, string $token, string|array $originalSpec): mixed
     {
         return match ($token) {
             self::BUILTIN_INT => $this->castOutInt($field, $domain),
@@ -159,7 +166,7 @@ final class ValueCaster
             self::BUILTIN_BOOL => $this->castOutBool($field, $domain),
             self::BUILTIN_STRING => $this->castOutString($field, $domain),
             self::BUILTIN_ARRAY => $this->castOutArray($field, $domain),
-            self::BUILTIN_DATETIME_IMMUTABLE => $this->castOutDateTimeImmutable($field, $domain),
+            self::BUILTIN_DATETIME_IMMUTABLE => $this->castOutDateTimeImmutable($field, $domain, $originalSpec),
             default => throw CastException::unknownBuiltinCast($field, $token),
         };
     }
@@ -414,7 +421,17 @@ final class ValueCaster
         }
     }
 
-    private function castInDateTimeImmutable(string $field, mixed $stored): DateTimeImmutable
+    /**
+     * @param string|array<string, mixed> $castSpec
+     */
+    private function castInDateTimeImmutable(string $field, mixed $stored, string|array $castSpec): DateTimeImmutable
+    {
+        $dt = $this->resolveStoredToDateTimeImmutable($field, $stored);
+
+        return $this->applyDatetimeDomain($field, $dt, $castSpec);
+    }
+
+    private function resolveStoredToDateTimeImmutable(string $field, mixed $stored): DateTimeImmutable
     {
         if ($stored instanceof DateTimeImmutable) {
             return $stored;
@@ -458,6 +475,27 @@ final class ValueCaster
         throw CastException::invalidStoredValue($field, self::BUILTIN_DATETIME_IMMUTABLE, $stored);
     }
 
+    /**
+     * @param string|array<string, mixed> $castSpec
+     */
+    private function applyDatetimeDomain(string $field, DateTimeImmutable $dt, string|array $castSpec): DateTimeImmutable
+    {
+        $domain = is_array($castSpec) ? ($castSpec['domain'] ?? null) : null;
+        if ($domain === null || $domain === '') {
+            return $dt;
+        }
+
+        if ($domain !== 'carbon_immutable') {
+            throw CastException::invalidCastSpec($field);
+        }
+
+        if (!class_exists(\Carbon\CarbonImmutable::class)) {
+            throw CastException::carbonImmutableNotInstalled($field);
+        }
+
+        return \Carbon\CarbonImmutable::instance($dt);
+    }
+
     private function dateTimeFromUnixTimestamp(string $field, int $timestamp): DateTimeImmutable
     {
         try {
@@ -473,22 +511,58 @@ final class ValueCaster
         }
     }
 
-    private function castOutDateTimeImmutable(string $field, mixed $domain): string
+    /**
+     * @param string|array<string, mixed> $castSpec
+     *
+     * @return int|string
+     */
+    private function castOutDateTimeImmutable(string $field, mixed $domain, string|array $castSpec): int|string
+    {
+        $storage = $this->resolveDatetimeStorageFormat($field, $castSpec);
+        $immutable = $this->normalizeDomainToDateTimeImmutable($field, $domain);
+
+        if ($storage === 'unix') {
+            return $immutable->getTimestamp();
+        }
+
+        return $immutable->format(DateTimeInterface::ATOM);
+    }
+
+    /**
+     * @param string|array<string, mixed> $castSpec
+     *
+     * @return 'unix'|'iso8601'
+     */
+    private function resolveDatetimeStorageFormat(string $field, string|array $castSpec): string
+    {
+        if (is_string($castSpec)) {
+            return 'iso8601';
+        }
+
+        $storage = $castSpec['storage'] ?? 'iso8601';
+        if (!is_string($storage) || ($storage !== 'unix' && $storage !== 'iso8601')) {
+            throw CastException::invalidDatetimeStorage($field, is_string($storage) ? $storage : get_debug_type($storage));
+        }
+
+        return $storage;
+    }
+
+    private function normalizeDomainToDateTimeImmutable(string $field, mixed $domain): DateTimeImmutable
     {
         if ($domain instanceof DateTimeImmutable) {
-            return $domain->format(DateTimeInterface::ATOM);
+            return $domain;
         }
 
         if ($domain instanceof DateTimeInterface) {
-            return DateTimeImmutable::createFromInterface($domain)->format(DateTimeInterface::ATOM);
+            return DateTimeImmutable::createFromInterface($domain);
         }
 
         if (is_string($domain) && $domain !== '') {
-            return $this->castOutDateTimeImmutable($field, $this->castInDateTimeImmutable($field, $domain));
+            return $this->resolveStoredToDateTimeImmutable($field, $domain);
         }
 
         if (is_int($domain)) {
-            return $this->dateTimeFromUnixTimestamp($field, $domain)->format(DateTimeInterface::ATOM);
+            return $this->dateTimeFromUnixTimestamp($field, $domain);
         }
 
         throw CastException::invalidDomainValue($field, self::BUILTIN_DATETIME_IMMUTABLE, $domain);
