@@ -9,6 +9,7 @@
 <!-- Spec reviewed 2026-04-09k - `ResourceSerializer`, `DiscoveryRouter`, and `DiscoveryApiHandler` build attribute/visibility maps via `EntityValues::toCastAwareMap()` (#1181 ST-8) -->
 <!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute pipeline cross-linked to docs/specs/jsonapi.md; ResourceSerializer uses toCastAwareMap (#1181) -->
 <!-- Spec reviewed 2026-04-09 ST-10 - ResourceSerializer delegates JSON value normalization to EntityValues::normalizeValueForJson() (#1181) -->
+<!-- Spec reviewed 2026-04-09 - SchemaPresenter: admin JSON Schema from field definitions, not EntityBase::$casts; cross-link entity-system #1184 -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
 
@@ -257,6 +258,8 @@ if ($accessHandler !== null && $account !== null) {
 Only two of the four possible states (both-null, both-non-null) are meaningful. Passing one without the other silently skips access filtering.
 
 ## Schema Presenter
+
+**Field definitions vs `$casts` (#1184):** `SchemaPresenter::present()` builds properties from **EntityType field definitions** (the `$fieldDefinitions` argument, usually from the entity type registry), not from `EntityBase::$casts` on the entity PHP class. A field may still appear in JSON:API `attributes` with correct typing when the entity uses `$casts` and serializers call `EntityValues` (see **`docs/specs/jsonapi.md`** and **`docs/specs/entity-system.md`**). Admin form widgets for cast-only value objects may require explicit field definition metadata in a follow-up.
 
 ```php
 // packages/api/src/Schema/SchemaPresenter.php

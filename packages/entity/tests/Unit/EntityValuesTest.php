@@ -9,6 +9,8 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityValues;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleNestedChildVo;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleNestedParentVo;
 use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleStringEnum;
 
 #[CoversClass(EntityValues::class)]
@@ -54,6 +56,22 @@ final class EntityValuesTest extends TestCase
             EntityValues::normalizeValueForJson(new \DateTimeImmutable('2026-01-02T03:04:05+00:00')),
         );
         self::assertSame(['x' => 'a'], EntityValues::normalizeValueForJson(['x' => SampleStringEnum::Alpha]));
+    }
+
+    #[Test]
+    public function normalizeValueForJsonRecursesNestedValueObjectsLikeNestedArrays(): void
+    {
+        $nested = new SampleNestedParentVo(child: new SampleNestedChildVo(code: 'c1'));
+        self::assertSame(
+            ['child' => ['code' => 'c1']],
+            EntityValues::normalizeValueForJson($nested),
+        );
+        self::assertSame(
+            ['wrap' => ['child' => ['code' => 'c2']]],
+            EntityValues::normalizeValueForJson([
+                'wrap' => new SampleNestedParentVo(child: new SampleNestedChildVo(code: 'c2')),
+            ]),
+        );
     }
 
     #[Test]

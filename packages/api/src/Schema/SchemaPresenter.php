@@ -13,6 +13,10 @@ use Waaseyaa\Entity\EntityTypeInterface;
  * Converts EntityType definitions (and optional FieldDefinitions) to JSON Schema
  * representations with widget hints for admin SPA consumption.
  *
+ * This presenter reads **field definitions on the entity type**, not `EntityBase::$casts`.
+ * Cast-only value objects or enums on the entity class do not automatically appear here; align definitions
+ * with admin UX when structured fields need widgets (#1184 / entity-system spec).
+ *
  * The output follows JSON Schema draft-07 format with custom extensions:
  * - "x-widget": widget type hint for the admin UI (text, textarea, richtext, select, boolean, etc.)
  * - "x-label": human-readable field label

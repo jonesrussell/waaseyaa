@@ -39,14 +39,14 @@ final class CastException extends \InvalidArgumentException
     }
 
     /**
-     * Non-enum class-strings are reserved for value-object casts (#1184).
+     * Stable contract when a cast class-string exists but does not implement {@see \Waaseyaa\Entity\Cast\FromArrayEntityValueInterface}.
      */
-    public static function unsupportedValueObjectCast(string $field, string $class): self
+    public static function valueObjectRequiresInterface(string $field, string $class): self
     {
         return new self(sprintf(
-            'Cast to class "%s" for field "%s" is not supported yet (value-object casts: #1184).',
-            $class,
+            'Value object cast requires class implementing FromArrayEntityValueInterface (field "%s", class "%s").',
             $field,
+            $class,
         ));
     }
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+use Waaseyaa\Entity\Cast\FromArrayEntityValueInterface;
+
 /**
  * Helpers for read paths that need cast-aware field values (#1181).
  *
@@ -101,6 +103,10 @@ final class EntityValues
 
         if ($value instanceof \JsonSerializable) {
             return self::normalizeValueForJson($value->jsonSerialize());
+        }
+
+        if ($value instanceof FromArrayEntityValueInterface) {
+            return self::normalizeValueForJson($value->toArray());
         }
 
         if (\is_array($value)) {

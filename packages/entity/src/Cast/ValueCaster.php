@@ -18,6 +18,7 @@ use Waaseyaa\TypedData\Coercion\EntityCastCoercion;
  *
  * Builtin scalar and JSON-array casts delegate to {@see EntityCastCoercion} in `waaseyaa/typed-data` (#1185).
  * {@code datetime_immutable} and backed enums remain here (#1183 / enum handling).
+ * Value objects use {@see FromArrayEntityValueInterface} with the same storage shape as the {@code array} cast (#1184).
  *
  * Optional Carbon: array spec `['type' => 'datetime_immutable', 'domain' => 'carbon_immutable']` requires
  * `nesbot/carbon` (#1183).
@@ -65,6 +66,13 @@ final class ValueCaster
             return $this->castInBuiltin($field, $stored, $resolved['token'], $castSpec);
         }
 
+        if ($resolved['kind'] === 'value_object') {
+            /** @var class-string<FromArrayEntityValueInterface> $voClass */
+            $voClass = $resolved['class'];
+
+            return $this->castInValueObject($field, $stored, $voClass);
+        }
+
         /** @var class-string<BackedEnum> $enumClass */
         $enumClass = $resolved['class'];
 
@@ -88,6 +96,13 @@ final class ValueCaster
             return $this->castOutBuiltin($field, $domain, $resolved['token'], $castSpec);
         }
 
+        if ($resolved['kind'] === 'value_object') {
+            /** @var class-string<FromArrayEntityValueInterface> $voClass */
+            $voClass = $resolved['class'];
+
+            return $this->castOutValueObject($field, $domain, $voClass);
+        }
+
         /** @var class-string<BackedEnum> $enumClass */
         $enumClass = $resolved['class'];
 
@@ -95,10 +110,37 @@ final class ValueCaster
     }
 
     /**
-     * @return array{kind: 'builtin', token: string}|array{kind: 'enum', class: class-string<BackedEnum>}
+     * Whether {@code $class} is a value-object cast target (single extension seam for VO detection).
+     *
+     * @param class-string $class
+     */
+    private function isValueObjectCast(string $class): bool
+    {
+        return class_exists($class) && is_subclass_of($class, FromArrayEntityValueInterface::class);
+    }
+
+    /**
+     * @return array{kind: 'builtin', token: string}|array{kind: 'enum', class: class-string<BackedEnum>}|array{kind: 'value_object', class: class-string<FromArrayEntityValueInterface>}
      */
     private function resolveCastTarget(string $field, string|array $castSpec): array
     {
+        if (is_array($castSpec)) {
+            $declaredType = $castSpec['type'] ?? '';
+            if ($declaredType === 'value_object') {
+                $class = $castSpec['class'] ?? null;
+                if (!is_string($class) || $class === '' || !class_exists($class)) {
+                    throw CastException::invalidCastSpec($field);
+                }
+
+                if (!$this->isValueObjectCast($class)) {
+                    throw CastException::valueObjectRequiresInterface($field, $class);
+                }
+
+                /** @var class-string<FromArrayEntityValueInterface> $class */
+                return ['kind' => 'value_object', 'class' => $class];
+            }
+        }
+
         $token = $this->normalizeSpecToToken($field, $castSpec);
         if ($token === '') {
             throw CastException::invalidCastSpec($field);
@@ -110,7 +152,12 @@ final class ValueCaster
 
         if (!enum_exists($token)) {
             if (class_exists($token)) {
-                throw CastException::unsupportedValueObjectCast($field, $token);
+                if ($this->isValueObjectCast($token)) {
+                    /** @var class-string<FromArrayEntityValueInterface> $token */
+                    return ['kind' => 'value_object', 'class' => $token];
+                }
+
+                throw CastException::valueObjectRequiresInterface($field, $token);
             }
 
             throw CastException::unknownBuiltinCast($field, $token);
@@ -471,5 +518,72 @@ final class ValueCaster
         }
 
         throw CastException::invalidDomainValue($field, $enumClass, $domain);
+    }
+
+    /**
+     * @param class-string<FromArrayEntityValueInterface> $voClass
+     */
+    private function castInValueObject(string $field, mixed $stored, string $voClass): FromArrayEntityValueInterface
+    {
+        if ($stored instanceof FromArrayEntityValueInterface && $stored::class === $voClass) {
+            return $stored;
+        }
+
+        $data = $this->typedCastIn(
+            static fn() => EntityCastCoercion::castInArray($field, $stored),
+        );
+
+        try {
+            return $voClass::fromArray($data);
+        } catch (\Throwable $e) {
+            throw new CastException(
+                sprintf('Cannot cast stored value for field "%s" to value object %s.', $field, $voClass),
+                0,
+                $e,
+            );
+        }
+    }
+
+    /**
+     * @param class-string<FromArrayEntityValueInterface> $voClass
+     *
+     * @return non-falsy-string JSON string (same storage shape as {@code array} cast).
+     */
+    private function castOutValueObject(string $field, mixed $domain, string $voClass): string
+    {
+        $vo = $this->normalizeDomainToValueObject($field, $domain, $voClass);
+
+        return $this->typedCastOut(
+            static fn() => EntityCastCoercion::castOutArray($field, $vo->toArray()),
+        );
+    }
+
+    /**
+     * @param class-string<FromArrayEntityValueInterface> $voClass
+     */
+    private function normalizeDomainToValueObject(string $field, mixed $domain, string $voClass): FromArrayEntityValueInterface
+    {
+        if ($domain instanceof FromArrayEntityValueInterface && $domain::class === $voClass) {
+            return $domain;
+        }
+
+        if (is_array($domain)) {
+            try {
+                return $voClass::fromArray($domain);
+            } catch (\Throwable $e) {
+                throw new CastException(
+                    sprintf('Cannot cast domain value for field "%s" to storage for value object %s.', $field, $voClass),
+                    0,
+                    $e,
+                );
+            }
+        }
+
+        throw CastException::invalidDomainValue(
+            $field,
+            $voClass,
+            $domain,
+            'Value object cast accepts only an instance of the cast class or an array (fromArray); scalars are not accepted.',
+        );
     }
 }

@@ -46,7 +46,8 @@ abstract class EntityBase implements EntityInterface
     protected array $entityKeys = [];
 
     /**
-     * Per-field cast specifications (string token, backed enum class-string, or `['type' => ...]`).
+     * Per-field cast specifications (string token, backed enum class-string,
+     * {@see \Waaseyaa\Entity\Cast\FromArrayEntityValueInterface} class-string, or `['type' => ...]`).
      *
      * @var array<string, string|array<string, mixed>>
      */
