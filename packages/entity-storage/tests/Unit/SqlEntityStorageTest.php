@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace Waaseyaa\EntityStorage\Tests\Unit;
 
+use DateTimeImmutable;
+use DateTimeInterface;
 use Waaseyaa\Database\DBALDatabase;
+use Waaseyaa\Entity\DateTime\FixedEntityClock;
 use Waaseyaa\Entity\EntityConstants;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\EntityStorage\Tests\Fixtures\IsoAtTimestampEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\SpyEntityEventFactory;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestConfigEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestStorageEntity;
+use Waaseyaa\EntityStorage\Tests\Fixtures\UnixCastTimestampEntity;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -331,6 +336,95 @@ final class SqlEntityStorageTest extends TestCase
 
         // Explicit non-zero created should be preserved.
         $this->assertSame(1700000000, (int) $loaded->get('created'));
+    }
+
+    public function testPopulateAtSuffixedTimestampsAsIso8601WithoutCast(): void
+    {
+        $database = DBALDatabase::createSqlite();
+        $fixed = new DateTimeImmutable('@1700000000');
+        $entityType = new EntityType(
+            id: 'iso_at_entity',
+            label: 'ISO @',
+            class: IsoAtTimestampEntity::class,
+            keys: [
+                'id' => 'id',
+                'uuid' => 'uuid',
+                'bundle' => 'bundle',
+                'label' => 'label',
+                'langcode' => 'langcode',
+            ],
+            fieldDefinitions: [
+                'created_at' => ['type' => 'timestamp'],
+                'updated_at' => ['type' => 'timestamp'],
+            ],
+        );
+        (new SqlSchemaHandler($entityType, $database))->ensureTable();
+
+        $storage = new SqlEntityStorage(
+            $entityType,
+            $database,
+            new EventDispatcher(),
+            clock: new FixedEntityClock($fixed),
+        );
+
+        $entity = $storage->create(['label' => 'At', 'bundle' => 'page']);
+        $entity->enforceIsNew();
+        $storage->save($entity);
+
+        $expected = $fixed->format(DateTimeInterface::ATOM);
+        $raw = $entity->toArray();
+        $this->assertSame($expected, $raw['created_at']);
+        $this->assertSame($expected, $raw['updated_at']);
+
+        $loaded = $storage->load($entity->id());
+        $this->assertNotNull($loaded);
+        $this->assertSame($expected, $loaded->toArray()['created_at']);
+
+        $loaded->set('label', 'At2');
+        $storage->save($loaded);
+
+        $reloaded = $storage->load($loaded->id());
+        $this->assertNotNull($reloaded);
+        $this->assertSame($expected, $reloaded->toArray()['created_at']);
+        $this->assertSame($expected, $reloaded->toArray()['updated_at']);
+    }
+
+    public function testPopulateDatetimeCastUsesUnixStorage(): void
+    {
+        $database = DBALDatabase::createSqlite();
+        $fixed = new DateTimeImmutable('@1800000000');
+        $entityType = new EntityType(
+            id: 'unix_cast_ts_entity',
+            label: 'Unix cast',
+            class: UnixCastTimestampEntity::class,
+            keys: [
+                'id' => 'id',
+                'uuid' => 'uuid',
+                'bundle' => 'bundle',
+                'label' => 'label',
+                'langcode' => 'langcode',
+            ],
+            fieldDefinitions: [
+                'created_at' => ['type' => 'timestamp'],
+                'updated_at' => ['type' => 'timestamp'],
+            ],
+        );
+        (new SqlSchemaHandler($entityType, $database))->ensureTable();
+
+        $storage = new SqlEntityStorage(
+            $entityType,
+            $database,
+            new EventDispatcher(),
+            clock: new FixedEntityClock($fixed),
+        );
+
+        $entity = $storage->create(['label' => 'U', 'bundle' => 'page']);
+        $entity->enforceIsNew();
+        $storage->save($entity);
+
+        $this->assertSame(1800000000, $entity->toArray()['created_at']);
+        $this->assertSame(1800000000, $entity->toArray()['updated_at']);
+        $this->assertSame(1800000000, $entity->get('created_at')->getTimestamp());
     }
 
     public function testCreateEnforcesIsNew(): void
