@@ -484,6 +484,11 @@ final class DiscoveryEntityTypeManager implements EntityTypeManagerInterface
         return $this->storages[$entityTypeId];
     }
 
+    public function getRepository(string $entityTypeId): \Waaseyaa\Entity\Repository\EntityRepositoryInterface
+    {
+        throw new \RuntimeException('Not needed in test.');
+    }
+
     public function registerEntityType(EntityTypeInterface $type): void
     {
         throw new \RuntimeException('Not needed in test.');

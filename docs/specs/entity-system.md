@@ -327,8 +327,13 @@ interface EntityTypeManagerInterface
     public function getDefinitions(): array;        // array<string, EntityTypeInterface>
     public function hasDefinition(string $entityTypeId): bool;
     public function getStorage(string $entityTypeId): EntityStorageInterface;
+    public function getRepository(string $entityTypeId): EntityRepositoryInterface;
 }
 ```
+
+`getStorage()` returns the legacy `EntityStorageInterface` implementation (typically `SqlEntityStorage`) created via the optional storage factory.
+
+`getRepository()` returns `EntityRepositoryInterface` (the driver-backed repository with hydration, validation hooks, and transactional batch APIs). The kernel registers a repository factory alongside the storage factory so consumers can wrap `EntityTypeManager::getRepository($entityTypeId)` in thin domain repositories without manually assembling `SqlStorageDriver`, `RevisionableStorageDriver`, and `EntityRepository` dependencies.
 
 ### EntityStorageInterface
 
@@ -1277,7 +1282,7 @@ class FieldType extends WaaseyaaPlugin
 - `FieldableInterface.php` -- hasField, get, set, getFieldDefinitions
 - `EntityType.php` -- final readonly value object for entity type definitions
 - `EntityTypeInterface.php` -- entity type definition contract
-- `EntityTypeManager.php` -- registry with storage factory support
+- `EntityTypeManager.php` -- registry with storage factory and optional repository factory (`getRepository()`)
 - `EntityTypeManagerInterface.php` -- manager contract
 - `EntityConstants.php` -- SAVED_NEW (1), SAVED_UPDATED (2)
 - `TranslatableInterface.php` -- translation contract
