@@ -28,7 +28,7 @@ jobs:
 
       - name: Resolve PR number
         id: pr
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             let prNumber;
@@ -49,7 +49,7 @@ jobs:
 
       - name: Check eligibility and merge
         if: steps.pr.outputs.number
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const prNumber = parseInt('${{ steps.pr.outputs.number }}');
