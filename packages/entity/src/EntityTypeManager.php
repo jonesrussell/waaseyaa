@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
 /**
  * Registry-based entity type manager.
@@ -30,13 +31,23 @@ class EntityTypeManager implements EntityTypeManagerInterface
     private array $storageInstances = [];
 
     /**
+     * Cached repository instances.
+     *
+     * @var array<string, EntityRepositoryInterface>
+     */
+    private array $repositoryInstances = [];
+
+    /**
      * @param EventDispatcherInterface $eventDispatcher The event dispatcher for entity lifecycle events.
      * @param \Closure|null $storageFactory A factory callable: fn(EntityTypeInterface): EntityStorageInterface.
      *                                     If null, getStorage() will throw when no storage class is configured.
+     * @param \Closure|null $repositoryFactory A factory callable: fn(string $entityTypeId, EntityTypeInterface): EntityRepositoryInterface.
+     *                                          If null, getRepository() throws.
      */
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly ?\Closure $storageFactory = null,
+        private readonly ?\Closure $repositoryFactory = null,
     ) {}
 
     /**
@@ -144,6 +155,35 @@ class EntityTypeManager implements EntityTypeManagerInterface
         $this->storageInstances[$entityTypeId] = $storage;
 
         return $storage;
+    }
+
+    public function getRepository(string $entityTypeId): EntityRepositoryInterface
+    {
+        if (isset($this->repositoryInstances[$entityTypeId])) {
+            return $this->repositoryInstances[$entityTypeId];
+        }
+
+        if ($this->repositoryFactory === null) {
+            throw new \RuntimeException(\sprintf(
+                'No repository factory configured for EntityTypeManager; cannot build repository for entity type "%s".',
+                $entityTypeId,
+            ));
+        }
+
+        $definition = $this->getDefinition($entityTypeId);
+        $repository = ($this->repositoryFactory)($entityTypeId, $definition);
+
+        if (!$repository instanceof EntityRepositoryInterface) {
+            throw new \RuntimeException(\sprintf(
+                'Repository factory for entity type "%s" must return an instance of %s.',
+                $entityTypeId,
+                EntityRepositoryInterface::class,
+            ));
+        }
+
+        $this->repositoryInstances[$entityTypeId] = $repository;
+
+        return $repository;
     }
 
     /**

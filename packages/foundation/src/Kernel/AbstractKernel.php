@@ -14,6 +14,11 @@ use Waaseyaa\Entity\Audit\EntityWriteAuditListener;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
+use Waaseyaa\EntityStorage\Connection\SingleConnectionResolver;
+use Waaseyaa\EntityStorage\Driver\RevisionableStorageDriver;
+use Waaseyaa\EntityStorage\Driver\SqlStorageDriver;
+use Waaseyaa\EntityStorage\EntityRepository;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
@@ -147,6 +152,33 @@ abstract class AbstractKernel
                 $schemaHandler = new SqlSchemaHandler($definition, $database);
                 $schemaHandler->ensureTable();
                 return new SqlEntityStorage($definition, $database, $dispatcher);
+            },
+            function (string $_entityTypeId, EntityTypeInterface $definition) use ($database, $dispatcher): EntityRepositoryInterface {
+                $schemaHandler = new SqlSchemaHandler($definition, $database);
+                $schemaHandler->ensureTable();
+                if ($definition->isRevisionable()) {
+                    $schemaHandler->ensureRevisionTable();
+                }
+                if ($definition->isTranslatable()) {
+                    $schemaHandler->ensureTranslationTable();
+                }
+
+                $keys = $definition->getKeys();
+                $idKey = $keys['id'] ?? 'id';
+
+                $resolver = new SingleConnectionResolver($database);
+                $driver = new SqlStorageDriver($resolver, $idKey);
+                $revisionDriver = $definition->isRevisionable()
+                    ? new RevisionableStorageDriver($resolver, $definition)
+                    : null;
+
+                return new EntityRepository(
+                    $definition,
+                    $driver,
+                    $dispatcher,
+                    $revisionDriver,
+                    $database,
+                );
             },
         );
     }

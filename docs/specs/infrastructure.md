@@ -10,6 +10,7 @@
 <!-- Spec reviewed 2026-04-08c - entity, entity-storage, queue, routing, typed-data, validation Symfony floors to ^7.0; see symfony-version-floors.md (#1151) -->
 <!-- Spec reviewed 2026-04-09 - typed-data: EntityCastCoercion, CoercionException, CastTokenMapper; entity ValueCaster delegates builtins (#1185); public surface map extended -->
 <!-- Spec reviewed 2026-04-10 - testing package EntityTypeFixtureValues + EntityFactory::defineFromEntityType (#1186) -->
+<!-- Spec reviewed 2026-04-11 - AbstractKernel::bootEntityTypeManager passes a third closure to EntityTypeManager wiring SqlSchemaHandler, SqlStorageDriver, optional RevisionableStorageDriver, and EntityRepository for getRepository() (#1128) -->
 <!-- Spec reviewed 2026-04-08 - #1129/#1134: HttpKernel::finalizeBoot() wires DB cache bins and discovery handler; SSR owns RenderCache listeners + SsrPageHandler via SsrServiceProvider::configureHttpKernel; ErrorPageRendererInterface bound in SSR; provider httpDomainRouters() merged after foundation routers through McpRouter and before BroadcastRouter; DiscoveryRouter/GraphQlRouter/MediaRouter live in api/graphql/media packages; ControllerDispatcher uses Inertia foundation interfaces + optional InertiaFullPageRendererInterface; LayerDependencyTest gates non-Router Foundation Http/ against non-Foundation Waaseyaa imports -->
 <!-- Spec reviewed 2026-04-08 - DX P2: HttpKernel boot catch returns HTML via DevExceptionRenderer when debug+package present else JSON:API bootFailureJsonResponse (non-empty body, #1117); ControllerDispatcher render.page returns 501 JSON when SsrPageHandler class unavailable (#1130); LogManager gains daily + fingers_crossed channel types -->
 <!-- Spec reviewed 2026-04-08 - LogManager: handler key string = type synonym only; fingers_crossed nested config via nested, inner, or array handler; channel buffer_limit caps FingersCrossedHandler in-memory buffer (drops oldest); handlerTypeFromConfig + fingersCrossedBufferLimit helpers -->
@@ -1306,7 +1307,7 @@ EnvLoader::load(.env)
   → new EntityAuditLogger($projectRoot)
   → register EntityWriteAuditListener on PRE_SAVE, POST_SAVE, POST_DELETE
   → bootDatabase()           // DatabaseBootstrapper
-  → bootEntityTypeManager()  // inline, wires storage factory closure
+  → bootEntityTypeManager()  // inline: storage factory (SqlEntityStorage) + repository factory (EntityRepository)
   → compileManifest()        // ManifestBootstrapper
   → bootMigrations()         // reuses DBAL connection from bootDatabase
   → discoverAndRegisterProviders()  // ProviderRegistry

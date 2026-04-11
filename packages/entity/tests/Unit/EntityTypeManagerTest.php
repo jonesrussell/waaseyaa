@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity\Tests\Unit;
 
 use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -172,6 +174,59 @@ class EntityTypeManagerTest extends TestCase
     public function testGetEventDispatcher(): void
     {
         $this->assertSame($this->eventDispatcher, $this->manager->getEventDispatcher());
+    }
+
+    public function testGetRepositoryThrowsWhenNoFactoryConfigured(): void
+    {
+        $type = new EntityType(id: 'node', label: 'Content', class: TestEntity::class);
+        $this->manager->registerEntityType($type);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('No repository factory configured');
+
+        $this->manager->getRepository('node');
+    }
+
+    public function testGetRepositoryUsesFactoryAndCaches(): void
+    {
+        $mockRepo = $this->createMock(EntityRepositoryInterface::class);
+        $callCount = 0;
+
+        $manager = new EntityTypeManager(
+            $this->eventDispatcher,
+            null,
+            function (string $entityTypeId, EntityTypeInterface $definition) use ($mockRepo, &$callCount) {
+                $callCount++;
+                $this->assertSame('node', $entityTypeId);
+                $this->assertSame('node', $definition->id());
+
+                return $mockRepo;
+            },
+        );
+
+        $type = new EntityType(id: 'node', label: 'Content', class: TestEntity::class);
+        $manager->registerEntityType($type);
+
+        $this->assertSame($mockRepo, $manager->getRepository('node'));
+        $this->assertSame($mockRepo, $manager->getRepository('node'));
+        $this->assertSame(1, $callCount);
+    }
+
+    public function testGetRepositoryThrowsWhenFactoryReturnsWrongType(): void
+    {
+        $manager = new EntityTypeManager(
+            $this->eventDispatcher,
+            null,
+            static fn (): object => new \stdClass(),
+        );
+
+        $type = new EntityType(id: 'node', label: 'Content', class: TestEntity::class);
+        $manager->registerEntityType($type);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('must return an instance');
+
+        $manager->getRepository('node');
     }
 
     public function testGetDefinitionsReturnsEmptyByDefault(): void

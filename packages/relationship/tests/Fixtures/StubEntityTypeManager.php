@@ -6,6 +6,7 @@ namespace Waaseyaa\Relationship\Tests\Fixtures;
 
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 
 /**
@@ -58,6 +59,11 @@ class StubEntityTypeManager implements EntityTypeManagerInterface
     public function getStorage(string $entityTypeId): EntityStorageInterface
     {
         return $this->storage ?? new StubEntityStorage();
+    }
+
+    public function getRepository(string $entityTypeId): EntityRepositoryInterface
+    {
+        throw new \BadMethodCallException('StubEntityTypeManager does not implement getRepository().');
     }
 
     public function getDefinitions(): array
