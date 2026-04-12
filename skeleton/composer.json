@@ -20,6 +20,7 @@
         "waaseyaa/workflows": "^0.1",
         "waaseyaa/api": "^0.1",
         "waaseyaa/routing": "^0.1",
+        "waaseyaa/ssr": "^0.1",
         "waaseyaa/config": "^0.1",
         "waaseyaa/cli": "^0.1",
         "waaseyaa/database-legacy": "^0.1",
