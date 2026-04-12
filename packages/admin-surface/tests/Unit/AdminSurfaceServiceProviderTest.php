@@ -336,6 +336,57 @@ final class AdminSurfaceServiceProviderTest extends TestCase
         }
     }
 
+    #[Test]
+    public function adminSpaServesVendorDistWhenPublicAdminMissing(): void
+    {
+        $tempDir = sys_get_temp_dir() . '/waaseyaa_test_spa_' . uniqid();
+        mkdir($tempDir . '/public', 0777, true);
+
+        try {
+            $result = AdminSurfaceServiceProvider::resolveAdminIndex($tempDir, '<html>Vendor</html>');
+
+            $this->assertSame('<html>Vendor</html>', $result);
+        } finally {
+            rmdir($tempDir . '/public');
+            rmdir($tempDir);
+        }
+    }
+
+    #[Test]
+    public function adminSpaServesPublicOverVendorDist(): void
+    {
+        $tempDir = sys_get_temp_dir() . '/waaseyaa_test_spa_' . uniqid();
+        mkdir($tempDir . '/public/admin', 0777, true);
+        file_put_contents($tempDir . '/public/admin/index.html', '<html>App Override</html>');
+
+        try {
+            $result = AdminSurfaceServiceProvider::resolveAdminIndex($tempDir, '<html>Vendor</html>');
+
+            $this->assertSame('<html>App Override</html>', $result);
+        } finally {
+            unlink($tempDir . '/public/admin/index.html');
+            rmdir($tempDir . '/public/admin');
+            rmdir($tempDir . '/public');
+            rmdir($tempDir);
+        }
+    }
+
+    #[Test]
+    public function adminSpaReturnsNullWhenNeitherExists(): void
+    {
+        $tempDir = sys_get_temp_dir() . '/waaseyaa_test_spa_' . uniqid();
+        mkdir($tempDir . '/public', 0777, true);
+
+        try {
+            $result = AdminSurfaceServiceProvider::resolveAdminIndex($tempDir, null);
+
+            $this->assertNull($result);
+        } finally {
+            rmdir($tempDir . '/public');
+            rmdir($tempDir);
+        }
+    }
+
     private function createTestHost(?AdminSurfaceSessionData $session): AbstractAdminSurfaceHost
     {
         return new class ($session) extends AbstractAdminSurfaceHost {

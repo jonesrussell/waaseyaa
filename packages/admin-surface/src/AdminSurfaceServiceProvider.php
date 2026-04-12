@@ -37,6 +37,25 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
     }
 
     /**
+     * Resolve the admin SPA index.html content.
+     *
+     * Two-tier fallback:
+     * 1. App override: $projectRoot/public/admin/index.html (checked first)
+     * 2. Vendor fallback: pre-built content passed as $vendorDistContent
+     *
+     * Returns null if neither source is available.
+     */
+    public static function resolveAdminIndex(string $projectRoot, ?string $vendorDistContent): ?string
+    {
+        $appIndexPath = $projectRoot . '/public/admin/index.html';
+        if (is_file($appIndexPath)) {
+            return file_get_contents($appIndexPath);
+        }
+
+        return $vendorDistContent;
+    }
+
+    /**
      * Auto-register admin surface routes with the generic host.
      *
      * If an app provides its own host via a higher-priority provider,
@@ -60,14 +79,17 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
         // match first, but before the framework's SSR catch-all in
         // BuiltinRouteRegistrar (provider routes() runs at line 145–147).
         $projectRoot = $this->projectRoot;
+        $vendorDistPath = __DIR__ . '/../dist/index.html';
+        $vendorDistContent = is_file($vendorDistPath) ? file_get_contents($vendorDistPath) : null;
+
         $router->addRoute('admin_spa', RouteBuilder::create('/admin/{path}')
             ->methods('GET')
             ->allowAll()
-            ->controller(static function (mixed $request = null, string $path = '') use ($projectRoot): Response {
-                $indexPath = $projectRoot . '/public/admin/index.html';
-                if (is_file($indexPath)) {
+            ->controller(static function (mixed $request = null, string $path = '') use ($projectRoot, $vendorDistContent): Response {
+                $html = self::resolveAdminIndex($projectRoot, $vendorDistContent);
+                if ($html !== null) {
                     return new Response(
-                        file_get_contents($indexPath),
+                        $html,
                         200,
                         ['Content-Type' => 'text/html; charset=UTF-8'],
                     );
