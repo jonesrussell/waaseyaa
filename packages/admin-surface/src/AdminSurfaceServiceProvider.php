@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AdminSurface;
 
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\AdminSurface\Host\AbstractAdminSurfaceHost;
@@ -79,13 +80,29 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
         // match first, but before the framework's SSR catch-all in
         // BuiltinRouteRegistrar (provider routes() runs at line 145–147).
         $projectRoot = $this->projectRoot;
-        $vendorDistPath = __DIR__ . '/../dist/index.html';
-        $vendorDistContent = is_file($vendorDistPath) ? file_get_contents($vendorDistPath) : null;
+        $vendorDistDir = __DIR__ . '/../dist';
+        $vendorDistContent = is_file($vendorDistDir . '/index.html')
+            ? file_get_contents($vendorDistDir . '/index.html')
+            : null;
 
         $router->addRoute('admin_spa', RouteBuilder::create('/admin/{path}')
             ->methods('GET')
             ->allowAll()
-            ->controller(static function (mixed $request = null, string $path = '') use ($projectRoot, $vendorDistContent): Response {
+            ->controller(static function (mixed $request = null, string $path = '') use ($projectRoot, $vendorDistDir, $vendorDistContent): Response {
+                // Serve static assets (JS, CSS, images) from public/admin/ or vendor dist.
+                if ($path !== '' && !str_contains($path, '..')) {
+                    $publicAsset = $projectRoot . '/public/admin/' . $path;
+                    if (is_file($publicAsset)) {
+                        return new BinaryFileResponse($publicAsset);
+                    }
+
+                    $vendorAsset = $vendorDistDir . '/' . $path;
+                    if (is_file($vendorAsset)) {
+                        return new BinaryFileResponse($vendorAsset);
+                    }
+                }
+
+                // SPA index fallback for route paths.
                 $html = self::resolveAdminIndex($projectRoot, $vendorDistContent);
                 if ($html !== null) {
                     return new Response(
