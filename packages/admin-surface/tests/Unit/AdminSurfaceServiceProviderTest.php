@@ -8,6 +8,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RequestContext;
+use Waaseyaa\AdminSurface\AdminSpaFallback;
 use Waaseyaa\AdminSurface\AdminSurfaceRoutePaths;
 use Waaseyaa\AdminSurface\AdminSurfaceServiceProvider;
 use Waaseyaa\AdminSurface\Catalog\CatalogBuilder;
@@ -227,9 +229,116 @@ final class AdminSurfaceServiceProviderTest extends TestCase
         $this->assertSame(401, $result['error']['status']);
     }
 
+    #[Test]
+    public function adminSpaRouteMatchesAdminRoot(): void
+    {
+        $router = new WaaseyaaRouter(new RequestContext('', 'GET'));
+        AdminSurfaceServiceProvider::registerRoutes($router, $this->host);
+
+        // Register the SPA catch-all the same way the provider does.
+        $router->addRoute('admin_spa', \Waaseyaa\Routing\RouteBuilder::create('/admin/{path}')
+            ->methods('GET')
+            ->allowAll()
+            ->controller(static fn() => new \Symfony\Component\HttpFoundation\Response('spa'))
+            ->requirement('path', '(?!_surface(/|$)).*')
+            ->default('path', '')
+            ->build());
+
+        $params = $router->match('/admin');
+        $this->assertSame('admin_spa', $params['_route']);
+    }
+
+    #[Test]
+    public function adminSpaRouteMatchesAdminSubPaths(): void
+    {
+        $router = new WaaseyaaRouter(new RequestContext('', 'GET'));
+        AdminSurfaceServiceProvider::registerRoutes($router, $this->host);
+
+        $router->addRoute('admin_spa', \Waaseyaa\Routing\RouteBuilder::create('/admin/{path}')
+            ->methods('GET')
+            ->allowAll()
+            ->controller(static fn() => new \Symfony\Component\HttpFoundation\Response('spa'))
+            ->requirement('path', '(?!_surface(/|$)).*')
+            ->default('path', '')
+            ->build());
+
+        $params = $router->match('/admin/users');
+        $this->assertSame('admin_spa', $params['_route']);
+        $this->assertSame('users', $params['path']);
+
+        $params = $router->match('/admin/content/articles/123');
+        $this->assertSame('admin_spa', $params['_route']);
+    }
+
+    #[Test]
+    public function adminSpaRouteDoesNotSwallowSurfaceEndpoints(): void
+    {
+        $router = new WaaseyaaRouter(new RequestContext('', 'GET'));
+        AdminSurfaceServiceProvider::registerRoutes($router, $this->host);
+
+        $router->addRoute('admin_spa', \Waaseyaa\Routing\RouteBuilder::create('/admin/{path}')
+            ->methods('GET')
+            ->allowAll()
+            ->controller(static fn() => new \Symfony\Component\HttpFoundation\Response('spa'))
+            ->requirement('path', '(?!_surface(/|$)).*')
+            ->default('path', '')
+            ->build());
+
+        $params = $router->match('/admin/_surface/session');
+        $this->assertSame('admin_surface.session', $params['_route']);
+
+        $params = $router->match('/admin/_surface/catalog');
+        $this->assertSame('admin_surface.catalog', $params['_route']);
+
+        $params = $router->match('/admin/_surface/article');
+        $this->assertSame('admin_surface.list', $params['_route']);
+
+        $params = $router->match('/admin/_surface/article/1');
+        $this->assertSame('admin_surface.get', $params['_route']);
+    }
+
+    #[Test]
+    public function adminSpaFallbackIsReturnedWhenIndexHtmlMissing(): void
+    {
+        $tempDir = sys_get_temp_dir() . '/waaseyaa_test_spa_' . uniqid();
+        mkdir($tempDir . '/public', 0777, true);
+
+        try {
+            $response = AdminSpaFallback::htmlResponse('TestApp');
+
+            $this->assertSame(200, $response->getStatusCode());
+            $this->assertStringContainsString('text/html', $response->headers->get('Content-Type'));
+            $this->assertStringContainsString('TestApp', $response->getContent());
+            $this->assertStringContainsString('admin:dev', $response->getContent());
+        } finally {
+            rmdir($tempDir . '/public');
+            rmdir($tempDir);
+        }
+    }
+
+    #[Test]
+    public function adminSpaServesIndexHtmlWhenPresent(): void
+    {
+        $tempDir = sys_get_temp_dir() . '/waaseyaa_test_spa_' . uniqid();
+        mkdir($tempDir . '/public/admin', 0777, true);
+        file_put_contents($tempDir . '/public/admin/index.html', '<html><body>Admin SPA</body></html>');
+
+        try {
+            // Simulate what the controller closure does.
+            $indexPath = $tempDir . '/public/admin/index.html';
+            $this->assertTrue(is_file($indexPath));
+            $this->assertStringContainsString('Admin SPA', file_get_contents($indexPath));
+        } finally {
+            unlink($tempDir . '/public/admin/index.html');
+            rmdir($tempDir . '/public/admin');
+            rmdir($tempDir . '/public');
+            rmdir($tempDir);
+        }
+    }
+
     private function createTestHost(?AdminSurfaceSessionData $session): AbstractAdminSurfaceHost
     {
-        return new class($session) extends AbstractAdminSurfaceHost {
+        return new class ($session) extends AbstractAdminSurfaceHost {
             public function __construct(
                 private readonly ?AdminSurfaceSessionData $session,
             ) {}

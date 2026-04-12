@@ -9,6 +9,8 @@
         "waaseyaa/entity": "^0.1",
         "waaseyaa/entity-storage": "^0.1",
         "waaseyaa/access": "^0.1",
+        "waaseyaa/admin-surface": "^0.1",
+        "waaseyaa/auth": "^0.1",
         "waaseyaa/user": "^0.1",
         "waaseyaa/node": "^0.1",
         "waaseyaa/taxonomy": "^0.1",
