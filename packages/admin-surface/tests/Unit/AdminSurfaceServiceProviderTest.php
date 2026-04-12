@@ -309,7 +309,7 @@ final class AdminSurfaceServiceProviderTest extends TestCase
             $this->assertSame(200, $response->getStatusCode());
             $this->assertStringContainsString('text/html', $response->headers->get('Content-Type'));
             $this->assertStringContainsString('TestApp', $response->getContent());
-            $this->assertStringContainsString('admin:dev', $response->getContent());
+            $this->assertStringContainsString('composer run dev', $response->getContent());
         } finally {
             rmdir($tempDir . '/public');
             rmdir($tempDir);

@@ -63,7 +63,7 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
         $router->addRoute('admin_spa', RouteBuilder::create('/admin/{path}')
             ->methods('GET')
             ->allowAll()
-            ->controller(static function () use ($projectRoot): Response {
+            ->controller(static function (mixed $request = null, string $path = '') use ($projectRoot): Response {
                 $indexPath = $projectRoot . '/public/admin/index.html';
                 if (is_file($indexPath)) {
                     return new Response(

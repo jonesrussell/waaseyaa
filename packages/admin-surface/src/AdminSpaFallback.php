@@ -58,7 +58,8 @@ final class AdminSpaFallback
                 <dt>POST {$pAction}</dt>
                 <dd>Action dispatch</dd>
             </dl>
-            <p>Developer UI (optional): run <code>vendor/bin/waaseyaa admin:dev</code> from the app, or see the <a href="{$spec}">Admin SPA spec</a>.</p>
+            <p>Developer UI (optional): run <code>composer run dev</code> from the app, or see the <a href="{$spec}">Admin SPA spec</a>.</p>
+            <p>See all commands: <code>bin/waaseyaa list</code></p>
         </body>
         </html>
         HTML;
