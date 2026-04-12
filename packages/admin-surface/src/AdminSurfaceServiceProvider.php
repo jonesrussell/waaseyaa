@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AdminSurface;
 
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\AdminSurface\Host\AbstractAdminSurfaceHost;
@@ -57,6 +56,42 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
     }
 
     /**
+     * Serve a static file with the correct Content-Type.
+     *
+     * PHP's built-in server defaults to text/html for BinaryFileResponse,
+     * so we read the file and set the MIME type explicitly.
+     */
+    public static function serveStaticFile(string $filePath): Response
+    {
+        $mimeTypes = [
+            'js' => 'application/javascript',
+            'mjs' => 'application/javascript',
+            'css' => 'text/css',
+            'json' => 'application/json',
+            'html' => 'text/html; charset=UTF-8',
+            'svg' => 'image/svg+xml',
+            'png' => 'image/png',
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'gif' => 'image/gif',
+            'ico' => 'image/x-icon',
+            'woff' => 'font/woff',
+            'woff2' => 'font/woff2',
+            'ttf' => 'font/ttf',
+            'map' => 'application/json',
+        ];
+
+        $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+        $contentType = $mimeTypes[$ext] ?? 'application/octet-stream';
+
+        return new Response(
+            file_get_contents($filePath),
+            200,
+            ['Content-Type' => $contentType],
+        );
+    }
+
+    /**
      * Auto-register admin surface routes with the generic host.
      *
      * If an app provides its own host via a higher-priority provider,
@@ -93,12 +128,12 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
                 if ($path !== '' && !str_contains($path, '..')) {
                     $publicAsset = $projectRoot . '/public/admin/' . $path;
                     if (is_file($publicAsset)) {
-                        return new BinaryFileResponse($publicAsset);
+                        return self::serveStaticFile($publicAsset);
                     }
 
                     $vendorAsset = $vendorDistDir . '/' . $path;
                     if (is_file($vendorAsset)) {
-                        return new BinaryFileResponse($vendorAsset);
+                        return self::serveStaticFile($vendorAsset);
                     }
                 }
 
