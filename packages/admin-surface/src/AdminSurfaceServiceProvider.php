@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AdminSurface;
 
+use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\AdminSurface\Host\AbstractAdminSurfaceHost;
 use Waaseyaa\AdminSurface\Host\GenericAdminSurfaceHost;
@@ -54,6 +55,32 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
         );
 
         self::registerRoutes($router, $host);
+
+        // Admin SPA catch-all — registered after _surface API routes so those
+        // match first, but before the framework's SSR catch-all in
+        // BuiltinRouteRegistrar (provider routes() runs at line 145–147).
+        $projectRoot = $this->projectRoot;
+        $router->addRoute('admin_spa', RouteBuilder::create('/admin/{path}')
+            ->methods('GET')
+            ->allowAll()
+            ->controller(static function () use ($projectRoot): Response {
+                $indexPath = $projectRoot . '/public/admin/index.html';
+                if (is_file($indexPath)) {
+                    return new Response(
+                        file_get_contents($indexPath),
+                        200,
+                        ['Content-Type' => 'text/html; charset=UTF-8'],
+                    );
+                }
+
+                $appName = getenv('APP_NAME');
+                $appName = is_string($appName) && $appName !== '' ? $appName : 'Application';
+
+                return AdminSpaFallback::htmlResponse($appName);
+            })
+            ->requirement('path', '(?!_surface(/|$)).*')
+            ->default('path', '')
+            ->build());
     }
 
     /**
