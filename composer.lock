@@ -4111,7 +4111,7 @@
         },
         {
             "name": "waaseyaa/github",
-            "version": "dev-fix/1236-serve-default-host",
+            "version": "dev-main",
             "dist": {
                 "type": "path",
                 "url": "packages/github",
@@ -9562,5 +9562,5 @@
         "php": ">=8.4"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
