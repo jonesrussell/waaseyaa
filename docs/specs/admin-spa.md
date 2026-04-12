@@ -29,6 +29,34 @@ Resolution order:
 
 Use **`npm run dev:wsl`** in `packages/admin` (Nuxt listens on `0.0.0.0`) when you need to open the admin dev UI from a Windows browser while Node runs in WSL. Equivalent: `nuxt dev --host 0.0.0.0` with your usual `NUXT_BACKEND_URL` pointing at the PHP server.
 
+### Pre-built SPA distribution (no Node.js required)
+
+The `waaseyaa/admin-surface` Composer package ships pre-built Nuxt SPA assets in its `dist/` directory. When a consumer installs `admin-surface` via Composer, the PHP `AdminSurfaceServiceProvider` serves the SPA from `vendor/waaseyaa/admin-surface/dist/` automatically — no Node.js build step needed.
+
+**Two-tier SPA lookup** (in the `/admin/{path}` catch-all controller):
+
+1. **App override:** `$projectRoot/public/admin/index.html` — checked first. Apps can build their own SPA here to override vendor assets.
+2. **Vendor fallback:** `vendor/waaseyaa/admin-surface/dist/index.html` — pre-built by CI, ships via Composer.
+3. **AdminSpaFallback:** If neither exists, a plain HTML page listing the `/_surface/*` API endpoints is returned.
+
+Static assets (`_nuxt/*.js`, `_nuxt/*.css`, fonts, images) are served from the same two-tier lookup with explicit MIME types via `serveStaticFile()`, since PHP's built-in server defaults to `text/html` for all routed responses.
+
+**CI automation:** The `.github/workflows/admin-dist.yml` workflow runs `nuxt generate` when `packages/admin/` changes on `main`, commits the output to `packages/admin-surface/dist/`, and opens a PR. After merge, the next tag distributes the assets via the splitsh-lite pipeline to Packagist.
+
+### Dev fallback account (auto-login for local development)
+
+When running `composer run dev` (PHP built-in server), the framework can auto-authenticate as a `DevAdminAccount` with admin privileges — no login required.
+
+**Three conditions must ALL be true:**
+
+1. `PHP_SAPI === 'cli-server'` (i.e., running via `composer run dev` or `php -S`)
+2. `APP_ENV=local` (development mode)
+3. `WAASEYAA_DEV_FALLBACK_ACCOUNT=true` in `.env`
+
+The skeleton's `.env.example` sets `WAASEYAA_DEV_FALLBACK_ACCOUNT=true` by default, so fresh `create-project` installs auto-authenticate. If any condition is missing, the admin SPA shows the login page instead — with no error message indicating why.
+
+**To disable:** Set `WAASEYAA_DEV_FALLBACK_ACCOUNT=false` or remove it from `.env`. The account uses sentinel ID `PHP_INT_MAX` and is never persisted.
+
 ## Package
 
 - Path: `packages/admin/`
