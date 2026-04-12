@@ -36,8 +36,8 @@ jobs:
       - name: Install dependencies
         run: cd packages/admin && npm ci
 
-      - name: Build Nuxt SPA
-        run: cd packages/admin && npm run build
+      - name: Generate static Nuxt SPA
+        run: cd packages/admin && npm run generate
 
       - name: Copy build output to admin-surface/dist
         run: |
