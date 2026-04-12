@@ -1,0 +1,100 @@
+name: Admin SPA Distribution Build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'packages/admin/**'
+      - '.github/workflows/admin-dist.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: admin-dist
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    name: Build admin SPA and open dist PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: packages/admin/package-lock.json
+
+      - name: Install dependencies
+        run: cd packages/admin && npm ci
+
+      - name: Build Nuxt SPA
+        run: cd packages/admin && npm run build
+
+      - name: Copy build output to admin-surface/dist
+        run: |
+          rm -rf packages/admin-surface/dist
+          cp -r packages/admin/.output/public packages/admin-surface/dist
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git add packages/admin-surface/dist/
+          if git diff --cached --quiet packages/admin-surface/dist/; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B admin-dist/update
+          git commit -m "chore(admin-surface): update pre-built SPA dist
+
+          Built from $(git rev-parse --short HEAD) by admin-dist workflow.
+
+          Co-Authored-By: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>"
+          git push --force-with-lease origin admin-dist/update
+
+      - name: Create or update PR
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_PR=$(gh pr list --head admin-dist/update --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING_PR" ]; then
+            echo "PR #${EXISTING_PR} already exists — push updated it."
+          else
+            gh pr create \
+              --title "chore(admin-surface): update pre-built SPA dist" \
+              --body "## Summary
+
+          - Rebuilt Nuxt 4 admin SPA from latest \`packages/admin/\` source
+          - Updated \`packages/admin-surface/dist/\` with production build output
+          - Assets ship via Composer so \`create-project\` installs work without Node.js
+
+          ## Test plan
+
+          - [ ] Verify \`packages/admin-surface/dist/index.html\` exists and is valid HTML
+          - [ ] \`composer create-project\` install serves \`/admin\` from vendor dist
+          - [ ] \`/admin/_surface/*\` API endpoints still work
+
+          Automated by \`admin-dist.yml\` workflow." \
+              --head admin-dist/update \
+              --base main
+          fi
+
+      - name: Skip — no changes
+        if: steps.diff.outputs.changed == 'false'
+        run: echo "Admin SPA dist is already up to date."
