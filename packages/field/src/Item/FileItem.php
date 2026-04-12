@@ -14,7 +14,7 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'file',
     defaultCardinality: 1,
 )]
-class FileItem extends FieldItemBase
+final class FileItem extends FieldItemBase
 {
     public static function propertyDefinitions(): array
     {

@@ -14,7 +14,7 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'reference',
     defaultCardinality: 1,
 )]
-class EntityReferenceItem extends FieldItemBase
+final class EntityReferenceItem extends FieldItemBase
 {
     public static function propertyDefinitions(): array
     {

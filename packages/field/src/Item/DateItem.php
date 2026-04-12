@@ -14,7 +14,7 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'datetime',
     defaultCardinality: 1,
 )]
-class DateItem extends FieldItemBase
+final class DateItem extends FieldItemBase
 {
     public static function propertyDefinitions(): array
     {

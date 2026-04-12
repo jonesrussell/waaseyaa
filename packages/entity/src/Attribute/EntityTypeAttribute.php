@@ -22,7 +22,7 @@ use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
  *   class Node extends ContentEntityBase { ... }
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class EntityTypeAttribute extends WaaseyaaPlugin
+final class EntityTypeAttribute extends WaaseyaaPlugin
 {
     /**
      * @param string $id Machine name of the entity type.

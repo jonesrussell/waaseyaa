@@ -9,7 +9,7 @@ use Waaseyaa\Field\Attribute\FieldType;
 use Waaseyaa\Plugin\DefaultPluginManager;
 use Waaseyaa\Plugin\Discovery\AttributeDiscovery;
 
-class FieldTypeManager extends DefaultPluginManager implements FieldTypeManagerInterface
+final class FieldTypeManager extends DefaultPluginManager implements FieldTypeManagerInterface
 {
     /**
      * @param string[] $directories Directories to scan for field type plugins.

@@ -7,7 +7,7 @@ namespace Waaseyaa\Field\Attribute;
 use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class FieldType extends WaaseyaaPlugin
+final class FieldType extends WaaseyaaPlugin
 {
     public function __construct(
         string $id,
