@@ -1,4 +1,3 @@
-import { joinURL } from 'ufo'
 import { SessionAuthAdapter } from '../adapters/SessionAuthAdapter'
 import { AdminSurfaceTransportAdapter } from '../adapters/AdminSurfaceTransportAdapter'
 import { isPublicAuthPath } from '../runtime/publicAuthPaths'
@@ -60,7 +59,7 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
       }
     } else if (sessionRes && !sessionRes.ok && sessionRes.error?.status === 401) {
       syncAuthState(null, true)
-      await navigateTo(joinURL(normalizedAppBase, 'login'), { replace: true })
+      await navigateTo('/login', { replace: true })
       return { provide: { admin: null } }
     }
   } catch {
@@ -75,7 +74,7 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
 
   if (!surfaceSession || !surfaceCatalog) {
     syncAuthState(null, true)
-    await navigateTo(joinURL(normalizedAppBase, 'login'), { replace: true })
+    await navigateTo('/login', { replace: true })
     return { provide: { admin: null } }
   }
 
@@ -105,7 +104,7 @@ export default defineNuxtPlugin(async (): Promise<{ provide: { admin: AdminRunti
 
   const account = surfaceSession.account
   const tenant = { ...surfaceSession.tenant, scopingStrategy: 'server' as const }
-  const authConfig: AdminAuthConfig = { strategy: 'redirect', loginUrl: joinURL(normalizedAppBase, 'login') }
+  const authConfig: AdminAuthConfig = { strategy: 'redirect', loginUrl: '/login' }
 
   const auth = new SessionAuthAdapter(account, tenant, authConfig, surfaceSession.features)
   const transport = new AdminSurfaceTransportAdapter(normalizedAppBase)

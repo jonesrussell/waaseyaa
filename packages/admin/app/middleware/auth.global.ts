@@ -1,4 +1,3 @@
-import { joinURL } from 'ufo'
 import type { AdminRuntime } from '~/contracts'
 import { isPublicAuthPath } from '~/runtime/publicAuthPaths'
 import { normalizeAppBaseURL } from '~/runtime/normalizeAppBaseURL'
@@ -17,7 +16,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   const nuxtApp = useNuxtApp()
   const admin = (nuxtApp as unknown as { $admin: AdminRuntime | null }).$admin
   if (!admin) {
-    return navigateTo(joinURL(normalizedAppBase, 'login'))
+    return navigateTo('/login')
   }
 
   const strategy = admin.authConfig?.strategy
@@ -25,7 +24,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
     const { isAuthenticated, checkAuth } = useAuth()
     await checkAuth()
     if (!isAuthenticated.value) {
-      return navigateTo(joinURL(normalizedAppBase, 'login'))
+      return navigateTo('/login')
     }
   }
 
@@ -37,7 +36,7 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (requireVerified) {
     const { currentUser } = useAuth()
     if (currentUser.value && !currentUser.value.emailVerified) {
-      return navigateTo(joinURL(normalizedAppBase, 'verify-email'))
+      return navigateTo('/verify-email')
     }
   }
 })
