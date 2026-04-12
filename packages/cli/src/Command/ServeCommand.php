@@ -24,8 +24,8 @@ final class ServeCommand extends Command
     protected function configure(): void
     {
         $this
-            ->addOption('host', null, InputOption::VALUE_OPTIONAL, 'The host address', (string) (getenv('APP_HOST') ?: '127.0.0.1'))
-            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'The port', (string) (getenv('APP_PORT') ?: '8080'));
+            ->addOption('host', null, InputOption::VALUE_OPTIONAL, 'Specify which IP address the server should listen on. Set to 127.0.0.1 to restrict to localhost only. Can also be set via APP_HOST.', (string) (getenv('APP_HOST') ?: '0.0.0.0'))
+            ->addOption('port', 'p', InputOption::VALUE_OPTIONAL, 'Specify which port the server should listen on. Can also be set via APP_PORT.', (string) (getenv('APP_PORT') ?: '8080'));
     }
 
     /**
@@ -71,7 +71,8 @@ final class ServeCommand extends Command
             );
         }
 
-        $output->writeln(sprintf('<info>Waaseyaa development server started:</info> http://%s:%s', $host, $port));
+        $displayHost = $host === '0.0.0.0' ? 'localhost' : $host;
+        $output->writeln(sprintf('<info>Waaseyaa development server started:</info> http://%s:%s', $displayHost, $port));
         $output->writeln('<comment>Press Ctrl+C to stop.</comment>');
 
         $process = proc_open(
