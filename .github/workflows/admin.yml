@@ -30,12 +30,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '25'
           cache: 'npm'
           cache-dependency-path: packages/admin/package-lock.json
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: TypeScript typecheck
         run: npx nuxi typecheck
@@ -88,12 +88,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '25'
           cache: 'npm'
           cache-dependency-path: packages/admin/package-lock.json
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Build Admin SPA
         run: npm run build
@@ -116,12 +116,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '25'
           cache: 'npm'
           cache-dependency-path: packages/admin/package-lock.json
 
       - name: Install dependencies and Playwright
-        run: cd packages/admin && npm install --no-audit --no-fund && npx playwright install --with-deps chromium
+        run: cd packages/admin && npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
 
       - name: Run Playwright integration tests
         run: cd packages/admin && npx playwright test --project=chromium
@@ -138,12 +138,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '25'
           cache: 'npm'
           cache-dependency-path: packages/admin/package-lock.json
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Run adapter unit tests
         run: npx vitest run tests/unit/adapters/
@@ -162,12 +162,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '25'
           cache: 'npm'
           cache-dependency-path: packages/admin/package-lock.json
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci --no-audit --no-fund
 
       - name: Contract freeze check
         run: |

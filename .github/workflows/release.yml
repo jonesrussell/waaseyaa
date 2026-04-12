@@ -79,12 +79,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '25'
           cache: 'npm'
           cache-dependency-path: packages/admin/package-lock.json
 
       - name: Install dependencies and Playwright
-        run: cd packages/admin && npm install --no-audit --no-fund && npx playwright install --with-deps chromium
+        run: cd packages/admin && npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
 
       - name: Start PHP backend
         run: |
@@ -185,12 +185,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '25'
           cache: 'npm'
           cache-dependency-path: packages/admin/package-lock.json
 
       - name: Install dependencies and Playwright
-        run: cd packages/admin && npm install --no-audit --no-fund && npx playwright install --with-deps chromium
+        run: cd packages/admin && npm ci --no-audit --no-fund && npx playwright install --with-deps chromium
 
       - name: Start PHP backend
         run: |
