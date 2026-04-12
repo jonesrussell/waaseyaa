@@ -13,7 +13,7 @@ use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
  * to enable attribute-based plugin discovery.
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class AccessPolicy extends WaaseyaaPlugin
+final class AccessPolicy extends WaaseyaaPlugin
 {
     /**
      * @param string   $id          Unique plugin ID.

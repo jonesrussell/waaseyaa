@@ -14,7 +14,7 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'general',
     defaultCardinality: 1,
 )]
-class ListItem extends FieldItemBase
+final class ListItem extends FieldItemBase
 {
     public static function propertyDefinitions(): array
     {

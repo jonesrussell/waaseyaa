@@ -14,7 +14,7 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'general',
     defaultCardinality: 1,
 )]
-class JsonItem extends FieldItemBase
+final class JsonItem extends FieldItemBase
 {
     public static function propertyDefinitions(): array
     {

@@ -7,7 +7,7 @@ namespace Waaseyaa\Access;
 /**
  * Simple in-memory registry of permissions.
  */
-class PermissionHandler implements PermissionHandlerInterface
+final class PermissionHandler implements PermissionHandlerInterface
 {
     /**
      * @var array<string, array{title: string, description: string}>

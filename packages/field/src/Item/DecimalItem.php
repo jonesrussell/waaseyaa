@@ -14,7 +14,7 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'number',
     defaultCardinality: 1,
 )]
-class DecimalItem extends FieldItemBase
+final class DecimalItem extends FieldItemBase
 {
     public static function propertyDefinitions(): array
     {
