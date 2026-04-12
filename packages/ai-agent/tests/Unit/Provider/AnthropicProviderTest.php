@@ -18,7 +18,7 @@ final class AnthropicProviderTest extends TestCase
     {
         $provider = new AnthropicProvider(
             apiKey: 'test-key',
-            model: 'claude-sonnet-4-20250514',
+            model: 'claude-sonnet-4-6',
         );
 
         $request = new MessageRequest(
@@ -28,7 +28,7 @@ final class AnthropicProviderTest extends TestCase
 
         $body = $provider->buildRequestBody($request);
 
-        $this->assertSame('claude-sonnet-4-20250514', $body['model']);
+        $this->assertSame('claude-sonnet-4-6', $body['model']);
         $this->assertSame(1024, $body['max_tokens']);
         $this->assertCount(1, $body['messages']);
     }

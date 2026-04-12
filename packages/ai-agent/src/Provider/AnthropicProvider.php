@@ -11,7 +11,7 @@ final class AnthropicProvider implements StreamingProviderInterface
 {
     private const string API_URL = 'https://api.anthropic.com/v1/messages';
     private const string API_VERSION = '2023-06-01';
-    private const string DEFAULT_MODEL = 'claude-sonnet-4-20250514';
+    private const string DEFAULT_MODEL = 'claude-sonnet-4-6';
 
     public function __construct(
         private readonly string $apiKey,
