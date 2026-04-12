@@ -162,7 +162,7 @@ $authResponse = $pipeline->handle(
 );
 ```
 
-`public/index.php` is now a thin entry point that boots the kernel and sends the returned response:
+`public/index.php` is a thin entry point that boots the kernel and sends the returned response. It also contains a `cli-server` guard (see [cli-server static file guard](#cli-server-static-file-guard)) so static assets are served directly by the built-in server without passing through `HttpKernel`:
 
 ```php
 $kernel = new HttpKernel(dirname(__DIR__));
@@ -361,8 +361,23 @@ All HTTP middleware implement `HttpMiddlewareInterface` and use `#[AsMiddleware(
 
 | File | Role |
 |------|------|
-| `public/index.php` | Thin entry point: boots `HttpKernel`, sends returned `Response` |
+| `public/index.php` | Thin entry point: boots `HttpKernel`, sends returned `Response`. Contains a `cli-server` guard so the PHP built-in server serves static files directly without routing them through `HttpKernel`. |
 | `HttpKernel::serveHttpRequest()` | Wires CORS, route matching, `HttpPipeline`, dispatch |
+
+#### cli-server static file guard
+
+`public/index.php` includes the following guard at the top (after `declare(strict_types=1)`):
+
+```php
+if (PHP_SAPI === 'cli-server') {
+    $path = __DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+    if (is_file($path)) {
+        return false;
+    }
+}
+```
+
+`return false` tells PHP's built-in server to serve the file directly from disk. Without this, requests for Vite build assets, images, and other static files would be routed through `HttpKernel` and return 404. This guard has no effect on production servers (Caddy, nginx) which never use the `cli-server` SAPI.
 
 ### Tests
 
