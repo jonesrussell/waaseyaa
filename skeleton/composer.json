@@ -46,6 +46,10 @@
     },
     "scripts": {
         "audit-site": "./bin/waaseyaa-audit-site",
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "PHP_CLI_SERVER_WORKERS=4 bin/waaseyaa serve"
+        ],
         "post-create-project-cmd": [
             "chmod +x bin/waaseyaa bin/waaseyaa-version bin/verify-deploy-rsync bin/waaseyaa-audit-site",
             "php bin/post-create-setup.php"
