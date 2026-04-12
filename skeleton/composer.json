@@ -51,6 +51,13 @@
             "php bin/post-create-setup.php"
         ]
     },
+    "extra": {
+        "waaseyaa": {
+            "providers": [
+                "App\\Provider\\AppServiceProvider"
+            ]
+        }
+    },
     "minimum-stability": "dev",
     "prefer-stable": true
 }
