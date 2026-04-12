@@ -893,7 +893,7 @@ $entities = $storage->loadMultiple($ids);
 File: `packages/entity/src/Event/EntityEvent.php`
 
 ```php
-class EntityEvent extends Event
+final class EntityEvent extends Event
 {
     public function __construct(
         public readonly EntityInterface $entity,
@@ -1237,7 +1237,7 @@ Contains `FieldItemInterface[]` items. Supports `__get($name)` to access first i
 ### FieldTypeManager
 
 File: `packages/field/src/FieldTypeManager.php`
-Class: `class FieldTypeManager extends DefaultPluginManager implements FieldTypeManagerInterface`
+Class: `final class FieldTypeManager extends DefaultPluginManager implements FieldTypeManagerInterface`
 
 Constructor: `(array $directories = [], ?CacheBackendInterface $cache = null)`
 
@@ -1253,7 +1253,7 @@ File: `packages/field/src/Attribute/FieldType.php`
 
 ```php
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class FieldType extends WaaseyaaPlugin
+final class FieldType extends WaaseyaaPlugin
 {
     public function __construct(
         string $id,

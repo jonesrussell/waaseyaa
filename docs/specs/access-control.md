@@ -291,7 +291,7 @@ Extends `WaaseyaaPlugin`. Used for attribute-based plugin discovery (distinct fr
 
 ```php
 #[\Attribute(\Attribute::TARGET_CLASS)]
-class AccessPolicy extends WaaseyaaPlugin
+final class AccessPolicy extends WaaseyaaPlugin
 {
     public function __construct(
         string $id,
@@ -367,7 +367,7 @@ If no access requirements are present on the route, returns `AccessResult::neutr
 **Namespace:** `Waaseyaa\Access`
 
 ```php
-class PermissionHandler implements PermissionHandlerInterface
+final class PermissionHandler implements PermissionHandlerInterface
 {
     public function registerPermission(string $id, string $title, string $description = ''): void
     public function getPermissions(): array // array<string, array{title: string, description: string}>
