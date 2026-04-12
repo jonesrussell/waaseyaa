@@ -30,6 +30,9 @@ packages/admin/.nuxtrc
 packages/admin/.output/
 packages/admin/node_modules/
 
+# Admin SPA pre-built distribution (committed by CI)
+!packages/admin-surface/dist/
+
 # Storage (compiled artifacts, database files)
 storage/*
 !storage/.gitkeep
