@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Wait for CI to complete
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const sha = context.sha;
@@ -97,7 +97,7 @@ jobs:
 
       - name: Send Discord notification
         if: ${{ !cancelled() }}
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           TAG_NAME: ${{ github.ref_name }}
