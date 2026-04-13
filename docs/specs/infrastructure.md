@@ -1111,7 +1111,7 @@ final class CorsHandler
 CORS origin resolution in `HttpKernel::handleCors()`:
 1. Reads `cors_origins` from config (defaults to `localhost:3000` and `127.0.0.1:3000`).
 2. Checks `WAASEYAA_CORS_ORIGIN` env var — if set, overrides the config array with a single-origin list.
-3. Passes `allowDevLocalhostPorts: true` when the kernel is in development mode (env is `dev`, `development`, or `local`), allowing any localhost port.
+3. Passes `allowDevLocalhostPorts: true` when the kernel is in development mode (env is `dev`, `development`, `local`, or `testing`), allowing any localhost port.
 
 ### HTTP authorization pipeline (`HttpKernel::serveHttpRequest`)
 
@@ -1123,7 +1123,7 @@ If any middleware short-circuits — for example `AuthorizationMiddleware` retur
 
 `HttpKernel::shouldUseDevFallbackAccount()` controls whether `DevAdminAccount` is injected as the session fallback. All three conditions must be true:
 - PHP SAPI is `cli-server` (built-in dev server)
-- Application is in development mode (`config.environment` or `APP_ENV` is dev/development/local)
+- Application is in development mode (`config.environment` or `APP_ENV` is dev/development/local/testing)
 - `config.auth.dev_fallback_account` is explicitly `true`
 
 ## Operator Diagnostics
@@ -1334,7 +1334,7 @@ Three protected methods provide environment awareness to all kernel subclasses:
 | Method | Resolution | Returns |
 |--------|-----------|---------|
 | `resolveEnvironment(): string` | Config `'environment'` key → `APP_ENV` env var → `'production'` | Canonical environment name (e.g., `'production'`, `'local'`, `'development'`) |
-| `isDevelopmentMode(): bool` | Calls `resolveEnvironment()`, checks if value is `dev`, `development`, or `local` (case-insensitive) | `true` in dev environments |
+| `isDevelopmentMode(): bool` | Calls `resolveEnvironment()`, checks if value is `dev`, `development`, `local`, or `testing` (case-insensitive) | `true` in dev environments |
 | `isDebugMode(): bool` | `APP_DEBUG` env var → config `'debug'` key → `false` | `true` when debug is enabled |
 
 **Boot guard:** Immediately after loading configuration, `boot()` checks `isDebugMode() && !isDevelopmentMode()`. If debug is enabled outside a development environment, it throws `RuntimeException` with the message `APP_DEBUG must not be enabled in production (APP_ENV=...)`. This prevents accidentally deploying with debug mode active.
@@ -1355,7 +1355,7 @@ Production safety contract:
 - when the resolved environment is `production`, file-backed SQLite paths must already exist before boot continues
 - if the resolved production SQLite file is missing, bootstrap throws `RuntimeException` with `Database not found at {path}. In production, the database must already exist.`
 - when that production guard fires, bootstrap does not create the parent directory as a side effect
-- non-production environments (`local`, `dev`, `development`, etc.) keep the existing auto-create behavior
+- non-production environments (`local`, `dev`, `development`, `testing`, etc.) keep the existing auto-create behavior
 - `:memory:` remains allowed in all environments for explicit in-memory bootstrap/test cases
 
 ### ManifestBootstrapper

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "84a7637e0cecb76c1367aa8386fdb703",
+    "content-hash": "bf27f968355b6ad99a5f30d6da1fdfbe",
     "packages": [
         {
             "name": "deployer/deployer",
@@ -3346,6 +3346,41 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Vector embedding storage and similarity search for Waaseyaa",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "waaseyaa/analytics",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/analytics",
+                "reference": "2d62da583c235fbee90b0e3938ddc365eda146af"
+            },
+            "require": {
+                "php": ">=8.4"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "0.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waaseyaa\\Analytics\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Waaseyaa\\Analytics\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Shared Umami analytics integration for Waaseyaa apps — backend sender, JS helpers, and Twig partial.",
             "transport-options": {
                 "relative": true
             }
@@ -9575,6 +9610,7 @@
         "waaseyaa/ai-pipeline": 20,
         "waaseyaa/ai-schema": 20,
         "waaseyaa/ai-vector": 20,
+        "waaseyaa/analytics": 20,
         "waaseyaa/api": 20,
         "waaseyaa/auth": 20,
         "waaseyaa/billing": 20,
@@ -9632,5 +9668,5 @@
         "php": ">=8.4"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

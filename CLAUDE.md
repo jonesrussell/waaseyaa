@@ -263,7 +263,7 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 - Frontend E2E: `cd packages/admin && npm run test:e2e` — Playwright specs in `e2e/`; requires `nuxt dev` on port 3000
 
 ## Environment
-- `APP_ENV` — Application environment: `local`, `dev`, `development`, `staging`, `production` (default: `production`)
+- `APP_ENV` — Application environment: `local`, `dev`, `development`, `testing`, `staging`, `production` (default: `production`)
 - `APP_DEBUG` — Debug mode toggle (default: `false`). Enables detailed error pages, debug toolbar, debug headers. **Kernel refuses to boot if `APP_DEBUG=true` in production.**
 - `LOG_LEVEL` — Minimum log level for default handler: `debug`, `info`, `notice`, `warning`, `error`, `critical`, `alert`, `emergency` (default: `warning`)
 - `WAASEYAA_DB` — SQLite database path (default: `./storage/waaseyaa.sqlite`)
