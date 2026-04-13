@@ -17,16 +17,33 @@ use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Waaseyaa\Mcp\Auth\BearerTokenAuth;
 use Waaseyaa\Mcp\Bridge\ToolExecutorInterface;
 use Waaseyaa\Mcp\Bridge\ToolRegistryInterface;
 use Waaseyaa\Mcp\McpEndpoint;
+use Waaseyaa\Mcp\McpResponse;
 use Waaseyaa\Mcp\McpServerCard;
 use Waaseyaa\Mcp\McpServiceProvider;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 final class McpEndpointSmokeTest extends TestCase
 {
+    private function dispatch(McpEndpoint $endpoint, string $method, string $body, ?string $authorizationHeader): McpResponse
+    {
+        $account = $this->createMock(AccountInterface::class);
+        $account->method('id')->willReturn(1);
+
+        $headers = [];
+        if ($authorizationHeader !== null) {
+            $headers['HTTP_AUTHORIZATION'] = $authorizationHeader;
+        }
+
+        $request = HttpRequest::create('/_mcp', $method, [], [], [], $headers, $body);
+
+        return $endpoint->handle([], [], $account, $request);
+    }
+
     #[Test]
     public function mcpToolDiscoveryAndExecution(): void
     {
@@ -103,23 +120,15 @@ final class McpEndpointSmokeTest extends TestCase
         $this->assertNotNull($routes->get('mcp.server_card'));
 
         // --- Step 3: Auth failure ---
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}',
-            authorizationHeader: 'Bearer wrong-token',
-        );
+        $response = $this->dispatch($endpoint, 'POST', '{"jsonrpc":"2.0","id":1,"method":"tools/list"}', 'Bearer wrong-token');
         $this->assertSame(401, $response->statusCode);
 
         // --- Step 4: Tool discovery ---
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: \json_encode([
-                'jsonrpc' => '2.0',
-                'id' => 1,
-                'method' => 'tools/list',
-            ]),
-            authorizationHeader: 'Bearer test-token-abc',
-        );
+        $response = $this->dispatch($endpoint, 'POST', \json_encode([
+            'jsonrpc' => '2.0',
+            'id' => 1,
+            'method' => 'tools/list',
+        ]), 'Bearer test-token-abc');
 
         $this->assertSame(200, $response->statusCode);
         $decoded = \json_decode($response->body, true);
@@ -149,19 +158,15 @@ final class McpEndpointSmokeTest extends TestCase
 
         $storage->method('load')->with(42)->willReturn($entity);
 
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: \json_encode([
-                'jsonrpc' => '2.0',
-                'id' => 2,
-                'method' => 'tools/call',
-                'params' => [
-                    'name' => 'read_node',
-                    'arguments' => ['id' => 42],
-                ],
-            ]),
-            authorizationHeader: 'Bearer test-token-abc',
-        );
+        $response = $this->dispatch($endpoint, 'POST', \json_encode([
+            'jsonrpc' => '2.0',
+            'id' => 2,
+            'method' => 'tools/call',
+            'params' => [
+                'name' => 'read_node',
+                'arguments' => ['id' => 42],
+            ],
+        ]), 'Bearer test-token-abc');
 
         $this->assertSame(200, $response->statusCode);
         $decoded = \json_decode($response->body, true);
@@ -175,20 +180,16 @@ final class McpEndpointSmokeTest extends TestCase
         $this->assertSame(42, $resultData['id']);
 
         // --- Step 6: Initialize handshake ---
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: \json_encode([
-                'jsonrpc' => '2.0',
-                'id' => 3,
-                'method' => 'initialize',
-                'params' => [
-                    'protocolVersion' => '2025-03-26',
-                    'clientInfo' => ['name' => 'test', 'version' => '1.0'],
-                    'capabilities' => [],
-                ],
-            ]),
-            authorizationHeader: 'Bearer test-token-abc',
-        );
+        $response = $this->dispatch($endpoint, 'POST', \json_encode([
+            'jsonrpc' => '2.0',
+            'id' => 3,
+            'method' => 'initialize',
+            'params' => [
+                'protocolVersion' => '2025-03-26',
+                'clientInfo' => ['name' => 'test', 'version' => '1.0'],
+                'capabilities' => [],
+            ],
+        ]), 'Bearer test-token-abc');
 
         $decoded = \json_decode($response->body, true);
         $this->assertSame('2025-03-26', $decoded['result']['protocolVersion']);
