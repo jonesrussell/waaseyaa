@@ -33,7 +33,7 @@ final readonly class McpEndpoint
     ): McpResponse {
         return $this->dispatch(
             $request->getMethod(),
-            (string) $request->getContent(),
+            $request->getContent(),
             $request->headers->get('Authorization'),
         );
     }
