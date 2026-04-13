@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Mcp;
 
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Mcp\Auth\McpAuthInterface;
 use Waaseyaa\Mcp\Bridge\ToolExecutorInterface;
 use Waaseyaa\Mcp\Bridge\ToolRegistryInterface;
@@ -16,7 +18,27 @@ final readonly class McpEndpoint
         private ToolExecutorInterface $executor,
     ) {}
 
+    /**
+     * Standard controller entry point — called by AppControllerRouter with
+     * ($params, $query, $account, $httpRequest).
+     *
+     * @param array<string, mixed> $params
+     * @param array<string, mixed> $query
+     */
     public function handle(
+        array $params,
+        array $query,
+        AccountInterface $account,
+        HttpRequest $request,
+    ): McpResponse {
+        return $this->dispatch(
+            $request->getMethod(),
+            (string) $request->getContent(),
+            $request->headers->get('Authorization'),
+        );
+    }
+
+    private function dispatch(
         string $method,
         string $body,
         ?string $authorizationHeader,

@@ -29,6 +29,7 @@ class UserCreateCommand extends Command
         $this
             ->addArgument('username', InputArgument::REQUIRED, 'The username for the new account')
             ->addOption('email', null, InputOption::VALUE_REQUIRED, 'Email address for the user')
+            ->addOption('password', null, InputOption::VALUE_REQUIRED, 'Password for the user (will be hashed)')
             ->addOption('role', null, InputOption::VALUE_REQUIRED, 'Role to assign to the user');
     }
 
@@ -41,6 +42,11 @@ class UserCreateCommand extends Command
         $email = $input->getOption('email');
         if ($email !== null) {
             $values['mail'] = $email;
+        }
+
+        $password = $input->getOption('password');
+        if ($password !== null) {
+            $values['pass'] = password_hash($password, PASSWORD_DEFAULT);
         }
 
         $role = $input->getOption('role');

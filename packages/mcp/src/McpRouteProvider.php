@@ -23,7 +23,7 @@ final readonly class McpRouteProvider
         $router->addRoute(
             'mcp.server_card',
             RouteBuilder::create('/.well-known/mcp.json')
-                ->controller('Waaseyaa\\Mcp\\McpServerCard::toJson')
+                ->controller('Waaseyaa\\Mcp\\McpServerCard::serve')
                 ->methods('GET')
                 ->allowAll()
                 ->build(),
