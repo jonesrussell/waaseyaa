@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Mcp\Tests\Unit;
 
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\AI\Schema\Mcp\McpToolDefinition;
 use Waaseyaa\Mcp\Auth\McpAuthInterface;
@@ -42,17 +43,25 @@ final class McpEndpointTest extends TestCase
         );
     }
 
+    private function dispatch(McpEndpoint $endpoint, string $method, string $body, ?string $authorizationHeader): McpResponse
+    {
+        $headers = [];
+        if ($authorizationHeader !== null) {
+            $headers['HTTP_AUTHORIZATION'] = $authorizationHeader;
+        }
+
+        $request = HttpRequest::create('/_mcp', $method, [], [], [], $headers, $body);
+
+        return $endpoint->handle([], [], $this->account, $request);
+    }
+
     #[Test]
     public function missingAuthHeaderReturns401(): void
     {
         $this->auth->method('authenticate')->willReturn(null);
 
         $endpoint = $this->createEndpoint();
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}',
-            authorizationHeader: null,
-        );
+        $response = $this->dispatch($endpoint, 'POST', '{"jsonrpc":"2.0","id":1,"method":"tools/list"}', null);
 
         $this->assertSame(401, $response->statusCode);
         $decoded = \json_decode($response->body, true);
@@ -66,11 +75,7 @@ final class McpEndpointTest extends TestCase
         $this->auth->method('authenticate')->willReturn(null);
 
         $endpoint = $this->createEndpoint();
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}',
-            authorizationHeader: 'Bearer bad-token',
-        );
+        $response = $this->dispatch($endpoint, 'POST', '{"jsonrpc":"2.0","id":1,"method":"tools/list"}', 'Bearer bad-token');
 
         $this->assertSame(401, $response->statusCode);
     }
@@ -90,15 +95,11 @@ final class McpEndpointTest extends TestCase
         $this->registry->method('getTools')->willReturn($tools);
 
         $endpoint = $this->createEndpoint();
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: \json_encode([
-                'jsonrpc' => '2.0',
-                'id' => 1,
-                'method' => 'tools/list',
-            ]),
-            authorizationHeader: 'Bearer valid-token',
-        );
+        $response = $this->dispatch($endpoint, 'POST', \json_encode([
+            'jsonrpc' => '2.0',
+            'id' => 1,
+            'method' => 'tools/list',
+        ]), 'Bearer valid-token');
 
         $this->assertSame(200, $response->statusCode);
 
@@ -137,19 +138,15 @@ final class McpEndpointTest extends TestCase
             ]);
 
         $endpoint = $this->createEndpoint();
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: \json_encode([
-                'jsonrpc' => '2.0',
-                'id' => 2,
-                'method' => 'tools/call',
-                'params' => [
-                    'name' => 'read_node',
-                    'arguments' => ['id' => 42],
-                ],
-            ]),
-            authorizationHeader: 'Bearer valid-token',
-        );
+        $response = $this->dispatch($endpoint, 'POST', \json_encode([
+            'jsonrpc' => '2.0',
+            'id' => 2,
+            'method' => 'tools/call',
+            'params' => [
+                'name' => 'read_node',
+                'arguments' => ['id' => 42],
+            ],
+        ]), 'Bearer valid-token');
 
         $this->assertSame(200, $response->statusCode);
 
@@ -166,19 +163,15 @@ final class McpEndpointTest extends TestCase
         $this->registry->method('getTool')->willReturn(null);
 
         $endpoint = $this->createEndpoint();
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: \json_encode([
-                'jsonrpc' => '2.0',
-                'id' => 3,
-                'method' => 'tools/call',
-                'params' => [
-                    'name' => 'nonexistent_tool',
-                    'arguments' => [],
-                ],
-            ]),
-            authorizationHeader: 'Bearer valid-token',
-        );
+        $response = $this->dispatch($endpoint, 'POST', \json_encode([
+            'jsonrpc' => '2.0',
+            'id' => 3,
+            'method' => 'tools/call',
+            'params' => [
+                'name' => 'nonexistent_tool',
+                'arguments' => [],
+            ],
+        ]), 'Bearer valid-token');
 
         $this->assertSame(200, $response->statusCode);
 
@@ -192,11 +185,7 @@ final class McpEndpointTest extends TestCase
         $this->auth->method('authenticate')->willReturn($this->account);
 
         $endpoint = $this->createEndpoint();
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: '{invalid json',
-            authorizationHeader: 'Bearer valid-token',
-        );
+        $response = $this->dispatch($endpoint, 'POST', '{invalid json', 'Bearer valid-token');
 
         $this->assertSame(200, $response->statusCode);
 
@@ -210,11 +199,7 @@ final class McpEndpointTest extends TestCase
         $this->auth->method('authenticate')->willReturn($this->account);
 
         $endpoint = $this->createEndpoint();
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: \json_encode(['jsonrpc' => '2.0', 'id' => 1]),
-            authorizationHeader: 'Bearer valid-token',
-        );
+        $response = $this->dispatch($endpoint, 'POST', \json_encode(['jsonrpc' => '2.0', 'id' => 1]), 'Bearer valid-token');
 
         $this->assertSame(200, $response->statusCode);
 
@@ -228,11 +213,7 @@ final class McpEndpointTest extends TestCase
         $this->auth->method('authenticate')->willReturn(null);
 
         $endpoint = $this->createEndpoint();
-        $response = $endpoint->handle(
-            method: 'POST',
-            body: '{}',
-            authorizationHeader: null,
-        );
+        $response = $this->dispatch($endpoint, 'POST', '{}', null);
 
         $this->assertSame('application/json', $response->contentType);
     }

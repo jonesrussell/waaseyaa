@@ -55,13 +55,18 @@ This means MCP route ownership no longer depends on foundation fallback registra
 
 ```php
 public function handle(
-    string $method,
-    string $body,
-    ?string $authorizationHeader,
+    array $params,
+    array $query,
+    AccountInterface $account,
+    HttpRequest $request,
 ): McpResponse
 ```
 
-The method processes requests in this order:
+This follows the standard `AppControllerRouter` signature (`$params`, `$query`, `$account`, `$request`). It extracts the HTTP method, body, and `Authorization` header from the request and delegates to a private `dispatch()` method.
+
+### dispatch() (private)
+
+The internal dispatch method processes requests in this order:
 
 1. **Authenticate** -- calls `$this->auth->authenticate($authorizationHeader)`. If null is returned, responds with HTTP 401 and a JSON-RPC error (code `-32001`, message "Unauthorized").
 2. **Parse JSON-RPC** -- decodes the body with `json_decode()`. On `JsonException`, returns parse error (code `-32700`). On missing `method` field, returns invalid request (code `-32600`).
@@ -454,7 +459,7 @@ The MCP spec (protocol version 2025-03-26) defines Streamable HTTP as the remote
 
 ### Server Card
 
-`McpServerCard` generates the `/.well-known/mcp.json` response:
+`McpServerCard` generates the `/.well-known/mcp.json` response. The route controller is `McpServerCard::serve()`, which returns an `HttpResponse` wrapping the `toJson()` output:
 
 ```json
 {
