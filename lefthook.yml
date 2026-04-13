@@ -3,7 +3,7 @@ pre-commit:
   commands:
     php-cs:
       glob: "*.php"
-      run: composer cs-fix
+      run: composer cs-check
 
 pre-push:
   parallel: true
