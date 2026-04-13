@@ -1,0 +1,11 @@
+{#
+ # Umami analytics script tag — include in base layout <head>.
+ #
+ # Requires Twig globals: umami_tracker_url, umami_site_id
+ # Set these in AppServiceProvider::boot() via $twig->addGlobal().
+ #
+ # No-op when either variable is empty (local dev, staging without tracker).
+ #}
+{% if umami_tracker_url is defined and umami_tracker_url and umami_site_id is defined and umami_site_id %}
+  <script defer src="{{ umami_tracker_url }}/script.js" data-website-id="{{ umami_site_id }}"></script>
+{% endif %}

@@ -240,6 +240,10 @@
         {
             "type": "path",
             "url": "packages/engagement"
+        },
+        {
+            "type": "path",
+            "url": "packages/analytics"
         }
     ],
     "require": {
@@ -249,6 +253,7 @@
         "symfony/dotenv": "^8.0",
         "symfony/html-sanitizer": "^8.0",
         "waaseyaa/access": "@dev",
+        "waaseyaa/analytics": "@dev",
         "waaseyaa/admin-surface": "@dev",
         "waaseyaa/ai-agent": "@dev",
         "waaseyaa/ai-pipeline": "@dev",

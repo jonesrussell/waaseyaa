@@ -71,6 +71,7 @@ jobs:
           - { local: 'packages/telescope', remote: 'telescope' }
           - { local: 'packages/admin-surface', remote: 'admin-surface' }
           # Split parity — packages with composer.json that were missing from the matrix (#1137)
+          - { local: 'packages/analytics', remote: 'analytics' }
           - { local: 'packages/engagement', remote: 'engagement' }
           - { local: 'packages/geo', remote: 'geo' }
           - { local: 'packages/mercure', remote: 'mercure' }
