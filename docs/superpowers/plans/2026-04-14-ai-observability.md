@@ -1909,492 +1909,60 @@ git commit -m "feat(#622): add LlmCallListener and ToolCallListener"
 
 ---
 
-### Task 15: ObservabilityServiceProvider
+### Task 15: ServiceProvider and closing verification
 
 **Files:**
 - Create: `packages/ai-observability/src/ObservabilityServiceProvider.php`
-
-Follow the `AIPipelineServiceProvider` pattern for entity registration (`$this->entityType(...)`) and consult `packages/notification/src/NotificationServiceProvider.php` or similar for the event-subscriber registration pattern (resolve `EventDispatcherInterface` and add subscribers).
-
-- [ ] **Step 1: Implement**
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace Waaseyaa\AI\Observability;
-
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Waaseyaa\AI\Observability\Analysis\AnomalyDetector;
-use Waaseyaa\AI\Observability\Cost\BudgetManager;
-use Waaseyaa\AI\Observability\Cost\CostTracker;
-use Waaseyaa\AI\Observability\Cost\ModelPricing;
-use Waaseyaa\AI\Observability\Cost\TokenAccountant;
-use Waaseyaa\AI\Observability\Listener\LlmCallListener;
-use Waaseyaa\AI\Observability\Listener\ToolCallListener;
-use Waaseyaa\AI\Observability\Outcome\OutcomeTracker;
-use Waaseyaa\AI\Observability\Recorder\NullTraceRecorder;
-use Waaseyaa\AI\Observability\Recorder\TraceRecorder;
-use Waaseyaa\AI\Observability\Recorder\TraceRecorderInterface;
-use Waaseyaa\Database\DatabaseInterface;
-use Waaseyaa\Entity\EntityRepository;
-use Waaseyaa\Entity\EntityType;
-use Waaseyaa\Entity\EntityTypeManager;
-use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
-
-final class ObservabilityServiceProvider extends ServiceProvider
-{
-    public function register(): void
-    {
-        $this->entityType(new EntityType(
-            id: 'trace',
-            label: 'Trace',
-            description: 'Agent execution trace',
-            class: Trace::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label'],
-            group: 'ai',
-        ));
-
-        $config = $this->container->get('config')->get('observability', [
-            'enabled' => true,
-            'budget' => ['daily_limit_usd' => 50.0, 'per_request_limit_usd' => 1.0],
-            'model_pricing' => [],
-        ]);
-
-        $this->container->singleton(TraceContext::class, fn () => new TraceContext());
-
-        $this->container->singleton(ModelPricing::class, fn () => new ModelPricing($config['model_pricing'] ?? []));
-
-        $this->container->singleton(TraceRecorderInterface::class, function () use ($config) {
-            if (($config['enabled'] ?? true) === false) {
-                return new NullTraceRecorder();
-            }
-            return new TraceRecorder(
-                $this->container->get(EntityTypeManager::class)->getStorage('trace'),
-                $this->container->get(DatabaseInterface::class),
-                $this->container->get(TraceContext::class),
-            );
-        });
-
-        $this->container->singleton(TokenAccountant::class, fn () => new TokenAccountant(
-            $this->container->get(TraceRecorderInterface::class),
-            $this->container->get(ModelPricing::class),
-        ));
-
-        $this->container->singleton(CostTracker::class, fn () => new CostTracker(
-            $this->container->get(DatabaseInterface::class),
-        ));
-
-        $this->container->singleton(BudgetManager::class, fn () => new BudgetManager(
-            $this->container->get(CostTracker::class),
-            (float) ($config['budget']['daily_limit_usd'] ?? 50.0),
-            (float) ($config['budget']['per_request_limit_usd'] ?? 1.0),
-        ));
-
-        $this->container->singleton(OutcomeTracker::class, fn () => new OutcomeTracker(
-            $this->container->get(TraceRecorderInterface::class),
-        ));
-
-        $this->container->singleton(AnomalyDetector::class, fn () => new AnomalyDetector());
-    }
-
-    public function boot(): void
-    {
-        $dispatcher = $this->container->get(EventDispatcherInterface::class);
-        if (!$dispatcher instanceof \Symfony\Component\EventDispatcher\EventDispatcherInterface) {
-            return;
-        }
-
-        $dispatcher->addSubscriber(new LlmCallListener(
-            $this->container->get(TraceContext::class),
-            $this->container->get(TokenAccountant::class),
-        ));
-
-        $dispatcher->addSubscriber(new ToolCallListener(
-            $this->container->get(TraceContext::class),
-            $this->container->get(TraceRecorderInterface::class),
-        ));
-    }
-}
-```
-
-If the `ServiceProvider` base class in this repo exposes bindings differently (`$this->app->singleton()`, `$this->bind()`, etc.), match the existing style from `packages/ai-pipeline/` or `packages/notification/`.
-
-- [ ] **Step 2: Commit**
-
-```bash
-git add packages/ai-observability/src/ObservabilityServiceProvider.php
-git commit -m "feat(#622): wire ObservabilityServiceProvider"
-```
-
----
-
-### Task 16: TraceRecorder Contract Test
-
-**Files:**
 - Create: `packages/ai-observability/tests/Contract/TraceRecorderContractTest.php`
-- Create: `packages/ai-observability/tests/Integration/TraceRecorderSqliteTest.php`
-
-- [ ] **Step 1: Write abstract contract test**
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace Waaseyaa\AI\Observability\Tests\Contract;
-
-use PHPUnit\Framework\Attributes\CoversNothing;
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Waaseyaa\AI\Observability\Recorder\TraceRecorderInterface;
-use Waaseyaa\AI\Observability\Value\DecisionTrace;
-use Waaseyaa\AI\Observability\Value\Outcome;
-
-#[CoversNothing]
-abstract class TraceRecorderContractTest extends TestCase
-{
-    abstract protected function recorder(): TraceRecorderInterface;
-
-    #[Test]
-    public function roundtrips_a_full_trace(): void
-    {
-        $r = $this->recorder();
-        $trace = $r->startTrace('test.roundtrip', ['user' => 'russ']);
-
-        $span1 = $r->span($trace, 'tool_call', 'grep');
-        $r->endSpan($span1, ['matches' => 3]);
-
-        $span2 = $r->span($trace, 'llm_call', 'claude-opus-4-6');
-        $r->endSpan($span2, ['input_tokens' => 100, 'output_tokens' => 50, 'cost_usd' => 0.0060]);
-
-        $r->recordDecision($trace, new DecisionTrace('pick model', 'claude-opus-4-6', ['gpt-4o'], 'deeper', 0.8));
-        $r->recordOutcome($trace, new Outcome('accepted', 'good'));
-        $r->completeTrace($trace, 'ok');
-
-        $this->assertTraceCompleted($trace->uuid);
-        $this->assertSpanCount($trace->uuid, 3);  // grep + llm + decision
-        $this->assertOutcomeRecorded($trace->uuid, 'accepted');
-    }
-
-    abstract protected function assertTraceCompleted(string $uuid): void;
-    abstract protected function assertSpanCount(string $uuid, int $expected): void;
-    abstract protected function assertOutcomeRecorded(string $uuid, string $status): void;
-}
-```
-
-- [ ] **Step 2: Write concrete SQLite integration test**
-
-```php
-<?php
-
-declare(strict_types=1);
-
-namespace Waaseyaa\AI\Observability\Tests\Integration;
-
-use Waaseyaa\AI\Observability\Recorder\TraceRecorder;
-use Waaseyaa\AI\Observability\Recorder\TraceRecorderInterface;
-use Waaseyaa\AI\Observability\Tests\Contract\TraceRecorderContractTest;
-use Waaseyaa\AI\Observability\TraceContext;
-use Waaseyaa\Database\DBALDatabase;
-use Waaseyaa\Database\DatabaseInterface;
-
-final class TraceRecorderSqliteTest extends TraceRecorderContractTest
-{
-    private DatabaseInterface $db;
-    private TraceRecorderInterface $recorder;
-
-    protected function setUp(): void
-    {
-        $this->db = DBALDatabase::createSqlite(':memory:');
-        $this->provisionSchema($this->db);
-
-        $traces = $this->createTraceRepository($this->db);
-        $this->recorder = new TraceRecorder($traces, $this->db, new TraceContext());
-    }
-
-    protected function recorder(): TraceRecorderInterface
-    {
-        return $this->recorder;
-    }
-
-    protected function assertTraceCompleted(string $uuid): void
-    {
-        $row = $this->db->select('trace')->condition('uuid', $uuid)->execute()->fetchAssociative();
-        self::assertNotFalse($row);
-        self::assertSame('ok', $row['status']);
-        self::assertNotNull($row['ended_at']);
-    }
-
-    protected function assertSpanCount(string $uuid, int $expected): void
-    {
-        $rows = $this->db->select('trace_span')->condition('trace_uuid', $uuid)->execute()->fetchAllAssociative();
-        self::assertCount($expected, $rows);
-    }
-
-    protected function assertOutcomeRecorded(string $uuid, string $status): void
-    {
-        $row = $this->db->select('trace')->condition('uuid', $uuid)->execute()->fetchAssociative();
-        self::assertSame($status, $row['outcome_status']);
-    }
-
-    private function provisionSchema(DatabaseInterface $db): void
-    {
-        // Load migration file and apply. Reference the file at
-        // packages/ai-observability/migrations/2026_04_14_000001_create_observability_tables.php
-        // and invoke its up() method with the DBAL Schema instance.
-        $conn = $db->getConnection();
-        $schemaManager = $conn->createSchemaManager();
-        $schema = new \Doctrine\DBAL\Schema\Schema();
-        $migration = require __DIR__.'/../../migrations/2026_04_14_000001_create_observability_tables.php';
-        $migration->up($schema);
-        foreach ($schema->toSql($conn->getDatabasePlatform()) as $sql) {
-            $conn->executeStatement($sql);
-        }
-    }
-
-    private function createTraceRepository(DatabaseInterface $db): \Waaseyaa\Entity\EntityRepository
-    {
-        // Adapt the nearest existing fixture — check these in order and copy the
-        // closest pattern, swapping the EntityType for Trace:
-        //   1. packages/entity-storage/tests/Integration/
-        //   2. packages/ai-pipeline/tests/
-        //   3. Any `tests/Integration/Phase*/` test that stands up a repository
-        //      via DBALDatabase::createSqlite() for a content entity.
-        //
-        // Minimum shape needed:
-        //   $resolver = new \Waaseyaa\EntityStorage\SingleConnectionResolver($db);
-        //   $driver   = new \Waaseyaa\EntityStorage\SqlStorageDriver($resolver);
-        //   $entityType = new \Waaseyaa\Entity\EntityType(
-        //       id: 'trace',
-        //       label: 'Trace',
-        //       class: \Waaseyaa\AI\Observability\Trace::class,
-        //       keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label'],
-        //   );
-        //   return new \Waaseyaa\Entity\EntityRepository(
-        //       $entityType,
-        //       $driver,
-        //       new \Symfony\Component\EventDispatcher\EventDispatcher(),
-        //   );
-        // Adjust class and constructor shapes to match the versions currently
-        // in this repo — class names above reflect the canonical pattern from
-        // .claude/rules/entity-storage-invariant.md.
-
-        $resolver = new \Waaseyaa\EntityStorage\SingleConnectionResolver($db);
-        $driver   = new \Waaseyaa\EntityStorage\SqlStorageDriver($resolver);
-        $entityType = new \Waaseyaa\Entity\EntityType(
-            id: 'trace',
-            label: 'Trace',
-            class: \Waaseyaa\AI\Observability\Trace::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label'],
-        );
-        return new \Waaseyaa\Entity\EntityRepository(
-            $entityType,
-            $driver,
-            new \Symfony\Component\EventDispatcher\EventDispatcher(),
-        );
-    }
-}
-```
-
-- [ ] **Step 3: Run tests**
-
-```bash
-./vendor/bin/phpunit packages/ai-observability/tests/Integration/TraceRecorderSqliteTest.php
-```
-
-Expected: PASS. If the repository helper isn't wired yet, this test may be marked skipped until the fixture lands — the unit tests already cover individual pieces.
-
-- [ ] **Step 4: Commit**
-
-```bash
-git add packages/ai-observability/tests
-git commit -m "test(#622): add TraceRecorder contract + SQLite integration test"
-```
-
----
-
-### Task 17: Disabled Mode + Event Wiring Integration Tests
-
-**Files:**
 - Create: `packages/ai-observability/tests/Integration/DisabledModeTest.php`
 - Create: `packages/ai-observability/tests/Integration/EventWiringTest.php`
+- Modify: `packages/ai-observability/composer.json` (register provider under `extra.waaseyaa.providers`)
 
-- [ ] **Step 1: `DisabledModeTest`**
+- [ ] **Step 1: ServiceProvider**
 
-```php
-<?php
+  Extend the framework `ServiceProvider` base (protected `singleton()`, `bind()`, `entityType()`; public `resolve()`). In `register()`:
+  - Register the `trace` EntityType
+  - Bind `TraceContext`, `ModelPricing`, `TokenAccountant`, `CostTracker`, `BudgetManager`, `AnomalyDetector` as singletons
+  - Bind `TraceRecorderInterface` to `NullTraceRecorder` when `observability.enabled` config is false, otherwise `TraceRecorder`
 
-declare(strict_types=1);
+  In `boot()`, resolve the event dispatcher and `addSubscriber($listener)` for `LlmCallListener` and `ToolCallListener`. Mirror the pattern in `packages/ai-pipeline/src/AIPipelineServiceProvider.php`.
 
-namespace Waaseyaa\AI\Observability\Tests\Integration;
+  Register the class under `composer.json` `extra.waaseyaa.providers`.
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Waaseyaa\AI\Observability\Recorder\NullTraceRecorder;
-use Waaseyaa\AI\Observability\Value\Outcome;
-use Waaseyaa\Database\DBALDatabase;
+- [ ] **Step 2: Contract test**
 
-final class DisabledModeTest extends TestCase
-{
-    #[Test]
-    public function null_recorder_makes_zero_db_writes(): void
-    {
-        $db = DBALDatabase::createSqlite(':memory:');
-        // Intentionally do NOT provision schema — if the null recorder writes anywhere, it will throw.
+  `TraceRecorderContractTest` (abstract) defines the recorder-lifecycle expectations (start → span → endSpan → recordOutcome → completeTrace → assertions against DB). A concrete subclass `TraceRecorderSqliteTest` supplies a real `TraceRecorder` wired to `DBALDatabase::createSqlite()`. Mark the abstract class `#[CoversNothing]`.
 
-        $recorder = new NullTraceRecorder();
-        $trace = $recorder->startTrace('x');
-        $span = $recorder->span($trace, 'llm_call', 'y');
-        $recorder->endSpan($span, ['cost_usd' => 0.01]);
-        $recorder->recordOutcome($trace, new Outcome('accepted'));
-        $recorder->completeTrace($trace);
+- [ ] **Step 3: Disabled-mode test**
 
-        // No exception thrown; no tables needed.
-        self::assertTrue(true);
-    }
-}
-```
+  Integration test: boot with `observability.enabled = false`. Assert:
+  - `TraceRecorderInterface` resolves to `NullTraceRecorder`
+  - Dispatching an `LlmCallCompleted` event writes no rows to `trace_span`
 
-- [ ] **Step 2: `EventWiringTest`**
+- [ ] **Step 4: Event-wiring test**
 
-```php
-<?php
+  Integration test with observability enabled. Start a trace via the recorder, dispatch a real `LlmCallCompleted` and a `ToolCallStarted`/`ToolCallCompleted` pair, then assert:
+  - Spans appear in `trace_span` with correct kinds (`llm_call`, `tool_call`)
+  - Cost is accounted via `CostTracker::totalForTrace()`
 
-declare(strict_types=1);
+- [ ] **Step 5: Full-suite verification**
 
-namespace Waaseyaa\AI\Observability\Tests\Integration;
+  Run in order, all must pass:
 
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Waaseyaa\AI\Observability\Cost\ModelPricing;
-use Waaseyaa\AI\Observability\Cost\TokenAccountant;
-use Waaseyaa\AI\Observability\Handle\TraceHandle;
-use Waaseyaa\AI\Observability\Listener\LlmCallListener;
-use Waaseyaa\AI\Observability\Recorder\TraceRecorderInterface;
-use Waaseyaa\AI\Observability\TraceContext;
+  ```
+  ./vendor/bin/phpunit
+  composer cs-check
+  composer phpstan
+  composer check-composer-policy
+  bin/waaseyaa optimize:manifest
+  ```
 
-final class EventWiringTest extends TestCase
-{
-    #[Test]
-    public function llm_call_event_triggers_token_accountant(): void
-    {
-        $context = new TraceContext();
-        $handle = new TraceHandle('t-1', new \DateTimeImmutable());
-        $context->register($handle);
+- [ ] **Step 6: Commit**
 
-        $captured = [];
-        $recorder = new class($captured) implements TraceRecorderInterface {
-            public function __construct(public array &$captured) {}
-            public function startTrace(string $l, array $a = []): \Waaseyaa\AI\Observability\Handle\TraceHandle { return new \Waaseyaa\AI\Observability\Handle\TraceHandle('x', new \DateTimeImmutable()); }
-            public function completeTrace(\Waaseyaa\AI\Observability\Handle\TraceHandle $h, string $s = 'ok'): void {}
-            public function span(\Waaseyaa\AI\Observability\Handle\TraceHandle $h, string $k, string $n, ?\Waaseyaa\AI\Observability\Handle\SpanHandle $p = null): \Waaseyaa\AI\Observability\Handle\SpanHandle { return new \Waaseyaa\AI\Observability\Handle\SpanHandle('s', $h->uuid, $k, new \DateTimeImmutable()); }
-            public function endSpan(\Waaseyaa\AI\Observability\Handle\SpanHandle $h, array $a = [], string $s = 'ok'): void { $this->captured[] = $a; }
-            public function recordDecision(\Waaseyaa\AI\Observability\Handle\TraceHandle $h, \Waaseyaa\AI\Observability\Value\DecisionTrace $d): void {}
-            public function recordOutcome(\Waaseyaa\AI\Observability\Handle\TraceHandle $h, \Waaseyaa\AI\Observability\Value\Outcome $o): void {}
-        };
-
-        $accountant = new TokenAccountant($recorder, new ModelPricing());
-        $dispatcher = new EventDispatcher();
-        $dispatcher->addSubscriber(new LlmCallListener($context, $accountant));
-
-        // Synthetic event class mirroring the expected ai-agent shape
-        $event = new class {
-            public string $traceUuid = 't-1';
-            public string $model = 'claude-opus-4-6';
-            public int $inputTokens = 1000;
-            public int $outputTokens = 500;
-            public int $cachedTokens = 0;
-        };
-        $dispatcher->dispatch($event, 'Waaseyaa\\AI\\Agent\\Event\\LlmCallCompleted');
-
-        self::assertNotEmpty($recorder->captured);
-        self::assertSame('claude-opus-4-6', $recorder->captured[0]['model']);
-        self::assertGreaterThan(0.0, $recorder->captured[0]['cost_usd']);
-    }
-}
-```
-
-- [ ] **Step 3: Run**
-
-```bash
-./vendor/bin/phpunit packages/ai-observability/tests/Integration/
-```
-
-Expected: PASS.
-
-- [ ] **Step 4: Commit**
-
-```bash
-git add packages/ai-observability/tests/Integration
-git commit -m "test(#622): add disabled-mode and event-wiring integration tests"
-```
-
----
-
-### Task 18: Final — Full Test Suite, PHPStan, CS
-
-**Files:** none new — verification only.
-
-- [ ] **Step 1: Run the package's full test suite**
-
-```bash
-./vendor/bin/phpunit packages/ai-observability/tests/
-```
-
-Expected: all green.
-
-- [ ] **Step 2: Run root-level suites**
-
-```bash
-./vendor/bin/phpunit --testsuite Unit
-./vendor/bin/phpunit --testsuite Integration
-```
-
-Expected: no regressions.
-
-- [ ] **Step 3: Code style check**
-
-```bash
-composer cs-check
-```
-
-Expected: clean. If not, run `composer cs-fix` and commit.
-
-- [ ] **Step 4: PHPStan**
-
-```bash
-composer phpstan
-```
-
-Expected: clean at level 5.
-
-- [ ] **Step 5: Composer policy check**
-
-```bash
-composer check-composer-policy
-```
-
-Expected: OK.
-
-- [ ] **Step 6: Optimize manifest**
-
-```bash
-bin/waaseyaa optimize:manifest
-```
-
-Expected: manifest compiled without errors.
-
-- [ ] **Step 7: If cs-fix or phpstan fixes were needed, commit**
-
-```bash
-git add -u
-git commit -m "style(#622): apply cs-fix / phpstan fixes in ai-observability"
-```
-
----
+  ```
+  git add packages/ai-observability
+  git commit -m "feat(#622): ai-observability ServiceProvider and closing tests"
+  ```
 
 ## Open items / deferrals (follow-up issues)
 
