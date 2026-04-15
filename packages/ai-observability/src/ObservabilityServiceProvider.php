@@ -74,7 +74,12 @@ final class ObservabilityServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $dispatcher = $this->resolve(EventDispatcherInterface::class);
+        try {
+            $dispatcher = $this->resolve(EventDispatcherInterface::class);
+        } catch (\RuntimeException) {
+            return;
+        }
+
         if (!$dispatcher instanceof EventDispatcher) {
             return;
         }
