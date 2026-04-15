@@ -114,7 +114,7 @@ final class NorthCloudClientTest extends TestCase
         $capturedMethod = '';
         $client = new NorthCloudClient(
             baseUrl: 'https://nc.test',
-            httpClient: static function (string $url, string $method = 'GET', ?string $body = null) use (&$capturedMethod): string {
+            httpClient: static function (string $url, string $method = 'GET', ?string $body = null, array $headers = []) use (&$capturedMethod): string {
                 $capturedMethod = $method;
                 return (string) json_encode(['ok' => true]);
             },
@@ -125,5 +125,87 @@ final class NorthCloudClientTest extends TestCase
 
         $this->assertSame(['ok' => true], $result);
         $this->assertSame('POST', $capturedMethod);
+    }
+
+    #[Test]
+    public function authenticatedCallPassesBearerHeaderToInjectedClient(): void
+    {
+        $capturedHeaders = [];
+        $client = new NorthCloudClient(
+            baseUrl: 'https://nc.test',
+            httpClient: static function (string $url, string $method = 'GET', ?string $body = null, array $headers = []) use (&$capturedHeaders): string {
+                $capturedHeaders = $headers;
+                return (string) json_encode(['ok' => true]);
+            },
+            apiToken: 'secret-token',
+        );
+
+        $client->linkSources(dryRun: false);
+
+        $this->assertContains('Authorization: Bearer secret-token', $capturedHeaders);
+        $this->assertContains('Content-Type: application/json', $capturedHeaders);
+    }
+
+    #[Test]
+    public function authenticatedCallReturnsNullWhenTokenEmptyEvenWithInjectedClient(): void
+    {
+        $called = false;
+        $client = new NorthCloudClient(
+            baseUrl: 'https://nc.test',
+            httpClient: static function () use (&$called): string {
+                $called = true;
+                return '{"ok": true}';
+            },
+        );
+
+        $this->assertNull($client->linkSources());
+        $this->assertFalse($called, 'Injected client should not be called when token is empty');
+    }
+
+    #[Test]
+    public function constructorRejectsHttpBaseUrlByDefault(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        new NorthCloudClient(baseUrl: 'http://nc.test');
+    }
+
+    #[Test]
+    public function constructorAcceptsHttpsBaseUrl(): void
+    {
+        $client = new NorthCloudClient(baseUrl: 'https://nc.test');
+        $this->assertInstanceOf(NorthCloudClient::class, $client);
+    }
+
+    #[Test]
+    public function constructorAcceptsHttpBaseUrlWhenAllowInsecure(): void
+    {
+        $client = new NorthCloudClient(baseUrl: 'http://nc.test', allowInsecure: true);
+        $this->assertInstanceOf(NorthCloudClient::class, $client);
+    }
+
+    #[Test]
+    public function searchMethodBuildsArrayParamsAndReturnsDecodedResponse(): void
+    {
+        $capturedUrl = '';
+        $client = new NorthCloudClient(
+            baseUrl: 'https://nc.test',
+            httpClient: static function (string $url) use (&$capturedUrl): string {
+                $capturedUrl = $url;
+                return (string) json_encode(['hits' => [['id' => 'x']], 'total_hits' => 1]);
+            },
+        );
+
+        $result = $client->search([
+            'q' => 'water',
+            'page' => 1,
+            'topics' => ['indigenous', 'governance'],
+        ]);
+
+        $this->assertNotNull($result);
+        $this->assertSame(1, $result['total_hits']);
+        $this->assertStringContainsString('q=water', $capturedUrl);
+        $this->assertStringContainsString('page=1', $capturedUrl);
+        $this->assertStringContainsString('topics%5B%5D=indigenous', $capturedUrl);
+        $this->assertStringContainsString('topics%5B%5D=governance', $capturedUrl);
     }
 }

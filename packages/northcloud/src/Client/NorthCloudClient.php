@@ -27,8 +27,34 @@ final class NorthCloudClient
         ?callable $httpClient = null,
         private readonly ?NorthCloudCache $cache = null,
         private readonly string $apiToken = '',
+        bool $allowInsecure = false,
     ) {
+        self::assertValidBaseUrl($baseUrl, $allowInsecure);
         $this->httpClient = $httpClient !== null ? $httpClient(...) : null;
+    }
+
+    /**
+     * Validate a candidate base URL to prevent SSRF / misconfiguration.
+     *
+     * Allows https by default. http is rejected unless explicitly permitted
+     * via the $allowInsecure flag (intended for local dev loopbacks only).
+     */
+    private static function assertValidBaseUrl(string $url, bool $allowInsecure): void
+    {
+        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+
+        if ($scheme === 'https') {
+            return;
+        }
+
+        if ($scheme === 'http' && $allowInsecure) {
+            return;
+        }
+
+        throw new \InvalidArgumentException(sprintf(
+            'NorthCloudClient requires an https base URL; got %s. Pass allowInsecure: true to permit http (local dev only).',
+            $url !== '' ? $url : '(empty)',
+        ));
     }
 
     /**
@@ -174,6 +200,54 @@ final class NorthCloudClient
     }
 
     /**
+     * Execute a search query against the NorthCloud Search API.
+     *
+     * Scalar values are encoded directly. list<string> values are expanded to
+     * `key[]=v1&key[]=v2` (Go's query parser requires explicit bracket notation).
+     *
+     * @param array<string, string|int|list<string>> $params Query parameters
+     * @return array<string, mixed>|null
+     */
+    public function search(array $params): ?array
+    {
+        $url = rtrim($this->baseUrl, '/') . '/api/v1/search?' . $this->buildQueryString($params);
+        $json = $this->doRequest($url);
+
+        if ($json === null) {
+            return null;
+        }
+
+        $data = json_decode($json, true);
+        if (!is_array($data)) {
+            error_log('NorthCloud search response malformed');
+            return null;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Encode params for NorthCloud Search API.
+     *
+     * @param array<string, string|int|list<string>> $params
+     */
+    private function buildQueryString(array $params): string
+    {
+        $parts = [];
+        foreach ($params as $key => $value) {
+            if (is_array($value)) {
+                foreach ($value as $item) {
+                    $parts[] = urlencode($key . '[]') . '=' . urlencode((string) $item);
+                }
+                continue;
+            }
+            $parts[] = urlencode($key) . '=' . urlencode((string) $value);
+        }
+
+        return implode('&', $parts);
+    }
+
+    /**
      * Link community sources via NorthCloud API.
      *
      * Requires authentication (api_token).
@@ -266,11 +340,6 @@ final class NorthCloudClient
 
     private function doAuthenticatedRequest(string $url, string $method = 'POST', ?string $body = null): ?string
     {
-        if ($this->httpClient !== null) {
-            $result = ($this->httpClient)($url, $method, $body);
-            return $result === false ? null : $result;
-        }
-
         if ($this->apiToken === '') {
             error_log('NorthCloud API token not configured — cannot make authenticated request');
             return null;
@@ -280,6 +349,11 @@ final class NorthCloudClient
             'Authorization: Bearer ' . $this->apiToken,
             'Content-Type: application/json',
         ];
+
+        if ($this->httpClient !== null) {
+            $result = ($this->httpClient)($url, $method, $body, $headers);
+            return $result === false ? null : $result;
+        }
 
         $httpOptions = [
             'method' => $method,
