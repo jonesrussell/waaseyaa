@@ -1,0 +1,39 @@
+{
+    "name": "waaseyaa/ai-observability",
+    "description": "Trace recording, cost tracking, and anomaly detection for Waaseyaa agentic framework",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "repositories": [
+        {"type": "path", "url": "../foundation"},
+        {"type": "path", "url": "../entity"},
+        {"type": "path", "url": "../entity-storage"},
+        {"type": "path", "url": "../database-legacy"}
+    ],
+    "require": {
+        "php": ">=8.4",
+        "waaseyaa/entity": "^0.1",
+        "waaseyaa/entity-storage": "^0.1",
+        "waaseyaa/database-legacy": "^0.1",
+        "waaseyaa/foundation": "^0.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {"Waaseyaa\\AI\\Observability\\": "src/"}
+    },
+    "autoload-dev": {
+        "psr-4": {"Waaseyaa\\AI\\Observability\\Tests\\": "tests/"}
+    },
+    "extra": {
+        "waaseyaa": {
+            "providers": ["Waaseyaa\\AI\\Observability\\ObservabilityServiceProvider"]
+        },
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {"sort-packages": true}
+}

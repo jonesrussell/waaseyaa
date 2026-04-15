@@ -115,6 +115,10 @@
         },
         {
             "type": "path",
+            "url": "packages/ai-observability"
+        },
+        {
+            "type": "path",
             "url": "packages/ai-vector"
         },
         {
@@ -256,6 +260,7 @@
         "waaseyaa/analytics": "@dev",
         "waaseyaa/admin-surface": "@dev",
         "waaseyaa/ai-agent": "@dev",
+        "waaseyaa/ai-observability": "@dev",
         "waaseyaa/ai-pipeline": "@dev",
         "waaseyaa/ai-schema": "@dev",
         "waaseyaa/ai-vector": "@dev",
