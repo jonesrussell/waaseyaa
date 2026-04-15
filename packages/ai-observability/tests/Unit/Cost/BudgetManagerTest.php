@@ -44,7 +44,7 @@ final class BudgetManagerTest extends TestCase
 
     private function fakeTracker(float $dailyTotal): CostTracker
     {
-        return new class($dailyTotal) extends CostTracker {
+        return new class ($dailyTotal) extends CostTracker {
             public function __construct(private readonly float $total) {}
 
             public function totalForTrace(string $traceUuid): float
