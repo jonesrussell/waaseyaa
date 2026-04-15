@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\NorthCloud\Provider;
 
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\NorthCloud\Client\NorthCloudCache;
@@ -79,6 +81,26 @@ final class NorthCloudServiceProvider extends ServiceProvider
                 statusPath: $config['sync']['status_path'] ?? null,
             );
         });
+    }
+
+    /**
+     * Expose console commands to the foundation so the host CLI surfaces
+     * `northcloud:sync`. Without this hook the command is registered in the
+     * container but never reaches the CLI kernel.
+     *
+     * Signature mirrors {@see ServiceProvider::commands()} — the foundation
+     * auto-injects the arguments even though this provider doesn't use them.
+     *
+     * @return array<int, object>
+     */
+    public function commands(
+        EntityTypeManager $entityTypeManager,
+        DatabaseInterface $database,
+        EventDispatcherInterface $dispatcher,
+    ): array {
+        return [
+            $this->resolve(NcSyncCommand::class),
+        ];
     }
 
     /** @return array<string, mixed> */
