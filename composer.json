@@ -187,6 +187,10 @@
         },
         {
             "type": "path",
+            "url": "packages/framework"
+        },
+        {
+            "type": "path",
             "url": "packages/admin-surface"
         },
         {

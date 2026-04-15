@@ -1,0 +1,11 @@
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../waaseyaa/packages/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    ]
+}
