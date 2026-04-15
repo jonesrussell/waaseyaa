@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\AI\Observability\Listener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Waaseyaa\AI\Agent\Event\LlmCallCompleted;
 use Waaseyaa\AI\Observability\Cost\TokenAccountant;
 use Waaseyaa\AI\Observability\TraceContext;
 use Waaseyaa\Foundation\Log\LoggerInterface;
@@ -25,33 +26,21 @@ final class LlmCallListener implements EventSubscriberInterface
         ];
     }
 
-    public function onLlmCallCompleted(object $event): void
+    public function onLlmCallCompleted(LlmCallCompleted $event): void
     {
-        $traceUuid = $this->readProp($event, 'traceUuid');
-        if (!is_string($traceUuid)) {
-            return;
-        }
-        $handle = $this->context->get($traceUuid);
+        $handle = $this->context->get($event->traceUuid);
         if ($handle === null) {
-            $this->logger->debug('LlmCallListener: no active trace for uuid', ['uuid' => $traceUuid]);
+            $this->logger->debug('LlmCallListener: no active trace for uuid', ['uuid' => $event->traceUuid]);
 
             return;
         }
-        $model = (string) ($this->readProp($event, 'model') ?? 'unknown');
-        $inputTokens = (int) ($this->readProp($event, 'inputTokens') ?? 0);
-        $outputTokens = (int) ($this->readProp($event, 'outputTokens') ?? 0);
-        $cachedTokens = (int) ($this->readProp($event, 'cachedTokens') ?? 0);
 
-        $this->accountant->record($handle, $model, $inputTokens, $outputTokens, $cachedTokens);
-    }
-
-    private function readProp(object $obj, string $name): mixed
-    {
-        if (!property_exists($obj, $name)) {
-            return null;
-        }
-
-        /** @phpstan-ignore property.dynamicName */
-        return $obj->{$name};
+        $this->accountant->record(
+            $handle,
+            $event->model,
+            $event->inputTokens,
+            $event->outputTokens,
+            $event->cachedTokens,
+        );
     }
 }

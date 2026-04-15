@@ -37,12 +37,8 @@ class CostTracker
     {
         $total = 0.0;
         foreach ($rows as $row) {
-            $raw = $row['attributes'] ?? null;
-            if (!is_string($raw) || $raw === '') {
-                continue;
-            }
             try {
-                $attrs = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+                $attrs = json_decode($row['attributes'], true, 512, JSON_THROW_ON_ERROR);
             } catch (\JsonException) {
                 continue;
             }
