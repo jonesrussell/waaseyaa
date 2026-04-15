@@ -67,8 +67,7 @@ final class NorthCloudServiceProvider extends ServiceProvider
             $config = $this->northcloudConfig();
 
             return new NorthCloudSearchProvider(
-                baseUrl: (string) ($config['base_url'] ?? ''),
-                timeout: (int) ($config['timeout'] ?? 5),
+                client: $this->resolve(NorthCloudClient::class),
                 cacheTtl: (int) ($config['search']['cache_ttl'] ?? 300),
             );
         });
@@ -109,8 +108,12 @@ final class NorthCloudServiceProvider extends ServiceProvider
      * package in and set `NORTHCLOUD_BASE_URL` / `NORTHCLOUD_API_TOKEN` in
      * `.env` without having to publish the config file first.
      *
-     * Values explicitly set in `config['northcloud']` always win over the env
-     * fallback.
+     * The provider is the single authority for reading NORTHCLOUD_* env vars;
+     * the shipped config file (config/northcloud.php) uses plain string
+     * defaults so there's no eager-read-vs-lazy-read drift.
+     *
+     * Env vars win over config defaults when set; empty config values fall
+     * back to env vars which fall back to package defaults.
      *
      * @return array<string, mixed>
      */
@@ -119,12 +122,18 @@ final class NorthCloudServiceProvider extends ServiceProvider
         $section = $this->config['northcloud'] ?? [];
         $section = is_array($section) ? $section : [];
 
-        if (!isset($section['base_url']) || $section['base_url'] === '') {
-            $section['base_url'] = getenv('NORTHCLOUD_BASE_URL') ?: 'https://api.northcloud.one';
+        $envBaseUrl = getenv('NORTHCLOUD_BASE_URL');
+        if ($envBaseUrl !== false && $envBaseUrl !== '') {
+            $section['base_url'] = $envBaseUrl;
+        } elseif (!isset($section['base_url']) || $section['base_url'] === '') {
+            $section['base_url'] = 'https://api.northcloud.one';
         }
 
-        if (!isset($section['api_token'])) {
-            $section['api_token'] = getenv('NORTHCLOUD_API_TOKEN') ?: '';
+        $envToken = getenv('NORTHCLOUD_API_TOKEN');
+        if ($envToken !== false && $envToken !== '') {
+            $section['api_token'] = $envToken;
+        } elseif (!isset($section['api_token'])) {
+            $section['api_token'] = '';
         }
 
         return $section;

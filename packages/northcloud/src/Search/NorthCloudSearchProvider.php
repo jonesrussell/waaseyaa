@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\NorthCloud\Search;
 
+use Waaseyaa\NorthCloud\Client\NorthCloudClient;
 use Waaseyaa\Search\FacetBucket;
 use Waaseyaa\Search\SearchFacet;
 use Waaseyaa\Search\SearchHit;
@@ -14,25 +15,21 @@ use Waaseyaa\Search\SearchResult;
 /**
  * NorthCloud-backed implementation of Waaseyaa\Search\SearchProviderInterface.
  *
- * Apps register this as the active search provider to route search through NC.
- * In-memory response cache with configurable TTL — set to 0 to disable.
+ * Delegates HTTP transport to {@see NorthCloudClient}; this class handles the
+ * SearchRequest -> params translation, response parsing, and a small in-memory
+ * response cache.
+ *
+ * Set $cacheTtl to 0 to disable the provider-level cache.
  */
 final class NorthCloudSearchProvider implements SearchProviderInterface
 {
     /** @var array<string, array{result: SearchResult, expires: int}> */
     private array $cache = [];
 
-    /** @var \Closure|null */
-    private readonly ?\Closure $httpClient;
-
     public function __construct(
-        private readonly string $baseUrl,
-        private readonly int $timeout = 5,
+        private readonly NorthCloudClient $client,
         private readonly int $cacheTtl = 300,
-        ?callable $httpClient = null,
-    ) {
-        $this->httpClient = $httpClient !== null ? $httpClient(...) : null;
-    }
+    ) {}
 
     public function search(SearchRequest $request): SearchResult
     {
@@ -46,15 +43,10 @@ final class NorthCloudSearchProvider implements SearchProviderInterface
             unset($this->cache[$cacheKey]);
         }
 
-        $url = $this->buildQueryUrl($request);
-        $json = $this->doRequest($url);
+        $params = $this->buildParams($request);
+        $data = $this->client->search($params);
 
-        if ($json === false) {
-            return SearchResult::empty();
-        }
-
-        $data = json_decode($json, true);
-        if (!is_array($data)) {
+        if ($data === null) {
             return SearchResult::empty();
         }
 
@@ -70,7 +62,10 @@ final class NorthCloudSearchProvider implements SearchProviderInterface
         return $searchResult;
     }
 
-    private function buildQueryUrl(SearchRequest $request): string
+    /**
+     * @return array<string, string|int|list<string>>
+     */
+    private function buildParams(SearchRequest $request): array
     {
         $params = [
             'q' => $request->query,
@@ -86,40 +81,14 @@ final class NorthCloudSearchProvider implements SearchProviderInterface
         if ($request->filters->minQuality > 0) {
             $params['min_quality_score'] = (string) $request->filters->minQuality;
         }
-
-        $url = rtrim($this->baseUrl, '/') . '/api/v1/search?' . http_build_query($params);
-
-        // Array params need explicit bracket notation for Go's query parser.
-        foreach ($request->filters->topics as $topic) {
-            $url .= '&' . urlencode('topics[]') . '=' . urlencode($topic);
+        if ($request->filters->topics !== []) {
+            $params['topics'] = array_values(array_map(strval(...), $request->filters->topics));
         }
-        foreach ($request->filters->sourceNames as $source) {
-            $url .= '&' . urlencode('source_names[]') . '=' . urlencode($source);
+        if ($request->filters->sourceNames !== []) {
+            $params['source_names'] = array_values(array_map(strval(...), $request->filters->sourceNames));
         }
 
-        return $url;
-    }
-
-    private function doRequest(string $url): string|false
-    {
-        if ($this->httpClient !== null) {
-            return ($this->httpClient)($url);
-        }
-
-        $context = stream_context_create([
-            'http' => [
-                'method' => 'GET',
-                'timeout' => $this->timeout,
-                'ignore_errors' => true,
-            ],
-        ]);
-
-        $result = @file_get_contents($url, false, $context);
-        if ($result === false) {
-            error_log(sprintf('NorthCloud search request failed: %s', $url));
-        }
-
-        return $result;
+        return $params;
     }
 
     /**
