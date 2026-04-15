@@ -103,10 +103,30 @@ final class NorthCloudServiceProvider extends ServiceProvider
         ];
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * Read the `northcloud` config section, falling back to env vars when the
+     * host app hasn't merged the package config. This lets consumers drop the
+     * package in and set `NORTHCLOUD_BASE_URL` / `NORTHCLOUD_API_TOKEN` in
+     * `.env` without having to publish the config file first.
+     *
+     * Values explicitly set in `config['northcloud']` always win over the env
+     * fallback.
+     *
+     * @return array<string, mixed>
+     */
     private function northcloudConfig(): array
     {
         $section = $this->config['northcloud'] ?? [];
-        return is_array($section) ? $section : [];
+        $section = is_array($section) ? $section : [];
+
+        if (!isset($section['base_url']) || $section['base_url'] === '') {
+            $section['base_url'] = getenv('NORTHCLOUD_BASE_URL') ?: 'https://api.northcloud.one';
+        }
+
+        if (!isset($section['api_token'])) {
+            $section['api_token'] = getenv('NORTHCLOUD_API_TOKEN') ?: '';
+        }
+
+        return $section;
     }
 }
