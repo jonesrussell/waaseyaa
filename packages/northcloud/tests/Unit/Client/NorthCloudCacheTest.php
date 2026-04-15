@@ -48,6 +48,24 @@ final class NorthCloudCacheTest extends TestCase
     }
 
     #[Test]
+    public function canonicalizationTreatsReorderedQueryParamsAsEqual(): void
+    {
+        $cache = new NorthCloudCache($this->pdo);
+        $cache->set('https://nc.test/search?a=1&b=2', 'cached-body');
+
+        $this->assertSame('cached-body', $cache->get('https://nc.test/search?b=2&a=1'));
+    }
+
+    #[Test]
+    public function canonicalizationDropsFragmentsAndLowercasesHost(): void
+    {
+        $cache = new NorthCloudCache($this->pdo);
+        $cache->set('https://NC.TEST/search?q=x#frag', 'cached-body');
+
+        $this->assertSame('cached-body', $cache->get('https://nc.test/search?q=x'));
+    }
+
+    #[Test]
     public function clearRemovesAllEntries(): void
     {
         $cache = new NorthCloudCache($this->pdo);

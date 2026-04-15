@@ -27,7 +27,7 @@ final class NorthCloudCache
         $stmt = $this->pdo->prepare(
             'SELECT response_body FROM nc_api_cache WHERE cache_key = :key AND expires_at > :now',
         );
-        $stmt->execute(['key' => $key, 'now' => time()]);
+        $stmt->execute(['key' => $this->canonicalize($key), 'now' => time()]);
         $result = $stmt->fetchColumn();
 
         return $result !== false ? (string) $result : null;
@@ -41,7 +41,7 @@ final class NorthCloudCache
             'INSERT OR REPLACE INTO nc_api_cache (cache_key, response_body, expires_at) VALUES (:key, :body, :expires)',
         );
         $stmt->execute([
-            'key' => $key,
+            'key' => $this->canonicalize($key),
             'body' => $value,
             'expires' => time() + $this->ttl,
         ]);
@@ -51,6 +51,38 @@ final class NorthCloudCache
     {
         $this->ensureTable();
         $this->pdo->exec('DELETE FROM nc_api_cache');
+    }
+
+    /**
+     * Canonicalize a URL so semantically-equivalent URLs hash to the same cache key.
+     *
+     * - Scheme and host are lowercased.
+     * - Query parameters are sorted alphabetically.
+     * - URL fragments are dropped.
+     *
+     * Non-URL inputs (no scheme) are returned as-is.
+     */
+    private function canonicalize(string $url): string
+    {
+        $parts = parse_url($url);
+        if ($parts === false || !isset($parts['scheme'], $parts['host'])) {
+            return $url;
+        }
+
+        $scheme = strtolower((string) $parts['scheme']);
+        $host = strtolower((string) $parts['host']);
+        $port = isset($parts['port']) ? ':' . $parts['port'] : '';
+        $user = isset($parts['user']) ? $parts['user'] . (isset($parts['pass']) ? ':' . $parts['pass'] : '') . '@' : '';
+        $path = $parts['path'] ?? '';
+
+        $queryString = '';
+        if (isset($parts['query']) && $parts['query'] !== '') {
+            parse_str($parts['query'], $params);
+            ksort($params);
+            $queryString = '?' . http_build_query($params);
+        }
+
+        return $scheme . '://' . $user . $host . $port . $path . $queryString;
     }
 
     private function ensureTable(): void
