@@ -9,11 +9,14 @@ declare(strict_types=1);
  */
 return [
     // Base URL of the North Cloud API (no trailing slash).
-    'base_url' => getenv('NORTHCLOUD_BASE_URL') ?: 'https://api.northcloud.one',
+    // NorthCloudServiceProvider falls back to the NORTHCLOUD_BASE_URL env var
+    // when this is empty or unset; leave as the default in most cases.
+    'base_url' => 'https://api.northcloud.one',
 
     // Bearer token for authenticated endpoints (crawl jobs, link-sources).
-    // Leave empty for read-only usage.
-    'api_token' => getenv('NORTHCLOUD_API_TOKEN') ?: '',
+    // NorthCloudServiceProvider falls back to the NORTHCLOUD_API_TOKEN env var
+    // when this is empty or unset. Leave empty for read-only usage.
+    'api_token' => '',
 
     // HTTP request timeout in seconds.
     'timeout' => 5,
