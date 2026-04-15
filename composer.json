@@ -75,6 +75,10 @@
         },
         {
             "type": "path",
+            "url": "packages/northcloud"
+        },
+        {
+            "type": "path",
             "url": "packages/note"
         },
         {
@@ -289,6 +293,7 @@
         "waaseyaa/mercure": "@dev",
         "waaseyaa/messaging": "@dev",
         "waaseyaa/node": "@dev",
+        "waaseyaa/northcloud": "@dev",
         "waaseyaa/note": "@dev",
         "waaseyaa/notification": "@dev",
         "waaseyaa/oauth-provider": "@dev",
@@ -355,6 +360,7 @@
             "Waaseyaa\\Mercure\\Tests\\": "packages/mercure/tests/",
             "Waaseyaa\\Messaging\\Tests\\": "packages/messaging/tests/",
             "Waaseyaa\\Node\\Tests\\": "packages/node/tests/",
+            "Waaseyaa\\NorthCloud\\Tests\\": "packages/northcloud/tests/",
             "Waaseyaa\\Path\\Tests\\": "packages/path/tests/",
             "Waaseyaa\\Relationship\\Tests\\": "packages/relationship/tests/",
             "Waaseyaa\\Routing\\Tests\\": "packages/routing/tests/",
