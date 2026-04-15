@@ -42,6 +42,12 @@ interface NcHitToEntityMapperInterface
      * for existing rows matching the mapped value of this field and skips the hit
      * if any exist. Override when your entity doesn't track source provenance via
      * `source_url`.
+     *
+     * Contract: when this returns a non-empty string, that key MUST be present
+     * in the array returned by {@see map()}. NcSyncService throws
+     * \LogicException if the contract is violated.
+     *
+     * Return `''` (empty string) to opt out of deduplication entirely.
      */
     public function dedupField(): string;
 }

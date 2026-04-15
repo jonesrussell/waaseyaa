@@ -47,6 +47,11 @@ final class NcSyncService
             return (new NcSyncResult())->withFetchFailed();
         }
 
+        if (!is_array($response['hits'] ?? null)) {
+            error_log('NcSyncService: malformed NorthCloud response, missing hits array');
+            return (new NcSyncResult())->withFetchFailed();
+        }
+
         $result = new NcSyncResult();
 
         foreach ($response['hits'] as $hit) {
@@ -85,13 +90,23 @@ final class NcSyncService
 
         $storage = $this->entityTypeManager->getStorage($entityType);
 
-        if (isset($fields[$dedupField]) && $fields[$dedupField] !== '') {
-            $existing = $storage->getQuery()
-                ->condition($dedupField, $fields[$dedupField])
-                ->execute();
+        if ($dedupField !== '') {
+            if (!array_key_exists($dedupField, $fields)) {
+                throw new \LogicException(sprintf(
+                    "Mapper %s declares dedupField '%s' but that key is not in map() output",
+                    $mapper::class,
+                    $dedupField,
+                ));
+            }
 
-            if ($existing !== []) {
-                return $result->withSkipped();
+            if ($fields[$dedupField] !== '' && $fields[$dedupField] !== null) {
+                $existing = $storage->getQuery()
+                    ->condition($dedupField, $fields[$dedupField])
+                    ->execute();
+
+                if ($existing !== []) {
+                    return $result->withSkipped();
+                }
             }
         }
 
@@ -103,8 +118,11 @@ final class NcSyncService
             $entity = $storage->create($fields);
             $storage->save($entity);
             return $result->withCreated();
-        } catch (\RuntimeException|\InvalidArgumentException $e) {
-            $source = isset($fields[$dedupField]) ? (string) $fields[$dedupField] : '(no dedup key)';
+        } catch (\LogicException $e) {
+            // Contract violation — rethrow so mapper bugs surface loudly.
+            throw $e;
+        } catch (\Throwable $e) {
+            $source = ($dedupField !== '' && isset($fields[$dedupField])) ? (string) $fields[$dedupField] : '(no dedup key)';
             error_log(sprintf(
                 'NcSyncService: failed to create %s from %s: %s',
                 $entityType,
