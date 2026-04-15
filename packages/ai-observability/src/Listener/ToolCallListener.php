@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Waaseyaa\AI\Observability\Listener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Waaseyaa\AI\Agent\Event\ToolCallCompleted;
+use Waaseyaa\AI\Agent\Event\ToolCallStarted;
 use Waaseyaa\AI\Observability\Handle\SpanHandle;
 use Waaseyaa\AI\Observability\Recorder\TraceRecorderInterface;
 use Waaseyaa\AI\Observability\TraceContext;
@@ -27,43 +29,27 @@ final class ToolCallListener implements EventSubscriberInterface
         ];
     }
 
-    public function onToolCallStarted(object $event): void
+    public function onToolCallStarted(ToolCallStarted $event): void
     {
-        $traceUuid = $this->readProp($event, 'traceUuid');
-        $callId = $this->readProp($event, 'callId');
-        if (!is_string($traceUuid) || !is_string($callId)) {
-            return;
-        }
-        $handle = $this->context->get($traceUuid);
+        $handle = $this->context->get($event->traceUuid);
         if ($handle === null) {
             return;
         }
-        $this->openSpans[$callId] = $this->recorder->span(
+        $this->openSpans[$event->callId] = $this->recorder->span(
             $handle,
             'tool_call',
-            (string) ($this->readProp($event, 'toolName') ?? 'unknown'),
+            $event->toolName,
         );
     }
 
-    public function onToolCallCompleted(object $event): void
+    public function onToolCallCompleted(ToolCallCompleted $event): void
     {
-        $callId = $this->readProp($event, 'callId');
-        if (!is_string($callId) || !isset($this->openSpans[$callId])) {
+        if (!isset($this->openSpans[$event->callId])) {
             return;
         }
-        $span = $this->openSpans[$callId];
-        unset($this->openSpans[$callId]);
-        $status = ($this->readProp($event, 'error') === null) ? 'ok' : 'error';
+        $span = $this->openSpans[$event->callId];
+        unset($this->openSpans[$event->callId]);
+        $status = $event->error === null ? 'ok' : 'error';
         $this->recorder->endSpan($span, ['tool' => $span->kind], $status);
-    }
-
-    private function readProp(object $obj, string $name): mixed
-    {
-        if (!property_exists($obj, $name)) {
-            return null;
-        }
-
-        /** @phpstan-ignore property.dynamicName */
-        return $obj->{$name};
     }
 }
