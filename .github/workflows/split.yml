@@ -43,6 +43,7 @@ jobs:
           - { local: 'packages/media', remote: 'media' }
           - { local: 'packages/path', remote: 'path' }
           - { local: 'packages/menu', remote: 'menu' }
+          - { local: 'packages/northcloud', remote: 'northcloud' }
           - { local: 'packages/note', remote: 'note' }
           - { local: 'packages/relationship', remote: 'relationship' }
           # Layer 2: Services
