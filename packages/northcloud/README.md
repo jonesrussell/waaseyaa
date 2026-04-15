@@ -25,7 +25,7 @@ Publish the config (optional):
 Set env vars:
 
 ```env
-NORTHCLOUD_BASE_URL=https://api.north-cloud.ca
+NORTHCLOUD_BASE_URL=https://api.northcloud.one
 NORTHCLOUD_API_TOKEN=              # only needed for authenticated endpoints
 ```
 

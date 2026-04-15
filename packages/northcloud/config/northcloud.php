@@ -9,7 +9,7 @@ declare(strict_types=1);
  */
 return [
     // Base URL of the North Cloud API (no trailing slash).
-    'base_url' => getenv('NORTHCLOUD_BASE_URL') ?: 'https://api.north-cloud.ca',
+    'base_url' => getenv('NORTHCLOUD_BASE_URL') ?: 'https://api.northcloud.one',
 
     // Bearer token for authenticated endpoints (crawl jobs, link-sources).
     // Leave empty for read-only usage.
