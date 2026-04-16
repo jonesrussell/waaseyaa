@@ -128,10 +128,10 @@ Register Waaseyaa's MCP server in `.claude/settings.json` for on-demand framewor
 composer install                    # Install dependencies
 php -S localhost:8080 -t public     # Dev server
 ./vendor/bin/phpunit                # Run tests
-bin/waaseyaa                        # CLI
+./vendor/bin/waaseyaa               # CLI
 bin/waaseyaa-version                # Framework provenance (path SHA, lockfile, drift vs golden)
 bin/waaseyaa-audit-site             # Mechanical convergence preflight (validate + bins + provenance)
-bin/waaseyaa sync-rules             # Update framework rules from Waaseyaa
+./vendor/bin/waaseyaa sync-rules    # Update framework rules from Waaseyaa
 ```
 
 Set `WAASEYAA_GOLDEN_SHA` or add `.waaseyaa-golden-sha` for CI drift gates (see `docs/specs/version-provenance.md` in the framework repo).
@@ -148,7 +148,7 @@ This app uses a three-tier codified context system inherited from Waaseyaa:
 | **Rules** | `.claude/rules/waaseyaa-*.md` | Framework invariants (always active, never cited) |
 | **Specs** | `docs/specs/*.md` | Domain contracts for each subsystem |
 
-Framework rules are owned by Waaseyaa. Update them via `bin/waaseyaa sync-rules` after `composer update`.
+Framework rules are owned by Waaseyaa. Update them via `./vendor/bin/waaseyaa sync-rules` after `composer update`.
 
 When modifying a subsystem, update its spec in the same PR.
 

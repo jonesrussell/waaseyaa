@@ -42,14 +42,14 @@ backend_port="${APP_PORT:-8080}"
 backend_url="http://${backend_host}:${backend_port}"
 
 echo "Starting Waaseyaa backend at ${backend_url}"
-PHP_CLI_SERVER_WORKERS="${PHP_CLI_SERVER_WORKERS:-4}" bin/waaseyaa serve &
+PHP_CLI_SERVER_WORKERS="${PHP_CLI_SERVER_WORKERS:-4}" vendor/bin/waaseyaa serve &
 PHP_PID=$!
 
 ADMIN_PID=""
 if admin_path="$(resolve_admin_path)"; then
     export NUXT_BACKEND_URL="${NUXT_BACKEND_URL:-$backend_url}"
     echo "Starting admin dev server from ${admin_path} (HMR enabled)"
-    bin/waaseyaa admin:dev &
+    vendor/bin/waaseyaa admin:dev &
     ADMIN_PID=$!
 else
     echo "Admin dev server not configured; running backend only."

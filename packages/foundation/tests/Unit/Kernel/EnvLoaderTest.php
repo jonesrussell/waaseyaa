@@ -190,4 +190,64 @@ final class EnvLoaderTest extends TestCase
         putenv('WAASEYAA_TEST_DB');
         putenv('WAASEYAA_TEST_ENV');
     }
+
+    #[Test]
+    public function populates_env_superglobal(): void
+    {
+        $path = $this->tempDir . '/.env';
+        file_put_contents($path, 'WAASEYAA_TEST_ENV_SUPER=env_value');
+
+        EnvLoader::load($path);
+
+        $this->assertSame('env_value', $_ENV['WAASEYAA_TEST_ENV_SUPER'] ?? null);
+
+        putenv('WAASEYAA_TEST_ENV_SUPER');
+        unset($_ENV['WAASEYAA_TEST_ENV_SUPER'], $_SERVER['WAASEYAA_TEST_ENV_SUPER']);
+    }
+
+    #[Test]
+    public function populates_server_superglobal(): void
+    {
+        $path = $this->tempDir . '/.env';
+        file_put_contents($path, 'WAASEYAA_TEST_SERVER_SUPER=server_value');
+
+        EnvLoader::load($path);
+
+        $this->assertSame('server_value', $_SERVER['WAASEYAA_TEST_SERVER_SUPER'] ?? null);
+
+        putenv('WAASEYAA_TEST_SERVER_SUPER');
+        unset($_ENV['WAASEYAA_TEST_SERVER_SUPER'], $_SERVER['WAASEYAA_TEST_SERVER_SUPER']);
+    }
+
+    #[Test]
+    public function does_not_overwrite_preset_env_superglobal(): void
+    {
+        $_ENV['WAASEYAA_TEST_PRESET_ENV'] = 'preset_env';
+
+        $path = $this->tempDir . '/.env';
+        file_put_contents($path, 'WAASEYAA_TEST_PRESET_ENV=from_file');
+
+        EnvLoader::load($path);
+
+        $this->assertSame('preset_env', $_ENV['WAASEYAA_TEST_PRESET_ENV']);
+
+        putenv('WAASEYAA_TEST_PRESET_ENV');
+        unset($_ENV['WAASEYAA_TEST_PRESET_ENV'], $_SERVER['WAASEYAA_TEST_PRESET_ENV']);
+    }
+
+    #[Test]
+    public function does_not_overwrite_preset_server_superglobal(): void
+    {
+        $_SERVER['WAASEYAA_TEST_PRESET_SERVER'] = 'preset_server';
+
+        $path = $this->tempDir . '/.env';
+        file_put_contents($path, 'WAASEYAA_TEST_PRESET_SERVER=from_file');
+
+        EnvLoader::load($path);
+
+        $this->assertSame('preset_server', $_SERVER['WAASEYAA_TEST_PRESET_SERVER']);
+
+        putenv('WAASEYAA_TEST_PRESET_SERVER');
+        unset($_ENV['WAASEYAA_TEST_PRESET_SERVER'], $_SERVER['WAASEYAA_TEST_PRESET_SERVER']);
+    }
 }

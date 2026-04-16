@@ -3,32 +3,28 @@
 
 declare(strict_types=1);
 
-// Supports two layouts:
-//   1. Consumer install: {project}/vendor/waaseyaa/cli/bin/waaseyaa
-//      autoload at       {project}/vendor/autoload.php            (3 levels up)
-//   2. Monorepo dev:     {repo}/packages/cli/bin/waaseyaa
-//      autoload at       {repo}/vendor/autoload.php               (3 levels up + vendor/)
-$autoloadPaths = [
-    __DIR__ . '/../../../autoload.php',          // consumer install
-    __DIR__ . '/../../../vendor/autoload.php',   // monorepo dev
-];
+// Project root is the current working directory. This contract matches
+// Laravel's artisan and Symfony's bin/console: the CLI must be invoked
+// from the project root (the directory containing composer.json).
+//
+// Deliberately avoids __DIR__-based resolution: __DIR__ canonicalizes
+// through symlinks, so a consumer that symlinks vendor/waaseyaa/cli for
+// local-dev would have __DIR__ resolve to the framework repo, not the
+// consumer project. See ADR-005.
+$projectRoot = getcwd();
 
-$autoloaderPath = null;
-foreach ($autoloadPaths as $candidate) {
-    if (file_exists($candidate)) {
-        require $candidate;
-        $autoloaderPath = $candidate;
-        break;
-    }
-}
-
-if ($autoloaderPath === null) {
-    fwrite(STDERR, "Could not find Composer autoloader. Run 'composer install' first.\n");
+if ($projectRoot === false || !file_exists($projectRoot . '/composer.json')) {
+    fwrite(STDERR, "waaseyaa: must be run from a project root (directory containing composer.json).\n");
+    fwrite(STDERR, 'current directory: ' . ($projectRoot === false ? '(unknown)' : $projectRoot) . "\n");
     exit(1);
 }
 
-// Project root is the directory containing vendor/, i.e., two levels up from autoload.php.
-$projectRoot = dirname($autoloaderPath, 2);
+$autoload = $projectRoot . '/vendor/autoload.php';
+if (!file_exists($autoload)) {
+    fwrite(STDERR, "waaseyaa: vendor/autoload.php not found in {$projectRoot}. Run 'composer install' first.\n");
+    exit(1);
+}
+require $autoload;
 
 $kernel = new Waaseyaa\Foundation\Kernel\ConsoleKernel($projectRoot);
 exit($kernel->handle());

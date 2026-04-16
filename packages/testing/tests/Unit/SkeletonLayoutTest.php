@@ -59,7 +59,6 @@ final class SkeletonLayoutTest extends TestCase
         $repoRoot = dirname(__DIR__, 4);
         $requiredFiles = [
             '/skeleton/.env.example',
-            '/skeleton/bin/waaseyaa',
             '/skeleton/bin/post-create-setup.php',
             '/skeleton/bin/dev.sh',
             '/skeleton/public/index.php',
@@ -73,5 +72,21 @@ final class SkeletonLayoutTest extends TestCase
                 sprintf('Missing first-boot skeleton artifact: %s', $relativePath),
             );
         }
+    }
+
+    /**
+     * Consumers use ./vendor/bin/waaseyaa (Composer-generated proxy to
+     * waaseyaa/cli's bin). The skeleton must NOT ship its own bin/waaseyaa
+     * wrapper: such a wrapper duplicates the proxy and, historically, was
+     * a workaround for CLI-bootstrap bugs fixed by ADR-005.
+     */
+    #[Test]
+    public function skeletonDoesNotShipDeprecatedWaaseyaaBinWrapper(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        self::assertFileDoesNotExist(
+            $repoRoot . '/skeleton/bin/waaseyaa',
+            'skeleton/bin/waaseyaa must not exist — use ./vendor/bin/waaseyaa (see ADR-005)',
+        );
     }
 }

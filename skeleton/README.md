@@ -40,9 +40,9 @@ and all references when moving code.
 composer install                    # Install dependencies
 composer run dev                    # Start backend (+ admin HMR when configured)
 ./vendor/bin/phpunit                # Run tests
-php bin/waaseyaa optimize:manifest  # Rebuild provider manifest
-bin/waaseyaa serve                  # Dev server
-bin/waaseyaa                        # CLI
+./vendor/bin/waaseyaa optimize:manifest  # Rebuild provider manifest
+./vendor/bin/waaseyaa serve              # Dev server
+./vendor/bin/waaseyaa                    # CLI
 ```
 
 ## First 60 Seconds

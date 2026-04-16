@@ -56,7 +56,7 @@ echo "  \033[32mWaaseyaa project ready.\033[0m\n";
 echo "\n";
 echo "  \033[33mcd {$dir}\033[0m\n";
 echo "  \033[33mcomposer run dev\033[0m      Start backend (and admin HMR when configured)\n";
-echo "  \033[33mbin/waaseyaa list\033[0m     See all commands\n";
+echo "  \033[33m./vendor/bin/waaseyaa list\033[0m  See all commands\n";
 echo "\n";
 echo "  {$adminStatus}\n";
 if (!$hasAdminPackage) {
