@@ -79,6 +79,10 @@
         },
         {
             "type": "path",
+            "url": "packages/northcloud"
+        },
+        {
+            "type": "path",
             "url": "packages/taxonomy"
         },
         {
@@ -293,6 +297,7 @@
         "waaseyaa/mercure": "@dev",
         "waaseyaa/messaging": "@dev",
         "waaseyaa/node": "@dev",
+        "waaseyaa/northcloud": "@dev",
         "waaseyaa/note": "@dev",
         "waaseyaa/notification": "@dev",
         "waaseyaa/oauth-provider": "@dev",
