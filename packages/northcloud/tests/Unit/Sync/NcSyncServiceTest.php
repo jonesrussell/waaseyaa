@@ -55,6 +55,70 @@ final class NcSyncServiceTest extends TestCase
     }
 
     #[Test]
+    public function malformedHitItemCountsAsFailedWithoutAbortingBatch(): void
+    {
+        $client = $this->stubClient([
+            'hits' => ['bad-hit', ['id' => 'good']],
+            'total_hits' => 2,
+        ]);
+
+        $entity = $this->createStub(EntityInterface::class);
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $storage->method('getQuery')->willReturn($this->stubQuery([]));
+        $storage->expects($this->once())->method('create')->willReturn($entity);
+        $storage->expects($this->once())->method('save')->willReturn(1);
+
+        $registry = new MapperRegistry();
+        $registry->register(new FakeMapper(dedup: 'source_url', map: ['source_url' => 'https://x']));
+
+        $service = new NcSyncService(
+            $client,
+            $this->stubEntityTypeManager(['thing' => $storage]),
+            $registry,
+        );
+
+        $result = $service->sync();
+
+        $this->assertSame(1, $result->failed);
+        $this->assertSame(1, $result->created);
+        $this->assertFalse($result->fetchFailed);
+    }
+
+    #[Test]
+    public function mapperFailureBeforePersistenceCountsAsFailedWithoutAbortingBatch(): void
+    {
+        $client = $this->stubClient([
+            'hits' => [['id' => 'bad'], ['id' => 'good']],
+            'total_hits' => 2,
+        ]);
+
+        $entity = $this->createStub(EntityInterface::class);
+        $storage = $this->createMock(EntityStorageInterface::class);
+        $storage->method('getQuery')->willReturn($this->stubQuery([]));
+        $storage->expects($this->once())->method('create')->willReturn($entity);
+        $storage->expects($this->once())->method('save')->willReturn(1);
+
+        $registry = new MapperRegistry();
+        $registry->register(new ThrowingMapper(throwOnId: 'bad'));
+        $registry->register(new SelectiveMapper(
+            supportedIds: ['good'],
+            map: ['source_url' => 'https://x'],
+        ));
+
+        $service = new NcSyncService(
+            $client,
+            $this->stubEntityTypeManager(['thing' => $storage]),
+            $registry,
+        );
+
+        $result = $service->sync();
+
+        $this->assertSame(1, $result->failed);
+        $this->assertSame(1, $result->created);
+        $this->assertFalse($result->fetchFailed);
+    }
+
+    #[Test]
     public function dedupHitExistingEntityIsSkipped(): void
     {
         $client = $this->stubClient(['hits' => [['id' => 'a']], 'total_hits' => 1]);
@@ -259,5 +323,66 @@ final class FakeMapper implements NcHitToEntityMapperInterface
     public function dedupField(): string
     {
         return $this->dedup;
+    }
+}
+
+final class ThrowingMapper implements NcHitToEntityMapperInterface
+{
+    public function __construct(private readonly string $throwOnId) {}
+
+    public function entityType(): string
+    {
+        return 'thing';
+    }
+
+    public function supports(array $hit): bool
+    {
+        return ($hit['id'] ?? null) === $this->throwOnId;
+    }
+
+    public function map(array $hit): array
+    {
+        if (($hit['id'] ?? null) === $this->throwOnId) {
+            throw new \RuntimeException('mapper blew up');
+        }
+
+        return ['source_url' => 'https://mapped.example/' . (string) ($hit['id'] ?? 'unknown')];
+    }
+
+    public function dedupField(): string
+    {
+        return 'source_url';
+    }
+}
+
+final class SelectiveMapper implements NcHitToEntityMapperInterface
+{
+    /**
+     * @param list<string> $supportedIds
+     * @param array<string, mixed> $map
+     */
+    public function __construct(
+        private readonly array $supportedIds,
+        private readonly array $map,
+    ) {}
+
+    public function entityType(): string
+    {
+        return 'thing';
+    }
+
+    public function supports(array $hit): bool
+    {
+        return in_array((string) ($hit['id'] ?? ''), $this->supportedIds, true);
+    }
+
+    public function map(array $hit): array
+    {
+        return $this->map;
+    }
+
+    public function dedupField(): string
+    {
+        return 'source_url';
     }
 }

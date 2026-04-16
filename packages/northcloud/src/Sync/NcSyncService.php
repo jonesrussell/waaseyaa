@@ -55,6 +55,12 @@ final class NcSyncService
         $result = new NcSyncResult();
 
         foreach ($response['hits'] as $hit) {
+            if (!is_array($hit)) {
+                error_log('NcSyncService: skipping malformed hit item');
+                $result = $result->withFailed();
+                continue;
+            }
+
             $result = $this->processHit($hit, $dryRun, $result);
         }
 
@@ -84,37 +90,36 @@ final class NcSyncService
      */
     private function applyMapper(NcHitToEntityMapperInterface $mapper, array $hit, bool $dryRun, NcSyncResult $result): NcSyncResult
     {
-        $entityType = $mapper->entityType();
-        $fields = $mapper->map($hit);
-        $dedupField = $mapper->dedupField();
+        try {
+            $entityType = $mapper->entityType();
+            $fields = $mapper->map($hit);
+            $dedupField = $mapper->dedupField();
+            $storage = $this->entityTypeManager->getStorage($entityType);
 
-        $storage = $this->entityTypeManager->getStorage($entityType);
+            if ($dedupField !== '') {
+                if (!array_key_exists($dedupField, $fields)) {
+                    throw new \LogicException(sprintf(
+                        "Mapper %s declares dedupField '%s' but that key is not in map() output",
+                        $mapper::class,
+                        $dedupField,
+                    ));
+                }
 
-        if ($dedupField !== '') {
-            if (!array_key_exists($dedupField, $fields)) {
-                throw new \LogicException(sprintf(
-                    "Mapper %s declares dedupField '%s' but that key is not in map() output",
-                    $mapper::class,
-                    $dedupField,
-                ));
-            }
+                if ($fields[$dedupField] !== '' && $fields[$dedupField] !== null) {
+                    $existing = $storage->getQuery()
+                        ->condition($dedupField, $fields[$dedupField])
+                        ->execute();
 
-            if ($fields[$dedupField] !== '' && $fields[$dedupField] !== null) {
-                $existing = $storage->getQuery()
-                    ->condition($dedupField, $fields[$dedupField])
-                    ->execute();
-
-                if ($existing !== []) {
-                    return $result->withSkipped();
+                    if ($existing !== []) {
+                        return $result->withSkipped();
+                    }
                 }
             }
-        }
 
-        if ($dryRun) {
-            return $result->withCreated();
-        }
+            if ($dryRun) {
+                return $result->withCreated();
+            }
 
-        try {
             $entity = $storage->create($fields);
             $storage->save($entity);
             return $result->withCreated();
@@ -122,6 +127,9 @@ final class NcSyncService
             // Contract violation — rethrow so mapper bugs surface loudly.
             throw $e;
         } catch (\Throwable $e) {
+            $entityType ??= $mapper->entityType();
+            $dedupField ??= $mapper->dedupField();
+            $fields ??= [];
             $source = ($dedupField !== '' && isset($fields[$dedupField])) ? (string) $fields[$dedupField] : '(no dedup key)';
             error_log(sprintf(
                 'NcSyncService: failed to create %s from %s: %s',

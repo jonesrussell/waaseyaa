@@ -78,11 +78,34 @@ final class NorthCloudCache
         $queryString = '';
         if (isset($parts['query']) && $parts['query'] !== '') {
             parse_str($parts['query'], $params);
-            ksort($params);
+            $params = $this->sortRecursive($params);
             $queryString = '?' . http_build_query($params);
         }
 
         return $scheme . '://' . $user . $host . $port . $path . $queryString;
+    }
+
+    /**
+     * Sort nested query params so semantically-equal array filters normalize.
+     *
+     * @param array<string|int, mixed> $value
+     * @return array<string|int, mixed>
+     */
+    private function sortRecursive(array $value): array
+    {
+        foreach ($value as $key => $item) {
+            if (is_array($item)) {
+                $value[$key] = $this->sortRecursive($item);
+            }
+        }
+
+        if (array_is_list($value)) {
+            sort($value);
+            return $value;
+        }
+
+        ksort($value);
+        return $value;
     }
 
     private function ensureTable(): void

@@ -98,6 +98,10 @@ final class NorthCloudSearchProvider implements SearchProviderInterface
     {
         $hits = [];
         foreach ($data['hits'] ?? [] as $hit) {
+            if (!is_array($hit)) {
+                continue;
+            }
+
             $hits[] = new SearchHit(
                 id: (string) ($hit['id'] ?? ''),
                 title: (string) ($hit['title'] ?? ''),
@@ -106,7 +110,7 @@ final class NorthCloudSearchProvider implements SearchProviderInterface
                 crawledAt: (string) ($hit['crawled_at'] ?? ''),
                 qualityScore: (int) ($hit['quality_score'] ?? 0),
                 contentType: (string) ($hit['content_type'] ?? ''),
-                topics: array_map(strval(...), $hit['topics'] ?? []),
+                topics: $this->normalizeStringList($hit['topics'] ?? []),
                 score: (float) ($hit['score'] ?? 0.0),
                 ogImage: (string) ($hit['og_image'] ?? ''),
                 highlight: $this->extractHighlight($hit['highlight'] ?? ''),
@@ -115,8 +119,16 @@ final class NorthCloudSearchProvider implements SearchProviderInterface
 
         $facets = [];
         foreach ($data['facets'] ?? [] as $name => $bucketList) {
+            if (!is_array($bucketList)) {
+                continue;
+            }
+
             $buckets = [];
             foreach ($bucketList as $bucket) {
+                if (!is_array($bucket)) {
+                    continue;
+                }
+
                 $buckets[] = new FacetBucket(
                     key: (string) ($bucket['key'] ?? ''),
                     count: (int) ($bucket['count'] ?? 0),
@@ -134,6 +146,18 @@ final class NorthCloudSearchProvider implements SearchProviderInterface
             hits: $hits,
             facets: $facets,
         );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function normalizeStringList(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_map(strval(...), $value));
     }
 
     private function extractHighlight(mixed $highlight): string
