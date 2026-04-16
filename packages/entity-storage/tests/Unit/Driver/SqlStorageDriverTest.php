@@ -553,4 +553,63 @@ final class SqlStorageDriverTest extends TestCase
 
         $this->assertSame(0, $rowCount);
     }
+
+    #[Test]
+    public function writeWithExplicitIdReturnsThatId(): void
+    {
+        $returned = $this->driver->write('test_entity', '7', [
+            'id' => 7,
+            'uuid' => 'test-uuid-7',
+            'label' => 'Explicit',
+            'bundle' => 'article',
+            'langcode' => 'en',
+            '_data' => '{}',
+        ]);
+
+        $this->assertSame('7', $returned);
+    }
+
+    #[Test]
+    public function writeWithEmptyIdReturnsLastInsertIdFromAutoIncrement(): void
+    {
+        $returned = $this->driver->write('test_entity', '', [
+            'id' => null,
+            'uuid' => 'auto-uuid-1',
+            'label' => 'Auto',
+            'bundle' => 'article',
+            'langcode' => 'en',
+            '_data' => '{}',
+        ]);
+
+        $this->assertNotSame('', $returned, 'Empty-id write must return an assigned id.');
+        $this->assertMatchesRegularExpression('/^\d+$/', $returned);
+
+        $row = $this->driver->read('test_entity', $returned);
+        $this->assertNotNull($row);
+        $this->assertSame('Auto', $row['label']);
+        $this->assertSame('auto-uuid-1', $row['uuid']);
+    }
+
+    #[Test]
+    public function successiveEmptyIdWritesReturnDistinctIds(): void
+    {
+        $first = $this->driver->write('test_entity', '', [
+            'id' => null,
+            'uuid' => 'auto-uuid-a',
+            'label' => 'A',
+            'bundle' => 'article',
+            'langcode' => 'en',
+            '_data' => '{}',
+        ]);
+        $second = $this->driver->write('test_entity', '', [
+            'id' => null,
+            'uuid' => 'auto-uuid-b',
+            'label' => 'B',
+            'bundle' => 'article',
+            'langcode' => 'en',
+            '_data' => '{}',
+        ]);
+
+        $this->assertNotSame($first, $second);
+    }
 }

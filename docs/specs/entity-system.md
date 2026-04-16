@@ -21,6 +21,7 @@
 <!-- Spec reviewed 2026-04-09 - backed enum invalid-value policy + value_object casts (#1184), FromArrayEntityValueInterface, EntityValues VO JSON normalization; cross-links #1181 -->
 <!-- Spec reviewed 2026-04-10 - waaseyaa/testing EntityTypeFixtureValues + EntityFactory::defineFromEntityType (#1186) -->
 <!-- Spec reviewed 2026-04-10b - P3 duplicate constructor arity contract; Hydratable scaffold; core User/Node hydration (#1188 follow-up) -->
+<!-- Spec reviewed 2026-04-16 - EntityStorageDriverInterface::write returns effective id; EntityRepository::doSave back-fills auto-increment pk before POST_SAVE (waaseyaa/giiken#57) -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
 
@@ -478,11 +479,12 @@ The `EntityRepository::save()` pipeline (used for all high-level persistence):
 1. Validates entity against the combined constraint map (`EntityTypeValidationConstraints::forEntityType()`) if `$validate === true` and `EntityValidator` is injected
 2. Calls `$entity->preSave($isNew)` lifecycle hook (if entity extends `EntityBase`)
 3. Dispatches `EntityEvents::PRE_SAVE` event (via `EntityEventFactoryInterface`)
-4. Writes to storage driver (`$driver->write()`)
-5. Calls `$entity->enforceIsNew(false)` for new entities
-6. Dispatches `EntityEvents::POST_SAVE` event
-7. Calls `$entity->postSave($isNew)` lifecycle hook (if entity extends `EntityBase`)
-8. Returns `EntityConstants::SAVED_NEW` (1) or `SAVED_UPDATED` (2)
+4. Writes to storage driver via `$driver->write()`, which returns the effective id of the persisted row (the backend-assigned pk for empty-id inserts, the caller-supplied id otherwise)
+5. For new entities with an empty id, back-fills the assigned pk via `$entity->set($idKey, $writtenId)` so POST_SAVE listeners see the real id
+6. Calls `$entity->enforceIsNew(false)` for new entities
+7. Dispatches `EntityEvents::POST_SAVE` event
+8. Calls `$entity->postSave($isNew)` lifecycle hook (if entity extends `EntityBase`)
+9. Returns `EntityConstants::SAVED_NEW` (1) or `SAVED_UPDATED` (2)
 
 ### Save (via SqlEntityStorage — low-level)
 

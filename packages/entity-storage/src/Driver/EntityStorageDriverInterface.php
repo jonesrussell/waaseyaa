@@ -36,11 +36,17 @@ interface EntityStorageDriverInterface
     /**
      * Write (insert or update) a row.
      *
+     * When $id is an empty string, the driver treats the call as an insert of a
+     * new row and returns the id the storage backend assigned (for SQL-backed
+     * drivers, the auto-increment primary key via lastInsertId). When $id is a
+     * non-empty string, the driver returns that same id.
+     *
      * @param string $entityType The entity type machine name.
-     * @param string $id The entity ID.
+     * @param string $id The entity ID, or empty string for an auto-assigned id.
      * @param array<string, mixed> $values The raw values to persist.
+     * @return string The effective id of the persisted row.
      */
-    public function write(string $entityType, string $id, array $values): void;
+    public function write(string $entityType, string $id, array $values): string;
 
     /**
      * Remove a row by entity type and ID.
