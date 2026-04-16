@@ -81,10 +81,15 @@ jobs:
           - { local: 'packages/oauth-provider', remote: 'oauth-provider' }
           - { local: 'packages/scheduler', remote: 'scheduler' }
           # Meta-packages
+          # NOTE: the `framework` meta-package (packages/framework) is intentionally
+          # NOT split here — its `remote: framework` collided with this monorepo's
+          # own repo (waaseyaa/framework), and the force-push at the end of this job
+          # wiped the monorepo main down to just the meta-package's composer.json.
+          # Re-add only after the monorepo is moved to a different repo name, or
+          # after this entry points at a different remote (e.g. framework-meta).
           - { local: 'packages/cms', remote: 'cms' }
           - { local: 'packages/core', remote: 'core' }
           - { local: 'packages/full', remote: 'full' }
-          - { local: 'packages/framework', remote: 'framework' }
           # Project skeleton
           - { local: 'skeleton', remote: 'waaseyaa' }
 
@@ -119,6 +124,18 @@ jobs:
           fi
           echo "SPLIT_GITHUB_TOKEN is configured."
 
+      - name: Guard against monorepo self-split
+        env:
+          REMOTE_REPO: ${{ matrix.package.remote }}
+          MONOREPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          if [ "${REMOTE_REPO}" = "${MONOREPO_NAME}" ]; then
+            echo "::error::Self-split blocked: matrix entry remote='${REMOTE_REPO}' equals this monorepo's repo name."
+            echo "::error::Pushing this split target would force-overwrite the monorepo's own main branch."
+            echo "::error::Rename the remote (e.g. '${REMOTE_REPO}-meta') or drop the entry."
+            exit 1
+          fi
+
       - name: Split and push
         env:
           SPLIT_GH_TOKEN: ${{ secrets.SPLIT_GITHUB_TOKEN }}
@@ -133,6 +150,27 @@ jobs:
           git remote add split "${REMOTE_URL}" 2>/dev/null || true
           git push split "${SHA}:refs/heads/main" --force
           git push split "${SHA}:refs/tags/${TAG_NAME}" --force
+
+  verify-monorepo-main-intact:
+    name: Verify monorepo main still points at the tagged commit
+    needs: split
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assert origin main SHA unchanged
+        env:
+          MONOREPO: ${{ github.repository }}
+          EXPECTED_SHA: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          actual_sha=$(gh api "repos/${MONOREPO}/commits/main" --jq '.sha')
+          if [ "${actual_sha}" != "${EXPECTED_SHA}" ]; then
+            echo "::error::Monorepo main SHA changed during split!"
+            echo "::error::Expected: ${EXPECTED_SHA}"
+            echo "::error::Actual:   ${actual_sha}"
+            echo "::error::A split target likely collided with this monorepo's repo name."
+            exit 1
+          fi
+          echo "OK — monorepo main still at ${EXPECTED_SHA}"
 
   verify-tag-parity:
     needs: split
@@ -150,10 +188,11 @@ jobs:
         run: |
           bash bin/check-release-tag-parity "${TAG_NAME}"
 
-  # Publish only after split matrix + parity — avoids racing github-release.yml on tag push.
+  # Publish only after split matrix + monorepo integrity + parity —
+  # avoids racing github-release.yml on tag push, and blocks releases if main was overwritten.
   publish-github-release:
     name: Publish GitHub Release
-    needs: [verify-tag-parity]
+    needs: [verify-monorepo-main-intact, verify-tag-parity]
     runs-on: ubuntu-latest
     permissions:
       contents: write
