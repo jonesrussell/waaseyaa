@@ -4,6 +4,8 @@
 
 **Goal:** Execute [ADR-004](../adr/004-framework-package-collapse.md) — collapse `packages/framework` into the monorepo root, canonicalize `waaseyaa/framework` as the monorepo root composer.json, and adopt Symfony-style `replace` semantics.
 
+> **Status 2026-04-16 — partial execution.** Phases 0, 3 (delete `packages/framework/`), and 4 (finalize `split.yml`) landed. Phases 1, 2, and the release tasks were deferred: mid-Phase-1 investigation found that `PackageManifestCompiler` and other framework discovery paths enumerate first-party packages via `vendor/composer/installed.json`, which `replace` semantics empty out. A follow-up ADR will fix discovery (synthesize installed entries from the root's replace block + path repos) before the root `composer.json` rewrite lands.
+
 **Design doc:** `docs/adr/004-framework-package-collapse.md`
 
 **Related tactical work (already landed 2026-04-16):**

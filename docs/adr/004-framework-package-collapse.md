@@ -1,6 +1,6 @@
 # ADR-004: Collapse `packages/framework` into the monorepo root
 
-**Status:** Accepted
+**Status:** Accepted — partial execution 2026-04-16. Deletion of `packages/framework/` and the invariant in §2 landed. The `replace`-block / `type: library` rewrite in §5 was deferred: `PackageManifestCompiler` and related discovery paths enumerate first-party packages via `vendor/composer/installed.json`, which `replace` semantics empty out. A follow-up ADR will fix discovery (synthesize installed entries from the root's replace block + path repositories) before the rewrite lands.
 **Date:** 2026-04-16
 **Repos:** waaseyaa/framework
 

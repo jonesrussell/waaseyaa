@@ -81,12 +81,6 @@ jobs:
           - { local: 'packages/oauth-provider', remote: 'oauth-provider' }
           - { local: 'packages/scheduler', remote: 'scheduler' }
           # Meta-packages
-          # NOTE: the `framework` meta-package (packages/framework) is intentionally
-          # NOT split here — its `remote: framework` collided with this monorepo's
-          # own repo (waaseyaa/framework), and the force-push at the end of this job
-          # wiped the monorepo main down to just the meta-package's composer.json.
-          # Re-add only after the monorepo is moved to a different repo name, or
-          # after this entry points at a different remote (e.g. framework-meta).
           - { local: 'packages/cms', remote: 'cms' }
           - { local: 'packages/core', remote: 'core' }
           - { local: 'packages/full', remote: 'full' }
