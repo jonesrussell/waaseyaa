@@ -1428,7 +1428,7 @@ Kernel/
     AbstractKernel.php           -- boot orchestrator, delegates to Bootstrap/ classes
     HttpKernel.php               -- HTTP request handling, cache setup, CORS
     ConsoleKernel.php            -- CLI bootstrapping; delegates command graph assembly to `Waaseyaa\CLI\CliCommandRegistry`
-    EnvLoader.php                -- .env file parser
+    EnvLoader.php                -- .env file parser; writes to putenv(), $_ENV, and $_SERVER (each destination guarded independently — preset keys in any destination are never overwritten)
     ConfigLoader.php             -- config/waaseyaa.php loader
     EventListenerRegistrar.php   -- registers cache invalidation listeners
     BuiltinRouteRegistrar.php    -- registers shared foundation-owned HTTP routes (schema, discovery, entity-types, SSR catch-all)
