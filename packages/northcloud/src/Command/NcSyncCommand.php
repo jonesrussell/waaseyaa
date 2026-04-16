@@ -27,6 +27,9 @@ final class NcSyncCommand extends Command
         $this->addOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Maximum hits to fetch', '20');
         $this->addOption('since', 's', InputOption::VALUE_REQUIRED, 'Fetch content from this date (YYYY-MM-DD)');
         $this->addOption('dry-run', null, InputOption::VALUE_NONE, 'Report what would be created without persisting');
+        $this->addOption('explain', null, InputOption::VALUE_NONE, 'Show skip reason breakdown and sampled hit diagnostics');
+        $this->addOption('sample', null, InputOption::VALUE_REQUIRED, 'Capture up to N created/skipped samples in output', '10');
+        $this->addOption('report-json', null, InputOption::VALUE_REQUIRED, 'Write sync report JSON to this path');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -34,6 +37,9 @@ final class NcSyncCommand extends Command
         $limit = (int) $input->getOption('limit');
         $since = $input->getOption('since');
         $dryRun = (bool) $input->getOption('dry-run');
+        $explain = (bool) $input->getOption('explain');
+        $sample = max(0, (int) $input->getOption('sample'));
+        $reportJsonPath = $input->getOption('report-json');
 
         if ($dryRun) {
             $output->writeln('<info>Dry run — no entities will be created.</info>');
@@ -41,7 +47,13 @@ final class NcSyncCommand extends Command
 
         $output->writeln(sprintf('Fetching up to %d hits from NorthCloud...', $limit));
 
-        $result = $this->syncService->sync($limit, $since, $dryRun);
+        $result = $this->syncService->sync(
+            limit: $limit,
+            since: is_string($since) ? $since : null,
+            dryRun: $dryRun,
+            explain: $explain,
+            sampleLimit: $sample,
+        );
 
         if ($result->fetchFailed) {
             $output->writeln('<error>Failed to fetch content from NorthCloud. Check NORTHCLOUD_BASE_URL and network connectivity.</error>');
@@ -54,6 +66,34 @@ final class NcSyncCommand extends Command
             $result->skipped,
             $result->failed,
         ));
+
+        if ($explain && $result->skipReasons !== []) {
+            $output->writeln('Skip reasons:');
+            $skipReasons = $result->skipReasons;
+            arsort($skipReasons);
+            foreach ($skipReasons as $reason => $count) {
+                $output->writeln(sprintf('  - %s: %d', $reason, $count));
+            }
+        }
+
+        if ($result->createdSamples !== []) {
+            $output->writeln('Created sample:');
+            foreach ($result->createdSamples as $sampleRow) {
+                $output->writeln('  - ' . $this->formatSampleLine($sampleRow));
+            }
+        }
+
+        if ($result->skippedSamples !== []) {
+            $output->writeln('Skipped sample:');
+            foreach ($result->skippedSamples as $sampleRow) {
+                $output->writeln('  - ' . $this->formatSampleLine($sampleRow));
+            }
+        }
+
+        if (is_string($reportJsonPath) && $reportJsonPath !== '') {
+            $this->writeJsonReport($reportJsonPath, $result, $limit, is_string($since) ? $since : null, $dryRun, $explain, $sample);
+            $output->writeln(sprintf('<info>Wrote report:</info> %s', $reportJsonPath));
+        }
 
         $this->writeStatusFile($result);
 
@@ -85,5 +125,60 @@ final class NcSyncCommand extends Command
             return;
         }
         rename($tmp, $this->statusPath);
+    }
+
+    /**
+     * @param array<string, mixed> $sample
+     */
+    private function formatSampleLine(array $sample): string
+    {
+        $title = (string) ($sample['title'] ?? '(untitled)');
+        $url = (string) ($sample['url'] ?? '(no-url)');
+        $reason = isset($sample['reason']) ? ' | reason=' . (string) $sample['reason'] : '';
+        $quality = isset($sample['quality_score']) ? ' | quality=' . (string) $sample['quality_score'] : '';
+        return sprintf('%s | %s%s%s', $title, $url, $quality, $reason);
+    }
+
+    private function writeJsonReport(
+        string $path,
+        NcSyncResult $result,
+        int $limit,
+        ?string $since,
+        bool $dryRun,
+        bool $explain,
+        int $sample,
+    ): void {
+        try {
+            $payload = [
+                'generated_at' => date('c'),
+                'options' => [
+                    'limit' => $limit,
+                    'since' => $since,
+                    'dry_run' => $dryRun,
+                    'explain' => $explain,
+                    'sample' => $sample,
+                ],
+                'result' => $result->toArray(),
+            ];
+
+            $json = json_encode($payload, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+            if ($json === false) {
+                return;
+            }
+
+            $directory = dirname($path);
+            if (!is_dir($directory)) {
+                @mkdir($directory, 0775, true);
+            }
+
+            $tmp = $path . '.tmp';
+            if (file_put_contents($tmp, $json) === false) {
+                return;
+            }
+
+            rename($tmp, $path);
+        } catch (\Throwable) {
+            // Report writing is best-effort and should not fail sync execution.
+        }
     }
 }

@@ -21,6 +21,10 @@ final class NcSyncResultTest extends TestCase
         $this->assertSame(0, $r->skipped);
         $this->assertSame(0, $r->failed);
         $this->assertFalse($r->fetchFailed);
+        $this->assertSame(0, $r->fetched);
+        $this->assertSame([], $r->skipReasons);
+        $this->assertSame([], $r->createdSamples);
+        $this->assertSame([], $r->skippedSamples);
     }
 
     #[Test]
@@ -45,12 +49,28 @@ final class NcSyncResultTest extends TestCase
     }
 
     #[Test]
-    public function toArrayIncludesAllCounters(): void
+    public function toArrayIncludesCountersAndObservabilityFields(): void
     {
-        $r = (new NcSyncResult())->withCreated(4)->withSkipped(2)->withFailed(1);
+        $r = (new NcSyncResult())
+            ->withCreated(4)
+            ->withSkipped(2)
+            ->withFailed(1)
+            ->withFetched(8)
+            ->withSkipReason('missing_regional_signal', 2)
+            ->withCreatedSample(['title' => 'A'], 10)
+            ->withSkippedSample(['title' => 'B', 'reason' => 'missing_regional_signal'], 10);
 
         $this->assertSame(
-            ['created' => 4, 'skipped' => 2, 'failed' => 1, 'fetch_failed' => false],
+            [
+                'created' => 4,
+                'skipped' => 2,
+                'failed' => 1,
+                'fetch_failed' => false,
+                'fetched' => 8,
+                'skip_reasons' => ['missing_regional_signal' => 2],
+                'created_samples' => [['title' => 'A']],
+                'skipped_samples' => [['title' => 'B', 'reason' => 'missing_regional_signal']],
+            ],
             $r->toArray(),
         );
     }

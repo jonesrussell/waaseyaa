@@ -12,6 +12,7 @@ use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 use Waaseyaa\NorthCloud\Client\NorthCloudClient;
+use Waaseyaa\NorthCloud\Sync\NcHitSupportDiagnosticsInterface;
 use Waaseyaa\NorthCloud\Sync\MapperRegistry;
 use Waaseyaa\NorthCloud\Sync\NcHitToEntityMapperInterface;
 use Waaseyaa\NorthCloud\Sync\NcSyncService;
@@ -212,6 +213,29 @@ final class NcSyncServiceTest extends TestCase
     }
 
     #[Test]
+    public function explainCapturesSkipReasonsAndSampleRows(): void
+    {
+        $client = $this->stubClient(['hits' => [['id' => 'a', 'title' => 'No region', 'url' => 'https://x']], 'total_hits' => 1]);
+
+        $registry = new MapperRegistry();
+        $registry->register(new DiagnosticRejectingMapper('missing_regional_signal'));
+
+        $service = new NcSyncService(
+            $client,
+            $this->stubEntityTypeManager(['thing' => $this->stubStorage($this->stubQuery([]))]),
+            $registry,
+        );
+
+        $result = $service->sync(dryRun: true, explain: true, sampleLimit: 5);
+
+        $this->assertSame(1, $result->skipped);
+        $this->assertSame(['missing_regional_signal' => 1], $result->skipReasons);
+        $this->assertCount(1, $result->skippedSamples);
+        $this->assertSame('missing_regional_signal', $result->skippedSamples[0]['reason'] ?? null);
+        $this->assertSame(1, $result->fetched);
+    }
+
+    #[Test]
     public function mapperExceptionDuringSaveIsCaughtAndCountsAsFailed(): void
     {
         $client = $this->stubClient(['hits' => [['id' => 'a']], 'total_hits' => 1]);
@@ -379,6 +403,40 @@ final class SelectiveMapper implements NcHitToEntityMapperInterface
     public function map(array $hit): array
     {
         return $this->map;
+    }
+
+    public function dedupField(): string
+    {
+        return 'source_url';
+    }
+}
+
+final class DiagnosticRejectingMapper implements NcHitToEntityMapperInterface, NcHitSupportDiagnosticsInterface
+{
+    public function __construct(private readonly string $reason) {}
+
+    public function entityType(): string
+    {
+        return 'thing';
+    }
+
+    public function supports(array $hit): bool
+    {
+        return false;
+    }
+
+    public function diagnoseSupport(array $hit): array
+    {
+        return [
+            'supported' => false,
+            'reason' => $this->reason,
+            'details' => ['id' => (string) ($hit['id'] ?? '')],
+        ];
+    }
+
+    public function map(array $hit): array
+    {
+        return ['source_url' => 'https://mapped.example/never'];
     }
 
     public function dedupField(): string
