@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `northcloud`: observable dry-run diagnostics for sync runs.
+
+### Changed
+
+- **BREAKING (entity-storage):** `EntityStorageDriverInterface::write()` now returns `string` (the effective id of the persisted row) instead of `void`. `SqlStorageDriver` captures the auto-increment pk via `lastInsertId` and `EntityRepository::doSave()` back-fills the entity before `POST_SAVE` dispatches, so listeners observe the real id on new rows. Removes the need for downstream reload-by-uuid workarounds (waaseyaa/giiken#57).
+
+### Fixed
+
+- `northcloud`: map `NcHitSupportDiagnosticsInterface` as public and add missing public surface dispositions (#1265).
+- Root `composer.json`: require `waaseyaa/northcloud` so the package resolves in monorepo installs.
+
 ## [0.1.0-alpha.121] - 2026-04-10
 
 ### Fixed
