@@ -16,6 +16,9 @@ BRANCH=$(git branch --show-current)
 # Must be clean
 [ -z "$(git status --porcelain)" ] || { echo "ERROR: working tree is not clean"; exit 1; }
 
+# Must be a real split-capable monorepo revision
+bash bin/check-monorepo-release-shape HEAD >/dev/null
+
 # Must be synced with origin
 git fetch origin main --quiet
 LOCAL=$(git rev-parse HEAD)
