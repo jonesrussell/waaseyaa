@@ -161,6 +161,7 @@ return [
     'Waaseyaa\Path\PathAliasManagerInterface' => 'public',
     'Waaseyaa\Relationship\VisibilityFilterInterface' => 'public',
     'Waaseyaa\NorthCloud\Sync\NcHitToEntityMapperInterface' => 'public',
+    'Waaseyaa\NorthCloud\Sync\NcHitSupportDiagnosticsInterface' => 'public',
 
     // Layer 3: Services — public
     'Waaseyaa\Search\SearchProviderInterface' => 'public',
