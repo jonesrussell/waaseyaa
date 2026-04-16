@@ -160,6 +160,7 @@ return [
     'Waaseyaa\Media\FileRepositoryInterface' => 'public',
     'Waaseyaa\Path\PathAliasManagerInterface' => 'public',
     'Waaseyaa\Relationship\VisibilityFilterInterface' => 'public',
+    'Waaseyaa\NorthCloud\Sync\NcHitToEntityMapperInterface' => 'public',
 
     // Layer 3: Services — public
     'Waaseyaa\Search\SearchProviderInterface' => 'public',
@@ -196,6 +197,7 @@ return [
     'Waaseyaa\AdminSurface\Action\SurfaceActionHandlerInterface' => 'public',
     'Waaseyaa\AdminSurface\Query\SurfaceFilterOperator' => 'public',
     'Waaseyaa\AdminSurface\Host\AbstractAdminSurfaceHost' => 'public',
+    'Waaseyaa\Bimaaji\Graph\GraphSectionProviderInterface' => 'public',
     'Waaseyaa\Mcp\Bridge\ToolExecutorInterface' => 'public',
     'Waaseyaa\Mcp\Bridge\ToolRegistryInterface' => 'public',
     'Waaseyaa\Mcp\Auth\McpAuthInterface' => 'public',
