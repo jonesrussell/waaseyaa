@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Oidc;
 
 use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
@@ -16,6 +17,8 @@ use Waaseyaa\Oidc\Http\DiscoveryController;
 use Waaseyaa\Oidc\Http\JwksController;
 use Waaseyaa\Oidc\Keys\OidcKeyLoaderInterface;
 use Waaseyaa\Oidc\Keys\PemFileKeyLoader;
+use Waaseyaa\Oidc\Repository\AuthorizationCodeRepositoryInterface;
+use Waaseyaa\Oidc\Repository\DatabaseAuthorizationCodeRepository;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 final class OidcServiceProvider extends ServiceProvider
@@ -90,6 +93,21 @@ final class OidcServiceProvider extends ServiceProvider
             fn(): JwksController => new JwksController(
                 keyLoader: $this->resolve(OidcKeyLoaderInterface::class),
             ),
+        );
+
+        $this->singleton(
+            AuthorizationCodeRepositoryInterface::class,
+            function (): AuthorizationCodeRepositoryInterface {
+                $database = $this->resolve(DatabaseInterface::class);
+                if (!$database instanceof DBALDatabase) {
+                    throw new \RuntimeException(
+                        'OIDC authorization code repository requires a DBALDatabase instance; '
+                        . 'got ' . $database::class . '.',
+                    );
+                }
+
+                return new DatabaseAuthorizationCodeRepository(database: $database);
+            },
         );
     }
 
