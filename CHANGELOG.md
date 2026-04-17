@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.145] - 2026-04-16
+
 ### Changed
 
 - `EnvLoader::load()` now populates `$_ENV` and `$_SERVER` in addition to `putenv()`, each guarded independently against overwriting a preset value. Consumer entry points (`public/index.php`, CLI bins) can drop their own `Symfony\Component\Dotenv` blocks — the kernel already owns `.env` loading. See ADR-005.
