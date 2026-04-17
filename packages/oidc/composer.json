@@ -1,0 +1,57 @@
+{
+    "name": "waaseyaa/oidc",
+    "description": "OpenID Connect issuer for Waaseyaa \u2014 ecosystem-wide single sign-on",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../foundation"
+        },
+        {
+            "type": "path",
+            "url": "../access"
+        },
+        {
+            "type": "path",
+            "url": "../user"
+        }
+    ],
+    "require": {
+        "php": ">=8.4",
+        "lcobucci/jwt": "^5.3",
+        "league/oauth2-server": "^9.0",
+        "waaseyaa/access": "^0.1",
+        "waaseyaa/foundation": "^0.1",
+        "waaseyaa/user": "^0.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Waaseyaa\\Oidc\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Waaseyaa\\Oidc\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "waaseyaa": {
+            "layer": 6,
+            "providers": [
+                "Waaseyaa\\Oidc\\OidcServiceProvider"
+            ]
+        },
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
+}
