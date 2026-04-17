@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `EnvLoader::load()` now populates `$_ENV` and `$_SERVER` in addition to `putenv()`, each guarded independently against overwriting a preset value. Consumer entry points (`public/index.php`, CLI bins) can drop their own `Symfony\Component\Dotenv` blocks — the kernel already owns `.env` loading. See ADR-005.
+
+### Fixed
+
+- CLI: `vendor/bin/waaseyaa` now resolves project root via `getcwd()` instead of walking up from `__DIR__`. Previously, `__DIR__` canonicalized through symlinks, so a consumer with `vendor/waaseyaa/cli` symlinked to the framework monorepo (standard local-dev workflow) booted the kernel with the framework repo as `$projectRoot`, read `.env` from the wrong place, and fell through to `APP_ENV=production`. See ADR-005.
+- CLI: running the binary from outside a project root now errors with a clear message (`must be run from a project root (directory containing composer.json)`) instead of silently resolving to the wrong location.
+
+### Removed
+
+- `packages/framework` metapackage (ADR-004 partial). Its declared name (`waaseyaa/framework`) collided with the monorepo's own repo and was the root cause of the 2026-04-16 release-pipeline incident that reduced `origin/main` to a single `composer.json`. The invariant "there is exactly one composer.json declaring `waaseyaa/framework`, and it is the monorepo root" is now enforced by construction. The `replace`-block rewrite described in ADR-004 §5 is deferred — `PackageManifestCompiler` and other discovery paths rely on `vendor/composer/installed.json` entries that `replace` semantics omit. A follow-up ADR will fix discovery before the rewrite lands.
+- `skeleton/bin/waaseyaa` wrapper. Consumer apps use `./vendor/bin/waaseyaa` via Composer's auto-generated proxy. The wrapper previously existed to work around the CLI bootstrap bugs now fixed by ADR-005.
+
 ## [0.1.0-alpha.144] - 2026-04-16
 
 ### Added
