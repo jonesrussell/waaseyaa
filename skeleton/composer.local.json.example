@@ -1,11 +1,5 @@
 {
+    "_comment": "Per-developer overrides. Copied to composer.local.json and merged by wikimedia/composer-merge-plugin. The default path repo for ../waaseyaa/packages/* already lives in composer.json; add entries here only for non-standard overrides (alternate framework checkout path, extra test packages, etc.).",
     "repositories": [
-        {
-            "type": "path",
-            "url": "../waaseyaa/packages/*",
-            "options": {
-                "symlink": true
-            }
-        }
     ]
 }

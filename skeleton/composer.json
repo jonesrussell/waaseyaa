@@ -3,6 +3,15 @@
     "description": "Waaseyaa CMS project skeleton",
     "type": "project",
     "license": "GPL-2.0-or-later",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../waaseyaa/packages/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "require": {
         "php": ">=8.4",
         "symfony/dotenv": "^8.0",
