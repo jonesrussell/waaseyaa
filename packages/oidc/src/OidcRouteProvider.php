@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Oidc;
 
+use Waaseyaa\Oidc\Authorize\AuthorizeController;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 final readonly class OidcRouteProvider
 {
+    public function __construct(private ?AuthorizeController $authorizeController = null) {}
+
     public function registerRoutes(WaaseyaaRouter $router): void
     {
         $router->addRoute(
@@ -28,5 +31,16 @@ final readonly class OidcRouteProvider
                 ->allowAll()
                 ->build(),
         );
+
+        if ($this->authorizeController !== null) {
+            $router->addRoute(
+                'oidc.authorize',
+                RouteBuilder::create('/authorize')
+                    ->controller($this->authorizeController)
+                    ->methods('GET')
+                    ->allowAll()
+                    ->build(),
+            );
+        }
     }
 }
