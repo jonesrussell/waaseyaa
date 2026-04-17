@@ -11,6 +11,9 @@ use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
+use Waaseyaa\Oidc\Authorize\AuthorizationRequestValidator;
+use Waaseyaa\Oidc\Authorize\AuthorizeController;
+use Waaseyaa\Oidc\ClientRegistry\OidcClientLookup;
 use Waaseyaa\Oidc\ClientRegistry\OidcClientSeeder;
 use Waaseyaa\Oidc\Entity\OidcClient;
 use Waaseyaa\Oidc\Http\DiscoveryController;
@@ -109,6 +112,36 @@ final class OidcServiceProvider extends ServiceProvider
                 return new DatabaseAuthorizationCodeRepository(database: $database);
             },
         );
+
+        $this->singleton(
+            OidcClientLookup::class,
+            function (): OidcClientLookup {
+                $entityTypeManager = $this->resolve(EntityTypeManager::class);
+                $storage = $entityTypeManager->getStorage('oidc_client');
+                if (!$storage instanceof SqlEntityStorage) {
+                    throw new \RuntimeException(
+                        'OIDC client lookup requires SqlEntityStorage; got ' . $storage::class . '.',
+                    );
+                }
+
+                return new OidcClientLookup($storage);
+            },
+        );
+
+        $this->singleton(
+            AuthorizationRequestValidator::class,
+            static fn(): AuthorizationRequestValidator => new AuthorizationRequestValidator(),
+        );
+
+        $this->singleton(
+            AuthorizeController::class,
+            fn(): AuthorizeController => new AuthorizeController(
+                clientLookup: $this->resolve(OidcClientLookup::class),
+                validator: $this->resolve(AuthorizationRequestValidator::class),
+                codeRepository: $this->resolve(AuthorizationCodeRepositoryInterface::class),
+                loginPath: $this->resolveLoginPath(),
+            ),
+        );
     }
 
     public function boot(): void
@@ -172,7 +205,29 @@ final class OidcServiceProvider extends ServiceProvider
 
     public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
     {
-        (new OidcRouteProvider())->registerRoutes($router);
+        $authorizeController = null;
+        try {
+            $authorizeController = $this->resolve(AuthorizeController::class);
+        } catch (\Throwable) {
+            // Storage not available yet (e.g., bootstrap without entity system); skip authorize route.
+        }
+
+        (new OidcRouteProvider(authorizeController: $authorizeController))->registerRoutes($router);
+    }
+
+    /**
+     * Resolve the path to the login page for anonymous authorize redirects.
+     * Defaults to `/login` (the admin SPA login route). Override via
+     * `config['oidc']['login_path']` when the login UI lives elsewhere.
+     */
+    private function resolveLoginPath(): string
+    {
+        $configured = $this->config['oidc']['login_path'] ?? null;
+        if (is_string($configured) && $configured !== '') {
+            return $configured;
+        }
+
+        return '/login';
     }
 
     /**
