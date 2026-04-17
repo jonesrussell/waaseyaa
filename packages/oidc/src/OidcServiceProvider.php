@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Oidc;
 
+use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\EntityStorage\SqlEntityStorage;
+use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
+use Waaseyaa\Oidc\ClientRegistry\OidcClientSeeder;
+use Waaseyaa\Oidc\Entity\OidcClient;
 use Waaseyaa\Oidc\Http\DiscoveryController;
 use Waaseyaa\Oidc\Http\JwksController;
 use Waaseyaa\Oidc\Keys\OidcKeyLoaderInterface;
@@ -16,6 +22,59 @@ final class OidcServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->entityType(new EntityType(
+            id: 'oidc_client',
+            label: 'OIDC Client',
+            description: 'Relying-party clients registered with the OIDC issuer.',
+            class: OidcClient::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
+            group: 'oidc',
+            fieldDefinitions: [
+                'client_id' => [
+                    'type' => 'string',
+                    'label' => 'Client ID',
+                    'description' => 'Stable public identifier for the client (OIDC spec).',
+                    'weight' => 0,
+                ],
+                'name' => [
+                    'type' => 'string',
+                    'label' => 'Name',
+                    'description' => 'Human-readable name shown in admin UIs.',
+                    'weight' => 1,
+                ],
+                'redirect_uris' => [
+                    'type' => 'string_list',
+                    'label' => 'Redirect URIs',
+                    'description' => 'Registered redirect URIs. Matched byte-for-byte per OIDC spec §3.1.2.1.',
+                    'weight' => 2,
+                ],
+                'scopes' => [
+                    'type' => 'string_list',
+                    'label' => 'Scopes',
+                    'description' => 'Scopes the client may request.',
+                    'weight' => 3,
+                ],
+                'grant_types' => [
+                    'type' => 'string_list',
+                    'label' => 'Grant types',
+                    'description' => 'OAuth grant types the client may use.',
+                    'weight' => 4,
+                ],
+                'is_confidential' => [
+                    'type' => 'boolean',
+                    'label' => 'Confidential',
+                    'description' => 'Whether the client authenticates with a secret.',
+                    'weight' => 5,
+                ],
+                'client_secret_hash' => [
+                    'type' => 'string',
+                    'label' => 'Client secret hash',
+                    'description' => 'Hashed client secret. Never exposed through the API.',
+                    'weight' => 6,
+                ],
+            ],
+        ));
+
         $this->singleton(
             DiscoveryController::class,
             fn(): DiscoveryController => new DiscoveryController(issuer: $this->resolveIssuer()),
@@ -32,6 +91,65 @@ final class OidcServiceProvider extends ServiceProvider
                 keyLoader: $this->resolve(OidcKeyLoaderInterface::class),
             ),
         );
+    }
+
+    public function boot(): void
+    {
+        $this->ensureOidcClientSchema();
+        $this->seedOidcClientsFromConfig();
+    }
+
+    /**
+     * Ensure the columns we need for indexed lookups exist on the oidc_client table.
+     *
+     * The kernel's storage factory calls ensureTable() (id/uuid/langcode/_data) when
+     * storage is first resolved; addFieldColumns() is idempotent, so re-running on
+     * each boot is safe. When package-level migrations land, this should move there.
+     */
+    private function ensureOidcClientSchema(): void
+    {
+        try {
+            $database = $this->resolve(DatabaseInterface::class);
+            $entityTypeManager = $this->resolve(EntityTypeManager::class);
+        } catch (\Throwable) {
+            return;
+        }
+
+        if (!$entityTypeManager->hasDefinition('oidc_client')) {
+            return;
+        }
+
+        $definition = $entityTypeManager->getDefinition('oidc_client');
+
+        $handler = new SqlSchemaHandler($definition, $database);
+        $handler->ensureTable();
+        $handler->addFieldColumns([
+            'client_id' => ['type' => 'varchar', 'length' => 255, 'not null' => true],
+            'name' => ['type' => 'varchar', 'length' => 255, 'not null' => true],
+            'is_confidential' => ['type' => 'int', 'not null' => true, 'default' => 0],
+            'client_secret_hash' => ['type' => 'varchar', 'length' => 255, 'not null' => false],
+        ]);
+    }
+
+    private function seedOidcClientsFromConfig(): void
+    {
+        $clients = $this->config['oidc']['clients'] ?? null;
+        if (!is_array($clients) || $clients === []) {
+            return;
+        }
+
+        try {
+            $entityTypeManager = $this->resolve(EntityTypeManager::class);
+            $storage = $entityTypeManager->getStorage('oidc_client');
+        } catch (\Throwable) {
+            return;
+        }
+
+        if (!$storage instanceof SqlEntityStorage) {
+            return;
+        }
+
+        (new OidcClientSeeder($storage))->seed($clients);
     }
 
     public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
