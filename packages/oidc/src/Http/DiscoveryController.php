@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Waaseyaa\Oidc\Http;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 
 final readonly class DiscoveryController
 {
     public function __construct(private string $issuer) {}
 
-    public function serve(Request $request): JsonResponse
+    public function serve(): JsonResponse
     {
         return new JsonResponse([
             'issuer' => $this->issuer,

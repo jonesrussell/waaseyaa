@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\Oidc\Http\DiscoveryController;
 
 #[CoversClass(DiscoveryController::class)]
@@ -18,9 +17,8 @@ final class DiscoveryControllerTest extends TestCase
     public function serveReturnsJsonResponseWithIssuerFromConfig(): void
     {
         $controller = new DiscoveryController(issuer: 'https://id.example');
-        $request = Request::create('/.well-known/openid-configuration');
 
-        $response = $controller->serve($request);
+        $response = $controller->serve();
 
         self::assertInstanceOf(JsonResponse::class, $response);
         self::assertSame(200, $response->getStatusCode());
@@ -34,8 +32,7 @@ final class DiscoveryControllerTest extends TestCase
     {
         $controller = new DiscoveryController(issuer: 'https://id.example');
 
-        $response = $controller->serve(Request::create('/.well-known/openid-configuration'));
-        $body = json_decode((string) $response->getContent(), true);
+        $body = json_decode((string) $controller->serve()->getContent(), true);
 
         self::assertSame('https://id.example/authorize', $body['authorization_endpoint'] ?? null);
         self::assertSame('https://id.example/token', $body['token_endpoint'] ?? null);
@@ -48,8 +45,7 @@ final class DiscoveryControllerTest extends TestCase
     {
         $controller = new DiscoveryController(issuer: 'https://id.example');
 
-        $response = $controller->serve(Request::create('/.well-known/openid-configuration'));
-        $body = json_decode((string) $response->getContent(), true);
+        $body = json_decode((string) $controller->serve()->getContent(), true);
 
         self::assertContains('code', $body['response_types_supported'] ?? []);
         self::assertContains('public', $body['subject_types_supported'] ?? []);
