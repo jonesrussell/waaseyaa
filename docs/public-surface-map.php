@@ -202,6 +202,7 @@ return [
     'Waaseyaa\Mcp\Bridge\ToolExecutorInterface' => 'public',
     'Waaseyaa\Mcp\Bridge\ToolRegistryInterface' => 'public',
     'Waaseyaa\Mcp\Auth\McpAuthInterface' => 'public',
+    'Waaseyaa\Oidc\Keys\OidcKeyLoaderInterface' => 'public',
     'Waaseyaa\SSR\ThemeInterface' => 'public',
 
     // Layer 1: Core Data — public (discovered during L5-L6 scan)

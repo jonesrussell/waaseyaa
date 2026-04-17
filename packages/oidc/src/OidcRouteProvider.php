@@ -19,5 +19,14 @@ final readonly class OidcRouteProvider
                 ->allowAll()
                 ->build(),
         );
+
+        $router->addRoute(
+            'oidc.jwks',
+            RouteBuilder::create('/.well-known/jwks.json')
+                ->controller('Waaseyaa\\Oidc\\Http\\JwksController::serve')
+                ->methods('GET')
+                ->allowAll()
+                ->build(),
+        );
     }
 }

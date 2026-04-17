@@ -28,4 +28,24 @@ final class OidcRouteProviderTest extends TestCase
         self::assertContains('GET', $route->getMethods());
         self::assertTrue($route->getOption('_public'));
     }
+
+    #[Test]
+    public function registerRoutesAddsJwksRoute(): void
+    {
+        $router = new WaaseyaaRouter();
+        $provider = new OidcRouteProvider();
+
+        $provider->registerRoutes($router);
+
+        $route = $router->getRouteCollection()->get('oidc.jwks');
+
+        self::assertNotNull($route);
+        self::assertSame('/.well-known/jwks.json', $route->getPath());
+        self::assertContains('GET', $route->getMethods());
+        self::assertTrue($route->getOption('_public'));
+        self::assertSame(
+            'Waaseyaa\\Oidc\\Http\\JwksController::serve',
+            $route->getDefault('_controller'),
+        );
+    }
 }
