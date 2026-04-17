@@ -248,6 +248,10 @@
         {
             "type": "path",
             "url": "packages/analytics"
+        },
+        {
+            "type": "path",
+            "url": "packages/oidc"
         }
     ],
     "require": {
@@ -297,6 +301,7 @@
         "waaseyaa/note": "@dev",
         "waaseyaa/notification": "@dev",
         "waaseyaa/oauth-provider": "@dev",
+        "waaseyaa/oidc": "@dev",
         "waaseyaa/path": "@dev",
         "waaseyaa/plugin": "@dev",
         "waaseyaa/queue": "@dev",
@@ -382,6 +387,7 @@
             "Waaseyaa\\Bimaaji\\Tests\\": "packages/bimaaji/tests/",
             "Waaseyaa\\HttpClient\\Tests\\": "packages/http-client/tests/",
             "Waaseyaa\\OAuthProvider\\Tests\\": "packages/oauth-provider/tests/",
+            "Waaseyaa\\Oidc\\Tests\\": "packages/oidc/tests/",
             "Waaseyaa\\Engagement\\Tests\\": "packages/engagement/tests/",
             "Waaseyaa\\Tests\\": "tests/"
         }
