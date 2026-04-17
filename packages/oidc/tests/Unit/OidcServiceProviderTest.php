@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Waaseyaa\Oidc\Entity\OidcClient;
 use Waaseyaa\Oidc\Http\DiscoveryController;
 use Waaseyaa\Oidc\Http\JwksController;
 use Waaseyaa\Oidc\Keys\OidcKeyLoaderInterface;
@@ -188,6 +189,39 @@ final class OidcServiceProviderTest extends TestCase
         $body = json_decode((string) $controller->serve()->getContent(), true, 512, JSON_THROW_ON_ERROR);
         self::assertCount(1, $body['keys']);
         self::assertSame('jwks-key', $body['keys'][0]['kid']);
+    }
+
+    #[Test]
+    public function registerRegistersOidcClientEntityType(): void
+    {
+        $provider = new OidcServiceProvider();
+        $provider->setKernelContext('/tmp/oidc-test', []);
+
+        $provider->register();
+
+        $entityTypes = $provider->getEntityTypes();
+        $ids = array_map(fn($t) => $t->id(), $entityTypes);
+        self::assertContains('oidc_client', $ids);
+
+        $oidcClient = null;
+        foreach ($entityTypes as $type) {
+            if ($type->id() === 'oidc_client') {
+                $oidcClient = $type;
+                break;
+            }
+        }
+        self::assertNotNull($oidcClient);
+        self::assertSame(OidcClient::class, $oidcClient->getClass());
+        self::assertSame(
+            ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
+            $oidcClient->getKeys(),
+        );
+
+        $fields = $oidcClient->getFieldDefinitions();
+        self::assertArrayHasKey('client_id', $fields);
+        self::assertArrayHasKey('redirect_uris', $fields);
+        self::assertArrayHasKey('scopes', $fields);
+        self::assertArrayHasKey('client_secret_hash', $fields);
     }
 
     #[Test]
