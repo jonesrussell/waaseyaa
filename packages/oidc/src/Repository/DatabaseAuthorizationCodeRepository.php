@@ -139,6 +139,11 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
             )
         SQL);
 
+        // Tables provisioned before #1289 lack the nonce column. Adding it lazily
+        // keeps the "one migration per schema bump" pattern and avoids a separate
+        // migration file for a single nullable column.
+        $this->ensureColumn('nonce', 'VARCHAR(255)');
+
         $this->database->query(
             'CREATE INDEX IF NOT EXISTS idx_oidc_auth_codes_expires_at ON oidc_authorization_codes (expires_at)',
         );
@@ -147,6 +152,24 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
         );
 
         $this->tableEnsured = true;
+    }
+
+    private function ensureColumn(string $column, string $definition): void
+    {
+        $columns = $this->database->getConnection()
+            ->createSchemaManager()
+            ->listTableColumns(self::TABLE);
+
+        if (isset($columns[$column])) {
+            return;
+        }
+
+        $this->database->query(sprintf(
+            'ALTER TABLE %s ADD COLUMN %s %s',
+            self::TABLE,
+            $column,
+            $definition,
+        ));
     }
 
     /**

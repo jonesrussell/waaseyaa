@@ -175,6 +175,42 @@ final class DatabaseAuthorizationCodeRepositoryTest extends TestCase
         self::assertSame(0, $repo->purgeExpired());
     }
 
+    public function testEnsureTableAddsNonceColumnToLegacySchema(): void
+    {
+        // Simulate a table provisioned by #1283 before nonce was introduced.
+        $this->database->query(<<<'SQL'
+            CREATE TABLE oidc_authorization_codes (
+                code VARCHAR(128) PRIMARY KEY,
+                client_id VARCHAR(255) NOT NULL,
+                account_id VARCHAR(255) NOT NULL,
+                redirect_uri TEXT NOT NULL,
+                scopes TEXT NOT NULL,
+                code_challenge VARCHAR(128) NOT NULL,
+                code_challenge_method VARCHAR(16) NOT NULL,
+                issued_at INTEGER NOT NULL,
+                expires_at INTEGER NOT NULL,
+                consumed_at INTEGER
+            )
+        SQL);
+
+        $repo = $this->buildRepo();
+
+        $issued = $repo->issue(
+            clientId: 'minoo-web',
+            account: $this->account('42'),
+            redirectUri: 'https://minoo.test/callback',
+            scopes: ['openid'],
+            codeChallenge: 'ch4lleng3',
+            codeChallengeMethod: 'S256',
+            nonce: 'n-migrated',
+        );
+
+        self::assertSame('n-migrated', $issued->nonce);
+        $consumed = $repo->consume($issued->code);
+        self::assertNotNull($consumed);
+        self::assertSame('n-migrated', $consumed->nonce);
+    }
+
     private function buildRepo(): DatabaseAuthorizationCodeRepository
     {
         return new DatabaseAuthorizationCodeRepository(
