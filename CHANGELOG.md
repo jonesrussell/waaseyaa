@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `oidc`: `/authorize` now propagates the OIDC `nonce` query parameter through the authorization code repository. `AuthorizationCodeRepositoryInterface::issue()` accepts `?string $nonce = null`, `AuthorizationCode` exposes it as a public field, and `DatabaseAuthorizationCodeRepository` stores it in a new nullable `nonce` column (added lazily via `ALTER TABLE` for tables provisioned before this change). Required by OIDC Core §3.1.3.6 so `/token` can embed `nonce` in the issued ID token. Closes #1289.
+
 ## [0.1.0-alpha.145] - 2026-04-16
 
 ### Changed
