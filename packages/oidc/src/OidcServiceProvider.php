@@ -22,6 +22,10 @@ use Waaseyaa\Oidc\Keys\OidcKeyLoaderInterface;
 use Waaseyaa\Oidc\Keys\PemFileKeyLoader;
 use Waaseyaa\Oidc\Repository\AuthorizationCodeRepositoryInterface;
 use Waaseyaa\Oidc\Repository\DatabaseAuthorizationCodeRepository;
+use Waaseyaa\Oidc\Token\IdTokenMinter;
+use Waaseyaa\Oidc\Token\PkceVerifier;
+use Waaseyaa\Oidc\Token\TokenController;
+use Waaseyaa\Oidc\Token\TokenRequestValidator;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 final class OidcServiceProvider extends ServiceProvider
@@ -142,6 +146,36 @@ final class OidcServiceProvider extends ServiceProvider
                 loginPath: $this->resolveLoginPath(),
             ),
         );
+
+        $this->singleton(
+            PkceVerifier::class,
+            static fn(): PkceVerifier => new PkceVerifier(),
+        );
+
+        $this->singleton(
+            TokenRequestValidator::class,
+            static fn(): TokenRequestValidator => new TokenRequestValidator(),
+        );
+
+        $this->singleton(
+            IdTokenMinter::class,
+            fn(): IdTokenMinter => new IdTokenMinter(
+                keyLoader: $this->resolve(OidcKeyLoaderInterface::class),
+            ),
+        );
+
+        $this->singleton(
+            TokenController::class,
+            fn(): TokenController => new TokenController(
+                clientLookup: $this->resolve(OidcClientLookup::class),
+                validator: $this->resolve(TokenRequestValidator::class),
+                pkceVerifier: $this->resolve(PkceVerifier::class),
+                codeRepository: $this->resolve(AuthorizationCodeRepositoryInterface::class),
+                idTokenMinter: $this->resolve(IdTokenMinter::class),
+                issuer: $this->resolveIssuer(),
+                clock: static fn(): \DateTimeImmutable => new \DateTimeImmutable(),
+            ),
+        );
     }
 
     public function boot(): void
@@ -212,7 +246,17 @@ final class OidcServiceProvider extends ServiceProvider
             // Storage not available yet (e.g., bootstrap without entity system); skip authorize route.
         }
 
-        (new OidcRouteProvider(authorizeController: $authorizeController))->registerRoutes($router);
+        $tokenController = null;
+        try {
+            $tokenController = $this->resolve(TokenController::class);
+        } catch (\Throwable) {
+            // Storage or signing keys not available yet; skip token route.
+        }
+
+        (new OidcRouteProvider(
+            authorizeController: $authorizeController,
+            tokenController: $tokenController,
+        ))->registerRoutes($router);
     }
 
     /**

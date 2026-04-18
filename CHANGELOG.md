@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `oidc`: `/authorize` now propagates the OIDC `nonce` query parameter through the authorization code repository. `AuthorizationCodeRepositoryInterface::issue()` accepts `?string $nonce = null`, `AuthorizationCode` exposes it as a public field, and `DatabaseAuthorizationCodeRepository` stores it in a new nullable `nonce` column (added lazily via `ALTER TABLE` for tables provisioned before this change). Required by OIDC Core §3.1.3.6 so `/token` can embed `nonce` in the issued ID token. Closes #1289.
+- `oidc`: `POST /token` endpoint implementing the OAuth 2.1 / OIDC authorization_code grant (ADR-006 §7, OIDC Core §3.1.3). Exchanges a consumed authorization code for an RS256-signed ID token and an opaque access token. Supports public clients via PKCE S256 alone, and confidential clients via HTTP Basic or `client_secret_post` per RFC 6749 §2.3.1. Enforces byte-exact `redirect_uri` match, `client_id` binding, and PKCE verifier check (RFC 7636). ID token claims: `iss`, `sub`, `aud`, `exp` (10 min), `iat`, `auth_time`, `nonce` (when issued). Error responses follow RFC 6749 §5.2. Route is CSRF-exempt (client authentication happens inside the handler). Non-goals: refresh tokens, `/userinfo`, consent screen, `at_hash` claim, JWT access tokens. Closes #1292.
 
 ## [0.1.0-alpha.145] - 2026-04-16
 
