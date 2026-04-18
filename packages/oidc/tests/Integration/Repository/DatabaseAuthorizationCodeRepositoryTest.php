@@ -48,6 +48,40 @@ final class DatabaseAuthorizationCodeRepositoryTest extends TestCase
         self::assertSame($this->now, $code->issuedAt);
         self::assertSame($this->now + 60, $code->expiresAt, 'OAuth 2.1 mandates 60 s TTL');
         self::assertNull($code->consumedAt);
+        self::assertNull($code->nonce, 'nonce defaults to null when not supplied');
+    }
+
+    public function testIssueStoresNonceWhenProvided(): void
+    {
+        $repo = $this->buildRepo();
+
+        $code = $repo->issue(
+            clientId: 'minoo-web',
+            account: $this->account('42'),
+            redirectUri: 'https://minoo.test/callback',
+            scopes: ['openid'],
+            codeChallenge: 'ch4lleng3',
+            codeChallengeMethod: 'S256',
+            nonce: 'n-0S6_WzA2Mj',
+        );
+
+        self::assertSame('n-0S6_WzA2Mj', $code->nonce);
+
+        $consumed = $repo->consume($code->code);
+        self::assertNotNull($consumed);
+        self::assertSame('n-0S6_WzA2Mj', $consumed->nonce, 'nonce must survive consume() round-trip');
+    }
+
+    public function testConsumeReturnsNullNonceWhenIssuedWithoutNonce(): void
+    {
+        $repo = $this->buildRepo();
+
+        $issued = $repo->issue('minoo-web', $this->account('1'), 'https://x/y', ['openid'], 'c', 'S256');
+
+        $consumed = $repo->consume($issued->code);
+
+        self::assertNotNull($consumed);
+        self::assertNull($consumed->nonce);
     }
 
     public function testIssueProducesUniqueCodesForDistinctCalls(): void
@@ -84,6 +118,7 @@ final class DatabaseAuthorizationCodeRepositoryTest extends TestCase
         self::assertSame('ch4lleng3', $consumed->codeChallenge);
         self::assertSame('S256', $consumed->codeChallengeMethod);
         self::assertSame($this->now, $consumed->consumedAt);
+        self::assertNull($consumed->nonce);
     }
 
     public function testSecondConsumeReturnsNull(): void

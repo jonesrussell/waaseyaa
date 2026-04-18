@@ -16,6 +16,9 @@ final readonly class AuthorizationCode
 {
     /**
      * @param list<string> $scopes
+     * @param ?string $nonce Verbatim copy of the OIDC `nonce` authorize param, or null.
+     *                      /token must include this in the ID token's `nonce` claim per
+     *                      OpenID Connect Core §3.1.3.6.
      */
     public function __construct(
         public string $code,
@@ -28,6 +31,7 @@ final readonly class AuthorizationCode
         public int $issuedAt,
         public int $expiresAt,
         public ?int $consumedAt = null,
+        public ?string $nonce = null,
     ) {}
 
     public function isExpired(int $now): bool
