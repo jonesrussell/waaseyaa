@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `oidc`: `/authorize` now propagates the OIDC `nonce` query parameter through the authorization code repository. `AuthorizationCodeRepositoryInterface::issue()` accepts `?string $nonce = null`, `AuthorizationCode` exposes it as a public field, and `DatabaseAuthorizationCodeRepository` stores it in a new nullable `nonce` column (added lazily via `ALTER TABLE` for tables provisioned before this change). Required by OIDC Core §3.1.3.6 so `/token` can embed `nonce` in the issued ID token. Closes #1289.
 
+### Fixed
+
+- `cli`: `waaseyaa serve` now starts PHP's built-in server with `public/index.php` as the router script instead of only setting the document root. This restores dynamic front-controller routing for local app development, so routes like `/submissions/1` and `/cohorts/1` resolve correctly under `composer run dev`.
+
 ## [0.1.0-alpha.145] - 2026-04-16
 
 ### Changed
