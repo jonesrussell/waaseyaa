@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.147] - 2026-04-18
+
+### Fixed
+
+- `northcloud`: `NorthCloudServiceProvider` now wires `allow_insecure` through to `NorthCloudClient`. Reads the flag from config, honors `NORTHCLOUD_ALLOW_INSECURE` env var, and auto-permits `http://localhost` / `http://127.0.0.1` loopback URLs so dev stacks with `NORTHCLOUD_BASE_URL=http://localhost:8050` no longer crash at CLI boot. Production https URLs stay strict. Removes the need for consumer apps to duplicate `shouldAllowInsecureNorthCloudUrl()` helpers across providers and scripts.
+
 ## [0.1.0-alpha.146] - 2026-04-18
 
 ### Added
