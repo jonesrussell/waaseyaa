@@ -48,6 +48,7 @@ final class NorthCloudServiceProvider extends ServiceProvider
                 timeout: (int) ($config['timeout'] ?? 5),
                 cache: $cache,
                 apiToken: (string) ($config['api_token'] ?? ''),
+                allowInsecure: (bool) ($config['allow_insecure'] ?? false),
             );
         });
 
@@ -134,6 +135,16 @@ final class NorthCloudServiceProvider extends ServiceProvider
             $section['api_token'] = $envToken;
         } elseif (!isset($section['api_token'])) {
             $section['api_token'] = '';
+        }
+
+        $envAllowInsecure = getenv('NORTHCLOUD_ALLOW_INSECURE');
+        if ($envAllowInsecure !== false && $envAllowInsecure !== '') {
+            $section['allow_insecure'] = filter_var($envAllowInsecure, FILTER_VALIDATE_BOOLEAN);
+        } elseif (!isset($section['allow_insecure'])) {
+            // Auto-permit http only for obvious loopback dev targets; production URLs stay strict.
+            $baseUrl = (string) ($section['base_url'] ?? '');
+            $section['allow_insecure'] = str_starts_with($baseUrl, 'http://localhost')
+                || str_starts_with($baseUrl, 'http://127.0.0.1');
         }
 
         return $section;
