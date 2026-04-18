@@ -48,4 +48,13 @@ final class OidcRouteProviderTest extends TestCase
             $route->getDefault('_controller'),
         );
     }
+
+    #[Test]
+    public function registerRoutesSkipsTokenRouteWhenControllerNotProvided(): void
+    {
+        $router = new WaaseyaaRouter();
+        (new OidcRouteProvider())->registerRoutes($router);
+
+        self::assertNull($router->getRouteCollection()->get('oidc.token'));
+    }
 }
