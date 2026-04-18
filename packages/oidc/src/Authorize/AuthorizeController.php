@@ -80,6 +80,7 @@ final readonly class AuthorizeController
             scopes: $validated->scopes,
             codeChallenge: $validated->codeChallenge,
             codeChallengeMethod: $validated->codeChallengeMethod,
+            nonce: $validated->nonce,
         );
 
         $params = ['code' => $code->code];

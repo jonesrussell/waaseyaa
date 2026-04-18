@@ -43,6 +43,7 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
         array $scopes,
         string $codeChallenge,
         string $codeChallengeMethod,
+        ?string $nonce = null,
     ): AuthorizationCode {
         $this->ensureTable();
 
@@ -65,6 +66,7 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
                 'issued_at' => $now,
                 'expires_at' => $expiresAt,
                 'consumed_at' => null,
+                'nonce' => $nonce,
             ])
             ->execute();
 
@@ -79,6 +81,7 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
             issuedAt: $now,
             expiresAt: $expiresAt,
             consumedAt: null,
+            nonce: $nonce,
         );
     }
 
@@ -131,9 +134,15 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
                 code_challenge_method VARCHAR(16) NOT NULL,
                 issued_at INTEGER NOT NULL,
                 expires_at INTEGER NOT NULL,
-                consumed_at INTEGER
+                consumed_at INTEGER,
+                nonce VARCHAR(255)
             )
         SQL);
+
+        // Tables provisioned before #1289 lack the nonce column. Adding it lazily
+        // keeps the "one migration per schema bump" pattern and avoids a separate
+        // migration file for a single nullable column.
+        $this->ensureColumn('nonce', 'VARCHAR(255)');
 
         $this->database->query(
             'CREATE INDEX IF NOT EXISTS idx_oidc_auth_codes_expires_at ON oidc_authorization_codes (expires_at)',
@@ -143,6 +152,24 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
         );
 
         $this->tableEnsured = true;
+    }
+
+    private function ensureColumn(string $column, string $definition): void
+    {
+        $columns = $this->database->getConnection()
+            ->createSchemaManager()
+            ->listTableColumns(self::TABLE);
+
+        if (isset($columns[$column])) {
+            return;
+        }
+
+        $this->database->query(sprintf(
+            'ALTER TABLE %s ADD COLUMN %s %s',
+            self::TABLE,
+            $column,
+            $definition,
+        ));
     }
 
     /**
@@ -169,6 +196,8 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
         /** @var list<string> $scopes */
         $scopes = array_values(array_map('strval', $scopes));
 
+        $nonce = $row['nonce'] ?? null;
+
         return new AuthorizationCode(
             code: (string) $row['code'],
             clientId: (string) $row['client_id'],
@@ -180,6 +209,7 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
             issuedAt: (int) $row['issued_at'],
             expiresAt: (int) $row['expires_at'],
             consumedAt: isset($row['consumed_at']) ? (int) $row['consumed_at'] : null,
+            nonce: $nonce === null ? null : (string) $nonce,
         );
     }
 }

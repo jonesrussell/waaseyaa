@@ -24,6 +24,7 @@ final class AuthorizationCodeTest extends TestCase
             issuedAt: 1_000_000,
             expiresAt: 1_000_060,
             consumedAt: null,
+            nonce: 'n-0S6_WzA2Mj',
         );
 
         self::assertSame('abc123', $code->code);
@@ -36,6 +37,14 @@ final class AuthorizationCodeTest extends TestCase
         self::assertSame(1_000_000, $code->issuedAt);
         self::assertSame(1_000_060, $code->expiresAt);
         self::assertNull($code->consumedAt);
+        self::assertSame('n-0S6_WzA2Mj', $code->nonce);
+    }
+
+    public function testNonceDefaultsToNull(): void
+    {
+        $code = $this->sample();
+
+        self::assertNull($code->nonce);
     }
 
     public function testIsExpiredReturnsFalseBeforeExpiry(): void

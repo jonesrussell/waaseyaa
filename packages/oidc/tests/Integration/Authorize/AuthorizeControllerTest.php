@@ -160,6 +160,17 @@ final class AuthorizeControllerTest extends TestCase
         $this->assertSame(['openid', 'profile'], $this->codeRepository->lastScopes);
         $this->assertSame('a-challenge', $this->codeRepository->lastCodeChallenge);
         $this->assertSame('S256', $this->codeRepository->lastCodeChallengeMethod);
+        $this->assertNull($this->codeRepository->lastNonce, 'nonce omitted in /authorize query must reach repo as null');
+    }
+
+    public function testNonceFromQueryIsPassedToRepository(): void
+    {
+        $query = $this->validQuery();
+        $query['nonce'] = 'n-0S6_WzA2Mj';
+
+        ($this->controller)($this->makeRequest($query));
+
+        $this->assertSame('n-0S6_WzA2Mj', $this->codeRepository->lastNonce);
     }
 
     public function testValidRequestWithoutStateOmitsStateInRedirect(): void
@@ -277,6 +288,7 @@ final class FakeCodeRepository implements AuthorizationCodeRepositoryInterface
     public ?array $lastScopes = null;
     public ?string $lastCodeChallenge = null;
     public ?string $lastCodeChallengeMethod = null;
+    public ?string $lastNonce = null;
 
     public function issue(
         string $clientId,
@@ -285,6 +297,7 @@ final class FakeCodeRepository implements AuthorizationCodeRepositoryInterface
         array $scopes,
         string $codeChallenge,
         string $codeChallengeMethod,
+        ?string $nonce = null,
     ): AuthorizationCode {
         $this->lastClientId = $clientId;
         $this->lastAccountId = $account->id();
@@ -292,6 +305,7 @@ final class FakeCodeRepository implements AuthorizationCodeRepositoryInterface
         $this->lastScopes = $scopes;
         $this->lastCodeChallenge = $codeChallenge;
         $this->lastCodeChallengeMethod = $codeChallengeMethod;
+        $this->lastNonce = $nonce;
 
         return new AuthorizationCode(
             code: 'issued-test-code',
@@ -303,6 +317,7 @@ final class FakeCodeRepository implements AuthorizationCodeRepositoryInterface
             codeChallengeMethod: $codeChallengeMethod,
             issuedAt: 1000,
             expiresAt: 1060,
+            nonce: $nonce,
         );
     }
 

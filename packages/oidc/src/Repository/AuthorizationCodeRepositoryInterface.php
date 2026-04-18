@@ -23,6 +23,9 @@ interface AuthorizationCodeRepositoryInterface
      * and PKCE challenge. Returns the persisted AuthorizationCode with its generated
      * code, issuedAt, and expiresAt fields.
      *
+     * The optional OIDC `nonce` is stored verbatim and round-tripped through consume()
+     * so /token can embed it in the ID token's `nonce` claim (OIDC Core §3.1.3.6).
+     *
      * @param list<string> $scopes
      */
     public function issue(
@@ -32,6 +35,7 @@ interface AuthorizationCodeRepositoryInterface
         array $scopes,
         string $codeChallenge,
         string $codeChallengeMethod,
+        ?string $nonce = null,
     ): AuthorizationCode;
 
     /**
