@@ -22,12 +22,44 @@ if (!file_exists($envFile) && file_exists($envExample)) {
     file_put_contents($envFile, $content);
 }
 
+/**
+ * @return array{0: bool, 1: string}
+ */
+function adminPackageStatus(string $projectRoot): array
+{
+    $adminPath = getenv('WAASEYAA_ADMIN_PATH');
+    if (!is_string($adminPath) || $adminPath === '') {
+        $composer = $projectRoot . '/composer.json';
+        if (is_file($composer)) {
+            $decoded = json_decode((string) file_get_contents($composer), true);
+            $adminPath = is_array($decoded) ? ($decoded['extra']['waaseyaa']['admin_path'] ?? '') : '';
+        }
+    }
+
+    if (!is_string($adminPath) || $adminPath === '') {
+        return [false, 'No admin package configured yet.'];
+    }
+
+    $absolute = str_starts_with($adminPath, '/') ? $adminPath : $projectRoot . '/' . $adminPath;
+    if (is_file($absolute . '/package.json')) {
+        return [true, 'Admin package detected; composer run dev will start HMR.'];
+    }
+
+    return [false, 'Admin package path configured but package.json is missing.'];
+}
+
 echo "\n";
 $dir = basename($root);
+[$hasAdminPackage, $adminStatus] = adminPackageStatus($root);
 
 echo "  \033[32mWaaseyaa project ready.\033[0m\n";
 echo "\n";
 echo "  \033[33mcd {$dir}\033[0m\n";
-echo "  \033[33mcomposer run dev\033[0m      Start the dev server\n";
-echo "  \033[33mbin/waaseyaa list\033[0m     See all commands\n";
+echo "  \033[33mcomposer run dev\033[0m      Start backend (and admin HMR when configured)\n";
+echo "  \033[33m./vendor/bin/waaseyaa list\033[0m  See all commands\n";
+echo "\n";
+echo "  {$adminStatus}\n";
+if (!$hasAdminPackage) {
+    echo "  Optional: set \033[33mWAASEYAA_ADMIN_PATH\033[0m to a Nuxt admin package for live-reload UI.\n";
+}
 echo "\n";

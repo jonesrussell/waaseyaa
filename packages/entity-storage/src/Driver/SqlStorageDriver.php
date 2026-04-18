@@ -114,41 +114,51 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
         return $byId;
     }
 
-    public function write(string $entityType, string $id, array $values): void
+    public function write(string $entityType, string $id, array $values): string
     {
         $db = $this->getDatabase();
 
         // Use a scope-unaware existence check: a row with this ID must trigger
         // UPDATE regardless of which community it belongs to, preventing a
         // duplicate INSERT when the active community differs from the stored one.
-        $rowExists = $this->rowExistsById($db, $entityType, $id);
+        $rowExists = $id !== '' && $this->rowExistsById($db, $entityType, $id);
 
         if (!$rowExists) {
-            // Insert.
-            $db->insert($entityType)
-                ->fields(array_keys($values))
-                ->values($values)
+            // Insert. When $id is empty, strip the id column so the DB assigns
+            // an auto-increment value; lastInsertId then reveals the assigned id.
+            $insertValues = $values;
+            if ($id === '' && array_key_exists($this->idKey, $insertValues) && $insertValues[$this->idKey] === null) {
+                unset($insertValues[$this->idKey]);
+            }
+
+            $lastInsertId = (string) $db->insert($entityType)
+                ->fields(array_keys($insertValues))
+                ->values($insertValues)
                 ->execute();
-        } else {
-            // Update: exclude the id from update fields.
-            $updateFields = [];
-            foreach ($values as $key => $value) {
-                if ($key === $this->idKey) {
-                    continue;
-                }
-                $updateFields[$key] = $value;
-            }
 
-            $update = $db->update($entityType)
-                ->fields($updateFields)
-                ->condition($this->idKey, $id);
-
-            if ($this->communityScope?->isActive()) {
-                $update->condition('community_id', $this->communityScope->getCommunityId());
-            }
-
-            $update->execute();
+            return $id !== '' ? $id : $lastInsertId;
         }
+
+        // Update: exclude the id from update fields.
+        $updateFields = [];
+        foreach ($values as $key => $value) {
+            if ($key === $this->idKey) {
+                continue;
+            }
+            $updateFields[$key] = $value;
+        }
+
+        $update = $db->update($entityType)
+            ->fields($updateFields)
+            ->condition($this->idKey, $id);
+
+        if ($this->communityScope?->isActive()) {
+            $update->condition('community_id', $this->communityScope->getCommunityId());
+        }
+
+        $update->execute();
+
+        return $id;
     }
 
     public function remove(string $entityType, string $id): void

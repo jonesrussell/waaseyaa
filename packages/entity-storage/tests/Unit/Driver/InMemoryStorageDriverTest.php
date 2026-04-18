@@ -234,4 +234,35 @@ final class InMemoryStorageDriverTest extends TestCase
         $this->assertNull($this->driver->read('node', '1'));
         $this->assertSame(0, $this->driver->count('node'));
     }
+
+    #[Test]
+    public function writeWithExplicitIdReturnsThatId(): void
+    {
+        $returned = $this->driver->write('node', '42', ['id' => '42', 'label' => 'Explicit']);
+
+        $this->assertSame('42', $returned);
+    }
+
+    #[Test]
+    public function writeWithEmptyIdAssignsDistinctSequentialIds(): void
+    {
+        $first = $this->driver->write('node', '', ['id' => null, 'label' => 'One']);
+        $second = $this->driver->write('node', '', ['id' => null, 'label' => 'Two']);
+
+        $this->assertNotSame('', $first);
+        $this->assertNotSame($first, $second);
+
+        $row = $this->driver->read('node', $first);
+        $this->assertNotNull($row);
+        $this->assertSame('One', $row['label']);
+    }
+
+    #[Test]
+    public function autoIncrementIsPerEntityType(): void
+    {
+        $a = $this->driver->write('alpha', '', ['label' => 'A']);
+        $b = $this->driver->write('beta', '', ['label' => 'B']);
+
+        $this->assertSame($a, $b, 'Separate entity types should have independent counters.');
+    }
 }

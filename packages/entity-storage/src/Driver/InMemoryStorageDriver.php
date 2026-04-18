@@ -32,6 +32,13 @@ final class InMemoryStorageDriver implements EntityStorageDriverInterface
      */
     private array $translations = [];
 
+    /**
+     * Per-entity-type auto-increment counter for empty-id writes.
+     *
+     * @var array<string, int>
+     */
+    private array $autoIncrement = [];
+
     public function read(string $entityType, string $id, ?string $langcode = null): ?array
     {
         if (!isset($this->store[$entityType][$id])) {
@@ -79,9 +86,16 @@ final class InMemoryStorageDriver implements EntityStorageDriverInterface
         return $byId;
     }
 
-    public function write(string $entityType, string $id, array $values): void
+    public function write(string $entityType, string $id, array $values): string
     {
+        if ($id === '') {
+            $this->autoIncrement[$entityType] = ($this->autoIncrement[$entityType] ?? 0) + 1;
+            $id = (string) $this->autoIncrement[$entityType];
+        }
+
         $this->store[$entityType][$id] = $values;
+
+        return $id;
     }
 
     /**
@@ -225,6 +239,7 @@ final class InMemoryStorageDriver implements EntityStorageDriverInterface
     {
         $this->store = [];
         $this->translations = [];
+        $this->autoIncrement = [];
     }
 
     /**

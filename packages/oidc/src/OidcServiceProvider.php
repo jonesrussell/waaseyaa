@@ -1,0 +1,271 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Oidc;
+
+use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Database\DBALDatabase;
+use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\EntityStorage\SqlEntityStorage;
+use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
+use Waaseyaa\Oidc\Authorize\AuthorizationRequestValidator;
+use Waaseyaa\Oidc\Authorize\AuthorizeController;
+use Waaseyaa\Oidc\ClientRegistry\OidcClientLookup;
+use Waaseyaa\Oidc\ClientRegistry\OidcClientSeeder;
+use Waaseyaa\Oidc\Entity\OidcClient;
+use Waaseyaa\Oidc\Http\DiscoveryController;
+use Waaseyaa\Oidc\Http\JwksController;
+use Waaseyaa\Oidc\Keys\OidcKeyLoaderInterface;
+use Waaseyaa\Oidc\Keys\PemFileKeyLoader;
+use Waaseyaa\Oidc\Repository\AuthorizationCodeRepositoryInterface;
+use Waaseyaa\Oidc\Repository\DatabaseAuthorizationCodeRepository;
+use Waaseyaa\Routing\WaaseyaaRouter;
+
+final class OidcServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->entityType(new EntityType(
+            id: 'oidc_client',
+            label: 'OIDC Client',
+            description: 'Relying-party clients registered with the OIDC issuer.',
+            class: OidcClient::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
+            group: 'oidc',
+            fieldDefinitions: [
+                'client_id' => [
+                    'type' => 'string',
+                    'label' => 'Client ID',
+                    'description' => 'Stable public identifier for the client (OIDC spec).',
+                    'weight' => 0,
+                ],
+                'name' => [
+                    'type' => 'string',
+                    'label' => 'Name',
+                    'description' => 'Human-readable name shown in admin UIs.',
+                    'weight' => 1,
+                ],
+                'redirect_uris' => [
+                    'type' => 'string_list',
+                    'label' => 'Redirect URIs',
+                    'description' => 'Registered redirect URIs. Matched byte-for-byte per OIDC spec §3.1.2.1.',
+                    'weight' => 2,
+                ],
+                'scopes' => [
+                    'type' => 'string_list',
+                    'label' => 'Scopes',
+                    'description' => 'Scopes the client may request.',
+                    'weight' => 3,
+                ],
+                'grant_types' => [
+                    'type' => 'string_list',
+                    'label' => 'Grant types',
+                    'description' => 'OAuth grant types the client may use.',
+                    'weight' => 4,
+                ],
+                'is_confidential' => [
+                    'type' => 'boolean',
+                    'label' => 'Confidential',
+                    'description' => 'Whether the client authenticates with a secret.',
+                    'weight' => 5,
+                ],
+                'client_secret_hash' => [
+                    'type' => 'string',
+                    'label' => 'Client secret hash',
+                    'description' => 'Hashed client secret. Never exposed through the API.',
+                    'weight' => 6,
+                ],
+            ],
+        ));
+
+        $this->singleton(
+            DiscoveryController::class,
+            fn(): DiscoveryController => new DiscoveryController(issuer: $this->resolveIssuer()),
+        );
+
+        $this->singleton(
+            OidcKeyLoaderInterface::class,
+            fn(): OidcKeyLoaderInterface => $this->resolveKeyLoader(),
+        );
+
+        $this->singleton(
+            JwksController::class,
+            fn(): JwksController => new JwksController(
+                keyLoader: $this->resolve(OidcKeyLoaderInterface::class),
+            ),
+        );
+
+        $this->singleton(
+            AuthorizationCodeRepositoryInterface::class,
+            function (): AuthorizationCodeRepositoryInterface {
+                $database = $this->resolve(DatabaseInterface::class);
+                if (!$database instanceof DBALDatabase) {
+                    throw new \RuntimeException(
+                        'OIDC authorization code repository requires a DBALDatabase instance; '
+                        . 'got ' . $database::class . '.',
+                    );
+                }
+
+                return new DatabaseAuthorizationCodeRepository(database: $database);
+            },
+        );
+
+        $this->singleton(
+            OidcClientLookup::class,
+            function (): OidcClientLookup {
+                $entityTypeManager = $this->resolve(EntityTypeManager::class);
+                $storage = $entityTypeManager->getStorage('oidc_client');
+                if (!$storage instanceof SqlEntityStorage) {
+                    throw new \RuntimeException(
+                        'OIDC client lookup requires SqlEntityStorage; got ' . $storage::class . '.',
+                    );
+                }
+
+                return new OidcClientLookup($storage);
+            },
+        );
+
+        $this->singleton(
+            AuthorizationRequestValidator::class,
+            static fn(): AuthorizationRequestValidator => new AuthorizationRequestValidator(),
+        );
+
+        $this->singleton(
+            AuthorizeController::class,
+            fn(): AuthorizeController => new AuthorizeController(
+                clientLookup: $this->resolve(OidcClientLookup::class),
+                validator: $this->resolve(AuthorizationRequestValidator::class),
+                codeRepository: $this->resolve(AuthorizationCodeRepositoryInterface::class),
+                loginPath: $this->resolveLoginPath(),
+            ),
+        );
+    }
+
+    public function boot(): void
+    {
+        $this->ensureOidcClientSchema();
+        $this->seedOidcClientsFromConfig();
+    }
+
+    /**
+     * Ensure the columns we need for indexed lookups exist on the oidc_client table.
+     *
+     * The kernel's storage factory calls ensureTable() (id/uuid/langcode/_data) when
+     * storage is first resolved; addFieldColumns() is idempotent, so re-running on
+     * each boot is safe. When package-level migrations land, this should move there.
+     */
+    private function ensureOidcClientSchema(): void
+    {
+        try {
+            $database = $this->resolve(DatabaseInterface::class);
+            $entityTypeManager = $this->resolve(EntityTypeManager::class);
+        } catch (\Throwable) {
+            return;
+        }
+
+        if (!$entityTypeManager->hasDefinition('oidc_client')) {
+            return;
+        }
+
+        $definition = $entityTypeManager->getDefinition('oidc_client');
+
+        $handler = new SqlSchemaHandler($definition, $database);
+        $handler->ensureTable();
+        $handler->addFieldColumns([
+            'client_id' => ['type' => 'varchar', 'length' => 255, 'not null' => true],
+            'name' => ['type' => 'varchar', 'length' => 255, 'not null' => true],
+            'is_confidential' => ['type' => 'int', 'not null' => true, 'default' => 0],
+            'client_secret_hash' => ['type' => 'varchar', 'length' => 255, 'not null' => false],
+        ]);
+    }
+
+    private function seedOidcClientsFromConfig(): void
+    {
+        $clients = $this->config['oidc']['clients'] ?? null;
+        if (!is_array($clients) || $clients === []) {
+            return;
+        }
+
+        try {
+            $entityTypeManager = $this->resolve(EntityTypeManager::class);
+            $storage = $entityTypeManager->getStorage('oidc_client');
+        } catch (\Throwable) {
+            return;
+        }
+
+        if (!$storage instanceof SqlEntityStorage) {
+            return;
+        }
+
+        (new OidcClientSeeder($storage))->seed($clients);
+    }
+
+    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    {
+        $authorizeController = null;
+        try {
+            $authorizeController = $this->resolve(AuthorizeController::class);
+        } catch (\Throwable) {
+            // Storage not available yet (e.g., bootstrap without entity system); skip authorize route.
+        }
+
+        (new OidcRouteProvider(authorizeController: $authorizeController))->registerRoutes($router);
+    }
+
+    /**
+     * Resolve the path to the login page for anonymous authorize redirects.
+     * Defaults to `/login` (the admin SPA login route). Override via
+     * `config['oidc']['login_path']` when the login UI lives elsewhere.
+     */
+    private function resolveLoginPath(): string
+    {
+        $configured = $this->config['oidc']['login_path'] ?? null;
+        if (is_string($configured) && $configured !== '') {
+            return $configured;
+        }
+
+        return '/login';
+    }
+
+    /**
+     * Resolve the OIDC issuer URL: `config['oidc']['issuer']`, then `$OIDC_ISSUER`,
+     * then a localhost dev default so route wiring boots even in skeleton installs.
+     */
+    private function resolveIssuer(): string
+    {
+        $configIssuer = $this->config['oidc']['issuer'] ?? null;
+        if (is_string($configIssuer) && $configIssuer !== '') {
+            return $configIssuer;
+        }
+
+        $envIssuer = getenv('OIDC_ISSUER');
+        if (is_string($envIssuer) && $envIssuer !== '') {
+            return $envIssuer;
+        }
+
+        return 'http://localhost:8000';
+    }
+
+    /**
+     * Resolve the OIDC key loader: `config['oidc']['signing_keys']`, then `$OIDC_SIGNING_KEY_DIR`.
+     * Throws when neither is set — OIDC signing must be explicit, no silent fallback.
+     */
+    private function resolveKeyLoader(): OidcKeyLoaderInterface
+    {
+        /** @var array<string, array{algorithm?: string, public_key_path: string, private_key_path?: string}>|null $configKeys */
+        $configKeys = $this->config['oidc']['signing_keys'] ?? null;
+        if (is_array($configKeys) && $configKeys !== []) {
+            return PemFileKeyLoader::fromConfig($configKeys);
+        }
+
+        $envDir = getenv('OIDC_SIGNING_KEY_DIR');
+        if (is_string($envDir) && $envDir !== '') {
+            return PemFileKeyLoader::fromDirectory($envDir);
+        }
+
+        return PemFileKeyLoader::fromConfig([]);
+    }
+}

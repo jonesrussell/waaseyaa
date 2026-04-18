@@ -12,7 +12,10 @@ namespace Waaseyaa\Foundation\Kernel;
  * - Lines starting with # and blank lines are skipped.
  * - Only lines containing = are parsed.
  * - Values wrapped in matching " or ' quotes have the quotes stripped.
- * - Existing process env vars are never overwritten — PHP-FPM pool vars win.
+ * - Values are written to putenv(), $_ENV, and $_SERVER.
+ * - Each destination is guarded independently: already-set keys are never
+ *   overwritten (PHP-FPM pool vars, test harness pre-sets, and partial
+ *   pre-population from a prior call all win against the .env file).
  */
 final class EnvLoader
 {
@@ -48,9 +51,15 @@ final class EnvLoader
 
             $value = self::stripQuotes($value);
 
-            // Never overwrite an already-set process env var.
+            // Never overwrite an already-set value in any destination.
             if (getenv($key) === false) {
                 putenv("{$key}={$value}");
+            }
+            if (!array_key_exists($key, $_ENV)) {
+                $_ENV[$key] = $value;
+            }
+            if (!array_key_exists($key, $_SERVER)) {
+                $_SERVER[$key] = $value;
             }
         }
     }

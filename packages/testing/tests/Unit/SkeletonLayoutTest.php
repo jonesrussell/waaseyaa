@@ -27,4 +27,66 @@ final class SkeletonLayoutTest extends TestCase
             self::assertDirectoryExists($path, sprintf('Skeleton PHPUnit path missing: %s', $path));
         }
     }
+
+    #[Test]
+    public function skeletonDevScriptIsWiredAndValid(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        $devScript = $repoRoot . '/skeleton/bin/dev.sh';
+        $composerJson = $repoRoot . '/skeleton/composer.json';
+
+        self::assertFileExists($devScript);
+        self::assertFileExists($composerJson);
+
+        $composer = json_decode((string) file_get_contents($composerJson), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($composer);
+
+        $scripts = $composer['scripts'] ?? null;
+        self::assertIsArray($scripts);
+
+        $dev = $scripts['dev'] ?? null;
+        self::assertIsArray($dev);
+        self::assertContains('Composer\\Config::disableProcessTimeout', $dev);
+        self::assertContains('bash bin/dev.sh', $dev);
+
+        exec(sprintf('bash -n %s 2>&1', escapeshellarg($devScript)), $output, $exitCode);
+        self::assertSame(0, $exitCode, implode("\n", $output));
+    }
+
+    #[Test]
+    public function skeletonIncludesEssentialFirstBootFiles(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        $requiredFiles = [
+            '/skeleton/.env.example',
+            '/skeleton/bin/post-create-setup.php',
+            '/skeleton/bin/dev.sh',
+            '/skeleton/public/index.php',
+            '/skeleton/config/waaseyaa.php',
+            '/skeleton/composer.json',
+        ];
+
+        foreach ($requiredFiles as $relativePath) {
+            self::assertFileExists(
+                $repoRoot . $relativePath,
+                sprintf('Missing first-boot skeleton artifact: %s', $relativePath),
+            );
+        }
+    }
+
+    /**
+     * Consumers use ./vendor/bin/waaseyaa (Composer-generated proxy to
+     * waaseyaa/cli's bin). The skeleton must NOT ship its own bin/waaseyaa
+     * wrapper: such a wrapper duplicates the proxy and, historically, was
+     * a workaround for CLI-bootstrap bugs fixed by ADR-005.
+     */
+    #[Test]
+    public function skeletonDoesNotShipDeprecatedWaaseyaaBinWrapper(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        self::assertFileDoesNotExist(
+            $repoRoot . '/skeleton/bin/waaseyaa',
+            'skeleton/bin/waaseyaa must not exist — use ./vendor/bin/waaseyaa (see ADR-005)',
+        );
+    }
 }

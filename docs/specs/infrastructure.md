@@ -6,6 +6,7 @@
 <!-- Spec reviewed 2026-04-07 - ControllerDispatcher and DiscoveryRouter: import ordering corrected to satisfy PHP-CS-Fixer alphabetical rule (no behavior change). ControllerDispatcher now uses `use Waaseyaa\Inertia\Inertia` import instead of inline FQCN for `Inertia::getRenderer()` call. LanguageResolver extracted from SsrPageHandler (#572): language detection, negotiation, and path prefix stripping now live in a dedicated service; HttpKernel delegates to SsrPageHandler::getLanguageResolver()->stripLanguagePrefixForRouting(). -->
 <!-- Spec reviewed 2026-04-07 - packages/billing and packages/inertia composer.json: waaseyaa/foundation requires use ^0.1 for split/Packagist consumers (#1138); no runtime change -->
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization across infrastructure-layer packages; no infrastructure runtime behavior change -->
+<!-- Spec reviewed 2026-04-15 - packages/github composer.json now matches the standard split-package metadata shape for infrastructure packages: minimum-stability stable plus dev-main/dev-develop branch aliases so canonical path repos can satisfy ^0.1 during local app development and metapackage resolution -->
 <!-- Spec reviewed 2026-04-08b - restored packages/foundation, packages/search, and packages/testing Symfony floors (^7.3 -> ^7.0) where no runtime/API requirement justified tighter constraints -->
 <!-- Spec reviewed 2026-04-08c - entity, entity-storage, queue, routing, typed-data, validation Symfony floors to ^7.0; see symfony-version-floors.md (#1151) -->
 <!-- Spec reviewed 2026-04-09 - typed-data: EntityCastCoercion, CoercionException, CastTokenMapper; entity ValueCaster delegates builtins (#1185); public surface map extended -->
@@ -64,6 +65,8 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 | `packages/plugin/` | `Waaseyaa\Plugin\` | 0 (Foundation) | PluginManager, attribute-based plugin discovery, plugin factory |
 | `packages/mail/` | `Waaseyaa\Mail\` | 0 (Foundation) | `MailerInterface` + `Envelope`; pluggable `TransportInterface` (array, local file, SendGrid API when configured) |
 | `packages/http-client/` | `Waaseyaa\HttpClient\` | 0 (Foundation) | Minimal HTTP client for JSON APIs and webhooks, zero external dependencies |
+
+Infrastructure-layer split packages that ship as Packagist libraries are expected to carry the normal release metadata shape in `composer.json`: `minimum-stability: stable` and branch aliases for `dev-main` plus the active maintenance branch. That invariant matters for local path-repository workflows because canonical path repos must still satisfy `^0.1` constraints when apps override published packages during development.
 
 ### Testing fixture factories (`packages/testing/`)
 
@@ -1425,7 +1428,7 @@ Kernel/
     AbstractKernel.php           -- boot orchestrator, delegates to Bootstrap/ classes
     HttpKernel.php               -- HTTP request handling, cache setup, CORS
     ConsoleKernel.php            -- CLI bootstrapping; delegates command graph assembly to `Waaseyaa\CLI\CliCommandRegistry`
-    EnvLoader.php                -- .env file parser
+    EnvLoader.php                -- .env file parser; writes to putenv(), $_ENV, and $_SERVER (each destination guarded independently — preset keys in any destination are never overwritten)
     ConfigLoader.php             -- config/waaseyaa.php loader
     EventListenerRegistrar.php   -- registers cache invalidation listeners
     BuiltinRouteRegistrar.php    -- registers shared foundation-owned HTTP routes (schema, discovery, entity-types, SSR catch-all)

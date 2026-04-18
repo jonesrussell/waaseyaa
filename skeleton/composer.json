@@ -3,30 +3,19 @@
     "description": "Waaseyaa CMS project skeleton",
     "type": "project",
     "license": "GPL-2.0-or-later",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../waaseyaa/packages/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
     "require": {
         "php": ">=8.4",
-        "waaseyaa/foundation": "^0.1",
-        "waaseyaa/entity": "^0.1",
-        "waaseyaa/entity-storage": "^0.1",
-        "waaseyaa/access": "^0.1",
-        "waaseyaa/admin-surface": "^0.1",
-        "waaseyaa/auth": "^0.1",
-        "waaseyaa/user": "^0.1",
-        "waaseyaa/node": "^0.1",
-        "waaseyaa/taxonomy": "^0.1",
-        "waaseyaa/media": "^0.1",
-        "waaseyaa/path": "^0.1",
-        "waaseyaa/menu": "^0.1",
-        "waaseyaa/workflows": "^0.1",
-        "waaseyaa/api": "^0.1",
-        "waaseyaa/routing": "^0.1",
-        "waaseyaa/ssr": "^0.1",
-        "waaseyaa/config": "^0.1",
-        "waaseyaa/cli": "^0.1",
-        "waaseyaa/database-legacy": "^0.1",
-        "waaseyaa/cache": "^0.1",
-        "waaseyaa/field": "^0.1",
-        "symfony/dotenv": "^8.0"
+        "symfony/dotenv": "^8.0",
+        "waaseyaa/framework": "^0.1"
     },
     "autoload": {
         "psr-4": {
@@ -39,26 +28,36 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.5 || ^11.0"
+        "phpunit/phpunit": "^10.5 || ^11.0",
+        "wikimedia/composer-merge-plugin": "^2.1"
     },
     "config": {
         "optimize-autoloader": true,
         "process-timeout": 0,
         "sort-packages": true,
-        "allow-plugins": {}
+        "allow-plugins": {
+            "wikimedia/composer-merge-plugin": true
+        }
     },
     "scripts": {
         "audit-site": "./bin/waaseyaa-audit-site",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "PHP_CLI_SERVER_WORKERS=4 bin/waaseyaa serve"
+            "bash bin/dev.sh"
         ],
+        "regen-lock": "@composer update 'waaseyaa/*' --no-plugins --no-install --no-scripts",
         "post-create-project-cmd": [
             "chmod +x bin/waaseyaa bin/waaseyaa-version bin/verify-deploy-rsync bin/waaseyaa-audit-site",
             "php bin/post-create-setup.php"
         ]
     },
     "extra": {
+        "merge-plugin": {
+            "include": [
+                "composer.local.json"
+            ],
+            "prepend-repositories": true
+        },
         "waaseyaa": {
             "providers": [
                 "App\\Provider\\AppServiceProvider"

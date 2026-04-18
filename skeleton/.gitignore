@@ -4,3 +4,4 @@
 !/files/.gitkeep
 *.sqlite
 .env
+composer.local.json

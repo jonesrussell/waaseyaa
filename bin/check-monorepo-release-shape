@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REVISION="${1:-HEAD}"
+
+fail() {
+  echo "FAIL [MR001] $1"
+  exit 1
+}
+
+if ! git rev-parse --verify "${REVISION}^{commit}" >/dev/null 2>&1; then
+  fail "Unknown revision: ${REVISION}"
+fi
+
+if ! git cat-file -e "${REVISION}:.github/workflows/split.yml" 2>/dev/null; then
+  fail "Revision ${REVISION} does not contain .github/workflows/split.yml"
+fi
+
+if ! git cat-file -e "${REVISION}:packages" 2>/dev/null; then
+  fail "Revision ${REVISION} does not contain a packages/ directory"
+fi
+
+package_count="$(
+  git ls-tree -r --name-only "${REVISION}" -- packages \
+    | grep '/composer\.json$' \
+    | wc -l \
+    | tr -d ' '
+)"
+
+if [[ "${package_count}" -lt 10 ]]; then
+  fail "Revision ${REVISION} only exposes ${package_count} package composer.json files; expected a full monorepo"
+fi
+
+echo "OK: ${REVISION} has split workflow and ${package_count} package composer.json files."

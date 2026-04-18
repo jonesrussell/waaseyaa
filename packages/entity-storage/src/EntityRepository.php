@@ -252,11 +252,17 @@ final class EntityRepository implements EntityRepositoryInterface
                 }
             }
 
-            $this->driver->write($entityTypeId, $id, $values);
+            $writtenId = $this->driver->write($entityTypeId, $id, $values);
             $transaction?->commit();
         } catch (\Throwable $e) {
             $transaction?->rollBack();
             throw $e;
+        }
+
+        // Back-fill auto-assigned ids so POST_SAVE subscribers see the real pk.
+        if ($isNew && $id === '' && $writtenId !== '') {
+            $idKey = $this->entityType->getKeys()['id'] ?? 'id';
+            $entity->set($idKey, $writtenId);
         }
 
         if ($isNew && method_exists($entity, 'enforceIsNew')) {

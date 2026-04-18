@@ -160,6 +160,8 @@ return [
     'Waaseyaa\Media\FileRepositoryInterface' => 'public',
     'Waaseyaa\Path\PathAliasManagerInterface' => 'public',
     'Waaseyaa\Relationship\VisibilityFilterInterface' => 'public',
+    'Waaseyaa\NorthCloud\Sync\NcHitToEntityMapperInterface' => 'public',
+    'Waaseyaa\NorthCloud\Sync\NcHitSupportDiagnosticsInterface' => 'public',
 
     // Layer 3: Services — public
     'Waaseyaa\Search\SearchProviderInterface' => 'public',
@@ -196,9 +198,12 @@ return [
     'Waaseyaa\AdminSurface\Action\SurfaceActionHandlerInterface' => 'public',
     'Waaseyaa\AdminSurface\Query\SurfaceFilterOperator' => 'public',
     'Waaseyaa\AdminSurface\Host\AbstractAdminSurfaceHost' => 'public',
+    'Waaseyaa\Bimaaji\Graph\GraphSectionProviderInterface' => 'public',
     'Waaseyaa\Mcp\Bridge\ToolExecutorInterface' => 'public',
     'Waaseyaa\Mcp\Bridge\ToolRegistryInterface' => 'public',
     'Waaseyaa\Mcp\Auth\McpAuthInterface' => 'public',
+    'Waaseyaa\Oidc\Keys\OidcKeyLoaderInterface' => 'public',
+    'Waaseyaa\Oidc\Repository\AuthorizationCodeRepositoryInterface' => 'public',
     'Waaseyaa\SSR\ThemeInterface' => 'public',
 
     // Layer 1: Core Data — public (discovered during L5-L6 scan)
