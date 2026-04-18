@@ -50,9 +50,7 @@ final readonly class TokenController
         try {
             $tokenRequest = $this->validator->validate($request->request->all());
         } catch (TokenRequestException $e) {
-            $status = $e->errorCode === 'unsupported_grant_type' ? 400 : 400;
-
-            return $this->error($status, $e->errorCode, $e->errorDescription);
+            return $this->error(400, $e->errorCode, $e->errorDescription);
         }
 
         [$credClientId, $credClientSecret] = $this->extractClientCredentials($request, $tokenRequest);
