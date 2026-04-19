@@ -24,6 +24,9 @@ enum DiagnosticCode: string
     // --- Runtime health codes ---
     case DATABASE_UNREACHABLE        = 'DATABASE_UNREACHABLE';
     case DATABASE_SCHEMA_DRIFT       = 'DATABASE_SCHEMA_DRIFT';
+    case MISSING_BUNDLE_SUBTABLE     = 'MISSING_BUNDLE_SUBTABLE';
+    case ORPHAN_BUNDLE_SUBTABLE      = 'ORPHAN_BUNDLE_SUBTABLE';
+    case FK_ENFORCEMENT_DISABLED     = 'FK_ENFORCEMENT_DISABLED';
     case CACHE_DIRECTORY_UNWRITABLE  = 'CACHE_DIRECTORY_UNWRITABLE';
     case STORAGE_DIRECTORY_MISSING   = 'STORAGE_DIRECTORY_MISSING';
     case INGESTION_LOG_OVERSIZED     = 'INGESTION_LOG_OVERSIZED';
@@ -48,6 +51,12 @@ enum DiagnosticCode: string
                 'The database file is missing, corrupt, or not accessible.',
             self::DATABASE_SCHEMA_DRIFT =>
                 'One or more entity table columns do not match the expected schema definition.',
+            self::MISSING_BUNDLE_SUBTABLE =>
+                'A bundle has registered fields but its per-bundle subtable does not exist in storage.',
+            self::ORPHAN_BUNDLE_SUBTABLE =>
+                'A per-bundle subtable exists in storage but no registered bundle of that entity type carries fields for it.',
+            self::FK_ENFORCEMENT_DISABLED =>
+                'SQLite foreign key enforcement is disabled — per-bundle subtable CASCADE deletes will not propagate.',
             self::CACHE_DIRECTORY_UNWRITABLE =>
                 'The cache storage directory exists but is not writable by the current process.',
             self::STORAGE_DIRECTORY_MISSING =>
@@ -78,6 +87,12 @@ enum DiagnosticCode: string
                 'Verify the WAASEYAA_DB environment variable points to a valid SQLite file. Run `waaseyaa install` to initialize.',
             self::DATABASE_SCHEMA_DRIFT =>
                 'Delete the SQLite database and restart to recreate tables, or run `waaseyaa schema:check` for details.',
+            self::MISSING_BUNDLE_SUBTABLE =>
+                'Re-run `waaseyaa install` (or the bundle-scoped migration) to materialize the subtable. Subtable name format: `{base_table}__{bundle}`.',
+            self::ORPHAN_BUNDLE_SUBTABLE =>
+                'Review whether the bundle was removed intentionally. If so, author a cleanup migration to drop the orphan subtable; auto-drop is never performed.',
+            self::FK_ENFORCEMENT_DISABLED =>
+                'Ensure the SQLite connection issues `PRAGMA foreign_keys = ON` on every connection. Waaseyaa configures this by default; external tooling may override.',
             self::CACHE_DIRECTORY_UNWRITABLE =>
                 'Check file permissions on storage/framework/. The web server user must have write access.',
             self::STORAGE_DIRECTORY_MISSING =>
@@ -98,12 +113,15 @@ enum DiagnosticCode: string
             self::DEFAULT_TYPE_MISSING,
             self::DEFAULT_TYPE_DISABLED,
             self::DATABASE_UNREACHABLE,
-            self::DATABASE_SCHEMA_DRIFT => 'error',
+            self::DATABASE_SCHEMA_DRIFT,
+            self::MISSING_BUNDLE_SUBTABLE,
+            self::FK_ENFORCEMENT_DISABLED => 'error',
 
             self::UNAUTHORIZED_V1_TAG,
             self::TAG_QUARANTINE_DETECTED,
             self::INGESTION_RECENT_FAILURES,
-            self::CACHE_DIRECTORY_UNWRITABLE => 'warning',
+            self::CACHE_DIRECTORY_UNWRITABLE,
+            self::ORPHAN_BUNDLE_SUBTABLE => 'warning',
 
             self::MANIFEST_VERSIONING_MISSING,
             self::NAMESPACE_RESERVED,

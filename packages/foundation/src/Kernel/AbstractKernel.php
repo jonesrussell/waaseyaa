@@ -48,6 +48,7 @@ abstract class AbstractKernel
     protected EventDispatcherInterface $dispatcher;
     protected DatabaseInterface $database;
     protected EntityTypeManager $entityTypeManager;
+    protected ?\Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface $fieldRegistry = null;
     protected PackageManifest $manifest;
     protected EntityAccessHandler $accessHandler;
     protected EntityTypeLifecycleManager $lifecycleManager;
@@ -147,6 +148,7 @@ abstract class AbstractKernel
         $database = $this->database;
         $dispatcher = $this->dispatcher;
         $fieldRegistry = new \Waaseyaa\Field\FieldDefinitionRegistry();
+        $this->fieldRegistry = $fieldRegistry;
         ContentEntityBase::setFieldRegistry($fieldRegistry);
 
         $this->entityTypeManager = new EntityTypeManager(
