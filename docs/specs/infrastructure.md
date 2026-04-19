@@ -665,6 +665,8 @@ File: `packages/foundation/src/Migration/TableBuilder.php`
 
 Convenience methods: `timestamps()` (creates `created` + `changed`), `entityBase()` (id + entity_type + bundle + _data + timestamps), `translationColumns()` (langcode + default_langcode + translation_source), `revisionColumns()` (revision_id + revision_created + revision_log).
 
+For multi-bundle entity types with bundle-scoped fields, `SqlSchemaHandler` additionally provisions `{base_table}__{bundle}` subtables (1:1 with the base, FK `ON DELETE CASCADE`). `SqlEntityStorage` partitions values by `FieldDefinition::$targetBundle` on save and two-query-loads (base row first, subtable by PK). `SqlEntityQuery` injects INNER JOINs for bundle-scoped conditions. See [`bundle-scoped-storage.md`](./bundle-scoped-storage.md) for the full contract.
+
 ### ColumnDefinition
 
 File: `packages/foundation/src/Migration/ColumnDefinition.php`

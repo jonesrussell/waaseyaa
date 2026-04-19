@@ -85,6 +85,8 @@ Each `DiagnosticCode` case provides:
 
 Compares actual SQLite table schema against expected definition for each entity type.
 
+For multi-bundle entity types with registered bundle-scoped fields, drift detection additionally enumerates `{base_table}__{bundle}` subtables. See [`bundle-scoped-storage.md`](./bundle-scoped-storage.md#drift-diagnostic) for the per-subtable drift contract, missing-subtable and `ORPHAN_BUNDLE_SUBTABLE` codes.
+
 ### Algorithm
 
 1. Iterate all registered entity types via `EntityTypeManagerInterface::getDefinitions()`

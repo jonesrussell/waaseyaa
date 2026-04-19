@@ -296,11 +296,14 @@ final class AccessPolicy extends WaaseyaaPlugin
     public function __construct(
         string $id,
         public readonly array $entityTypes = [],
+        public readonly array $bundles = [],  // see bundle-scoped-fields.md §Access
         string $label = '',
         string $description = '',
     ) {}
 }
 ```
+
+The optional `bundles:` parameter scopes a policy to specific bundles of the listed entity types. An empty array (default) preserves existing semantics — the policy applies to every bundle. See [`bundle-scoped-fields.md`](./bundle-scoped-fields.md#access) for the full contract.
 
 ### AccessDeniedException
 
