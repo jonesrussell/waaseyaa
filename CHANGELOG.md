@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.148] - 2026-04-19
+
+### Added
+
+- `groups`: new layer-2 content-type package `waaseyaa/groups` (`Group` extends `ContentEntityBase`, `GroupType` extends `ConfigEntityBase`). Ships with zero pre-registered bundles — consumers register `GroupType` config entities and bundle-scoped fields via `EntityTypeManager::addBundleFields()`. Closes #1296.
+- `entity-storage`: bundle-scoped storage substrate. Per-bundle subtables follow the `{base_table}__{bundle}` naming invariant, carry a `PRIMARY KEY (entity_id)` + `FOREIGN KEY ... REFERENCES {base}(id) ON DELETE CASCADE`, and partition field storage by bundle. `SqlSchemaHandler::ensureBundleSubtable()` provisions subtables; `SqlEntityStorage` routes per-bundle writes via `persistBundleRow()` (SELECT-then-INSERT-or-UPDATE) and merges bundle columns on read via `mergeBundleSubtableRow()`.
+- `field`: `FieldDefinitionRegistry` partitions field definitions into core and per-bundle buckets. `EntityTypeManager::addBundleFields()` accepts an array of `FieldDefinition` objects keyed by entity type + bundle. `BundleAmbiguousFieldException` and `UnknownFieldException` surface registry lookup failures with explicit diagnostics.
+- `access`: `#[AccessPolicy(bundles: [...])]` attribute parameter binds a policy to specific bundles of an entity type; `EntityAccessHandler` consults the bundle-scoped registry when resolving policies.
+- `foundation`: subtable-aware schema drift diagnostics. `HealthChecker` emits `MISSING_BUNDLE_SUBTABLE` (registered fields but no subtable), `ORPHAN_BUNDLE_SUBTABLE` (subtable but no registered bundle; SQLite-only detection until #1300), and `FK_ENFORCEMENT_DISABLED` (SQLite `PRAGMA foreign_keys = OFF` or MySQL session override — bundle `ON DELETE CASCADE` silently becomes a no-op when FK enforcement is disabled).
+
+### Changed
+
+- `ci`: `.github/workflows/split.yml` matrix now includes `packages/groups` under Layer 2 so the split-deploy pipeline publishes `waaseyaa/groups` to its own repo and packagist.
+
 ## [0.1.0-alpha.147] - 2026-04-18
 
 ### Fixed
