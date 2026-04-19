@@ -18,12 +18,16 @@ final class AccessPolicy extends WaaseyaaPlugin
     /**
      * @param string   $id          Unique plugin ID.
      * @param string[] $entityTypes Entity type IDs this policy applies to.
+     * @param string[] $bundles     Bundle names this policy applies to.
+     *                              Empty array (default) applies to every bundle of the listed entity types.
+     *                              See docs/specs/bundle-scoped-fields.md §Access.
      * @param string   $label       Human-readable label.
      * @param string   $description Description of the policy.
      */
     public function __construct(
         string $id,
         public readonly array $entityTypes = [],
+        public readonly array $bundles = [],
         string $label = '',
         string $description = '',
     ) {
