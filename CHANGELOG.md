@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.150] - 2026-04-19
+
+Closes the bundle-substrate four-release discovery arc: alpha.148 shipped the bundle API, alpha.149 wired `FieldDefinitionRegistry` but missed the kernel-path enumerator, the alpha.149 fix wired the enumerator but exposed a missing `getQuery()` registry forward, and this release closes query forwarding while introducing explicit storage-hint semantics. See #26 for the cross-package version-constraint tightening that would have shortened this arc.
+
+### Fixed
+
+- `entity-storage`: `SqlEntityStorage::getQuery()` now forwards `$this->fieldRegistry` into `SqlEntityQuery`. Previously the registry was silently dropped, so `getQuery()->condition($bundleField, $value)` either returned wrong rows (no JOIN) or threw `UnknownFieldException` once strict routing landed. Bundle-scoped queries on registry-aware storage now work end-to-end.
+
+### Added
+
+- `field`: `FieldStorage` backed enum (`Column`, `Data`) and `FieldDefinition::getStored()` accessor expressing the canonical persistence target for a field. `FieldDefinitionRegistry::synthesizeCoreField()` reads `'stored'` from EntityType field-definition metadata. Defaults to `FieldStorage::Column` so existing call sites are unchanged.
+- `entity-storage`: `SqlEntityQuery::routeFields()` resolves `FieldStorage::Data` core fields via `json_extract(_data, ...)` instead of throwing `UnknownFieldException`, so registry-aware queries can target `_data`-backed fields without forcing a column to exist. `SqlEntityStorage::splitForStorage()` honors the same hint on save: `FieldStorage::Data` values land in `_data` even when a legacy column happens to exist (deferred follow-up: column-vs-data drift diagnostic).
+- `entity-storage`: `SqlSchemaHandler` skips column emission for `FieldStorage::Data` fields in `buildBundleSubtableSpec()` and `ensureBundleSubtable()` so subtable layouts match the registered storage hints.
+- `groups`: `Group` now ships universal lifecycle core fields (`status`, `created_at`, `updated_at`) registered with `stored: FieldStorage::Data`. The bundle-fields surface stays consumer-defined; only the universals are pre-registered so registry-aware queries can resolve them.
+
 ## [0.1.0-alpha.149] - 2026-04-19
 
 ### Fixed

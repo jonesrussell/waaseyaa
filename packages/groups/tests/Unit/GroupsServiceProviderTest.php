@@ -61,7 +61,7 @@ final class GroupsServiceProviderTest extends TestCase
     }
 
     #[Test]
-    public function groupShipsWithZeroPreRegisteredBundleFields(): void
+    public function groupShipsWithUniversalDataStoredCoreFieldsOnly(): void
     {
         $provider = new GroupsServiceProvider();
         $provider->register();
@@ -74,8 +74,15 @@ final class GroupsServiceProviderTest extends TestCase
             }
         }
         self::assertNotNull($group);
-        // Core field-definition map is empty; bundle fields are registered by
-        // consumers via EntityTypeManager::addBundleFields().
-        self::assertSame([], $group->getFieldDefinitions());
+
+        // Bundle fields are still 100% consumer-defined via
+        // EntityTypeManager::addBundleFields(); the only core fields shipped
+        // are the FieldStorage::Data universals so registry-aware queries can
+        // resolve `status`/`created_at`/`updated_at` via json_extract.
+        $fieldDefs = $group->getFieldDefinitions();
+        self::assertSame(['status', 'created_at', 'updated_at'], array_keys($fieldDefs));
+        foreach ($fieldDefs as $def) {
+            self::assertSame(\Waaseyaa\Field\FieldStorage::Data, $def['stored']);
+        }
     }
 }
