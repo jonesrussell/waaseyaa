@@ -456,6 +456,8 @@ New parameters added to `EntityType`:
 - `group: ?string` -- admin sidebar group key (e.g., `'content'`, `'taxonomy'`) for catalog grouping
 - `description: ?string` -- human-readable description of the entity type, displayed in admin catalog
 
+For multi-bundle entity types (those declaring `bundleEntityType`), fields may additionally be registered per-bundle via `EntityTypeManager::addBundleFields()`. `ContentEntityBase::getFieldDefinitions()` returns the union of core fields plus the active bundle's fields. See [`bundle-scoped-fields.md`](./bundle-scoped-fields.md) for the full contract.
+
 Entity types are registered explicitly with `EntityTypeManager::registerEntityType()`. The manager throws `\InvalidArgumentException` if a type ID is already registered.
 
 ### EntityTypeAttribute (future plugin discovery)
@@ -1193,7 +1195,7 @@ public function __construct(
     private int $cardinality = 1,
     private array $settings = [],
     private string $targetEntityTypeId = '',
-    private ?string $targetBundle = null,
+    private ?string $targetBundle = null,  // see bundle-scoped-fields.md
     private bool $translatable = false,
     private bool $revisionable = false,
     private mixed $defaultValue = null,

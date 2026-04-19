@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
 /**
@@ -43,11 +44,16 @@ class EntityTypeManager implements EntityTypeManagerInterface
      *                                     If null, getStorage() will throw when no storage class is configured.
      * @param \Closure|null $repositoryFactory A factory callable: fn(string $entityTypeId, EntityTypeInterface): EntityRepositoryInterface.
      *                                          If null, getRepository() throws.
+     * @param FieldDefinitionRegistryInterface|null $fieldRegistry Registry for core and bundle-scoped field definitions.
+     *                                                             If null, addBundleFields() and getFieldRegistry() throw.
+     *                                                             Core fields are registered into the registry at
+     *                                                             registerEntityType() time when this is provided.
      */
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly ?\Closure $storageFactory = null,
         private readonly ?\Closure $repositoryFactory = null,
+        private readonly ?FieldDefinitionRegistryInterface $fieldRegistry = null,
     ) {}
 
     /**
@@ -96,6 +102,58 @@ class EntityTypeManager implements EntityTypeManagerInterface
         }
 
         $this->definitions[$type->id()] = $type;
+
+        $this->fieldRegistry?->registerCoreFields($type->id(), $type->getFieldDefinitions());
+    }
+
+    /**
+     * Register bundle-scoped fields on a multi-bundle entity type.
+     *
+     * See docs/specs/bundle-scoped-fields.md for the full contract.
+     *
+     * @param array<string|int, object> $fields FieldDefinition objects whose
+     *                                          targetEntityTypeId and targetBundle
+     *                                          match the arguments.
+     *
+     * @throws \InvalidArgumentException If the entity type is not registered, does
+     *                                   not declare bundleEntityType, or any field
+     *                                   fails validation (see registry).
+     * @throws \RuntimeException         If no FieldDefinitionRegistry is configured.
+     */
+    public function addBundleFields(string $entityTypeId, string $bundle, array $fields): void
+    {
+        if ($this->fieldRegistry === null) {
+            throw new \RuntimeException(\sprintf(
+                'Cannot register bundle fields for entity type "%s" bundle "%s": no FieldDefinitionRegistry configured on EntityTypeManager.',
+                $entityTypeId,
+                $bundle,
+            ));
+        }
+
+        $type = $this->getDefinition($entityTypeId);
+
+        if ($type->getBundleEntityType() === null) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Entity type "%s" does not declare bundleEntityType; cannot register bundle-scoped fields.',
+                $entityTypeId,
+            ));
+        }
+
+        $this->fieldRegistry->registerBundleFields($entityTypeId, $bundle, $fields);
+    }
+
+    /**
+     * Returns the configured FieldDefinitionRegistry.
+     *
+     * @throws \RuntimeException If no registry was configured.
+     */
+    public function getFieldRegistry(): FieldDefinitionRegistryInterface
+    {
+        if ($this->fieldRegistry === null) {
+            throw new \RuntimeException('No FieldDefinitionRegistry configured on EntityTypeManager.');
+        }
+
+        return $this->fieldRegistry;
     }
 
     public function getDefinition(string $entityTypeId): EntityTypeInterface

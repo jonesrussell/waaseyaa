@@ -136,7 +136,7 @@ final class NodeAccessPolicy implements AccessPolicyInterface, FieldAccessPolicy
 }
 ```
 
-The `appliesTo()` method from `AccessPolicyInterface` scopes both entity-level and field-level access to the same entity types.
+The `appliesTo()` method from `AccessPolicyInterface` scopes both entity-level and field-level access to the same entity types. For multi-bundle entity types, policies may additionally narrow scope to specific bundles via the `#[AccessPolicy(bundles: [...])]` attribute parameter; see [`bundle-scoped-fields.md`](./bundle-scoped-fields.md#access).
 
 ## View vs Edit Denial
 

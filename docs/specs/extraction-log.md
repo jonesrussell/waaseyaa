@@ -41,3 +41,29 @@ See `waaseyaa:framework-extraction` skill for the extraction process.
 | | |
 |---|---|
 | **Status** | No new package: `Waaseyaa\SSR\Flash\Flash`, `FlashMessageService`, `FlashTwigExtension` already live under `packages/ssr`; tracker #1157 mail work does not relocate flash. |
+
+## 2026-04 — waaseyaa/groups package extraction
+
+| | |
+|---|---|
+| **Source** | Multi-bundle Group concept, previously an open design question in Minoo. No pre-existing app code relocated — extracted as a framework-level content-type package alongside the bundle-scoped storage work. |
+| **Package** | `waaseyaa/groups` (layer 2 content-type) |
+| **Classes** | `Waaseyaa\Groups\Group` (extends `ContentEntityBase`; id=gid, uuid, bundle=type, label=name), `Waaseyaa\Groups\GroupType` (extends `ConfigEntityBase`), `Waaseyaa\Groups\GroupsServiceProvider` |
+| **Tests** | `packages/groups/tests/Unit/GroupsServiceProviderTest.php`, `packages/groups/tests/Integration/StandaloneConsumptionTest.php`, `packages/groups/tests/Integration/TwoBundleCoexistenceTest.php` |
+| **Specs** | `docs/specs/bundle-scoped-storage.md`, `docs/specs/bundle-scoped-fields.md`, `docs/specs/entity-system.md` |
+| **Consumers** | None in-framework; product code (Minoo) registers GroupType config entities and bundle-scoped fields via `EntityTypeManager::addBundleFields()`. Ships with zero pre-registered bundles. |
+
+## Future adoption candidates
+
+Per-bundle field storage (see `docs/specs/bundle-scoped-storage.md`, `docs/specs/bundle-scoped-fields.md`) was introduced for `waaseyaa/groups`. The same pattern is a candidate — not a proposal — for several existing content-type packages where bundles today share a flat table and bundle-specific fields collide in practice. No migration in this PR; no timeline.
+
+- **node** (`packages/node`). Node bundles (`article`, `page`, etc.) currently store all fields on the base `node` table. Bundle-specific fields collide on a flat schema. Adoption candidate: per-bundle subtables (`node__article`, `node__page`, …) following the bundle-scoped-storage/bundle-scoped-fields contract. Deferred. (Spec: `docs/specs/entity-system.md`.)
+- **taxonomy** (`packages/taxonomy`). Term storage is per-vocabulary in concept but per-entity-type in practice — vocabulary-specific fields sit on the base term table. Adoption candidate: per-vocabulary subtables following the same pattern. Deferred.
+- **media** (`packages/media`). Media bundles (image, document, video, …) diverge on bundle-specific metadata. Adoption candidate: per-bundle subtables. Deferred.
+
+## Follow-ups
+
+- **Shared FieldDefinition → column mapper.** `SqlSchemaHandler::deriveColumnSpec()` (introduced with the `waaseyaa/groups` extraction's bundle-subtable work) translates `FieldDefinition::getType()` to a Waaseyaa column spec locally. It should be promoted to a shared mapper once a second consumer needs it — the likely trigger is a `NodeServiceProvider`-style migration from hand-authored column-spec arrays to `FieldDefinition` objects. Until then, keep it private to `SqlSchemaHandler`; premature extraction without a second caller would bake the current limited type set (`string/text/integer/boolean/float`) into a shared contract. (Spec: `docs/specs/bundle-scoped-storage.md`.)
+- **`FieldDefinitionInterface` is not yet public cross-package API.** Registered `FieldDefinition` objects are treated as opaque by everything outside `waaseyaa/field` + `waaseyaa/entity-storage` — `FieldDefinitionRegistry` returns them but no downstream package (admin, graphql, api) yet inspects their metadata. Revisit the interface surface (stability guarantees, accessors, typed metadata shape) when a package outside `waaseyaa/groups` needs to read registered field definitions. Premature public-API stabilization would lock in the minimal shape required for the bundle-subtable path. (Specs: `docs/specs/entity-system.md`, `docs/specs/bundle-scoped-fields.md`.)
+- **Per-bundle upsert implemented as SELECT-then-INSERT-or-UPDATE.** `SqlEntityStorage::persistBundleRow()` (commit 4) performs a PK existence check and then routes to `INSERT` or `UPDATE` because DBAL does not expose a portable upsert (MySQL `INSERT … ON DUPLICATE KEY UPDATE`, PostgreSQL `INSERT … ON CONFLICT`, SQLite `INSERT … ON CONFLICT`, MSSQL `MERGE` all differ). Acceptable for current load. Revisit with dialect-specific paths — branching on `Connection::getDatabasePlatform()` — if subtable writes become a hotspot under concurrent workloads (double round-trip + race window between SELECT and INSERT/UPDATE). (Spec: `docs/specs/bundle-scoped-storage.md`.)
+- **Boot-time FK enforcement health check.** Delivered in commit 7 (`operator-diagnostics`) — SQLite requires `PRAGMA foreign_keys = ON` issued via `Connection::executeStatement()`; MySQL/InnoDB is on by default but can be disabled per-session. Bundle-subtable `ON DELETE CASCADE` silently becomes a no-op if FKs are off. Retained here as a pointer: any new driver added to `DBALDatabase` must be audited for FK-default behaviour. (Spec: `docs/specs/operator-diagnostics.md`.)

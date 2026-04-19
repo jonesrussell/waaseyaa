@@ -47,6 +47,9 @@ BootDiagnosticReport ─→ HealthChecker ─→ HealthCheckResult[] ─→ CLI 
 |------|----------|---------|
 | `DATABASE_UNREACHABLE` | error | SQLite file missing, corrupt, or inaccessible |
 | `DATABASE_SCHEMA_DRIFT` | error | Table columns don't match expected entity type definition |
+| `MISSING_BUNDLE_SUBTABLE` | error | Bundle has registered fields but `{base_table}__{bundle}` subtable does not exist |
+| `ORPHAN_BUNDLE_SUBTABLE` | warning | `{base_table}__{bundle}` subtable exists but no registered bundle carries fields for it |
+| `FK_ENFORCEMENT_DISABLED` | error | SQLite `PRAGMA foreign_keys` is OFF — subtable CASCADE deletes will not propagate |
 | `CACHE_DIRECTORY_UNWRITABLE` | warning | `storage/framework/` exists but not writable |
 | `STORAGE_DIRECTORY_MISSING` | warning | `storage/framework/` does not exist |
 | `INGESTION_LOG_OVERSIZED` | warning | Ingestion log exceeds 10,000 entries |
@@ -71,7 +74,8 @@ Each `DiagnosticCode` case provides:
 ### 2. Runtime Checks
 
 - **Database** — `SELECT 1` connectivity test via `DBALDatabase::query()`
-- **Schema drift** — compares `PRAGMA table_info()` against `SqlSchemaHandler.buildTableSpec()` expected columns for each registered entity type
+- **Schema drift** — compares `PRAGMA table_info()` against `SqlSchemaHandler.buildTableSpec()` expected columns for each registered entity type. Multi-bundle types additionally enumerate their `{base_table}__{bundle}` subtables (see below).
+- **Foreign key enforcement** — SQLite only: checks `PRAGMA foreign_keys`; emits `FK_ENFORCEMENT_DISABLED` when off. Skipped for dialects with default-on enforcement.
 - **Storage directory** — `storage/framework/` existence check
 - **Cache directory** — `storage/framework/` writability check
 
@@ -84,6 +88,8 @@ Each `DiagnosticCode` case provides:
 ## Schema Drift Detection
 
 Compares actual SQLite table schema against expected definition for each entity type.
+
+For multi-bundle entity types with registered bundle-scoped fields, drift detection additionally enumerates `{base_table}__{bundle}` subtables. See [`bundle-scoped-storage.md`](./bundle-scoped-storage.md#drift-diagnostic) for the per-subtable drift contract, missing-subtable and `ORPHAN_BUNDLE_SUBTABLE` codes.
 
 ### Algorithm
 
@@ -103,6 +109,17 @@ Compares actual SQLite table schema against expected definition for each entity 
 ['column' => 'type', 'issue' => 'type mismatch: expected TEXT, got INTEGER']
 ['column' => 'uuid', 'issue' => 'missing']
 ```
+
+### Bundle Subtable Drift
+
+When `HealthChecker` is constructed with a `FieldDefinitionRegistryInterface`, multi-bundle entity types (those with a `bundleEntityType`) are additionally enumerated per bundle:
+
+1. For each bundle returned by `bundleNamesFor($entityTypeId)` with non-empty `bundleFieldsFor()`, the expected subtable is `{base_table}__{bundle}`.
+2. If the subtable is missing, emit `MISSING_BUNDLE_SUBTABLE` under the name `Schema: {base_table}__{bundle}`. `context.table` carries the subtable name.
+3. If the subtable exists, compare its columns against the bundle's registered field names. Missing columns are reported as `DATABASE_SCHEMA_DRIFT` under the subtable name, again with `context.table` set.
+4. Orphan detection queries `sqlite_master` for tables matching `{base_table}__%` (LIKE pattern with `_` and `%` escaped). Any subtable not accounted for by a registered non-empty bundle is reported as `ORPHAN_BUNDLE_SUBTABLE` (warn, informational — auto-drop is never performed; author a cleanup migration).
+
+Single-bundle entity types (no `bundleEntityType`) are unchanged — subtable enumeration is skipped entirely.
 
 ## CLI Commands
 

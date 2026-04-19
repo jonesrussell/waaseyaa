@@ -665,6 +665,8 @@ File: `packages/foundation/src/Migration/TableBuilder.php`
 
 Convenience methods: `timestamps()` (creates `created` + `changed`), `entityBase()` (id + entity_type + bundle + _data + timestamps), `translationColumns()` (langcode + default_langcode + translation_source), `revisionColumns()` (revision_id + revision_created + revision_log).
 
+For multi-bundle entity types with bundle-scoped fields, `SqlSchemaHandler` additionally provisions `{base_table}__{bundle}` subtables (1:1 with the base, FK `ON DELETE CASCADE`). `SqlEntityStorage` partitions values by `FieldDefinition::$targetBundle` on save and two-query-loads (base row first, subtable by PK). `SqlEntityQuery` injects INNER JOINs for bundle-scoped conditions. See [`bundle-scoped-storage.md`](./bundle-scoped-storage.md) for the full contract.
+
 ### ColumnDefinition
 
 File: `packages/foundation/src/Migration/ColumnDefinition.php`
@@ -1142,13 +1144,16 @@ String-backed enum of operator-facing error codes:
 | `DEFAULT_TYPE_MISSING` | No entity types registered at boot |
 | `DEFAULT_TYPE_DISABLED` | All registered types disabled |
 | `DATABASE_UNREACHABLE` | Database file missing or corrupt |
-| `DATABASE_SCHEMA_DRIFT` | Entity table columns don't match expected schema |
+| `DATABASE_SCHEMA_DRIFT` | Entity table columns don't match expected schema (base or bundle subtable) |
+| `MISSING_BUNDLE_SUBTABLE` | A bundle with registered fields has no `{base}__{bundle}` subtable |
+| `ORPHAN_BUNDLE_SUBTABLE` | A `{base}__{bundle}` subtable exists with no registered bundle fields |
+| `FK_ENFORCEMENT_DISABLED` | Foreign-key enforcement off at the connection level (e.g. SQLite without `PRAGMA foreign_keys = ON`) |
 | `STORAGE_DIRECTORY_MISSING` | `storage/framework/` does not exist |
 | `CACHE_DIRECTORY_UNWRITABLE` | Cache directory not writable |
 | `INGESTION_LOG_OVERSIZED` | Ingestion log exceeds retention threshold |
 | `INGESTION_RECENT_FAILURES` | High ingestion failure rate |
 
-Each code has a `defaultMessage()` method for human-readable descriptions.
+Each code has a `defaultMessage()` method for human-readable descriptions. Severity: `MISSING_BUNDLE_SUBTABLE` and `FK_ENFORCEMENT_DISABLED` are errors; `ORPHAN_BUNDLE_SUBTABLE` is a warning (the base row is still reachable, the subtable is merely stale).
 
 ### DiagnosticEmitter
 
@@ -1184,16 +1189,38 @@ final class HealthChecker implements HealthCheckerInterface
         private readonly EntityTypeManagerInterface $entityTypeManager,
         private readonly string $projectRoot,
         ?LoggerInterface $logger = null,
+        ?FieldDefinitionRegistryInterface $fieldRegistry = null,
     );
 
     public function runAll(): array;          // list<HealthCheckResult>
     public function checkBoot(): array;       // entity type registry state
-    public function checkRuntime(): array;    // database, schema drift, storage, cache dirs
+    public function checkRuntime(): array;    // database, schema drift, storage, cache dirs, FK enforcement
+    public function checkSchemaDrift(): array; // base + bundle subtable drift
     public function checkIngestion(): array;  // ingestion log health, error rates
 }
 ```
 
-Three check groups: boot (entity type registry), runtime (database connectivity, schema drift, storage directories), and ingestion (log size, error rate). Results are `HealthCheckResult` value objects with pass/warn/fail status.
+Three check groups: boot (entity type registry), runtime (database connectivity, schema drift, storage directories, foreign-key enforcement), and ingestion (log size, error rate). Results are `HealthCheckResult` value objects with pass/warn/fail status.
+
+#### Subtable-aware schema drift
+
+For any entity type whose `EntityType::getBundleEntityType()` is non-null, `checkSchemaDrift()` does not stop at the base table. It enumerates the registered bundles via `$this->fieldRegistry->bundleNamesFor($entityTypeId)`, and for each bundle:
+
+- If the bundle has registered fields (`bundleFieldsFor()` is non-empty) but the `{base}__{bundle}` subtable is absent, emits `MISSING_BUNDLE_SUBTABLE` (fail).
+- If a `{base}__{bundle}` subtable exists but no fields are registered for that bundle, emits `ORPHAN_BUNDLE_SUBTABLE` (warn). Orphan detection scans `sqlite_master LIKE '{base_table}__%'` (ESCAPE-aware) and compares against the registry.
+- If the subtable exists but its columns do not match the registered field shape, the existing `DATABASE_SCHEMA_DRIFT` code is emitted with the subtable name in the message so the operator can distinguish base-table drift from bundle-table drift.
+
+The `fieldRegistry` parameter is optional to preserve the prior constructor contract for callers that predate per-bundle storage; when null, `HealthChecker` degrades to base-table-only drift detection (its former behaviour).
+
+#### FK enforcement health check
+
+`checkRuntime()` probes `PRAGMA foreign_keys` on SQLite connections. If the pragma reports `0`, it emits `FK_ENFORCEMENT_DISABLED` (fail), since `ON DELETE CASCADE` from the base table to bundle subtables silently becomes a no-op. MySQL/InnoDB is on by default but can be disabled per-session; any new driver added to `DBALDatabase` must be audited for FK-default behaviour.
+
+#### Wiring
+
+Both `AbstractKernel` and `ConsoleKernel` expose the `FieldDefinitionRegistry` they construct during `bootEntityTypeManager()` via a protected `$fieldRegistry` property, and pass it through when instantiating `HealthChecker` for CLI health commands. The same registry instance is shared with `SqlSchemaHandler`, `SqlEntityStorage`, and `ContentEntityBase::setFieldRegistry()`, so drift detection sees exactly the bundle set the storage layer is materializing.
+
+Authoritative contracts: `docs/specs/bundle-scoped-storage.md §Drift diagnostic` and `docs/specs/operator-diagnostics.md` define the codes and their operator-facing semantics; this section describes how `HealthChecker` surfaces them.
 
 ## Internal Interfaces
 
