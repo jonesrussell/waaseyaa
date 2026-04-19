@@ -72,6 +72,18 @@ final class DBALSchema implements SchemaInterface
             }
         }
 
+        if (!empty($spec['foreign keys'])) {
+            foreach ($spec['foreign keys'] as $fkName => $fkDef) {
+                $table->addForeignKeyConstraint(
+                    $fkDef['table'],
+                    $fkDef['columns'],
+                    $fkDef['references'],
+                    $fkDef['options'] ?? [],
+                    is_string($fkName) ? $fkName : null,
+                );
+            }
+        }
+
         $queries = $schema->toSql($this->platform);
         foreach ($queries as $sql) {
             $this->connection->executeStatement($sql);
