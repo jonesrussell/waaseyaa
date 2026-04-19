@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.149] - 2026-04-19
+
+### Fixed
+
+- `entity-storage`: `SqlSchemaHandler::shouldProcessBundles()` no longer requires an explicit `bundleEnumerator`. The enumerator becomes an optional escape hatch; when absent, `registeredBundlesFor()` falls back to `FieldDefinitionRegistry::bundleNamesFor()` — the same source `SqlEntityStorage` uses for save-time partitioning, so schema materialization and write-path routing agree on the "known bundles" set. Closes the alpha.148 kernel-path gap where `AbstractKernel`-booted apps with `addBundleFields()`-registered bundles silently skipped subtable creation and crashed at runtime with `no such table: {base}__{bundle}`. PR #1306.
+
+### Added
+
+- `foundation`: `KernelBundleSubtableMaterializationTest` — kernel-boot integration test that boots `AbstractKernel`, registers bundle fields via `EntityTypeManager::addBundleFields()`, triggers `getStorage()`, and asserts the `{base}__{bundle}` subtable physically materializes in the database. The assertion gap that allowed alpha.148 to ship with the kernel path broken.
+
 ## [0.1.0-alpha.148] - 2026-04-19
 
 ### Added
