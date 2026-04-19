@@ -35,7 +35,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 |---------|-------------------|
 | entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
-| field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
+| field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldStorage`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
 
 **`@internal`** (implementation details, may change without notice):
@@ -1230,10 +1230,18 @@ public function __construct(
     private bool $required = false,
     private bool $readOnly = false,
     private array $constraints = [],    // Constraint[]
+    private FieldStorage $stored = FieldStorage::Column,  // see "Storage hint" below
 )
 ```
 
 `toJsonSchema()` maps types: `string` -> `{'type': 'string'}`, `integer` -> `{'type': 'integer'}`, `boolean` -> `{'type': 'boolean'}`, `float` -> `{'type': 'number'}`, `text` -> object with `value`/`format`, `entity_reference` -> object with `target_id`/`target_type`. Wraps in `{'type': 'array', 'items': ...}` when `isMultiple()`.
+
+**Storage hint.** `FieldStorage` (`packages/field/src/FieldStorage.php`, backed enum: `Column`, `Data`) tells the schema and storage layers where the field's canonical value lives:
+
+- `FieldStorage::Column` (default) — `SqlSchemaHandler` materializes a column for the field; `SqlEntityStorage::splitForStorage()` writes the value to that column; `SqlEntityQuery` resolves it as a base/subtable column reference.
+- `FieldStorage::Data` — `SqlSchemaHandler` skips column emission (both base and bundle-subtable specs); `SqlEntityStorage::splitForStorage()` routes the value into the `_data` JSON blob even when a legacy column happens to exist; `SqlEntityQuery::routeFields()` accepts the registered field as core and `resolveField()` falls back to `json_extract(_data, '$.field')`.
+
+Core `EntityType::fieldDefinitions` metadata may pass `'stored' => FieldStorage::Data` (or the string `'data'`); `FieldDefinitionRegistry::synthesizeCoreField()` reads the value into the `FieldDefinition`. The hint enables registry-aware queries like `getQuery()->condition('status', 1)` to resolve cleanly without forcing a dedicated column for low-traffic universals.
 
 ### FieldItemBase
 
