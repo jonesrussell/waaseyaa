@@ -46,6 +46,7 @@ jobs:
           - { local: 'packages/northcloud', remote: 'northcloud' }
           - { local: 'packages/note', remote: 'note' }
           - { local: 'packages/relationship', remote: 'relationship' }
+          - { local: 'packages/groups', remote: 'groups' }
           # Layer 2: Services
           - { local: 'packages/auth', remote: 'auth' }
           - { local: 'packages/billing', remote: 'billing' }
