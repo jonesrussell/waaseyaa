@@ -41,3 +41,8 @@ See `waaseyaa:framework-extraction` skill for the extraction process.
 | | |
 |---|---|
 | **Status** | No new package: `Waaseyaa\SSR\Flash\Flash`, `FlashMessageService`, `FlashTwigExtension` already live under `packages/ssr`; tracker #1157 mail work does not relocate flash. |
+
+## Follow-ups
+
+- **Shared FieldDefinition → column mapper.** `SqlSchemaHandler::deriveColumnSpec()` (introduced with the `waaseyaa/groups` extraction's bundle-subtable work) translates `FieldDefinition::getType()` to a Waaseyaa column spec locally. It should be promoted to a shared mapper once a second consumer needs it — the likely trigger is a `NodeServiceProvider`-style migration from hand-authored column-spec arrays to `FieldDefinition` objects. Until then, keep it private to `SqlSchemaHandler`; premature extraction without a second caller would bake the current limited type set (`string/text/integer/boolean/float`) into a shared contract.
+- **Boot-time FK enforcement health check.** Commit 7 (`operator-diagnostics`) should add a health check that verifies foreign-key enforcement is on at boot: SQLite requires `PRAGMA foreign_keys = ON` (not supported through prepared statements — must be issued via `Connection::executeStatement()`); MySQL/InnoDB is on by default but can be disabled per-session. Bundle-subtable `ON DELETE CASCADE` silently becomes a no-op if the driver/session has FKs off. Caught during commit-3 test authoring when the cascade test failed against a SQLite connection that silently ignored the pragma set through the query builder.

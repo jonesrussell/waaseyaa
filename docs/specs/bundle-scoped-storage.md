@@ -72,6 +72,8 @@ public function ensureTable(EntityTypeInterface $type): void
 
 A bundle with zero registered fields has no subtable. This is both the install-time default state for a newly-registered bundle and a legitimate steady state: a bundle may exist solely as a discriminator with all shared behavior on core.
 
+Per-bundle subtable creation is the first consumer of foreign-key DDL in the framework and the driver of an additive extension to the schema spec: `SchemaInterface::createTable()` now honors a `foreign keys` entry in the spec array, forwarded by `DBALSchema` to DBAL's `Table::addForeignKeyConstraint()`. The interface itself is unchanged — the extension is purely in the accepted spec shape.
+
 ## Lifecycle
 
 The empty→non-empty transition is a first-class case, triggered whenever a release adds the first field to a previously-empty bundle.
