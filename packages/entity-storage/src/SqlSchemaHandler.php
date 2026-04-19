@@ -8,6 +8,7 @@ use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Field\FieldDefinitionInterface;
+use Waaseyaa\Field\FieldStorage;
 
 /**
  * Handles entity table schema creation and management.
@@ -102,6 +103,9 @@ final class SqlSchemaHandler
         }
 
         foreach ($bundleFields as $field) {
+            if ($field->getStored() === FieldStorage::Data) {
+                continue;
+            }
             $columnName = $field->getName();
             if (!$schema->fieldExists($subtableName, $columnName)) {
                 $schema->addField($subtableName, $columnName, $this->deriveColumnSpec($field));
@@ -612,6 +616,9 @@ final class SqlSchemaHandler
         }
 
         foreach ($bundleFields as $field) {
+            if ($field->getStored() === FieldStorage::Data) {
+                continue;
+            }
             $fields[$field->getName()] = $this->deriveColumnSpec($field);
         }
 

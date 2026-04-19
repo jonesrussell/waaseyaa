@@ -333,7 +333,12 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     public function getQuery(): EntityQueryInterface
     {
-        return new SqlEntityQuery($this->entityType, $this->database, $this->queryResultCache);
+        return new SqlEntityQuery(
+            $this->entityType,
+            $this->database,
+            $this->queryResultCache,
+            $this->fieldRegistry,
+        );
     }
 
     public function getEntityTypeId(): string
@@ -421,11 +426,19 @@ final class SqlEntityStorage implements EntityStorageInterface
     {
         $schema = $this->database->schema();
         $jsonFields = $this->getJsonFieldNames();
+        $dataStoredFields = $this->getDataStoredCoreFieldNames();
         $dbValues = [];
         $extraData = [];
 
         foreach ($values as $key => $value) {
             if ($key === '_data') {
+                continue;
+            }
+            // Honor explicit FieldStorage::Data: route to _data even if a
+            // legacy column happens to exist. Keeps the registry's storage
+            // hint authoritative over residual schema state.
+            if (isset($dataStoredFields[$key])) {
+                $extraData[$key] = $value;
                 continue;
             }
             if ($this->columnExists($key, $schema)) {
@@ -442,6 +455,29 @@ final class SqlEntityStorage implements EntityStorageInterface
         $dbValues['_data'] = json_encode($extraData, \JSON_THROW_ON_ERROR);
 
         return $dbValues;
+    }
+
+    /**
+     * Returns the set of core field names whose registered storage hint is
+     * FieldStorage::Data. Used by splitForStorage() to keep `_data`-routed
+     * fields out of base columns even when legacy columns exist.
+     *
+     * @return array<string, true>
+     */
+    private function getDataStoredCoreFieldNames(): array
+    {
+        if ($this->fieldRegistry === null) {
+            return [];
+        }
+
+        $names = [];
+        foreach ($this->fieldRegistry->coreFieldsFor($this->entityType->id()) as $name => $definition) {
+            if ($definition->getStored() === \Waaseyaa\Field\FieldStorage::Data) {
+                $names[$name] = true;
+            }
+        }
+
+        return $names;
     }
 
     /**

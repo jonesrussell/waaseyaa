@@ -27,6 +27,7 @@ final readonly class FieldDefinition implements FieldDefinitionInterface
         private bool $required = false,
         private bool $readOnly = false,
         private array $constraints = [],
+        private FieldStorage $stored = FieldStorage::Column,
     ) {}
 
     public function getName(): string
@@ -154,5 +155,10 @@ final readonly class FieldDefinition implements FieldDefinitionInterface
     public function getConstraints(): array
     {
         return $this->constraints;
+    }
+
+    public function getStored(): FieldStorage
+    {
+        return $this->stored;
     }
 }

@@ -146,6 +146,7 @@ return [
     'Waaseyaa\Field\FieldItemInterface' => 'public',
     'Waaseyaa\Field\FieldItemListInterface' => 'public',
     'Waaseyaa\Field\FieldDefinitionInterface' => 'public',
+    'Waaseyaa\Field\FieldStorage' => 'public',
     'Waaseyaa\Field\FieldTypeInterface' => 'public',
     'Waaseyaa\Field\FieldFormatterInterface' => 'public',
     'Waaseyaa\Field\FieldTypeManagerInterface' => 'public',
