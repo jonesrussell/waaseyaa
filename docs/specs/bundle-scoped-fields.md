@@ -34,7 +34,7 @@ Constraints enforced at registration time:
 - Field names within one `(entityTypeId, bundle)` pair must be unique. Duplicate registration throws.
 - Collisions with core fields of the same entity type throw — see [collision rules](#collision-rules) below.
 
-Core field registration continues via `EntityType::fieldDefinitions` on construction, unchanged. A new registry, `FieldDefinitionRegistry` (in `packages/field/src/`), keys all registered fields by `(entityTypeId, targetBundle)` and exposes `coreFieldsFor($entityTypeId)` and `bundleFieldsFor($entityTypeId, $bundle)`. The registry is owned by `waaseyaa/field`; `EntityTypeManager` consults it.
+Core field registration continues via `EntityType::fieldDefinitions` on construction, unchanged. A new registry, `FieldDefinitionRegistry`, keys all registered fields by `(entityTypeId, targetBundle)` and exposes `coreFieldsFor($entityTypeId)` and `bundleFieldsFor($entityTypeId, $bundle)`. The contract — `FieldDefinitionRegistryInterface` — lives in `packages/entity/src/Field/` so `EntityTypeManager` can consult it without importing from `waaseyaa/field`; the concrete `FieldDefinitionRegistry` lives in `packages/field/src/`. This follows the existing layer graph (`waaseyaa/field` depends on `waaseyaa/entity`, not the reverse).
 
 ## Collision rules
 
@@ -64,6 +64,8 @@ public function getFieldDefinitions(): array
 ```
 
 The union is safe because core × bundle name collisions are forbidden at registration. The merged result is the entity's effective schema for the rest of its lifecycle — validation, serialization, access checks, JSON Schema output.
+
+Both `coreFieldsFor()` and `bundleFieldsFor()` return `FieldDefinition` objects; core fields are synthesized from `EntityType::fieldDefinitions` metadata arrays at registration time. The registry is the normalization boundary — `EntityType::getFieldDefinitions()` and the rest of the codebase retain the metadata-array shape, and this spec does not require a sweeping consumer migration.
 
 For entity types with no `bundleEntityType` declared, `bundleFieldsFor()` returns empty and behavior matches the pre-spec status quo. This guarantees backward compatibility for `node`, `taxonomy`, `media`, and any other multi-bundle entity that has not yet adopted per-bundle fields.
 
