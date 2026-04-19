@@ -65,6 +65,8 @@ public function getFieldDefinitions(): array
 
 The union is safe because core × bundle name collisions are forbidden at registration. The merged result is the entity's effective schema for the rest of its lifecycle — validation, serialization, access checks, JSON Schema output.
 
+The registry is authoritative for any entity type whose registration has run. For entity types whose registration has *not* run — bootstrap, isolated unit tests that construct entity objects without going through `EntityTypeManager::registerEntityType()` — `ContentEntityBase::getFieldDefinitions()` falls back to the per-instance `$fieldDefinitions` passed through the legacy constructor. This is a transitional convenience, not a permanent dual-source contract: the fallback exists so pre-registration call sites and contract tests keep working, and it disappears silently the moment the type registers. Code that wants the registry to be the source of truth must route through registration; no caller should treat the legacy array as a supplemental path.
+
 Both `coreFieldsFor()` and `bundleFieldsFor()` return `FieldDefinition` objects; core fields are synthesized from `EntityType::fieldDefinitions` metadata arrays at registration time. The registry is the normalization boundary — `EntityType::getFieldDefinitions()` and the rest of the codebase retain the metadata-array shape, and this spec does not require a sweeping consumer migration.
 
 For entity types with no `bundleEntityType` declared, `bundleFieldsFor()` returns empty and behavior matches the pre-spec status quo. This guarantees backward compatibility for `node`, `taxonomy`, `media`, and any other multi-bundle entity that has not yet adopted per-bundle fields.
