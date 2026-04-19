@@ -24,10 +24,16 @@ final class SqlSchemaHandler
 
     /**
      * @param \Closure|null $bundleEnumerator fn(EntityTypeInterface): iterable<string>
-     *   Supplies the list of registered bundles for a multi-bundle entity
-     *   type — typically backed by the bundle-entity-type config storage.
-     *   When null (or when $fieldRegistry is null), ensureTable() skips the
-     *   bundle loop and behavior matches the pre-bundle-scoped status quo.
+     *   Optional override for bundle discovery — typically backed by the
+     *   bundle-entity-type config storage, used when the caller needs to
+     *   enumerate bundles beyond those currently in the registry (e.g. a
+     *   declared-but-empty bundle that still wants a subtable, or a pre-flight
+     *   schema rebuild from config). When null, the registry's
+     *   bundleNamesFor() is used as the default source — which matches
+     *   SqlEntityStorage's save-time partitioning so both paths agree on
+     *   which bundles are "known". When $fieldRegistry is also null the
+     *   bundle loop is skipped and behavior matches the pre-bundle-scoped
+     *   status quo.
      */
     public function __construct(
         private readonly EntityTypeInterface $entityType,
@@ -553,25 +559,31 @@ final class SqlSchemaHandler
     private function shouldProcessBundles(): bool
     {
         return $this->fieldRegistry !== null
-            && $this->bundleEnumerator !== null
             && $this->entityType->getBundleEntityType() !== null;
     }
 
     /**
-     * Enumerates registered bundles for a multi-bundle entity type.
+     * Enumerates bundles to consider for subtable materialization.
      *
-     * Reads from the configured enumerator (typically backed by the
-     * bundle-entity-type config storage) rather than the field registry,
-     * so that bundles with zero registered fields still appear — they simply
-     * take the empty-subtable branch in ensureTable().
+     * Prefers the explicit $bundleEnumerator when supplied — it can include
+     * bundles declared via the bundle-entity-type config that have no
+     * registered fields yet (an empty-subtable branch in ensureTable()
+     * handles those cleanly). Otherwise falls back to the registry's
+     * bundleNamesFor(), which is the same source SqlEntityStorage uses for
+     * save-time partitioning, so schema-side and write-side agree on which
+     * bundles are "known".
      *
      * @return iterable<string>
      */
     private function registeredBundlesFor(EntityTypeInterface $type): iterable
     {
-        \assert($this->bundleEnumerator !== null);
+        if ($this->bundleEnumerator !== null) {
+            return ($this->bundleEnumerator)($type);
+        }
 
-        return ($this->bundleEnumerator)($type);
+        \assert($this->fieldRegistry !== null);
+
+        return $this->fieldRegistry->bundleNamesFor($type->id());
     }
 
     /**
