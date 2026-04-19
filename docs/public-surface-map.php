@@ -128,6 +128,8 @@ return [
     'Waaseyaa\Entity\DateTime\TimestampFieldConvention' => 'public',
     'Waaseyaa\EntityStorage\Driver\EntityStorageDriverInterface' => 'public',
     'Waaseyaa\EntityStorage\Connection\ConnectionResolverInterface' => 'public',
+    'Waaseyaa\EntityStorage\Exception\UnknownFieldException' => 'public',
+    'Waaseyaa\EntityStorage\Exception\BundleAmbiguousFieldException' => 'public',
     'Waaseyaa\Access\AccountInterface' => 'public',
     'Waaseyaa\Access\AccessPolicyInterface' => 'public',
     'Waaseyaa\Access\FieldAccessPolicyInterface' => 'public',

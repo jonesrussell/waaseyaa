@@ -20,4 +20,13 @@ interface DatabaseInterface
 
     /** @return \Traversable */
     public function query(string $sql, array $args = []): \Traversable;
+
+    /**
+     * Quote a SQL identifier (table or column name) in the platform dialect.
+     *
+     * Callers must pass the raw unquoted identifier. Implementations decide
+     * the appropriate quote character (for example, double-quote on SQLite
+     * and PostgreSQL; backtick on MySQL).
+     */
+    public function quoteIdentifier(string $identifier): string;
 }

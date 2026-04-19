@@ -171,4 +171,16 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
     {
         return \array_keys($this->bundleFields[$entityTypeId] ?? []);
     }
+
+    public function bundlesDefiningField(string $entityTypeId, string $fieldName): array
+    {
+        $bundles = [];
+        foreach ($this->bundleFields[$entityTypeId] ?? [] as $bundle => $fields) {
+            if (\array_key_exists($fieldName, $fields)) {
+                $bundles[] = $bundle;
+            }
+        }
+
+        return $bundles;
+    }
 }

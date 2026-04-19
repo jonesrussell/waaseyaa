@@ -72,4 +72,17 @@ interface FieldDefinitionRegistryInterface
      *                            when no bundle fields are registered.
      */
     public function bundleNamesFor(string $entityTypeId): array;
+
+    /**
+     * Returns the bundles that define a field with the given name, so that
+     * query routing can detect bundle-scoped ambiguity before compiling SQL.
+     *
+     * Core fields are intentionally excluded — only bundle-scoped definitions
+     * contribute. Result order is insertion order of bundle registration.
+     *
+     * @return array<int, string> List of bundle identifiers defining that
+     *                            field name. Empty when the field is not
+     *                            registered against any bundle of the type.
+     */
+    public function bundlesDefiningField(string $entityTypeId, string $fieldName): array;
 }

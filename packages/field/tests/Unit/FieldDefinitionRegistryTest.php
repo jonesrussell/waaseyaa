@@ -246,4 +246,47 @@ final class FieldDefinitionRegistryTest extends TestCase
         self::assertSame($businessEmail, $registry->bundleFieldsFor('group', 'business')['email']);
         self::assertSame($orgEmail, $registry->bundleFieldsFor('group', 'organization')['email']);
     }
+
+    #[Test]
+    public function bundlesDefiningFieldEnumeratesEveryBundleWithThatName(): void
+    {
+        $registry = new FieldDefinitionRegistry();
+        $registry->registerBundleFields('group', 'business', [
+            new FieldDefinition(
+                name: 'email',
+                type: 'string',
+                targetEntityTypeId: 'group',
+                targetBundle: 'business',
+            ),
+            new FieldDefinition(
+                name: 'phone',
+                type: 'string',
+                targetEntityTypeId: 'group',
+                targetBundle: 'business',
+            ),
+        ]);
+        $registry->registerBundleFields('group', 'organization', [
+            new FieldDefinition(
+                name: 'email',
+                type: 'string',
+                targetEntityTypeId: 'group',
+                targetBundle: 'organization',
+            ),
+            new FieldDefinition(
+                name: 'org_code',
+                type: 'string',
+                targetEntityTypeId: 'group',
+                targetBundle: 'organization',
+            ),
+        ]);
+
+        self::assertEqualsCanonicalizing(
+            ['business', 'organization'],
+            $registry->bundlesDefiningField('group', 'email'),
+        );
+        self::assertSame(['business'], $registry->bundlesDefiningField('group', 'phone'));
+        self::assertSame(['organization'], $registry->bundlesDefiningField('group', 'org_code'));
+        self::assertSame([], $registry->bundlesDefiningField('group', 'nonexistent'));
+        self::assertSame([], $registry->bundlesDefiningField('other_type', 'email'));
+    }
 }

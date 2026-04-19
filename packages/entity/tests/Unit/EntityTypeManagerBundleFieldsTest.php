@@ -176,4 +176,22 @@ final class SpyRegistry implements FieldDefinitionRegistryInterface
         }
         return \array_keys($names);
     }
+
+    public function bundlesDefiningField(string $entityTypeId, string $fieldName): array
+    {
+        $bundles = [];
+        foreach ($this->bundleCalls as [$id, $b, $fields]) {
+            if ($id !== $entityTypeId) {
+                continue;
+            }
+            foreach ($fields as $key => $field) {
+                $name = \is_string($key) ? $key : (\is_object($field) && \method_exists($field, 'getName') ? $field->getName() : null);
+                if ($name === $fieldName) {
+                    $bundles[$b] = true;
+                    break;
+                }
+            }
+        }
+        return \array_keys($bundles);
+    }
 }
