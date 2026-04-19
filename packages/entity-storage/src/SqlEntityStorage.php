@@ -16,6 +16,7 @@ use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\Event\DefaultEntityEventFactory;
 use Waaseyaa\Entity\Event\EntityEventFactoryInterface;
 use Waaseyaa\Entity\Event\EntityEvents;
+use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
@@ -36,12 +37,16 @@ final class SqlEntityStorage implements EntityStorageInterface
 {
     private readonly string $tableName;
     private readonly string $idKey;
+    private readonly ?string $bundleKey;
 
     /** @var array<string, string> */
     private readonly array $entityKeys;
 
     /** @var array<string, bool> Column existence cache (column name => exists in table). */
     private array $columnCache = [];
+
+    /** @var array<string, bool> Bundle subtable existence cache (subtable name => exists). */
+    private array $bundleSubtableCache = [];
 
     private readonly LoggerInterface $logger;
 
@@ -51,10 +56,13 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     private readonly EntityClockInterface $clock;
 
+    private readonly ?FieldDefinitionRegistryInterface $fieldRegistry;
+
     public function __construct(
         private readonly EntityTypeInterface $entityType,
         private readonly DatabaseInterface $database,
         private readonly EventDispatcherInterface $eventDispatcher,
+        ?FieldDefinitionRegistryInterface $fieldRegistry = null,
         ?LoggerInterface $logger = null,
         ?EntityEventFactoryInterface $eventFactory = null,
         ?SqlEntityQueryResultCache $queryResultCache = null,
@@ -63,11 +71,13 @@ final class SqlEntityStorage implements EntityStorageInterface
         $this->tableName = $this->entityType->id();
         $keys = $this->entityType->getKeys();
         $this->idKey = $keys['id'] ?? 'id';
+        $this->bundleKey = $keys['bundle'] ?? null;
         $this->entityKeys = $keys;
         $this->logger = $logger ?? new NullLogger();
         $this->eventFactory = $eventFactory ?? new DefaultEntityEventFactory();
         $this->queryResultCache = $queryResultCache ?? new SqlEntityQueryResultCache();
         $this->clock = $clock ?? new UtcEntityClock();
+        $this->fieldRegistry = $fieldRegistry;
     }
 
     public function create(array $values = []): EntityInterface
@@ -105,6 +115,8 @@ final class SqlEntityStorage implements EntityStorageInterface
             return null;
         }
 
+        $this->mergeBundleSubtableRow($row);
+
         return $this->mapRowToEntity($row);
     }
 
@@ -137,9 +149,19 @@ final class SqlEntityStorage implements EntityStorageInterface
 
         $result = $query->execute();
 
+        $rows = [];
+        foreach ($result as $r) {
+            $rows[] = (array) $r;
+        }
+
+        if ($rows === []) {
+            return [];
+        }
+
+        $this->mergeBundleSubtableRowsBatch($rows);
+
         $entities = [];
-        foreach ($result as $row) {
-            $row = (array) $row;
+        foreach ($rows as $row) {
             $entity = $this->mapRowToEntity($row);
             $entityId = $entity->id();
             if ($entityId !== null) {
@@ -166,62 +188,36 @@ final class SqlEntityStorage implements EntityStorageInterface
         // Snapshot entity values AFTER PRE_SAVE so listener mutations are persisted.
         $values = $entity->toArray();
 
-        // Split values into schema columns and extra data.
-        $dbValues = $this->splitForStorage($values);
+        // Partition values into base-row + bundle-subtable shapes. Bundle-scoped
+        // fields (per the registry) are pulled out first so splitForStorage's
+        // _data fallback doesn't absorb them. Mismatched-bundle fields throw.
+        [$baseValues, $bundleValues, $currentBundle] = $this->partitionBundleValues($values, $entity);
+        $dbValues = $this->splitForStorage($baseValues);
 
-        if ($isNew) {
-            // Remove id key if null (auto-increment will handle it).
-            $insertValues = [];
-            foreach ($dbValues as $key => $value) {
-                if ($key === $this->idKey && $value === null) {
-                    continue;
+        $writesSubtable = $bundleValues !== []
+            && $currentBundle !== null
+            && $this->bundleSubtableExists($currentBundle);
+
+        $txn = $writesSubtable ? $this->database->transaction() : null;
+        try {
+            if ($isNew) {
+                $result = $this->insertBaseRow($entity, $dbValues);
+            } else {
+                $result = $this->updateBaseRow($entity, $dbValues);
+            }
+
+            if ($writesSubtable) {
+                $entityId = $entity->id();
+                if ($entityId !== null) {
+                    /** @var string $currentBundle — narrowed by $writesSubtable. */
+                    $this->upsertBundleRow($currentBundle, $entityId, $bundleValues);
                 }
-                $insertValues[$key] = $value;
             }
 
-            // Config entities (no uuid key) must have an explicit non-empty ID.
-            if (!isset($this->entityKeys['uuid']) && (!isset($insertValues[$this->idKey]) || $insertValues[$this->idKey] === '')) {
-                throw new \InvalidArgumentException(sprintf(
-                    'Config entity "%s" requires a non-empty string ID in the "%s" field.',
-                    $this->entityType->id(),
-                    $this->idKey,
-                ));
-            }
-
-            $id = $this->database->insert($this->tableName)
-                ->fields(array_keys($insertValues))
-                ->values($insertValues)
-                ->execute();
-
-            // Set the auto-generated ID only when ID was not in the insert
-            // (auto-increment). Config entities and entities with pre-set IDs
-            // already have their ID and should not be overwritten.
-            if (!isset($insertValues[$this->idKey]) && method_exists($entity, 'set')) {
-                $entity->set($this->idKey, (int) $id);
-            }
-
-            // Mark entity as no longer new.
-            if (method_exists($entity, 'enforceIsNew')) {
-                $entity->enforceIsNew(false);
-            }
-
-            $result = EntityConstants::SAVED_NEW;
-        } else {
-            // Build update fields excluding the ID.
-            $updateFields = [];
-            foreach ($dbValues as $key => $value) {
-                if ($key === $this->idKey) {
-                    continue;
-                }
-                $updateFields[$key] = $value;
-            }
-
-            $this->database->update($this->tableName)
-                ->fields($updateFields)
-                ->condition($this->idKey, $entity->id())
-                ->execute();
-
-            $result = EntityConstants::SAVED_UPDATED;
+            $txn?->commit();
+        } catch (\Throwable $e) {
+            $txn?->rollBack();
+            throw $e;
         }
 
         $this->queryResultCache->invalidate($this->tableName);
@@ -233,6 +229,64 @@ final class SqlEntityStorage implements EntityStorageInterface
         );
 
         return $result;
+    }
+
+    /**
+     * @param array<string, mixed> $dbValues
+     */
+    private function insertBaseRow(EntityInterface $entity, array $dbValues): int
+    {
+        $insertValues = [];
+        foreach ($dbValues as $key => $value) {
+            if ($key === $this->idKey && $value === null) {
+                continue;
+            }
+            $insertValues[$key] = $value;
+        }
+
+        if (!isset($this->entityKeys['uuid']) && (!isset($insertValues[$this->idKey]) || $insertValues[$this->idKey] === '')) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Config entity "%s" requires a non-empty string ID in the "%s" field.',
+                $this->entityType->id(),
+                $this->idKey,
+            ));
+        }
+
+        $id = $this->database->insert($this->tableName)
+            ->fields(\array_keys($insertValues))
+            ->values($insertValues)
+            ->execute();
+
+        if (!isset($insertValues[$this->idKey]) && \method_exists($entity, 'set')) {
+            $entity->set($this->idKey, (int) $id);
+        }
+
+        if (\method_exists($entity, 'enforceIsNew')) {
+            $entity->enforceIsNew(false);
+        }
+
+        return EntityConstants::SAVED_NEW;
+    }
+
+    /**
+     * @param array<string, mixed> $dbValues
+     */
+    private function updateBaseRow(EntityInterface $entity, array $dbValues): int
+    {
+        $updateFields = [];
+        foreach ($dbValues as $key => $value) {
+            if ($key === $this->idKey) {
+                continue;
+            }
+            $updateFields[$key] = $value;
+        }
+
+        $this->database->update($this->tableName)
+            ->fields($updateFields)
+            ->condition($this->idKey, $entity->id())
+            ->execute();
+
+        return EntityConstants::SAVED_UPDATED;
     }
 
     /**
@@ -476,5 +530,240 @@ final class SqlEntityStorage implements EntityStorageInterface
             $this->columnCache[$column] = $schema->fieldExists($this->tableName, $column);
         }
         return $this->columnCache[$column];
+    }
+
+    /**
+     * Partition entity values into base-row and bundle-subtable shapes.
+     *
+     * When no FieldDefinitionRegistry is wired, or when the entity type has
+     * no bundleKey, or when no bundle fields are registered for the type, all
+     * values flow to the base row unchanged and the bundle is reported as null.
+     *
+     * Otherwise, fields whose name is registered as a bundle field for the
+     * entity's current bundle are pulled out into $bundleValues; fields
+     * registered as bundle fields for some OTHER bundle are rejected as a
+     * programming error (writing them would corrupt the schema).
+     *
+     * @param array<string, mixed> $values
+     * @return array{0: array<string, mixed>, 1: array<string, mixed>, 2: ?string}
+     */
+    private function partitionBundleValues(array $values, EntityInterface $entity): array
+    {
+        if ($this->fieldRegistry === null || $this->bundleKey === null) {
+            return [$values, [], null];
+        }
+
+        $entityTypeId = $this->entityType->id();
+        $registeredBundles = $this->fieldRegistry->bundleNamesFor($entityTypeId);
+        if ($registeredBundles === []) {
+            return [$values, [], null];
+        }
+
+        $currentBundle = $entity->bundle();
+        if ($currentBundle === '' || $currentBundle === $entityTypeId) {
+            return [$values, [], null];
+        }
+
+        $bundleFieldNames = [];
+        foreach ($this->fieldRegistry->bundleFieldsFor($entityTypeId, $currentBundle) as $name => $_def) {
+            $bundleFieldNames[$name] = true;
+        }
+
+        $otherBundleFields = [];
+        foreach ($registeredBundles as $bundle) {
+            if ($bundle === $currentBundle) {
+                continue;
+            }
+            foreach ($this->fieldRegistry->bundleFieldsFor($entityTypeId, $bundle) as $name => $_def) {
+                $otherBundleFields[$name] = $bundle;
+            }
+        }
+
+        $baseValues = [];
+        $bundleValues = [];
+        foreach ($values as $key => $value) {
+            if (isset($bundleFieldNames[$key])) {
+                $bundleValues[$key] = $value;
+                continue;
+            }
+            if (isset($otherBundleFields[$key])) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Field "%s" belongs to bundle "%s" but entity of type "%s" has bundle "%s".',
+                    $key,
+                    $otherBundleFields[$key],
+                    $entityTypeId,
+                    $currentBundle,
+                ));
+            }
+            $baseValues[$key] = $value;
+        }
+
+        return [$baseValues, $bundleValues, $currentBundle];
+    }
+
+    private function bundleSubtableName(string $bundle): string
+    {
+        return $this->tableName . '__' . $bundle;
+    }
+
+    private function bundleSubtableExists(string $bundle): bool
+    {
+        $subtable = $this->bundleSubtableName($bundle);
+        if (!isset($this->bundleSubtableCache[$subtable])) {
+            $this->bundleSubtableCache[$subtable] = $this->database->schema()->tableExists($subtable);
+        }
+        return $this->bundleSubtableCache[$subtable];
+    }
+
+    /**
+     * UPSERT a bundle subtable row by primary key.
+     *
+     * Portable across SQLite/MySQL/Postgres: probes for an existing row, then
+     * issues UPDATE or INSERT. The subtable's PK column matches the base
+     * table's idKey and carries an ON DELETE CASCADE FK per commit 3.
+     *
+     * @param array<string, mixed> $bundleValues
+     */
+    private function upsertBundleRow(string $bundle, int|string $id, array $bundleValues): void
+    {
+        $subtable = $this->bundleSubtableName($bundle);
+
+        $existingResult = $this->database->select($subtable)
+            ->fields($subtable, [$this->idKey])
+            ->condition($this->idKey, $id)
+            ->execute();
+
+        $exists = false;
+        foreach ($existingResult as $_) {
+            $exists = true;
+            break;
+        }
+
+        if ($exists) {
+            if ($bundleValues === []) {
+                return;
+            }
+            $this->database->update($subtable)
+                ->fields($bundleValues)
+                ->condition($this->idKey, $id)
+                ->execute();
+            return;
+        }
+
+        $insertRow = $bundleValues;
+        $insertRow[$this->idKey] = $id;
+        $this->database->insert($subtable)
+            ->fields(\array_keys($insertRow))
+            ->values($insertRow)
+            ->execute();
+    }
+
+    /**
+     * Merge the matching bundle subtable row into a single base-table row.
+     *
+     * No-op when the registry/bundleKey is unavailable, when the row lacks a
+     * bundle/id, or when the subtable does not exist. Existing keys on the
+     * base row win — bundle columns cannot shadow base columns.
+     *
+     * @param array<string, mixed> $row
+     * @param-out array<string, mixed> $row
+     */
+    private function mergeBundleSubtableRow(array &$row): void
+    {
+        if ($this->fieldRegistry === null || $this->bundleKey === null) {
+            return;
+        }
+
+        $bundle = $row[$this->bundleKey] ?? null;
+        if (!\is_string($bundle) || $bundle === '') {
+            return;
+        }
+
+        $id = $row[$this->idKey] ?? null;
+        if ($id === null) {
+            return;
+        }
+
+        if (!$this->bundleSubtableExists($bundle)) {
+            return;
+        }
+
+        $subtable = $this->bundleSubtableName($bundle);
+        $result = $this->database->select($subtable)
+            ->fields($subtable)
+            ->condition($this->idKey, $id)
+            ->execute();
+
+        foreach ($result as $subRow) {
+            $subRowArr = (array) $subRow;
+            unset($subRowArr[$this->idKey]);
+            foreach ($subRowArr as $k => $v) {
+                if (!\is_string($k)) {
+                    continue;
+                }
+                if (!\array_key_exists($k, $row)) {
+                    $row[$k] = $v;
+                }
+            }
+            break;
+        }
+    }
+
+    /**
+     * Batch variant of mergeBundleSubtableRow: groups rows by bundle and
+     * performs one IN query per bundle rather than one lookup per row.
+     *
+     * @param list<array<string, mixed>> $rows
+     * @param-out list<array<string, mixed>> $rows
+     */
+    private function mergeBundleSubtableRowsBatch(array &$rows): void
+    {
+        if ($this->fieldRegistry === null || $this->bundleKey === null || $rows === []) {
+            return;
+        }
+
+        $idsByBundle = [];
+        $indexByBundleAndId = [];
+        foreach ($rows as $i => $row) {
+            $bundle = $row[$this->bundleKey] ?? null;
+            $id = $row[$this->idKey] ?? null;
+            if (!\is_string($bundle) || $bundle === '' || $id === null) {
+                continue;
+            }
+            $idsByBundle[$bundle][] = $id;
+            $indexByBundleAndId[$bundle][(string) $id] = $i;
+        }
+
+        foreach ($idsByBundle as $bundle => $ids) {
+            if (!$this->bundleSubtableExists($bundle)) {
+                continue;
+            }
+            $subtable = $this->bundleSubtableName($bundle);
+            $result = $this->database->select($subtable)
+                ->fields($subtable)
+                ->condition($this->idKey, $ids, 'IN')
+                ->execute();
+
+            foreach ($result as $subRow) {
+                $subRowArr = (array) $subRow;
+                $subId = $subRowArr[$this->idKey] ?? null;
+                if ($subId === null) {
+                    continue;
+                }
+                $rowIndex = $indexByBundleAndId[$bundle][(string) $subId] ?? null;
+                if ($rowIndex === null) {
+                    continue;
+                }
+                unset($subRowArr[$this->idKey]);
+                foreach ($subRowArr as $k => $v) {
+                    if (!\is_string($k)) {
+                        continue;
+                    }
+                    if (!\array_key_exists($k, $rows[$rowIndex])) {
+                        $rows[$rowIndex][$k] = $v;
+                    }
+                }
+            }
+        }
     }
 }

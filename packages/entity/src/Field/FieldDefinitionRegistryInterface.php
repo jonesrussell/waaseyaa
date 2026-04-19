@@ -20,10 +20,14 @@ interface FieldDefinitionRegistryInterface
     /**
      * Register the core field metadata for an entity type.
      *
-     * Called once per entity type at registration time. Core field names
+     * Called once per entity type at registration time. Metadata-array entries
+     * are synthesized into FieldDefinition objects with targetBundle === null
+     * and targetEntityTypeId === $entityTypeId; already-constructed
+     * FieldDefinition instances pass through unchanged. Core field names
      * occupy the entity type's global namespace for collision detection.
      *
-     * @param array<string, mixed> $fields Field metadata keyed by field name.
+     * @param array<string, array<string, mixed>|object> $fields Metadata
+     *        arrays or FieldDefinitionInterface instances keyed by field name.
      */
     public function registerCoreFields(string $entityTypeId, array $fields): void;
 
@@ -43,9 +47,12 @@ interface FieldDefinitionRegistryInterface
     public function registerBundleFields(string $entityTypeId, string $bundle, array $fields): void;
 
     /**
-     * Returns the core field metadata registered for an entity type.
+     * Returns the core FieldDefinition objects registered for an entity type.
      *
-     * @return array<string, mixed> Empty if nothing registered.
+     * Values are FieldDefinitionInterface instances with targetBundle === null.
+     *
+     * @return array<string, object> Field objects keyed by field name. Empty
+     *                               when no core fields are registered.
      */
     public function coreFieldsFor(string $entityTypeId): array;
 
@@ -56,4 +63,13 @@ interface FieldDefinitionRegistryInterface
      *                               when no bundle fields are registered.
      */
     public function bundleFieldsFor(string $entityTypeId, string $bundle): array;
+
+    /**
+     * Returns the bundle identifiers that have at least one registered field
+     * for the given entity type.
+     *
+     * @return array<int, string> Unordered list of bundle identifiers. Empty
+     *                            when no bundle fields are registered.
+     */
+    public function bundleNamesFor(string $entityTypeId): array;
 }

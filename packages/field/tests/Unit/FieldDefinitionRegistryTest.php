@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Field\FieldDefinition;
+use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\FieldDefinitionRegistry;
 
 #[CoversClass(FieldDefinitionRegistry::class)]
@@ -32,14 +33,46 @@ final class FieldDefinitionRegistryTest extends TestCase
     }
 
     #[Test]
-    public function coreFieldsReturnedInOriginalShape(): void
+    public function coreFieldsSynthesizedToFieldDefinitionObjects(): void
     {
         $registry = new FieldDefinitionRegistry();
-        $meta = ['name' => ['type' => 'string', 'required' => true]];
+        $meta = [
+            'label' => ['type' => 'string', 'required' => true, 'label' => 'Label'],
+            'age' => ['type' => 'integer', 'weight' => 5, 'default' => 0],
+        ];
 
         $registry->registerCoreFields('group', $meta);
+        $fields = $registry->coreFieldsFor('group');
 
-        self::assertSame($meta, $registry->coreFieldsFor('group'));
+        self::assertArrayHasKey('label', $fields);
+        self::assertInstanceOf(FieldDefinitionInterface::class, $fields['label']);
+        self::assertSame('label', $fields['label']->getName());
+        self::assertSame('string', $fields['label']->getType());
+        self::assertTrue($fields['label']->isRequired());
+        self::assertSame('Label', $fields['label']->getLabel());
+        self::assertSame('group', $fields['label']->getTargetEntityTypeId());
+        self::assertNull($fields['label']->getTargetBundle());
+
+        self::assertSame('integer', $fields['age']->getType());
+        self::assertSame(0, $fields['age']->getDefaultValue());
+        // Unknown metadata keys surface in settings.
+        self::assertSame(5, $fields['age']->getSetting('weight'));
+    }
+
+    #[Test]
+    public function corePreConstructedFieldDefinitionsPassThrough(): void
+    {
+        $registry = new FieldDefinitionRegistry();
+        $label = new FieldDefinition(
+            name: 'label',
+            type: 'string',
+            targetEntityTypeId: 'group',
+            targetBundle: null,
+        );
+
+        $registry->registerCoreFields('group', ['label' => $label]);
+
+        self::assertSame($label, $registry->coreFieldsFor('group')['label']);
     }
 
     #[Test]

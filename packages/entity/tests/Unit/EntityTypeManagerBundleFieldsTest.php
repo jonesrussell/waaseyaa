@@ -165,4 +165,15 @@ final class SpyRegistry implements FieldDefinitionRegistryInterface
         }
         return [];
     }
+
+    public function bundleNamesFor(string $entityTypeId): array
+    {
+        $names = [];
+        foreach ($this->bundleCalls as [$id, $b, $_fields]) {
+            if ($id === $entityTypeId) {
+                $names[$b] = true;
+            }
+        }
+        return \array_keys($names);
+    }
 }

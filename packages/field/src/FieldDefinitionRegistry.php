@@ -9,13 +9,15 @@ use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 /**
  * Default FieldDefinitionRegistry implementation.
  *
- * Stores core field metadata (array shape) and bundle FieldDefinition objects
- * keyed by (entityTypeId, bundle). Enforces collision rules at registration
- * time per docs/specs/bundle-scoped-fields.md §Collision rules.
+ * Stores FieldDefinition objects keyed by (entityTypeId, targetBundle). Core
+ * fields are synthesized from EntityType::fieldDefinitions metadata arrays at
+ * registration time — the registry is the normalization boundary per
+ * docs/specs/bundle-scoped-fields.md §Resolution. Bundle fields are registered
+ * as FieldDefinition objects directly and validated for self-description.
  */
 final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
 {
-    /** @var array<string, array<string, mixed>> [entityTypeId] => metadata keyed by field name. */
+    /** @var array<string, array<string, FieldDefinitionInterface>> [entityTypeId][fieldName]. */
     private array $coreFields = [];
 
     /** @var array<string, array<string, array<string, FieldDefinitionInterface>>> [entityTypeId][bundle][fieldName]. */
@@ -23,7 +25,60 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
 
     public function registerCoreFields(string $entityTypeId, array $fields): void
     {
-        $this->coreFields[$entityTypeId] = $fields;
+        $synthesized = [];
+        foreach ($fields as $name => $meta) {
+            if ($meta instanceof FieldDefinitionInterface) {
+                $synthesized[$name] = $meta;
+                continue;
+            }
+            if (!\is_array($meta)) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Core field "%s" on entity type "%s" must be a metadata array or FieldDefinitionInterface; got %s.',
+                    $name,
+                    $entityTypeId,
+                    \get_debug_type($meta),
+                ));
+            }
+            $synthesized[$name] = self::synthesizeCoreField($name, $entityTypeId, $meta);
+        }
+        $this->coreFields[$entityTypeId] = $synthesized;
+    }
+
+    /**
+     * @param array<string, mixed> $meta
+     */
+    private static function synthesizeCoreField(string $name, string $entityTypeId, array $meta): FieldDefinition
+    {
+        $known = ['type', 'label', 'description', 'required', 'readOnly', 'read_only',
+            'cardinality', 'translatable', 'revisionable', 'default', 'defaultValue',
+            'settings', 'constraints'];
+
+        $settings = $meta['settings'] ?? [];
+        if (!\is_array($settings)) {
+            $settings = [];
+        }
+        foreach ($meta as $key => $value) {
+            if (!\in_array($key, $known, true)) {
+                $settings[$key] = $value;
+            }
+        }
+
+        return new FieldDefinition(
+            name: $name,
+            type: (string) ($meta['type'] ?? 'string'),
+            cardinality: (int) ($meta['cardinality'] ?? 1),
+            settings: $settings,
+            targetEntityTypeId: $entityTypeId,
+            targetBundle: null,
+            translatable: (bool) ($meta['translatable'] ?? false),
+            revisionable: (bool) ($meta['revisionable'] ?? false),
+            defaultValue: $meta['defaultValue'] ?? ($meta['default'] ?? null),
+            label: (string) ($meta['label'] ?? ''),
+            description: (string) ($meta['description'] ?? ''),
+            required: (bool) ($meta['required'] ?? false),
+            readOnly: (bool) ($meta['readOnly'] ?? $meta['read_only'] ?? false),
+            constraints: \is_array($meta['constraints'] ?? null) ? $meta['constraints'] : [],
+        );
     }
 
     public function registerBundleFields(string $entityTypeId, string $bundle, array $fields): void
@@ -73,7 +128,7 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
 
         $coreNames = $this->coreFields[$entityTypeId] ?? [];
         foreach ($byName as $name => $_field) {
-            if (isset($coreNames[$name])) {
+            if (\array_key_exists($name, $coreNames)) {
                 throw new \InvalidArgumentException(\sprintf(
                     'Field "%s" on entity type "%s" bundle "%s" collides with core field "%s" on entity type "%s".',
                     $name,
@@ -110,5 +165,10 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
     public function bundleFieldsFor(string $entityTypeId, string $bundle): array
     {
         return $this->bundleFields[$entityTypeId][$bundle] ?? [];
+    }
+
+    public function bundleNamesFor(string $entityTypeId): array
+    {
+        return \array_keys($this->bundleFields[$entityTypeId] ?? []);
     }
 }

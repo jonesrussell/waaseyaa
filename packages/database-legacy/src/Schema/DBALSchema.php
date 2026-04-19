@@ -188,7 +188,7 @@ final class DBALSchema implements SchemaInterface
 
     public function addUniqueKey(string $table, string $name, array $fields): void
     {
-        if (empty($fields)) {
+        if ($fields === []) {
             throw new \InvalidArgumentException('Unique key fields must not be empty.');
         }
 

@@ -110,6 +110,7 @@ return [
     'Waaseyaa\Entity\Community\HasCommunityTrait' => 'public',
     'Waaseyaa\Entity\Repository\EntityRepositoryInterface' => 'public',
     'Waaseyaa\Entity\Event\EntityEventFactoryInterface' => 'public',
+    'Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface' => 'public',
     'Waaseyaa\Entity\Storage\EntityStorageInterface' => 'public',
     'Waaseyaa\Entity\Storage\RevisionableStorageInterface' => 'public',
     'Waaseyaa\Entity\Storage\EntityQueryInterface' => 'public',
