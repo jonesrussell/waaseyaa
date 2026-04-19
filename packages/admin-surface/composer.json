@@ -28,11 +28,11 @@
     "require": {
         "php": ">=8.4",
         "symfony/http-foundation": "^7.0",
-        "waaseyaa/entity": "^0.1",
-        "waaseyaa/access": "^0.1",
-        "waaseyaa/routing": "^0.1",
-        "waaseyaa/foundation": "^0.1",
-        "waaseyaa/api": "^0.1"
+        "waaseyaa/entity": "^0.1.0-alpha.150",
+        "waaseyaa/access": "^0.1.0-alpha.150",
+        "waaseyaa/routing": "^0.1.0-alpha.150",
+        "waaseyaa/foundation": "^0.1.0-alpha.150",
+        "waaseyaa/api": "^0.1.0-alpha.150"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
