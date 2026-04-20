@@ -396,10 +396,10 @@ If any test fails: DO NOT adapt the test to pass by partial-booting. The point o
 - [ ] **Step 4: Confirm `MinimalTestKernel` is gone**
 
 ```bash
-grep -rn "class MinimalTestKernel\|MinimalTestKernel " tests/ packages/
+grep -rnE 'class [A-Za-z_][A-Za-z0-9_]*[[:space:]]+extends[[:space:]]+(AbstractKernel|HttpKernel|ConsoleKernel)\b' tests/
 ```
 
-Expected: zero matches.
+Expected: zero matches. This is the same anchored named-class pattern used in Task 4 Step 2, so anonymous subclasses remain intentionally out of scope.
 
 ```bash
 grep -rn "extends AbstractKernel\|extends HttpKernel\|extends ConsoleKernel" tests/
@@ -648,7 +648,7 @@ Expected: `OK (3 tests, N assertions)`. If the first test fails here, the regres
 
 - [ ] **Step 4: Verify the mutation — flip the fallback to always-empty, confirm failure**
 
-This step is a hand-verification that the test is load-bearing. Temporarily edit `packages/entity-storage/src/SqlSchemaHandler.php` so that `registeredBundlesFor()` returns an empty array when `bundleEnumerator` is null:
+This step is a human-debug aid to prove the test is load-bearing; it is not the functional guard. The CI contract is the test suite itself (`SqlSchemaHandlerRegistryFallbackTest` plus `KernelBundleSubtableMaterializationTest`). Temporarily edit `packages/entity-storage/src/SqlSchemaHandler.php` so that `registeredBundlesFor()` returns an empty array when `bundleEnumerator` is null:
 
 ```php
 private function registeredBundlesFor(EntityTypeInterface $type): iterable
@@ -737,7 +737,7 @@ gh pr create --title "test(#1315): pin SqlSchemaHandler registry-fallback branch
 
 ## Test plan
 - [ ] `./vendor/bin/phpunit packages/entity-storage/tests/Unit/SqlSchemaHandlerRegistryFallbackTest.php` passes (3 tests).
-- [ ] Mutation recipe produces a red test when applied, green again after revert.
+- [ ] The tests themselves are green by default; the optional mutation recipe is a human verification aid and produces a red test when applied, green again after revert.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
