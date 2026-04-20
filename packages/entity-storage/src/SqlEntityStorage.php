@@ -194,9 +194,18 @@ final class SqlEntityStorage implements EntityStorageInterface
         [$baseValues, $bundleValues, $currentBundle] = $this->partitionBundleValues($values, $entity);
         $dbValues = $this->splitForStorage($baseValues);
 
-        $writesSubtable = $bundleValues !== []
-            && $currentBundle !== null
-            && $this->bundleSubtableExists($currentBundle);
+        $writesSubtable = false;
+        if ($bundleValues !== [] && $currentBundle !== null) {
+            $writesSubtable = $this->bundleSubtableExists($currentBundle);
+            if (!$writesSubtable) {
+                $this->logger->notice(\sprintf(
+                    '[MISSING_BUNDLE_SUBTABLE] Bundle-scoped fields are registered for entity type "%s" bundle "%s", but subtable "%s" does not exist at save time. Bundle-field values will not be persisted for this write. Run the schema migration or sync that materializes the subtable before saving this bundle.',
+                    $this->entityType->id(),
+                    $currentBundle,
+                    $this->bundleSubtableName($currentBundle),
+                ));
+            }
+        }
 
         $txn = $writesSubtable ? $this->database->transaction() : null;
         try {

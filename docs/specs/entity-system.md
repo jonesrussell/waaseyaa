@@ -588,6 +588,8 @@ Multi-bundle entity types (declaring `bundleEntityType`) may register bundle-spe
 
 **Query path.** `SqlEntityQuery` resolves bundle-scoped fields by JOINing `{base}__{bundle}` on demand. A bundle filter narrows the JOIN set; queries without a bundle filter that reference a field belonging to multiple bundles throw `BundleAmbiguousFieldException` (listing the conflicting bundles) rather than silently picking one. `UnknownFieldException` is thrown when the field resolves against neither core nor any registered bundle.
 
+**Runtime notice follow-up.** `SqlEntityStorage::save()` now emits a `LoggerInterface::notice()` with diagnostic code `MISSING_BUNDLE_SUBTABLE` when bundle-scoped values are present but the matching `{base}__{bundle}` subtable is still absent at save time. The notice belongs on the save path rather than `addBundleFields()` because registration is pre-materialization and would false-positive on healthy boots.
+
 **Drift diagnostics.** Three `DiagnosticCode` cases back this substrate, all surfaced by `HealthChecker`:
 - `MISSING_BUNDLE_SUBTABLE` (error) — bundle has registered fields but no subtable.
 - `ORPHAN_BUNDLE_SUBTABLE` (warning) — subtable exists with no matching registered bundle. Current detection queries `sqlite_master` and is SQLite-only; portable enumeration is tracked as issue #1301.
