@@ -39,11 +39,11 @@
     ],
     "require": {
         "php": ">=8.4",
-        "waaseyaa/entity": "^0.1",
-        "waaseyaa/config": "^0.1",
-        "waaseyaa/cache": "^0.1",
-        "waaseyaa/user": "^0.1",
-        "waaseyaa/access": "^0.1",
+        "waaseyaa/entity": "^0.1.0-alpha.150",
+        "waaseyaa/config": "^0.1.0-alpha.150",
+        "waaseyaa/cache": "^0.1.0-alpha.150",
+        "waaseyaa/user": "^0.1.0-alpha.150",
+        "waaseyaa/access": "^0.1.0-alpha.150",
         "symfony/console": "^7.0"
     },
     "require-dev": {

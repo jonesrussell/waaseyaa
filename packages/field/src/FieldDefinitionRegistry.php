@@ -51,7 +51,7 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
     {
         $known = ['type', 'label', 'description', 'required', 'readOnly', 'read_only',
             'cardinality', 'translatable', 'revisionable', 'default', 'defaultValue',
-            'settings', 'constraints'];
+            'settings', 'constraints', 'stored'];
 
         $settings = $meta['settings'] ?? [];
         if (!\is_array($settings)) {
@@ -61,6 +61,14 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
             if (!\in_array($key, $known, true)) {
                 $settings[$key] = $value;
             }
+        }
+
+        $stored = $meta['stored'] ?? FieldStorage::Column;
+        if (\is_string($stored)) {
+            $stored = FieldStorage::tryFrom($stored) ?? FieldStorage::Column;
+        }
+        if (!$stored instanceof FieldStorage) {
+            $stored = FieldStorage::Column;
         }
 
         return new FieldDefinition(
@@ -78,6 +86,7 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
             required: (bool) ($meta['required'] ?? false),
             readOnly: (bool) ($meta['readOnly'] ?? $meta['read_only'] ?? false),
             constraints: \is_array($meta['constraints'] ?? null) ? $meta['constraints'] : [],
+            stored: $stored,
         );
     }
 

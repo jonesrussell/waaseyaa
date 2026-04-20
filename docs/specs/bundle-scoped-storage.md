@@ -72,6 +72,8 @@ public function ensureTable(EntityTypeInterface $type): void
 
 A bundle with zero registered fields has no subtable. This is both the install-time default state for a newly-registered bundle and a legitimate steady state: a bundle may exist solely as a discriminator with all shared behavior on core.
 
+**Bundle-enumeration source.** `registeredBundlesFor()` resolves the bundle list in two ways. When `SqlSchemaHandler` is constructed with an explicit `bundleEnumerator` closure, that closure is authoritative — it is the escape hatch for callers that need to enumerate bundles beyond the registry (e.g. a declared-but-empty bundle from the bundle-entity-type config that still wants a subtable pre-created, or a pre-flight schema rebuild driven by config rather than registry). When no enumerator is passed, the handler falls back to `FieldDefinitionRegistry::bundleNamesFor($type->id())`. This is the same source `SqlEntityStorage` uses for save-time partitioning, so schema materialization and write-path routing agree on which bundles are "known". The kernel path — `AbstractKernel::bootEntityTypeManager()` — constructs handlers without an enumerator and relies on the registry fallback. Callers passing an explicit enumerator (currently only test fixtures enumerating intentionally-scoped bundle sets) keep their override behavior unchanged.
+
 Per-bundle subtable creation is the first consumer of foreign-key DDL in the framework and the driver of an additive extension to the schema spec: `SchemaInterface::createTable()` now honors a `foreign keys` entry in the spec array, forwarded by `DBALSchema` to DBAL's `Table::addForeignKeyConstraint()`. The interface itself is unchanged — the extension is purely in the accepted spec shape.
 
 ## Lifecycle

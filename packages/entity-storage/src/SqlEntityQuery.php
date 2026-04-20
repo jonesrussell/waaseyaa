@@ -10,6 +10,7 @@ use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\EntityStorage\Exception\BundleAmbiguousFieldException;
 use Waaseyaa\EntityStorage\Exception\UnknownFieldException;
+use Waaseyaa\Field\FieldStorage;
 
 /**
  * SQL-based entity query implementation.
@@ -201,6 +202,11 @@ final class SqlEntityQuery implements EntityQueryInterface
         foreach (array_keys($referenced) as $name) {
             if ($name === $this->bundleKey || \array_key_exists($name, $coreFields)) {
                 $routing[$name] = null;
+                // A core field marked FieldStorage::Data lives in the base
+                // table's `_data` JSON blob, not in a column. Resolve it via
+                // json_extract on the base alias so query routing matches the
+                // splitForStorage write path. resolveField() already handles
+                // the column-vs-data branching when the column lookup misses.
                 continue;
             }
 

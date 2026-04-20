@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Groups;
 
 use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Field\FieldStorage;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
 /**
@@ -33,6 +34,25 @@ final class GroupsServiceProvider extends ServiceProvider
             ],
             bundleEntityType: 'group_type',
             group: 'groups',
+            fieldDefinitions: [
+                'status' => [
+                    'type' => 'integer',
+                    'default' => 1,
+                    'stored' => FieldStorage::Data,
+                    'label' => 'Status',
+                    'description' => 'Whether the group is published.',
+                ],
+                'created_at' => [
+                    'type' => 'integer',
+                    'stored' => FieldStorage::Data,
+                    'label' => 'Created at',
+                ],
+                'updated_at' => [
+                    'type' => 'integer',
+                    'stored' => FieldStorage::Data,
+                    'label' => 'Updated at',
+                ],
+            ],
         ));
 
         $this->entityType(new EntityType(

@@ -35,10 +35,10 @@
     ],
     "require": {
         "php": ">=8.4",
-        "waaseyaa/entity": "^0.1",
-        "waaseyaa/field": "^0.1",
-        "waaseyaa/cache": "^0.1",
-        "waaseyaa/database-legacy": "^0.1",
+        "waaseyaa/entity": "^0.1.0-alpha.150",
+        "waaseyaa/field": "^0.1.0-alpha.150",
+        "waaseyaa/cache": "^0.1.0-alpha.150",
+        "waaseyaa/database-legacy": "^0.1.0-alpha.150",
         "symfony/event-dispatcher": "^7.0"
     },
     "require-dev": {
