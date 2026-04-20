@@ -11,9 +11,9 @@ interface EntityTypeManagerInterface
     public function getDefinition(string $entityTypeId): EntityTypeInterface;
 
     /** @throws \DomainException If the entity type ID uses the reserved `core.` namespace. */
-    public function registerEntityType(EntityTypeInterface $type): void;
+    public function registerEntityType(EntityTypeInterface $type, ?string $registrant = null): void;
 
-    public function registerCoreEntityType(EntityTypeInterface $type): void;
+    public function registerCoreEntityType(EntityTypeInterface $type, ?string $registrant = null): void;
 
     /** @return array<string, EntityTypeInterface> */
     public function getDefinitions(): array;
