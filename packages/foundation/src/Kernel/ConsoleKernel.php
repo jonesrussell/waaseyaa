@@ -109,6 +109,7 @@ final class ConsoleKernel extends AbstractKernel
             database: $this->database,
             entityTypeManager: $this->entityTypeManager,
             projectRoot: $this->projectRoot,
+            fieldRegistry: $this->fieldRegistry,
         );
 
         $typeIdNormalizer = new EntityTypeIdNormalizer($this->entityTypeManager);

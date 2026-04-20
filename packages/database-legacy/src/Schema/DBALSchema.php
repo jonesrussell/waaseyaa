@@ -72,6 +72,18 @@ final class DBALSchema implements SchemaInterface
             }
         }
 
+        if (!empty($spec['foreign keys'])) {
+            foreach ($spec['foreign keys'] as $fkName => $fkDef) {
+                $table->addForeignKeyConstraint(
+                    $fkDef['table'],
+                    $fkDef['columns'],
+                    $fkDef['references'],
+                    $fkDef['options'] ?? [],
+                    is_string($fkName) ? $fkName : null,
+                );
+            }
+        }
+
         $queries = $schema->toSql($this->platform);
         foreach ($queries as $sql) {
             $this->connection->executeStatement($sql);
@@ -176,7 +188,7 @@ final class DBALSchema implements SchemaInterface
 
     public function addUniqueKey(string $table, string $name, array $fields): void
     {
-        if (empty($fields)) {
+        if ($fields === []) {
             throw new \InvalidArgumentException('Unique key fields must not be empty.');
         }
 

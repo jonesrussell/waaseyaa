@@ -35,7 +35,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 |---------|-------------------|
 | entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
-| field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
+| field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldStorage`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
 
 **`@internal`** (implementation details, may change without notice):
@@ -456,6 +456,8 @@ New parameters added to `EntityType`:
 - `group: ?string` -- admin sidebar group key (e.g., `'content'`, `'taxonomy'`) for catalog grouping
 - `description: ?string` -- human-readable description of the entity type, displayed in admin catalog
 
+For multi-bundle entity types (those declaring `bundleEntityType`), fields may additionally be registered per-bundle via `EntityTypeManager::addBundleFields()`. `ContentEntityBase::getFieldDefinitions()` returns the union of core fields plus the active bundle's fields. See [`bundle-scoped-fields.md`](./bundle-scoped-fields.md) for the full contract.
+
 Entity types are registered explicitly with `EntityTypeManager::registerEntityType()`. The manager throws `\InvalidArgumentException` if a type ID is already registered.
 
 ### EntityTypeAttribute (future plugin discovery)
@@ -561,6 +563,32 @@ Table name derived from `$entityType->id()` (e.g., entity type `'node'` maps to 
 `SqlEntityStorage::mapRowToEntity()`:
 - If `$row['_data']` exists, `json_decode()` it and merge back into `$row`
 - Remove the `_data` key from the row before entity creation
+
+### Per-Bundle Subtables (Bundle-Scoped Storage)
+
+Multi-bundle entity types (declaring `bundleEntityType`) may register bundle-specific fields via `EntityTypeManager::addBundleFields($entityTypeId, $bundleId, $fieldDefinitions)`. Those fields are materialized as a dedicated subtable per bundle rather than sharing the base table or the `_data` blob. By default, `SqlSchemaHandler` discovers which bundles to materialize via `FieldDefinitionRegistry::bundleNamesFor($entityTypeId)` — the same registry source `SqlEntityStorage` uses for save-time partitioning — so schema-side and write-side agree on which bundles are "known". An optional `bundleEnumerator` closure on the handler is the escape hatch for callers that need to enumerate bundles beyond the registry (declared-but-empty bundles from bundle-entity-type config, pre-flight rebuilds). See [`bundle-scoped-storage.md`](./bundle-scoped-storage.md) for the full contract; the summary below captures the substrate the spec references.
+
+**Naming.** Subtables are named `{base_table}__{bundle}` (double-underscore separator). `SqlSchemaHandler::bundleSubtableName()` validates that the bundle id does not contain `__` and throws `\InvalidArgumentException` on violation — the separator is reserved. Bundle ids reach SQL through subtable names, LIKE patterns, and JOIN targets; validation at registration time is therefore structural, not per-site-of-use (tracked for centralization — see `docs/specs/extraction-log.md` follow-ups and issue #1298).
+
+**Schema.** `SqlSchemaHandler::ensureBundleSubtable($bundleId, $fieldSchemas)` creates `{base}__{bundle}` with:
+- `entity_id` column matching the base table's id key type, declared as the subtable's PRIMARY KEY.
+- One column per registered bundle field (type translated via `deriveColumnSpec()`).
+- Foreign key `entity_id → {base}.{idKey}` with `ON DELETE CASCADE`. FK enforcement requires `PRAGMA foreign_keys = ON` on SQLite and is default-on for MySQL/InnoDB and PostgreSQL. `HealthChecker::checkForeignKeysEnabled()` emits `FK_ENFORCEMENT_DISABLED` if the probe shows FKs off.
+
+**Field registry partitioning.** `FieldDefinitionRegistry` (implements `FieldDefinitionRegistryInterface`, extracted for cross-package consumption under `packages/entity/src/Field/`) keeps core-field and per-bundle-field maps separate. `ContentEntityBase::getFieldDefinitions()` returns the union of core plus the active bundle; entities created with an unknown bundle see only core fields.
+
+**Write path.** `SqlEntityStorage::save()` calls `partitionBundleValues()` to split values into core (base table), active-bundle (subtable), and foreign-bundle buckets. Foreign-bundle writes throw `\InvalidArgumentException` — attempts to write fields belonging to a different bundle fail loud rather than silently populating `_data`. After the base-table row is written, `persistBundleRow()` upserts into the subtable inside the same `$database->transaction()`, so subtable failure rolls back the base insert/update and suppresses POST_SAVE. The upsert is a portable SELECT-then-INSERT-or-UPDATE (DBAL has no portable upsert); a small race window under concurrent writes surfaces as a PK collision on the loser — acceptable for current load.
+
+**Read path.** `SqlEntityStorage::load()` merges the base row with `mergeBundleSubtableRow()`, which LEFT JOINs (or selects) the subtable matching the entity's active bundle. Missing subtable (mid-migration: fields registered but `ensureBundleSubtable()` not yet run) currently returns core values silently; `HealthChecker` catches this with the `MISSING_BUNDLE_SUBTABLE` diagnostic (runtime warning under design review — see issue #1299).
+
+**Query path.** `SqlEntityQuery` resolves bundle-scoped fields by JOINing `{base}__{bundle}` on demand. A bundle filter narrows the JOIN set; queries without a bundle filter that reference a field belonging to multiple bundles throw `BundleAmbiguousFieldException` (listing the conflicting bundles) rather than silently picking one. `UnknownFieldException` is thrown when the field resolves against neither core nor any registered bundle.
+
+**Drift diagnostics.** Three `DiagnosticCode` cases back this substrate, all surfaced by `HealthChecker`:
+- `MISSING_BUNDLE_SUBTABLE` (error) — bundle has registered fields but no subtable.
+- `ORPHAN_BUNDLE_SUBTABLE` (warning) — subtable exists with no matching registered bundle. Current detection queries `sqlite_master` and is SQLite-only; portable enumeration is tracked as issue #1301.
+- `FK_ENFORCEMENT_DISABLED` (error) — PRAGMA probe returned `foreign_keys = 0` on SQLite.
+
+`HealthChecker` itself sits in `packages/foundation` (layer 0) and currently imports from layer 1 (`EntityTypeInterface`, `FieldDefinitionRegistryInterface`, `SqlSchemaHandler`). The nullable registry ctor parameter mitigates coupling but not import direction; architectural cleanup is tracked as issue #1300.
 
 ### SqlSchemaHandler
 
@@ -1193,7 +1221,7 @@ public function __construct(
     private int $cardinality = 1,
     private array $settings = [],
     private string $targetEntityTypeId = '',
-    private ?string $targetBundle = null,
+    private ?string $targetBundle = null,  // see bundle-scoped-fields.md
     private bool $translatable = false,
     private bool $revisionable = false,
     private mixed $defaultValue = null,
@@ -1202,10 +1230,18 @@ public function __construct(
     private bool $required = false,
     private bool $readOnly = false,
     private array $constraints = [],    // Constraint[]
+    private FieldStorage $stored = FieldStorage::Column,  // see "Storage hint" below
 )
 ```
 
 `toJsonSchema()` maps types: `string` -> `{'type': 'string'}`, `integer` -> `{'type': 'integer'}`, `boolean` -> `{'type': 'boolean'}`, `float` -> `{'type': 'number'}`, `text` -> object with `value`/`format`, `entity_reference` -> object with `target_id`/`target_type`. Wraps in `{'type': 'array', 'items': ...}` when `isMultiple()`.
+
+**Storage hint.** `FieldStorage` (`packages/field/src/FieldStorage.php`, backed enum: `Column`, `Data`) tells the schema and storage layers where the field's canonical value lives:
+
+- `FieldStorage::Column` (default) — `SqlSchemaHandler` materializes a column for the field; `SqlEntityStorage::splitForStorage()` writes the value to that column; `SqlEntityQuery` resolves it as a base/subtable column reference.
+- `FieldStorage::Data` — `SqlSchemaHandler` skips column emission (both base and bundle-subtable specs); `SqlEntityStorage::splitForStorage()` routes the value into the `_data` JSON blob even when a legacy column happens to exist; `SqlEntityQuery::routeFields()` accepts the registered field as core and `resolveField()` falls back to `json_extract(_data, '$.field')`.
+
+Core `EntityType::fieldDefinitions` metadata may pass `'stored' => FieldStorage::Data` (or the string `'data'`); `FieldDefinitionRegistry::synthesizeCoreField()` reads the value into the `FieldDefinition`. The hint enables registry-aware queries like `getQuery()->condition('status', 1)` to resolve cleanly without forcing a dedicated column for low-traffic universals.
 
 ### FieldItemBase
 
@@ -1301,12 +1337,15 @@ final class FieldType extends WaaseyaaPlugin
 - `Storage/EntityQueryInterface.php` -- query builder contract
 - `Storage/RevisionableStorageInterface.php` -- revision storage contract
 - `Repository/EntityRepositoryInterface.php` -- high-level repository contract
+- `Field/FieldDefinitionRegistryInterface.php` -- cross-package contract for core + per-bundle field registration (consumed by storage and diagnostics)
 
 ### packages/entity-storage/src/
-- `SqlEntityStorage.php` -- SQL storage with _data blob split/merge
-- `SqlEntityQuery.php` -- SQL query builder with CONTAINS/STARTS_WITH operators; optional `SqlEntityQueryResultCache`
+- `SqlEntityStorage.php` -- SQL storage with `_data` blob split/merge and per-bundle subtable partitioning
+- `SqlEntityQuery.php` -- SQL query builder with CONTAINS/STARTS_WITH operators, bundle-aware JOIN resolution, optional `SqlEntityQueryResultCache`
 - `SqlEntityQueryResultCache.php` -- per-entity-type memoization for `SqlEntityQuery::execute()` results
-- `SqlSchemaHandler.php` -- table creation and schema management
+- `SqlSchemaHandler.php` -- base-table creation, per-bundle subtable creation (`ensureBundleSubtable()`), FK+CASCADE wiring, schema management
+- `Exception/BundleAmbiguousFieldException.php` -- thrown when a query references a field shared across multiple bundles without a bundle filter
+- `Exception/UnknownFieldException.php` -- thrown when a field resolves against neither core nor any registered bundle
 - `EntitySchemaSync.php` -- batch wrapper that calls `SqlSchemaHandler::ensureTable()` for a list of entity types
 - `EntityStorageFactory.php` -- factory that creates/caches SqlEntityStorage
 - `EntityRepository.php` -- high-level repository with language fallback

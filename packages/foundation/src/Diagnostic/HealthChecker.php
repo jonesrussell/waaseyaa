@@ -7,6 +7,7 @@ namespace Waaseyaa\Foundation\Diagnostic;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\Foundation\Ingestion\IngestionLogger;
 use Waaseyaa\Foundation\Log\LoggerInterface;
@@ -36,6 +37,7 @@ final class HealthChecker implements HealthCheckerInterface
         private readonly EntityTypeManagerInterface $entityTypeManager,
         private readonly string $projectRoot,
         ?LoggerInterface $logger = null,
+        private readonly ?FieldDefinitionRegistryInterface $fieldRegistry = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -97,6 +99,12 @@ final class HealthChecker implements HealthCheckerInterface
 
         // Cache directory.
         $results[] = $this->checkCacheDirectory();
+
+        // SQLite foreign-key enforcement (skipped for non-SQLite drivers).
+        $fk = $this->checkForeignKeysEnabled();
+        if ($fk !== null) {
+            $results[] = $fk;
+        }
 
         return $results;
     }
@@ -200,6 +208,18 @@ final class HealthChecker implements HealthCheckerInterface
                     context: ['table' => $tableName, 'drift' => $driftEntries],
                 );
             }
+
+            // Bundle subtable drift — only for multi-bundle entity types when a
+            // FieldDefinitionRegistry was supplied. See bundle-scoped-storage.md
+            // §Drift diagnostic.
+            if ($this->fieldRegistry !== null && $type->getBundleEntityType() !== null) {
+                foreach ($this->checkBundleSubtables($type) as $subtableResult) {
+                    if ($subtableResult->status === 'fail') {
+                        $driftFound = true;
+                    }
+                    $results[] = $subtableResult;
+                }
+            }
         }
 
         if (!$driftFound && $results === []) {
@@ -207,6 +227,172 @@ final class HealthChecker implements HealthCheckerInterface
         }
 
         return $results;
+    }
+
+    /**
+     * Enumerate per-bundle subtables for a multi-bundle entity type and report
+     * missing subtables, column drift, and orphan subtables.
+     *
+     * @return list<HealthCheckResult>
+     */
+    private function checkBundleSubtables(EntityTypeInterface $type): array
+    {
+        \assert($this->fieldRegistry !== null);
+        $results = [];
+        $entityId = $type->id();
+        $baseTable = $entityId;
+        $schema = $this->database->schema();
+        $expectedSubtables = [];
+
+        foreach ($this->fieldRegistry->bundleNamesFor($entityId) as $bundle) {
+            $fields = $this->fieldRegistry->bundleFieldsFor($entityId, $bundle);
+            if ($fields === []) {
+                continue;
+            }
+
+            $subtableName = $baseTable . '__' . $bundle;
+            $expectedSubtables[$subtableName] = true;
+
+            if (!$schema->tableExists($subtableName)) {
+                $results[] = HealthCheckResult::fail(
+                    "Schema: {$subtableName}",
+                    DiagnosticCode::MISSING_BUNDLE_SUBTABLE,
+                    sprintf(
+                        'Bundle "%s" has %d registered field(s) but subtable "%s" does not exist.',
+                        $bundle,
+                        count($fields),
+                        $subtableName,
+                    ),
+                    context: [
+                        'table' => $subtableName,
+                        'bundle' => $bundle,
+                        'entity_type' => $entityId,
+                        'field_count' => count($fields),
+                    ],
+                );
+                continue;
+            }
+
+            $drift = $this->detectSubtableColumnDrift($subtableName, array_keys($fields));
+            if ($drift !== []) {
+                $results[] = HealthCheckResult::fail(
+                    "Schema: {$subtableName}",
+                    DiagnosticCode::DATABASE_SCHEMA_DRIFT,
+                    sprintf('Subtable "%s" has %d column(s) with schema drift.', $subtableName, count($drift)),
+                    context: [
+                        'table' => $subtableName,
+                        'bundle' => $bundle,
+                        'entity_type' => $entityId,
+                        'drift' => $drift,
+                    ],
+                );
+            }
+        }
+
+        foreach ($this->findOrphanSubtables($baseTable, $expectedSubtables) as $orphan) {
+            $results[] = HealthCheckResult::warn(
+                "Schema: {$orphan}",
+                DiagnosticCode::ORPHAN_BUNDLE_SUBTABLE,
+                sprintf(
+                    'Subtable "%s" exists but no registered bundle of "%s" carries fields for it.',
+                    $orphan,
+                    $entityId,
+                ),
+                context: ['table' => $orphan, 'entity_type' => $entityId],
+            );
+        }
+
+        return $results;
+    }
+
+    /**
+     * @param list<string> $expectedFieldNames
+     * @return list<array{column: string, issue: string}>
+     */
+    private function detectSubtableColumnDrift(string $subtableName, array $expectedFieldNames): array
+    {
+        $actualColumns = [];
+        foreach ($this->database->query("PRAGMA table_info(\"{$subtableName}\")", []) as $row) {
+            $actualColumns[$row['name']] = true;
+        }
+
+        $drift = [];
+        foreach ($expectedFieldNames as $fieldName) {
+            if (!isset($actualColumns[$fieldName])) {
+                $drift[] = ['column' => $fieldName, 'issue' => 'missing'];
+            }
+        }
+        return $drift;
+    }
+
+    /**
+     * @param array<string, true> $expectedSubtables
+     * @return list<string>
+     */
+    private function findOrphanSubtables(string $baseTable, array $expectedSubtables): array
+    {
+        // LIKE pattern escapes `_` and `%` so base-table names containing those
+        // characters don't match extra tables. The `__` between base and bundle
+        // is reserved (see bundle-scoped-storage.md §Naming).
+        $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $baseTable);
+        $like = $escaped . '\\_\\_%';
+        $orphans = [];
+
+        try {
+            foreach ($this->database->query(
+                "SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE ? ESCAPE '\\'",
+                [$like],
+            ) as $row) {
+                $name = $row['name'];
+                if (!isset($expectedSubtables[$name])) {
+                    $orphans[] = $name;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Non-SQLite dialect — skip orphan detection silently.
+            $this->logger->info(sprintf(
+                'Orphan subtable detection skipped for %s: %s',
+                $baseTable,
+                $e->getMessage(),
+            ));
+        }
+
+        return $orphans;
+    }
+
+    /**
+     * SQLite-only PRAGMA check. Returns null for non-SQLite drivers or when
+     * the pragma value is unavailable — no noise for default-ON dialects.
+     */
+    private function checkForeignKeysEnabled(): ?HealthCheckResult
+    {
+        try {
+            $rows = iterator_to_array($this->database->query('PRAGMA foreign_keys', []), false);
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if ($rows === []) {
+            return null;
+        }
+
+        $value = $rows[0]['foreign_keys'] ?? null;
+        if ($value === null) {
+            return null;
+        }
+
+        if ((int) $value === 1) {
+            return HealthCheckResult::pass(
+                'Foreign key enforcement',
+                'SQLite PRAGMA foreign_keys = ON.',
+            );
+        }
+
+        return HealthCheckResult::fail(
+            'Foreign key enforcement',
+            DiagnosticCode::FK_ENFORCEMENT_DISABLED,
+            'SQLite PRAGMA foreign_keys = OFF. Per-bundle subtable CASCADE deletes will not fire.',
+        );
     }
 
     /**

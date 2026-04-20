@@ -1,0 +1,88 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Groups\Tests\Unit;
+
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Waaseyaa\Groups\Group;
+use Waaseyaa\Groups\GroupsServiceProvider;
+use Waaseyaa\Groups\GroupType;
+
+#[CoversClass(GroupsServiceProvider::class)]
+final class GroupsServiceProviderTest extends TestCase
+{
+    #[Test]
+    public function registersGroupAndGroupType(): void
+    {
+        $provider = new GroupsServiceProvider();
+        $provider->register();
+
+        $entityTypes = $provider->getEntityTypes();
+
+        self::assertCount(2, $entityTypes);
+
+        $ids = array_map(static fn($t) => $t->id(), $entityTypes);
+        self::assertContains('group', $ids);
+        self::assertContains('group_type', $ids);
+
+        $byId = [];
+        foreach ($entityTypes as $t) {
+            $byId[$t->id()] = $t;
+        }
+        self::assertSame(Group::class, $byId['group']->getClass());
+        self::assertSame(GroupType::class, $byId['group_type']->getClass());
+    }
+
+    #[Test]
+    public function groupIsMultiBundleKeyedByGidTypeName(): void
+    {
+        $provider = new GroupsServiceProvider();
+        $provider->register();
+
+        $group = null;
+        foreach ($provider->getEntityTypes() as $t) {
+            if ($t->id() === 'group') {
+                $group = $t;
+                break;
+            }
+        }
+        self::assertNotNull($group);
+        self::assertSame('group_type', $group->getBundleEntityType());
+
+        $keys = $group->getKeys();
+        self::assertSame('gid', $keys['id']);
+        self::assertSame('uuid', $keys['uuid']);
+        self::assertSame('type', $keys['bundle']);
+        self::assertSame('name', $keys['label']);
+        self::assertSame('langcode', $keys['langcode']);
+    }
+
+    #[Test]
+    public function groupShipsWithUniversalDataStoredCoreFieldsOnly(): void
+    {
+        $provider = new GroupsServiceProvider();
+        $provider->register();
+
+        $group = null;
+        foreach ($provider->getEntityTypes() as $t) {
+            if ($t->id() === 'group') {
+                $group = $t;
+                break;
+            }
+        }
+        self::assertNotNull($group);
+
+        // Bundle fields are still 100% consumer-defined via
+        // EntityTypeManager::addBundleFields(); the only core fields shipped
+        // are the FieldStorage::Data universals so registry-aware queries can
+        // resolve `status`/`created_at`/`updated_at` via json_extract.
+        $fieldDefs = $group->getFieldDefinitions();
+        self::assertSame(['status', 'created_at', 'updated_at'], array_keys($fieldDefs));
+        foreach ($fieldDefs as $def) {
+            self::assertSame(\Waaseyaa\Field\FieldStorage::Data, $def['stored']);
+        }
+    }
+}

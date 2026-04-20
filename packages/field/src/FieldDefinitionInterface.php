@@ -31,4 +31,6 @@ interface FieldDefinitionInterface extends DataDefinitionInterface
     public function getDefaultValue(): mixed;
 
     public function toJsonSchema(): array;
+
+    public function getStored(): FieldStorage;
 }

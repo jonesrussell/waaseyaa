@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0b4e2af608bde9c1a72fe1c41b5b50b8",
+    "content-hash": "5b992246898d74ed09e3a560b1ce6b55",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -4864,6 +4864,54 @@
                 "GPL-2.0-or-later"
             ],
             "description": "GraphQL endpoint for Waaseyaa — auto-generated schema from entity types",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "waaseyaa/groups",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/groups",
+                "reference": "d077545afdd4c34e6871823fdf6d7fdb87a4ef91"
+            },
+            "require": {
+                "php": ">=8.4",
+                "waaseyaa/entity": "^0.1",
+                "waaseyaa/entity-storage": "^0.1",
+                "waaseyaa/field": "^0.1",
+                "waaseyaa/foundation": "^0.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "waaseyaa": {
+                    "providers": [
+                        "Waaseyaa\\Groups\\GroupsServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-main": "0.1.x-dev",
+                    "dev-develop/v1.1": "0.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waaseyaa\\Groups\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Waaseyaa\\Groups\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Multi-bundle Group content entity type for Waaseyaa (extracted from Minoo)",
             "transport-options": {
                 "relative": true
             }
@@ -10309,6 +10357,7 @@
         "waaseyaa/geo": 20,
         "waaseyaa/github": 20,
         "waaseyaa/graphql": 20,
+        "waaseyaa/groups": 20,
         "waaseyaa/http-client": 20,
         "waaseyaa/i18n": 20,
         "waaseyaa/inertia": 20,
