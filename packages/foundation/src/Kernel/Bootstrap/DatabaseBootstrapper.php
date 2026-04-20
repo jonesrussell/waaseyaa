@@ -56,7 +56,12 @@ final class DatabaseBootstrapper
         }
 
         throw new \RuntimeException(
-            sprintf('Database not found at %s. In production, the database must already exist.', $path),
+            sprintf(
+                'Database not found at %s. In production, the database must already exist. '
+                . 'Run "bin/waaseyaa db:init" to create the database file and apply migrations. '
+                . 'The command is idempotent and safe to run on every deploy.',
+                $path,
+            ),
         );
     }
 

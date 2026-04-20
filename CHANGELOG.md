@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+Closes the first-deploy database-bootstrap gap: `DatabaseBootstrapper`'s production guard (correct for steady-state) had no sanctioned counterpart for first-run initialization, forcing downstream apps to either ship `APP_ENV=local` workarounds or pre-touch the sqlite file outside the framework. This release adds `bin/waaseyaa db:init` as the single sanctioned path through the guard.
+
+### Added
+
+- `cli`: `db:init` command (`Waaseyaa\CLI\Command\DbInitCommand`) — sanctioned first-deploy database initializer. Resolves the sqlite path from the same config chain the HTTP kernel uses, creates the file and parent directory if missing, applies all pending migrations via the standard `Migrator`, and is idempotent on re-run (safe to invoke on every deploy). Refuses to touch an existing database that lacks the `waaseyaa_migrations` table rather than guessing at a repair. Runs through `ConsoleKernel::shouldUseMinimalConsole()` so it can execute under `APP_ENV=production` without tripping the `DatabaseBootstrapper` production guard.
+- `cli`: `db:init --dry-run` reports the target path, parent-directory state, and pending migration list without touching the filesystem or database.
+- `cli`: `db:init` acquires an exclusive `flock` on `.db-init.lock` in the database's parent directory so concurrent invocations bail fast with a clear message instead of racing.
+- `cli`: `db:init` reports parent-directory and file-creation permission failures with the offending path, process user name, and uid, so operators can fix ownership without guessing.
+- `cli`: `DbInitCommandTest` covers fresh volume, idempotent re-run, partial-init refusal, all three `--dry-run` branches, permission failure messaging, concurrent-invocation bail, and `WAASEYAA_DB` env-var precedence.
+
+### Changed
+
+- `foundation`: `DatabaseBootstrapper` production-guard error message now names `bin/waaseyaa db:init` and states the command is idempotent and safe to run on every deploy. The guard itself is unchanged.
+
 ## [0.1.0-alpha.151] - 2026-04-19
 
 Five-release postmortem: alpha.147→148→149→150 each closed an immediate bundle-substrate alarm. alpha.150 then surfaced a fifth bug — `SqlEntityQuery`'s newly-reachable bundle JOIN code calling `DBALDatabase::quoteIdentifier()` against a `^0.1` `database-legacy` constraint that resolved to a stale alpha.145 sibling in consumer installs (Minoo crashed at 13 call sites simultaneously). The bug was structural, not local: every cross-package constraint in the monorepo was bare `^0.X`, so each fix in the chain only resolved the *specific* permissive-constraint failure that consumer's code had reached. This release closes the *class* of defect.

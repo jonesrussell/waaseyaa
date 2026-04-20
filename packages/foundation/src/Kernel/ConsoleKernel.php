@@ -12,6 +12,7 @@ use Waaseyaa\Cache\Backend\DatabaseBackend;
 use Waaseyaa\Cache\CacheConfiguration;
 use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\CliCommandRegistry;
+use Waaseyaa\CLI\Command\DbInitCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeManifestCommand;
 use Waaseyaa\CLI\Command\WaaseyaaVersionCommand;
 use Waaseyaa\CLI\WaaseyaaApplication;
@@ -156,7 +157,7 @@ final class ConsoleKernel extends AbstractKernel
     {
         $name = $this->requestedCommandName();
 
-        return $name === 'optimize:manifest' || $name === 'waaseyaa:version';
+        return $name === 'optimize:manifest' || $name === 'waaseyaa:version' || $name === 'db:init';
     }
 
     private function requestedCommandName(): ?string
@@ -182,9 +183,14 @@ final class ConsoleKernel extends AbstractKernel
     {
         $app = new WaaseyaaApplication();
         $app->setAutoExit(false);
-        if ($this->requestedCommandName() === 'waaseyaa:version') {
+        $requested = $this->requestedCommandName();
+        if ($requested === 'waaseyaa:version') {
             $app->registerCommands([
                 new WaaseyaaVersionCommand($this->projectRoot),
+            ]);
+        } elseif ($requested === 'db:init') {
+            $app->registerCommands([
+                new DbInitCommand($this->projectRoot),
             ]);
         } else {
             $app->registerCommands([

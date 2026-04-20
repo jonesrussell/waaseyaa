@@ -1385,7 +1385,7 @@ Creates `DBALDatabase::createSqlite()` using path resolution: `$config['database
 Production safety contract:
 - environment resolution matches the kernel contract: config `'environment'` key → `APP_ENV` env var → `'production'`
 - when the resolved environment is `production`, file-backed SQLite paths must already exist before boot continues
-- if the resolved production SQLite file is missing, bootstrap throws `RuntimeException` with `Database not found at {path}. In production, the database must already exist.`
+- if the resolved production SQLite file is missing, bootstrap throws `RuntimeException` naming `bin/waaseyaa db:init` as the sanctioned first-deploy path (`Database not found at {path}. In production, the database must already exist. Run "bin/waaseyaa db:init" to create the database file and apply migrations. The command is idempotent and safe to run on every deploy.`). The guard itself is unchanged; `db:init` bypasses it by running through the minimal-console path (see `ConsoleKernel::shouldUseMinimalConsole()` and the `DbInitCommand` reference below).
 - when that production guard fires, bootstrap does not create the parent directory as a side effect
 - non-production environments (`local`, `dev`, `development`, `testing`, etc.) keep the existing auto-create behavior
 - `:memory:` remains allowed in all environments for explicit in-memory bootstrap/test cases
