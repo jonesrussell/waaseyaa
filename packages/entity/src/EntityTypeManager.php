@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Waaseyaa\Entity\Exception\EntityTypeRegistrationCollisionException;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
@@ -23,6 +24,9 @@ class EntityTypeManager implements EntityTypeManagerInterface
      * @var array<string, EntityTypeInterface>
      */
     private array $definitions = [];
+
+    /** @var array<string, class-string|null> */
+    private array $definitionRegistrants = [];
 
     /**
      * Cached storage handler instances.
@@ -66,7 +70,7 @@ class EntityTypeManager implements EntityTypeManagerInterface
      * @throws \DomainException        If the entity type ID uses the reserved `core.` namespace.
      * @throws \InvalidArgumentException If an entity type with the same ID is already registered.
      */
-    public function registerEntityType(EntityTypeInterface $type): void
+    public function registerEntityType(EntityTypeInterface $type, ?string $registrant = null): void
     {
         if (str_starts_with($type->id(), 'core.')) {
             throw new \DomainException(\sprintf(
@@ -77,7 +81,7 @@ class EntityTypeManager implements EntityTypeManagerInterface
             ));
         }
 
-        $this->persistDefinition($type);
+        $this->persistDefinition($type, $registrant);
     }
 
     /**
@@ -87,21 +91,38 @@ class EntityTypeManager implements EntityTypeManagerInterface
      *
      * @throws \InvalidArgumentException If an entity type with the same ID is already registered.
      */
-    public function registerCoreEntityType(EntityTypeInterface $type): void
+    public function registerCoreEntityType(EntityTypeInterface $type, ?string $registrant = null): void
     {
-        $this->persistDefinition($type);
+        $this->persistDefinition($type, $registrant);
     }
 
-    private function persistDefinition(EntityTypeInterface $type): void
+    private function persistDefinition(EntityTypeInterface $type, ?string $registrant = null): void
     {
         if (isset($this->definitions[$type->id()])) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Entity type "%s" is already registered.',
+            $existingDefinition = $this->definitions[$type->id()];
+            $existingRegistrant = $this->definitionRegistrants[$type->id()] ?? null;
+
+            if ($existingDefinition->getClass() === $type->getClass()) {
+                throw EntityTypeRegistrationCollisionException::duplicate(
+                    $type->id(),
+                    $existingRegistrant,
+                    $existingDefinition->getClass(),
+                    $registrant,
+                    $type->getClass(),
+                );
+            }
+
+            throw EntityTypeRegistrationCollisionException::shadowCollision(
                 $type->id(),
-            ));
+                $existingRegistrant,
+                $existingDefinition->getClass(),
+                $registrant,
+                $type->getClass(),
+            );
         }
 
         $this->definitions[$type->id()] = $type;
+        $this->definitionRegistrants[$type->id()] = $registrant;
 
         $this->fieldRegistry?->registerCoreFields($type->id(), $type->getFieldDefinitions());
     }

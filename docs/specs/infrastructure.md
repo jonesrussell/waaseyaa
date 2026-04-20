@@ -21,6 +21,8 @@
 <!-- Spec reviewed 2026-04-10 - inertia RootTemplateRenderer: JSON script tag uses data-page="app" (mount id) so @inertiajs/core getInitialPageFromDOM finds the initial page -->
 <!-- Spec reviewed 2026-04-09 - HttpKernel::serveHttpRequest: auth middleware short-circuit — return pipeline response whenever status !== 200 (302 login redirect, 401/403 JSON), not only when status >= 400, so unauthenticated SSR routes cannot fall through to controller dispatch -->
 
+<!-- Spec reviewed 2026-04-20 - ServiceProvider now preserves entity-type registrant provenance and ProviderRegistry rethrows entity-type collision exceptions after logging so duplicate canonical registrations fail boot deterministically (#1313) -->
+
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
 ## Public Surface
@@ -1430,7 +1432,7 @@ Discovery and registration follows a multi-phase process:
 1. **Instantiation**: Each provider class from `$manifest->providers` is instantiated. Missing classes are logged with actionable remediation guidance (fix `composer.json` or run `optimize:manifest`) and skipped. Non-`ServiceProvider` instances are also logged and skipped.
 2. **Context injection**: Each provider receives kernel context via `setKernelContext($projectRoot, $config, $manifest->formatters)` and a kernel resolver closure via `setKernelResolver()`. The resolver provides cross-provider DI — it resolves `EntityTypeManager`, `DatabaseInterface`, `EventDispatcherInterface`, `LoggerInterface`, and any binding registered by previously-loaded providers.
 3. **Registration**: `register()` is called on each provider, allowing them to bind interfaces to implementations.
-4. **Entity type collection**: After all providers register, entity types from `$provider->getEntityTypes()` are registered with the `EntityTypeManager`. Registration failures are logged as errors but do not halt boot.
+4. **Entity type collection**: After all providers register, entity types from `$provider->getEntityTypeRegistrations()` are registered with the `EntityTypeManager` together with the provider class that declared them. Generic registration failures are still logged as errors. `EntityTypeRegistrationCollisionException` is special-cased: the failure is logged and then rethrown so duplicate or shadow registrations stop boot deterministically.
 5. **Provider-owned surfaces**: Route and command ownership stays with the package provider or package registry that declared it. Foundation now declares only its own baseline provider (`Waaseyaa\Foundation\FoundationServiceProvider`), while package-level providers such as `ApiServiceProvider`, `UserServiceProvider`, and `McpServiceProvider` own their respective HTTP surfaces.
 
 The method returns the full list of instantiated providers. Handles instantiation failures gracefully with error logging.
@@ -1487,7 +1489,7 @@ Migration/
     MigrationResult.php          -- count + list of ran migrations
 ServiceProvider/
     ServiceProviderInterface.php -- register()/boot()/provides()/isDeferred()
-    ServiceProvider.php          -- abstract base with singleton/bind/tag helpers
+    ServiceProvider.php          -- abstract base with singleton/bind/tag helpers and provider-owned entity-type provenance capture
     ProviderDiscovery.php        -- reads composer installed.json extra.waaseyaa
     ContainerCompiler.php        -- register phase -> boot phase -> Symfony DI container
 Discovery/

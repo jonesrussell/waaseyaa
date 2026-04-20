@@ -6,6 +6,7 @@ namespace Waaseyaa\Entity\Tests\Unit;
 
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Entity\Exception\EntityTypeRegistrationCollisionException;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
@@ -80,13 +81,45 @@ class EntityTypeManagerTest extends TestCase
         $this->manager->getDefinition('unknown');
     }
 
-    public function testRegisterDuplicateThrows(): void
+    public function testRegisterDuplicateThrowsCollisionExceptionForSameClassWithRegistrants(): void
+    {
+        $type = new EntityType(id: 'node', label: 'Content', class: TestEntity::class);
+        $this->manager->registerEntityType($type, ExistingRegistrant::class);
+
+        $this->expectException(EntityTypeRegistrationCollisionException::class);
+        $this->expectExceptionMessage('[ENTITY_TYPE_DUPLICATE]');
+        $this->expectExceptionMessage(ExistingRegistrant::class);
+        $this->expectExceptionMessage(IncomingRegistrant::class);
+        $this->expectExceptionMessage(TestEntity::class);
+
+        $duplicate = new EntityType(id: 'node', label: 'Content v2', class: TestEntity::class);
+        $this->manager->registerEntityType($duplicate, IncomingRegistrant::class);
+    }
+
+    public function testRegisterDuplicateThrowsShadowCollisionForDifferentClass(): void
+    {
+        $type = new EntityType(id: 'node', label: 'Content', class: TestEntity::class);
+        $this->manager->registerEntityType($type, ExistingRegistrant::class);
+
+        $this->expectException(EntityTypeRegistrationCollisionException::class);
+        $this->expectExceptionMessage('[ENTITY_TYPE_SHADOW_COLLISION]');
+        $this->expectExceptionMessage('node');
+        $this->expectExceptionMessage(ExistingRegistrant::class);
+        $this->expectExceptionMessage(IncomingRegistrant::class);
+        $this->expectExceptionMessage(TestEntity::class);
+        $this->expectExceptionMessage(ShadowEntity::class);
+
+        $duplicate = new EntityType(id: 'node', label: 'Content v2', class: ShadowEntity::class);
+        $this->manager->registerEntityType($duplicate, IncomingRegistrant::class);
+    }
+
+    public function testRegisterDuplicateFallsBackToUnknownRegistrantWhenProvenanceMissing(): void
     {
         $type = new EntityType(id: 'node', label: 'Content', class: TestEntity::class);
         $this->manager->registerEntityType($type);
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Entity type "node" is already registered.');
+        $this->expectException(EntityTypeRegistrationCollisionException::class);
+        $this->expectExceptionMessage('an unknown registrant');
 
         $duplicate = new EntityType(id: 'node', label: 'Content v2', class: TestEntity::class);
         $this->manager->registerEntityType($duplicate);
@@ -289,9 +322,15 @@ class EntityTypeManagerTest extends TestCase
         $type = new EntityType(id: 'core.note', label: 'Note', class: TestEntity::class);
         $this->manager->registerCoreEntityType($type);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(EntityTypeRegistrationCollisionException::class);
 
         $duplicate = new EntityType(id: 'core.note', label: 'Note v2', class: TestEntity::class);
         $this->manager->registerCoreEntityType($duplicate);
     }
 }
+
+final class ExistingRegistrant {}
+
+final class IncomingRegistrant {}
+
+final class ShadowEntity {}

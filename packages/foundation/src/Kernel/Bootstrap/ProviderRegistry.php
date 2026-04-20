@@ -7,6 +7,7 @@ namespace Waaseyaa\Foundation\Kernel\Bootstrap;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\Exception\EntityTypeRegistrationCollisionException;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
@@ -89,9 +90,19 @@ final class ProviderRegistry
         }
 
         foreach ($this->providers as $provider) {
-            foreach ($provider->getEntityTypes() as $entityType) {
+            foreach ($provider->getEntityTypeRegistrations() as $registration) {
+                $entityType = $registration['entityType'];
                 try {
-                    $entityTypeManager->registerEntityType($entityType);
+                    $entityTypeManager->registerEntityType($entityType, $registration['registrant']);
+                } catch (EntityTypeRegistrationCollisionException $e) {
+                    $this->logger->error(sprintf(
+                        'Failed to register entity type "%s" from %s: %s',
+                        $entityType->id(),
+                        $provider::class,
+                        $e->getMessage(),
+                    ));
+
+                    throw $e;
                 } catch (\RuntimeException | \InvalidArgumentException $e) {
                     $this->logger->error(sprintf(
                         'Failed to register entity type "%s" from %s: %s',

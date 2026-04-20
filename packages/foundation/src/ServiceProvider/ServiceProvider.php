@@ -27,8 +27,8 @@ abstract class ServiceProvider implements ServiceProviderInterface
     /** @var array<string, list<string>> */
     private array $tags = [];
 
-    /** @var list<\Waaseyaa\Entity\EntityTypeInterface> */
-    private array $entityTypes = [];
+    /** @var list<array{entityType: \Waaseyaa\Entity\EntityTypeInterface, registrant: class-string}> */
+    private array $entityTypeRegistrations = [];
 
     /** @var (\Closure(string): ?object)|null */
     private ?\Closure $kernelResolver = null;
@@ -183,7 +183,10 @@ abstract class ServiceProvider implements ServiceProviderInterface
 
     protected function entityType(\Waaseyaa\Entity\EntityTypeInterface $entityType): void
     {
-        $this->entityTypes[] = $entityType;
+        $this->entityTypeRegistrations[] = [
+            'entityType' => $entityType,
+            'registrant' => static::class,
+        ];
     }
 
     /** @return array<string, array{concrete: string|callable, shared: bool}> */
@@ -201,6 +204,15 @@ abstract class ServiceProvider implements ServiceProviderInterface
     /** @return list<\Waaseyaa\Entity\EntityTypeInterface> */
     public function getEntityTypes(): array
     {
-        return $this->entityTypes;
+        return array_map(
+            static fn(array $registration): \Waaseyaa\Entity\EntityTypeInterface => $registration['entityType'],
+            $this->entityTypeRegistrations,
+        );
+    }
+
+    /** @return list<array{entityType: \Waaseyaa\Entity\EntityTypeInterface, registrant: class-string}> */
+    public function getEntityTypeRegistrations(): array
+    {
+        return $this->entityTypeRegistrations;
     }
 }

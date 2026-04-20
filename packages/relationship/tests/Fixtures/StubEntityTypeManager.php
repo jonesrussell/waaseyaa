@@ -71,12 +71,12 @@ class StubEntityTypeManager implements EntityTypeManagerInterface
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function registerEntityType(EntityTypeInterface $type): void
+    public function registerEntityType(EntityTypeInterface $type, ?string $registrant = null): void
     {
         throw new \BadMethodCallException('Not implemented.');
     }
 
-    public function registerCoreEntityType(EntityTypeInterface $type): void
+    public function registerCoreEntityType(EntityTypeInterface $type, ?string $registrant = null): void
     {
         throw new \BadMethodCallException('Not implemented.');
     }

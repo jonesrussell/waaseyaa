@@ -22,6 +22,7 @@
 <!-- Spec reviewed 2026-04-10 - waaseyaa/testing EntityTypeFixtureValues + EntityFactory::defineFromEntityType (#1186) -->
 <!-- Spec reviewed 2026-04-10b - P3 duplicate constructor arity contract; Hydratable scaffold; core User/Node hydration (#1188 follow-up) -->
 <!-- Spec reviewed 2026-04-16 - EntityStorageDriverInterface::write returns effective id; EntityRepository::doSave back-fills auto-increment pk before POST_SAVE (waaseyaa/giiken#57) -->
+<!-- Spec reviewed 2026-04-20 - EntityTypeManager collision guard now preserves registrant provenance, distinguishes duplicate vs shadow registration, and throws EntityTypeRegistrationCollisionException (#1313) -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
 
@@ -33,7 +34,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints` |
+| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `EntityTypeRegistrationCollisionException`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
 | field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldStorage`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
@@ -325,6 +326,8 @@ File: `packages/entity/src/EntityTypeManagerInterface.php`
 interface EntityTypeManagerInterface
 {
     public function getDefinition(string $entityTypeId): EntityTypeInterface;
+    public function registerEntityType(EntityTypeInterface $type, ?string $registrant = null): void;
+    public function registerCoreEntityType(EntityTypeInterface $type, ?string $registrant = null): void;
     public function getDefinitions(): array;        // array<string, EntityTypeInterface>
     public function hasDefinition(string $entityTypeId): bool;
     public function getStorage(string $entityTypeId): EntityStorageInterface;
@@ -335,6 +338,8 @@ interface EntityTypeManagerInterface
 `getStorage()` returns the legacy `EntityStorageInterface` implementation (typically `SqlEntityStorage`) created via the optional storage factory.
 
 `getRepository()` returns `EntityRepositoryInterface` (the driver-backed repository with hydration, validation hooks, and transactional batch APIs). The kernel registers a repository factory alongside the storage factory so consumers can wrap `EntityTypeManager::getRepository($entityTypeId)` in thin domain repositories without manually assembling `SqlStorageDriver`, `RevisionableStorageDriver`, and `EntityRepository` dependencies.
+
+`registerEntityType()` and `registerCoreEntityType()` accept an optional registrant class so the registry can emit provenance-aware collision errors. When an entity type id is registered twice with the same class, the manager throws `EntityTypeRegistrationCollisionException` with the duplicate-registration message contract. When the same id is registered with a different class, the manager throws the shadow-collision variant naming the canonical and conflicting classes.
 
 ### EntityStorageInterface
 
@@ -1320,8 +1325,9 @@ final class FieldType extends WaaseyaaPlugin
 - `FieldableInterface.php` -- hasField, get, set, getFieldDefinitions
 - `EntityType.php` -- final readonly value object for entity type definitions
 - `EntityTypeInterface.php` -- entity type definition contract
-- `EntityTypeManager.php` -- registry with storage factory and optional repository factory (`getRepository()`)
-- `EntityTypeManagerInterface.php` -- manager contract
+- `EntityTypeManager.php` -- registry with provenance-aware collision detection, storage factory, and optional repository factory (`getRepository()`)
+- `EntityTypeManagerInterface.php` -- manager contract, including optional registrant provenance on registration
+- `Exception/EntityTypeRegistrationCollisionException.php` -- dedicated duplicate/shadow registration exception with migration-grade DX
 - `EntityConstants.php` -- SAVED_NEW (1), SAVED_UPDATED (2)
 - `TranslatableInterface.php` -- translation contract
 - `RevisionableInterface.php` -- revision contract
