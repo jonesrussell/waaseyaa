@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.151] - 2026-04-19
+
+Five-release postmortem: alpha.147→148→149→150 each closed an immediate bundle-substrate alarm. alpha.150 then surfaced a fifth bug — `SqlEntityQuery`'s newly-reachable bundle JOIN code calling `DBALDatabase::quoteIdentifier()` against a `^0.1` `database-legacy` constraint that resolved to a stale alpha.145 sibling in consumer installs (Minoo crashed at 13 call sites simultaneously). The bug was structural, not local: every cross-package constraint in the monorepo was bare `^0.X`, so each fix in the chain only resolved the *specific* permissive-constraint failure that consumer's code had reached. This release closes the *class* of defect.
+
+### Fixed
+
+- monorepo-wide: cross-package `waaseyaa/*` `composer.json` constraints tightened from `^0.1` to `^0.1.0-alpha.150` across 54 manifests (179 individual constraints in `packages/*/composer.json` and `skeleton/composer.json`). Prevents Composer from co-resolving stale sibling versions that pre-date methods callers now use — the alpha.150 `quoteIdentifier()` regression class. Closes #1311.
+
+### Added
+
+- `bin/check-composer-policy`: new rule **CP005 (`tight_internal_floor`)** rejects any cross-package `waaseyaa/*` constraint in `packages/*` or `skeleton/composer.json` that lacks a pre-release-anchored floor (`alpha`/`beta`/`rc`/`dev` tag). Existing CP003 hint message updated to reflect the new floor convention. Future PRs introducing a bare `^0.X` cross-package constraint fail policy gate before merge.
+- `entity-storage`: `DatabaseInterfaceCompositionTest` — local regression gate that asserts (1) every method called on `$this->database` in entity-storage source is declared on `Waaseyaa\Database\DatabaseInterface`, and (2) entity-storage's own `composer.json` anchors sibling waaseyaa/* constraints to a pre-release floor. Either invariant failing reproduces the alpha.150 class of defect at the unit-test layer instead of in production.
+
+### Notes
+
+- **Release-arc retrospective**: chain length 5. Each release closed a specific alarm; the class wasn't closed until treated as a class. Process-debt category: per-PR contract tests in PR #1307 ran against the source tree where co-resolution was always-fresh — they did not exercise packaged-form artifacts against constraint-floor dependencies. Filed as separate test-infrastructure follow-up to avoid scope creep here.
+
 ## [0.1.0-alpha.150] - 2026-04-19
 
 Closes the bundle-substrate four-release discovery arc: alpha.148 shipped the bundle API, alpha.149 wired `FieldDefinitionRegistry` but missed the kernel-path enumerator, the alpha.149 fix wired the enumerator but exposed a missing `getQuery()` registry forward, and this release closes query forwarding while introducing explicit storage-hint semantics. See #26 for the cross-package version-constraint tightening that would have shortened this arc.
