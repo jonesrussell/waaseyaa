@@ -249,6 +249,8 @@ rename($tmpPath, $cachePath);
 
 This pattern is used in `PackageManifestCompiler::compileAndCache()` and must be used anywhere the cache system writes PHP files to disk.
 
+Attribute instances built via `ReflectionAttribute::newInstance()` — used throughout `PackageManifestCompiler` for `AsFormatter`, `AsMiddleware`, `AsEntityType`, etc. — reflect their constructor declarations verbatim. Required typed properties are guaranteed initialized, so `isset()` / `??` guards on them are dead code; PHPStan flags them as `isset.property` / `nullCoalesce.property`. Gate on `!== ''` (or an explicit nullability check against the declared type) instead.
+
 ## Database Layer
 
 ### DatabaseInterface
