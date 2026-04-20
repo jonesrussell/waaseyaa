@@ -64,7 +64,7 @@ final class KernelBootValidationTest extends TestCase
 
     private function newKernel(): AbstractKernel
     {
-        return new class($this->projectRoot) extends AbstractKernel {
+        return new class ($this->projectRoot) extends AbstractKernel {
             public function publicBoot(): void
             {
                 $this->boot();
