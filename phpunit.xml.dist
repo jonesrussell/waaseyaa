@@ -18,6 +18,9 @@
             <directory>packages/*/tests/Integration</directory>
             <directory>tests/Integration</directory>
         </testsuite>
+        <testsuite name="Architecture">
+            <directory>tests/Architecture</directory>
+        </testsuite>
     </testsuites>
     <coverage>
         <report>
