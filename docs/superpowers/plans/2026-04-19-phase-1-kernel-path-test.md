@@ -401,19 +401,13 @@ grep -rnE 'class [A-Za-z_][A-Za-z0-9_]*[[:space:]]+extends[[:space:]]+(AbstractK
 
 Expected: zero matches. This is the same anchored named-class pattern used in Task 4 Step 2, so anonymous subclasses remain intentionally out of scope.
 
-```bash
-grep -rn "extends AbstractKernel\|extends HttpKernel\|extends ConsoleKernel" tests/
-```
-
-Expected: zero matches. (Anonymous subclasses show in the source as `new class(...) extends AbstractKernel` and are fine for artefact 4's architectural guard — but the grep above only matches named `class X extends ...` forms, which should now be zero.)
-
 - [ ] **Step 5: Run the full Phase17 suite to catch collateral damage**
 
 ```bash
 ./vendor/bin/phpunit --testsuite Integration
 ```
 
-Expected: all integration tests green. If anything else imported `MinimalTestKernel`, the autoload failure surfaces here.
+Expected: all integration tests green. If anything else still references `MinimalTestKernel`, the autoload failure surfaces here.
 
 - [ ] **Step 6: Commit and push**
 
@@ -447,7 +441,7 @@ gh pr create --title "refactor(#1315): drain MinimalTestKernel to real-kernel pa
 ## Test plan
 - [ ] `./vendor/bin/phpunit tests/Integration/Phase17/KernelBootValidationTest.php` passes all six tests.
 - [ ] `./vendor/bin/phpunit --testsuite Integration` passes.
-- [ ] `grep -rn "class MinimalTestKernel" tests/ packages/` returns zero matches.
+- [ ] `grep -rnE 'class [A-Za-z_][A-Za-z0-9_]*[[:space:]]+extends[[:space:]]+(AbstractKernel|HttpKernel|ConsoleKernel)\b' tests/` returns zero matches.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
