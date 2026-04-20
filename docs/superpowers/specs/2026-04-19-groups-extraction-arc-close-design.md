@@ -78,7 +78,7 @@ The primary materialization test boots via anonymous subclass of `AbstractKernel
 **Why first:** every correctness claim downstream rides on this harness. Without the guards in artefacts 2–4, the five-release bootstrap-variant failure mode can re-enter the suite undetected.
 
 **Code smells called out:**
-- **Bootstrap-variant proliferation** was the root smell — parallel "kernel-ish" helpers (mocked kernel, partial boot, in-memory manifest stubs) masked the alpha.148–151 chain. Artefact 4 makes re-introduction a hard error; artefact 2 drains the one pre-existing variant so the guard starts with no allowlist.
+- **Bootstrap-variant proliferation** was the root smell — parallel "kernel-ish" helpers (mocked kernel, partial boot, in-memory manifest stubs) masked the alpha.148–152 chain. Artefact 4 makes re-introduction a hard error; artefact 2 drains the one pre-existing variant so the guard starts with no allowlist.
 - **Registry-fallback branch is implicit.** `SqlSchemaHandler::shouldProcessBundles()` + `registeredBundlesFor()` falls back to `FieldDefinitionRegistry::bundleNamesFor()` only when `bundleEnumerator` is null — the exact shape alpha.148 got wrong. Artefact 3 pins it.
 
 **Exit criteria (merge gates):**
