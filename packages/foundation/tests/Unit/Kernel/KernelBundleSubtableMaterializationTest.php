@@ -26,6 +26,17 @@ use Waaseyaa\Foundation\Kernel\AbstractKernel;
  * Lives at this layer because the assertion is "kernel wiring delivers
  * end-to-end bundle substrate" — sibling to AbstractKernelTest /
  * HttpKernelTest, where other kernel-boot guarantees are codified.
+ *
+ * Deliberate mutation recipe (Phase 1 exit criterion 2). To prove the
+ * assertion is load-bearing, temporarily edit
+ * packages/entity-storage/src/SqlSchemaHandler.php::registeredBundlesFor()
+ * so its null-bundleEnumerator branch returns `[]` instead of calling
+ * `$this->fieldRegistry->bundleNamesFor($type->id())`. Re-run this
+ * test: `registeredBundleFieldsMaterializeSubtableViaKernelPath` must
+ * fail with "kernel_test_widget__gizmo must be materialized". This is
+ * the alpha.148 shape; a unit-level companion
+ * (SqlSchemaHandlerRegistryFallbackTest) pins the same branch so the
+ * kernel-path test is not the sole guard.
  */
 #[CoversNothing]
 final class KernelBundleSubtableMaterializationTest extends TestCase
