@@ -49,6 +49,38 @@ fi
 # they bring in.
 CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -vE '(_test|Test)\.php$|\.claude/|composer\.lock$|composer\.json$|package-lock\.json$|CLAUDE\.md$|/vendor/|\.layers$|phpunit\.xml|phpstan\.neon' || true)
 
+# package.json is not blanket-excluded — structural edits (new scripts,
+# workspaces, exports, entry points) genuinely do affect specs. But
+# dep-version-only bumps (the shape dependabot produces) are non-
+# structural. Drop any package.json whose diff touches only
+# "dependencies" / "devDependencies" version strings.
+is_pure_dep_bump() {
+  local diff="$1"
+  # Hunk body lines only: drop file headers (+++/---) and hunk headers (@@).
+  local changed_lines
+  changed_lines=$(echo "$diff" | grep -E '^[+-][^+-]' || true)
+  [ -z "$changed_lines" ] && return 1
+  # A dep-version line has shape:  "<pkg>": "<semver-ish>"[,]
+  # Value must start with an optional range prefix then a digit — ruling
+  # out paths, URLs, scopes like "@waaseyaa/foo", and arbitrary strings.
+  local non_match
+  non_match=$(echo "$changed_lines" | grep -vE '^[+-][[:space:]]*"[^"]+"[[:space:]]*:[[:space:]]*"[~^<>=]*[0-9][0-9a-zA-Z.+-]*"[[:space:]]*,?[[:space:]]*$' || true)
+  [ -z "$non_match" ]
+}
+
+FILTERED_FILES=""
+while IFS= read -r changed_file; do
+  [ -z "$changed_file" ] && continue
+  if [[ "$(basename "$changed_file")" == "package.json" ]]; then
+    file_diff=$(git diff "HEAD~${N}..HEAD" -- "$changed_file" 2>/dev/null || true)
+    if is_pure_dep_bump "$file_diff"; then
+      continue
+    fi
+  fi
+  FILTERED_FILES+="$changed_file"$'\n'
+done <<< "$CHANGED_FILES"
+CHANGED_FILES=$(echo -n "$FILTERED_FILES")
+
 if [ -z "$CHANGED_FILES" ]; then
   echo "No spec-affecting changes in last ${N} commits."
   exit 0
