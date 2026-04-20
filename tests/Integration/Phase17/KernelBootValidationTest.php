@@ -7,152 +7,164 @@ namespace Waaseyaa\Tests\Integration\Phase17;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
-use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Kernel\AbstractKernel;
-use Waaseyaa\Note\Note;
 
+/**
+ * Validates the content-type guard in AbstractKernel::boot() via the real
+ * kernel path. Each test writes a real `config/entity-types.php` under a
+ * temp projectRoot, instantiates an anonymous subclass of AbstractKernel
+ * exposing publicBoot(), and calls boot() — no MinimalTestKernel, no
+ * partial boot(), no hand-wired EntityTypeManager.
+ *
+ * Bootstrap-variant policy: this file must use the anonymous-subclass +
+ * real-projectRoot pattern codified in KernelBundleSubtableMaterializationTest.
+ * See tests/Architecture/NoKernelSubclassesInTestsTest for enforcement.
+ */
 #[CoversClass(AbstractKernel::class)]
 final class KernelBootValidationTest extends TestCase
 {
+    private string $projectRoot;
+
+    protected function setUp(): void
+    {
+        $this->projectRoot = sys_get_temp_dir() . '/waaseyaa_boot_validation_' . uniqid();
+        mkdir($this->projectRoot . '/config', 0755, true);
+        mkdir($this->projectRoot . '/storage/framework', 0755, true);
+
+        file_put_contents(
+            $this->projectRoot . '/config/waaseyaa.php',
+            "<?php return ['database' => ':memory:'];",
+        );
+    }
+
+    protected function tearDown(): void
+    {
+        $registryProperty = new \ReflectionProperty(ContentEntityBase::class, 'fieldRegistry');
+        $registryProperty->setValue(null, null);
+
+        if (!is_dir($this->projectRoot)) {
+            return;
+        }
+        $items = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($this->projectRoot, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST,
+        );
+        foreach ($items as $item) {
+            $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
+        }
+        rmdir($this->projectRoot);
+    }
+
+    private function writeEntityTypes(string $body): void
+    {
+        file_put_contents($this->projectRoot . '/config/entity-types.php', "<?php\nreturn {$body};\n");
+    }
+
+    private function newKernel(): AbstractKernel
+    {
+        return new class($this->projectRoot) extends AbstractKernel {
+            public function publicBoot(): void
+            {
+                $this->boot();
+            }
+        };
+    }
+
     #[Test]
     public function bootHaltsWithDefaultTypeMissingWhenNoTypesRegistered(): void
     {
-        $kernel = new MinimalTestKernel(types: []);
+        $this->writeEntityTypes('[]');
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessageMatches('/DEFAULT_TYPE_MISSING/');
 
-        $kernel->bootForTest();
+        $this->newKernel()->publicBoot();
     }
 
     #[Test]
     public function exceptionIncludesRemediationMessage(): void
     {
-        $kernel = new MinimalTestKernel(types: []);
+        $this->writeEntityTypes('[]');
 
         try {
-            $kernel->bootForTest();
+            $this->newKernel()->publicBoot();
             $this->fail('Expected RuntimeException was not thrown.');
         } catch (\RuntimeException $e) {
-            $this->assertStringContainsString('DEFAULT_TYPE_MISSING', $e->getMessage());
-            $this->assertStringContainsString('content type', $e->getMessage());
+            self::assertStringContainsString('DEFAULT_TYPE_MISSING', $e->getMessage());
+            self::assertStringContainsString('content type', $e->getMessage());
         }
     }
 
     #[Test]
     public function bootSucceedsWithOneRegisteredContentType(): void
     {
-        $kernel = new MinimalTestKernel(types: [
-            new EntityType(
-                id: 'note',
-                label: 'Note',
-                class: Note::class,
-                keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
-            ),
-        ]);
+        $this->writeEntityTypes(<<<'PHP'
+[
+    new \Waaseyaa\Entity\EntityType(
+        id: 'note',
+        label: 'Note',
+        class: \Waaseyaa\Note\Note::class,
+        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
+    ),
+]
+PHP);
 
-        // Should not throw.
-        $kernel->bootForTest();
+        $kernel = $this->newKernel();
+        $kernel->publicBoot();
 
-        $this->assertTrue($kernel->getEntityTypeManager()->hasDefinition('note'));
+        self::assertTrue($kernel->getEntityTypeManager()->hasDefinition('note'));
     }
 
     #[Test]
     public function bootSucceedsWithMultipleContentTypes(): void
     {
-        $kernel = new MinimalTestKernel(types: [
-            new EntityType(id: 'note', label: 'Note', class: Note::class, keys: ['id' => 'id']),
-            new EntityType(id: 'article', label: 'Article', class: Note::class, keys: ['id' => 'id']),
-        ]);
+        $this->writeEntityTypes(<<<'PHP'
+[
+    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
+    new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
+]
+PHP);
 
-        $kernel->bootForTest();
+        $kernel = $this->newKernel();
+        $kernel->publicBoot();
 
-        $this->assertCount(2, $kernel->getEntityTypeManager()->getDefinitions());
+        self::assertCount(2, $kernel->getEntityTypeManager()->getDefinitions());
     }
 
     #[Test]
     public function bootHaltsWithDefaultTypeDisabledWhenAllTypesDisabled(): void
     {
-        $tempDir = sys_get_temp_dir() . '/waaseyaa_disabled_test_' . uniqid();
-        mkdir($tempDir . '/storage/framework', 0755, true);
+        $this->writeEntityTypes(<<<'PHP'
+[
+    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
+]
+PHP);
 
-        $lifecycleManager = new EntityTypeLifecycleManager($tempDir);
-        $lifecycleManager->disable('note', 'test');
-
-        $kernel = new MinimalTestKernel(types: [
-            new EntityType(id: 'note', label: 'Note', class: Note::class, keys: ['id' => 'id']),
-        ]);
+        (new EntityTypeLifecycleManager($this->projectRoot))->disable('note', 'test');
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessageMatches('/DEFAULT_TYPE_DISABLED/');
 
-        try {
-            $kernel->bootForTest($lifecycleManager);
-        } finally {
-            array_map('unlink', glob($tempDir . '/storage/framework/*') ?: []);
-            @rmdir($tempDir . '/storage/framework');
-            @rmdir($tempDir . '/storage');
-            @rmdir($tempDir);
-        }
+        $this->newKernel()->publicBoot();
     }
 
     #[Test]
     public function bootSucceedsWhenOnlyOneOfTwoTypesIsDisabled(): void
     {
-        $tempDir = sys_get_temp_dir() . '/waaseyaa_partial_disabled_test_' . uniqid();
-        mkdir($tempDir . '/storage/framework', 0755, true);
+        $this->writeEntityTypes(<<<'PHP'
+[
+    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
+    new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
+]
+PHP);
 
-        $lifecycleManager = new EntityTypeLifecycleManager($tempDir);
-        $lifecycleManager->disable('article', 'test');
+        (new EntityTypeLifecycleManager($this->projectRoot))->disable('article', 'test');
 
-        $kernel = new MinimalTestKernel(types: [
-            new EntityType(id: 'note', label: 'Note', class: Note::class, keys: ['id' => 'id']),
-            new EntityType(id: 'article', label: 'Article', class: Note::class, keys: ['id' => 'id']),
-        ]);
+        $kernel = $this->newKernel();
+        $kernel->publicBoot();
 
-        // Should not throw — 'note' is still enabled.
-        $kernel->bootForTest($lifecycleManager);
-
-        array_map('unlink', glob($tempDir . '/storage/framework/*') ?: []);
-        @rmdir($tempDir . '/storage/framework');
-        @rmdir($tempDir . '/storage');
-        @rmdir($tempDir);
-
-        $this->assertTrue(true); // boot succeeded
-    }
-}
-
-/**
- * Minimal AbstractKernel subclass for testing boot validation in isolation.
- *
- * Skips database, manifest, providers, access policies, and extensions.
- * Only exercises the entity type registration + content type validation path.
- */
-class MinimalTestKernel extends AbstractKernel
-{
-    /** @param \Waaseyaa\Entity\EntityTypeInterface[] $types */
-    public function __construct(
-        private readonly array $types,
-    ) {
-        parent::__construct(projectRoot: sys_get_temp_dir());
-    }
-
-    /**
-     * Runs only the entity type registration + validation portion of boot.
-     */
-    public function bootForTest(?EntityTypeLifecycleManager $lifecycleManager = null): void
-    {
-        $this->dispatcher = new EventDispatcher();
-        $this->entityTypeManager = new EntityTypeManager($this->dispatcher);
-        $this->lifecycleManager = $lifecycleManager ?? new EntityTypeLifecycleManager(sys_get_temp_dir());
-
-        foreach ($this->types as $type) {
-            $this->entityTypeManager->registerEntityType($type);
-        }
-
-        $this->validateContentTypes();
+        self::assertTrue($kernel->getEntityTypeManager()->hasDefinition('note'));
     }
 }
