@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.152] - 2026-04-20
+
 Closes the first-deploy database-bootstrap gap: `DatabaseBootstrapper`'s production guard (correct for steady-state) had no sanctioned counterpart for first-run initialization, forcing downstream apps to either ship `APP_ENV=local` workarounds or pre-touch the sqlite file outside the framework. This release adds `bin/waaseyaa db:init` as the single sanctioned path through the guard.
 
 ### Added
