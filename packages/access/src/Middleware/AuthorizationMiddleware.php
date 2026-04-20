@@ -91,7 +91,7 @@ final class AuthorizationMiddleware implements HttpMiddlewareInterface
 
         if ($result->isForbidden()) {
             if ($isRenderRoute) {
-                return $this->renderError(403, 'Forbidden', $result->reason ?? 'You do not have permission to access this page.', $request);
+                return $this->renderError(403, 'Forbidden', $result->reason !== '' ? $result->reason : 'You do not have permission to access this page.', $request);
             }
 
             return new JsonResponse([

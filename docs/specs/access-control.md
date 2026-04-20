@@ -107,6 +107,8 @@ AccessResult::forbidden(string $reason = ''): AccessResult
 AccessResult::unauthenticated(string $reason = ''): AccessResult
 ```
 
+`$reason` is a non-nullable string (`''` default) — callers needing a fallback message must use `!== ''` rather than `??`; the null-coalesce is dead code and PHPStan flags it as `nullCoalesce.property`.
+
 ### State Checks
 
 ```php

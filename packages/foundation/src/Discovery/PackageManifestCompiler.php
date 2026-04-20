@@ -105,7 +105,7 @@ final class PackageManifestCompiler
 
             foreach ($ref->getAttributes(self::FORMATTER_ATTRIBUTE) as $attr) {
                 $instance = $attr->newInstance();
-                if (isset($instance->fieldType) && is_string($instance->fieldType) && $instance->fieldType !== '') {
+                if ($instance->fieldType !== '') {
                     $formatters[$instance->fieldType] = $class;
                 }
             }
