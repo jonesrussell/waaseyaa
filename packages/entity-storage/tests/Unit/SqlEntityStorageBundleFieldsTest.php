@@ -17,6 +17,8 @@ use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestStorageEntity;
 use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldDefinitionRegistry;
+use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\Log\LoggerTrait;
 
 /**
  * Commit-4 tests: activate the per-bundle save/load path in SqlEntityStorage.
@@ -226,6 +228,67 @@ final class SqlEntityStorageBundleFieldsTest extends TestCase
      * Test 5: attempting to save a field registered against a different
      * bundle throws — the partitioner refuses to write silently-corrupt data.
      */
+    /**
+     * Test 5: when bundle-scoped fields are present but the bundle subtable is
+     * missing at save time, the write continues on the base row and emits a
+     * deterministic notice instead of failing silently.
+     */
+    #[Test]
+    public function saveEmitsNoticeWhenBundleSubtableIsMissing(): void
+    {
+        $this->registerBusinessFields();
+        $this->ensureSchema(['business']);
+
+        $messages = [];
+        $logger = new class ($messages) implements LoggerInterface {
+            use LoggerTrait;
+
+            /** @var list<string> */
+            private array $messages;
+
+            /**
+             * @param list<string> $messages
+             */
+            public function __construct(array &$messages)
+            {
+                $this->messages = &$messages;
+            }
+
+            public function log(\Waaseyaa\Foundation\Log\LogLevel $level, string|\Stringable $message, array $context = []): void
+            {
+                if ($level === \Waaseyaa\Foundation\Log\LogLevel::NOTICE) {
+                    $this->messages[] = (string) $message;
+                }
+            }
+        };
+        $storage = $this->makeStorage($logger);
+
+        $this->database->getConnection()->executeStatement('DROP TABLE "group__business"');
+
+        $entity = $storage->create([
+            'uuid' => 'uuid-missing-subtable',
+            'type' => 'business',
+            'label' => 'Acme',
+            'langcode' => 'en',
+            'email' => 'hi@acme.example',
+        ]);
+
+        $storage->save($entity);
+
+        self::assertCount(1, $messages);
+        self::assertStringContainsString('[MISSING_BUNDLE_SUBTABLE]', $messages[0]);
+        self::assertStringContainsString('entity type "group" bundle "business"', $messages[0]);
+        self::assertStringContainsString('subtable "group__business"', $messages[0]);
+
+        $loaded = $storage->load($entity->id());
+        self::assertNotNull($loaded);
+        self::assertFalse($loaded->hasField('email'));
+    }
+
+    /**
+     * Test 6: attempting to save a field registered against a different
+     * bundle throws â€” the partitioner refuses to write silently-corrupt data.
+     */
     #[Test]
     public function saveRejectsFieldsBelongingToOtherBundles(): void
     {
@@ -250,7 +313,7 @@ final class SqlEntityStorageBundleFieldsTest extends TestCase
     }
 
     /**
-     * Test 6: loading an entity whose bundle has zero registered fields
+     * Test 7: loading an entity whose bundle has zero registered fields
      * skips the subtable lookup entirely — the merge path is a no-op and
      * no "no such table" error surfaces.
      */
@@ -283,7 +346,7 @@ final class SqlEntityStorageBundleFieldsTest extends TestCase
     }
 
     /**
-     * Test 7: entity types without bundleEntityType (the v0.1 legacy shape)
+     * Test 8: entity types without bundleEntityType (the v0.1 legacy shape)
      * continue to behave as before — partitionBundleValues short-circuits,
      * no transaction is opened for the subtable, and no subtable query runs
      * on load.
@@ -369,17 +432,18 @@ final class SqlEntityStorageBundleFieldsTest extends TestCase
             $this->groupType,
             $this->database,
             $this->registry,
-            static fn (): iterable => $bundles,
+            static fn(): iterable => $bundles,
         ))->ensureTable();
     }
 
-    private function makeStorage(): SqlEntityStorage
+    private function makeStorage(?LoggerInterface $logger = null): SqlEntityStorage
     {
         return new SqlEntityStorage(
             $this->groupType,
             $this->database,
             $this->dispatcher,
             $this->registry,
+            $logger,
         );
     }
 }
