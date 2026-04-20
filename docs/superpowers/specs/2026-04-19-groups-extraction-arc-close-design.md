@@ -65,18 +65,29 @@ ADR markdown file written at `docs/superpowers/specs/2026-04-19-groups-reconcili
 ## Phase 1 — framework#1315 part A: in-tree kernel-path integration test
 
 **Repo:** waaseyaa.
-**Scope:** `tests/Integration/Kernel/KernelBundleFieldTest` (or similar). Boots real `HttpKernel` (or a dedicated `KernelTestCase` exercising the same bootstrap as `public/index.php`), constructs real SQLite via `DBALDatabase::createSqlite()`, registers a test bundle field through `EntityTypeManager::addBundleFields()`, runs migrations, asserts `{base}__{bundle}` subtable exists with declared columns, round-trips save/load.
+**Status:** core assertion already landed as `packages/foundation/tests/Unit/Kernel/KernelBundleSubtableMaterializationTest.php` (commit `070970de`, 2026-04-19). Phase 1 is the cluster of cleanups and guards around that landed test, not a greenfield test write.
 
-**Why first:** every correctness claim downstream rides on this harness. Without it, #1313's guard is unverified on the consumer-equivalent path.
+**Scope:** Four artefacts, strictly ordered:
+1. **This spec amendment** (docs-only PR, first) — aligns the spec with the already-landed path.
+2. **Drain `MinimalTestKernel`** in `tests/Integration/Phase17/KernelBootValidationTest.php` to the real-kernel pattern (anonymous subclass + real `projectRoot` + `config/entity-types.php`), so the architectural guard in artefact 4 has nothing to allowlist.
+3. **Deliberate-mutation regression guard** — a targeted unit test for `SqlSchemaHandler`'s registry-fallback branch (`shouldProcessBundles()` + `registeredBundlesFor()`), plus a docblock mutation recipe on the primary materialization test.
+4. **Architectural test** rejecting new `extends AbstractKernel | HttpKernel | ConsoleKernel` under `tests/**`. Anonymous classes (the real-kernel pattern) are excluded by design.
+
+The primary materialization test boots via anonymous subclass of `AbstractKernel` that exposes `publicBoot()`, constructs a real on-disk `projectRoot` under `sys_get_temp_dir()` with written `config/waaseyaa.php` + `config/entity-types.php`, registers a test bundle field through `EntityTypeManager::addBundleFields()`, triggers storage resolution, and asserts `sqlite_master` contains `{base}__{bundle}` with the declared columns. A companion test asserts that registering no bundles creates no subtables.
+
+**Why first:** every correctness claim downstream rides on this harness. Without the guards in artefacts 2–4, the five-release bootstrap-variant failure mode can re-enter the suite undetected.
 
 **Code smells called out:**
-- Parallel "kernel-ish" helpers in the existing suite (mocked kernel, partial boot, in-memory manifest stubs) are the root smell — **bootstrap-variant proliferation** is what masked the five-release chain. This PR must not add a fourth variant; use the real kernel or extract one shared `KernelTestCase`.
+- **Bootstrap-variant proliferation** was the root smell — parallel "kernel-ish" helpers (mocked kernel, partial boot, in-memory manifest stubs) masked the alpha.148–151 chain. Artefact 4 makes re-introduction a hard error; artefact 2 drains the one pre-existing variant so the guard starts with no allowlist.
+- **Registry-fallback branch is implicit.** `SqlSchemaHandler::shouldProcessBundles()` + `registeredBundlesFor()` falls back to `FieldDefinitionRegistry::bundleNamesFor()` only when `bundleEnumerator` is null — the exact shape alpha.148 got wrong. Artefact 3 pins it.
 
-**Exit criterion:**
-1. Test file runs green.
-2. Deliberately skipping the subtable migration makes it fail. Proves the assertion is load-bearing.
+**Exit criteria (merge gates):**
+1. `packages/foundation/tests/Unit/Kernel/KernelBundleSubtableMaterializationTest.php` runs green.
+2. Deliberately swapping `bundleNamesFor()` for an always-empty fallback (per the docblock recipe added in artefact 3) makes the primary assertion fail with `kernel_test_widget__gizmo must be materialized` — proves the assertion is load-bearing.
+3. `tests/Integration/Phase17/KernelBootValidationTest.php` runs green after the `MinimalTestKernel` drain (artefact 2).
+4. The architectural test (artefact 4) runs green with zero allowlisted entries.
 
-**Standalone PR?** Yes.
+**Standalone PR?** No — four PRs, in the order above.
 
 ---
 
@@ -212,7 +223,7 @@ Any test constructing `new App\Entity\Group([...])` with shadow entity-key names
 1. **Shadow-by-subclass** (root condition this arc dismantles). Lesson generalizes: bundle-fields or domain service, never shadow subclass.
 2. **Capability-via-class** (`instanceof DomainInterface` on framework-owned entities). Unfixable at the class level once the canonical class is upstream.
 3. **Stringly-typed field access as a replacement for capability-via-class** — trades one fragile coupling for another. Prefer an intent-revealing domain service at the access boundary.
-4. **Bootstrap-variant proliferation** in the test suite (root cause of the five-release chain). Phase 1 must not add a fourth variant.
+4. **Bootstrap-variant proliferation** in the test suite (root cause of the five-release chain). Phase 1 drains the one pre-existing variant (`MinimalTestKernel` in `tests/Integration/Phase17/KernelBootValidationTest.php`) and installs an architectural assertion that rejects new `extends AbstractKernel | HttpKernel | ConsoleKernel` under `tests/**`. The arch-test starts with an empty allowlist; any future "just one more variant" lands a red test.
 5. **Backtrace-driven error messages.** Tempting in Phase 3's quick path; rejected.
 6. **Two-sources-of-truth on key naming.** Fixed in Phase 5.
 7. **Silent overwrite on duplicate registration.** Fixed in Phase 3.
@@ -234,7 +245,7 @@ Any test constructing `new App\Entity\Group([...])` with shadow entity-key names
 | Phase | Repo | Issue | PR count |
 |---|---|---|---|
 | 0 | (neither) | — (prerequisite) | 0 (workspace file) |
-| 1 | waaseyaa | framework#1315 | 1 |
+| 1 | waaseyaa | framework#1315 | 4 (spec amendment, MinimalTestKernel drain, deliberate-mutation guard, arch-test) |
 | 2 | waaseyaa | framework#1315 | 1 (release-gated verification) |
 | 3 | waaseyaa | framework#1313 | 1 |
 | 4 | waaseyaa | minoo#741 prereq | 0 (expected empty) |
