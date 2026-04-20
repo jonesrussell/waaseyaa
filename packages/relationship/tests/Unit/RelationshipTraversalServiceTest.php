@@ -322,12 +322,12 @@ final class TraversalEntityTypeManager implements EntityTypeManagerInterface
         throw new \RuntimeException('Not needed in test.');
     }
 
-    public function registerEntityType(EntityTypeInterface $type): void
+    public function registerEntityType(EntityTypeInterface $type, ?string $registrant = null): void
     {
         throw new \RuntimeException('Not needed in test.');
     }
 
-    public function registerCoreEntityType(EntityTypeInterface $type): void
+    public function registerCoreEntityType(EntityTypeInterface $type, ?string $registrant = null): void
     {
         throw new \RuntimeException('Not needed in test.');
     }

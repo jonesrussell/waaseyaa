@@ -205,7 +205,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
     public function getEntityTypes(): array
     {
         return array_map(
-            static fn (array $registration): \Waaseyaa\Entity\EntityTypeInterface => $registration['entityType'],
+            static fn(array $registration): \Waaseyaa\Entity\EntityTypeInterface => $registration['entityType'],
             $this->entityTypeRegistrations,
         );
     }
