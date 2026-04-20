@@ -119,12 +119,16 @@ ADR markdown file written at `docs/superpowers/specs/2026-04-19-groups-reconcili
 - Silent overwrite on duplicate registration (root smell this phase fixes).
 - No provenance tracking on registered types tempts backtrace hacks; don't.
 
-**Exit criterion:**
+**Exit criteria:**
+
+*Merge gates (required before PR merge):*
 1. Unit test: duplicate registration throws; message contains both provider class names verbatim.
 2. Integration test **using Phase 1's kernel harness**: missing-subtable `addBundleFields()` emits the expected `notice()` log.
-3. Packaged-form CI (Phase 2) passes against an alpha containing these changes.
 
-**Standalone PR?** Yes.
+*Post-release verification (release-gated; mirrors Phase 2):*
+3. Merge PR → cut alpha → Phase 2's packaged-form CI runs against the new alpha → confirm green. **Not a merge blocker** — treating it as one would be circular: Phase 2 CI cannot exercise these changes until an alpha containing them is published.
+
+**Standalone PR?** Yes. Exits 1–2 gate the merge; exit 3 is post-release verification on the same release-gated track as Phase 2's first green run (see Ordering flags).
 
 ---
 
@@ -219,7 +223,7 @@ Any test constructing `new App\Entity\Group([...])` with shadow entity-key names
 
 - **No conflicts with the fixed #1315 → #1313 → minoo#741 sequence.**
 - **Phase 0 runs in parallel with Phases 1–3.** Decisions depend only on ADR + Minoo grep, not on harness/guard.
-- **Phase 2's first green run is release-gated**, not PR-gated. Only phase that breaks "phase = standalone mergeable PR." PR itself is mergeable; verification requires cutting an alpha.
+- **Release-gated verification** (Phase 2 first green run; Phase 3 exit criterion 3): both require a published alpha, not a PR merge. Phase 2's PR is mergeable on scaffolding alone; verifying it requires cutting an alpha. Phase 3's PR merges on exits 1–2 (merge gates); exit 3 confirms post-merge, post-release on Phase 2's harness. These two are the only release-gated items in the arc.
 - **Phase 4 likely empty** given recommended decisions. Retained for legibility.
 - **Phases 5/6/7 are three Minoo PRs in strict order.** Split keeps data migration, test migration, and file-deletion independently reviewable and revertable.
 
