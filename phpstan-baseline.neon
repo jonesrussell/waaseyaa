@@ -1170,11 +1170,6 @@ parameters:
 			count: 1
 			path: packages/foundation/src/Discovery/PackageManifestCompiler.php
 
-		-
-			message: '#^Right side of && is always true\.$#'
-			identifier: booleanAnd.rightAlwaysTrue
-			count: 1
-			path: packages/foundation/src/Discovery/PackageManifestCompiler.php
 
 		-
 			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
