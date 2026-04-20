@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
+
 /**
  * Abstract base class for content entities (nodes, users, terms, etc.).
  *
@@ -19,7 +21,18 @@ namespace Waaseyaa\Entity;
 abstract class ContentEntityBase extends EntityBase implements ContentEntityInterface
 {
     /**
-     * Field definitions for this entity.
+     * Process-wide field registry consulted by {@see getFieldDefinitions()}.
+     *
+     * AbstractKernel wires this at boot with the same FieldDefinitionRegistry
+     * held by EntityTypeManager. When set, getFieldDefinitions() returns the
+     * bundle-aware union per docs/specs/bundle-scoped-fields.md §Resolution;
+     * when null, it returns the per-instance legacy array. Tests that wire
+     * this must reset it in tearDown() to avoid bleed between cases.
+     */
+    private static ?FieldDefinitionRegistryInterface $fieldRegistry = null;
+
+    /**
+     * Field definitions passed into the entity constructor (legacy path).
      *
      * @var array<string, mixed>
      */
@@ -41,16 +54,32 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
         $this->fieldDefinitions = $fieldDefinitions;
     }
 
+    public static function setFieldRegistry(?FieldDefinitionRegistryInterface $registry): void
+    {
+        self::$fieldRegistry = $registry;
+    }
+
     public function hasField(string $name): bool
     {
         return \array_key_exists($name, $this->values)
-            || \array_key_exists($name, $this->fieldDefinitions);
+            || \array_key_exists($name, $this->getFieldDefinitions());
     }
 
     /** @return array<string, mixed> */
     public function getFieldDefinitions(): array
     {
-        return $this->fieldDefinitions;
+        if (self::$fieldRegistry === null) {
+            return $this->fieldDefinitions;
+        }
+
+        $core = self::$fieldRegistry->coreFieldsFor($this->entityTypeId);
+        $bundle = self::$fieldRegistry->bundleFieldsFor($this->entityTypeId, $this->bundle());
+
+        if ($core === [] && $bundle === []) {
+            return $this->fieldDefinitions;
+        }
+
+        return $core + $bundle;
     }
 
     /**

@@ -6,38 +6,130 @@ namespace Waaseyaa\EntityStorage;
 
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
+use Waaseyaa\Field\FieldDefinitionInterface;
+use Waaseyaa\Field\FieldStorage;
 
 /**
  * Handles entity table schema creation and management.
  *
  * Generates SQL table schemas from entity type definitions and ensures
  * the required tables exist in the database. Supports translation tables
- * for translatable entity types.
+ * for translatable entity types, and — for multi-bundle entity types whose
+ * bundles carry registered fields — per-bundle subtables named
+ * `{base_table}__{bundle}`. See docs/specs/bundle-scoped-storage.md.
  */
 final class SqlSchemaHandler
 {
     private readonly string $tableName;
 
+    /**
+     * @param \Closure|null $bundleEnumerator fn(EntityTypeInterface): iterable<string>
+     *   Optional override for bundle discovery — typically backed by the
+     *   bundle-entity-type config storage, used when the caller needs to
+     *   enumerate bundles beyond those currently in the registry (e.g. a
+     *   declared-but-empty bundle that still wants a subtable, or a pre-flight
+     *   schema rebuild from config). When null, the registry's
+     *   bundleNamesFor() is used as the default source — which matches
+     *   SqlEntityStorage's save-time partitioning so both paths agree on
+     *   which bundles are "known". When $fieldRegistry is also null the
+     *   bundle loop is skipped and behavior matches the pre-bundle-scoped
+     *   status quo.
+     */
     public function __construct(
         private readonly EntityTypeInterface $entityType,
         private readonly DatabaseInterface $database,
+        private readonly ?FieldDefinitionRegistryInterface $fieldRegistry = null,
+        private readonly ?\Closure $bundleEnumerator = null,
     ) {
         $this->tableName = $this->entityType->id();
     }
 
     /**
-     * Ensures the entity table exists, creating it if necessary.
+     * Ensures the entity table and any registered non-empty bundle subtables exist.
+     *
+     * Base-table creation is existing behavior. For multi-bundle entity types,
+     * this additionally enumerates registered bundles and materializes the
+     * `{base_table}__{bundle}` subtable for any bundle that has at least one
+     * registered FieldDefinition. Bundles with zero registered fields have no
+     * subtable — both install-time default and a legitimate steady state.
+     *
+     * Idempotent: re-runs never drop and never fail on existing tables; they
+     * additively create columns for any field registered since the last run.
      */
     public function ensureTable(): void
     {
         $schema = $this->database->schema();
 
-        if ($schema->tableExists($this->tableName)) {
+        if (!$schema->tableExists($this->tableName)) {
+            $schema->createTable($this->tableName, $this->buildTableSpec());
+        }
+
+        if (!$this->shouldProcessBundles()) {
             return;
         }
 
-        $spec = $this->buildTableSpec();
-        $schema->createTable($this->tableName, $spec);
+        foreach ($this->registeredBundlesFor($this->entityType) as $bundle) {
+            $bundleFields = $this->fieldRegistry->bundleFieldsFor($this->entityType->id(), $bundle);
+            if ($bundleFields === []) {
+                continue;
+            }
+            $this->ensureBundleSubtable($bundle, $bundleFields);
+        }
+    }
+
+    /**
+     * Creates (or additively updates) the subtable for a given bundle.
+     *
+     * Called directly by migrations for the empty→non-empty bundle transition
+     * and indirectly by ensureTable() for install-time creation. Idempotent.
+     *
+     * @param array<string, FieldDefinitionInterface> $bundleFields Field definitions
+     *   for this bundle keyed by field name; must satisfy the registry's
+     *   self-description invariants (targetEntityTypeId + targetBundle match).
+     *
+     * @throws \InvalidArgumentException If $bundle contains the subtable
+     *   separator '__'; the separator is load-bearing in the name format and
+     *   cannot appear in a bundle identifier.
+     */
+    public function ensureBundleSubtable(string $bundle, array $bundleFields): void
+    {
+        $subtableName = $this->bundleSubtableName($bundle);
+        $schema = $this->database->schema();
+
+        if (!$schema->tableExists($subtableName)) {
+            $schema->createTable($subtableName, $this->buildBundleSubtableSpec($subtableName, $bundleFields));
+            return;
+        }
+
+        foreach ($bundleFields as $field) {
+            if ($field->getStored() === FieldStorage::Data) {
+                continue;
+            }
+            $columnName = $field->getName();
+            if (!$schema->fieldExists($subtableName, $columnName)) {
+                $schema->addField($subtableName, $columnName, $this->deriveColumnSpec($field));
+            }
+        }
+    }
+
+    /**
+     * Returns the subtable name for the given bundle: `{base_table}__{bundle}`.
+     *
+     * @throws \InvalidArgumentException If $bundle contains '__'.
+     */
+    public function bundleSubtableName(string $bundle): string
+    {
+        if (str_contains($bundle, '__')) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Bundle identifier "%s" contains the reserved separator "__"; '
+                . 'it cannot be used in bundle-scoped subtable names for entity type "%s".',
+                $bundle,
+                $this->entityType->id(),
+            ));
+        }
+
+        return $this->tableName . '__' . $bundle;
     }
 
     /**
@@ -463,5 +555,117 @@ final class SqlSchemaHandler
             'primary key' => ['entity_id', 'revision_id'],
             'indexes' => [],
         ];
+    }
+
+    /**
+     * Whether the bundle-subtable loop should run for this entity type.
+     */
+    private function shouldProcessBundles(): bool
+    {
+        return $this->fieldRegistry !== null
+            && $this->entityType->getBundleEntityType() !== null;
+    }
+
+    /**
+     * Enumerates bundles to consider for subtable materialization.
+     *
+     * Prefers the explicit $bundleEnumerator when supplied — it can include
+     * bundles declared via the bundle-entity-type config that have no
+     * registered fields yet (an empty-subtable branch in ensureTable()
+     * handles those cleanly). Otherwise falls back to the registry's
+     * bundleNamesFor(), which is the same source SqlEntityStorage uses for
+     * save-time partitioning, so schema-side and write-side agree on which
+     * bundles are "known".
+     *
+     * @return iterable<string>
+     */
+    private function registeredBundlesFor(EntityTypeInterface $type): iterable
+    {
+        if ($this->bundleEnumerator !== null) {
+            return ($this->bundleEnumerator)($type);
+        }
+
+        \assert($this->fieldRegistry !== null);
+
+        return $this->fieldRegistry->bundleNamesFor($type->id());
+    }
+
+    /**
+     * Builds the createTable spec for a bundle subtable.
+     *
+     * PK shares the base table's id key; FK references the base with
+     * ON DELETE CASCADE so deleting an entity drops its extension row.
+     *
+     * @param array<string, FieldDefinitionInterface> $bundleFields
+     * @return array<string, mixed>
+     */
+    private function buildBundleSubtableSpec(string $subtableName, array $bundleFields): array
+    {
+        $keys = $this->entityType->getKeys();
+        $idKey = $keys['id'] ?? 'id';
+
+        $fields = [];
+
+        $fields[$idKey] = [
+            'type' => isset($keys['uuid']) ? 'int' : 'varchar',
+            'length' => isset($keys['uuid']) ? null : 255,
+            'not null' => true,
+        ];
+        if ($fields[$idKey]['length'] === null) {
+            unset($fields[$idKey]['length']);
+        }
+
+        foreach ($bundleFields as $field) {
+            if ($field->getStored() === FieldStorage::Data) {
+                continue;
+            }
+            $fields[$field->getName()] = $this->deriveColumnSpec($field);
+        }
+
+        return [
+            'fields' => $fields,
+            'primary key' => [$idKey],
+            'foreign keys' => [
+                $subtableName . '_fk' => [
+                    'table' => $this->tableName,
+                    'columns' => [$idKey],
+                    'references' => [$idKey],
+                    'options' => ['onDelete' => 'CASCADE'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Maps a FieldDefinition's type to a Waaseyaa column spec.
+     *
+     * Conservative defaults: unknown types fall back to text. Settings keys
+     * `length`, `not_null`, and `default` are honored when present; otherwise
+     * they default to nullable with no default.
+     *
+     * @return array<string, mixed>
+     */
+    private function deriveColumnSpec(FieldDefinitionInterface $field): array
+    {
+        $settings = $field->getSettings();
+
+        $spec = match (strtolower($field->getType())) {
+            'string' => ['type' => 'varchar', 'length' => (int) ($settings['length'] ?? 255)],
+            'text' => ['type' => 'text'],
+            'integer', 'int' => ['type' => 'int'],
+            'boolean', 'bool' => ['type' => 'boolean'],
+            'float', 'decimal', 'numeric', 'number' => ['type' => 'float'],
+            default => ['type' => 'text'],
+        };
+
+        $spec['not null'] = (bool) ($settings['not_null'] ?? false);
+
+        if (array_key_exists('default', $settings)) {
+            $spec['default'] = $settings['default'];
+        } elseif ($field->getDefaultValue() !== null) {
+            $spec['default'] = $field->getDefaultValue();
+        }
+
+        return $spec;
     }
 }

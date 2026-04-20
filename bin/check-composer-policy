@@ -18,7 +18,16 @@ policy_id = {
     "dev_scope": "CP002",
     "no_wildcard_internal": "CP003",
     "core_runtime_surface": "CP004",
+    "tight_internal_floor": "CP005",
 }
+
+# Cross-package constraints in publishable manifests must include an explicit
+# pre-release floor (alpha/beta/rc/dev), otherwise Composer can resolve a
+# stale sibling that lacks methods the current code calls. Discovered after
+# alpha.150 entity-storage shipped a `quoteIdentifier()` call against a
+# `^0.1` database-legacy constraint that resolved to alpha.145 in consumers.
+# Bare `^0.X` floors are forbidden; `^0.1.0-alpha.N` is the required shape.
+TIGHT_FLOOR_PATTERN = re.compile(r"-(alpha|beta|rc|dev)\.")
 
 def fail(rule_key: str, rel_path: str, current: str, expected: str) -> None:
     rid = policy_id[rule_key]
@@ -93,7 +102,29 @@ for path in in_scope:
                         "no_wildcard_internal",
                         rel,
                         f'{pkg}={version}',
-                        "use an explicit semver range (for example ^0.1)",
+                        "use an explicit pre-release-anchored range "
+                        "(for example ^0.1.0-alpha.150)",
+                    )
+
+                # Tight-floor policy: publishable manifests must anchor
+                # cross-package constraints to a pre-release tag so Composer
+                # cannot silently resolve a stale sibling. Root composer.json
+                # is exempt (uses @dev). require-dev in skeleton/packages
+                # is also enforced — test deps shipped to consumers.
+                if (
+                    rel != "composer.json"
+                    and version != "@dev"
+                    and "*" not in version
+                    and not TIGHT_FLOOR_PATTERN.search(version)
+                ):
+                    errors += 1
+                    fail(
+                        "tight_internal_floor",
+                        rel,
+                        f'{pkg}={version}',
+                        "anchor to a pre-release floor "
+                        "(for example ^0.1.0-alpha.150) so Composer cannot "
+                        "resolve a stale sibling missing required methods",
                     )
 
     if rel == "packages/core/composer.json":

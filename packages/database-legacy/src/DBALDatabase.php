@@ -105,4 +105,9 @@ final class DBALDatabase implements DatabaseInterface
     {
         return $this->connection;
     }
+
+    public function quoteIdentifier(string $identifier): string
+    {
+        return $this->connection->quoteIdentifier($identifier);
+    }
 }

@@ -15,8 +15,8 @@
     ],
     "require": {
         "php": ">=8.4",
-        "waaseyaa/entity": "^0.1",
-        "waaseyaa/access": "^0.1"
+        "waaseyaa/entity": "^0.1.0-alpha.150",
+        "waaseyaa/access": "^0.1.0-alpha.150"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"

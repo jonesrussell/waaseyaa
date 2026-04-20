@@ -6,9 +6,9 @@
     "require": {
         "php": ">=8.4",
         "twig/twig": "^3.0",
-        "waaseyaa/foundation": "^0.1",
-        "waaseyaa/database-legacy": "^0.1",
-        "waaseyaa/entity": "^0.1",
+        "waaseyaa/foundation": "^0.1.0-alpha.150",
+        "waaseyaa/database-legacy": "^0.1.0-alpha.150",
+        "waaseyaa/entity": "^0.1.0-alpha.150",
         "symfony/event-dispatcher": "^7.0"
     },
     "require-dev": {

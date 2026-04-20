@@ -209,6 +209,22 @@ $gate = new EntityAccessGate($accessHandler);
 $accessChecker = new AccessChecker(gate: $gate);
 ```
 
+### Bundle-scoped policies
+
+Multi-bundle entity types (e.g. `group`) may need different access rules per bundle. The `#[AccessPolicy]` attribute carries a `bundles` parameter for this:
+
+```php
+#[AccessPolicy(id: 'group_team', entityTypes: ['group'], bundles: ['team'])]
+final class TeamAccessPolicy implements AccessPolicyInterface { ... }
+```
+
+- `bundles: []` (the default) — policy applies to every bundle of the named entity types. All pre-existing single-bundle policies retain their prior semantics without edits.
+- `bundles: ['alpha', 'beta']` — policy applies only when the entity being checked has one of those bundles.
+
+`EntityAccessHandler` keeps a parallel `$bundleFilters` array, populated from the attribute at registration time via `resolveBundles()` (reflection over `#[AccessPolicy]`). The filter is applied at every gate the handler exposes: `check()`, `checkCreateAccess()`, and `checkFieldAccess()`. A policy whose `bundles` list is non-empty is skipped when the resolved bundle does not match; a policy with an empty list is always considered. No ordering or combinator changes — the filter runs before `appliesTo($entityTypeId)`, and the rest of the evaluation algorithm is unchanged.
+
+For the storage-side contract this surfaces (how bundle membership is resolved from per-bundle subtables and field registration), see `docs/specs/bundle-scoped-fields.md §Access`.
+
 ## Gate System
 
 The Gate is a separate access mechanism from EntityAccessHandler. It resolves policies by entity type and delegates ability checks to method calls.
@@ -296,11 +312,14 @@ final class AccessPolicy extends WaaseyaaPlugin
     public function __construct(
         string $id,
         public readonly array $entityTypes = [],
+        public readonly array $bundles = [],  // see bundle-scoped-fields.md §Access
         string $label = '',
         string $description = '',
     ) {}
 }
 ```
+
+The optional `bundles:` parameter scopes a policy to specific bundles of the listed entity types. An empty array (default) preserves existing semantics — the policy applies to every bundle. See [`bundle-scoped-fields.md`](./bundle-scoped-fields.md#access) for the full contract.
 
 ### AccessDeniedException
 

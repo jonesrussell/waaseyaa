@@ -4,28 +4,41 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Access;
 
+use Waaseyaa\Access\Attribute\AccessPolicy;
 use Waaseyaa\Entity\EntityInterface;
 
 /**
  * Checks entity access by running all registered AccessPolicy plugins.
  *
- * Policies are filtered by entity type, then executed. Results are combined
- * using OR logic (any Allowed grants access), but Forbidden always wins.
- * If no policy grants access, the result is Neutral (effectively denied).
+ * Policies are filtered by entity type and — when the #[AccessPolicy] attribute
+ * declares a non-empty bundles list — by bundle. Results are combined using OR
+ * logic (any Allowed grants access), but Forbidden always wins. If no policy
+ * grants access, the result is Neutral (effectively denied).
+ *
+ * See docs/specs/bundle-scoped-fields.md §Access for the bundle filter contract.
  */
 class EntityAccessHandler
 {
     /**
      * @var AccessPolicyInterface[]
      */
-    private array $policies;
+    private array $policies = [];
+
+    /**
+     * Bundle filters parallel to $policies. Empty array = applies to every bundle.
+     *
+     * @var array<int, string[]>
+     */
+    private array $bundleFilters = [];
 
     /**
      * @param AccessPolicyInterface[] $policies
      */
     public function __construct(array $policies = [])
     {
-        $this->policies = $policies;
+        foreach ($policies as $policy) {
+            $this->addPolicy($policy);
+        }
     }
 
     /**
@@ -34,6 +47,7 @@ class EntityAccessHandler
     public function addPolicy(AccessPolicyInterface $policy): void
     {
         $this->policies[] = $policy;
+        $this->bundleFilters[] = $this->resolveBundles($policy);
     }
 
     /**
@@ -47,9 +61,13 @@ class EntityAccessHandler
     {
         $result = AccessResult::neutral('No policy provided an opinion.');
         $entityTypeId = $entity->getEntityTypeId();
+        $bundle = $entity->bundle();
 
-        foreach ($this->policies as $policy) {
+        foreach ($this->policies as $index => $policy) {
             if (!$policy->appliesTo($entityTypeId)) {
+                continue;
+            }
+            if (!$this->matchesBundle($this->bundleFilters[$index] ?? [], $bundle)) {
                 continue;
             }
 
@@ -76,8 +94,11 @@ class EntityAccessHandler
     {
         $result = AccessResult::neutral('No policy provided an opinion.');
 
-        foreach ($this->policies as $policy) {
+        foreach ($this->policies as $index => $policy) {
             if (!$policy->appliesTo($entityTypeId)) {
+                continue;
+            }
+            if (!$this->matchesBundle($this->bundleFilters[$index] ?? [], $bundle)) {
                 continue;
             }
 
@@ -112,12 +133,16 @@ class EntityAccessHandler
     ): AccessResult {
         $result = AccessResult::neutral('No field access policy provided an opinion.');
         $entityTypeId = $entity->getEntityTypeId();
+        $bundle = $entity->bundle();
 
-        foreach ($this->policies as $policy) {
+        foreach ($this->policies as $index => $policy) {
             if (!$policy->appliesTo($entityTypeId)) {
                 continue;
             }
             if (!$policy instanceof FieldAccessPolicyInterface) {
+                continue;
+            }
+            if (!$this->matchesBundle($this->bundleFilters[$index] ?? [], $bundle)) {
                 continue;
             }
 
@@ -152,5 +177,29 @@ class EntityAccessHandler
             $fieldNames,
             fn(string $field): bool => !$this->checkFieldAccess($entity, $field, $operation, $account)->isForbidden(),
         ));
+    }
+
+    /**
+     * @return string[] Bundles the policy opts into, or [] to apply to all bundles.
+     */
+    private function resolveBundles(AccessPolicyInterface $policy): array
+    {
+        $attributes = (new \ReflectionClass($policy))->getAttributes(AccessPolicy::class);
+        if ($attributes === []) {
+            return [];
+        }
+
+        /** @var AccessPolicy $attribute */
+        $attribute = $attributes[0]->newInstance();
+
+        return $attribute->bundles;
+    }
+
+    /**
+     * @param string[] $bundles
+     */
+    private function matchesBundle(array $bundles, string $bundle): bool
+    {
+        return $bundles === [] || in_array($bundle, $bundles, true);
     }
 }

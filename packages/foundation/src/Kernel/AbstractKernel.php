@@ -11,6 +11,7 @@ use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
 use Waaseyaa\Entity\Audit\EntityWriteAuditListener;
+use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
@@ -47,6 +48,7 @@ abstract class AbstractKernel
     protected EventDispatcherInterface $dispatcher;
     protected DatabaseInterface $database;
     protected EntityTypeManager $entityTypeManager;
+    protected ?\Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface $fieldRegistry = null;
     protected PackageManifest $manifest;
     protected EntityAccessHandler $accessHandler;
     protected EntityTypeLifecycleManager $lifecycleManager;
@@ -145,16 +147,19 @@ abstract class AbstractKernel
     {
         $database = $this->database;
         $dispatcher = $this->dispatcher;
+        $fieldRegistry = new \Waaseyaa\Field\FieldDefinitionRegistry();
+        $this->fieldRegistry = $fieldRegistry;
+        ContentEntityBase::setFieldRegistry($fieldRegistry);
 
         $this->entityTypeManager = new EntityTypeManager(
             $dispatcher,
-            function (EntityTypeInterface $definition) use ($database, $dispatcher): SqlEntityStorage {
-                $schemaHandler = new SqlSchemaHandler($definition, $database);
+            function (EntityTypeInterface $definition) use ($database, $dispatcher, $fieldRegistry): SqlEntityStorage {
+                $schemaHandler = new SqlSchemaHandler($definition, $database, $fieldRegistry);
                 $schemaHandler->ensureTable();
-                return new SqlEntityStorage($definition, $database, $dispatcher);
+                return new SqlEntityStorage($definition, $database, $dispatcher, $fieldRegistry);
             },
-            function (string $_entityTypeId, EntityTypeInterface $definition) use ($database, $dispatcher): EntityRepositoryInterface {
-                $schemaHandler = new SqlSchemaHandler($definition, $database);
+            function (string $_entityTypeId, EntityTypeInterface $definition) use ($database, $dispatcher, $fieldRegistry): EntityRepositoryInterface {
+                $schemaHandler = new SqlSchemaHandler($definition, $database, $fieldRegistry);
                 $schemaHandler->ensureTable();
                 if ($definition->isRevisionable()) {
                     $schemaHandler->ensureRevisionTable();
@@ -180,6 +185,7 @@ abstract class AbstractKernel
                     $database,
                 );
             },
+            $fieldRegistry,
         );
     }
 

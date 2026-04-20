@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.151] - 2026-04-19
+
+Five-release postmortem: alpha.147→148→149→150 each closed an immediate bundle-substrate alarm. alpha.150 then surfaced a fifth bug — `SqlEntityQuery`'s newly-reachable bundle JOIN code calling `DBALDatabase::quoteIdentifier()` against a `^0.1` `database-legacy` constraint that resolved to a stale alpha.145 sibling in consumer installs (Minoo crashed at 13 call sites simultaneously). The bug was structural, not local: every cross-package constraint in the monorepo was bare `^0.X`, so each fix in the chain only resolved the *specific* permissive-constraint failure that consumer's code had reached. This release closes the *class* of defect.
+
+### Fixed
+
+- monorepo-wide: cross-package `waaseyaa/*` `composer.json` constraints tightened from `^0.1` to `^0.1.0-alpha.150` across 54 manifests (179 individual constraints in `packages/*/composer.json` and `skeleton/composer.json`). Prevents Composer from co-resolving stale sibling versions that pre-date methods callers now use — the alpha.150 `quoteIdentifier()` regression class. Closes #1311.
+
+### Added
+
+- `bin/check-composer-policy`: new rule **CP005 (`tight_internal_floor`)** rejects any cross-package `waaseyaa/*` constraint in `packages/*` or `skeleton/composer.json` that lacks a pre-release-anchored floor (`alpha`/`beta`/`rc`/`dev` tag). Existing CP003 hint message updated to reflect the new floor convention. Future PRs introducing a bare `^0.X` cross-package constraint fail policy gate before merge.
+- `entity-storage`: `DatabaseInterfaceCompositionTest` — local regression gate that asserts (1) every method called on `$this->database` in entity-storage source is declared on `Waaseyaa\Database\DatabaseInterface`, and (2) entity-storage's own `composer.json` anchors sibling waaseyaa/* constraints to a pre-release floor. Either invariant failing reproduces the alpha.150 class of defect at the unit-test layer instead of in production.
+
+### Notes
+
+- **Release-arc retrospective**: chain length 5. Each release closed a specific alarm; the class wasn't closed until treated as a class. Process-debt category: per-PR contract tests in PR #1307 ran against the source tree where co-resolution was always-fresh — they did not exercise packaged-form artifacts against constraint-floor dependencies. Filed as separate test-infrastructure follow-up to avoid scope creep here.
+
+## [0.1.0-alpha.150] - 2026-04-19
+
+Closes the bundle-substrate four-release discovery arc: alpha.148 shipped the bundle API, alpha.149 wired `FieldDefinitionRegistry` but missed the kernel-path enumerator, the alpha.149 fix wired the enumerator but exposed a missing `getQuery()` registry forward, and this release closes query forwarding while introducing explicit storage-hint semantics. See #26 for the cross-package version-constraint tightening that would have shortened this arc.
+
+### Fixed
+
+- `entity-storage`: `SqlEntityStorage::getQuery()` now forwards `$this->fieldRegistry` into `SqlEntityQuery`. Previously the registry was silently dropped, so `getQuery()->condition($bundleField, $value)` either returned wrong rows (no JOIN) or threw `UnknownFieldException` once strict routing landed. Bundle-scoped queries on registry-aware storage now work end-to-end.
+
+### Added
+
+- `field`: `FieldStorage` backed enum (`Column`, `Data`) and `FieldDefinition::getStored()` accessor expressing the canonical persistence target for a field. `FieldDefinitionRegistry::synthesizeCoreField()` reads `'stored'` from EntityType field-definition metadata. Defaults to `FieldStorage::Column` so existing call sites are unchanged.
+- `entity-storage`: `SqlEntityQuery::routeFields()` resolves `FieldStorage::Data` core fields via `json_extract(_data, ...)` instead of throwing `UnknownFieldException`, so registry-aware queries can target `_data`-backed fields without forcing a column to exist. `SqlEntityStorage::splitForStorage()` honors the same hint on save: `FieldStorage::Data` values land in `_data` even when a legacy column happens to exist (deferred follow-up: column-vs-data drift diagnostic).
+- `entity-storage`: `SqlSchemaHandler` skips column emission for `FieldStorage::Data` fields in `buildBundleSubtableSpec()` and `ensureBundleSubtable()` so subtable layouts match the registered storage hints.
+- `groups`: `Group` now ships universal lifecycle core fields (`status`, `created_at`, `updated_at`) registered with `stored: FieldStorage::Data`. The bundle-fields surface stays consumer-defined; only the universals are pre-registered so registry-aware queries can resolve them.
+
+## [0.1.0-alpha.149] - 2026-04-19
+
+### Fixed
+
+- `entity-storage`: `SqlSchemaHandler::shouldProcessBundles()` no longer requires an explicit `bundleEnumerator`. The enumerator becomes an optional escape hatch; when absent, `registeredBundlesFor()` falls back to `FieldDefinitionRegistry::bundleNamesFor()` — the same source `SqlEntityStorage` uses for save-time partitioning, so schema materialization and write-path routing agree on the "known bundles" set. Closes the alpha.148 kernel-path gap where `AbstractKernel`-booted apps with `addBundleFields()`-registered bundles silently skipped subtable creation and crashed at runtime with `no such table: {base}__{bundle}`. PR #1306.
+
+### Added
+
+- `foundation`: `KernelBundleSubtableMaterializationTest` — kernel-boot integration test that boots `AbstractKernel`, registers bundle fields via `EntityTypeManager::addBundleFields()`, triggers `getStorage()`, and asserts the `{base}__{bundle}` subtable physically materializes in the database. The assertion gap that allowed alpha.148 to ship with the kernel path broken.
+
+## [0.1.0-alpha.148] - 2026-04-19
+
+### Added
+
+- `groups`: new layer-2 content-type package `waaseyaa/groups` (`Group` extends `ContentEntityBase`, `GroupType` extends `ConfigEntityBase`). Ships with zero pre-registered bundles — consumers register `GroupType` config entities and bundle-scoped fields via `EntityTypeManager::addBundleFields()`. Closes #1296.
+- `entity-storage`: bundle-scoped storage substrate. Per-bundle subtables follow the `{base_table}__{bundle}` naming invariant, carry a `PRIMARY KEY (entity_id)` + `FOREIGN KEY ... REFERENCES {base}(id) ON DELETE CASCADE`, and partition field storage by bundle. `SqlSchemaHandler::ensureBundleSubtable()` provisions subtables; `SqlEntityStorage` routes per-bundle writes via `persistBundleRow()` (SELECT-then-INSERT-or-UPDATE) and merges bundle columns on read via `mergeBundleSubtableRow()`.
+- `field`: `FieldDefinitionRegistry` partitions field definitions into core and per-bundle buckets. `EntityTypeManager::addBundleFields()` accepts an array of `FieldDefinition` objects keyed by entity type + bundle. `BundleAmbiguousFieldException` and `UnknownFieldException` surface registry lookup failures with explicit diagnostics.
+- `access`: `#[AccessPolicy(bundles: [...])]` attribute parameter binds a policy to specific bundles of an entity type; `EntityAccessHandler` consults the bundle-scoped registry when resolving policies.
+- `foundation`: subtable-aware schema drift diagnostics. `HealthChecker` emits `MISSING_BUNDLE_SUBTABLE` (registered fields but no subtable), `ORPHAN_BUNDLE_SUBTABLE` (subtable but no registered bundle; SQLite-only detection until #1300), and `FK_ENFORCEMENT_DISABLED` (SQLite `PRAGMA foreign_keys = OFF` or MySQL session override — bundle `ON DELETE CASCADE` silently becomes a no-op when FK enforcement is disabled).
+
+### Changed
+
+- `ci`: `.github/workflows/split.yml` matrix now includes `packages/groups` under Layer 2 so the split-deploy pipeline publishes `waaseyaa/groups` to its own repo and packagist.
+
 ## [0.1.0-alpha.147] - 2026-04-18
 
 ### Fixed
