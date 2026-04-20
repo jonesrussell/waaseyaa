@@ -42,7 +42,12 @@ else
 fi
 
 # Exclude files that don't affect spec accuracy
-CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -vE '(_test|Test)\.php$|\.claude/|composer\.lock$|package-lock\.json$|CLAUDE\.md$|/vendor/|\.layers$|phpunit\.xml|phpstan\.neon' || true)
+# composer.json is excluded because cross-package constraint bumps (the
+# common edit shape — `^0.1` → `^0.1.0-alpha.N`) are release artifacts,
+# not architectural changes. Genuinely spec-affecting composer.json
+# edits (new packages, autoload changes) surface via the source files
+# they bring in.
+CHANGED_FILES=$(echo "$CHANGED_FILES" | grep -vE '(_test|Test)\.php$|\.claude/|composer\.lock$|composer\.json$|package-lock\.json$|CLAUDE\.md$|/vendor/|\.layers$|phpunit\.xml|phpstan\.neon' || true)
 
 if [ -z "$CHANGED_FILES" ]; then
   echo "No spec-affecting changes in last ${N} commits."
@@ -144,7 +149,7 @@ for spec in $(printf '%s\n' "${!AFFECTED_SPECS[@]}" | sort); do
     service_last_commit=0
     for pattern in "${!PATTERN_TO_SPEC[@]}"; do
       if [ "${PATTERN_TO_SPEC[$pattern]}" = "$spec" ]; then
-        pattern_commit=$(git log -1 --format=%ct -- "$pattern" ':!*/vendor/*' ':!*Test.php' ':!*_test.php' 2>/dev/null)
+        pattern_commit=$(git log -1 --format=%ct -- "$pattern" ':!*/vendor/*' ':!*Test.php' ':!*_test.php' ':!*composer.json' ':!*composer.lock' 2>/dev/null)
         pattern_commit=${pattern_commit:-0}
         if [ "$pattern_commit" -gt "$service_last_commit" ]; then
           service_last_commit=$pattern_commit
