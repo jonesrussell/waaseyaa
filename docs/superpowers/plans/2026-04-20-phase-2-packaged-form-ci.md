@@ -18,7 +18,7 @@
 
 **Create (PR 1 — consumer skeleton + packaged-form tests):**
 - `tests/PackagedForm/skeleton/` — minimal consumer app fixture, Composer-installed from Packagist.
-- `tests/PackagedForm/skeleton/composer.json` — requires `waaseyaa/core:^ALPHA` and `waaseyaa/groups:^ALPHA`; **does not** use path repositories.
+- `tests/PackagedForm/skeleton/composer.json` — requires **exact published alpha tags** for `waaseyaa/core` and `waaseyaa/groups`; **does not** use path repositories.
 - `tests/PackagedForm/skeleton/config/waaseyaa.php` — consumer-owned kernel config.
 - `tests/PackagedForm/skeleton/config/entity-types.php` — declares the minimal `group` / `group_type` consumer-visible entity types needed for the harness.
 - `tests/PackagedForm/skeleton/src/Provider/PackagedFormServiceProvider.php` — registers one bundle field on `group`.
@@ -57,6 +57,12 @@ The harness must stay minimal. If it starts mirroring the main `skeleton/` app o
 - The consumer fixture should require `waaseyaa/core` and `waaseyaa/groups`, not the monorepo root `waaseyaa/framework` project package.
 - Reason: Phase 2 is meant to exercise the split-packages as a downstream app consumes them from Packagist. Using the root project package would proxy the wrong contract and partially collapse the distinction Phase 2 is supposed to validate.
 
+**Constraint stance (also load-bearing):**
+- Pin the consumer fixture to the **exact alpha tag under verification** such as `0.1.0-alpha.153`.
+- Do not use caret floors like `^0.1.0-alpha.153`; they silently float to newer alphas and erode reproducibility.
+- Do not use `dev-main`; that collapses the Packagist contract back toward source-tree behavior.
+- When the next release is cut, bump the exact tag in the fixture as part of the release-follow-up workflow. A red harness between "Phase 1 merged" and "next alpha published" is expected and should remain loud.
+
 **Location recommendation:**
 - Use `tests/PackagedForm/skeleton/`.
 - Reason: it lives with other framework-owned test fixtures, but remains visibly separate from `tests/Integration/` and from the shipped application `skeleton/`.
@@ -81,10 +87,14 @@ The harness must stay minimal. If it starts mirroring the main `skeleton/` app o
 
 1. **Execution PR posture:** mergeable without requiring a pre-merge green Packagist run against unpublished changes.
    - Reason: the first meaningful green for this harness is release-gated. Requiring it as a merge blocker for the PR that introduces the harness is circular when the published alpha does not yet contain the Phase 1 fixes or the new fixture.
-2. **Steady-state posture after first published-alpha verification:** make `ci/packaged-form` merge-blocking in the existing `CI` workflow.
+2. **Steady-state posture after first published-alpha verification:** make the packaged-form check merge-blocking in the existing `CI` workflow.
    - Reason: once one released alpha proves the harness itself is sound, packaged-form regressions are exactly the class we want to block before merge.
 
 This mirrors the spec's release-gated note: the **first green run** is not a PR-merge blocker, but the harness should not remain informational forever.
+
+**Objective gate-flip criterion:**
+- Promote the packaged-form check to merge-blocking once it is green against the **first alpha tagged after Phase 1 landed on `main`**.
+- Until that alpha exists on Packagist, a red packaged-form run is expected bring-up noise, not evidence that Phase 2 itself is misdesigned.
 
 ---
 
@@ -140,12 +150,12 @@ git checkout -b test/1315-packaged-form-skeleton
 
 Create `tests/PackagedForm/skeleton/composer.json` with these invariants:
 
-- Requires `waaseyaa/core:^0.1.0-alpha.<current_floor>` and `waaseyaa/groups:^0.1.0-alpha.<current_floor>`.
+- Requires exact published tags such as `waaseyaa/core:0.1.0-alpha.153` and `waaseyaa/groups:0.1.0-alpha.153`.
 - Includes `phpunit/phpunit` in `require-dev`.
 - Registers one consumer provider under `extra.waaseyaa.providers`.
 - Contains **no** `repositories` block pointing at local paths.
 
-Expected outcome: Composer resolves only Packagist artifacts.
+Expected outcome: Composer resolves only Packagist artifacts, and the exact alpha under test is unambiguous in both the fixture and CI logs.
 
 - [ ] **Step 3: Add the minimal consumer-owned files**
 
@@ -178,7 +188,7 @@ Add a short fixture-local README noting:
 
 Use the fixture's own Composer install and PHPUnit entrypoint. Expected: the packaged-form test passes on a machine that can resolve the target alpha from Packagist.
 
-If Packagist has not yet published the required alpha, stop and surface that the local run is release-gated rather than weakening the fixture into a path-resolved install.
+If Packagist has not yet published the required alpha, stop and surface that the local run is release-gated rather than weakening the fixture into a path-resolved install. The correct outcome in that window is "waiting on the next alpha tag," not "relax the constraint."
 
 - [ ] **Step 6: Commit and push**
 
@@ -207,7 +217,10 @@ git checkout -b ci/1315-packaged-form-job
 
 - [ ] **Step 2: Add one job to the existing CI workflow**
 
-Modify `.github/workflows/ci.yml` to add a `ci/packaged-form` job that:
+Modify `.github/workflows/ci.yml` to add a job with:
+
+- job id `packaged-form`,
+- displayed check name `ci/packaged-form`,
 
 - runs on `ubuntu-latest`,
 - uses `shivammathur/setup-php@v2` with PHP `8.4`,
@@ -228,14 +241,14 @@ Document in the PR body that this is deliberate: the variable under test is arti
 Recommended initial implementation:
 
 - job exists in `CI`,
-- job is treated as informative for the bring-up window if the published alpha is not yet available,
-- the PR description explicitly states that branch protection should promote it to required after the first successful published-alpha run.
+- job is treated as informative for the bring-up window if the published alpha pinned by the fixture has not yet shipped,
+- the PR description explicitly states that branch protection should promote it to required after the first successful run against the first alpha tagged after Phase 1 landed on `main`.
 
 If the repo's branch-protection workflow cannot express "informative for bring-up, required after first green" in one PR, prefer documenting the promotion step rather than encoding a permanent `continue-on-error`.
 
 - [ ] **Step 5: Verify the workflow shape**
 
-Check the generated job names and dependencies for coherence with the existing `CI` workflow. The Phase 2 job should sit beside `ci/unit-tests`, not inside `release.yml`, `packagist-update.yml`, or `sync-skeleton.yml`.
+Check the generated job id and displayed name for coherence with the existing `CI` workflow. The Phase 2 check should appear beside `ci/unit-tests`, not inside `release.yml`, `packagist-update.yml`, or `sync-skeleton.yml`.
 
 - [ ] **Step 6: Commit and push**
 
@@ -261,13 +274,13 @@ This is the first moment Packagist can serve the package set the harness is inte
 
 Use the existing Packagist update flow; do not invent a second publication path.
 
-- [ ] **Step 4: Observe the first meaningful `ci/packaged-form` green**
+- [ ] **Step 4: Observe the first meaningful packaged-form green**
 
-Expected: the fixture installs the published alpha from Packagist, boots, materializes the bundle subtable, and completes one save/read round-trip.
+Expected: the fixture installs the first alpha tagged after Phase 1 landed on `main`, boots, materializes the bundle subtable, and completes one save/read round-trip.
 
 - [ ] **Step 5: Promote the job to merge-blocking**
 
-Once one published-alpha run is green, update branch protection so `ci/packaged-form` becomes required for future PRs.
+Once that first post-Phase-1 published-alpha run is green, update branch protection so the packaged-form check becomes required for future PRs.
 
 If the promotion itself needs a small repo-settings or docs PR, do that separately; do not fold it into the bring-up wiring PRs.
 
@@ -285,6 +298,8 @@ Phase 2 is specifically meant to catch these classes:
    - Example: alpha.148's runtime `no such table: {base}__{bundle}` when `addBundleFields()` bundles never materialized subtables in an `AbstractKernel`-booted consumer.
 4. **Consumer-provider registration drift.**
    - The harness proves a downstream provider can register bundle fields and have the published package set honor them.
+5. **Release handoff gaps between merged source and published artifact.**
+   - The exact-tag fixture makes the "merged on `main` but not yet published" window explicit instead of silently floating past it.
 
 ---
 
@@ -302,6 +317,8 @@ Future readers must not treat packaged-form CI as a universal safety net. It doe
    - SQLite on PHP 8.4 is enough to close the packaged-form contract class, not every portability axis.
 5. **Release-propagation timing guarantees by itself.**
    - The first meaningful proof is still gated on a published alpha reaching Packagist.
+6. **Anything hidden by relaxing the consumer constraint.**
+   - If the fixture is allowed to float on caret ranges or `dev-main`, it stops proving the exact published artifact under review.
 
 ---
 
@@ -309,9 +326,11 @@ Future readers must not treat packaged-form CI as a universal safety net. It doe
 
 - **Do not reuse the shipped `skeleton/` app wholesale.** It currently requires `waaseyaa/framework` and includes local-development affordances that blur the Packagist-only contract. Phase 2 needs a purpose-built minimal fixture.
 - **Do not let the fixture use path repositories "just for local convenience."** That would recreate the exact blind spot this phase exists to close.
+- **Do not use caret floors or `dev-main` in the fixture's Composer constraints.** Phase 2 needs an exact published-alpha target so failures are loud, reproducible, and tied to one release.
 - **Do not introduce a named kernel subclass under `tests/**`.** The Phase 1 architectural guard now makes that a red test by design, including inside `tests/PackagedForm/`.
 - **Do not over-matrix the first implementation.** The risk being closed is package resolution and consumer boot semantics, not broad compatibility burn-down.
 - **Do not mistake the mutation recipe concept for the CI contract.** If a future docblock includes a deliberate mutation recipe, it is a human-debug aid only; the CI contract is the test suite itself.
+- **Do not treat the pre-release red window as a regression.** Between "Phase 1 merged" and "next alpha published," the packaged-form harness is expected to stay red if it is pinned to the not-yet-published target tag.
 
 ---
 
@@ -319,9 +338,9 @@ Future readers must not treat packaged-form CI as a universal safety net. It doe
 
 1. A minimal Packagist-only consumer fixture exists under `tests/PackagedForm/skeleton/`.
 2. The fixture boots via the anonymous-subclass + `publicBoot()` pattern and proves both subtable materialization and one save/read round-trip.
-3. `.github/workflows/ci.yml` contains a `ci/packaged-form` job on the existing CI substrate.
-4. The first published-alpha run is observed green after release publication.
-5. After that first green, `ci/packaged-form` is promoted to merge-blocking for future PRs.
+3. `.github/workflows/ci.yml` contains a `packaged-form` job whose displayed check name is `ci/packaged-form`, on the existing CI substrate.
+4. The first alpha tagged after Phase 1 landed on `main` is observed green after release publication.
+5. After that first green, the packaged-form check is promoted to merge-blocking for future PRs.
 
 ---
 
