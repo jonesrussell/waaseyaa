@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.153] - 2026-04-21
+
+### Added
+
+- `northcloud`: `NcSyncWorker` sync status JSON now includes bounded samples and skip reasons from the explain path so operators and status files can see what North Cloud returned each cycle.
+
+### Changed
+
+- `admin`: NC sync summary widget calls `/api/staff/nc-sync-status` and links “open dashboard” to `/staff/ingestion` (aligns with Minoo staff ingestion routes).
+
 ## [0.1.0-alpha.152] - 2026-04-20
 
 Closes the first-deploy database-bootstrap gap: `DatabaseBootstrapper`'s production guard (correct for steady-state) had no sanctioned counterpart for first-run initialization, forcing downstream apps to either ship `APP_ENV=local` workarounds or pre-touch the sqlite file outside the framework. This release adds `bin/waaseyaa db:init` as the single sanctioned path through the guard.

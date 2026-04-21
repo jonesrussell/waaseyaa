@@ -1,5 +1,6 @@
 # Admin SPA
 
+<!-- Spec reviewed 2026-04-21 - IngestSummaryWidget: NC sync status from `/api/staff/nc-sync-status`; dashboard link `/staff/ingestion` (staff surface, not admin SPA catch-all) -->
 <!-- Spec reviewed 2026-04-08 - normalizeAppBaseURL (ufo cleanDoubleSlashes + joinURL): shared by admin plugin and auth.global so adminPathBase matches normalized base; surface $fetch uses joinURL paths; packages/admin/app/runtime/normalizeAppBaseURL.ts -->
 <!-- Spec reviewed 2026-04-08 - Admin fetch baseURL: useRuntimeConfig().app.baseURL (trailing slash) for $fetch/apiFetch and auth.global navigateTo; plugins/admin tests stub app.baseURL (#814); ufo joinURL for path joins -->
 <!-- Spec reviewed 2026-04-08 - Admin SPA DX alignment; vue-router ^5 for Volar `sfc-route-blocks` + `nuxi typecheck`; IngestSummaryWidget typed ingest_log status guard for strict JSON:API attributes -->
@@ -482,7 +483,7 @@ And emit: `'update:modelValue'` with the new value.
 The dashboard page uses the `useAdmin()` catalog (from the AdminSurface bootstrap endpoint) to render entity type cards. It includes:
 
 1. **Onboarding detection**: On mount, probes for existing content by listing the first listable catalog type (prefers `node_type`). If no content exists, shows `OnboardingPrompt` with links to create a Note, create a custom type, or open the quickstart guide. Paths are computed from catalog capabilities.
-2. **IngestSummaryWidget**: Renders ingestion status counters (pending_review, approved, rejected, failed) from the `ingest_log` entity type. Hides silently on 404 (entity type not registered). Each counter links to the filtered ingest_log list. Also includes a North Cloud Search sync panel fetched from `/api/admin/nc-sync-status` with last-sync timestamp, created/skipped/failed counts, and links to the ingestion dashboard, teachings, and events.
+2. **IngestSummaryWidget**: Renders ingestion status counters (pending_review, approved, rejected, failed) from the `ingest_log` entity type. Hides silently on 404 (entity type not registered). Each counter links to the filtered ingest_log list. Also includes a North Cloud Search sync panel fetched from `/api/staff/nc-sync-status` with last-sync timestamp, created/skipped/failed counts, and links to the staff ingestion dashboard (`/staff/ingestion`), teachings, and events.
 3. **Entity type card grid**: Renders a card for each catalog entry using `entityLabel(et.id, et.label)` for i18n-aware labels.
 
 Error handling uses `TransportError` from `~/contracts/transport` to distinguish 404s from other failures.

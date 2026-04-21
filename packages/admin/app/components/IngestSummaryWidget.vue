@@ -77,7 +77,7 @@ onMounted(fetchCounts)
 
 async function fetchNcSyncStatus() {
   try {
-    const result = await apiFetch<{ status: typeof ncSync.value }>('/api/admin/nc-sync-status')
+    const result = await apiFetch<{ status: typeof ncSync.value }>('/api/staff/nc-sync-status')
     ncSync.value = result.status ?? null
   } catch {
     ncSync.value = null
@@ -119,7 +119,7 @@ onMounted(fetchNcSyncStatus)
           <span>{{ t('nc_sync_failed') }}: {{ ncSync.failed ?? 0 }}</span>
         </div>
         <div class="nc-sync-links">
-          <NuxtLink to="/admin/ingestion">{{ t('nc_sync_open_dashboard') }}</NuxtLink>
+          <NuxtLink to="/staff/ingestion">{{ t('nc_sync_open_dashboard') }}</NuxtLink>
           <NuxtLink to="/teaching">{{ t('nc_sync_view_teachings') }}</NuxtLink>
           <NuxtLink to="/event">{{ t('nc_sync_view_events') }}</NuxtLink>
         </div>
