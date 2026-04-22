@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.157] - 2026-04-22
+
+### Changed
+
+- `foundation`: `HttpKernel` JSON boot-failure responses now include operator-safe `detail` text for known cases (debug enabled in production, missing production SQLite, PHPUnit reachable on production autoload) without echoing database filesystem paths. Full diagnostics remain in the critical boot log line.
+
+### Added
+
+- `foundation`: `HttpKernelBootFailureTest` coverage for the client-safe boot failure detail mapping.
+
 ## [0.1.0-alpha.153] - 2026-04-21
 
 ### Added

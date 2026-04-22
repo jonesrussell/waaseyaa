@@ -17,6 +17,7 @@
 <!-- Spec reviewed 2026-04-11 - AbstractKernel::bootEntityTypeManager passes a third closure to EntityTypeManager wiring SqlSchemaHandler, SqlStorageDriver, optional RevisionableStorageDriver, and EntityRepository for getRepository() (#1128) -->
 <!-- Spec reviewed 2026-04-08 - #1129/#1134: HttpKernel::finalizeBoot() wires DB cache bins and discovery handler; SSR owns RenderCache listeners + SsrPageHandler via SsrServiceProvider::configureHttpKernel; ErrorPageRendererInterface bound in SSR; provider httpDomainRouters() merged after foundation routers through McpRouter and before BroadcastRouter; DiscoveryRouter/GraphQlRouter/MediaRouter live in api/graphql/media packages; ControllerDispatcher uses Inertia foundation interfaces + optional InertiaFullPageRendererInterface; LayerDependencyTest gates non-Router Foundation Http/ against non-Foundation Waaseyaa imports -->
 <!-- Spec reviewed 2026-04-22 - HttpKernel boot failures now always return JSON:API (DevExceptionRenderer branch removed) -->
+<!-- Spec reviewed 2026-04-22 - HttpKernel bootFailureJsonResponse: clientSafeBootFailureDetail maps known boot failures to operator-safe JSON detail (no DB paths); raw message when debug; critical log retains full exception -->
 <!-- Spec reviewed 2026-04-08 - DX P2: HttpKernel boot catch returns HTML via DevExceptionRenderer when debug+package present else JSON:API bootFailureJsonResponse (non-empty body, #1117); ControllerDispatcher render.page returns 501 JSON when SsrPageHandler class unavailable (#1130); LogManager gains daily + fingers_crossed channel types -->
 <!-- Spec reviewed 2026-04-08 - LogManager: handler key string = type synonym only; fingers_crossed nested config via nested, inner, or array handler; channel buffer_limit caps FingersCrossedHandler in-memory buffer (drops oldest); handlerTypeFromConfig + fingersCrossedBufferLimit helpers -->
 <!-- Spec reviewed 2026-04-09 - Monorepo toolchain: PHPStan 2.x + phpstan-strict-rules 2.x; symfony/html-sanitizer ^8 required by waaseyaa/ssr (HtmlFormatter) and root composer (#1158 / #808/#809) -->
@@ -84,7 +85,7 @@ Machine clients (Admin SPA, MCP, curl scripts) should assume **JSON:API-shaped e
 
 | Phase | Content-Type | When |
 |-------|----------------|------|
-| Boot failure (non-debug) | `application/vnd.api+json` | `HttpKernel::handle()` catch around `boot()` — `bootFailureJsonResponse()` |
+| Boot failure (non-debug) | `application/vnd.api+json` | `HttpKernel::handle()` catch around `boot()` — `bootFailureJsonResponse()` uses `clientSafeBootFailureDetail()` so JSON `errors[].detail` names known cases (e.g. debug-in-production guard, missing production SQLite, PHPUnit on production autoload) without echoing filesystem paths; the matching `logger->critical` boot line still carries the full message and trace |
 | Unhandled exception after successful boot | `application/vnd.api+json` | Outer `handle()` catch — generic 500 JSON:API body |
 | Controller pipeline | JSON:API or negotiated Inertia/SSR | `ControllerDispatcher` and domain routers |
 

@@ -65,4 +65,47 @@ final class HttpKernelBootFailureTest extends TestCase
             'HttpKernel::handle() must wrap $this->boot() in a try-catch to handle boot failures gracefully.',
         );
     }
+
+    #[Test]
+    public function client_safe_boot_failure_detail_hides_database_path(): void
+    {
+        $kernel = new HttpKernel('/tmp');
+        $method = new \ReflectionMethod(HttpKernel::class, 'clientSafeBootFailureDetail');
+        $method->setAccessible(true);
+
+        $e = new \RuntimeException(
+            'Database not found at /secret/deploy/path/waaseyaa.sqlite. In production, the database must already exist. '
+            . 'Run "bin/waaseyaa db:init" to create the database file and apply migrations. '
+            . 'The command is idempotent and safe to run on every deploy.',
+        );
+        $detail = $method->invoke($kernel, $e);
+
+        $this->assertStringNotContainsString('/secret/', $detail);
+        $this->assertStringContainsString('SQLite database file is missing', $detail);
+    }
+
+    #[Test]
+    public function client_safe_boot_failure_detail_passes_through_app_debug_guard_message(): void
+    {
+        $kernel = new HttpKernel('/tmp');
+        $method = new \ReflectionMethod(HttpKernel::class, 'clientSafeBootFailureDetail');
+        $method->setAccessible(true);
+
+        $expected = 'APP_DEBUG must not be enabled in production (APP_ENV=production). Aborting boot.';
+        $detail = $method->invoke($kernel, new \RuntimeException($expected));
+
+        $this->assertSame($expected, $detail);
+    }
+
+    #[Test]
+    public function client_safe_boot_failure_detail_describes_phpunit_autoload_mistake(): void
+    {
+        $kernel = new HttpKernel('/tmp');
+        $method = new \ReflectionMethod(HttpKernel::class, 'clientSafeBootFailureDetail');
+        $method->setAccessible(true);
+
+        $detail = $method->invoke($kernel, new \Error('Class "PHPUnit\\Framework\\TestCase" not found'));
+
+        $this->assertStringContainsString('PHPUnit-only class', $detail);
+    }
 }

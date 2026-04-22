@@ -458,7 +458,7 @@ final class HttpKernel extends AbstractKernel
 
         $detail = $showDetail
             ? $e->getMessage()
-            : 'Application failed to boot.';
+            : $this->clientSafeBootFailureDetail($e);
 
         try {
             $body = json_encode([
@@ -470,6 +470,31 @@ final class HttpKernel extends AbstractKernel
         }
 
         return new HttpResponse($body, 500, ['Content-Type' => 'application/vnd.api+json']);
+    }
+
+    /**
+     * Human-readable boot failure text for non-debug HTTP responses.
+     *
+     * Omits filesystem paths and stack details; those remain in the critical log line above.
+     */
+    private function clientSafeBootFailureDetail(\Throwable $e): string
+    {
+        $msg = $e->getMessage();
+
+        if ($e instanceof \RuntimeException) {
+            if (str_starts_with($msg, 'APP_DEBUG must not be enabled in production')) {
+                return $msg;
+            }
+            if (str_starts_with($msg, 'Database not found at ')) {
+                return 'SQLite database file is missing in production. Verify WAASEYAA_DB points to an existing file on the server, or run bin/waaseyaa db:init.';
+            }
+        }
+
+        if (str_contains($msg, 'PHPUnit\\Framework')) {
+            return 'A PHPUnit-only class was loaded during bootstrap (often a test base class on a production autoload path). Install with composer --no-dev and ensure test helpers are autoload-dev only.';
+        }
+
+        return 'Application failed to boot.';
     }
 
     private function handleCors(): ?HttpResponse
