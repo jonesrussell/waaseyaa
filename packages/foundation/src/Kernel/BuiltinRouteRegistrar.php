@@ -13,7 +13,7 @@ use Waaseyaa\Routing\WaaseyaaRouter;
  * Registers all built-in HTTP routes on the router.
  *
  * Handles JSON:API entity routes, schema, OpenAPI, discovery endpoints,
- * MCP, media upload, SSR page rendering, and app-level provider routes.
+ * media upload, SSR page rendering, and app-level provider routes.
  */
 final class BuiltinRouteRegistrar
 {
@@ -131,16 +131,6 @@ final class BuiltinRouteRegistrar
                 ->build(),
         );
 
-        $router->addRoute(
-            'mcp.endpoint',
-            RouteBuilder::create('/mcp')
-                ->controller('mcp.endpoint')
-                ->allowAll()
-                ->jsonApi()
-                ->methods('GET', 'POST')
-                ->build(),
-        );
-
         // App routes — registered before SSR catchall so they take priority.
         foreach ($this->providers as $provider) {
             $provider->routes($router, $this->entityTypeManager);
@@ -167,5 +157,7 @@ final class BuiltinRouteRegistrar
                 ->requirement('path', '(?!api(?:/|$)).+')
                 ->build(),
         );
+
+        $router->sortRoutesByPriority();
     }
 }

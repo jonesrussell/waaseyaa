@@ -31,7 +31,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
     private array $entityTypeRegistrations = [];
 
     /** @var (\Closure(string): ?object)|null */
-    private ?\Closure $kernelResolver = null;
+    protected ?\Closure $kernelResolver = null;
 
     abstract public function register(): void;
 
@@ -132,6 +132,31 @@ abstract class ServiceProvider implements ServiceProviderInterface
     public function setKernelResolver(\Closure $resolver): void
     {
         $this->kernelResolver = $resolver;
+    }
+
+    /**
+     * Run {@see register()} on a child provider and merge its bindings, entity types, and tags into this provider.
+     *
+     * Used by application "stack" providers to preserve a single composer entry while delegating to focused classes.
+     */
+    final protected function mergeChildProvider(ServiceProvider $child): void
+    {
+        $child->setKernelContext($this->projectRoot, $this->config, $this->manifestFormatters);
+        if ($this->kernelResolver !== null) {
+            $child->setKernelResolver($this->kernelResolver);
+        }
+        $child->register();
+        foreach ($child->getBindings() as $abstract => $binding) {
+            $this->bindings[$abstract] = $binding;
+        }
+        foreach ($child->getEntityTypeRegistrations() as $registration) {
+            $this->entityTypeRegistrations[] = $registration;
+        }
+        foreach ($child->getTags() as $tag => $abstracts) {
+            foreach ($abstracts as $abstract) {
+                $this->tag($abstract, $tag);
+            }
+        }
     }
 
     protected function singleton(string $abstract, string|callable $concrete): void

@@ -132,6 +132,16 @@ final class RouteBuilder
     }
 
     /**
+     * Route ordering hint for {@see WaaseyaaRouter::sortRoutesByPriority()} (higher matches first).
+     */
+    public function priority(int $priority): self
+    {
+        $this->options['_waaseyaa_priority'] = $priority;
+
+        return $this;
+    }
+
+    /**
      * Mark route as SSR render route.
      */
     public function render(bool $enabled = true): self

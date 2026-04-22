@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Migration;
 
+use Composer\InstalledVersions;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 
 final class MigrationLoader
@@ -21,7 +22,8 @@ final class MigrationLoader
         $migrations = [];
 
         foreach ($this->manifest->migrations as $package => $path) {
-            $loaded = $this->loadFromDirectory($path, $package);
+            $resolved = $this->resolvePackageMigrationDirectory($package, $path);
+            $loaded = $this->loadFromDirectory($resolved, $package);
             if ($loaded !== []) {
                 $migrations[$package] = $loaded;
             }
@@ -34,6 +36,27 @@ final class MigrationLoader
         }
 
         return $migrations;
+    }
+
+    private function resolvePackageMigrationDirectory(string $packageName, string $path): string
+    {
+        if ($path === '') {
+            return $path;
+        }
+        if (is_dir($path)) {
+            return $path;
+        }
+        if (class_exists(InstalledVersions::class)) {
+            $install = InstalledVersions::getInstallPath($packageName);
+            if (is_string($install) && $install !== '') {
+                $candidate = $install . '/' . ltrim($path, '/');
+                if (is_dir($candidate)) {
+                    return $candidate;
+                }
+            }
+        }
+
+        return $this->basePath . '/vendor/' . $packageName . '/' . ltrim($path, '/');
     }
 
     /**

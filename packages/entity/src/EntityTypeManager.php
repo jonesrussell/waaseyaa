@@ -13,8 +13,9 @@ use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
  * Registry-based entity type manager.
  *
  * Holds entity type definitions and provides access to storage handlers.
- * Entity types are registered explicitly (not discovered via annotations),
- * keeping the system simple and predictable.
+ * Entity types are registered explicitly by service providers; optional
+ * attribute-driven registration runs when {@code entity_auto_register} is enabled
+ * in application config (see {@see \Waaseyaa\Foundation\Kernel\Bootstrap\ProviderRegistry}).
  */
 class EntityTypeManager implements EntityTypeManagerInterface
 {

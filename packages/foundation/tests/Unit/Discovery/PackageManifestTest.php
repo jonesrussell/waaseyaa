@@ -22,6 +22,7 @@ final class PackageManifestTest extends TestCase
         $this->assertSame([], $manifest->formatters);
         $this->assertSame([], $manifest->middleware);
         $this->assertSame([], $manifest->packageDeclarations);
+        $this->assertSame([], $manifest->attributeEntityTypes);
     }
 
     #[Test]
@@ -36,6 +37,7 @@ final class PackageManifestTest extends TestCase
             packageDeclarations: [
                 'waaseyaa/example' => ['surface' => 'implementation', 'activation' => 'provider'],
             ],
+            attributeEntityTypes: ['App\\ExampleAttributedEntity'],
         );
 
         $array = $manifest->toArray();
@@ -47,6 +49,7 @@ final class PackageManifestTest extends TestCase
         $this->assertSame($manifest->formatters, $restored->formatters);
         $this->assertSame($manifest->middleware, $restored->middleware);
         $this->assertSame($manifest->packageDeclarations, $restored->packageDeclarations);
+        $this->assertSame($manifest->attributeEntityTypes, $restored->attributeEntityTypes);
     }
 
     #[Test]
@@ -92,6 +95,7 @@ final class PackageManifestTest extends TestCase
         $this->assertSame([], $manifest->policies);
         $this->assertSame([], $manifest->formatters);
         $this->assertSame([], $manifest->packageDeclarations);
+        $this->assertSame([], $manifest->attributeEntityTypes);
     }
 
     #[Test]
@@ -102,6 +106,7 @@ final class PackageManifestTest extends TestCase
         $this->assertSame([], $manifest->policies);
         $this->assertSame([], $manifest->formatters);
         $this->assertSame([], $manifest->packageDeclarations);
+        $this->assertSame([], $manifest->attributeEntityTypes);
     }
 
     #[Test]

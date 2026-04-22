@@ -231,7 +231,7 @@ final class HttpKernelTest extends TestCase
         $this->assertNotNull($routes->get('api.discovery.timeline'));
         $this->assertNotNull($routes->get('api.discovery.endpoint'));
         $this->assertNotNull($routes->get('api.media.upload'));
-        $this->assertNotNull($routes->get('mcp.endpoint'));
+        $this->assertNull($routes->get('mcp.endpoint'), 'MCP route is registered by McpServiceProvider, not BuiltinRouteRegistrar.');
         $this->assertNotNull($routes->get('public.home'));
         $this->assertNotNull($routes->get('public.page'));
         $this->assertTrue((bool) $routes->get('public.home')?->getOption('_render'));

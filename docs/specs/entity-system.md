@@ -1,5 +1,6 @@
 # Entity System
 
+<!-- Spec reviewed 2026-04-22 - DefinesEntityType; PackageManifest attributeEntityTypes; optional config entity_auto_register in ProviderRegistry (default off) for attribute-driven type registration -->
 <!-- Spec reviewed 2026-04-22 - removed reflection hydration fallback; ContentEntityBase/ConfigEntityBase implement HydratableFromStorageInterface and EntityInstantiator now requires fromStorage -->
 <!-- Spec reviewed 2026-04-22 - FieldDefinitionConstraintBuilder now consumes FieldDefinitionInterface objects; FieldDefinition registry/core definitions normalize to object contracts -->
 <!-- Spec reviewed 2026-04-22 - EntityType::getFieldDefinitions phpdoc covariance with EntityTypeInterface (FieldDefinitionInterface union) -->

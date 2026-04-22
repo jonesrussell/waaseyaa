@@ -53,7 +53,7 @@ final class BuiltinRouteRegistrarTest extends TestCase
     }
 
     #[Test]
-    public function registers_mcp_and_ssr_routes(): void
+    public function registers_public_ssr_routes(): void
     {
         $entityTypeManager = new EntityTypeManager(new EventDispatcher());
         $registrar = new BuiltinRouteRegistrar($entityTypeManager);
@@ -62,7 +62,7 @@ final class BuiltinRouteRegistrarTest extends TestCase
         $registrar->register($router);
 
         $routes = $router->getRouteCollection();
-        $this->assertNotNull($routes->get('mcp.endpoint'));
+        $this->assertNull($routes->get('mcp.endpoint'), 'MCP route is owned by waaseyaa/mcp, not BuiltinRouteRegistrar.');
         $this->assertNotNull($routes->get('public.home'));
         $this->assertNotNull($routes->get('public.page'));
     }

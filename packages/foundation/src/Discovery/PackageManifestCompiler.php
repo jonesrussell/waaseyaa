@@ -46,6 +46,7 @@ final class PackageManifestCompiler
         $permissions = [];
         $policies = [];
         $packageDeclarations = [];
+        $attributeEntityTypes = [];
         $packages = [];
 
         // Read installed packages manifest
@@ -118,8 +119,12 @@ final class PackageManifestCompiler
                 ];
             }
 
-            foreach ($ref->getAttributes(AsEntityType::class) as $attr) {
-                // Entity types are tracked in providers for now
+            foreach ($ref->getAttributes(AsEntityType::class) as $_attr) {
+                if (interface_exists(\Waaseyaa\Entity\DefinesEntityType::class)
+                    && is_subclass_of($class, \Waaseyaa\Entity\DefinesEntityType::class, true)
+                ) {
+                    $attributeEntityTypes[] = $class;
+                }
             }
 
             foreach ($ref->getAttributes(self::POLICY_ATTRIBUTE) as $attr) {
@@ -133,6 +138,8 @@ final class PackageManifestCompiler
             usort($stack, fn(array $a, array $b) => $b['priority'] <=> $a['priority']);
         }
 
+        $attributeEntityTypes = array_values(array_unique($attributeEntityTypes));
+
         return new PackageManifest(
             providers: $providers,
             commands: $commands,
@@ -144,6 +151,7 @@ final class PackageManifestCompiler
             permissions: $permissions,
             policies: $policies,
             packageDeclarations: $packageDeclarations,
+            attributeEntityTypes: $attributeEntityTypes,
         );
     }
 
@@ -569,6 +577,7 @@ final class PackageManifestCompiler
             permissions: $permissions,
             policies: $manifest->policies,
             packageDeclarations: $manifest->packageDeclarations,
+            attributeEntityTypes: $manifest->attributeEntityTypes,
         );
     }
 

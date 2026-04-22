@@ -46,7 +46,8 @@
         "waaseyaa": {
             "providers": [
                 "Waaseyaa\\Scheduler\\SchedulerServiceProvider"
-            ]
+            ],
+            "migrations": "src/Migration"
         }
     },
     "config": {

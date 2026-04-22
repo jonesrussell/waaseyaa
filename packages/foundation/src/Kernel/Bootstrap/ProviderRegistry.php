@@ -103,11 +103,46 @@ final class ProviderRegistry
                     ));
 
                     throw $e;
-                } catch (\RuntimeException | \InvalidArgumentException $e) {
+                } catch (\InvalidArgumentException $e) {
                     $this->logger->error(sprintf(
                         'Failed to register entity type "%s" from %s: %s',
                         $entityType->id(),
                         $provider::class,
+                        $e->getMessage(),
+                    ));
+                }
+            }
+        }
+
+        $autoRegister = filter_var($config['entity_auto_register'] ?? false, FILTER_VALIDATE_BOOLEAN);
+        if ($autoRegister && $manifest->attributeEntityTypes !== [] && interface_exists(\Waaseyaa\Entity\DefinesEntityType::class)) {
+            foreach ($manifest->attributeEntityTypes as $entityClass) {
+                if (!class_exists($entityClass)) {
+                    continue;
+                }
+                if (!is_subclass_of($entityClass, \Waaseyaa\Entity\DefinesEntityType::class, true)) {
+                    continue;
+                }
+                $entityType = $entityClass::entityType();
+                if ($entityTypeManager->hasDefinition($entityType->id())) {
+                    continue;
+                }
+                try {
+                    $entityTypeManager->registerEntityType($entityType, $entityClass);
+                } catch (EntityTypeRegistrationCollisionException $e) {
+                    $this->logger->error(sprintf(
+                        'Failed to auto-register entity type "%s" from %s: %s',
+                        $entityType->id(),
+                        $entityClass,
+                        $e->getMessage(),
+                    ));
+
+                    throw $e;
+                } catch (\InvalidArgumentException $e) {
+                    $this->logger->error(sprintf(
+                        'Failed to auto-register entity type "%s" from %s: %s',
+                        $entityType->id(),
+                        $entityClass,
                         $e->getMessage(),
                     ));
                 }

@@ -27,6 +27,8 @@ final class PackageManifest
         public readonly array $policies = [],
         /** @var array<string, array{surface: 'aggregate'|'implementation'|'tooling', activation: 'discovery'|'none'|'provider'}> */
         public readonly array $packageDeclarations = [],
+        /** @var list<class-string> Classes carrying #[AsEntityType] that also implement DefinesEntityType */
+        public readonly array $attributeEntityTypes = [],
     ) {}
 
     /**
@@ -37,7 +39,7 @@ final class PackageManifest
     public static function fromArray(array $data): self
     {
         $requiredKeys = ['providers', 'commands', 'routes', 'migrations', 'field_types', 'middleware'];
-        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations'];
+        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types'];
         $missing = array_diff($requiredKeys, array_keys($data));
 
         if ($missing !== []) {
@@ -68,6 +70,7 @@ final class PackageManifest
             permissions: $data['permissions'] ?? [],
             policies: $data['policies'] ?? [],
             packageDeclarations: $data['package_declarations'] ?? [],
+            attributeEntityTypes: $data['attribute_entity_types'] ?? [],
         );
     }
 
@@ -87,6 +90,7 @@ final class PackageManifest
             'permissions' => $this->permissions,
             'policies' => $this->policies,
             'package_declarations' => $this->packageDeclarations,
+            'attribute_entity_types' => $this->attributeEntityTypes,
         ];
     }
 }

@@ -42,7 +42,8 @@
         "waaseyaa": {
             "providers": [
                 "Waaseyaa\\Queue\\QueueServiceProvider"
-            ]
+            ],
+            "migrations": "src/Migration"
         }
     },
     "config": {

@@ -38,8 +38,52 @@ final class WaaseyaaRouter
      */
     public function addRoute(string $name, Route $route): void
     {
+        if ($this->routes->get($name) !== null) {
+            throw new \LogicException(sprintf('Duplicate route name registered: %s', $name));
+        }
         $this->routes->add($name, $route);
         // Reset matchers/generators when routes change.
+        $this->matcher = null;
+        $this->generator = null;
+    }
+
+    /**
+     * Remove a named route if present (used when an app intentionally overrides a framework route).
+     */
+    public function removeRoute(string $name): void
+    {
+        $this->routes->remove($name);
+        $this->matcher = null;
+        $this->generator = null;
+    }
+
+    /**
+     * Re-order routes by {@see RouteBuilder::priority()} (higher priority wins; default 0).
+     */
+    public function sortRoutesByPriority(): void
+    {
+        $named = $this->routes->all();
+        $indexed = [];
+        $i = 0;
+        foreach ($named as $name => $route) {
+            $indexed[] = ['name' => $name, 'route' => $route, 'idx' => $i++];
+        }
+        usort(
+            $indexed,
+            static function (array $x, array $y): int {
+                $pa = (int) ($x['route']->getOption('_waaseyaa_priority') ?? 0);
+                $pb = (int) ($y['route']->getOption('_waaseyaa_priority') ?? 0);
+                if ($pb !== $pa) {
+                    return $pb <=> $pa;
+                }
+
+                return $x['idx'] <=> $y['idx'];
+            },
+        );
+        $this->routes = new RouteCollection();
+        foreach ($indexed as $row) {
+            $this->routes->add($row['name'], $row['route']);
+        }
         $this->matcher = null;
         $this->generator = null;
     }

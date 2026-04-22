@@ -9,9 +9,11 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Waaseyaa\Database\DBALDatabase;
+use Waaseyaa\Entity\DefinesEntityType;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Exception\EntityTypeRegistrationCollisionException;
+use Waaseyaa\Foundation\Attribute\AsEntityType;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ProviderRegistry;
 use Waaseyaa\Foundation\Log\LoggerInterface;
@@ -157,6 +159,56 @@ final class ProviderRegistryTest extends TestCase
             dispatcher: $dispatcher,
         );
     }
+
+    #[Test]
+    public function entity_auto_register_registers_attribute_manifest_classes(): void
+    {
+        $registry = new ProviderRegistry(new NullLogger());
+        $database = DBALDatabase::createSqlite(':memory:');
+        $dispatcher = new EventDispatcher();
+        $entityTypeManager = new EntityTypeManager($dispatcher);
+
+        $manifest = new PackageManifest(
+            providers: [],
+            attributeEntityTypes: [AttributeAutoEntityFixture::class],
+        );
+
+        $registry->discoverAndRegister(
+            manifest: $manifest,
+            projectRoot: sys_get_temp_dir(),
+            config: ['entity_auto_register' => true],
+            entityTypeManager: $entityTypeManager,
+            database: $database,
+            dispatcher: $dispatcher,
+        );
+
+        $this->assertTrue($entityTypeManager->hasDefinition('attr_auto_fixture'));
+    }
+
+    #[Test]
+    public function entity_auto_register_off_skips_attribute_manifest_classes(): void
+    {
+        $registry = new ProviderRegistry(new NullLogger());
+        $database = DBALDatabase::createSqlite(':memory:');
+        $dispatcher = new EventDispatcher();
+        $entityTypeManager = new EntityTypeManager($dispatcher);
+
+        $manifest = new PackageManifest(
+            providers: [],
+            attributeEntityTypes: [AttributeAutoEntityFixture::class],
+        );
+
+        $registry->discoverAndRegister(
+            manifest: $manifest,
+            projectRoot: sys_get_temp_dir(),
+            config: [],
+            entityTypeManager: $entityTypeManager,
+            database: $database,
+            dispatcher: $dispatcher,
+        );
+
+        $this->assertFalse($entityTypeManager->hasDefinition('attr_auto_fixture'));
+    }
 }
 
 /**
@@ -222,3 +274,16 @@ final class DuplicateEntityTypeConsumerProvider extends ServiceProvider
 }
 
 final class EntityTypeFixture {}
+
+#[AsEntityType(id: 'attr_auto_fixture', label: 'Attr fixture')]
+final class AttributeAutoEntityFixture implements DefinesEntityType
+{
+    public static function entityType(): EntityType
+    {
+        return new EntityType(
+            id: 'attr_auto_fixture',
+            label: 'Attr fixture',
+            class: self::class,
+        );
+    }
+}
