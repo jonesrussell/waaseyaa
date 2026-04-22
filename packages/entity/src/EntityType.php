@@ -94,7 +94,7 @@ final readonly class EntityType implements EntityTypeInterface
         return $this->constraints;
     }
 
-    /** @return array<string, array<string, mixed>|object> */
+    /** @return array<string, array<string, mixed>|\Waaseyaa\Field\FieldDefinitionInterface> */
     public function getFieldDefinitions(): array
     {
         return $this->fieldDefinitions;
