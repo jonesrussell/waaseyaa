@@ -57,6 +57,16 @@ final class GenealogyServiceProvider extends ServiceProvider
     public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
     {
         $router->addRoute(
+            'genealogy.landing',
+            RouteBuilder::create('/genealogy')
+                ->controller(GenealogySsrController::class . '::landing')
+                ->allowAll()
+                ->render()
+                ->methods('GET')
+                ->build(),
+        );
+
+        $router->addRoute(
             'genealogy.person',
             RouteBuilder::create('/genealogy/person/{id}')
                 ->controller(GenealogySsrController::class . '::person')

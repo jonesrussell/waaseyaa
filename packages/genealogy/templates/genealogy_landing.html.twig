@@ -1,0 +1,35 @@
+{% extends 'genealogy/layout.html.twig' %}
+
+{% block genealogy_page_title %}Genealogy{% endblock %}
+
+{% block genealogy_content %}
+  <header class="genealogy-landing-header">
+    <h1>Genealogy</h1>
+    <p class="genealogy-lead">Server-rendered views for family trees, persons, and households.</p>
+  </header>
+
+  {% if demo_person_id %}
+    <section class="genealogy-demo" aria-labelledby="genealogy-demo-heading">
+      <h2 id="genealogy-demo-heading">Local demo dataset</h2>
+      <p>Sample records from <code>genealogy:demo-seed</code>:</p>
+      <ul>
+        <li><a href="/genealogy/person/{{ demo_person_id }}">Demo person</a></li>
+        <li><a href="/genealogy/person/{{ demo_person_id }}/ancestors">Ancestor chart</a></li>
+        {% if demo_family_id %}
+          <li><a href="/genealogy/family/{{ demo_family_id }}">Demo family</a></li>
+        {% endif %}
+      </ul>
+    </section>
+  {% else %}
+    <section class="genealogy-empty" aria-labelledby="genealogy-empty-heading">
+      <h2 id="genealogy-empty-heading">No demo data yet</h2>
+      <p>Run <code>bin/waaseyaa genealogy:demo-seed</code> to create a published demo tree, then reload this page for links.</p>
+    </section>
+  {% endif %}
+
+  {% if authenticated and not genealogy_product_enabled %}
+    <section class="genealogy-hint" role="note">
+      <p>Your account does not have genealogy SSR enabled. Turn on <strong>Genealogy product</strong> on your user profile to open views that are not published for anonymous visitors.</p>
+    </section>
+  {% endif %}
+{% endblock %}

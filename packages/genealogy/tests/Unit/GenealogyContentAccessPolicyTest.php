@@ -13,6 +13,7 @@ use Waaseyaa\Genealogy\GenealogyBootstrap;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 use Waaseyaa\User\AnonymousUser;
+use Waaseyaa\User\DevAdminAccount;
 
 final class GenealogyContentAccessPolicyTest extends TestCase
 {
@@ -84,6 +85,30 @@ final class GenealogyContentAccessPolicyTest extends TestCase
 
         self::assertTrue($result->isForbidden());
         self::assertStringContainsString('not published for anonymous viewing', $result->reason);
+    }
+
+    #[Test]
+    public function dev_admin_may_view_living_person_without_tree_ownership(): void
+    {
+        $this->bindPublishedTreeStorage(1, new GenealogyTree([
+            'id' => 1,
+            'display_name' => 'Fixture tree',
+            'status' => 1,
+            'owner_uid' => 99,
+        ]));
+
+        $policy = new GenealogyContentAccessPolicy();
+        $account = new DevAdminAccount();
+        $person = new GenealogyPerson([
+            'display_name' => 'X',
+            'status' => 1,
+            'tree_id' => 1,
+            'is_living' => true,
+        ]);
+
+        $result = $policy->access($person, 'view', $account);
+
+        self::assertTrue($result->isAllowed());
     }
 
     #[Test]

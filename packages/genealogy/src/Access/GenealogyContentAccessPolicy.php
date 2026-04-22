@@ -14,6 +14,7 @@ use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Genealogy\Entity\GenealogyTree;
 use Waaseyaa\Genealogy\GenealogyBootstrap;
 use Waaseyaa\Genealogy\GenealogyLivingSemantics;
+use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\Workflows\WorkflowVisibility;
 
 #[PolicyAttribute(entityType: ['genealogy_person', 'genealogy_family', 'genealogy_event', 'genealogy_tree'])]
@@ -73,6 +74,10 @@ final class GenealogyContentAccessPolicy implements AccessPolicyInterface, Field
 
     private function viewAccess(EntityInterface $entity, AccountInterface $account): AccessResult
     {
+        if ($account instanceof DevAdminAccount) {
+            return AccessResult::allowed('Dev fallback account may view genealogy content under the built-in server.');
+        }
+
         if (!$account->isAuthenticated()) {
             return $this->anonymousPublishedViewAccess($entity);
         }

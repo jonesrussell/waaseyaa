@@ -19,6 +19,7 @@ use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
+use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
@@ -83,7 +84,18 @@ final class SqlEntityStorage implements EntityStorageInterface
     public function create(array $values = []): EntityInterface
     {
         foreach ($this->entityType->getFieldDefinitions() as $name => $def) {
-            if (!array_key_exists($name, $values) && array_key_exists('default', $def)) {
+            if (array_key_exists($name, $values)) {
+                continue;
+            }
+            if ($def instanceof FieldDefinitionInterface) {
+                $defaultValue = $def->getDefaultValue();
+                if ($defaultValue !== null) {
+                    $values[$name] = $defaultValue;
+                }
+
+                continue;
+            }
+            if (is_array($def) && array_key_exists('default', $def)) {
                 $values[$name] = $def['default'];
             }
         }
@@ -498,11 +510,12 @@ final class SqlEntityStorage implements EntityStorageInterface
         $now = $this->clock->now();
 
         foreach ($fieldDefs as $fieldName => $def) {
-            if (($def['type'] ?? null) !== 'timestamp') {
+            $meta = $this->fieldDefinitionAsMetadataArray($def);
+            if (($meta['type'] ?? null) !== 'timestamp') {
                 continue;
             }
 
-            $role = TimestampFieldConvention::inferAutoPopulate($fieldName, $def);
+            $role = TimestampFieldConvention::inferAutoPopulate($fieldName, $meta);
             if ($role === null) {
                 continue;
             }
@@ -520,7 +533,7 @@ final class SqlEntityStorage implements EntityStorageInterface
                 continue;
             }
 
-            $format = TimestampFieldConvention::resolveStorageFormat($fieldName, $def);
+            $format = TimestampFieldConvention::resolveStorageFormat($fieldName, $meta);
             $scalar = $format === 'unix'
                 ? $now->getTimestamp()
                 : $now->format(\DateTimeInterface::ATOM);
@@ -558,12 +571,39 @@ final class SqlEntityStorage implements EntityStorageInterface
 
         $this->jsonFieldCache = [];
         foreach ($this->entityType->getFieldDefinitions() as $name => $def) {
-            if (($def['type'] ?? null) === 'json') {
+            $meta = $this->fieldDefinitionAsMetadataArray($def);
+            if (($meta['type'] ?? null) === 'json') {
                 $this->jsonFieldCache[$name] = true;
             }
         }
 
         return $this->jsonFieldCache;
+    }
+
+    /**
+     * Entity types may declare fields as legacy metadata arrays or as
+     * {@see FieldDefinitionInterface} objects (registry / package entity types).
+     *
+     * @return array<string, mixed>
+     */
+    private function fieldDefinitionAsMetadataArray(mixed $def): array
+    {
+        if (is_array($def)) {
+            return $def;
+        }
+        if ($def instanceof FieldDefinitionInterface) {
+            $settings = $def->getSettings();
+
+            return array_merge($settings, [
+                'type' => $def->getType(),
+            ]);
+        }
+
+        throw new \InvalidArgumentException(sprintf(
+            'Unsupported field definition for entity type %s: %s',
+            $this->entityType->id(),
+            is_object($def) ? $def::class : get_debug_type($def),
+        ));
     }
 
     /**

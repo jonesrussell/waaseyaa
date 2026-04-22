@@ -24,6 +24,7 @@
 <!-- Spec reviewed 2026-04-16 - EntityStorageDriverInterface::write returns effective id; EntityRepository::doSave back-fills auto-increment pk before POST_SAVE (waaseyaa/giiken#57) -->
 <!-- Spec reviewed 2026-04-20 - EntityTypeManager collision guard now preserves registrant provenance, distinguishes duplicate vs shadow registration, and throws EntityTypeRegistrationCollisionException (#1313) -->
 <!-- Spec reviewed 2026-04-21 - FieldDefinitionRegistryInterface::mergeCoreFields for host-app core field overlays without forking package entity types -->
+<!-- Spec reviewed 2026-04-22 - SqlEntityStorage + EntityType field definitions: legacy array defs or FieldDefinitionInterface objects in create(), JSON typing, timestamp auto-populate -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
 

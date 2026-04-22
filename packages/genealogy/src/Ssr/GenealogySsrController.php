@@ -11,8 +11,10 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\Gate\GateInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Genealogy\Entity\GenealogyFamily;
+use Waaseyaa\Genealogy\GenealogyLocalDemoMarkers;
 use Waaseyaa\Genealogy\Service\GenealogyFamilyService;
 use Waaseyaa\Genealogy\Service\GenealogyPedigreeService;
+use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\User;
 
 final class GenealogySsrController
@@ -24,6 +26,25 @@ final class GenealogySsrController
         private readonly GenealogyPedigreeService $pedigree,
         private readonly GenealogyFamilyService $familyService,
     ) {}
+
+    /**
+     * Public landing page for genealogy SSR (no product opt-in gate).
+     *
+     * @param array<string, mixed> $params
+     * @param array<string, mixed> $query
+     */
+    public function landing(array $params, array $query, AccountInterface $account, Request $request): Response
+    {
+        $demo = $this->resolveLocalDemoLinks();
+        $html = $this->twig->render('genealogy_landing.html.twig', [
+            'demo_person_id' => $demo['person_id'],
+            'demo_family_id' => $demo['family_id'],
+            'authenticated' => $account->isAuthenticated(),
+            'genealogy_product_enabled' => $this->genealogyProductEnabled($account),
+        ]);
+
+        return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+    }
 
     /**
      * @param array<string, mixed> $params
@@ -106,6 +127,10 @@ final class GenealogySsrController
             // published tree + entity visibility (see GenealogyContentAccessPolicy).
             return true;
         }
+        // Built-in server dev fallback: authenticated but not a persisted User row.
+        if ($account instanceof DevAdminAccount) {
+            return true;
+        }
         if (!$account instanceof User) {
             return false;
         }
@@ -113,5 +138,29 @@ final class GenealogySsrController
         $v = $account->get('genealogy_product_enabled');
 
         return $v === true || $v === 1 || $v === '1';
+    }
+
+    /**
+     * @return array{person_id: ?string, family_id: ?string}
+     */
+    private function resolveLocalDemoLinks(): array
+    {
+        $personStorage = $this->entityTypeManager->getStorage('genealogy_person');
+        $personIds = $personStorage->getQuery()
+            ->condition('display_name', GenealogyLocalDemoMarkers::CHILD_PERSON_DISPLAY)
+            ->accessCheck(false)
+            ->range(0, 1)
+            ->execute();
+        $personId = isset($personIds[0]) ? (string) $personIds[0] : null;
+
+        $familyStorage = $this->entityTypeManager->getStorage('genealogy_family');
+        $familyIds = $familyStorage->getQuery()
+            ->condition('display_name', GenealogyLocalDemoMarkers::FAMILY_DISPLAY)
+            ->accessCheck(false)
+            ->range(0, 1)
+            ->execute();
+        $familyId = isset($familyIds[0]) ? (string) $familyIds[0] : null;
+
+        return ['person_id' => $personId, 'family_id' => $familyId];
     }
 }

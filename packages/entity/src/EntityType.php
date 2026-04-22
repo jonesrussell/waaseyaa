@@ -22,7 +22,7 @@ final readonly class EntityType implements EntityTypeInterface
      * @param bool $translatable Whether this entity type supports translations.
      * @param string|null $bundleEntityType The entity type ID that provides bundles (e.g. 'node_type' for 'node').
      * @param array<string, mixed> $constraints Validation constraints.
-     * @param array<string, array<string, mixed>> $fieldDefinitions Field definitions keyed by field name.
+     * @param array<string, array<string, mixed>|object> $fieldDefinitions Field definitions keyed by field name.
      * @param string|null $description Human-readable description of the entity type.
      */
     public function __construct(
@@ -94,7 +94,7 @@ final readonly class EntityType implements EntityTypeInterface
         return $this->constraints;
     }
 
-    /** @return array<string, array<string, mixed>> */
+    /** @return array<string, array<string, mixed>|object> */
     public function getFieldDefinitions(): array
     {
         return $this->fieldDefinitions;

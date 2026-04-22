@@ -29,7 +29,14 @@ interface EntityTypeInterface
     /** @return array<string, mixed> */
     public function getConstraints(): array;
 
-    /** @return array<string, array<string, mixed>> Field definitions keyed by field name. */
+    /**
+     * Field definitions keyed by field name.
+     *
+     * Values are legacy metadata arrays and/or objects implementing
+     * {@see \Waaseyaa\Field\FieldDefinitionInterface} when provided by field registries.
+     *
+     * @return array<string, array<string, mixed>|object>
+     */
     public function getFieldDefinitions(): array;
 
     /** @return string|null Admin sidebar group key (e.g. 'content', 'taxonomy'). */
