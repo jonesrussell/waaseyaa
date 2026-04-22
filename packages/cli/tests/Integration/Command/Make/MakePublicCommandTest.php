@@ -41,6 +41,7 @@ final class MakePublicCommandTest extends TestCase
         self::assertNotSame('', $contents);
         self::assertStringContainsString('HttpKernel', $contents);
         self::assertStringContainsString('handle()', $contents);
+        self::assertStringContainsString("->loadEnv(\$projectRoot . '/.env', 'APP_ENV', 'production');", $contents);
     }
 
     #[Test]

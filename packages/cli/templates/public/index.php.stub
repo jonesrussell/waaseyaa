@@ -2,12 +2,35 @@
 
 declare(strict_types=1);
 
+// Requires symfony/dotenv in composer.json (waaseyaa skeleton includes it).
+use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
+
+if (PHP_SAPI === 'cli-server') {
+    $file = __DIR__ . parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+    if (is_file($file)) {
+        return false;
+    }
+}
 
 $projectRoot = dirname(__DIR__);
 
 require $projectRoot . '/vendor/autoload.php';
 
+if (is_file($projectRoot . '/.env')) {
+    (new \Symfony\Component\Dotenv\Dotenv())->loadEnv($projectRoot . '/.env', 'APP_ENV', 'production');
+}
+
 $kernel = new HttpKernel($projectRoot);
-$response = $kernel->handle();
+
+try {
+    $response = $kernel->handle();
+} catch (\Throwable $e) {
+    $payload = json_encode([
+        'jsonapi' => ['version' => '1.1'],
+        'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => $e->getMessage()]],
+    ], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
+    $response = new Response($payload, 500, ['Content-Type' => 'application/vnd.api+json']);
+}
+
 $response->send();

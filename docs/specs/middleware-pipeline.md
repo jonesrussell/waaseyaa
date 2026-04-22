@@ -1,5 +1,7 @@
 # Middleware Pipeline
 
+<!-- Spec reviewed 2026-04-22 - public/index.php: optional Dotenv loadEnv(..., APP_ENV, production), REQUEST_URI ?? '/' in cli-server guard, outer Throwable catch JSON:API 500 -->
+
 Waaseyaa implements typed middleware pipelines for two execution contexts: HTTP requests and background jobs. Each pipeline uses the onion pattern with separate, type-safe interface pairs. Middleware is discovered via PHP 8 attributes and compiled into sorted stacks.
 
 ## Packages
@@ -162,10 +164,15 @@ $authResponse = $pipeline->handle(
 );
 ```
 
-`public/index.php` is a thin entry point that boots the kernel and sends the returned response. It also contains a `cli-server` guard (see [cli-server static file guard](#cli-server-static-file-guard)) so static assets are served directly by the built-in server without passing through `HttpKernel`:
+`public/index.php` is a thin entry point that boots the kernel and sends the returned response. Production apps typically load `.env` **before** constructing `HttpKernel` via Symfony `Dotenv::loadEnv($projectRoot . '/.env', 'APP_ENV', 'production')` when the file exists — the third argument defaults missing `APP_ENV` to **`production`**, not Symfony's implicit **`dev`**. The monorepo entry wraps malformed `.env` in try/catch; skeleton / `make:public` stub match Minoo's optional-load + outer `Throwable` catch returning JSON:API 500. The file also contains a `cli-server` guard (see [cli-server static file guard](#cli-server-static-file-guard)) so static assets are served directly by the built-in server without passing through `HttpKernel`:
 
 ```php
-$kernel = new HttpKernel(dirname(__DIR__));
+$projectRoot = dirname(__DIR__);
+require $projectRoot . '/vendor/autoload.php';
+if (is_file($projectRoot . '/.env')) {
+    (new \Symfony\Component\Dotenv\Dotenv())->loadEnv($projectRoot . '/.env', 'APP_ENV', 'production');
+}
+$kernel = new HttpKernel($projectRoot);
 $response = $kernel->handle();
 $response->send();
 ```
@@ -361,7 +368,7 @@ All HTTP middleware implement `HttpMiddlewareInterface` and use `#[AsMiddleware(
 
 | File | Role |
 |------|------|
-| `public/index.php` | Thin entry point: boots `HttpKernel`, sends returned `Response`. Contains a `cli-server` guard so the PHP built-in server serves static files directly without routing them through `HttpKernel`. |
+| `public/index.php` | Thin entry point: optional pre-kernel `Dotenv::loadEnv(..., 'APP_ENV', 'production')`, boots `HttpKernel`, sends returned `Response`. `cli-server` guard uses `$_SERVER['REQUEST_URI'] ?? '/'` when resolving paths. |
 | `HttpKernel::serveHttpRequest()` | Wires CORS, route matching, `HttpPipeline`, dispatch |
 
 #### cli-server static file guard
@@ -370,8 +377,8 @@ All HTTP middleware implement `HttpMiddlewareInterface` and use `#[AsMiddleware(
 
 ```php
 if (PHP_SAPI === 'cli-server') {
-    $path = __DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-    if (is_file($path)) {
+    $file = __DIR__ . parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+    if (is_file($file)) {
         return false;
     }
 }
