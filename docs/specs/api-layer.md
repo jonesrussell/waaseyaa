@@ -1,5 +1,6 @@
 # API Layer
 
+<!-- Spec reviewed 2026-04-22 - SchemaPresenter/ResourceSerializer consume normalized FieldDefinitionInterface contracts; legacy array inputs normalized at presenter boundary -->
 <!-- Spec reviewed 2026-04-05 - #598 replace instanceof dispatch with JsonApiDocumentException in TranslationController -->
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/api and packages/routing; no API/runtime behavior change -->
 <!-- Spec reviewed 2026-04-09 - packages/routing/composer.json churn (manifest policy); routing and JSON:API behavior unchanged -->

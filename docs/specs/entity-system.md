@@ -1,5 +1,7 @@
 # Entity System
 
+<!-- Spec reviewed 2026-04-22 - removed reflection hydration fallback; ContentEntityBase/ConfigEntityBase implement HydratableFromStorageInterface and EntityInstantiator now requires fromStorage -->
+<!-- Spec reviewed 2026-04-22 - FieldDefinitionConstraintBuilder now consumes FieldDefinitionInterface objects; FieldDefinition registry/core definitions normalize to object contracts -->
 <!-- Spec reviewed 2026-04-22 - EntityType::getFieldDefinitions phpdoc covariance with EntityTypeInterface (FieldDefinitionInterface union) -->
 <!-- Spec reviewed 2026-04-21 - Breaking-change cutover (alpha → stable): HydratableFromStorage + FieldDefinitionInterface-only direction; SqlEntityStorage applyFieldDefinitionDefaults extraction -->
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/config, packages/entity-storage, packages/entity, packages/field; no entity runtime behavior change -->
