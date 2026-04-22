@@ -32,6 +32,16 @@ interface FieldDefinitionRegistryInterface
     public function registerCoreFields(string $entityTypeId, array $fields): void;
 
     /**
+     * Merge additional core fields into an entity type that already registered core fields.
+     *
+     * Used by host apps to attach product-only columns (e.g. overlays) without forking
+     * package entity types. Names must not collide with existing core fields.
+     *
+     * @param array<string, array<string, mixed>|object> $fields
+     */
+    public function mergeCoreFields(string $entityTypeId, array $fields): void;
+
+    /**
      * Register bundle-scoped fields for (entityTypeId, bundle).
      *
      * Each entry must be a FieldDefinitionInterface instance whose

@@ -44,6 +44,22 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
         $this->coreFields[$entityTypeId] = $synthesized;
     }
 
+    public function mergeCoreFields(string $entityTypeId, array $fields): void
+    {
+        $existing = $this->coreFields[$entityTypeId] ?? [];
+        foreach ($fields as $name => $_meta) {
+            if (isset($existing[$name])) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Cannot merge core field "%s" on entity type "%s": name already registered.',
+                    $name,
+                    $entityTypeId,
+                ));
+            }
+        }
+
+        $this->registerCoreFields($entityTypeId, $existing + $fields);
+    }
+
     /**
      * @param array<string, mixed> $meta
      */

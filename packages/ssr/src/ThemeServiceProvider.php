@@ -111,6 +111,10 @@ final class ThemeServiceProvider extends ServiceProvider
             }
         }
 
+        foreach (self::vendorPackageTemplateDirectories($root) as $dir) {
+            self::addPathLoaderIfExists($chain, $dir);
+        }
+
         // 4) Base SSR theme templates (lowest priority)
         self::addPathLoaderIfExists($chain, $root . '/packages/ssr/templates');
 
@@ -166,6 +170,63 @@ final class ThemeServiceProvider extends ServiceProvider
         }
 
         return $themes;
+    }
+
+    /**
+     * Template directories from Composer-installed packages (e.g. waaseyaa/genealogy).
+     *
+     * Composer 2 writes {@see https://getcomposer.org/schema/installed.json} `install-path`
+     * relative to `vendor/composer/` (e.g. `../waaseyaa/foo`, `./ca-bundle`). Resolve that first.
+     * If `realpath` fails, fall back to joining against `vendor/` for other Composer layouts.
+     *
+     * @return list<string>
+     */
+    private static function vendorPackageTemplateDirectories(string $projectRoot): array
+    {
+        $installedJson = rtrim($projectRoot, '/') . '/vendor/composer/installed.json';
+        if (!is_file($installedJson)) {
+            return [];
+        }
+
+        try {
+            $data = json_decode((string) file_get_contents($installedJson), true, 512, JSON_THROW_ON_ERROR);
+        } catch (\Throwable) {
+            return [];
+        }
+
+        $packages = $data['packages'] ?? $data;
+        if (!is_array($packages)) {
+            return [];
+        }
+
+        $composerDir = rtrim($projectRoot, '/') . '/vendor/composer';
+        $vendorDir = rtrim($projectRoot, '/') . '/vendor';
+        $out = [];
+        foreach ($packages as $package) {
+            if (!is_array($package)) {
+                continue;
+            }
+
+            $installPath = $package['install-path'] ?? null;
+            if (!is_string($installPath) || $installPath === '') {
+                continue;
+            }
+
+            $resolved = realpath($composerDir . '/' . $installPath);
+            if ($resolved === false) {
+                $resolved = realpath($vendorDir . '/' . $installPath);
+            }
+            if ($resolved === false) {
+                continue;
+            }
+
+            $templates = $resolved . '/templates';
+            if (is_dir($templates)) {
+                $out[] = $templates;
+            }
+        }
+
+        return $out;
     }
 
     private static function addPathLoaderIfExists(ChainLoader $chain, string $path): void

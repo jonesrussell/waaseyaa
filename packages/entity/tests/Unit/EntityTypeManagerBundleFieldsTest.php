@@ -140,6 +140,11 @@ final class SpyRegistry implements FieldDefinitionRegistryInterface
         $this->coreCalls[] = [$entityTypeId, $fields];
     }
 
+    public function mergeCoreFields(string $entityTypeId, array $fields): void
+    {
+        $this->coreCalls[] = [$entityTypeId, $fields];
+    }
+
     public function registerBundleFields(string $entityTypeId, string $bundle, array $fields): void
     {
         $this->bundleCalls[] = [$entityTypeId, $bundle, $fields];

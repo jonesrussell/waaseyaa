@@ -1,0 +1,8 @@
+{% extends "genealogy/layout.html.twig" %}
+
+{% block genealogy_page_title %}{{ family.label }}{% endblock %}
+
+{% block genealogy_content %}
+  <h1 class="genealogy-page__title">{{ family.label }}</h1>
+  {% include "genealogy/_neighbor_list.html.twig" with { title: 'Members', neighbors: member_neighbors } %}
+{% endblock %}

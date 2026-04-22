@@ -1,0 +1,14 @@
+{# Default standalone shell when no app overrides this path. Apps (e.g. Minoo) add templates/genealogy/layout.html.twig extending their base layout. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block genealogy_page_title %}Genealogy{% endblock %}</title>
+</head>
+<body class="genealogy-standalone">
+<main class="genealogy-main">
+  {% block genealogy_content %}{% endblock %}
+</main>
+</body>
+</html>

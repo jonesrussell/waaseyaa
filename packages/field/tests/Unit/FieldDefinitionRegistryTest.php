@@ -289,4 +289,41 @@ final class FieldDefinitionRegistryTest extends TestCase
         self::assertSame([], $registry->bundlesDefiningField('group', 'nonexistent'));
         self::assertSame([], $registry->bundlesDefiningField('other_type', 'email'));
     }
+
+    #[Test]
+    public function mergeCoreFields_appends_without_replacing_existing(): void
+    {
+        $registry = new FieldDefinitionRegistry();
+        $registry->registerCoreFields('node', ['title' => ['type' => 'string', 'label' => 'Title']]);
+        $registry->mergeCoreFields('node', [
+            'subtitle' => new FieldDefinition(
+                name: 'subtitle',
+                type: 'string',
+                targetEntityTypeId: 'node',
+                label: 'Subtitle',
+            ),
+        ]);
+
+        $core = $registry->coreFieldsFor('node');
+        self::assertArrayHasKey('title', $core);
+        self::assertArrayHasKey('subtitle', $core);
+        self::assertSame('subtitle', $core['subtitle']->getName());
+    }
+
+    #[Test]
+    public function mergeCoreFields_rejects_duplicate_names(): void
+    {
+        $registry = new FieldDefinitionRegistry();
+        $registry->registerCoreFields('node', ['title' => ['type' => 'string', 'label' => 'Title']]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $registry->mergeCoreFields('node', [
+            'title' => new FieldDefinition(
+                name: 'title',
+                type: 'string',
+                targetEntityTypeId: 'node',
+                label: 'Other',
+            ),
+        ]);
+    }
 }

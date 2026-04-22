@@ -1,0 +1,84 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Genealogy\Access;
+
+use Waaseyaa\Access\AccessPolicyInterface;
+use Waaseyaa\Access\AccessResult;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\EntityAccessHandler;
+use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Genealogy\GenealogyRelationshipType;
+use Waaseyaa\Relationship\Relationship;
+
+/**
+ * Genealogy graph edges inherit endpoint visibility. Registered from
+ * {@see \Waaseyaa\Genealogy\GenealogyServiceProvider::configureHttpKernel()} so the
+ * handler can delegate to endpoint entities without discovery-time cycles.
+ */
+final class GenealogyRelationshipAccessPolicy implements AccessPolicyInterface
+{
+    public function __construct(
+        private readonly EntityTypeManagerInterface $entityTypeManager,
+        private readonly EntityAccessHandler $accessHandler,
+    ) {}
+
+    public function appliesTo(string $entityTypeId): bool
+    {
+        return $entityTypeId === 'relationship';
+    }
+
+    public function access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResult
+    {
+        if (!$entity instanceof Relationship) {
+            return AccessResult::neutral();
+        }
+
+        $type = (string) $entity->get('relationship_type');
+        if (!GenealogyRelationshipType::isGenealogyEdge($type)) {
+            return AccessResult::neutral('Not a genealogy relationship edge.');
+        }
+
+        return match ($operation) {
+            'view' => $this->viewEdge($entity, $account),
+            default => AccessResult::neutral(),
+        };
+    }
+
+    public function createAccess(string $entityTypeId, string $bundle, AccountInterface $account): AccessResult
+    {
+        return AccessResult::neutral();
+    }
+
+    private function viewEdge(Relationship $edge, AccountInterface $account): AccessResult
+    {
+        $from = $this->loadEndpoint((string) $edge->get('from_entity_type'), (string) $edge->get('from_entity_id'));
+        $to = $this->loadEndpoint((string) $edge->get('to_entity_type'), (string) $edge->get('to_entity_id'));
+
+        if ($from === null || $to === null) {
+            return AccessResult::forbidden('Genealogy edge endpoint is missing or unloadable.');
+        }
+
+        $fromOk = $this->accessHandler->check($from, 'view', $account)->isAllowed();
+        $toOk = $this->accessHandler->check($to, 'view', $account)->isAllowed();
+
+        if ($fromOk && $toOk) {
+            return AccessResult::allowed('Both genealogy endpoints are viewable.');
+        }
+
+        return AccessResult::forbidden('Genealogy edge is not viewable when an endpoint is hidden.');
+    }
+
+    private function loadEndpoint(string $entityTypeId, string $id): ?EntityInterface
+    {
+        if ($id === '' || !$this->entityTypeManager->hasDefinition($entityTypeId)) {
+            return null;
+        }
+
+        $loaded = $this->entityTypeManager->getStorage($entityTypeId)->load($id);
+
+        return $loaded instanceof EntityInterface ? $loaded : null;
+    }
+}

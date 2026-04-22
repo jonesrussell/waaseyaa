@@ -1,0 +1,215 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Genealogy\Access;
+
+use Waaseyaa\Access\AccessPolicyInterface;
+use Waaseyaa\Access\AccessResult;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\FieldAccessPolicyInterface;
+use Waaseyaa\Access\Gate\PolicyAttribute;
+use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityValues;
+use Waaseyaa\Genealogy\Entity\GenealogyTree;
+use Waaseyaa\Genealogy\GenealogyBootstrap;
+use Waaseyaa\Genealogy\GenealogyLivingSemantics;
+use Waaseyaa\Workflows\WorkflowVisibility;
+
+#[PolicyAttribute(entityType: ['genealogy_person', 'genealogy_family', 'genealogy_event', 'genealogy_tree'])]
+final class GenealogyContentAccessPolicy implements AccessPolicyInterface, FieldAccessPolicyInterface
+{
+    private const array ENTITY_TYPES = ['genealogy_person', 'genealogy_family', 'genealogy_event', 'genealogy_tree'];
+
+    private readonly WorkflowVisibility $workflowVisibility;
+
+    public function __construct(?WorkflowVisibility $workflowVisibility = null)
+    {
+        $this->workflowVisibility = $workflowVisibility ?? new WorkflowVisibility();
+    }
+
+    public function appliesTo(string $entityTypeId): bool
+    {
+        return in_array($entityTypeId, self::ENTITY_TYPES, true);
+    }
+
+    public function access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResult
+    {
+        if (self::isTombstoned($entity)) {
+            return match ($operation) {
+                'view' => AccessResult::forbidden('Soft-deleted genealogy entity is not visible.'),
+                default => AccessResult::neutral('Tombstone blocks default mutation grants.'),
+            };
+        }
+
+        return match ($operation) {
+            'view' => $this->viewAccess($entity, $account),
+            'update', 'delete' => $this->mutateAccess($entity, $operation, $account),
+            default => AccessResult::neutral(),
+        };
+    }
+
+    public function createAccess(string $entityTypeId, string $bundle, AccountInterface $account): AccessResult
+    {
+        if (!in_array($entityTypeId, self::ENTITY_TYPES, true)) {
+            return AccessResult::neutral();
+        }
+
+        if (!$account->isAuthenticated()) {
+            return AccessResult::forbidden('Genealogy create requires authentication.');
+        }
+
+        if ($entityTypeId === 'genealogy_tree') {
+            return AccessResult::allowed('Authenticated user may create a tree workspace.');
+        }
+
+        return AccessResult::neutral('Genealogy nested creates require tree ownership checks at write time.');
+    }
+
+    public function fieldAccess(EntityInterface $entity, string $fieldName, string $operation, AccountInterface $account): AccessResult
+    {
+        return AccessResult::neutral();
+    }
+
+    private function viewAccess(EntityInterface $entity, AccountInterface $account): AccessResult
+    {
+        if (!$account->isAuthenticated()) {
+            return $this->anonymousPublishedViewAccess($entity);
+        }
+
+        if ($entity instanceof GenealogyTree) {
+            return $this->treeView($entity, $account);
+        }
+
+        $tree = $this->treeForContent($entity);
+        if ($tree === null) {
+            return AccessResult::forbidden('Genealogy row is not attached to a viewable tree.');
+        }
+
+        if (!$this->accountOwnsTree($account, $tree)) {
+            $published = $this->workflowVisibility->isEntityPublic($entity->getEntityTypeId(), EntityValues::toCastAwareMap($entity))
+                && $this->workflowVisibility->isEntityPublic('genealogy_tree', EntityValues::toCastAwareMap($tree));
+            if (!$published) {
+                return AccessResult::forbidden('Genealogy content is private outside the owning account.');
+            }
+        }
+
+        if ($entity->getEntityTypeId() === 'genealogy_person' && !$this->accountOwnsTree($account, $tree)) {
+            if (GenealogyLivingSemantics::effectiveIsLiving($entity)) {
+                return AccessResult::forbidden('Living persons are not visible without an explicit grant.');
+            }
+        }
+
+        if ($this->accountOwnsTree($account, $tree)) {
+            return AccessResult::allowed('Tree owner may view genealogy workspace content.');
+        }
+
+        if ($this->workflowVisibility->isEntityPublic($entity->getEntityTypeId(), EntityValues::toCastAwareMap($entity))) {
+            return AccessResult::allowed('Published genealogy resource is viewable under tree policy.');
+        }
+
+        return AccessResult::neutral('Genealogy view not granted.');
+    }
+
+    /**
+     * Anonymous visitors may only load published genealogy metadata and published
+     * rows under a published tree; living persons remain redacted.
+     */
+    private function anonymousPublishedViewAccess(EntityInterface $entity): AccessResult
+    {
+        if ($entity instanceof GenealogyTree) {
+            return $this->workflowVisibility->isEntityPublic('genealogy_tree', EntityValues::toCastAwareMap($entity))
+                ? AccessResult::allowed('Published tree metadata is viewable.')
+                : AccessResult::forbidden('Tree is not published.');
+        }
+
+        $tree = $this->treeForContent($entity);
+        if ($tree === null) {
+            return AccessResult::forbidden('Genealogy row is not attached to a viewable tree.');
+        }
+
+        $entityPublic = $this->workflowVisibility->isEntityPublic(
+            $entity->getEntityTypeId(),
+            EntityValues::toCastAwareMap($entity),
+        );
+        $treePublic = $this->workflowVisibility->isEntityPublic('genealogy_tree', EntityValues::toCastAwareMap($tree));
+        if (!$entityPublic || !$treePublic) {
+            return AccessResult::forbidden('Genealogy content is not published for anonymous viewing.');
+        }
+
+        if ($entity->getEntityTypeId() === 'genealogy_person' && GenealogyLivingSemantics::effectiveIsLiving($entity)) {
+            return AccessResult::forbidden('Living persons are not visible without an explicit grant.');
+        }
+
+        return AccessResult::allowed('Published genealogy resource is viewable anonymously.');
+    }
+
+    private function mutateAccess(EntityInterface $entity, string $operation, AccountInterface $account): AccessResult
+    {
+        if (!$account->isAuthenticated()) {
+            return AccessResult::forbidden('Genealogy mutations require authentication.');
+        }
+
+        if ($entity instanceof GenealogyTree) {
+            return $this->accountOwnsTree($account, $entity)
+                ? AccessResult::allowed("Tree owner may {$operation} this tree.")
+                : AccessResult::forbidden('Only the tree owner may change this tree.');
+        }
+
+        $tree = $this->treeForContent($entity);
+        if ($tree === null) {
+            return AccessResult::forbidden('Cannot mutate genealogy row without a tree attach point.');
+        }
+
+        return $this->accountOwnsTree($account, $tree)
+            ? AccessResult::allowed("Tree owner may {$operation} this record.")
+            : AccessResult::forbidden('Only the tree owner may change this genealogy record.');
+    }
+
+    private function treeView(GenealogyTree $tree, AccountInterface $account): AccessResult
+    {
+        if ($this->accountOwnsTree($account, $tree)) {
+            return AccessResult::allowed('Tree owner may view their tree.');
+        }
+
+        if ($this->workflowVisibility->isEntityPublic('genealogy_tree', EntityValues::toCastAwareMap($tree))) {
+            return AccessResult::allowed('Published tree metadata is viewable.');
+        }
+
+        return AccessResult::forbidden('Tree is private to non-owners.');
+    }
+
+    private function accountOwnsTree(AccountInterface $account, GenealogyTree $tree): bool
+    {
+        $owner = $tree->get('owner_uid');
+
+        return (string) $owner === (string) $account->id();
+    }
+
+    private function treeForContent(EntityInterface $entity): ?GenealogyTree
+    {
+        $etm = GenealogyBootstrap::entityTypeManager();
+        if ($etm === null) {
+            return null;
+        }
+
+        $treeId = $entity->get('tree_id');
+        if ($treeId === null || $treeId === '' || $treeId === 0 || $treeId === '0') {
+            return null;
+        }
+
+        $loaded = $etm->getStorage('genealogy_tree')->load((string) $treeId);
+        if (!$loaded instanceof GenealogyTree) {
+            return null;
+        }
+
+        return $loaded;
+    }
+
+    private static function isTombstoned(EntityInterface $entity): bool
+    {
+        $v = $entity->get('deleted_at');
+
+        return is_string($v) && trim($v) !== '';
+    }
+}

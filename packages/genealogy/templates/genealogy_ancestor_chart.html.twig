@@ -1,0 +1,26 @@
+{% extends "genealogy/layout.html.twig" %}
+
+{% block genealogy_page_title %}Ancestors — {{ person.label }}{% endblock %}
+
+{% block genealogy_content %}
+  <h1 class="genealogy-page__title">Ancestors: {{ person.label }}</h1>
+  <ol class="genealogy-ancestors">
+    {% for level in generations %}
+      <li>
+        Generation {{ loop.index0 }}:
+        <ul>
+          {% for n in level %}
+            <li>
+              {% if n.redacted %}
+                <span class="genealogy-redacted">{{ n.label }}</span>
+              {% else %}
+                <a href="/genealogy/person/{{ n.id }}">{{ n.label }}</a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </li>
+    {% endfor %}
+  </ol>
+  <p class="genealogy-page__nav"><a href="/genealogy/person/{{ person.id }}">Back to person</a></p>
+{% endblock %}

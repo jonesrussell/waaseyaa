@@ -86,9 +86,19 @@ final class SsrServiceProvider extends ServiceProvider implements LanguagePathSt
                 $event->entity->id(),
             );
 
-            if (in_array($entityType, ['relationship', 'node'], true)) {
+            if (in_array($entityType, [
+                'relationship',
+                'node',
+                'genealogy_person',
+                'genealogy_family',
+                'genealogy_event',
+                'genealogy_tree',
+            ], true)) {
                 $renderCache->invalidateEntity('node', null);
                 $renderCache->invalidateEntity('relationship', null);
+                foreach (['genealogy_person', 'genealogy_family', 'genealogy_event', 'genealogy_tree'] as $genealogyType) {
+                    $renderCache->invalidateEntity($genealogyType, null);
+                }
             }
         };
 

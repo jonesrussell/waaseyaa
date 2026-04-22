@@ -1,0 +1,17 @@
+{% extends "genealogy/layout.html.twig" %}
+
+{% block genealogy_page_title %}{{ person.label }}{% endblock %}
+
+{% block genealogy_content %}
+  <h1 class="genealogy-page__title">{{ person.label }}</h1>
+  <p class="genealogy-page__meta">
+    Given: {{ person.get('given_name')|default('') }} — Family: {{ person.get('family_name')|default('') }}
+  </p>
+  <p class="genealogy-page__meta">
+    Birth: {{ person.get('birth_date')|default('') }} — Death: {{ person.get('death_date')|default('') }}
+  </p>
+  {% include "genealogy/_neighbor_list.html.twig" with { title: 'Parents', neighbors: parent_neighbors } %}
+  {% include "genealogy/_neighbor_list.html.twig" with { title: 'Children', neighbors: child_neighbors } %}
+  {% include "genealogy/_neighbor_list.html.twig" with { title: 'Spouses', neighbors: spouse_neighbors } %}
+  <p class="genealogy-page__nav"><a href="/genealogy/person/{{ person.id }}/ancestors">Ancestor chart</a></p>
+{% endblock %}

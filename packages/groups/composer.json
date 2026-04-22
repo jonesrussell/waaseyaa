@@ -1,6 +1,6 @@
 {
     "name": "waaseyaa/groups",
-    "description": "Multi-bundle Group content entity type for Waaseyaa (extracted from Minoo)",
+    "description": "Multi-bundle Group content entity type for Waaseyaa (group + group_type; app-defined bundles)",
     "type": "library",
     "license": "GPL-2.0-or-later",
     "repositories": [

@@ -2,7 +2,9 @@
 
 **Layer 2 — Content Types**
 
-Multi-bundle `group` content entity type for Waaseyaa applications.
+Multi-bundle `group` content entity type for Waaseyaa applications. This package is **framework-agnostic**: consuming apps register bundles and fields; it does not target any single product domain.
+
+**History:** Originally extracted from an early Waaseyaa product codebase; extraction context belongs in this repository’s changelog, not in runtime docs.
 
 Defines two entity types:
 

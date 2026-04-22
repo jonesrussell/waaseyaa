@@ -23,6 +23,7 @@
 <!-- Spec reviewed 2026-04-10b - P3 duplicate constructor arity contract; Hydratable scaffold; core User/Node hydration (#1188 follow-up) -->
 <!-- Spec reviewed 2026-04-16 - EntityStorageDriverInterface::write returns effective id; EntityRepository::doSave back-fills auto-increment pk before POST_SAVE (waaseyaa/giiken#57) -->
 <!-- Spec reviewed 2026-04-20 - EntityTypeManager collision guard now preserves registrant provenance, distinguishes duplicate vs shadow registration, and throws EntityTypeRegistrationCollisionException (#1313) -->
+<!-- Spec reviewed 2026-04-21 - FieldDefinitionRegistryInterface::mergeCoreFields for host-app core field overlays without forking package entity types -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
 
@@ -581,6 +582,8 @@ Multi-bundle entity types (declaring `bundleEntityType`) may register bundle-spe
 - Foreign key `entity_id → {base}.{idKey}` with `ON DELETE CASCADE`. FK enforcement requires `PRAGMA foreign_keys = ON` on SQLite and is default-on for MySQL/InnoDB and PostgreSQL. `HealthChecker::checkForeignKeysEnabled()` emits `FK_ENFORCEMENT_DISABLED` if the probe shows FKs off.
 
 **Field registry partitioning.** `FieldDefinitionRegistry` (implements `FieldDefinitionRegistryInterface`, extracted for cross-package consumption under `packages/entity/src/Field/`) keeps core-field and per-bundle-field maps separate. `ContentEntityBase::getFieldDefinitions()` returns the union of core plus the active bundle; entities created with an unknown bundle see only core fields.
+
+**Incremental core fields (`mergeCoreFields`).** Packages register their baseline core set via `registerCoreFields()`. Host applications may then call `FieldDefinitionRegistryInterface::mergeCoreFields(string $entityTypeId, array $fields)` to append additional **core** fields (same value shapes as `registerCoreFields`: metadata arrays or `FieldDefinitionInterface` instances). Use this for product-only overlays (feature flags, optional references stored in `_data`, etc.) without subclassing or replacing the package `EntityType`. New names must not collide with existing core fields; the implementation rejects duplicates. After merge, storage partitioning, schema materialization, validation, and query field resolution all treat the added definitions like any other core field.
 
 **Write path.** `SqlEntityStorage::save()` calls `partitionBundleValues()` to split values into core (base table), active-bundle (subtable), and foreign-bundle buckets. Foreign-bundle writes throw `\InvalidArgumentException` — attempts to write fields belonging to a different bundle fail loud rather than silently populating `_data`. After the base-table row is written, `persistBundleRow()` upserts into the subtable inside the same `$database->transaction()`, so subtable failure rolls back the base insert/update and suppresses POST_SAVE. The upsert is a portable SELECT-then-INSERT-or-UPDATE (DBAL has no portable upsert); a small race window under concurrent writes surfaces as a PK collision on the loser — acceptable for current load.
 

@@ -1,0 +1,14 @@
+<h2>{{ title }}</h2>
+<ul class="genealogy-id-list">
+  {% for n in neighbors %}
+    <li>
+      {% if n.redacted %}
+        <span class="genealogy-redacted">{{ n.label }}</span>
+      {% else %}
+        <a href="/genealogy/person/{{ n.id }}">{{ n.label }}</a>
+      {% endif %}
+    </li>
+  {% else %}
+    <li class="genealogy-id-list__empty">—</li>
+  {% endfor %}
+</ul>
