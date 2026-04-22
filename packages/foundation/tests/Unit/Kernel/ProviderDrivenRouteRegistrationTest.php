@@ -37,8 +37,6 @@ final class ProviderDrivenRouteRegistrationTest extends TestCase
 
         $manifest = new PackageManifest(
             providers: $providers,
-            commands: [],
-            routes: [],
             migrations: [],
             fieldTypes: [],
             formatters: [],

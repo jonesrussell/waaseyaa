@@ -9,10 +9,6 @@ final class PackageManifest
     public function __construct(
         /** @var string[] */
         public readonly array $providers = [],
-        /** @var string[] */
-        public readonly array $commands = [],
-        /** @var string[] */
-        public readonly array $routes = [],
         /** @var array<string, string> */
         public readonly array $migrations = [],
         /** @var array<string, string> */
@@ -34,11 +30,16 @@ final class PackageManifest
     /**
      * Create from a cached array (loaded from storage/framework/packages.php).
      *
+     * Legacy caches may still contain `commands` and `routes` keys; they are ignored (see docs/adr/0001-manifest-routes-commands-removal.md).
+     *
      * @throws \InvalidArgumentException If required keys are missing or have wrong types
      */
     public static function fromArray(array $data): self
     {
-        $requiredKeys = ['providers', 'commands', 'routes', 'migrations', 'field_types', 'middleware'];
+        // Legacy keys — never consumed at runtime (see ADR docs/adr).
+        unset($data['commands'], $data['routes']);
+
+        $requiredKeys = ['providers', 'migrations', 'field_types', 'middleware'];
         $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types'];
         $missing = array_diff($requiredKeys, array_keys($data));
 
@@ -61,8 +62,6 @@ final class PackageManifest
 
         return new self(
             providers: $data['providers'],
-            commands: $data['commands'],
-            routes: $data['routes'],
             migrations: $data['migrations'],
             fieldTypes: $data['field_types'],
             formatters: $data['formatters'] ?? [],
@@ -76,13 +75,13 @@ final class PackageManifest
 
     /**
      * Export to a cacheable array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {
         return [
             'providers' => $this->providers,
-            'commands' => $this->commands,
-            'routes' => $this->routes,
             'migrations' => $this->migrations,
             'field_types' => $this->fieldTypes,
             'formatters' => $this->formatters,

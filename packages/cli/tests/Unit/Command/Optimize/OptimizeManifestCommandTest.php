@@ -57,7 +57,7 @@ final class OptimizeManifestCommandTest extends TestCase
         $this->assertSame(0, $tester->getStatusCode());
         $output = $tester->getDisplay();
         $this->assertStringContainsString('1 providers', $output);
-        $this->assertStringContainsString('2 commands', $output);
+        $this->assertStringContainsString('0 attribute entity types', $output);
         $this->assertStringContainsString('0 field types', $output);
         $this->assertStringContainsString('0 middleware stacks', $output);
 

@@ -37,8 +37,6 @@ final class PackageManifestCompiler
     public function compile(): PackageManifest
     {
         $providers = [];
-        $commands = [];
-        $routes = [];
         $migrations = [];
         $fieldTypes = [];
         $formatters = [];
@@ -70,12 +68,6 @@ final class PackageManifestCompiler
                 if (isset($extra['providers'])) {
                     array_push($providers, ...$extra['providers']);
                 }
-                if (isset($extra['commands'])) {
-                    array_push($commands, ...$extra['commands']);
-                }
-                if (isset($extra['routes'])) {
-                    array_push($routes, ...$extra['routes']);
-                }
                 if (isset($extra['migrations'])) {
                     $packageName = $package['name'] ?? 'unknown';
                     $migrations[$packageName] = $extra['migrations'];
@@ -90,10 +82,12 @@ final class PackageManifestCompiler
 
         $packageDeclarations = $this->collectPackageDeclarations($packages);
 
+        $this->warnIfLegacyComposerCommandsOrRoutes($packages);
+
         // Read root composer.json for app-level providers.
         // Composer's installed.json excludes the root package, so app providers
         // declared in the project's extra.waaseyaa.providers must be read separately.
-        $this->mergeRootWaaseyaaIntoLists($providers, $commands, $routes, $permissions, onlyAppendMissingFromRoot: false);
+        $this->mergeRootWaaseyaaIntoLists($providers, $permissions, onlyAppendMissingFromRoot: false);
 
         // Scan classes for attributes
         foreach ($this->scanClasses() as $class) {
@@ -142,8 +136,6 @@ final class PackageManifestCompiler
 
         return new PackageManifest(
             providers: $providers,
-            commands: $commands,
-            routes: $routes,
             migrations: $migrations,
             fieldTypes: $fieldTypes,
             formatters: $formatters,
@@ -452,7 +444,7 @@ final class PackageManifestCompiler
     }
 
     /**
-     * Fingerprint of composer inputs used for declared providers/commands/routes/permissions.
+     * Fingerprint of composer inputs used for declared providers/permissions and discovery metadata.
      * When this differs from the value stored in the cache, the manifest must be recompiled.
      */
     private function computeManifestInputsFingerprint(): string
@@ -497,17 +489,48 @@ final class PackageManifestCompiler
     }
 
     /**
-     * Merge root extra.waaseyaa providers, commands, routes, and permissions into the given lists.
+     * @param array<int, array<string, mixed>> $packages
+     */
+    private function warnIfLegacyComposerCommandsOrRoutes(array $packages): void
+    {
+        $sources = [];
+        foreach ($packages as $package) {
+            $extra = $package['extra']['waaseyaa'] ?? null;
+            if (!is_array($extra)) {
+                continue;
+            }
+            if (!isset($extra['commands']) && !isset($extra['routes'])) {
+                continue;
+            }
+            $name = $package['name'] ?? null;
+            $sources[] = is_string($name) && $name !== '' ? $name : '(unknown package)';
+        }
+
+        $rootExtra = $this->readRootWaaseyaaExtra();
+        if ($rootExtra !== null && (isset($rootExtra['commands']) || isset($rootExtra['routes']))) {
+            $sources[] = 'root composer.json (extra.waaseyaa)';
+        }
+
+        if ($sources === []) {
+            return;
+        }
+
+        $this->logger->warning(sprintf(
+            'extra.waaseyaa.commands / extra.waaseyaa.routes are deprecated and ignored (found in: %s). '
+            . 'Register HTTP routes from ServiceProvider::routes(); register console commands from ServiceProvider::commands() '
+            . 'or extend the core CLI registry. See docs/adr/0001-manifest-routes-commands-removal.md in the waaseyaa monorepo.',
+            implode(', ', array_unique($sources)),
+        ));
+    }
+
+    /**
+     * Merge root extra.waaseyaa providers and permissions into the given lists.
      *
      * @param list<string> $providers
-     * @param list<string> $commands
-     * @param list<string> $routes
      * @param array<string, array{title: string, description?: string}> $permissions
      */
     private function mergeRootWaaseyaaIntoLists(
         array &$providers,
-        array &$commands,
-        array &$routes,
         array &$permissions,
         bool $onlyAppendMissingFromRoot,
     ): void {
@@ -527,28 +550,6 @@ final class PackageManifestCompiler
             }
         }
 
-        if (isset($rootExtra['commands']) && is_array($rootExtra['commands'])) {
-            foreach ($rootExtra['commands'] as $command) {
-                if (!is_string($command)) {
-                    continue;
-                }
-                if (!$onlyAppendMissingFromRoot || !in_array($command, $commands, true)) {
-                    $commands[] = $command;
-                }
-            }
-        }
-
-        if (isset($rootExtra['routes']) && is_array($rootExtra['routes'])) {
-            foreach ($rootExtra['routes'] as $route) {
-                if (!is_string($route)) {
-                    continue;
-                }
-                if (!$onlyAppendMissingFromRoot || !in_array($route, $routes, true)) {
-                    $routes[] = $route;
-                }
-            }
-        }
-
         if (isset($rootExtra['permissions']) && is_array($rootExtra['permissions'])) {
             foreach ($rootExtra['permissions'] as $permId => $permDef) {
                 if (is_string($permId) && is_array($permDef)) {
@@ -561,15 +562,11 @@ final class PackageManifestCompiler
     private function mergeRootWaaseyaaIntoManifest(PackageManifest $manifest): PackageManifest
     {
         $providers = $manifest->providers;
-        $commands = $manifest->commands;
-        $routes = $manifest->routes;
         $permissions = $manifest->permissions;
-        $this->mergeRootWaaseyaaIntoLists($providers, $commands, $routes, $permissions, onlyAppendMissingFromRoot: true);
+        $this->mergeRootWaaseyaaIntoLists($providers, $permissions, onlyAppendMissingFromRoot: true);
 
         return new PackageManifest(
             providers: $providers,
-            commands: $commands,
-            routes: $routes,
             migrations: $manifest->migrations,
             fieldTypes: $manifest->fieldTypes,
             formatters: $manifest->formatters,

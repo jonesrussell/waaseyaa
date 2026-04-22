@@ -27,9 +27,9 @@ final class OptimizeManifestCommand extends Command
         $manifest = $this->compiler->compileAndCache();
 
         $output->writeln(sprintf(
-            'Package manifest compiled: %d providers, %d commands, %d field types, %d middleware stacks.',
+            'Package manifest compiled: %d providers, %d attribute entity types, %d field types, %d middleware stacks.',
             count($manifest->providers),
-            count($manifest->commands),
+            count($manifest->attributeEntityTypes),
             count($manifest->fieldTypes),
             count($manifest->middleware),
         ));

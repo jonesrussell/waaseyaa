@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 namespace Waaseyaa\Foundation\Tests\Unit\Discovery;
 
 use Waaseyaa\Foundation\Discovery\PackageManifest;
@@ -15,8 +17,6 @@ final class PackageManifestTest extends TestCase
     {
         $manifest = new PackageManifest();
         $this->assertSame([], $manifest->providers);
-        $this->assertSame([], $manifest->commands);
-        $this->assertSame([], $manifest->routes);
         $this->assertSame([], $manifest->migrations);
         $this->assertSame([], $manifest->fieldTypes);
         $this->assertSame([], $manifest->formatters);
@@ -30,7 +30,6 @@ final class PackageManifestTest extends TestCase
     {
         $manifest = new PackageManifest(
             providers: ['App\\Provider'],
-            commands: ['App\\Command'],
             fieldTypes: ['text' => 'App\\TextField'],
             formatters: ['string' => 'App\\PlainTextFormatter'],
             middleware: ['http' => [['class' => 'App\\Mw', 'priority' => 100]]],
@@ -44,7 +43,6 @@ final class PackageManifestTest extends TestCase
         $restored = PackageManifest::fromArray($array);
 
         $this->assertSame($manifest->providers, $restored->providers);
-        $this->assertSame($manifest->commands, $restored->commands);
         $this->assertSame($manifest->fieldTypes, $restored->fieldTypes);
         $this->assertSame($manifest->formatters, $restored->formatters);
         $this->assertSame($manifest->middleware, $restored->middleware);
@@ -69,8 +67,6 @@ final class PackageManifestTest extends TestCase
 
         PackageManifest::fromArray([
             'providers' => 'not-an-array',
-            'commands' => [],
-            'routes' => [],
             'migrations' => [],
             'field_types' => [],
             'middleware' => [],
@@ -84,8 +80,6 @@ final class PackageManifestTest extends TestCase
     {
         $manifest = PackageManifest::fromArray([
             'providers' => [],
-            'commands' => [],
-            'routes' => [],
             'migrations' => [],
             'field_types' => [],
             'middleware' => [],
@@ -96,6 +90,23 @@ final class PackageManifestTest extends TestCase
         $this->assertSame([], $manifest->formatters);
         $this->assertSame([], $manifest->packageDeclarations);
         $this->assertSame([], $manifest->attributeEntityTypes);
+    }
+
+    #[Test]
+    public function from_array_ignores_legacy_commands_and_routes_keys(): void
+    {
+        $manifest = PackageManifest::fromArray([
+            'providers' => ['App\\P'],
+            'commands' => ['App\\LegacyCmd'],
+            'routes' => ['App\\LegacyRoute'],
+            'migrations' => [],
+            'field_types' => [],
+            'middleware' => [],
+        ]);
+
+        $this->assertSame(['App\\P'], $manifest->providers);
+        $this->assertArrayNotHasKey('commands', $manifest->toArray());
+        $this->assertArrayNotHasKey('routes', $manifest->toArray());
     }
 
     #[Test]
@@ -118,7 +129,7 @@ final class PackageManifestTest extends TestCase
                 'create article' => ['title' => 'Create Article content', 'description' => 'Allows creating article nodes'],
             ],
             policies: [
-                'node' => 'App\\Policy\\NodePolicy',
+                'App\\Policy\\NodePolicy' => ['node'],
             ],
             formatters: [
                 'string' => 'App\\Formatter\\PlainTextFormatter',

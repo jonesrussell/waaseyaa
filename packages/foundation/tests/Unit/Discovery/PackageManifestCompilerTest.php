@@ -50,11 +50,26 @@ final class PackageManifestCompilerTest extends TestCase
         );
 
         $storagePath = $this->tempDir . '/storage';
-        $compiler = new PackageManifestCompiler($this->tempDir, $storagePath);
+        $logger = new class implements LoggerInterface {
+            use LoggerTrait;
+
+            /** @var list<string> */
+            public array $messages = [];
+
+            public function log(LogLevel $level, string|\Stringable $message, array $context = []): void
+            {
+                $this->messages[] = (string) $message;
+            }
+        };
+        $compiler = new PackageManifestCompiler($this->tempDir, $storagePath, $logger);
         $manifest = $compiler->compile();
 
         $this->assertSame(['Waaseyaa\\Node\\NodeServiceProvider'], $manifest->providers);
-        $this->assertSame(['Waaseyaa\\Node\\Command\\NodeCreateCommand'], $manifest->commands);
+        $warned = array_filter(
+            $logger->messages,
+            static fn(string $m): bool => str_contains($m, 'extra.waaseyaa.commands'),
+        );
+        $this->assertNotEmpty($warned, 'legacy extra.waaseyaa.commands should log a deprecation warning');
     }
 
     #[Test]
@@ -223,7 +238,6 @@ final class PackageManifestCompilerTest extends TestCase
         $manifest = $compiler->compile();
 
         $this->assertSame([], $manifest->providers);
-        $this->assertSame([], $manifest->commands);
     }
 
     #[Test]
@@ -256,8 +270,6 @@ final class PackageManifestCompilerTest extends TestCase
 
         $data = [
             'providers' => [\stdClass::class],
-            'commands' => [],
-            'routes' => [],
             'migrations' => [],
             'field_types' => [],
             'middleware' => [],
@@ -284,8 +296,6 @@ final class PackageManifestCompilerTest extends TestCase
 
         $data = [
             'providers' => ['App\\Provider\\MissingProvider'],
-            'commands' => [],
-            'routes' => [],
             'migrations' => [],
             'field_types' => [],
             'middleware' => [],
@@ -481,8 +491,6 @@ final class PackageManifestCompilerTest extends TestCase
 
         $data = [
             'providers' => [],
-            'commands' => [],
-            'routes' => [],
             'migrations' => [],
             'field_types' => [],
             'middleware' => [],
@@ -503,7 +511,7 @@ final class PackageManifestCompilerTest extends TestCase
     }
 
     #[Test]
-    public function load_merges_root_commands_and_routes_when_cache_incomplete_but_fingerprint_matches(): void
+    public function load_ignores_deprecated_root_commands_and_routes_when_fingerprint_matches(): void
     {
         $composer = [
             'name' => 'test/root',
@@ -534,8 +542,6 @@ final class PackageManifestCompilerTest extends TestCase
 
         $data = [
             'providers' => [],
-            'commands' => [],
-            'routes' => [],
             'migrations' => [],
             'field_types' => [],
             'middleware' => [],
@@ -552,8 +558,7 @@ final class PackageManifestCompilerTest extends TestCase
         $compiler = new PackageManifestCompiler($this->tempDir, $storagePath);
         $manifest = $compiler->load();
 
-        $this->assertSame([\Iterator::class], $manifest->commands);
-        $this->assertSame([\Stringable::class], $manifest->routes);
+        $this->assertSame([], $manifest->providers);
     }
 
     #[Test]

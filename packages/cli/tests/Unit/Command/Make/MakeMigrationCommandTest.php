@@ -92,8 +92,6 @@ final class MakeMigrationCommandTest extends TestCase
         $packageMigDir = $this->tempDir . '/packages/node/migrations';
         $manifest = new PackageManifest(
             providers: [],
-            commands: [],
-            routes: [],
             migrations: ['waaseyaa/node' => $packageMigDir],
             fieldTypes: [],
             middleware: [],
@@ -120,8 +118,6 @@ final class MakeMigrationCommandTest extends TestCase
     {
         $manifest = new PackageManifest(
             providers: [],
-            commands: [],
-            routes: [],
             migrations: [],
             fieldTypes: [],
             middleware: [],

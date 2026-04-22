@@ -135,8 +135,6 @@ final class ConsoleKernelTest extends TestCase
     {
         $data = [
             'providers' => ['App\\Provider\\MissingProvider'],
-            'commands' => [],
-            'routes' => [],
             'migrations' => [],
             'field_types' => [],
             'listeners' => [],

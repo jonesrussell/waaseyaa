@@ -27,11 +27,6 @@
         }
     },
     "extra": {
-        "waaseyaa": {
-            "providers": [
-                "Waaseyaa\\Geo\\GeoServiceProvider"
-            ]
-        },
         "branch-alias": {
             "dev-main": "0.1.x-dev"
         }
