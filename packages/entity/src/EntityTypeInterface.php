@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+use Waaseyaa\Field\FieldDefinitionInterface;
+
 interface EntityTypeInterface
 {
     public function id(): string;
@@ -32,11 +34,7 @@ interface EntityTypeInterface
     /**
      * Field definitions keyed by field name.
      *
-     * Prefer {@see \Waaseyaa\Field\FieldDefinitionInterface} instances; associative
-     * metadata arrays remain supported during alpha only (see docs/specs/entity-system.md,
-     * "Breaking-change cutover (alpha → stable)").
-     *
-     * @return array<string, array<string, mixed>|\Waaseyaa\Field\FieldDefinitionInterface>
+     * @return array<string, FieldDefinitionInterface>
      */
     public function getFieldDefinitions(): array;
 

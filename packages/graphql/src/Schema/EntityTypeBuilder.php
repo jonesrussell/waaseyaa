@@ -111,11 +111,11 @@ final class EntityTypeBuilder
                 continue;
             }
 
-            $fieldType = $def['type'] ?? 'string';
-            $isMultiple = ($def['cardinality'] ?? 1) !== 1;
-            $targetEntityTypeId = $def['target_entity_type_id']
-                ?? $def['targetEntityTypeId']
-                ?? '';
+            $fieldType = $def->getType();
+            $isMultiple = $def->isMultiple();
+            $targetEntityTypeId = (string) ($def->getSetting('target_entity_type_id')
+                ?? $def->getSetting('targetEntityTypeId')
+                ?? '');
 
             if ($this->fieldTypeMapper->isEntityReference($fieldType) && $targetEntityTypeId !== '') {
                 $fields[$fieldName] = $this->buildEntityReferenceOutputField(
@@ -217,13 +217,13 @@ final class EntityTypeBuilder
             }
 
             // Skip readOnly fields
-            if (!empty($def['readOnly'])) {
+            if ($def->isReadOnly()) {
                 continue;
             }
 
-            $fieldType = $def['type'] ?? 'string';
-            $isMultiple = ($def['cardinality'] ?? 1) !== 1;
-            $isRequired = !empty($def['required']);
+            $fieldType = $def->getType();
+            $isMultiple = $def->isMultiple();
+            $isRequired = $def->isRequired();
 
             $graphqlType = $this->fieldTypeMapper->toInputType($fieldType, $isMultiple);
             if ($isRequired && $forCreate) {

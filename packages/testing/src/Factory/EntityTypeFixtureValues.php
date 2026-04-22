@@ -14,6 +14,9 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\Validation\EntityTypeValidationConstraints;
+use Waaseyaa\Field\FieldDefinition;
+use Waaseyaa\Field\FieldDefinitionInterface;
+use Waaseyaa\Field\FieldStorage;
 
 /**
  * Builds storage-shaped entity value bags for tests and seeds from {@see EntityTypeInterface}
@@ -65,8 +68,7 @@ final class EntityTypeFixtureValues
                 continue;
             }
 
-            /** @var array<string, mixed> $def */
-            $def = $fieldDefinitions[$field] ?? [];
+            $def = $fieldDefinitions[$field] ?? null;
             /** @var list<Constraint> $constraints */
             $constraints = $constraintMap[$field] ?? [];
 
@@ -78,6 +80,9 @@ final class EntityTypeFixtureValues
             }
 
             if ($constraints === []) {
+                if (!$def instanceof FieldDefinitionInterface) {
+                    continue;
+                }
                 $fallback = $this->valueFromFieldDefinitionOnly($def);
                 if ($fallback !== self::skipField()) {
                     $values[$field] = $fallback;
@@ -86,7 +91,16 @@ final class EntityTypeFixtureValues
                 continue;
             }
 
-            $values[$field] = $this->valueFromConstraints($def, $constraints);
+            $definition = $def instanceof FieldDefinitionInterface
+                ? $def
+                : new FieldDefinition(
+                    name: $field,
+                    type: 'string',
+                    targetEntityTypeId: '',
+                    targetBundle: null,
+                    stored: FieldStorage::Column,
+                );
+            $values[$field] = $this->valueFromConstraints($definition, $constraints);
         }
 
         return array_merge($values, $overrides);
@@ -156,26 +170,22 @@ final class EntityTypeFixtureValues
         }
     }
 
-    /**
-     * @param array<string, mixed> $def
-     */
-    private function valueFromFieldDefinitionOnly(array $def): mixed
+    private function valueFromFieldDefinitionOnly(FieldDefinitionInterface $def): mixed
     {
-        $required = $this->truthy($def['required'] ?? false);
+        $required = $def->isRequired();
         if (!$required) {
             return self::skipField();
         }
 
-        $type = (string) ($def['type'] ?? 'string');
+        $type = $def->getType();
 
         return $this->scalarDefaultForFieldType($type);
     }
 
     /**
-     * @param array<string, mixed> $def
      * @param list<Constraint> $constraints
      */
-    private function valueFromConstraints(array $def, array $constraints): mixed
+    private function valueFromConstraints(FieldDefinitionInterface $def, array $constraints): mixed
     {
         $choiceValues = null;
         $hasEmail = false;
@@ -225,7 +235,7 @@ final class EntityTypeFixtureValues
             return $this->generatedEmail();
         }
 
-        $fieldType = (string) ($def['type'] ?? 'string');
+        $fieldType = $def->getType();
         $primaryPhpType = $phpTypes[0] ?? null;
 
         if ($primaryPhpType === 'int' || $primaryPhpType === 'float' || $fieldType === 'integer'
@@ -308,8 +318,4 @@ final class EntityTypeFixtureValues
         };
     }
 
-    private function truthy(mixed $value): bool
-    {
-        return $value === true || $value === 1 || $value === '1' || $value === 'true';
-    }
 }

@@ -19,7 +19,6 @@ use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
-use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
@@ -421,10 +420,6 @@ final class SqlEntityStorage implements EntityStorageInterface
     /**
      * Fills missing keys from registered field definitions before hydration.
      *
-     * Prefer {@see FieldDefinitionInterface} objects; legacy array metadata is
-     * supported until the cutover in docs/specs/entity-system.md
-     * ("Breaking-change cutover (alpha → stable)").
-     *
      * @param array<string, mixed> $values
      * @return array<string, mixed>
      */
@@ -434,18 +429,9 @@ final class SqlEntityStorage implements EntityStorageInterface
             if (array_key_exists($name, $values)) {
                 continue;
             }
-            if ($def instanceof FieldDefinitionInterface) {
-                $defaultValue = $def->getDefaultValue();
-                if ($defaultValue !== null) {
-                    $values[$name] = $defaultValue;
-                }
-
-                continue;
-            }
-            /** @var array<string, mixed> $legacyDef */
-            $legacyDef = $def;
-            if (array_key_exists('default', $legacyDef)) {
-                $values[$name] = $legacyDef['default'];
+            $defaultValue = $def->getDefaultValue();
+            if ($defaultValue !== null) {
+                $values[$name] = $defaultValue;
             }
         }
 
@@ -529,8 +515,11 @@ final class SqlEntityStorage implements EntityStorageInterface
         $now = $this->clock->now();
 
         foreach ($fieldDefs as $fieldName => $def) {
-            $meta = $this->fieldDefinitionAsMetadataArray($def);
-            if (($meta['type'] ?? null) !== 'timestamp') {
+            $meta = array_merge($def->getSettings(), [
+                'type' => $def->getType(),
+                'stored' => $def->getStored()->value,
+            ]);
+            if ($meta['type'] !== 'timestamp') {
                 continue;
             }
 
@@ -590,39 +579,12 @@ final class SqlEntityStorage implements EntityStorageInterface
 
         $this->jsonFieldCache = [];
         foreach ($this->entityType->getFieldDefinitions() as $name => $def) {
-            $meta = $this->fieldDefinitionAsMetadataArray($def);
-            if (($meta['type'] ?? null) === 'json') {
+            if ($def->getType() === 'json') {
                 $this->jsonFieldCache[$name] = true;
             }
         }
 
         return $this->jsonFieldCache;
-    }
-
-    /**
-     * Entity types may declare fields as legacy metadata arrays or as
-     * {@see FieldDefinitionInterface} objects (registry / package entity types).
-     *
-     * @return array<string, mixed>
-     */
-    private function fieldDefinitionAsMetadataArray(mixed $def): array
-    {
-        if (is_array($def)) {
-            return $def;
-        }
-        if ($def instanceof FieldDefinitionInterface) {
-            $settings = $def->getSettings();
-
-            return array_merge($settings, [
-                'type' => $def->getType(),
-            ]);
-        }
-
-        throw new \InvalidArgumentException(sprintf(
-            'Unsupported field definition for entity type %s: %s',
-            $this->entityType->id(),
-            is_object($def) ? $def::class : get_debug_type($def),
-        ));
     }
 
     /**

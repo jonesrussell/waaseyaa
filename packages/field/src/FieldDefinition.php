@@ -6,7 +6,7 @@ namespace Waaseyaa\Field;
 
 use Symfony\Component\Validator\Constraint;
 
-final readonly class FieldDefinition implements FieldDefinitionInterface
+final readonly class FieldDefinition implements FieldDefinitionInterface, \ArrayAccess
 {
     /**
      * @param array<string, mixed> $settings
@@ -160,5 +160,55 @@ final readonly class FieldDefinition implements FieldDefinitionInterface
     public function getStored(): FieldStorage
     {
         return $this->stored;
+    }
+
+    public function offsetExists(mixed $offset): bool
+    {
+        if (!is_string($offset)) {
+            return false;
+        }
+
+        return match ($offset) {
+            'settings' => $this->settings !== [],
+            'target_entity_type_id', 'targetEntityTypeId' => isset($this->settings['target_entity_type_id']) || isset($this->settings['targetEntityTypeId']),
+            'default', 'defaultValue' => $this->defaultValue !== null,
+            'name', 'type', 'cardinality', 'target_bundle', 'targetBundle', 'translatable', 'revisionable', 'label', 'description', 'required', 'readOnly', 'read_only', 'stored' => true,
+            default => array_key_exists($offset, $this->settings),
+        };
+    }
+
+    public function offsetGet(mixed $offset): mixed
+    {
+        if (!is_string($offset)) {
+            return null;
+        }
+
+        return match ($offset) {
+            'name' => $this->name,
+            'type' => $this->type,
+            'cardinality' => $this->cardinality,
+            'settings' => $this->settings,
+            'target_entity_type_id', 'targetEntityTypeId' => $this->settings['target_entity_type_id'] ?? $this->settings['targetEntityTypeId'] ?? '',
+            'target_bundle', 'targetBundle' => $this->targetBundle,
+            'translatable' => $this->translatable,
+            'revisionable' => $this->revisionable,
+            'default', 'defaultValue' => $this->defaultValue,
+            'label' => $this->label,
+            'description' => $this->description,
+            'required' => $this->required,
+            'readOnly', 'read_only' => $this->readOnly,
+            'stored' => $this->stored,
+            default => $this->settings[$offset] ?? null,
+        };
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): void
+    {
+        throw new \LogicException('FieldDefinition is immutable.');
+    }
+
+    public function offsetUnset(mixed $offset): void
+    {
+        throw new \LogicException('FieldDefinition is immutable.');
     }
 }

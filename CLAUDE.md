@@ -82,7 +82,7 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 
 **Rule:** Packages can only import from their own layer or lower. Upward communication via DomainEvents.
 
-**Enforcement:** `bin/check-package-layers` validates every `packages/*/composer.json` `require` edge `waaseyaa/*` against this table (metapackages `cms`, `core`, `full` skipped). Runtime `require` only — `require-dev` may pull test fixtures from higher layers. Historical GitHub **#315** (foundation → path) and **#316** (validation → entity) are closed at the manifest level; re-run the script after editing internal dependencies.
+**Enforcement:** `bin/check-package-layers` validates every `packages/*/composer.json` `require` edge `waaseyaa/*` against this table (metapackages `cms`, `core`, `full` skipped). Runtime `require` only — `require-dev` may pull test fixtures from higher layers. Use `bin/audit-require-dev-layers` for a warn-only audit report of upward dev-only edges. Historical GitHub **#315** (foundation → path) and **#316** (validation → entity) are closed at the manifest level; re-run scripts after editing internal dependencies.
 
 **Exemption:** The `Kernel/` classes in Foundation (`AbstractKernel`, `HttpKernel`, `ConsoleKernel`) are application bootstrappers that wire all layers together. They intentionally import from all layers. This is acceptable because kernels are entry-point orchestrators, not reusable library code — no other package imports from them.
 
@@ -161,6 +161,7 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 - `composer phpstan` — static analysis (PHPStan 2.x, level 5)
 - `composer check-composer-policy` — enforce codified Composer manifest policy
 - `bin/check-package-layers` — enforce internal `waaseyaa/*` dependency layers (see Layer Architecture)
+- `bin/audit-require-dev-layers` — warn-only report for upward `require-dev` `waaseyaa/*` edges
 
 **Development:**
 - `composer dev` — start dev server (PHP built-in server + admin SPA)

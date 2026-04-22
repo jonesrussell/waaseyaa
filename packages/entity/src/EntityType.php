@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+use Waaseyaa\Field\FieldDefinition;
+use Waaseyaa\Field\FieldDefinitionInterface;
+use Waaseyaa\Field\FieldStorage;
+
 /**
  * Value object representing an entity type definition.
  *
@@ -22,7 +26,7 @@ final readonly class EntityType implements EntityTypeInterface
      * @param bool $translatable Whether this entity type supports translations.
      * @param string|null $bundleEntityType The entity type ID that provides bundles (e.g. 'node_type' for 'node').
      * @param array<string, mixed> $constraints Validation constraints.
-     * @param array<string, array<string, mixed>|object> $fieldDefinitions Field definitions keyed by field name.
+     * @param array<string, FieldDefinitionInterface|array<string, mixed>> $fieldDefinitions Field definitions keyed by field name.
      * @param string|null $description Human-readable description of the entity type.
      */
     public function __construct(
@@ -94,10 +98,53 @@ final readonly class EntityType implements EntityTypeInterface
         return $this->constraints;
     }
 
-    /** @return array<string, array<string, mixed>|\Waaseyaa\Field\FieldDefinitionInterface> */
+    /** @return array<string, FieldDefinitionInterface> */
     public function getFieldDefinitions(): array
     {
-        return $this->fieldDefinitions;
+        $normalized = [];
+        foreach ($this->fieldDefinitions as $name => $definition) {
+            if ($definition instanceof FieldDefinitionInterface) {
+                $normalized[$name] = $definition;
+                continue;
+            }
+            /** @var array<string, mixed> $meta */
+            $meta = $definition;
+            $settings = $meta['settings'] ?? [];
+            if (!is_array($settings)) {
+                $settings = [];
+            }
+            foreach ($meta as $key => $value) {
+                if (!in_array($key, ['type', 'label', 'description', 'required', 'readOnly', 'read_only', 'cardinality', 'translatable', 'revisionable', 'default', 'defaultValue', 'settings', 'constraints', 'stored'], true)) {
+                    $settings[$key] = $value;
+                }
+            }
+            $stored = $meta['stored'] ?? FieldStorage::Column;
+            if (is_string($stored)) {
+                $stored = FieldStorage::tryFrom($stored) ?? FieldStorage::Column;
+            }
+            if (!$stored instanceof FieldStorage) {
+                $stored = FieldStorage::Column;
+            }
+            $normalized[$name] = new FieldDefinition(
+                name: $name,
+                type: (string) ($meta['type'] ?? 'string'),
+                cardinality: (int) ($meta['cardinality'] ?? 1),
+                settings: $settings,
+                targetEntityTypeId: $this->id,
+                targetBundle: null,
+                translatable: (bool) ($meta['translatable'] ?? false),
+                revisionable: (bool) ($meta['revisionable'] ?? false),
+                defaultValue: $meta['defaultValue'] ?? ($meta['default'] ?? null),
+                label: (string) ($meta['label'] ?? ''),
+                description: (string) ($meta['description'] ?? ''),
+                required: (bool) ($meta['required'] ?? false),
+                readOnly: (bool) ($meta['readOnly'] ?? $meta['read_only'] ?? false),
+                constraints: is_array($meta['constraints'] ?? null) ? $meta['constraints'] : [],
+                stored: $stored,
+            );
+        }
+
+        return $normalized;
     }
 
     public function getGroup(): ?string

@@ -9,11 +9,9 @@ use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 /**
  * Default FieldDefinitionRegistry implementation.
  *
- * Stores FieldDefinition objects keyed by (entityTypeId, targetBundle). Core
- * fields are synthesized from EntityType::fieldDefinitions metadata arrays at
- * registration time — the registry is the normalization boundary per
- * docs/specs/bundle-scoped-fields.md §Resolution. Bundle fields are registered
- * as FieldDefinition objects directly and validated for self-description.
+ * Stores FieldDefinition objects keyed by (entityTypeId, targetBundle).
+ * Core fields may still be authored as metadata arrays during the alpha
+ * transition; they are normalized to FieldDefinition objects at registration.
  */
 final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
 {
@@ -25,39 +23,30 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
 
     public function registerCoreFields(string $entityTypeId, array $fields): void
     {
-        $synthesized = [];
-        foreach ($fields as $name => $meta) {
-            if ($meta instanceof FieldDefinitionInterface) {
-                $synthesized[$name] = $meta;
-                continue;
+        $byName = [];
+        foreach ($fields as $name => $field) {
+            if (!$field instanceof FieldDefinitionInterface) {
+                if (!is_array($field)) {
+                    throw new \InvalidArgumentException(\sprintf(
+                        'Core field "%s" on entity type "%s" must implement FieldDefinitionInterface; got %s.',
+                        $name,
+                        $entityTypeId,
+                        \get_debug_type($field),
+                    ));
+                }
+                $field = self::synthesizeCoreField($name, $entityTypeId, $field);
             }
-            if (!\is_array($meta)) {
+            if ($field->getTargetEntityTypeId() !== $entityTypeId) {
                 throw new \InvalidArgumentException(\sprintf(
-                    'Core field "%s" on entity type "%s" must be a metadata array or FieldDefinitionInterface; got %s.',
-                    $name,
-                    $entityTypeId,
-                    \get_debug_type($meta),
-                ));
-            }
-            $synthesized[$name] = self::synthesizeCoreField($name, $entityTypeId, $meta);
-        }
-        $this->coreFields[$entityTypeId] = $synthesized;
-    }
-
-    public function mergeCoreFields(string $entityTypeId, array $fields): void
-    {
-        $existing = $this->coreFields[$entityTypeId] ?? [];
-        foreach ($fields as $name => $_meta) {
-            if (isset($existing[$name])) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'Cannot merge core field "%s" on entity type "%s": name already registered.',
-                    $name,
+                    'Core field "%s" declares targetEntityTypeId "%s" but is being registered against entity type "%s".',
+                    $field->getName(),
+                    $field->getTargetEntityTypeId(),
                     $entityTypeId,
                 ));
             }
+            $byName[$field->getName()] = $field;
         }
-
-        $this->registerCoreFields($entityTypeId, $existing + $fields);
+        $this->coreFields[$entityTypeId] = $byName;
     }
 
     /**
@@ -106,6 +95,21 @@ final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
         );
     }
 
+    public function mergeCoreFields(string $entityTypeId, array $fields): void
+    {
+        $existing = $this->coreFields[$entityTypeId] ?? [];
+        foreach ($fields as $name => $_meta) {
+            if (isset($existing[$name])) {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Cannot merge core field "%s" on entity type "%s": name already registered.',
+                    $name,
+                    $entityTypeId,
+                ));
+            }
+        }
+
+        $this->registerCoreFields($entityTypeId, $existing + $fields);
+    }
     public function registerBundleFields(string $entityTypeId, string $bundle, array $fields): void
     {
         $byName = [];

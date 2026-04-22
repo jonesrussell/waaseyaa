@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity;
 
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
+use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
+use Waaseyaa\Entity\Hydration\HydrationContext;
+use Waaseyaa\Field\FieldDefinitionInterface;
 
 /**
  * Abstract base class for content entities (nodes, users, terms, etc.).
@@ -17,8 +20,10 @@ use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
  *
  * Unlike Drupal, a ContentEntityBase object represents ONE language at a time.
  * getTranslation() returns a separate entity object for the requested language.
+ *
+ * @phpstan-consistent-constructor
  */
-abstract class ContentEntityBase extends EntityBase implements ContentEntityInterface
+abstract class ContentEntityBase extends EntityBase implements ContentEntityInterface, HydratableFromStorageInterface
 {
     /**
      * Process-wide field registry consulted by {@see getFieldDefinitions()}.
@@ -34,7 +39,7 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
     /**
      * Field definitions passed into the entity constructor (legacy path).
      *
-     * @var array<string, mixed>
+     * @var array<string, FieldDefinitionInterface>
      */
     protected array $fieldDefinitions = [];
 
@@ -42,7 +47,7 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
      * @param array<string, mixed> $values Initial entity values.
      * @param string $entityTypeId The entity type machine name.
      * @param array<string, string> $entityKeys Entity key mappings.
-     * @param array<string, mixed> $fieldDefinitions Field definitions keyed by field name.
+     * @param array<string, FieldDefinitionInterface> $fieldDefinitions Field definitions keyed by field name.
      */
     public function __construct(
         array $values = [],
@@ -65,7 +70,7 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
             || \array_key_exists($name, $this->getFieldDefinitions());
     }
 
-    /** @return array<string, mixed> */
+    /** @return array<string, FieldDefinitionInterface> */
     public function getFieldDefinitions(): array
     {
         if (self::$fieldRegistry === null) {
@@ -90,5 +95,15 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
         $class = static::class;
 
         return new $class($values, $this->entityTypeId, $this->entityKeys, $this->fieldDefinitions);
+    }
+
+    public static function fromStorage(array $values, HydrationContext $context): static
+    {
+        return new static(
+            values: $values,
+            entityTypeId: $context->entityTypeId,
+            entityKeys: $context->entityKeys,
+            fieldDefinitions: [],
+        );
     }
 }

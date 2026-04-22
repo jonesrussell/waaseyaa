@@ -38,54 +38,19 @@ final class EntityInstantiator
             ));
         }
 
-        if (is_subclass_of($class, HydratableFromStorageInterface::class)) {
-            $context = new HydrationContext(
-                entityTypeId: $this->entityType->id(),
-                entityKeys: $this->entityType->getKeys(),
-            );
-
-            return $class::fromStorage($values, $context);
+        if (!is_subclass_of($class, HydratableFromStorageInterface::class)) {
+            throw new \RuntimeException(sprintf(
+                'Entity class "%s" must implement %s for storage hydration.',
+                $class,
+                HydratableFromStorageInterface::class,
+            ));
         }
 
-        return $this->instantiateLegacy($class, $values);
-    }
+        $context = new HydrationContext(
+            entityTypeId: $this->entityType->id(),
+            entityKeys: $this->entityType->getKeys(),
+        );
 
-    /**
-     * Reflection-based hydration for types that do not yet implement
-     * {@see HydratableFromStorageInterface}. Scheduled for removal once all
-     * content entities use `fromStorage()` (see docs/specs/entity-system.md,
-     * "Breaking-change cutover (alpha → stable)").
-     *
-     * @param class-string<EntityInterface> $class
-     * @param array<string, mixed> $values
-     */
-    private function instantiateLegacy(string $class, array $values): EntityInterface
-    {
-        $ref = new \ReflectionClass($class);
-        $constructor = $ref->getConstructor();
-        $hasEntityTypeId = false;
-
-        if ($constructor !== null) {
-            foreach ($constructor->getParameters() as $param) {
-                if ($param->getName() === 'entityTypeId') {
-                    $hasEntityTypeId = true;
-                    break;
-                }
-            }
-        }
-
-        $keys = $this->entityType->getKeys();
-
-        if ($hasEntityTypeId) {
-            /** @var EntityInterface */
-            return new $class(
-                values: $values,
-                entityTypeId: $this->entityType->id(),
-                entityKeys: $keys,
-            );
-        }
-
-        /** @var EntityInterface */
-        return new $class(values: $values);
+        return $class::fromStorage($values, $context);
     }
 }

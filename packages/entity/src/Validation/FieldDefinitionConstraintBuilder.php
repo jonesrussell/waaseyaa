@@ -12,16 +12,19 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
+use Waaseyaa\Field\FieldDefinition;
+use Waaseyaa\Field\FieldDefinitionInterface;
+use Waaseyaa\Field\FieldStorage;
 
 /**
- * Builds per-field Symfony {@see Constraint} lists from entity type field definition arrays.
+ * Builds per-field Symfony {@see Constraint} lists from entity field definitions.
  *
  * Full metadata → constraint mapping: `docs/specs/entity-system.md` (Field definitions → constraints, #1182).
  */
 final class FieldDefinitionConstraintBuilder
 {
     /**
-     * @param array<string, mixed> $fieldDefinitions
+     * @param array<string, FieldDefinitionInterface|array<string, mixed>> $fieldDefinitions
      *
      * @return array<string, list<Constraint>>
      */
@@ -29,11 +32,7 @@ final class FieldDefinitionConstraintBuilder
     {
         $out = [];
         foreach ($fieldDefinitions as $name => $def) {
-            if (!is_array($def)) {
-                continue;
-            }
-            /** @var array<string, mixed> $def */
-            $constraints = self::constraintsForField($def);
+            $constraints = self::constraintsForField($name, $def);
             if ($constraints !== []) {
                 $out[$name] = $constraints;
             }
@@ -43,15 +42,14 @@ final class FieldDefinitionConstraintBuilder
     }
 
     /**
-     * @param array<string, mixed> $def
-     *
      * @return list<Constraint>
      */
-    private static function constraintsForField(array $def): array
+    private static function constraintsForField(string $fieldName, FieldDefinitionInterface|array $def): array
     {
+        $def = self::normalizeDefinition($fieldName, $def);
         $constraints = [];
-        $type = (string) ($def['type'] ?? 'string');
-        $required = self::truthy($def['required'] ?? false);
+        $type = $def->getType();
+        $required = $def->isRequired();
 
         if ($required) {
             $constraints[] = self::requiredConstraintForType($type);
@@ -66,12 +64,12 @@ final class FieldDefinitionConstraintBuilder
             $constraints[] = new Email();
         }
 
-        $allowed = $def['allowed_values'] ?? $def['allowedValues'] ?? null;
+        $allowed = $def->getSetting('allowed_values') ?? $def->getSetting('allowedValues');
         if (is_array($allowed) && $allowed !== []) {
             $constraints[] = new Choice(choices: array_values($allowed));
         }
 
-        $enumClass = $def['enum_class'] ?? $def['enumClass'] ?? null;
+        $enumClass = $def->getSetting('enum_class') ?? $def->getSetting('enumClass');
         if (is_string($enumClass) && $enumClass !== '' && enum_exists($enumClass)
             && is_subclass_of($enumClass, BackedEnum::class)) {
             /** @var class-string<BackedEnum> $enumClass */
@@ -88,12 +86,55 @@ final class FieldDefinitionConstraintBuilder
     }
 
     /**
-     * @param array<string, mixed> $def
+     * @param FieldDefinitionInterface|array<string, mixed> $definition
      */
-    private static function lengthConstraint(array $def): ?Length
+    private static function normalizeDefinition(string $fieldName, FieldDefinitionInterface|array $definition): FieldDefinitionInterface
     {
-        $maxRaw = $def['max_length'] ?? $def['maxLength'] ?? null;
-        $minRaw = $def['min_length'] ?? $def['minLength'] ?? null;
+        if ($definition instanceof FieldDefinitionInterface) {
+            return $definition;
+        }
+        $settings = $definition['settings'] ?? [];
+        if (!is_array($settings)) {
+            $settings = [];
+        }
+        foreach ($definition as $key => $value) {
+            if (!in_array($key, ['type', 'label', 'description', 'required', 'readOnly', 'read_only', 'cardinality', 'translatable', 'revisionable', 'default', 'defaultValue', 'settings', 'constraints', 'stored'], true)) {
+                $settings[$key] = $value;
+            }
+        }
+        $stored = $definition['stored'] ?? FieldStorage::Column;
+        if (is_string($stored)) {
+            $stored = FieldStorage::tryFrom($stored) ?? FieldStorage::Column;
+        }
+        if (!$stored instanceof FieldStorage) {
+            $stored = FieldStorage::Column;
+        }
+
+        return new FieldDefinition(
+            name: $fieldName,
+            type: (string) ($definition['type'] ?? 'string'),
+            cardinality: (int) ($definition['cardinality'] ?? 1),
+            settings: $settings,
+            targetEntityTypeId: '',
+            targetBundle: null,
+            translatable: (bool) ($definition['translatable'] ?? false),
+            revisionable: (bool) ($definition['revisionable'] ?? false),
+            defaultValue: $definition['defaultValue'] ?? ($definition['default'] ?? null),
+            label: (string) ($definition['label'] ?? ''),
+            description: (string) ($definition['description'] ?? ''),
+            required: (bool) ($definition['required'] ?? false),
+            readOnly: (bool) ($definition['readOnly'] ?? $definition['read_only'] ?? false),
+            constraints: is_array($definition['constraints'] ?? null) ? $definition['constraints'] : [],
+            stored: $stored,
+        );
+    }
+
+    /**
+     */
+    private static function lengthConstraint(FieldDefinitionInterface $def): ?Length
+    {
+        $maxRaw = $def->getSetting('max_length') ?? $def->getSetting('maxLength');
+        $minRaw = $def->getSetting('min_length') ?? $def->getSetting('minLength');
         $max = is_numeric($maxRaw) ? (int) $maxRaw : null;
         $min = is_numeric($minRaw) ? (int) $minRaw : null;
 
@@ -134,10 +175,5 @@ final class FieldDefinitionConstraintBuilder
             'array', 'json' => new Type('array'),
             default => null,
         };
-    }
-
-    private static function truthy(mixed $value): bool
-    {
-        return $value === true || $value === 1 || $value === '1' || $value === 'true';
     }
 }

@@ -9,6 +9,7 @@ use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\EntityValues;
+use Waaseyaa\Field\FieldDefinitionInterface;
 
 /**
  * Converts EntityInterface objects to JsonApiResource value objects.
@@ -136,13 +137,13 @@ final class ResourceSerializer
      * Cast attribute values based on field type definitions.
      *
      * @param array<string, mixed> $attributes
-     * @param array<string, array<string, mixed>> $fieldDefinitions
+     * @param array<string, FieldDefinitionInterface> $fieldDefinitions
      * @return array<string, mixed>
      */
     private function castAttributes(array $attributes, array $fieldDefinitions): array
     {
         foreach ($attributes as $name => $value) {
-            $type = $fieldDefinitions[$name]['type'] ?? null;
+            $type = isset($fieldDefinitions[$name]) ? $fieldDefinitions[$name]->getType() : null;
 
             $attributes[$name] = match ($type) {
                 'boolean' => (bool) $value,

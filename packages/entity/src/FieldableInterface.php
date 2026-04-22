@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+use Waaseyaa\Field\FieldDefinitionInterface;
+
 interface FieldableInterface
 {
     public function hasField(string $name): bool;
@@ -12,6 +14,6 @@ interface FieldableInterface
 
     public function set(string $name, mixed $value): static;
 
-    /** @return array<string, mixed> Field definitions keyed by field name */
+    /** @return array<string, FieldDefinitionInterface> Field definitions keyed by field name */
     public function getFieldDefinitions(): array;
 }

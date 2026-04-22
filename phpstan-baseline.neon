@@ -253,12 +253,6 @@ parameters:
 			path: packages/api/src/Query/QueryParser.php
 
 		-
-			message: '#^Construct empty\(\) is not allowed\. Use more strict comparison\.$#'
-			identifier: empty.notAllowed
-			count: 2
-			path: packages/api/src/Schema/SchemaPresenter.php
-
-		-
 			message: '#^Cannot call method execute\(\) on PDOStatement\|false\.$#'
 			identifier: method.nonObject
 			count: 12

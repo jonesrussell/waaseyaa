@@ -6,6 +6,7 @@ namespace Waaseyaa\Entity\Tests\Unit;
 
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Field\FieldDefinitionInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -129,7 +130,18 @@ class EntityTypeTest extends TestCase
             fieldDefinitions: $fields,
         );
 
-        $this->assertSame($fields, $type->getFieldDefinitions());
+        $defs = $type->getFieldDefinitions();
+        $this->assertArrayHasKey('status', $defs);
+        $this->assertArrayHasKey('uid', $defs);
+        $this->assertInstanceOf(FieldDefinitionInterface::class, $defs['status']);
+        $this->assertInstanceOf(FieldDefinitionInterface::class, $defs['uid']);
+        $this->assertSame('boolean', $defs['status']->getType());
+        $this->assertSame('Published', $defs['status']->getLabel());
+        $this->assertSame(10, $defs['status']->getSetting('weight'));
+        $this->assertSame('entity_reference', $defs['uid']->getType());
+        $this->assertSame('Author', $defs['uid']->getLabel());
+        $this->assertSame('user', $defs['uid']->getSetting('target_entity_type_id'));
+        $this->assertSame(20, $defs['uid']->getSetting('weight'));
     }
 
     public function testIsReadonly(): void

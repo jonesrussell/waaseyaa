@@ -43,11 +43,9 @@ use Waaseyaa\User\Middleware\SessionMiddleware;
  * authorization pipeline (Session -> Authorization), and dispatches
  * to controllers. Returns a Symfony Response for the caller to send.
  *
- * Error surface: JSON:API (`application/vnd.api+json`) for boot failures when
- * not in debug mode, and for unhandled exceptions after boot. HTML boot errors
- * use DevExceptionRenderer only when debug mode is on and the error-handler
- * package is present. See docs/specs/infrastructure.md "HTTP error surface
- * (JSON-first)".
+ * Error surface: JSON:API (`application/vnd.api+json`) for boot failures and
+ * for unhandled exceptions after boot. See docs/specs/infrastructure.md
+ * "HTTP error surface (JSON-first)".
  */
 final class HttpKernel extends AbstractKernel
 {
@@ -64,21 +62,6 @@ final class HttpKernel extends AbstractKernel
             $this->boot();
         } catch (\Throwable $e) {
             $this->logger->critical(sprintf("Boot failed: %s in %s:%d\n%s", $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString()));
-
-            if (\class_exists(\Waaseyaa\ErrorHandler\DevExceptionRenderer::class)) {
-                try {
-                    $debug = $this->isDebugMode();
-                } catch (\Throwable) {
-                    $appDebugEnv = getenv('APP_DEBUG');
-                    $debug = filter_var($appDebugEnv === false ? '' : $appDebugEnv, FILTER_VALIDATE_BOOLEAN);
-                }
-                if ($debug) {
-                    /** @var class-string<\Waaseyaa\ErrorHandler\DevExceptionRenderer> $class */
-                    $class = \Waaseyaa\ErrorHandler\DevExceptionRenderer::class;
-
-                    return new HttpResponse((new $class())->render($e), 500, ['Content-Type' => 'text/html; charset=UTF-8']);
-                }
-            }
 
             return $this->bootFailureJsonResponse($e);
         }

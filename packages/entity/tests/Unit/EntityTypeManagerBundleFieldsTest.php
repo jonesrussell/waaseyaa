@@ -11,6 +11,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
+use Waaseyaa\Field\FieldDefinitionInterface;
 
 #[CoversClass(EntityTypeManager::class)]
 final class EntityTypeManagerBundleFieldsTest extends TestCase
@@ -105,10 +106,11 @@ final class EntityTypeManagerBundleFieldsTest extends TestCase
             fieldDefinitions: $coreFieldMeta,
         ));
 
-        self::assertSame(
-            [['group', $coreFieldMeta]],
-            $registry->coreCalls,
-        );
+        self::assertCount(1, $registry->coreCalls);
+        self::assertSame('group', $registry->coreCalls[0][0]);
+        self::assertArrayHasKey('name', $registry->coreCalls[0][1]);
+        self::assertInstanceOf(FieldDefinitionInterface::class, $registry->coreCalls[0][1]['name']);
+        self::assertSame('string', $registry->coreCalls[0][1]['name']->getType());
     }
 
     #[Test]

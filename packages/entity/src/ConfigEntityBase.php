@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
+use Waaseyaa\Entity\Hydration\HydrationContext;
+
 /**
  * Abstract base class for configuration entities.
  *
@@ -11,8 +14,10 @@ namespace Waaseyaa\Entity;
  * imported, and synchronized (e.g. content types, vocabularies, views).
  * Unlike content entities, config entities use a string machine name as
  * their primary key and do not have a UUID.
+ *
+ * @phpstan-consistent-constructor
  */
-abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterface
+abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterface, HydratableFromStorageInterface
 {
     /**
      * Whether this config entity is enabled.
@@ -106,5 +111,14 @@ abstract class ConfigEntityBase extends EntityBase implements ConfigEntityInterf
         }
 
         return $config;
+    }
+
+    public static function fromStorage(array $values, HydrationContext $context): static
+    {
+        return new static(
+            values: $values,
+            entityTypeId: $context->entityTypeId,
+            entityKeys: $context->entityKeys,
+        );
     }
 }

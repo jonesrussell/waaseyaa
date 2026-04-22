@@ -135,7 +135,7 @@ TWIG,
         $response = $this->request('/does-not-exist');
 
         $this->assertSame(404, $response['status']);
-        $this->assertStringContainsString('<h1>Not Found</h1>', $response['body']);
+        $this->assertStringContainsString('<h1>Page Not Found</h1>', $response['body']);
         $this->assertStringNotContainsString('"jsonapi"', $response['body']);
     }
 

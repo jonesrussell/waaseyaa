@@ -8,6 +8,9 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Field\FieldDefinition;
+use Waaseyaa\Field\FieldDefinitionInterface;
+use Waaseyaa\Field\FieldStorage;
 
 /**
  * Converts EntityType definitions (and optional FieldDefinitions) to JSON Schema
@@ -96,8 +99,7 @@ final class SchemaPresenter
      * Present an entity type as a JSON Schema with widget hints.
      *
      * @param EntityTypeInterface                  $entityType       The entity type definition.
-     * @param array<string, array<string, mixed>>  $fieldDefinitions Optional field definitions keyed by field name.
-     *   Each field definition may contain: type, label, description, required, weight, settings.
+     * @param array<string, FieldDefinitionInterface|array<string, mixed>>  $fieldDefinitions Optional field definitions keyed by field name.
      * @param EntityInterface|null                 $entity           Optional entity for field access checking.
      * @param EntityAccessHandler|null             $accessHandler    Optional access handler for field filtering.
      * @param AccountInterface|null                $account          Optional account for access checks.
@@ -135,17 +137,18 @@ final class SchemaPresenter
 
         // Add field definitions if provided.
         if ($fieldDefinitions !== []) {
-            foreach ($fieldDefinitions as $fieldName => $definition) {
+            foreach ($fieldDefinitions as $fieldName => $definitionRaw) {
                 // Skip system keys — they are already handled.
                 if (in_array($fieldName, array_values($keys), true)) {
                     continue;
                 }
+                $definition = $this->normalizeFieldDefinition($fieldName, $definitionRaw, $entityType->id());
 
-                $fieldType = $definition['type'] ?? 'string';
+                $fieldType = $definition->getType();
                 $fieldSchema = $this->buildFieldSchema($fieldName, $fieldType, $definition);
                 $properties[$fieldName] = $fieldSchema;
 
-                if (!empty($definition['required'])) {
+                if ($definition->isRequired()) {
                     $required[] = $fieldName;
                 }
             }
@@ -186,6 +189,54 @@ final class SchemaPresenter
         }
 
         return $schema;
+    }
+
+    /**
+     * @param FieldDefinitionInterface|array<string, mixed> $definition
+     */
+    private function normalizeFieldDefinition(
+        string $fieldName,
+        FieldDefinitionInterface|array $definition,
+        string $entityTypeId,
+    ): FieldDefinitionInterface {
+        if ($definition instanceof FieldDefinitionInterface) {
+            return $definition;
+        }
+
+        $settings = $definition['settings'] ?? [];
+        if (!is_array($settings)) {
+            $settings = [];
+        }
+        foreach ($definition as $key => $value) {
+            if (!in_array($key, ['type', 'label', 'description', 'required', 'readOnly', 'read_only', 'cardinality', 'translatable', 'revisionable', 'default', 'defaultValue', 'settings', 'constraints', 'stored'], true)) {
+                $settings[$key] = $value;
+            }
+        }
+        $stored = $definition['stored'] ?? FieldStorage::Column;
+        if (is_string($stored)) {
+            $stored = FieldStorage::tryFrom($stored) ?? FieldStorage::Column;
+        }
+        if (!$stored instanceof FieldStorage) {
+            $stored = FieldStorage::Column;
+        }
+
+        return new FieldDefinition(
+            name: $fieldName,
+            type: (string) ($definition['type'] ?? 'string'),
+            cardinality: (int) ($definition['cardinality'] ?? 1),
+            settings: $settings,
+            targetEntityTypeId: $entityTypeId,
+            targetBundle: null,
+            translatable: (bool) ($definition['translatable'] ?? false),
+            revisionable: (bool) ($definition['revisionable'] ?? false),
+            defaultValue: $definition['defaultValue'] ?? ($definition['default'] ?? null),
+            label: (string) ($definition['label'] ?? ''),
+            description: (string) ($definition['description'] ?? ''),
+            required: (bool) ($definition['required'] ?? false),
+            readOnly: (bool) ($definition['readOnly'] ?? $definition['read_only'] ?? false),
+            constraints: is_array($definition['constraints'] ?? null) ? $definition['constraints'] : [],
+            stored: $stored,
+        );
     }
 
     /**
@@ -266,13 +317,13 @@ final class SchemaPresenter
     /**
      * Build a JSON Schema property for a field definition.
      *
-     * @param string               $fieldName  The field machine name.
-     * @param string               $fieldType  The field type (string, boolean, integer, etc.).
-     * @param array<string, mixed> $definition The full field definition.
+     * @param string $fieldName  The field machine name.
+     * @param string $fieldType  The field type (string, boolean, integer, etc.).
+     * @param FieldDefinitionInterface $definition The full field definition.
      *
      * @return array<string, mixed>
      */
-    private function buildFieldSchema(string $fieldName, string $fieldType, array $definition): array
+    private function buildFieldSchema(string $fieldName, string $fieldType, FieldDefinitionInterface $definition): array
     {
         $schema = [
             'type' => self::TYPE_MAP[$fieldType] ?? 'string',
@@ -284,16 +335,18 @@ final class SchemaPresenter
         }
 
         // Add description.
-        if (isset($definition['description'])) {
-            $schema['description'] = $definition['description'];
+        $description = $definition->getDescription();
+        if ($description !== '') {
+            $schema['description'] = $description;
         }
 
         // Widget hint.
-        $schema['x-widget'] = $definition['widget'] ?? self::WIDGET_MAP[$fieldType] ?? 'text';
+        $schema['x-widget'] = $definition->getSetting('widget') ?? self::WIDGET_MAP[$fieldType] ?? 'text';
 
         // Human-readable label.
-        if (isset($definition['label'])) {
-            $schema['x-label'] = $definition['label'];
+        $label = $definition->getLabel();
+        if ($label !== '') {
+            $schema['x-label'] = $label;
         } else {
             // Generate a label from field name: 'field_body' -> 'Body', 'title' -> 'Title'.
             $label = str_replace('field_', '', $fieldName);
@@ -302,23 +355,21 @@ final class SchemaPresenter
         }
 
         // Description for help text.
-        if (isset($definition['description'])) {
-            $schema['x-description'] = $definition['description'];
+        if ($description !== '') {
+            $schema['x-description'] = $description;
         }
 
         // Display weight.
-        if (isset($definition['weight'])) {
-            $schema['x-weight'] = $definition['weight'];
-        }
+        $schema['x-weight'] = (int) ($definition->getSetting('weight') ?? 0);
 
         // Required flag.
-        if (!empty($definition['required'])) {
+        if ($definition->isRequired()) {
             $schema['x-required'] = true;
         }
 
         // Settings (e.g., allowed values for select fields).
-        if (isset($definition['settings'])) {
-            $settings = $definition['settings'];
+        $settings = $definition->getSettings();
+        if ($settings !== []) {
 
             // Handle allowed_values for list/select fields.
             if (isset($settings['allowed_values'])) {
@@ -346,13 +397,15 @@ final class SchemaPresenter
         }
 
         // Handle top-level target_entity_type_id for entity_reference fields.
-        if (isset($definition['target_entity_type_id'])) {
-            $schema['x-target-type'] = $definition['target_entity_type_id'];
+        $targetType = $definition->getSetting('target_entity_type_id')
+            ?? $definition->getSetting('targetEntityTypeId');
+        if (is_string($targetType) && $targetType !== '') {
+            $schema['x-target-type'] = $targetType;
         }
 
         // Default value.
-        if (array_key_exists('default', $definition)) {
-            $defaultValue = $definition['default'];
+        $defaultValue = $definition->getDefaultValue();
+        if ($defaultValue !== null) {
             // Cast boolean defaults to native bool for JSON Schema.
             if ($fieldType === 'boolean') {
                 $defaultValue = (bool) $defaultValue;

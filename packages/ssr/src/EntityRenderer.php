@@ -7,6 +7,7 @@ namespace Waaseyaa\SSR;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\EntityValues;
+use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\ViewModeConfigInterface;
 
 final class EntityRenderer
@@ -55,7 +56,7 @@ final class EntityRenderer
         $fields = [];
         foreach ($display as $fieldName => $item) {
             $raw = $values[$fieldName] ?? null;
-            $fieldType = (string) ($fieldDefinitions[$fieldName]['type'] ?? 'string');
+            $fieldType = isset($fieldDefinitions[$fieldName]) ? $fieldDefinitions[$fieldName]->getType() : 'string';
             $formatterType = (string) ($item['formatter'] ?? $fieldType);
             $settings = is_array($item['settings'] ?? null) ? $item['settings'] : [];
 
@@ -102,7 +103,7 @@ final class EntityRenderer
     }
 
     /**
-     * @param array<string, array<string, mixed>> $fieldDefinitions
+     * @param array<string, FieldDefinitionInterface> $fieldDefinitions
      * @param array<string, mixed> $values
      * @param array<string, string> $entityKeys
      * @return array<string, array{formatter: string, settings: array<string, mixed>, weight: int}>
@@ -122,7 +123,7 @@ final class EntityRenderer
             }
 
             $display[$name] = [
-                'formatter' => (string) ($fieldDefinitions[$name]['type'] ?? 'string'),
+                'formatter' => isset($fieldDefinitions[$name]) ? $fieldDefinitions[$name]->getType() : 'string',
                 'settings' => [],
                 'weight' => $weight++,
             ];

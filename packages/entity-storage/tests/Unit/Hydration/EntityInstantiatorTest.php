@@ -7,6 +7,7 @@ namespace Waaseyaa\EntityStorage\Tests\Unit\Hydration;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\EntityStorage\Hydration\EntityInstantiator;
 use Waaseyaa\EntityStorage\Tests\Fixtures\HydratableFromStorageTestEntity;
+use Waaseyaa\EntityStorage\Tests\Fixtures\NonHydratableEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestStorageEntity;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -45,12 +46,12 @@ final class EntityInstantiatorTest extends TestCase
     }
 
     #[Test]
-    public function instantiateUsesLegacyConstructorWhenNotHydratable(): void
+    public function instantiateThrowsWhenEntityIsNotHydratableFromStorage(): void
     {
         $entityType = new EntityType(
             id: 'test_entity',
             label: 'Test',
-            class: TestStorageEntity::class,
+            class: NonHydratableEntity::class,
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',
@@ -61,16 +62,14 @@ final class EntityInstantiatorTest extends TestCase
         );
 
         $instantiator = new EntityInstantiator($entityType);
-        $entity = $instantiator->instantiate(TestStorageEntity::class, [
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('must implement');
+        $instantiator->instantiate(NonHydratableEntity::class, [
             'id' => '1',
             'label' => 'Legacy',
             'bundle' => 'article',
             'langcode' => 'en',
         ]);
-
-        $this->assertInstanceOf(TestStorageEntity::class, $entity);
-        $this->assertNull($entity->get('_rehydrated_via_storage'));
-        $this->assertSame('Legacy', $entity->label());
     }
 
     #[Test]

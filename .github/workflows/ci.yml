@@ -19,6 +19,9 @@ jobs:
       - name: Enforce package layer graph
         run: bash bin/check-package-layers
 
+      - name: Audit require-dev layer graph (warn-only)
+        run: bash bin/audit-require-dev-layers
+
   spec-drift:
     name: spec-drift
     runs-on: ubuntu-latest

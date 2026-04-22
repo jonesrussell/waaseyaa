@@ -56,7 +56,6 @@ final class NodeServiceProviderTest extends TestCase
 
         $this->assertArrayHasKey('uid', $fields);
         $this->assertSame('user', $fields['uid']['target_entity_type_id']);
-        $this->assertArrayNotHasKey('settings', $fields['uid']);
 
         $this->assertArrayHasKey('created', $fields);
         $this->assertArrayHasKey('changed', $fields);
