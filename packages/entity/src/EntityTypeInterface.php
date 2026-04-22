@@ -32,10 +32,11 @@ interface EntityTypeInterface
     /**
      * Field definitions keyed by field name.
      *
-     * Values are legacy metadata arrays and/or objects implementing
-     * {@see \Waaseyaa\Field\FieldDefinitionInterface} when provided by field registries.
+     * Prefer {@see \Waaseyaa\Field\FieldDefinitionInterface} instances; associative
+     * metadata arrays remain supported during alpha only (see docs/specs/entity-system.md,
+     * "Breaking-change cutover (alpha → stable)").
      *
-     * @return array<string, array<string, mixed>|object>
+     * @return array<string, array<string, mixed>|\Waaseyaa\Field\FieldDefinitionInterface>
      */
     public function getFieldDefinitions(): array;
 

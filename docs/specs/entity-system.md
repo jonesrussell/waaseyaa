@@ -1,5 +1,6 @@
 # Entity System
 
+<!-- Spec reviewed 2026-04-21 - Breaking-change cutover (alpha → stable): HydratableFromStorage + FieldDefinitionInterface-only direction; SqlEntityStorage applyFieldDefinitionDefaults extraction -->
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/config, packages/entity-storage, packages/entity, packages/field; no entity runtime behavior change -->
 <!-- Spec reviewed 2026-04-08b - restored packages/config symfony/event-dispatcher floor from ^7.3 back to ^7.0; no entity/config runtime behavior change -->
 <!-- Spec reviewed 2026-04-09 - packages/entity and packages/entity-storage composer.json (manifest policy); storage and entity semantics unchanged -->
@@ -857,6 +858,14 @@ When `HydratableFromStorageInterface` is **not** implemented, `EntityInstantiato
 4. If no, passes `(values: $values)` only
 
 This is critical: entity subclasses like User and Node only accept `(array $values)` and hardcode their type/keys.
+
+### Breaking-change cutover (alpha → stable)
+
+Breaking changes are acceptable while the framework is alpha if they reduce dual code paths. Target end state:
+
+1. **Hydration:** Every `EntityType`-registered **content** class implements `HydratableFromStorageInterface` and `fromStorage()`; `EntityInstantiator::instantiateLegacy()` (reflection + optional `entityTypeId` ctor parameter) is removed. Until then, new entity types **must** implement the interface — the legacy branch exists only for in-repo types not yet migrated.
+2. **Field definitions:** `EntityType::getFieldDefinitions()` returns only `FieldDefinitionInterface` instances (no associative metadata arrays with `'default'`, `'type'`, etc.). `SqlEntityStorage::create()` stops reading array-shaped definitions once the monorepo registrations are migrated; `SchemaPresenter` and validation already prefer objects.
+3. **Migration checklist for consumer apps:** (a) add `fromStorage` + interface on each content entity; (b) replace array field defs with `FieldDefinition` builders or equivalent; (c) run storage/API tests; (d) remove widening constructors that relied on reflection-only hydration.
 
 ### enforceIsNew()
 

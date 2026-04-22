@@ -83,22 +83,7 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     public function create(array $values = []): EntityInterface
     {
-        foreach ($this->entityType->getFieldDefinitions() as $name => $def) {
-            if (array_key_exists($name, $values)) {
-                continue;
-            }
-            if ($def instanceof FieldDefinitionInterface) {
-                $defaultValue = $def->getDefaultValue();
-                if ($defaultValue !== null) {
-                    $values[$name] = $defaultValue;
-                }
-
-                continue;
-            }
-            if (is_array($def) && array_key_exists('default', $def)) {
-                $values[$name] = $def['default'];
-            }
-        }
+        $values = $this->applyFieldDefinitionDefaults($values);
 
         $class = $this->entityType->getClass();
         $entity = $this->instantiateEntity($class, $values);
@@ -431,6 +416,40 @@ final class SqlEntityStorage implements EntityStorageInterface
     private function instantiateEntity(string $class, array $values): EntityInterface
     {
         return (new Hydration\EntityInstantiator($this->entityType))->instantiate($class, $values);
+    }
+
+    /**
+     * Fills missing keys from registered field definitions before hydration.
+     *
+     * Prefer {@see FieldDefinitionInterface} objects; legacy array metadata is
+     * supported until the cutover in docs/specs/entity-system.md
+     * ("Breaking-change cutover (alpha → stable)").
+     *
+     * @param array<string, mixed> $values
+     * @return array<string, mixed>
+     */
+    private function applyFieldDefinitionDefaults(array $values): array
+    {
+        foreach ($this->entityType->getFieldDefinitions() as $name => $def) {
+            if (array_key_exists($name, $values)) {
+                continue;
+            }
+            if ($def instanceof FieldDefinitionInterface) {
+                $defaultValue = $def->getDefaultValue();
+                if ($defaultValue !== null) {
+                    $values[$name] = $defaultValue;
+                }
+
+                continue;
+            }
+            /** @var array<string, mixed> $legacyDef */
+            $legacyDef = $def;
+            if (array_key_exists('default', $legacyDef)) {
+                $values[$name] = $legacyDef['default'];
+            }
+        }
+
+        return $values;
     }
 
     /**

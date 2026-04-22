@@ -16,7 +16,7 @@ final class LayerDependencyTest extends TestCase
         // Layer 1 — Core Data
         'waaseyaa/entity', 'waaseyaa/entity-storage', 'waaseyaa/access',
         'waaseyaa/user', 'waaseyaa/config', 'waaseyaa/field',
-        'waaseyaa/auth',
+        'waaseyaa/auth', 'waaseyaa/testing',
         // Layer 2 — Content Types
         'waaseyaa/node', 'waaseyaa/taxonomy', 'waaseyaa/media',
         'waaseyaa/path', 'waaseyaa/menu', 'waaseyaa/note',

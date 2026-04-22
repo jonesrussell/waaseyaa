@@ -72,8 +72,8 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 
 | Layer | Name | Packages |
 |---|---|---|
-| 0 | Foundation | foundation, cache, plugin, typed-data, database-legacy, testing, i18n, queue, scheduler, state, validation, mail, http-client, ingestion, error-handler |
-| 1 | Core Data | entity, entity-storage, access, user, config, field, auth |
+| 0 | Foundation | foundation, cache, plugin, typed-data, database-legacy, i18n, queue, scheduler, state, validation, mail, http-client, ingestion, error-handler |
+| 1 | Core Data | entity, entity-storage, access, user, config, field, auth, testing |
 | 2 | Content Types | node, taxonomy, media, path, menu, note, relationship |
 | 3 | Services | workflows, search, seo, notification, billing, github |
 | 4 | API | api, routing |
@@ -81,6 +81,8 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 | 6 | Interfaces | cli, admin, admin-surface, graphql, mcp, ssr, genealogy, telescope, deployer, inertia, debug |
 
 **Rule:** Packages can only import from their own layer or lower. Upward communication via DomainEvents.
+
+**Enforcement:** `bin/check-package-layers` validates every `packages/*/composer.json` `require` edge `waaseyaa/*` against this table (metapackages `cms`, `core`, `full` skipped). Runtime `require` only — `require-dev` may pull test fixtures from higher layers. Historical GitHub **#315** (foundation → path) and **#316** (validation → entity) are closed at the manifest level; re-run the script after editing internal dependencies.
 
 **Exemption:** The `Kernel/` classes in Foundation (`AbstractKernel`, `HttpKernel`, `ConsoleKernel`) are application bootstrappers that wire all layers together. They intentionally import from all layers. This is acceptable because kernels are entry-point orchestrators, not reusable library code — no other package imports from them.
 
@@ -158,6 +160,7 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 - `composer cs-fix` — auto-fix code style
 - `composer phpstan` — static analysis (PHPStan 2.x, level 5)
 - `composer check-composer-policy` — enforce codified Composer manifest policy
+- `bin/check-package-layers` — enforce internal `waaseyaa/*` dependency layers (see Layer Architecture)
 
 **Development:**
 - `composer dev` — start dev server (PHP built-in server + admin SPA)
@@ -241,7 +244,7 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 - **Git worktrees can't run Nuxt dev server**: Worktrees share source via symlinks but not `node_modules/.vite/` or `.nuxt/`. Vite module resolution fails with MIME type errors. Run E2E tests against the main repo's dev server, not from worktrees.
 - **RateLimiter: check before hit**: Always call `tooManyAttempts()` BEFORE `hit()`. Calling `hit()` first counts the current request before checking, reducing the effective limit by 1.
 - **PHPUnit void method mocking**: `createMock()` + `willReturn(null)` on void methods throws `IncompatibleReturnValueException`. Use `createStub()` for classes with void methods, or omit `willReturn()` entirely.
-- **`database-legacy` package namespace is `Waaseyaa\Database`**: Despite the directory being `packages/database-legacy/`, the PHP namespace is `Waaseyaa\Database`, NOT `Waaseyaa\DatabaseLegacy`. Always check `composer.json` autoload for the canonical namespace.
+- **`database-legacy` package namespace is `Waaseyaa\Database`**: Despite the directory being `packages/database-legacy/`, the PHP namespace is `Waaseyaa\Database`, NOT `Waaseyaa\DatabaseLegacy`. Always check `composer.json` autoload for the canonical namespace. Renaming the Composer package was rejected for alpha stability — see `docs/adr/007-database-legacy-package-naming.md`.
 - **Auth config in admin SPA**: `runtimeConfig.public.auth` provides `registration` (admin/open/invite) and `requireVerifiedEmail` (boolean). Cast as `Record<string, unknown>` in TypeScript to safely access nested keys. Controlled by `NUXT_PUBLIC_AUTH_REGISTRATION` and `NUXT_PUBLIC_AUTH_REQUIRE_VERIFIED_EMAIL` env vars.
 - **DBAL empty IN/NOT IN returns no results**: `condition('id', [], 'IN')` and `condition('id', [], 'NOT IN')` both return empty results — DBAL silently produces no matches. Callers must guard against empty arrays before building IN conditions.
 - **JsonApiResource::toArray() omits empty keys**: `attributes` and `relationships` are omitted from serialized output when empty, not set to `[]`. Tests should use `assertArrayNotHasKey` for empty fields, not `assertEmpty`.

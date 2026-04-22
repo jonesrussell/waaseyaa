@@ -42,6 +42,12 @@ use Waaseyaa\User\Middleware\SessionMiddleware;
  * Boots the application, handles CORS, matches routes, runs the
  * authorization pipeline (Session -> Authorization), and dispatches
  * to controllers. Returns a Symfony Response for the caller to send.
+ *
+ * Error surface: JSON:API (`application/vnd.api+json`) for boot failures when
+ * not in debug mode, and for unhandled exceptions after boot. HTML boot errors
+ * use DevExceptionRenderer only when debug mode is on and the error-handler
+ * package is present. See docs/specs/infrastructure.md "HTTP error surface
+ * (JSON-first)".
  */
 final class HttpKernel extends AbstractKernel
 {

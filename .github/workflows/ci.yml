@@ -16,6 +16,9 @@ jobs:
       - name: Enforce composer policy
         run: bash bin/check-composer-policy
 
+      - name: Enforce package layer graph
+        run: bash bin/check-package-layers
+
   spec-drift:
     name: spec-drift
     runs-on: ubuntu-latest

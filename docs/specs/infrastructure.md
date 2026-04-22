@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-04-21 - Composer layer graph (bin/check-package-layers), HTTP JSON-first error surface, database-legacy ADR 007 cross-link -->
 <!-- Spec reviewed 2026-04-05 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation; SsrResponse removed, all controllers return Symfony Response/JsonResponse; ControllerDispatcher now delegates to DomainRouterInterface chain; both callable and router dispatch paths wrapped in try-catch returning 500 JSON:API errors; MediaRouter file move wrapped in try-catch; ViteAssetManager gained assetTags() method with devServerUrl constructor param for dev mode support; ControllerDispatcher uses Inertia::getRenderer() instead of hardcoded new RootTemplateRenderer(); RootTemplateRenderer accepts optional ViteAssetManager and injects Vite asset tags in default template; InertiaServiceProvider auto-configures renderer with ViteAssetManager for zero-config Inertia SPA support; AppControllerRouter added to dispatch Class::method controllers from ServiceProvider::routes() — delegates to SsrPageHandler::dispatchAppController, wired after SsrRouter in HttpKernel router chain (#1119); AppControllerRouter handle() relies on dispatchAppController's typed array shape contract (no runtime defensive casts); MediaRouter mkdir warning suppressed via @-prefix double-check idiom so a non-directory ancestor produces a clean 500 from the move catch block instead of a PHP warning under --fail-on-warning -->
 <!-- Spec reviewed 2026-04-05 - AbstractKernel extracted: AppEntityTypeLoader, ContentTypeValidator, KnowledgeExtensionBootstrapper join existing Bootstrap/ classes (DatabaseBootstrapper, ManifestBootstrapper, ProviderRegistry, AccessPolicyRegistry) -->
 <!-- Spec reviewed 2026-04-06 - GraphQlRouter: inline `new \Waaseyaa\GraphQL\GraphQlEndpoint(...)` replaced with a proper `use Waaseyaa\GraphQL\GraphQlEndpoint` import (#1091 cleanup, no behavior change). Also reverted an incorrect fix that had added `waaseyaa/ssr` as a hard `require` of foundation's composer.json — that violated the layer rule (layer 0 must not depend on layer 6) and tripped `LayerDependencyTest::foundationDoesNotDependOnHigherLayerPackages`. The pre-existing architectural debt it was trying to paper over (HttpKernel directly imports `Waaseyaa\SSR\RenderCache`, `SsrPageHandler`, `SsrServiceProvider`, `TwigErrorPageRenderer`; `SsrRouter` and `AppControllerRouter` live in foundation but require `SsrPageHandler`; `EventListenerRegistrar::registerRenderCacheListeners()` type-hints `RenderCache`) is tracked as a separate P1 refactor follow-up to #571. -->
@@ -63,12 +64,29 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 |---------|-----------|-------|---------|
 | `packages/foundation/` | `Waaseyaa\Foundation\` | 0 (Foundation) | DomainEvent, ServiceProvider, middleware interfaces, migration system, attribute discovery |
 | `packages/cache/` | `Waaseyaa\Cache\` | 0 (Foundation) | CacheBackendInterface, MemoryBackend, DatabaseBackend, NullBackend, tag invalidation |
-| `packages/database-legacy/` | `Waaseyaa\Database\` | 0 (Foundation) | DatabaseInterface, DBALDatabase (Doctrine DBAL), query builder (select/insert/update/delete), schema, transactions |
+| `packages/database-legacy/` | `Waaseyaa\Database\` | 0 (Foundation) | DatabaseInterface, DBALDatabase (Doctrine DBAL), query builder (select/insert/update/delete), schema, transactions. Composer name keeps the `-legacy` suffix for historical reasons; see [ADR 007](../adr/007-database-legacy-package-naming.md). |
 | `packages/plugin/` | `Waaseyaa\Plugin\` | 0 (Foundation) | PluginManager, attribute-based plugin discovery, plugin factory |
 | `packages/mail/` | `Waaseyaa\Mail\` | 0 (Foundation) | `MailerInterface` + `Envelope`; pluggable `TransportInterface` (array, local file, SendGrid API when configured) |
 | `packages/http-client/` | `Waaseyaa\HttpClient\` | 0 (Foundation) | Minimal HTTP client for JSON APIs and webhooks, zero external dependencies |
 
 Infrastructure-layer split packages that ship as Packagist libraries are expected to carry the normal release metadata shape in `composer.json`: `minimum-stability: stable` and branch aliases for `dev-main` plus the active maintenance branch. That invariant matters for local path-repository workflows because canonical path repos must still satisfy `^0.1` constraints when apps override published packages during development.
+
+### Composer layer graph
+
+The monorepo enforces the seven-layer rule from `CLAUDE.md` on **runtime** Composer edges: `bin/check-package-layers` walks `packages/*/composer.json` and fails if any `require` entry `waaseyaa/*` targets a package **strictly above** the declaring package’s layer. Metapackages (`cms`, `core`, `full`) are skipped. `require-dev` is not checked (tests may depend on higher layers for fixtures). The canonical short-name → layer map lives in that script; when you add a new first-party package, extend the map and the Layer Architecture table in `CLAUDE.md` together. This supersedes ad-hoc checks for historical issues such as foundation → path or validation → entity at the manifest level.
+
+### HTTP error surface (JSON-first)
+
+Machine clients (Admin SPA, MCP, curl scripts) should assume **JSON:API-shaped errors** unless they explicitly negotiated HTML.
+
+| Phase | Content-Type | When |
+|-------|----------------|------|
+| Boot failure (non-debug) | `application/vnd.api+json` | `HttpKernel::handle()` catch around `boot()` — `bootFailureJsonResponse()` |
+| Boot failure (debug + `waaseyaa/error-handler` present) | `text/html` | `DevExceptionRenderer` for developer-readable stack traces only when `isDebugMode()` is true |
+| Unhandled exception after successful boot | `application/vnd.api+json` | Outer `handle()` catch — generic 500 JSON:API body |
+| Controller pipeline | JSON:API or negotiated Inertia/SSR | `ControllerDispatcher` and domain routers |
+
+**Policy:** New HTTP surfaces must not introduce ad-hoc HTML error snippets for API-shaped routes. SSR and browser-document routes may return HTML via dedicated renderers. MCP stays on JSON-RPC as defined in `docs/specs/mcp-endpoint.md` — boot failures still pass through `HttpKernel` first, so MCP inherits the same boot behavior as other routes until the kernel is healthy.
 
 ### Testing fixture factories (`packages/testing/`)
 

@@ -26,6 +26,7 @@ final class LayerDependencyTest extends TestCase
         'waaseyaa/config',
         'waaseyaa/field',
         'waaseyaa/auth',
+        'waaseyaa/testing',
         // Layer 2 — Content Types
         'waaseyaa/node',
         'waaseyaa/taxonomy',

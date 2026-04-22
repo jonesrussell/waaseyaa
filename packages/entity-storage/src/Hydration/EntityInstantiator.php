@@ -51,6 +51,11 @@ final class EntityInstantiator
     }
 
     /**
+     * Reflection-based hydration for types that do not yet implement
+     * {@see HydratableFromStorageInterface}. Scheduled for removal once all
+     * content entities use `fromStorage()` (see docs/specs/entity-system.md,
+     * "Breaking-change cutover (alpha → stable)").
+     *
      * @param class-string<EntityInterface> $class
      * @param array<string, mixed> $values
      */

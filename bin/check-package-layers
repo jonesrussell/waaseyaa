@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+export ROOT_DIR
+
+python3 - <<'PY'
+import json
+import os
+import pathlib
+import re
+import sys
+
+root = pathlib.Path(os.environ["ROOT_DIR"])
+
+# Canonical layer index (0 = foundation). Must match CLAUDE.md "Layer Architecture".
+# waaseyaa/<short> maps to directory packages/<short>/
+LAYER_BY_SHORT = {
+    # 0 — Foundation
+    "foundation": 0,
+    "cache": 0,
+    "plugin": 0,
+    "typed-data": 0,
+    "database-legacy": 0,
+    "i18n": 0,
+    "queue": 0,
+    "scheduler": 0,
+    "state": 0,
+    "validation": 0,
+    "mail": 0,
+    "http-client": 0,
+    "ingestion": 0,
+    "error-handler": 0,
+    "geo": 0,
+    "mercure": 0,
+    "analytics": 0,
+    "oauth-provider": 0,
+    # 1 — Core data (testing ships entity fixtures; composer requires entity — see CLAUDE.md)
+    "entity": 1,
+    "entity-storage": 1,
+    "access": 1,
+    "user": 1,
+    "config": 1,
+    "field": 1,
+    "auth": 1,
+    "testing": 1,
+    "oidc": 1,
+    # 2 — Content types
+    "node": 2,
+    "taxonomy": 2,
+    "media": 2,
+    "path": 2,
+    "menu": 2,
+    "note": 2,
+    "relationship": 2,
+    "groups": 2,
+    "engagement": 2,
+    "messaging": 2,
+    # 3 — Services
+    "workflows": 3,
+    "search": 3,
+    "seo": 3,
+    "notification": 3,
+    "billing": 3,
+    "github": 3,
+    "northcloud": 3,
+    # 4 — API
+    "api": 4,
+    "routing": 4,
+    "bimaaji": 4,
+    # 5 — AI
+    "ai-schema": 5,
+    "ai-agent": 5,
+    "ai-pipeline": 5,
+    "ai-vector": 5,
+    "ai-observability": 5,
+    # 6 — Interfaces
+    "cli": 6,
+    "admin": 6,
+    "admin-surface": 6,
+    "graphql": 6,
+    "mcp": 6,
+    "ssr": 6,
+    "genealogy": 6,
+    "telescope": 6,
+    "deployer": 6,
+    "inertia": 6,
+    "debug": 6,
+}
+
+METAPACKAGES = frozenset({"cms", "core", "full"})
+
+WAASEYAA_NAME = re.compile(r"^waaseyaa/([a-z0-9-]+)$", re.I)
+
+
+def short_from_package_name(name: str) -> str | None:
+    m = WAASEYAA_NAME.match(name.strip())
+    return m.group(1).lower() if m else None
+
+
+errors = 0
+packages_dir = root / "packages"
+
+if not packages_dir.is_dir():
+    print("FAIL [PL000] packages/ not found", file=sys.stderr)
+    sys.exit(1)
+
+for pkg_dir in sorted(packages_dir.iterdir()):
+    if not pkg_dir.is_dir():
+        continue
+    manifest = pkg_dir / "composer.json"
+    if not manifest.is_file():
+        continue
+    data = json.loads(manifest.read_text())
+    pkg_type = data.get("type", "library")
+    if pkg_type == "metapackage" or pkg_dir.name in METAPACKAGES:
+        continue
+
+    name = data.get("name", "")
+    short = short_from_package_name(name) if name else None
+    if short is None:
+        continue
+    if short != pkg_dir.name:
+        errors += 1
+        print(f"FAIL [PL001] {manifest.relative_to(root)}: name {name!r} does not match directory {pkg_dir.name!r}")
+        continue
+
+    if short not in LAYER_BY_SHORT:
+        errors += 1
+        print(
+            f"FAIL [PL002] {manifest.relative_to(root)}: package {short!r} missing from bin/check-package-layers LAYER_BY_SHORT — add layer and update CLAUDE.md"
+        )
+        continue
+
+    layer_self = LAYER_BY_SHORT[short]
+
+    # Runtime edges only: require-dev frequently pulls higher-layer packages for
+    # PHPUnit fixtures (e.g. media -> api). Composer policy still applies to dev.
+    for sec in ("require",):
+        section = data.get(sec, {})
+        if not isinstance(section, dict):
+            continue
+        for dep_name, _ver in section.items():
+            dep_short = short_from_package_name(dep_name)
+            if dep_short is None:
+                continue
+            if dep_short not in LAYER_BY_SHORT:
+                errors += 1
+                print(
+                    f"FAIL [PL003] {manifest.relative_to(root)} {sec}: dependency {dep_name!r} (short={dep_short!r}) not in LAYER_BY_SHORT"
+                )
+                continue
+            layer_dep = LAYER_BY_SHORT[dep_short]
+            if layer_dep > layer_self:
+                errors += 1
+                print(
+                    f"FAIL [PL004] {manifest.relative_to(root)} {sec}: layer violation — "
+                    f"{short} (layer {layer_self}) must not depend on {dep_short} (layer {layer_dep}). "
+                    f"See CLAUDE.md Layer Architecture and GitHub #315/#316."
+                )
+
+if errors:
+    print(f"\nPackage layer check failed with {errors} error(s).", file=sys.stderr)
+    sys.exit(1)
+
+print("OK — package layer constraints (waaseyaa/* in require) satisfied.")
+PY
