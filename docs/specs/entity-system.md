@@ -1,5 +1,6 @@
 # Entity System
 
+<!-- Spec reviewed 2026-04-22 - EntityType::getFieldDefinitions phpdoc covariance with EntityTypeInterface (FieldDefinitionInterface union) -->
 <!-- Spec reviewed 2026-04-21 - Breaking-change cutover (alpha → stable): HydratableFromStorage + FieldDefinitionInterface-only direction; SqlEntityStorage applyFieldDefinitionDefaults extraction -->
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/config, packages/entity-storage, packages/entity, packages/field; no entity runtime behavior change -->
 <!-- Spec reviewed 2026-04-08b - restored packages/config symfony/event-dispatcher floor from ^7.3 back to ^7.0; no entity/config runtime behavior change -->
