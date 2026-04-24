@@ -43,7 +43,7 @@
             "providers": [
                 "Waaseyaa\\Queue\\QueueServiceProvider"
             ],
-            "migrations": "src/Migration"
+            "migrations": "migrations"
         }
     },
     "config": {
