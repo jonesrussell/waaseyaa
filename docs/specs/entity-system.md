@@ -1,5 +1,6 @@
 # Entity System
 
+<!-- Spec reviewed 2026-04-24 - packages/entity ValueCaster: PHPStan strict-rules / control-flow cleanup only; cast-in/cast-out semantics and typed-data delegation unchanged -->
 <!-- Spec reviewed 2026-04-22 - DefinesEntityType; PackageManifest attributeEntityTypes; optional config entity_auto_register in ProviderRegistry (default off) for attribute-driven type registration -->
 <!-- Spec reviewed 2026-04-22 - removed reflection hydration fallback; ContentEntityBase/ConfigEntityBase implement HydratableFromStorageInterface and EntityInstantiator now requires fromStorage -->
 <!-- Spec reviewed 2026-04-22 - FieldDefinitionConstraintBuilder now consumes FieldDefinitionInterface objects; FieldDefinition registry/core definitions normalize to object contracts -->

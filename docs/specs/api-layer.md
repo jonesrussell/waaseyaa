@@ -1,5 +1,6 @@
 # API Layer
 
+<!-- Spec reviewed 2026-04-24 - CodifiedContextController depends only on CodifiedContextSessionStoreInterface + CodifiedContextSessionRow (packages/api); waaseyaa/telescope ships CodifiedContextSessionStoreAdapter and requires waaseyaa/api at runtime (#1339 L4/L6 boundary) -->
 <!-- Spec reviewed 2026-04-24 - Auth and OIDC HTTP route tables: AuthOidcRouteServiceProvider + OidcHttpRoutes in packages/routing (waaseyaa/routing requires auth+oidc); BuiltinRouteRegistrar still calls all providers' routes() -->
 <!-- Spec reviewed 2026-04-22 - WaaseyaaRouter: reject duplicate route names; RouteBuilder::priority + sortRoutesByPriority (_waaseyaa_priority) for deterministic ordering -->
 <!-- Spec reviewed 2026-04-22 - SchemaPresenter/ResourceSerializer consume normalized FieldDefinitionInterface contracts; legacy array inputs normalized at presenter boundary -->
@@ -26,6 +27,10 @@ Technical specification for the Waaseyaa JSON:API layer and routing system. This
 
 Foundation still wires several shared HTTP surfaces that are not entity-package specific (routes and foundation routers), including `/api/schema/{entity_type}`, `/api/openapi.json`, `/api/entity-types`, broadcast, MCP, and SSR catch-all routing. **Discovery** read models are implemented in the API package: `Waaseyaa\Api\Http\Router\DiscoveryRouter` implements `DomainRouterInterface` and is registered from `ApiServiceProvider::httpDomainRouters()` so discovery stays co-located with `DiscoveryApiHandler` and JSON:API tooling.
 
+### Codified context session endpoints
+
+`CodifiedContextController` exposes operator JSON for codified-context **session** telemetry (for example `GET /api/telescope/codified-context/sessions`). It type-hints **`CodifiedContextSessionStoreInterface`** only; row shapes use **`CodifiedContextSessionRow`** (`packages/api/src/CodifiedContext/`). That keeps Layer 4 free of Layer 6 Telescope storage types. **`Waaseyaa\Telescope\CodifiedContext\Storage\CodifiedContextSessionStoreAdapter`** bridges Telescope’s SQLite codified-context store to the port; `waaseyaa/telescope` `require`s `waaseyaa/api` for those interfaces. Unit tests may register an in-memory or stub store without loading Telescope.
+
 ### packages/api/
 
 | File | Namespace | Purpose |
@@ -47,6 +52,8 @@ Foundation still wires several shared HTTP surfaces that are not entity-package 
 | `src/Schema/SchemaPresenter.php` | `Waaseyaa\Api\Schema` | Converts EntityType definitions to JSON Schema with widget hints |
 | `src/Controller/SchemaController.php` | `Waaseyaa\Api\Controller` | `GET /api/schema/{entity_type}` endpoint |
 | `src/Controller/TranslationController.php` | `Waaseyaa\Api\Controller` | Translation sub-resource CRUD endpoints |
+| `src/CodifiedContext/CodifiedContextSessionStoreInterface.php` | `Waaseyaa\Api\CodifiedContext` | Port for listing/querying codified-context session rows (Telescope adapter in `waaseyaa/telescope`) |
+| `src/CodifiedContext/CodifiedContextSessionRow.php` | `Waaseyaa\Api\CodifiedContext` | Value object for a single session-oriented telescope row exposed through the port |
 | `src/Controller/BroadcastController.php` | `Waaseyaa\Api\Controller` | SSE real-time broadcast endpoint |
 | `src/Controller/BroadcastStorage.php` | `Waaseyaa\Api\Controller` | PDO-backed message queue for SSE broadcasting |
 | `src/Cache/ApiCacheMiddleware.php` | `Waaseyaa\Api\Cache` | ETag, If-None-Match, Cache-Control header generation |
@@ -761,6 +768,9 @@ packages/api/
   src/
     Cache/
       ApiCacheMiddleware.php
+    CodifiedContext/
+      CodifiedContextSessionRow.php
+      CodifiedContextSessionStoreInterface.php
     Controller/
       BroadcastController.php
       BroadcastStorage.php
