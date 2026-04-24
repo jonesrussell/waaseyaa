@@ -77,10 +77,6 @@ Dependencies flow **downward only**. Never import from a higher layer.
 
 ---
 
-## MCP Spec Retrieval
+## Subsystem specs
 
-For deeper framework knowledge beyond these invariants, query the Waaseyaa MCP server:
-
-- `waaseyaa_list_specs` — index of all framework specs
-- `waaseyaa_get_spec("entity-system")` — full spec content
-- `waaseyaa_search_specs("transaction locking")` — keyword search
+For deeper framework knowledge beyond these invariants, read `docs/specs/` in the Waaseyaa monorepo (e.g. `docs/specs/entity-system.md`) or search with `rg` under `docs/specs/`. There is no Waaseyaa spec MCP server.

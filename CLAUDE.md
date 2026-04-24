@@ -16,7 +16,7 @@
 
 ## Orchestration
 
-When working on files matching these patterns, retrieve the spec for deep context. **Orchestration skills are not Skill-tool skills**: The `waaseyaa:*` entries below are conceptual — use `waaseyaa_get_spec` / `waaseyaa_search_specs` MCP tools to retrieve the context they reference, not the `Skill` tool.
+When working on files matching these patterns, retrieve the spec for deep context. **Orchestration skills are not Skill-tool skills**: The `waaseyaa:*` entries below are conceptual routing hints — read the listed `docs/specs/*.md` files (Read tool or `rg` in `docs/specs/`), not the `Skill` tool, unless you explicitly load a specialist skill.
 
 | File pattern | Specialist skill | Cold memory spec |
 |---|---|---|
@@ -59,14 +59,9 @@ When working on files matching these patterns, retrieve the spec for deep contex
 | `skills/waaseyaa/app-development/*` | — | — |
 | `skills/waaseyaa/framework-extraction/*` | — | `docs/specs/extraction-log.md` |
 | `docs/audits/*` | — | — |
-| `docs/specs/**`, `.claude/**`, `**/CLAUDE.md` | `updating-codified-context` | — |
+| `docs/specs/**`, `.claude/**`, `**/CLAUDE.md` | `waaseyaa:spec-maintenance` | — |
 
-Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the mapping isn't obvious.
-
-**MCP tools available:**
-- `waaseyaa_list_specs` — list all subsystem specs with descriptions
-- `waaseyaa_get_spec <name>` — retrieve full spec content (e.g., `waaseyaa_get_spec entity-system`)
-- `waaseyaa_search_specs <query>` — keyword search across all specs (e.g., `waaseyaa_search_specs EntityAccessHandler`)
+When the mapping is not obvious, search under `docs/specs/` (e.g. `rg -n "TopicOrSymbol" docs/specs/`) or load `skills/waaseyaa/spec-maintenance/SKILL.md`.
 
 ## Layer Architecture
 
@@ -128,7 +123,7 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 
 ## GitHub Workflow
 
-All work in this repo follows a GitHub-first workflow. See `docs/specs/workflow.md` (via `waaseyaa_get_spec workflow`) for the full governance model including the versioning strategy and current milestone structure.
+All work in this repo follows a GitHub-first workflow. See `docs/specs/workflow.md` for the full governance model including the versioning strategy and current milestone structure.
 
 **The 5 rules — enforced at every session start via `bin/check-milestones`:**
 
@@ -138,13 +133,15 @@ All work in this repo follows a GitHub-first workflow. See `docs/specs/workflow.
 4. **PRs must reference issues.** PR title format: `feat(#N): description`. Use `.github/pull_request_template.md`.
 5. **Read the drift report.** `bin/check-milestones` runs at session start. Flag any warnings before beginning work.
 
-## Codified Context
+## Agent context and Spec Kitty
 
-This project uses three-tier codified context infrastructure ([arxiv.org/abs/2602.20478](https://arxiv.org/abs/2602.20478)):
-- **Tier 1 (Constitution):** This CLAUDE.md file — loaded every session, orchestration triggers, checklists
-- **Tier 2 (Skills):** Domain specialist skills in `skills/waaseyaa/` — loaded on demand per the orchestration table
-- **Tier 3 (Specs):** Subsystem specs in `docs/specs/` — retrieved via `waaseyaa_*` MCP tools for deep context
-  - `docs/specs/workflow.md` — GitHub workflow governance, versioning model, milestone structure
+- **Constitution (this file):** Session-hot rules — orchestration table, layer graph, checklists, gotchas.
+- **Specialist skills:** `skills/waaseyaa/*` — load on demand for a subsystem; each skill lists related specs.
+- **Cold specs:** `docs/specs/*.md` — read directly from disk when you need contracts, file maps, and edge cases (no spec MCP server).
+
+This repo also uses **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** for optional spec/plan/task workflows (`.kittify/`, slash commands such as `/spec-kitty.specify`, `spec-kitty dashboard`). Install: `pip install spec-kitty-cli` (or `uv tool install spec-kitty-cli`). Run `spec-kitty upgrade` in the repo after upgrading the CLI.
+
+**Workflow precedence:** GitHub issues and milestones remain authoritative for what ships (`docs/specs/workflow.md`). Spec Kitty missions, work packages, and worktrees structure implementation and review alongside that process — they do not replace issue assignment or PR title conventions.
 
 Design docs in `docs/plans/` are session artifacts (implementation history). Specs in `docs/specs/` are enduring architectural knowledge (kept current). When refactoring a subsystem, update its spec — run `tools/drift-detector.sh` to find stale specs.
 

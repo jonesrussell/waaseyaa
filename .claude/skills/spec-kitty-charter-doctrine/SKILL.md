@@ -1,0 +1,1 @@
+/home/jones/.claude/skills/spec-kitty-charter-doctrine/SKILL.md

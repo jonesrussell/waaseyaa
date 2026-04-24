@@ -52,7 +52,6 @@ storage/*
 .worktrees/
 
 .playwright-mcp/
-mcp/node_modules/
 
 # Playwright test artifacts
 packages/admin/playwright-report/
@@ -64,3 +63,32 @@ smoke-*.png
 # Node/Vitest temp artifacts
 node-compile-cache/
 .superpowers/
+
+# Added by Spec Kitty CLI (auto-managed)
+# Note: do not ignore .claude/ root — this repo tracks .claude/settings.json and rules.
+.codex/
+.vibe/
+.opencode/
+.windsurf/
+.gemini/
+.cursor/
+.qwen/
+.kilocode/
+.augment/
+.roo/
+.amazonq/
+.kiro/
+.agent/
+.github/copilot/
+.kittify/.dashboard
+.kittify/charter/context-state.json
+.kittify/charter/directives.yaml
+.kittify/charter/governance.yaml
+.kittify/charter/metadata.yaml
+.kittify/charter/references.yaml
+.kittify/dossiers/
+.kittify/events/
+.kittify/merge-state.json
+.kittify/missions/__pycache__/
+.kittify/runtime/
+.kittify/workspaces/

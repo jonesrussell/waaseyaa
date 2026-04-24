@@ -6,7 +6,7 @@ For steady-state drift scans and C17+ logging, follow [m11-periodic-drift-scan-p
 
 ## What is Drift?
 
-Drift occurs when the codebase diverges from its codified context (specs, CLAUDE.md, contracts).
+Drift occurs when the codebase diverges from its documented contracts (specs, CLAUDE.md, policies).
 Undetected drift causes agents to generate code that conflicts with recent changes.
 
 ## Detection Tools
@@ -14,7 +14,7 @@ Undetected drift causes agents to generate code that conflicts with recent chang
 | Tool | Purpose | How to run |
 |------|---------|-----------|
 | `tools/drift-detector.sh` | Finds stale specs by comparing last-modified dates | `bash tools/drift-detector.sh` |
-| `waaseyaa_search_specs` MCP | Cross-references specs during development | Via Claude Code MCP tools |
+| Read / `rg` on `docs/specs/` | Cross-reference subsystem specs during development | Local files in the repo |
 | `bin/check-milestones` | Validates milestone hygiene at session start | `bin/check-milestones` |
 
 ## Drift Categories
@@ -23,7 +23,7 @@ Undetected drift causes agents to generate code that conflicts with recent chang
 Spec in `docs/specs/` describes behaviour that no longer matches the code.
 
 **Detection:** `drift-detector.sh` compares spec mtime vs. source file mtime.
-**Resolution:** Update the spec. Run `waaseyaa_get_spec <name>` to load current version.
+**Resolution:** Update the spec. Open `docs/specs/<name>.md` from the repo to load the current version.
 
 ### Template drift (SSR)
 Twig templates render content that diverges from the PHP domain model.

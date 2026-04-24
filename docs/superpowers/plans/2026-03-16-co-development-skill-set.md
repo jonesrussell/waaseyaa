@@ -87,7 +87,7 @@ This skill ensures consistent, framework-compliant application development acros
 **Before writing ANY new code, complete these checks:**
 
 1. Search waaseyaa specs: does the framework already provide this?
-   - Use `waaseyaa_search_specs <capability>` if available, or grep `/home/fsd42/dev/waaseyaa/packages/`
+   - Search `docs/specs/` with `rg` or read the spec paths from `CLAUDE.md` orchestration; also grep `packages/` as needed
 2. Search sibling apps: has minoo or claudriel already solved this?
    - Grep `/home/fsd42/dev/minoo/src/` and `/home/fsd42/dev/claudriel/src/`
    - Check their specs in `docs/specs/`

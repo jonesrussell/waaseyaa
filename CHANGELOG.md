@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Contributor / agent workflow:** Retired the Node MCP spec-retrieval servers (`waaseyaa_list_specs`, `waaseyaa_get_spec`, `waaseyaa_search_specs`). Subsystem context is read from `docs/specs/` directly. Adopted [Spec Kitty](https://github.com/Priivacy-ai/spec-kitty) scaffold (`.kittify/`); see `CLAUDE.md` for GitHub-vs-Spec-Kitty precedence and optional CLI install.
+
+### Removed
+
+- `tools/spec-retrieval/` and root `mcp/` spec MCP implementations.
+- `skills/codified-context/SKILL.md` (superseded by `skills/waaseyaa/spec-maintenance/SKILL.md`).
+
 ## [0.1.0-alpha.157] - 2026-04-22
 
 ### Changed
