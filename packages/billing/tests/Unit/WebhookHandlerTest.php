@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\Billing\FakeStripeClient;
 use Waaseyaa\Billing\WebhookHandler;
 
+/**
+ * @covers \Waaseyaa\Billing\WebhookHandler
+ */
 #[CoversClass(WebhookHandler::class)]
 final class WebhookHandlerTest extends TestCase
 {

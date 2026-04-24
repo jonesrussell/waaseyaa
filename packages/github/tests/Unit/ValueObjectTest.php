@@ -11,6 +11,11 @@ use Waaseyaa\GitHub\Issue;
 use Waaseyaa\GitHub\Milestone;
 use Waaseyaa\GitHub\PullRequest;
 
+/**
+ * @covers \Waaseyaa\GitHub\Issue
+ * @covers \Waaseyaa\GitHub\Milestone
+ * @covers \Waaseyaa\GitHub\PullRequest
+ */
 #[CoversClass(Issue::class)]
 #[CoversClass(Milestone::class)]
 #[CoversClass(PullRequest::class)]

@@ -74,8 +74,8 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 |---|---|---|
 | 0 | Foundation | foundation, cache, plugin, typed-data, database-legacy, i18n, queue, scheduler, state, validation, mail, http-client, ingestion, error-handler |
 | 1 | Core Data | entity, entity-storage, access, user, config, field, auth, oidc, testing |
-| 2 | Content Types | node, taxonomy, media, path, menu, note, relationship |
-| 3 | Services | workflows, search, seo, notification, billing, github |
+| 2 | Content Types | node, taxonomy, media, path, menu, note, relationship, groups, engagement, messaging |
+| 3 | Services | workflows, search, seo, notification, billing, github, northcloud |
 | 4 | API | api, routing |
 | 5 | AI | ai-schema, ai-agent, ai-pipeline, ai-vector |
 | 6 | Interfaces | cli, admin, admin-surface, graphql, mcp, ssr, genealogy, telescope, deployer, inertia, debug |

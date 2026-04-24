@@ -1,0 +1,1606 @@
+{
+    "generated_at": "2026-04-24T21:13:54+00:00",
+    "audit": "Layer 0 forensic audit (Foundation)",
+    "target_layer": 0,
+    "layer_name": "Foundation",
+    "canonical_layer_packages": [
+        "analytics",
+        "cache",
+        "database-legacy",
+        "error-handler",
+        "foundation",
+        "geo",
+        "http-client",
+        "i18n",
+        "ingestion",
+        "mail",
+        "mercure",
+        "oauth-provider",
+        "plugin",
+        "queue",
+        "scheduler",
+        "state",
+        "typed-data",
+        "validation"
+    ],
+    "inventory": {
+        "generated_at": "2026-04-24T21:13:51+00:00",
+        "layer": 0,
+        "packages": {
+            "analytics": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 1,
+                "has_tests_unit_dir": false,
+                "has_tests_integration_dir": false
+            },
+            "cache": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 16,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "database-legacy": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 14,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "error-handler": {
+                "waaseyaa_require": {
+                    "waaseyaa/foundation": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 9,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "foundation": {
+                "waaseyaa_require": {
+                    "waaseyaa/queue": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": {
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/error-handler": "^0.1.0-alpha.150",
+                    "waaseyaa/routing": "^0.1.0-alpha.150"
+                },
+                "src_php_count": 134,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "geo": {
+                "waaseyaa_require": {
+                    "waaseyaa/foundation": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 2,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "http-client": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 4,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "i18n": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 8,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "ingestion": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 3,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "mail": {
+                "waaseyaa_require": {
+                    "waaseyaa/foundation": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 9,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "mercure": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 2,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "oauth-provider": {
+                "waaseyaa_require": {
+                    "waaseyaa/http-client": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 9,
+                "has_tests_unit_dir": false,
+                "has_tests_integration_dir": false
+            },
+            "plugin": {
+                "waaseyaa_require": {
+                    "waaseyaa/cache": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 12,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "queue": {
+                "waaseyaa_require": {
+                    "waaseyaa/foundation": "^0.1.0-alpha.150",
+                    "waaseyaa/database-legacy": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 28,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "scheduler": {
+                "waaseyaa_require": {
+                    "waaseyaa/foundation": "^0.1.0-alpha.150",
+                    "waaseyaa/queue": "^0.1.0-alpha.150",
+                    "waaseyaa/database-legacy": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 12,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "state": {
+                "waaseyaa_require": {
+                    "waaseyaa/database-legacy": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 3,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "typed-data": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 17,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "validation": {
+                "waaseyaa_require": {
+                    "waaseyaa/typed-data": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 11,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            }
+        }
+    },
+    "priority_findings": [
+        {
+            "id": "L0-USE-1",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/cache/src/Listener/EntityCacheSubscriber.php",
+                "from_package": "cache",
+                "import": "Waaseyaa\\Entity\\Event\\EntityEvents",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-2",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/cache/src/Listener/ConfigCacheInvalidator.php",
+                "from_package": "cache",
+                "import": "Waaseyaa\\Config\\Event\\ConfigEvent",
+                "target_package": "config",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-3",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/cache/src/Listener/EntityCacheInvalidator.php",
+                "from_package": "cache",
+                "import": "Waaseyaa\\Entity\\Event\\EntityEvent",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-4",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/cache/src/CacheConfigResolver.php",
+                "from_package": "cache",
+                "import": "Waaseyaa\\Access\\AccountInterface",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-5",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/BroadcastRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\Controller\\BroadcastController",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-6",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SchemaRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\EntityAccessHandler",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-7",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SchemaRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\Controller\\SchemaController",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-8",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SchemaRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\OpenApi\\OpenApiGenerator",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-9",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SchemaRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\Schema\\SchemaPresenter",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-10",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SchemaRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-11",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SearchRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\EmbeddingProviderFactory",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-12",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SearchRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\SearchController",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-13",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SearchRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\SqliteEmbeddingStorage",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-14",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SearchRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\ResourceSerializer",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-15",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/SearchRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManagerInterface",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-16",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/WaaseyaaContext.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\AccountInterface",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-17",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/WaaseyaaContext.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\Controller\\BroadcastStorage",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-18",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/JsonApiRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\EntityAccessHandler",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-19",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/JsonApiRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\JsonApiController",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-20",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/JsonApiRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\JsonApiDocument",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-21",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/JsonApiRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\JsonApiError",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-22",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/JsonApiRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\ResourceSerializer",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-23",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/JsonApiRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-24",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/McpRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\EntityAccessHandler",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-25",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/McpRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\EmbeddingProviderFactory",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-26",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/McpRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\SqliteEmbeddingStorage",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-27",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/McpRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\ResourceSerializer",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-28",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/McpRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-29",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/McpRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Mcp\\McpController",
+                "target_package": "mcp",
+                "target_layer": 6,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-30",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/EntityTypeLifecycleRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeIdNormalizer",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-31",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/EntityTypeLifecycleRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeLifecycleManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-32",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Http/Router/EntityTypeLifecycleRouter.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-33",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Diagnostic/BootDiagnosticReport.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeInterface",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-34",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Diagnostic/HealthChecker.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeInterface",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-35",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Diagnostic/HealthChecker.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManagerInterface",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-36",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Diagnostic/HealthChecker.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\Field\\FieldDefinitionRegistryInterface",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-37",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Diagnostic/HealthChecker.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\EntityStorage\\SqlSchemaHandler",
+                "target_package": "entity-storage",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-38",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/Bootstrap/AccessPolicyRegistry.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\EntityAccessHandler",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-39",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/Bootstrap/ContentTypeValidator.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-40",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/Bootstrap/AppEntityTypeLoader.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-41",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/Bootstrap/ProviderRegistry.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-42",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/Bootstrap/ProviderRegistry.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\Exception\\EntityTypeRegistrationCollisionException",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-43",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/BuiltinRouteRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-44",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/BuiltinRouteRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Routing\\RouteBuilder",
+                "target_package": "routing",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-45",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/BuiltinRouteRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Routing\\WaaseyaaRouter",
+                "target_package": "routing",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-46",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\EntityAccessHandler",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-47",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\Audit\\EntityAuditLogger",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-48",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\Audit\\EntityWriteAuditListener",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-49",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\ContentEntityBase",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-50",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeInterface",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-51",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeLifecycleManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-52",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeManager",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-53",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\Repository\\EntityRepositoryInterface",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-54",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\EntityStorage\\Connection\\SingleConnectionResolver",
+                "target_package": "entity-storage",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-55",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\EntityStorage\\Driver\\RevisionableStorageDriver",
+                "target_package": "entity-storage",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-56",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\EntityStorage\\Driver\\SqlStorageDriver",
+                "target_package": "entity-storage",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-57",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\EntityStorage\\EntityRepository",
+                "target_package": "entity-storage",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-58",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\EntityStorage\\SqlEntityStorage",
+                "target_package": "entity-storage",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-59",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/AbstractKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\EntityStorage\\SqlSchemaHandler",
+                "target_package": "entity-storage",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-60",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\AccessChecker",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-61",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\AccountInterface",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-62",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\ErrorPageRendererInterface",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-63",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\Gate\\EntityAccessGate",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-64",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\Middleware\\AuthorizationMiddleware",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-65",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\Controller\\BroadcastStorage",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-66",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\Http\\DiscoveryApiHandler",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-67",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Routing\\WaaseyaaRouter",
+                "target_package": "routing",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-68",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\User\\DevAdminAccount",
+                "target_package": "user",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-69",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\User\\Middleware\\BearerAuthMiddleware",
+                "target_package": "user",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-70",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\User\\Middleware\\CsrfMiddleware",
+                "target_package": "user",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-71",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/HttpKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\User\\Middleware\\SessionMiddleware",
+                "target_package": "user",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-72",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Access\\PermissionHandler",
+                "target_package": "access",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-73",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\EmbeddingProviderFactory",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-74",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\SemanticIndexWarmer",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-75",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\SqliteEmbeddingStorage",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-76",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\CLI\\CliCommandRegistry",
+                "target_package": "cli",
+                "target_layer": 6,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-77",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\CLI\\Command\\DbInitCommand",
+                "target_package": "cli",
+                "target_layer": 6,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-78",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\CLI\\Command\\Optimize\\OptimizeManifestCommand",
+                "target_package": "cli",
+                "target_layer": 6,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-79",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\CLI\\Command\\WaaseyaaVersionCommand",
+                "target_package": "cli",
+                "target_layer": 6,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-80",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\CLI\\WaaseyaaApplication",
+                "target_package": "cli",
+                "target_layer": 6,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-81",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Config\\ConfigManager",
+                "target_package": "config",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-82",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Config\\Storage\\FileStorage",
+                "target_package": "config",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-83",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\EntityTypeIdNormalizer",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-84",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Routing\\WaaseyaaRouter",
+                "target_package": "routing",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-85",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/EventListenerRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\EmbeddingProviderFactory",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-86",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/EventListenerRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\EntityEmbeddingCleanupListener",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-87",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/EventListenerRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\EntityEmbeddingListener",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-88",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/EventListenerRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\AI\\Vector\\SqliteEmbeddingStorage",
+                "target_package": "ai-vector",
+                "target_layer": 5,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-89",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/EventListenerRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Api\\Controller\\BroadcastStorage",
+                "target_package": "api",
+                "target_layer": 4,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-90",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/EventListenerRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\Event\\EntityEvent",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-USE-91",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L0 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/foundation/src/Kernel/EventListenerRegistrar.php",
+                "from_package": "foundation",
+                "import": "Waaseyaa\\Entity\\Event\\EntityEvents",
+                "target_package": "entity",
+                "target_layer": 1,
+                "rule": "L0 must not use types from layer >0 via use statement"
+            }
+        },
+        {
+            "id": "L0-COV-AGG",
+            "priority": 4,
+            "category": "test_coverage",
+            "severity": "low",
+            "message": "Public (non-@internal) L0 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer0.json",
+            "detail": {
+                "count": 269,
+                "sample_fqcn": [
+                    "Waaseyaa\\Analytics\\UmamiClient",
+                    "Waaseyaa\\Cache\\CacheFactory",
+                    "Waaseyaa\\Cache\\TagAwareCacheInterface",
+                    "Waaseyaa\\Cache\\CacheItem",
+                    "Waaseyaa\\Cache\\CacheTagsInvalidator",
+                    "Waaseyaa\\Cache\\Listener\\TranslationCacheInvalidator",
+                    "Waaseyaa\\Cache\\Listener\\EntityCacheSubscriber",
+                    "Waaseyaa\\Cache\\Listener\\ConfigCacheInvalidator",
+                    "Waaseyaa\\Cache\\Listener\\EntityCacheInvalidator",
+                    "Waaseyaa\\Cache\\Backend\\DatabaseBackend",
+                    "Waaseyaa\\Cache\\Backend\\MemoryBackend",
+                    "Waaseyaa\\Cache\\Backend\\NullBackend"
+                ]
+            }
+        },
+        {
+            "id": "L0-DOC-CLAUDE",
+            "priority": 1,
+            "category": "public_api_documentation",
+            "severity": "low",
+            "message": "CLAUDE.md Layer 0 table and bin/check-package-layers disagree on package set.",
+            "detail": {
+                "in_script_not_in_claude": [
+                    "analytics",
+                    "geo",
+                    "mercure",
+                    "oauth-provider"
+                ],
+                "in_claude_not_in_script": []
+            }
+        }
+    ],
+    "phpstan_totals": {
+        "errors": 0,
+        "file_errors": 0
+    },
+    "deliverables": [
+        "layer0-audit.md",
+        "layer0-audit.json",
+        "public_api_layer0.json",
+        "symbol_test_map_layer0.json",
+        "layer0_layer_boundary_report.json",
+        "layer0_metadata_consistency.json",
+        "layer0_hygiene_report.txt",
+        "layer0_static_analysis.json"
+    ]
+}

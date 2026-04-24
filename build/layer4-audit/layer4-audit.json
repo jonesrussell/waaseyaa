@@ -1,0 +1,129 @@
+{
+    "generated_at": "2026-04-24T21:14:04+00:00",
+    "audit": "Layer 4 forensic audit (API)",
+    "target_layer": 4,
+    "layer_name": "API",
+    "canonical_layer_packages": [
+        "api",
+        "bimaaji",
+        "routing"
+    ],
+    "inventory": {
+        "generated_at": "2026-04-24T21:14:02+00:00",
+        "layer": 4,
+        "packages": {
+            "api": {
+                "waaseyaa_require": {
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/foundation": "^0.1.0-alpha.150",
+                    "waaseyaa/routing": "^0.1.0-alpha.150",
+                    "waaseyaa/access": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": {
+                    "waaseyaa/database-legacy": "^0.1.0-alpha.150"
+                },
+                "src_php_count": 29,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "bimaaji": {
+                "waaseyaa_require": {
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/foundation": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 25,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": true
+            },
+            "routing": {
+                "waaseyaa_require": {
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/access": "^0.1.0-alpha.150",
+                    "waaseyaa/i18n": "^0.1.0-alpha.150",
+                    "waaseyaa/auth": "^0.1.0-alpha.150",
+                    "waaseyaa/oidc": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 11,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            }
+        }
+    },
+    "priority_findings": [
+        {
+            "id": "L4-USE-1",
+            "priority": 2,
+            "category": "layer_boundary",
+            "severity": "high",
+            "message": "L4 source uses Waaseyaa type from higher layer (static use)",
+            "detail": {
+                "file": "packages/api/src/Controller/CodifiedContextController.php",
+                "from_package": "api",
+                "import": "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\CodifiedContextStoreInterface",
+                "target_package": "telescope",
+                "target_layer": 6,
+                "rule": "L4 must not use types from layer >4 via use statement"
+            }
+        },
+        {
+            "id": "L4-PHPSTAN-GAP-bimaaji",
+            "priority": 2,
+            "category": "ci_alignment",
+            "severity": "medium",
+            "message": "Package 'bimaaji' (L4) not listed in phpstan.neon paths; default CI may not analyze it."
+        },
+        {
+            "id": "L4-COV-AGG",
+            "priority": 4,
+            "category": "test_coverage",
+            "severity": "low",
+            "message": "Public (non-@internal) L4 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer4.json",
+            "detail": {
+                "count": 64,
+                "sample_fqcn": [
+                    "Waaseyaa\\Api\\Http\\DiscoveryApiHandler",
+                    "Waaseyaa\\Api\\Http\\Router\\DiscoveryRouter",
+                    "Waaseyaa\\Api\\ResourceSerializer",
+                    "Waaseyaa\\Api\\Query\\ParsedQuery",
+                    "Waaseyaa\\Api\\Query\\QueryFilter",
+                    "Waaseyaa\\Api\\Query\\QueryParser",
+                    "Waaseyaa\\Api\\Query\\QueryApplier",
+                    "Waaseyaa\\Api\\Query\\QuerySort",
+                    "Waaseyaa\\Api\\Query\\PaginationLinks",
+                    "Waaseyaa\\Api\\Schema\\SchemaPresenter",
+                    "Waaseyaa\\Api\\Controller\\BroadcastStorage",
+                    "Waaseyaa\\Api\\Controller\\TranslationController"
+                ]
+            }
+        },
+        {
+            "id": "L4-DOC-CLAUDE",
+            "priority": 1,
+            "category": "public_api_documentation",
+            "severity": "low",
+            "message": "CLAUDE.md Layer 4 table and bin/check-package-layers disagree on package set.",
+            "detail": {
+                "in_script_not_in_claude": [
+                    "bimaaji"
+                ],
+                "in_claude_not_in_script": []
+            }
+        }
+    ],
+    "phpstan_totals": {
+        "errors": 0,
+        "file_errors": 3
+    },
+    "deliverables": [
+        "layer4-audit.md",
+        "layer4-audit.json",
+        "public_api_layer4.json",
+        "symbol_test_map_layer4.json",
+        "layer4_layer_boundary_report.json",
+        "layer4_metadata_consistency.json",
+        "layer4_hygiene_report.txt",
+        "layer4_static_analysis.json"
+    ]
+}

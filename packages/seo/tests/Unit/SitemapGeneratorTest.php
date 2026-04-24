@@ -13,6 +13,9 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Seo\SitemapGenerator;
 use Waaseyaa\Seo\SitemapUrl;
 
+/**
+ * @covers \Waaseyaa\Seo\SitemapGenerator
+ */
 #[CoversClass(SitemapGenerator::class)]
 final class SitemapGeneratorTest extends TestCase
 {

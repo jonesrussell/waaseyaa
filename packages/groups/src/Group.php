@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Groups;
 
 use Waaseyaa\Entity\ContentEntityBase;
+use Waaseyaa\Field\FieldDefinitionInterface;
 
 /**
  * Multi-bundle Group content entity.
@@ -27,8 +28,9 @@ final class Group extends ContentEntityBase
 
     /**
      * @param array<string, mixed> $values Initial entity values.
+     * @param string $entityTypeId Override machine name (defaults to `group` when empty).
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
-     * @param array<string, array<string, mixed>> $fieldDefinitions
+     * @param array<string, FieldDefinitionInterface> $fieldDefinitions Field definitions keyed by field name.
      */
     public function __construct(
         array $values = [],

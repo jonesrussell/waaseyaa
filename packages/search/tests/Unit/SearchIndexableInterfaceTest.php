@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Search\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Search\SearchIndexableInterface;
 
-#[CoversNothing]
+/**
+ * @covers \Waaseyaa\Search\SearchIndexableInterface
+ */
 final class SearchIndexableInterfaceTest extends TestCase
 {
     #[Test]

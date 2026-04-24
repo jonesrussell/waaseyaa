@@ -8,6 +8,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Billing\SubscriptionData;
 
+/**
+ * @covers \Waaseyaa\Billing\SubscriptionData
+ */
 #[CoversClass(SubscriptionData::class)]
 final class SubscriptionDataTest extends TestCase
 {

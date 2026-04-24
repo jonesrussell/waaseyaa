@@ -10,6 +10,9 @@ use Waaseyaa\Workflows\WorkflowTransition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Waaseyaa\Workflows\Workflow
+ */
 #[CoversClass(Workflow::class)]
 final class WorkflowTest extends TestCase
 {

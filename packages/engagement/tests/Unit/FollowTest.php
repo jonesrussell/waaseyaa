@@ -9,6 +9,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Engagement\Follow;
 
+/**
+ * @covers \Waaseyaa\Engagement\Follow
+ */
 #[CoversClass(Follow::class)]
 final class FollowTest extends TestCase
 {

@@ -10,6 +10,9 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Workflows\EditorialTransitionAccessResolver;
 use Waaseyaa\Workflows\EditorialWorkflowPreset;
 
+/**
+ * @covers \Waaseyaa\Workflows\EditorialTransitionAccessResolver
+ */
 #[CoversClass(EditorialTransitionAccessResolver::class)]
 final class EditorialTransitionAccessResolverTest extends TestCase
 {

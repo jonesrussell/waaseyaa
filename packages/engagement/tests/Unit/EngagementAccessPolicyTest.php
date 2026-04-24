@@ -11,6 +11,9 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Engagement\EngagementAccessPolicy;
 use Waaseyaa\Entity\EntityInterface;
 
+/**
+ * @covers \Waaseyaa\Engagement\EngagementAccessPolicy
+ */
 #[CoversClass(EngagementAccessPolicy::class)]
 final class EngagementAccessPolicyTest extends TestCase
 {

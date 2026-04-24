@@ -8,6 +8,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Billing\CheckoutSession;
 
+/**
+ * @covers \Waaseyaa\Billing\CheckoutSession
+ */
 #[CoversClass(CheckoutSession::class)]
 final class CheckoutSessionTest extends TestCase
 {

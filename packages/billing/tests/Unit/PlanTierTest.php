@@ -8,6 +8,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Billing\PlanTier;
 
+/**
+ * @covers \Waaseyaa\Billing\PlanTier
+ */
 #[CoversClass(PlanTier::class)]
 final class PlanTierTest extends TestCase
 {

@@ -27,6 +27,9 @@ final class NorthCloudCache
         $stmt = $this->pdo->prepare(
             'SELECT response_body FROM nc_api_cache WHERE cache_key = :key AND expires_at > :now',
         );
+        if ($stmt === false) {
+            throw new \RuntimeException('NorthCloudCache: failed to prepare SELECT');
+        }
         $stmt->execute(['key' => $this->canonicalize($key), 'now' => time()]);
         $result = $stmt->fetchColumn();
 
@@ -40,6 +43,9 @@ final class NorthCloudCache
         $stmt = $this->pdo->prepare(
             'INSERT OR REPLACE INTO nc_api_cache (cache_key, response_body, expires_at) VALUES (:key, :body, :expires)',
         );
+        if ($stmt === false) {
+            throw new \RuntimeException('NorthCloudCache: failed to prepare INSERT');
+        }
         $stmt->execute([
             'key' => $this->canonicalize($key),
             'body' => $value,
@@ -69,8 +75,8 @@ final class NorthCloudCache
             return $url;
         }
 
-        $scheme = strtolower((string) $parts['scheme']);
-        $host = strtolower((string) $parts['host']);
+        $scheme = strtolower($parts['scheme']);
+        $host = strtolower($parts['host']);
         $port = isset($parts['port']) ? ':' . $parts['port'] : '';
         $user = isset($parts['user']) ? $parts['user'] . (isset($parts['pass']) ? ':' . $parts['pass'] : '') . '@' : '';
         $path = $parts['path'] ?? '';

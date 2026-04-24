@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\Workflows\Workflow;
 use Waaseyaa\Workflows\WorkflowServiceProvider;
 
+/**
+ * @covers \Waaseyaa\Workflows\WorkflowServiceProvider
+ */
 #[CoversClass(WorkflowServiceProvider::class)]
 final class WorkflowServiceProviderTest extends TestCase
 {

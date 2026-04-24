@@ -9,6 +9,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Seo\JsonLdBuilder;
 
+/**
+ * @covers \Waaseyaa\Seo\JsonLdBuilder
+ */
 #[CoversClass(JsonLdBuilder::class)]
 final class JsonLdBuilderTest extends TestCase
 {

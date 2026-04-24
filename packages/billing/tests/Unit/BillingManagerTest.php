@@ -12,6 +12,9 @@ use Waaseyaa\Billing\FakeStripeClient;
 use Waaseyaa\Billing\PlanTier;
 use Waaseyaa\Billing\SubscriptionData;
 
+/**
+ * @covers \Waaseyaa\Billing\BillingManager
+ */
 #[CoversClass(BillingManager::class)]
 final class BillingManagerTest extends TestCase
 {

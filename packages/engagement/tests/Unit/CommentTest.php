@@ -9,6 +9,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Engagement\Comment;
 
+/**
+ * @covers \Waaseyaa\Engagement\Comment
+ */
 #[CoversClass(Comment::class)]
 final class CommentTest extends TestCase
 {

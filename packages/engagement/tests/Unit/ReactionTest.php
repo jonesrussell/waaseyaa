@@ -9,6 +9,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Engagement\Reaction;
 
+/**
+ * @covers \Waaseyaa\Engagement\Reaction
+ */
 #[CoversClass(Reaction::class)]
 final class ReactionTest extends TestCase
 {

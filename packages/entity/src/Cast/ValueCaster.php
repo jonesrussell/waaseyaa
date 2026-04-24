@@ -22,6 +22,9 @@ use Waaseyaa\TypedData\Coercion\EntityCastCoercion;
  *
  * Optional Carbon: array spec `['type' => 'datetime_immutable', 'domain' => 'carbon_immutable']` requires
  * `nesbot/carbon` (#1183).
+ *
+ * Backed-enum handling intentionally uses {@see ReflectionEnum} to validate `isBacked()` and read backing
+ * types; there is no smaller surface API for the same checks (audit hygiene flags `new Reflection` generically).
  */
 final class ValueCaster
 {

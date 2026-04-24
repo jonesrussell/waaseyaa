@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\Workflows\EditorialWorkflowPreset;
 use Waaseyaa\Workflows\Workflow;
 
+/**
+ * @covers \Waaseyaa\Workflows\EditorialWorkflowPreset
+ */
 #[CoversClass(EditorialWorkflowPreset::class)]
 final class EditorialWorkflowPresetTest extends TestCase
 {

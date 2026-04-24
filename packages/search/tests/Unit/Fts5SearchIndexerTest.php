@@ -11,6 +11,9 @@ use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Search\Fts5\Fts5SearchIndexer;
 use Waaseyaa\Search\SearchIndexableInterface;
 
+/**
+ * @covers \Waaseyaa\Search\Fts5\Fts5SearchIndexer
+ */
 #[CoversClass(Fts5SearchIndexer::class)]
 final class Fts5SearchIndexerTest extends TestCase
 {

@@ -12,6 +12,12 @@ use Waaseyaa\Search\SearchFacet;
 use Waaseyaa\Search\SearchHit;
 use Waaseyaa\Search\SearchResult;
 
+/**
+ * @covers \Waaseyaa\Search\SearchResult
+ * @covers \Waaseyaa\Search\SearchHit
+ * @covers \Waaseyaa\Search\SearchFacet
+ * @covers \Waaseyaa\Search\FacetBucket
+ */
 #[CoversClass(SearchResult::class)]
 #[CoversClass(SearchHit::class)]
 #[CoversClass(SearchFacet::class)]

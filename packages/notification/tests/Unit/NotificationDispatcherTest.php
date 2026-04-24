@@ -18,6 +18,11 @@ use Waaseyaa\Notification\NotificationInterface;
 use Waaseyaa\Queue\SyncQueue;
 use Waaseyaa\Database\DBALDatabase;
 
+/**
+ * @covers \Waaseyaa\Notification\NotificationDispatcher
+ * @covers \Waaseyaa\Notification\Channel\MailChannel
+ * @covers \Waaseyaa\Notification\Channel\DatabaseChannel
+ */
 #[CoversClass(NotificationDispatcher::class)]
 #[CoversClass(MailChannel::class)]
 #[CoversClass(DatabaseChannel::class)]

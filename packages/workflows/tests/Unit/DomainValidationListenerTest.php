@@ -13,6 +13,9 @@ use Waaseyaa\Entity\FieldableInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 use Waaseyaa\Workflows\DomainValidationListener;
 
+/**
+ * @covers \Waaseyaa\Workflows\DomainValidationListener
+ */
 #[CoversClass(DomainValidationListener::class)]
 final class DomainValidationListenerTest extends TestCase
 {

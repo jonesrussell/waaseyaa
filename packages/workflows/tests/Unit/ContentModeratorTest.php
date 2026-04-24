@@ -12,6 +12,9 @@ use Waaseyaa\Workflows\WorkflowTransition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Waaseyaa\Workflows\ContentModerator
+ */
 #[CoversClass(ContentModerator::class)]
 final class ContentModeratorTest extends TestCase
 {

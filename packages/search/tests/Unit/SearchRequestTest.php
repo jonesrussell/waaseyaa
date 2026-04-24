@@ -10,6 +10,10 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\Search\SearchFilters;
 use Waaseyaa\Search\SearchRequest;
 
+/**
+ * @covers \Waaseyaa\Search\SearchRequest
+ * @covers \Waaseyaa\Search\SearchFilters
+ */
 #[CoversClass(SearchRequest::class)]
 #[CoversClass(SearchFilters::class)]
 final class SearchRequestTest extends TestCase

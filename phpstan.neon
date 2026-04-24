@@ -17,6 +17,7 @@ parameters:
         - packages/ai-vector/src
         - packages/api/src
         - packages/auth/src
+        - packages/billing/src
         - packages/analytics/src
         - packages/cache/src
         - packages/cli/src
@@ -24,10 +25,13 @@ parameters:
         - packages/database-legacy/src
         - packages/entity-storage/src
         - packages/entity/src
+        - packages/engagement/src
         - packages/error-handler/src
         - packages/field/src
         - packages/foundation/src
         - packages/geo/src
+        - packages/groups/src
+        - packages/github/src
 
         - packages/i18n/src
         - packages/http-client/src
@@ -37,9 +41,12 @@ parameters:
         - packages/media/src
         - packages/mercure/src
         - packages/menu/src
+        - packages/messaging/src
         - packages/node/src
+        - packages/northcloud/src
         - packages/note/src
         - packages/oauth-provider/src
+        - packages/notification/src
         - packages/oidc/src
         - packages/path/src
         - packages/plugin/src

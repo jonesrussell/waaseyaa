@@ -11,6 +11,9 @@ use Waaseyaa\NorthCloud\Client\NorthCloudClient;
 use Waaseyaa\NorthCloud\Search\NorthCloudSearchProvider;
 use Waaseyaa\Search\SearchRequest;
 
+/**
+ * @covers \Waaseyaa\NorthCloud\Search\NorthCloudSearchProvider
+ */
 #[CoversClass(NorthCloudSearchProvider::class)]
 final class NorthCloudSearchProviderTest extends TestCase
 {

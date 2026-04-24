@@ -1,0 +1,244 @@
+{
+    "generated_at": "2026-04-24T21:14:07+00:00",
+    "audit": "Layer 6 forensic audit (Interfaces)",
+    "target_layer": 6,
+    "layer_name": "Interfaces",
+    "canonical_layer_packages": [
+        "admin",
+        "admin-surface",
+        "cli",
+        "debug",
+        "deployer",
+        "genealogy",
+        "graphql",
+        "inertia",
+        "mcp",
+        "ssr",
+        "telescope"
+    ],
+    "inventory": {
+        "generated_at": "2026-04-24T21:14:07+00:00",
+        "layer": 6,
+        "packages": {
+            "admin": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 0,
+                "has_tests_unit_dir": false,
+                "has_tests_integration_dir": false
+            },
+            "admin-surface": {
+                "waaseyaa_require": {
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/access": "^0.1.0-alpha.150",
+                    "waaseyaa/routing": "^0.1.0-alpha.150",
+                    "waaseyaa/foundation": "^0.1.0-alpha.150",
+                    "waaseyaa/api": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 16,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "cli": {
+                "waaseyaa_require": {
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/config": "^0.1.0-alpha.150",
+                    "waaseyaa/cache": "^0.1.0-alpha.150",
+                    "waaseyaa/user": "^0.1.0-alpha.150",
+                    "waaseyaa/access": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 94,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": true
+            },
+            "debug": {
+                "waaseyaa_require": {
+                    "waaseyaa/foundation": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 4,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "deployer": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 0,
+                "has_tests_unit_dir": false,
+                "has_tests_integration_dir": false
+            },
+            "genealogy": {
+                "waaseyaa_require": {
+                    "waaseyaa/access": "^0.1.0-alpha.150",
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/field": "^0.1.0-alpha.150",
+                    "waaseyaa/foundation": "^0.1.0-alpha.150",
+                    "waaseyaa/relationship": "^0.1.0-alpha.150",
+                    "waaseyaa/routing": "^0.1.0-alpha.150",
+                    "waaseyaa/ssr": "^0.1.0-alpha.150",
+                    "waaseyaa/user": "^0.1.0-alpha.150",
+                    "waaseyaa/workflows": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": {
+                    "waaseyaa/api": "^0.1.0-alpha.150",
+                    "waaseyaa/database-legacy": "^0.1.0-alpha.150",
+                    "waaseyaa/entity-storage": "^0.1.0-alpha.150"
+                },
+                "src_php_count": 15,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "graphql": {
+                "waaseyaa_require": {
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/field": "^0.1.0-alpha.150",
+                    "waaseyaa/access": "^0.1.0-alpha.150",
+                    "waaseyaa/foundation": "^0.1.0-alpha.150",
+                    "waaseyaa/routing": "^0.1.0-alpha.150",
+                    "waaseyaa/api": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 11,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "inertia": {
+                "waaseyaa_require": {
+                    "waaseyaa/foundation": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 7,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "mcp": {
+                "waaseyaa_require": {
+                    "waaseyaa/ai-schema": "^0.1.0-alpha.150",
+                    "waaseyaa/ai-agent": "^0.1.0-alpha.150",
+                    "waaseyaa/routing": "^0.1.0-alpha.150",
+                    "waaseyaa/access": "^0.1.0-alpha.150",
+                    "waaseyaa/cache": "^0.1.0-alpha.150",
+                    "waaseyaa/api": "^0.1.0-alpha.150",
+                    "waaseyaa/ai-vector": "^0.1.0-alpha.150",
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/workflows": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 18,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "ssr": {
+                "waaseyaa_require": {
+                    "waaseyaa/api": "^0.1.0-alpha.150",
+                    "waaseyaa/access": "^0.1.0-alpha.150",
+                    "waaseyaa/cache": "^0.1.0-alpha.150",
+                    "waaseyaa/config": "^0.1.0-alpha.150",
+                    "waaseyaa/entity": "^0.1.0-alpha.150",
+                    "waaseyaa/field": "^0.1.0-alpha.150",
+                    "waaseyaa/foundation": "^0.1.0-alpha.150",
+                    "waaseyaa/routing": "^0.1.0-alpha.150"
+                },
+                "waaseyaa_require_dev": [],
+                "src_php_count": 31,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            },
+            "telescope": {
+                "waaseyaa_require": [],
+                "waaseyaa_require_dev": [],
+                "src_php_count": 36,
+                "has_tests_unit_dir": true,
+                "has_tests_integration_dir": false
+            }
+        }
+    },
+    "priority_findings": [
+        {
+            "id": "L6-PHPSTAN-GAP-admin",
+            "priority": 2,
+            "category": "ci_alignment",
+            "severity": "medium",
+            "message": "Package 'admin' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
+        },
+        {
+            "id": "L6-PHPSTAN-GAP-admin-surface",
+            "priority": 2,
+            "category": "ci_alignment",
+            "severity": "medium",
+            "message": "Package 'admin-surface' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
+        },
+        {
+            "id": "L6-PHPSTAN-GAP-debug",
+            "priority": 2,
+            "category": "ci_alignment",
+            "severity": "medium",
+            "message": "Package 'debug' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
+        },
+        {
+            "id": "L6-PHPSTAN-GAP-deployer",
+            "priority": 2,
+            "category": "ci_alignment",
+            "severity": "medium",
+            "message": "Package 'deployer' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
+        },
+        {
+            "id": "L6-PHPSTAN-GAP-genealogy",
+            "priority": 2,
+            "category": "ci_alignment",
+            "severity": "medium",
+            "message": "Package 'genealogy' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
+        },
+        {
+            "id": "L6-PHPSTAN-GAP-graphql",
+            "priority": 2,
+            "category": "ci_alignment",
+            "severity": "medium",
+            "message": "Package 'graphql' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
+        },
+        {
+            "id": "L6-PHPSTAN-GAP-inertia",
+            "priority": 2,
+            "category": "ci_alignment",
+            "severity": "medium",
+            "message": "Package 'inertia' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
+        },
+        {
+            "id": "L6-COV-AGG",
+            "priority": 4,
+            "category": "test_coverage",
+            "severity": "low",
+            "message": "Public (non-@internal) L6 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer6.json",
+            "detail": {
+                "count": 226,
+                "sample_fqcn": [
+                    "Waaseyaa\\AdminSurface\\Query\\SurfaceFilterOperator",
+                    "Waaseyaa\\AdminSurface\\Query\\SurfaceQueryParser",
+                    "Waaseyaa\\AdminSurface\\Query\\SurfaceQuery",
+                    "Waaseyaa\\AdminSurface\\Action\\SurfaceActionHandlerInterface",
+                    "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceSessionData",
+                    "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceUiPayload",
+                    "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceResultData",
+                    "Waaseyaa\\AdminSurface\\Host\\GenericAdminSurfaceHost",
+                    "Waaseyaa\\AdminSurface\\Host\\AbstractAdminSurfaceHost",
+                    "Waaseyaa\\AdminSurface\\Catalog\\ActionDefinition",
+                    "Waaseyaa\\AdminSurface\\Catalog\\EntityDefinition",
+                    "Waaseyaa\\AdminSurface\\Catalog\\CatalogBuilder"
+                ]
+            }
+        }
+    ],
+    "phpstan_totals": null,
+    "deliverables": [
+        "layer6-audit.md",
+        "layer6-audit.json",
+        "public_api_layer6.json",
+        "symbol_test_map_layer6.json",
+        "layer6_layer_boundary_report.json",
+        "layer6_metadata_consistency.json",
+        "layer6_hygiene_report.txt",
+        "layer6_static_analysis.json"
+    ]
+}

@@ -11,6 +11,13 @@ use Waaseyaa\Groups\Group;
 use Waaseyaa\Groups\GroupsServiceProvider;
 use Waaseyaa\Groups\GroupType;
 
+/**
+ * Docblock @covers is indexed by tools/audit/GenerateLayerAudit.php; #[CoversClass] alone is not.
+ *
+ * @covers \Waaseyaa\Groups\GroupsServiceProvider
+ * @covers \Waaseyaa\Groups\Group
+ * @covers \Waaseyaa\Groups\GroupType
+ */
 #[CoversClass(GroupsServiceProvider::class)]
 final class GroupsServiceProviderTest extends TestCase
 {

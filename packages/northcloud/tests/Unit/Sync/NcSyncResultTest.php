@@ -9,6 +9,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\NorthCloud\Sync\NcSyncResult;
 
+/**
+ * @covers \Waaseyaa\NorthCloud\Sync\NcSyncResult
+ */
 #[CoversClass(NcSyncResult::class)]
 final class NcSyncResultTest extends TestCase
 {

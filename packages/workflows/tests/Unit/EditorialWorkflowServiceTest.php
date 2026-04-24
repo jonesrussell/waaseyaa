@@ -11,6 +11,9 @@ use Waaseyaa\Entity\FieldableInterface;
 use Waaseyaa\Workflows\EditorialWorkflowPreset;
 use Waaseyaa\Workflows\EditorialWorkflowService;
 
+/**
+ * @covers \Waaseyaa\Workflows\EditorialWorkflowService
+ */
 #[CoversClass(EditorialWorkflowService::class)]
 final class EditorialWorkflowServiceTest extends TestCase
 {

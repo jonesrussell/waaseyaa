@@ -17,6 +17,9 @@ use Waaseyaa\NorthCloud\Sync\MapperRegistry;
 use Waaseyaa\NorthCloud\Sync\NcHitToEntityMapperInterface;
 use Waaseyaa\NorthCloud\Sync\NcSyncService;
 
+/**
+ * @covers \Waaseyaa\NorthCloud\Sync\NcSyncService
+ */
 #[CoversClass(NcSyncService::class)]
 final class NcSyncServiceTest extends TestCase
 {

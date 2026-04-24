@@ -8,6 +8,9 @@ use Waaseyaa\Workflows\WorkflowState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Waaseyaa\Workflows\WorkflowState
+ */
 #[CoversClass(WorkflowState::class)]
 final class WorkflowStateTest extends TestCase
 {

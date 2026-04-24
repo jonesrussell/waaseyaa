@@ -8,6 +8,9 @@ use Waaseyaa\Workflows\ContentModerationState;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Waaseyaa\Workflows\ContentModerationState
+ */
 #[CoversClass(ContentModerationState::class)]
 final class ContentModerationStateTest extends TestCase
 {

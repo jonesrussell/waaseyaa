@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\NorthCloud\Client\NorthCloudClient;
 use Waaseyaa\NorthCloud\Provider\NorthCloudServiceProvider;
 
+/**
+ * @covers \Waaseyaa\NorthCloud\Provider\NorthCloudServiceProvider
+ */
 #[CoversClass(NorthCloudServiceProvider::class)]
 final class NorthCloudServiceProviderTest extends TestCase
 {

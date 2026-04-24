@@ -12,6 +12,9 @@ use Waaseyaa\GitHub\Issue;
 use Waaseyaa\GitHub\Milestone;
 use Waaseyaa\GitHub\PullRequest;
 
+/**
+ * @covers \Waaseyaa\GitHub\GitHubClient
+ */
 #[CoversClass(GitHubClient::class)]
 final class GitHubClientTest extends TestCase
 {

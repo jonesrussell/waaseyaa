@@ -10,6 +10,9 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Workflows\EditorialVisibilityResolver;
 
+/**
+ * @covers \Waaseyaa\Workflows\EditorialVisibilityResolver
+ */
 #[CoversClass(EditorialVisibilityResolver::class)]
 final class EditorialVisibilityResolverTest extends TestCase
 {

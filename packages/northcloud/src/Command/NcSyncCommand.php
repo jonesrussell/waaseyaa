@@ -162,9 +162,6 @@ final class NcSyncCommand extends Command
             ];
 
             $json = json_encode($payload, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
-            if ($json === false) {
-                return;
-            }
 
             $directory = dirname($path);
             if (!is_dir($directory)) {

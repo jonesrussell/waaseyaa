@@ -9,6 +9,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Seo\RobotsTxtGenerator;
 
+/**
+ * @covers \Waaseyaa\Seo\RobotsTxtGenerator
+ */
 #[CoversClass(RobotsTxtGenerator::class)]
 final class RobotsTxtGeneratorTest extends TestCase
 {

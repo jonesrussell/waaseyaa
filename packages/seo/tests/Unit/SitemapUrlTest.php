@@ -10,6 +10,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Seo\SitemapUrl;
 
+/**
+ * @covers \Waaseyaa\Seo\SitemapUrl
+ */
 #[CoversClass(SitemapUrl::class)]
 final class SitemapUrlTest extends TestCase
 {

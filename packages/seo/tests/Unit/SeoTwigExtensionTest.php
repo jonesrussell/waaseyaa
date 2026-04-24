@@ -12,6 +12,9 @@ use Twig\Loader\ArrayLoader;
 use Waaseyaa\Seo\MetaTagBuilder;
 use Waaseyaa\Seo\Twig\SeoTwigExtension;
 
+/**
+ * @covers \Waaseyaa\Seo\Twig\SeoTwigExtension
+ */
 #[CoversClass(SeoTwigExtension::class)]
 final class SeoTwigExtensionTest extends TestCase
 {

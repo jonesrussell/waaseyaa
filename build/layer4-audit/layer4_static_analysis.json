@@ -1,0 +1,64 @@
+{
+    "generated_at": "2026-04-24T21:14:04+00:00",
+    "phpstan": {
+        "command": "phpstan analyse (L4 package src/ trees only \u2014 not full CI set)",
+        "paths": [
+            "/home/jones/dev/waaseyaa/packages/api/src",
+            "/home/jones/dev/waaseyaa/packages/bimaaji/src",
+            "/home/jones/dev/waaseyaa/packages/routing/src"
+        ]
+    },
+    "ci_alignment_note": "Default `composer phpstan` uses the full `phpstan.neon` path list. This audit run is scoped to this layer's package src/ directories. Compare `phpstan_neon.packages_in_neon` to see which of those dirs are also in `phpstan.neon`.",
+    "phpstan_baseline": "present",
+    "phpstan_neon": {
+        "note": "Per-package: path contains packages/<short>/src in phpstan.neon.",
+        "packages_in_neon": {
+            "included": [
+                "api",
+                "routing"
+            ],
+            "missing_from_phpstan_neon": [
+                "bimaaji"
+            ]
+        }
+    },
+    "raw_stdout": "Note: Using configuration file /home/jones/dev/waaseyaa/phpstan.neon.\nInstructions for interpreting errors\n---------\n\nEach error has an associated identifier, like `argument.type`\nor `return.missing`.\n\nEach error identifier has documentation at URL https://phpstan.org/error-identifiers/<identifier>\nThis page contains code example, explanation why is this an error\nand instruction how to fix it.\nBefore fixing the error, fetch the documentation page for its identifier.\n\nThe error usually indicates a real bug or incorrect type in the code. Fix the underlying cause, do not just make the error go away.\nDo not add `@phpstan-ignore` comments, `@phpstan-ignore-next-line` comments, or baseline entries to suppress the error.\nDo not use assert() or inline @var PHPDoc tag to override PHPStan's inferred type.\nDo not add type casts just to silence errors.\nDo not widen parameter or return types just to make the error go away.\n{\"totals\":{\"errors\":0,\"file_errors\":3},\"files\":{\"/home/jones/dev/waaseyaa/packages/bimaaji/src/Introspection/JsonApi/JsonApiIntrospectionProvider.php\":{\"errors\":2,\"messages\":[{\"message\":\"Property Waaseyaa\\\\Bimaaji\\\\Introspection\\\\JsonApi\\\\JsonApiIntrospectionProvider::$entityTypeManager is never read, only written.\",\"line\":16,\"ignorable\":true,\"tip\":\"See: https://phpstan.org/developing-extensions/always-read-written-properties\",\"identifier\":\"property.onlyWritten\"},{\"message\":\"Construct empty() is not allowed. Use more strict comparison.\",\"line\":31,\"ignorable\":true,\"identifier\":\"empty.notAllowed\"}]},\"/home/jones/dev/waaseyaa/packages/bimaaji/src/Mutation/MutationValidator.php\":{\"errors\":1,\"messages\":[{\"message\":\"Using nullsafe property access \\\"?->data\\\" on left side of ?? is unnecessary. Use -> instead.\",\"line\":23,\"ignorable\":true,\"identifier\":\"nullsafe.neverNull\"}]}},\"errors\":[]}",
+    "phpstan_json_parsed": {
+        "totals": {
+            "errors": 0,
+            "file_errors": 3
+        },
+        "files": {
+            "/home/jones/dev/waaseyaa/packages/bimaaji/src/Introspection/JsonApi/JsonApiIntrospectionProvider.php": {
+                "errors": 2,
+                "messages": [
+                    {
+                        "message": "Property Waaseyaa\\Bimaaji\\Introspection\\JsonApi\\JsonApiIntrospectionProvider::$entityTypeManager is never read, only written.",
+                        "line": 16,
+                        "ignorable": true,
+                        "tip": "See: https://phpstan.org/developing-extensions/always-read-written-properties",
+                        "identifier": "property.onlyWritten"
+                    },
+                    {
+                        "message": "Construct empty() is not allowed. Use more strict comparison.",
+                        "line": 31,
+                        "ignorable": true,
+                        "identifier": "empty.notAllowed"
+                    }
+                ]
+            },
+            "/home/jones/dev/waaseyaa/packages/bimaaji/src/Mutation/MutationValidator.php": {
+                "errors": 1,
+                "messages": [
+                    {
+                        "message": "Using nullsafe property access \"?->data\" on left side of ?? is unnecessary. Use -> instead.",
+                        "line": 23,
+                        "ignorable": true,
+                        "identifier": "nullsafe.neverNull"
+                    }
+                ]
+            }
+        },
+        "errors": []
+    }
+}

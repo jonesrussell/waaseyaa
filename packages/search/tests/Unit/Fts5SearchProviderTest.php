@@ -14,6 +14,9 @@ use Waaseyaa\Search\SearchFilters;
 use Waaseyaa\Search\SearchIndexableInterface;
 use Waaseyaa\Search\SearchRequest;
 
+/**
+ * @covers \Waaseyaa\Search\Fts5\Fts5SearchProvider
+ */
 #[CoversClass(Fts5SearchProvider::class)]
 final class Fts5SearchProviderTest extends TestCase
 {

@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Workflows\WorkflowVisibility;
 
+/**
+ * @covers \Waaseyaa\Workflows\WorkflowVisibility
+ */
 #[CoversClass(WorkflowVisibility::class)]
 final class WorkflowVisibilityTest extends TestCase
 {

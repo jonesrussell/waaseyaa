@@ -165,7 +165,9 @@ final class NorthCloudClient
      * @param string $searchQuery Optional text query (empty by default)
      * @param list<string> $topics Topic filters (default: ['indigenous'])
      * @param int $minQuality Minimum quality score (default: 60)
-     * @return array{hits: list<array<string, mixed>>, total_hits: int}|null
+     * @return array{hits: list<mixed>, total_hits: int}|null
+     *                                             Hits are filtered to a list; each element may be a full hit
+     *                                             array or malformed data (callers should validate with is_array()).
      */
     public function getRecentContent(int $limit = 20, ?string $since = null, string $searchQuery = '', array $topics = ['indigenous'], int $minQuality = 60): ?array
     {
@@ -237,7 +239,7 @@ final class NorthCloudClient
         foreach ($params as $key => $value) {
             if (is_array($value)) {
                 foreach ($value as $item) {
-                    $parts[] = urlencode($key . '[]') . '=' . urlencode((string) $item);
+                    $parts[] = urlencode($key . '[]') . '=' . urlencode($item);
                 }
                 continue;
             }

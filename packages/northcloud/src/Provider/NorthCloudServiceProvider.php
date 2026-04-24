@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\NorthCloud\Provider;
 
+use Symfony\Component\Console\Command\Command;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
@@ -91,7 +92,7 @@ final class NorthCloudServiceProvider extends ServiceProvider
      * Signature mirrors {@see ServiceProvider::commands()} — the foundation
      * auto-injects the arguments even though this provider doesn't use them.
      *
-     * @return array<int, object>
+     * @return list<Command>
      */
     public function commands(
         EntityTypeManager $entityTypeManager,

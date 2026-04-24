@@ -12,6 +12,9 @@ use Waaseyaa\Search\SearchRequest;
 use Waaseyaa\Search\SearchResult;
 use Waaseyaa\Search\Twig\SearchTwigExtension;
 
+/**
+ * @covers \Waaseyaa\Search\Twig\SearchTwigExtension
+ */
 #[CoversClass(SearchTwigExtension::class)]
 final class SearchTwigExtensionTest extends TestCase
 {

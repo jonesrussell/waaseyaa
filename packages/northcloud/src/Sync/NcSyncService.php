@@ -57,15 +57,11 @@ final class NcSyncService
             return (new NcSyncResult())->withFetchFailed();
         }
 
-        if (!is_array($response['hits'] ?? null)) {
-            error_log('NcSyncService: malformed NorthCloud response, missing hits array');
-            return (new NcSyncResult())->withFetchFailed();
-        }
+        $hits = $response['hits'];
+        $result = (new NcSyncResult())->withFetched(\count($hits));
 
-        $result = (new NcSyncResult())->withFetched(count($response['hits']));
-
-        foreach ($response['hits'] as $hit) {
-            if (!is_array($hit)) {
+        foreach ($hits as $hit) {
+            if (!\is_array($hit)) {
                 error_log('NcSyncService: skipping malformed hit item');
                 $result = $result->withFailed();
                 continue;
@@ -214,13 +210,13 @@ final class NcSyncService
         foreach ($this->mappers->all() as $mapper) {
             if ($mapper instanceof NcHitSupportDiagnosticsInterface) {
                 $decision = $mapper->diagnoseSupport($hit);
-                $supported = (bool) ($decision['supported'] ?? false);
+                $supported = $decision['supported'];
 
                 if (!$supported) {
                     $diagnostics[] = [
                         'mapper' => $mapper::class,
-                        'reason' => (string) ($decision['reason'] ?? self::SKIP_REASON_NO_MAPPER),
-                        'details' => is_array($decision['details'] ?? null) ? $decision['details'] : [],
+                        'reason' => $decision['reason'] ?? self::SKIP_REASON_NO_MAPPER,
+                        'details' => $decision['details'] ?? [],
                     ];
                     continue;
                 }

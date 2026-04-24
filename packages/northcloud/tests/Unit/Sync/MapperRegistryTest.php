@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\NorthCloud\Sync\MapperRegistry;
 use Waaseyaa\NorthCloud\Sync\NcHitToEntityMapperInterface;
 
+/**
+ * @covers \Waaseyaa\NorthCloud\Sync\MapperRegistry
+ */
 #[CoversClass(MapperRegistry::class)]
 final class MapperRegistryTest extends TestCase
 {

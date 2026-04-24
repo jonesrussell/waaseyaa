@@ -13,6 +13,9 @@ use Waaseyaa\Search\EventSubscriber\SearchIndexSubscriber;
 use Waaseyaa\Search\SearchIndexableInterface;
 use Waaseyaa\Search\SearchIndexerInterface;
 
+/**
+ * @covers \Waaseyaa\Search\EventSubscriber\SearchIndexSubscriber
+ */
 #[CoversClass(SearchIndexSubscriber::class)]
 final class SearchIndexSubscriberTest extends TestCase
 {

@@ -9,6 +9,9 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Seo\MetaTagBuilder;
 
+/**
+ * @covers \Waaseyaa\Seo\MetaTagBuilder
+ */
 #[CoversClass(MetaTagBuilder::class)]
 final class MetaTagBuilderTest extends TestCase
 {
