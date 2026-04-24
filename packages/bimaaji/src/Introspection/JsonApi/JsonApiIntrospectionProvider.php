@@ -7,13 +7,11 @@ namespace Waaseyaa\Bimaaji\Introspection\JsonApi;
 use Symfony\Component\Routing\RouteCollection;
 use Waaseyaa\Bimaaji\Graph\GraphSection;
 use Waaseyaa\Bimaaji\Graph\GraphSectionProviderInterface;
-use Waaseyaa\Entity\EntityTypeManagerInterface;
 
 final class JsonApiIntrospectionProvider implements GraphSectionProviderInterface
 {
     public function __construct(
         private readonly RouteCollection $routes,
-        private readonly EntityTypeManagerInterface $entityTypeManager,
     ) {}
 
     public function getKey(): string
@@ -28,7 +26,7 @@ final class JsonApiIntrospectionProvider implements GraphSectionProviderInterfac
         foreach ($this->routes as $name => $route) {
             $options = $route->getOptions();
 
-            if (empty($options['_json_api'])) {
+            if (!isset($options['_json_api']) || $options['_json_api'] === false) {
                 continue;
             }
 

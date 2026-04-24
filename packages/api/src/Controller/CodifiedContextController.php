@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Controller;
 
-use Waaseyaa\Telescope\CodifiedContext\Storage\CodifiedContextStoreInterface;
+use Waaseyaa\Api\CodifiedContext\CodifiedContextSessionStoreInterface;
 
 /**
  * API controller for codified context session data.
  */
 final class CodifiedContextController
 {
-    public function __construct(private readonly ?CodifiedContextStoreInterface $store = null) {}
+    public function __construct(private readonly ?CodifiedContextSessionStoreInterface $store = null) {}
 
     /**
      * GET /api/telescope/codified-context/sessions

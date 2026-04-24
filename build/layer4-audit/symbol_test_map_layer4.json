@@ -1,8 +1,18 @@
 {
-    "generated_at": "2026-04-24T21:14:02+00:00",
+    "generated_at": "2026-04-24T21:45:59+00:00",
     "test_files_parsed": 77,
-    "at_covers_hits": 0,
-    "per_symbol": [],
+    "at_covers_hits": 3,
+    "per_symbol": {
+        "Waaseyaa\\Api\\Controller\\CodifiedContextController": [
+            "packages/api/tests/Unit/Controller/CodifiedContextControllerTest.php"
+        ],
+        "Waaseyaa\\Api\\CodifiedContext\\CodifiedContextSessionStoreInterface": [
+            "packages/api/tests/Unit/Controller/CodifiedContextControllerTest.php"
+        ],
+        "Waaseyaa\\Api\\CodifiedContext\\CodifiedContextSessionRow": [
+            "packages/api/tests/Unit/Controller/CodifiedContextControllerTest.php"
+        ]
+    },
     "public_non_internal_symbols_lacking_at_covers": [
         {
             "fqcn": "Waaseyaa\\Api\\Http\\DiscoveryApiHandler",
@@ -113,14 +123,6 @@
             "kind": "class",
             "file": "packages/api/src/Controller/BroadcastController.php",
             "line": 27,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Api\\Controller\\CodifiedContextController",
-            "kind": "class",
-            "file": "packages/api/src/Controller/CodifiedContextController.php",
-            "line": 12,
             "internal": false,
             "api": false
         },
@@ -304,7 +306,7 @@
             "fqcn": "Waaseyaa\\Bimaaji\\Introspection\\JsonApi\\JsonApiIntrospectionProvider",
             "kind": "class",
             "file": "packages/bimaaji/src/Introspection/JsonApi/JsonApiIntrospectionProvider.php",
-            "line": 12,
+            "line": 11,
             "internal": false,
             "api": false
         },

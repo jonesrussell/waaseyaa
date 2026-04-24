@@ -47,7 +47,7 @@ final class ActionDefinition
             'label' => $this->label,
             'scope' => $this->scope,
             'confirmation' => $this->confirmation,
-            'dangerous' => $this->dangerous ?: null,
+            'dangerous' => $this->dangerous === true ? true : null,
         ], fn($v) => $v !== null);
     }
 }

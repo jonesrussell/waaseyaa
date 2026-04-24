@@ -10,6 +10,7 @@ use Waaseyaa\Api\Query\ParsedQuery;
 use Waaseyaa\Api\Query\QueryApplier;
 use Waaseyaa\Api\Query\QueryFilter;
 use Waaseyaa\Api\Query\QuerySort;
+use Waaseyaa\Entity\EntityBase;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\EntityValues;
@@ -138,7 +139,9 @@ final class EntityResolver
             $this->guard->assertFieldEditAccess($entity, $fieldName);
         }
 
-        $entity->enforceIsNew();
+        if ($entity instanceof EntityBase) {
+            $entity->enforceIsNew();
+        }
         $storage->save($entity);
 
         $values = EntityValues::toCastAwareMap($entity);
@@ -292,13 +295,6 @@ final class EntityResolver
 
         if (isset($fieldDefinitions['account_id']) && !isset($input['account_id'])) {
             $input['account_id'] = (string) $this->account->id();
-        }
-
-        if (isset($fieldDefinitions['tenant_id']) && !isset($input['tenant_id'])) {
-            $tenantId = $this->account->getTenantId();
-            if ($tenantId !== null) {
-                $input['tenant_id'] = $tenantId;
-            }
         }
 
         return $input;

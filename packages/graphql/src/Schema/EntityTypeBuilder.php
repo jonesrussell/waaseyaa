@@ -103,7 +103,7 @@ final class EntityTypeBuilder
         $skipFields = array_filter([
             $keys['id'] ?? null,
             $keys['uuid'] ?? null,
-        ]);
+        ], static fn(?string $v): bool => $v !== null);
 
         foreach ($fieldDefs as $fieldName => $def) {
             // Skip entity keys already handled above (id, uuid)
@@ -171,7 +171,7 @@ final class EntityTypeBuilder
                     return null;
                 }
 
-                $depth = ($data['_graphql_depth'] ?? 0) + 1;
+                $depth = (int) (($data['_graphql_depth'] ?? 0) + 1);
 
                 if ($isMultiple) {
                     $refs = is_array($value) ? $value : [$value];
@@ -207,7 +207,7 @@ final class EntityTypeBuilder
         $skipFields = array_filter([
             $keys['id'] ?? null,
             $keys['uuid'] ?? null,
-        ]);
+        ], static fn(?string $v): bool => $v !== null);
         $fieldDefs = $entityType->getFieldDefinitions();
 
         foreach ($fieldDefs as $fieldName => $def) {

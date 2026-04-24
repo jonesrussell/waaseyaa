@@ -1,10 +1,10 @@
 {
-    "generated_at": "2026-04-24T21:14:02+00:00",
+    "generated_at": "2026-04-24T21:45:59+00:00",
     "source": "bin/check-package-layers LAYER_BY_SHORT",
     "layer": 4,
     "packages": {
         "api": {
-            "file_count": 29,
+            "file_count": 31,
             "symbols": [
                 {
                     "fqcn": "Waaseyaa\\Api\\Http\\DiscoveryApiHandler",
@@ -237,6 +237,22 @@
                     "line": 12,
                     "internal": false,
                     "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Api\\CodifiedContext\\CodifiedContextSessionStoreInterface",
+                    "kind": "interface",
+                    "file": "packages/api/src/CodifiedContext/CodifiedContextSessionStoreInterface.php",
+                    "line": 10,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Api\\CodifiedContext\\CodifiedContextSessionRow",
+                    "kind": "class",
+                    "file": "packages/api/src/CodifiedContext/CodifiedContextSessionRow.php",
+                    "line": 10,
+                    "internal": false,
+                    "api": false
                 }
             ]
         },
@@ -319,7 +335,7 @@
                     "fqcn": "Waaseyaa\\Bimaaji\\Introspection\\JsonApi\\JsonApiIntrospectionProvider",
                     "kind": "class",
                     "file": "packages/bimaaji/src/Introspection/JsonApi/JsonApiIntrospectionProvider.php",
-                    "line": 12,
+                    "line": 11,
                     "internal": false,
                     "api": false
                 },

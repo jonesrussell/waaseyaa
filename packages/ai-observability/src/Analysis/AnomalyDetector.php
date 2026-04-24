@@ -133,7 +133,7 @@ final class AnomalyDetector
     {
         $total = 0.0;
         foreach ($spans as $s) {
-            $total += (float) ($s['cost_usd'] ?? 0.0);
+            $total += $s['cost_usd'] ?? 0.0;
         }
 
         return $total;

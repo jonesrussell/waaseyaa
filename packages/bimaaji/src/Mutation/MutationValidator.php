@@ -20,7 +20,7 @@ final class MutationValidator
 
         if (!in_array($request->operation, self::CREATION_OPERATIONS, true)) {
             $entitiesSection = $this->graph->getSection('entities');
-            $entities = $entitiesSection?->data ?? [];
+            $entities = $entitiesSection === null ? [] : $entitiesSection->data;
 
             if (!isset($entities[$request->entityType])) {
                 $errors[] = 'UNKNOWN_ENTITY_TYPE';

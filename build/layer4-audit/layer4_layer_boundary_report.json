@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:14:02+00:00",
+    "generated_at": "2026-04-24T21:45:59+00:00",
     "layer_4_packages": [
         "api",
         "bimaaji",
@@ -9,6 +9,7 @@
         "claude_parsed": true,
         "claude_table_packages": [
             "api",
+            "bimaaji",
             "routing"
         ],
         "script_layer_packages": [
@@ -16,9 +17,7 @@
             "bimaaji",
             "routing"
         ],
-        "in_script_not_in_claude": [
-            "bimaaji"
-        ],
+        "in_script_not_in_claude": [],
         "in_claude_not_in_script": []
     },
     "bin_check_package_layers": {
@@ -26,19 +25,10 @@
         "output": "OK \u2014 package layer constraints (waaseyaa/* in require) satisfied."
     },
     "bin_audit_require_dev_layers": {
-        "output": "require-dev layer audit warnings (non-fatal):\n  WARN [PLD001] packages/foundation/composer.json require-dev: foundation(L0) -> entity(L1)\n  WARN [PLD001] packages/foundation/composer.json require-dev: foundation(L0) -> routing(L4)\n  WARN [PLD001] packages/media/composer.json require-dev: media(L2) -> api(L4)\nTotal warnings: 3"
+        "output": "require-dev layer audit warnings (non-fatal):\n  WARN [PLD001] packages/api/composer.json require-dev: api(L4) -> telescope(L6)\n  WARN [PLD001] packages/foundation/composer.json require-dev: foundation(L0) -> entity(L1)\n  WARN [PLD001] packages/foundation/composer.json require-dev: foundation(L0) -> routing(L4)\n  WARN [PLD001] packages/media/composer.json require-dev: media(L2) -> api(L4)\nTotal warnings: 4"
     },
-    "l4_waaseyaa_use_violations": [
-        {
-            "file": "packages/api/src/Controller/CodifiedContextController.php",
-            "from_package": "api",
-            "import": "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\CodifiedContextStoreInterface",
-            "target_package": "telescope",
-            "target_layer": 6,
-            "rule": "L4 must not use types from layer >4 via use statement"
-        }
-    ],
+    "l4_waaseyaa_use_violations": [],
     "summary": {
-        "l4_static_use_violation_count": 1
+        "l4_static_use_violation_count": 0
     }
 }

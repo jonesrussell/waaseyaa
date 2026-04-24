@@ -11,7 +11,6 @@ use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Waaseyaa\Bimaaji\Graph\GraphSection;
 use Waaseyaa\Bimaaji\Introspection\JsonApi\JsonApiIntrospectionProvider;
-use Waaseyaa\Entity\EntityTypeManagerInterface;
 
 #[CoversClass(JsonApiIntrospectionProvider::class)]
 final class JsonApiIntrospectionProviderTest extends TestCase
@@ -20,9 +19,8 @@ final class JsonApiIntrospectionProviderTest extends TestCase
     public function getKeyReturnsJsonapi(): void
     {
         $routes = new RouteCollection();
-        $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
 
-        $provider = new JsonApiIntrospectionProvider($routes, $entityTypeManager);
+        $provider = new JsonApiIntrospectionProvider($routes);
 
         self::assertSame('jsonapi', $provider->getKey());
     }
@@ -53,9 +51,7 @@ final class JsonApiIntrospectionProviderTest extends TestCase
         $otherRoute->setMethods(['GET']);
         $routes->add('admin.dashboard', $otherRoute);
 
-        $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-
-        $provider = new JsonApiIntrospectionProvider($routes, $entityTypeManager);
+        $provider = new JsonApiIntrospectionProvider($routes);
         $section = $provider->provide();
 
         self::assertInstanceOf(GraphSection::class, $section);
@@ -85,9 +81,7 @@ final class JsonApiIntrospectionProviderTest extends TestCase
         $jsonApiRoute->setMethods(['GET', 'POST']);
         $routes->add('api.search', $jsonApiRoute);
 
-        $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-
-        $provider = new JsonApiIntrospectionProvider($routes, $entityTypeManager);
+        $provider = new JsonApiIntrospectionProvider($routes);
         $section = $provider->provide();
 
         self::assertArrayHasKey('api.search', $section->data);
@@ -106,9 +100,7 @@ final class JsonApiIntrospectionProviderTest extends TestCase
         $otherRoute = new Route('/admin', ['_controller' => 'SomeController::index']);
         $routes->add('admin.index', $otherRoute);
 
-        $entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-
-        $provider = new JsonApiIntrospectionProvider($routes, $entityTypeManager);
+        $provider = new JsonApiIntrospectionProvider($routes);
         $section = $provider->provide();
 
         self::assertSame([], $section->data);

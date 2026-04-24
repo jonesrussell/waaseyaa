@@ -265,10 +265,7 @@ class GenericAdminSurfaceHost extends AbstractAdminSurfaceHost
 
         // Check custom actions first
         if (isset($this->actions[$action])) {
-            $handler = $this->actions[$action];
-            if ($handler instanceof SurfaceActionHandlerInterface) {
-                return $handler->handle($type, $payload);
-            }
+            return $this->actions[$action]->handle($type, $payload);
         }
 
         return match ($action) {

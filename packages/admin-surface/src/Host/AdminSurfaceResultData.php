@@ -54,7 +54,7 @@ final readonly class AdminSurfaceResultData
             'ok' => $this->ok,
             'data' => $this->data,
             'error' => $this->error,
-            'meta' => $this->meta ?: null,
+            'meta' => $this->meta !== [] ? $this->meta : null,
         ], fn($v) => $v !== null);
     }
 }

@@ -12,7 +12,7 @@ declare(strict_types=1);
 $root = realpath(__DIR__ . '/../..');
 $path = $root . '/build/layer3-audit/symbol_test_map_layer3.json';
 if (!is_file($path)) {
-    fwrite(STDERR, "Missing {$path} — run: php tools/audit/GenerateLayer3Audit.php\n");
+    fwrite(STDERR, "Missing {$path} — run: php tools/audit/GenerateLayerAudit.php 3\n");
     exit(1);
 }
 

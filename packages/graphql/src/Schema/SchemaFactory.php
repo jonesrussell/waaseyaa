@@ -197,11 +197,11 @@ final class SchemaFactory
 
         $override = $this->mutationOverrides[$mutationName];
 
-        if (isset($override['args']) && is_array($override['args'])) {
+        if (isset($override['args'])) {
             $default['args'] = array_merge($default['args'], $override['args']);
         }
 
-        if (isset($override['resolve']) && is_callable($override['resolve'])) {
+        if (isset($override['resolve'])) {
             $default['resolve'] = $override['resolve'];
         }
 

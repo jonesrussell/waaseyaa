@@ -29,9 +29,6 @@ final class SurfaceQueryParser
     private static function parseFilters(Request $request): array
     {
         $raw = $request->query->all('filter');
-        if (!is_array($raw)) {
-            return [];
-        }
 
         $filters = [];
         foreach ($raw as $field => $condition) {
@@ -74,9 +71,6 @@ final class SurfaceQueryParser
     private static function parsePagination(Request $request): array
     {
         $page = $request->query->all('page');
-        if (!is_array($page)) {
-            $page = [];
-        }
 
         $offset = max(0, (int) ($page['offset'] ?? 0));
         $limit = (int) ($page['limit'] ?? 50);

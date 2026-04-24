@@ -5,11 +5,17 @@ declare(strict_types=1);
 namespace Waaseyaa\Api\Tests\Unit\Controller;
 
 use Waaseyaa\Api\Controller\CodifiedContextController;
+use Waaseyaa\Telescope\CodifiedContext\Storage\CodifiedContextSessionStoreAdapter;
 use Waaseyaa\Telescope\CodifiedContext\Storage\SqliteCodifiedContextStore;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \Waaseyaa\Api\Controller\CodifiedContextController
+ * @covers \Waaseyaa\Api\CodifiedContext\CodifiedContextSessionStoreInterface
+ * @covers \Waaseyaa\Api\CodifiedContext\CodifiedContextSessionRow
+ */
 #[CoversClass(CodifiedContextController::class)]
 final class CodifiedContextControllerTest extends TestCase
 {
@@ -52,18 +58,19 @@ final class CodifiedContextControllerTest extends TestCase
     #[Test]
     public function list_sessions_groups_by_session_id(): void
     {
-        $store = SqliteCodifiedContextStore::createInMemory();
-        $store->store('cc_session', [
+        $inner = SqliteCodifiedContextStore::createInMemory();
+        $inner->store('cc_session', [
             'session_id' => 'sess-A',
             'event_type' => 'cc_session',
             'phase' => 'start',
         ]);
-        $store->store('cc_session', [
+        $inner->store('cc_session', [
             'session_id' => 'sess-B',
             'event_type' => 'cc_session',
             'phase' => 'start',
         ]);
 
+        $store = new CodifiedContextSessionStoreAdapter($inner);
         $controller = new CodifiedContextController($store);
         $result = $controller->listSessions();
 
@@ -76,7 +83,7 @@ final class CodifiedContextControllerTest extends TestCase
     #[Test]
     public function get_session_returns_null_for_unknown_session(): void
     {
-        $store = SqliteCodifiedContextStore::createInMemory();
+        $store = new CodifiedContextSessionStoreAdapter(SqliteCodifiedContextStore::createInMemory());
         $controller = new CodifiedContextController($store);
 
         $result = $controller->getSession('nonexistent-session');
@@ -87,13 +94,14 @@ final class CodifiedContextControllerTest extends TestCase
     #[Test]
     public function get_session_returns_data_for_known_session(): void
     {
-        $store = SqliteCodifiedContextStore::createInMemory();
-        $store->store('cc_session', [
+        $inner = SqliteCodifiedContextStore::createInMemory();
+        $inner->store('cc_session', [
             'session_id' => 'sess-X',
             'event_type' => 'cc_session',
             'phase' => 'start',
         ]);
 
+        $store = new CodifiedContextSessionStoreAdapter($inner);
         $controller = new CodifiedContextController($store);
         $result = $controller->getSession('sess-X');
 
@@ -104,23 +112,24 @@ final class CodifiedContextControllerTest extends TestCase
     #[Test]
     public function get_session_events_filters_to_cc_event_type(): void
     {
-        $store = SqliteCodifiedContextStore::createInMemory();
-        $store->store('cc_session', [
+        $inner = SqliteCodifiedContextStore::createInMemory();
+        $inner->store('cc_session', [
             'session_id' => 'sess-Y',
             'event_type' => 'cc_session',
             'phase' => 'start',
         ]);
-        $store->store('cc_event', [
+        $inner->store('cc_event', [
             'session_id' => 'sess-Y',
             'event_type' => 'cc_event',
             'action' => 'load_spec',
         ]);
-        $store->store('cc_validation', [
+        $inner->store('cc_validation', [
             'session_id' => 'sess-Y',
             'event_type' => 'cc_validation',
             'drift_score' => 0.3,
         ]);
 
+        $store = new CodifiedContextSessionStoreAdapter($inner);
         $controller = new CodifiedContextController($store);
         $result = $controller->getSessionEvents('sess-Y');
 
@@ -131,13 +140,14 @@ final class CodifiedContextControllerTest extends TestCase
     #[Test]
     public function get_session_validation_returns_null_when_no_validation(): void
     {
-        $store = SqliteCodifiedContextStore::createInMemory();
-        $store->store('cc_session', [
+        $inner = SqliteCodifiedContextStore::createInMemory();
+        $inner->store('cc_session', [
             'session_id' => 'sess-Z',
             'event_type' => 'cc_session',
             'phase' => 'start',
         ]);
 
+        $store = new CodifiedContextSessionStoreAdapter($inner);
         $controller = new CodifiedContextController($store);
         $result = $controller->getSessionValidation('sess-Z');
 
@@ -147,14 +157,15 @@ final class CodifiedContextControllerTest extends TestCase
     #[Test]
     public function get_session_validation_returns_latest_report(): void
     {
-        $store = SqliteCodifiedContextStore::createInMemory();
-        $store->store('cc_validation', [
+        $inner = SqliteCodifiedContextStore::createInMemory();
+        $inner->store('cc_validation', [
             'session_id' => 'sess-V',
             'event_type' => 'cc_validation',
             'drift_score' => 0.85,
             'issues' => ['stale spec detected'],
         ]);
 
+        $store = new CodifiedContextSessionStoreAdapter($inner);
         $controller = new CodifiedContextController($store);
         $result = $controller->getSessionValidation('sess-V');
 

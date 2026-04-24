@@ -628,6 +628,9 @@ function staticScanUses(
     array &$violations,
     int $targetLayer
 ): void {
+    if ($targetLayer === 0 && isLayer0KernelOrRouterCompositionUseExempt($rel)) {
+        return;
+    }
     if (!preg_match_all(
         '/^\s*use\s+(Waaseyaa\\\\[A-Za-z0-9_\\\\]+)\s*;/m',
         $code,
@@ -660,6 +663,16 @@ function staticScanUses(
             ];
         }
     }
+}
+
+/**
+ * CLAUDE.md documents Kernel/ and composition-root HTTP routers in Foundation as intentional
+ * cross-layer wiring; exclude them from static `use` violation noise for Layer 0.
+ */
+function isLayer0KernelOrRouterCompositionUseExempt(string $rel): bool
+{
+    return str_contains($rel, 'packages/foundation/src/Kernel/')
+        || str_contains($rel, 'packages/foundation/src/Http/Router/');
 }
 
 function getNsTop(string $useStmtFqcn): ?string

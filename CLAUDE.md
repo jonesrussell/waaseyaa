@@ -72,12 +72,12 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 
 | Layer | Name | Packages |
 |---|---|---|
-| 0 | Foundation | foundation, cache, plugin, typed-data, database-legacy, i18n, queue, scheduler, state, validation, mail, http-client, ingestion, error-handler |
+| 0 | Foundation | analytics, cache, database-legacy, error-handler, foundation, geo, http-client, i18n, ingestion, mail, mercure, oauth-provider, plugin, queue, scheduler, state, typed-data, validation |
 | 1 | Core Data | entity, entity-storage, access, user, config, field, auth, oidc, testing |
 | 2 | Content Types | node, taxonomy, media, path, menu, note, relationship, groups, engagement, messaging |
 | 3 | Services | workflows, search, seo, notification, billing, github, northcloud |
-| 4 | API | api, routing |
-| 5 | AI | ai-schema, ai-agent, ai-pipeline, ai-vector |
+| 4 | API | api, bimaaji, routing |
+| 5 | AI | ai-agent, ai-observability, ai-pipeline, ai-schema, ai-vector |
 | 6 | Interfaces | cli, admin, admin-surface, graphql, mcp, ssr, genealogy, telescope, deployer, inertia, debug |
 
 **Rule:** Packages can only import from their own layer or lower. Upward communication via DomainEvents.

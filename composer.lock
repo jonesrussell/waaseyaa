@@ -4020,7 +4020,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/api",
-                "reference": "4821bf64e2b3be8bbafa15f5eada5d5d9ded40c3"
+                "reference": "81ae22405940893311d0dd0f18893cca3ab90ee8"
             },
             "require": {
                 "php": ">=8.4",
@@ -4031,7 +4031,8 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5",
-                "waaseyaa/database-legacy": "^0.1.0-alpha.150"
+                "waaseyaa/database-legacy": "^0.1.0-alpha.150",
+                "waaseyaa/telescope": "^0.1.0-alpha.150"
             },
             "type": "library",
             "extra": {
@@ -6210,10 +6211,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/telescope",
-                "reference": "2f99bb7f311e9a781d78b0adb11f552a1bff1a9b"
+                "reference": "c2382c39505dc955b19caafbdbaa7103c342b30a"
             },
             "require": {
-                "php": ">=8.4"
+                "php": ">=8.4",
+                "waaseyaa/api": "^0.1.0-alpha.150"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"

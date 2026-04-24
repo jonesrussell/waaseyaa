@@ -29,12 +29,13 @@ final class InertiaServiceProvider extends ServiceProvider
             return;
         }
         $root = $root ?? $cwd;
-        $devServerUrl = $_ENV['VITE_DEV_SERVER'] ?? getenv('VITE_DEV_SERVER') ?: null;
+        $viteRaw = $_ENV['VITE_DEV_SERVER'] ?? getenv('VITE_DEV_SERVER');
+        $devServerUrl = is_string($viteRaw) && $viteRaw !== '' ? $viteRaw : null;
 
         $assetManager = new ViteAssetManager(
             basePath: $root . '/public',
             baseUrl: '',
-            devServerUrl: $devServerUrl ?: null,
+            devServerUrl: $devServerUrl,
         );
 
         $renderer = new RootTemplateRenderer(assetManager: $assetManager);

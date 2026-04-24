@@ -11,18 +11,22 @@ parameters:
     reportPossiblyNonexistentConstantArrayOffset: true
     paths:
         - packages/access/src
+        - packages/admin-surface/src
         - packages/ai-agent/src
+        - packages/ai-observability/src
         - packages/ai-pipeline/src
         - packages/ai-schema/src
         - packages/ai-vector/src
         - packages/api/src
         - packages/auth/src
         - packages/billing/src
+        - packages/bimaaji/src
         - packages/analytics/src
         - packages/cache/src
         - packages/cli/src
         - packages/config/src
         - packages/database-legacy/src
+        - packages/debug/src
         - packages/entity-storage/src
         - packages/entity/src
         - packages/engagement/src
@@ -32,9 +36,12 @@ parameters:
         - packages/geo/src
         - packages/groups/src
         - packages/github/src
+        - packages/genealogy/src
+        - packages/graphql/src
 
         - packages/i18n/src
         - packages/http-client/src
+        - packages/inertia/src
         - packages/ingestion/src
         - packages/mail/src
         - packages/mcp/src

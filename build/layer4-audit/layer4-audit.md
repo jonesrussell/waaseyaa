@@ -1,51 +1,21 @@
 # Layer 4 Forensic Audit (API)
 
-Generated: 2026-04-24T21:14:04+00:00 UTC
+Generated: 2026-04-24T21:46:01+00:00 UTC
 
 ## 1. Canonical scope
 
 Layer 4 (API) packages from `bin/check-package-layers` **LAYER_BY_SHORT**: api, bimaaji, routing.
 
-**Drift vs CLAUDE.md:** `in_script_not_in_claude` = ["bimaaji"], `in_claude_not_in_script` = [].
+**Drift vs CLAUDE.md:** none (package lists match the Layer Architecture table for this row).
 
 ## 2. Priority-ordered findings
-
-### L4-DOC-CLAUDE
-- **Priority:** P1 | **Category:** public_api_documentation | **Severity:** low
-- **Message:** CLAUDE.md Layer 4 table and bin/check-package-layers disagree on package set.
-```json
-{
-    "in_script_not_in_claude": [
-        "bimaaji"
-    ],
-    "in_claude_not_in_script": []
-}
-```
-
-### L4-USE-1
-- **Priority:** P2 | **Category:** layer_boundary | **Severity:** high
-- **Message:** L4 source uses Waaseyaa type from higher layer (static use)
-```json
-{
-    "file": "packages/api/src/Controller/CodifiedContextController.php",
-    "from_package": "api",
-    "import": "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\CodifiedContextStoreInterface",
-    "target_package": "telescope",
-    "target_layer": 6,
-    "rule": "L4 must not use types from layer >4 via use statement"
-}
-```
-
-### L4-PHPSTAN-GAP-bimaaji
-- **Priority:** P2 | **Category:** ci_alignment | **Severity:** medium
-- **Message:** Package 'bimaaji' (L4) not listed in phpstan.neon paths; default CI may not analyze it.
 
 ### L4-COV-AGG
 - **Priority:** P4 | **Category:** test_coverage | **Severity:** low
 - **Message:** Public (non-@internal) L4 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer4.json
 ```json
 {
-    "count": 64,
+    "count": 63,
     "sample_fqcn": [
         "Waaseyaa\\Api\\Http\\DiscoveryApiHandler",
         "Waaseyaa\\Api\\Http\\Router\\DiscoveryRouter",
@@ -65,8 +35,8 @@ Layer 4 (API) packages from `bin/check-package-layers` **LAYER_BY_SHORT**: api, 
 
 ## 3. PHPStan (L4 paths) and CI alignment
 
-- `phpstan.neon` inclusions for this layer’s packages: {"included":["api","routing"],"missing_from_phpstan_neon":["bimaaji"]}
-- PHPStan totals (this run): 0 errors, 3 files with errors (see `layer4_static_analysis.json`).
+- `phpstan.neon` inclusions for this layer’s packages: {"included":["api","bimaaji","routing"],"missing_from_phpstan_neon":[]}
+- PHPStan totals (this run): 0 errors, 0 files with errors (see `layer4_static_analysis.json`).
 
 ## 4. Layer boundary (manifest + static `use`)
 
@@ -79,8 +49,8 @@ Counts: service providers **2**, *Listener* classes **0**, *Attribute* classes (
 
 ## 6. Test / @covers
 
-Unique FQCNs with at least one `@covers`: 0
-Public symbols with no @covers: 64 (see coverage finding and `symbol_test_map_layer4.json`).
+Unique FQCNs with at least one `@covers`: 3
+Public symbols with no @covers: 63 (see coverage finding and `symbol_test_map_layer4.json`).
 
 ## 7. Hygiene
 

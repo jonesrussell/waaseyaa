@@ -74,11 +74,11 @@ final class FieldDefinition
             'label' => $this->label,
             'type' => $this->type,
             'widget' => $this->widget,
-            'weight' => $this->weight ?: null,
-            'required' => $this->required ?: null,
-            'readOnly' => $this->readOnly ?: null,
-            'accessRestricted' => $this->accessRestricted ?: null,
-            'options' => $this->options ?: null,
+            'weight' => $this->weight !== 0 ? $this->weight : null,
+            'required' => $this->required === true ? true : null,
+            'readOnly' => $this->readOnly === true ? true : null,
+            'accessRestricted' => $this->accessRestricted === true ? true : null,
+            'options' => $this->options !== [] ? $this->options : null,
         ], fn($v) => $v !== null);
     }
 }
