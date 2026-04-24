@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Oidc\Tests\Unit;
+namespace Waaseyaa\Routing\Tests\Unit;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Waaseyaa\Oidc\OidcRouteProvider;
+use Waaseyaa\Routing\OidcHttpRoutes;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
-#[CoversClass(OidcRouteProvider::class)]
-final class OidcRouteProviderTest extends TestCase
+#[CoversClass(OidcHttpRoutes::class)]
+final class OidcHttpRoutesTest extends TestCase
 {
     #[Test]
     public function registerRoutesAddsDiscoveryRoute(): void
     {
         $router = new WaaseyaaRouter();
-        $provider = new OidcRouteProvider();
+        $http = new OidcHttpRoutes();
 
-        $provider->registerRoutes($router);
+        $http->registerRoutes($router);
 
         $route = $router->getRouteCollection()->get('oidc.discovery');
 
@@ -33,9 +33,9 @@ final class OidcRouteProviderTest extends TestCase
     public function registerRoutesAddsJwksRoute(): void
     {
         $router = new WaaseyaaRouter();
-        $provider = new OidcRouteProvider();
+        $http = new OidcHttpRoutes();
 
-        $provider->registerRoutes($router);
+        $http->registerRoutes($router);
 
         $route = $router->getRouteCollection()->get('oidc.jwks');
 
@@ -53,7 +53,7 @@ final class OidcRouteProviderTest extends TestCase
     public function registerRoutesSkipsTokenRouteWhenControllerNotProvided(): void
     {
         $router = new WaaseyaaRouter();
-        (new OidcRouteProvider())->registerRoutes($router);
+        (new OidcHttpRoutes())->registerRoutes($router);
 
         self::assertNull($router->getRouteCollection()->get('oidc.token'));
     }

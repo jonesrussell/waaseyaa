@@ -14,7 +14,6 @@ use Waaseyaa\Oidc\Http\JwksController;
 use Waaseyaa\Oidc\Keys\OidcKeyLoaderInterface;
 use Waaseyaa\Oidc\Keys\PemFileKeyLoader;
 use Waaseyaa\Oidc\OidcServiceProvider;
-use Waaseyaa\Routing\WaaseyaaRouter;
 
 #[CoversClass(OidcServiceProvider::class)]
 final class OidcServiceProviderTest extends TestCase
@@ -38,19 +37,6 @@ final class OidcServiceProviderTest extends TestCase
             }
         }
         $this->tmpDirs = [];
-    }
-
-    #[Test]
-    public function routesRegistersDiscoveryEndpoint(): void
-    {
-        $provider = new OidcServiceProvider();
-        $router = new WaaseyaaRouter();
-
-        $provider->routes($router);
-
-        $route = $router->getRouteCollection()->get('oidc.discovery');
-        self::assertNotNull($route);
-        self::assertSame('/.well-known/openid-configuration', $route->getPath());
     }
 
     #[Test]

@@ -46,7 +46,7 @@ final class RegisterController
         $this->rateLimiter->hit($rateLimitKey, 900);
 
         // 3. Parse JSON body
-        $body = json_decode((string) $request->getContent(), true) ?? [];
+        $body = json_decode($request->getContent(), true) ?? [];
         $name = trim((string) ($body['name'] ?? ''));
         $email = trim((string) ($body['email'] ?? ''));
         $password = (string) ($body['password'] ?? '');

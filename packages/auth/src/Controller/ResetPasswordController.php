@@ -19,7 +19,7 @@ final class ResetPasswordController
     public function __invoke(Request $request): JsonResponse
     {
         // 1. Parse JSON body
-        $body = json_decode((string) $request->getContent(), true) ?? [];
+        $body = json_decode($request->getContent(), true) ?? [];
         $token = trim((string) ($body['token'] ?? ''));
         $password = (string) ($body['password'] ?? '');
         $passwordConfirmation = (string) ($body['password_confirmation'] ?? '');

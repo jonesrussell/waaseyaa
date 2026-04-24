@@ -33,7 +33,7 @@ final class ForgotPasswordController
     public function __invoke(Request $request): JsonResponse
     {
         // 1. Parse JSON body, extract email
-        $body = json_decode((string) $request->getContent(), true) ?? [];
+        $body = json_decode($request->getContent(), true) ?? [];
         $email = trim((string) ($body['email'] ?? ''));
 
         // 2. Return 422 if email empty

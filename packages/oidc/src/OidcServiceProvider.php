@@ -26,7 +26,6 @@ use Waaseyaa\Oidc\Token\IdTokenMinter;
 use Waaseyaa\Oidc\Token\PkceVerifier;
 use Waaseyaa\Oidc\Token\TokenController;
 use Waaseyaa\Oidc\Token\TokenRequestValidator;
-use Waaseyaa\Routing\WaaseyaaRouter;
 
 final class OidcServiceProvider extends ServiceProvider
 {
@@ -235,28 +234,6 @@ final class OidcServiceProvider extends ServiceProvider
         }
 
         (new OidcClientSeeder($storage))->seed($clients);
-    }
-
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
-    {
-        $authorizeController = null;
-        try {
-            $authorizeController = $this->resolve(AuthorizeController::class);
-        } catch (\Throwable) {
-            // Storage not available yet (e.g., bootstrap without entity system); skip authorize route.
-        }
-
-        $tokenController = null;
-        try {
-            $tokenController = $this->resolve(TokenController::class);
-        } catch (\Throwable) {
-            // Storage or signing keys not available yet; skip token route.
-        }
-
-        (new OidcRouteProvider(
-            authorizeController: $authorizeController,
-            tokenController: $tokenController,
-        ))->registerRoutes($router);
     }
 
     /**

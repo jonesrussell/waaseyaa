@@ -1,5 +1,6 @@
 # Access Control
 
+<!-- Spec reviewed 2026-04-24 - Auth HTTP routes moved to Waaseyaa\Routing\AuthOidcRouteServiceProvider; AuthServiceProvider is DI-only; auth controllers and access semantics unchanged (Layer 1 audit remediation) -->
 <!-- Spec reviewed 2026-04-11 - User/UserBlock: widened constructors (optional entityTypeId, entityKeys, fieldDefinitions) for ContentEntityBase::duplicateInstance re-entry; no change to gate or policy semantics (#alpha-119) -->
 <!-- Spec reviewed 2026-04-08 - LoginController: removed session_write_close() after successful JSON login so Set-Cookie is emitted with the response (#813); no change to gate/session access semantics -->
 <!-- Spec reviewed 2026-04-07 - packages/auth composer.json: waaseyaa/* requires use ^0.1 for split/Packagist consumers (#1138); no access API change -->
@@ -32,7 +33,8 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 | Package | Path | Provides |
 |---------|------|----------|
 | access | `packages/access/src/` | AccessPolicyInterface, AccessResult, AccessStatus, EntityAccessHandler, AccountInterface, FieldAccessPolicyInterface, PermissionHandler, Gate, EntityAccessGate, AuthorizationMiddleware |
-| routing | `packages/routing/src/` | AccessChecker (route-level access) |
+| auth | `packages/auth/src/` | Controllers and services for login/register/reset/verify; **HTTP route registration** is in `packages/routing` (`AuthOidcRouteServiceProvider`), not in `AuthServiceProvider` |
+| routing | `packages/routing/src/` | AccessChecker (route-level access); `AuthOidcRouteServiceProvider` wires auth and OIDC HTTP routes |
 | user | `packages/user/src/` | SessionMiddleware (account resolution), UserServiceProvider (user entity type registration) |
 
 ## Core Interfaces

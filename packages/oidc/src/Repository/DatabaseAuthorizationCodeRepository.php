@@ -52,7 +52,7 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
 
         $code = bin2hex(random_bytes(32));
         $accountId = (string) $account->id();
-        $scopesJson = json_encode(array_values($scopes), JSON_THROW_ON_ERROR);
+        $scopesJson = json_encode($scopes, JSON_THROW_ON_ERROR);
 
         $this->database->insert(self::TABLE)
             ->values([
@@ -75,7 +75,7 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
             clientId: $clientId,
             accountId: $accountId,
             redirectUri: $redirectUri,
-            scopes: array_values($scopes),
+            scopes: $scopes,
             codeChallenge: $codeChallenge,
             codeChallengeMethod: $codeChallengeMethod,
             issuedAt: $now,

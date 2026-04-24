@@ -73,7 +73,7 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 | Layer | Name | Packages |
 |---|---|---|
 | 0 | Foundation | foundation, cache, plugin, typed-data, database-legacy, i18n, queue, scheduler, state, validation, mail, http-client, ingestion, error-handler |
-| 1 | Core Data | entity, entity-storage, access, user, config, field, auth, testing |
+| 1 | Core Data | entity, entity-storage, access, user, config, field, auth, oidc, testing |
 | 2 | Content Types | node, taxonomy, media, path, menu, note, relationship |
 | 3 | Services | workflows, search, seo, notification, billing, github |
 | 4 | API | api, routing |
@@ -85,6 +85,8 @@ Use `waaseyaa_search_specs` MCP tool to find specs affected by a change when the
 **Enforcement:** `bin/check-package-layers` validates every `packages/*/composer.json` `require` edge `waaseyaa/*` against this table (metapackages `cms`, `core`, `full` skipped). Runtime `require` only — `require-dev` may pull test fixtures from higher layers. Use `bin/audit-require-dev-layers` for a warn-only audit report of upward dev-only edges. Historical GitHub **#315** (foundation → path) and **#316** (validation → entity) are closed at the manifest level; re-run scripts after editing internal dependencies.
 
 **Exemption:** The `Kernel/` classes in Foundation (`AbstractKernel`, `HttpKernel`, `ConsoleKernel`) are application bootstrappers that wire all layers together. They intentionally import from all layers. This is acceptable because kernels are entry-point orchestrators, not reusable library code — no other package imports from them.
+
+**Auth and OIDC HTTP routes:** Route registration (RouteBuilder / WaaseyaaRouter) for `waaseyaa/auth` and `waaseyaa/oidc` is implemented in `Waaseyaa\Routing\AuthOidcRouteServiceProvider` ([packages/routing](packages/routing)) so L1 auth/oidc packages do not `use` Layer 4 routing types. Service bindings stay in their respective L1 `ServiceProvider` classes; only route wiring is lifted to L4.
 
 ## Operation Checklists
 

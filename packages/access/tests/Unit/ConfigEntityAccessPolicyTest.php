@@ -14,6 +14,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(ConfigEntityAccessPolicy::class)]
+#[CoversClass(AccessPolicyInterface::class)]
 final class ConfigEntityAccessPolicyTest extends TestCase
 {
     private ConfigEntityAccessPolicy $policy;

@@ -31,6 +31,22 @@
         {
             "type": "path",
             "url": "../i18n"
+        },
+        {
+            "type": "path",
+            "url": "../foundation"
+        },
+        {
+            "type": "path",
+            "url": "../user"
+        },
+        {
+            "type": "path",
+            "url": "../auth"
+        },
+        {
+            "type": "path",
+            "url": "../oidc"
         }
     ],
     "require": {
@@ -38,6 +54,8 @@
         "waaseyaa/entity": "^0.1.0-alpha.150",
         "waaseyaa/access": "^0.1.0-alpha.150",
         "waaseyaa/i18n": "^0.1.0-alpha.150",
+        "waaseyaa/auth": "^0.1.0-alpha.150",
+        "waaseyaa/oidc": "^0.1.0-alpha.150",
         "symfony/routing": "^7.0"
     },
     "require-dev": {
@@ -56,6 +74,11 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "extra": {
+        "waaseyaa": {
+            "providers": [
+                "Waaseyaa\\Routing\\AuthOidcRouteServiceProvider"
+            ]
+        },
         "branch-alias": {
             "dev-main": "0.1.x-dev",
             "dev-develop/v1.1": "0.1.x-dev"

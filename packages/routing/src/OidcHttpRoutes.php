@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Oidc;
+namespace Waaseyaa\Routing;
 
 use Waaseyaa\Oidc\Authorize\AuthorizeController;
 use Waaseyaa\Oidc\Token\TokenController;
-use Waaseyaa\Routing\RouteBuilder;
-use Waaseyaa\Routing\WaaseyaaRouter;
 
-final readonly class OidcRouteProvider
+/**
+ * OIDC HTTP route table. Lives in the routing package (L4) so L1 oidc is free of
+ * RouteBuilder / WaaseyaaRouter type references.
+ */
+final readonly class OidcHttpRoutes
 {
     public function __construct(
         private ?AuthorizeController $authorizeController = null,

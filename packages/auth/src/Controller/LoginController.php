@@ -30,15 +30,15 @@ final class LoginController
         }
 
         try {
-            $body = json_decode((string) $request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+            $body = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             return new JsonResponse([
                 'jsonapi' => ['version' => '1.1'],
                 'errors' => [['status' => '400', 'title' => 'Bad Request', 'detail' => 'Request body is not valid JSON.']],
             ], 400);
         }
-        $username = is_string($body['username'] ?? null) ? trim((string) $body['username']) : '';
-        $password = is_string($body['password'] ?? null) ? (string) $body['password'] : '';
+        $username = is_string($body['username'] ?? null) ? trim($body['username']) : '';
+        $password = is_string($body['password'] ?? null) ? $body['password'] : '';
 
         if ($username === '' || $password === '') {
             return new JsonResponse([

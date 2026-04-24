@@ -71,7 +71,7 @@ final class PemFileKeyLoader implements OidcKeyLoaderInterface
         $keys = [];
         foreach ($this->entries as $kid => $entry) {
             $keys[] = new SigningKey(
-                kid: (string) $kid,
+                kid: $kid,
                 algorithm: $entry['algorithm'] ?? 'RS256',
                 publicKeyPem: $this->readPem($entry['public_key_path']),
                 privateKeyPem: isset($entry['private_key_path']) ? $this->readPem($entry['private_key_path']) : null,

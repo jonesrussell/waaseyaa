@@ -126,7 +126,10 @@ final class AuthorizationRequestValidator
             return [];
         }
 
-        $parts = preg_split('/\s+/', trim($raw)) ?: [];
+        $parts = preg_split('/\s+/', trim($raw));
+        if ($parts === false) {
+            return [];
+        }
 
         return array_values(array_filter($parts, static fn(string $s): bool => $s !== ''));
     }

@@ -19,7 +19,7 @@ final class VerifyEmailController
     public function __invoke(Request $request): JsonResponse
     {
         // 1. Parse JSON body, extract token
-        $body = json_decode((string) $request->getContent(), true) ?? [];
+        $body = json_decode($request->getContent(), true) ?? [];
         $token = trim((string) ($body['token'] ?? ''));
 
         // 2. Return 422 if token is empty
