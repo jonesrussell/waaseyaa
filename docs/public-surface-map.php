@@ -182,6 +182,7 @@ return [
     'Waaseyaa\Billing\StripeClientInterface' => 'internal',
 
     // Layer 4: API — public
+    'Waaseyaa\Api\CodifiedContext\CodifiedContextSessionStoreInterface' => 'public',
     'Waaseyaa\Api\JsonResponseTrait' => 'public',
     'Waaseyaa\Api\MutableTranslatableInterface' => 'public',
     'Waaseyaa\Routing\Language\LanguageNegotiatorInterface' => 'public',

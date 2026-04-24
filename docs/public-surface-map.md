@@ -227,6 +227,7 @@ Machine-readable source: `docs/public-surface-map.php`.
 |---------|------|---------|
 | `JsonResponseTrait` | trait | Parses incoming JSON request bodies and builds JSON error responses |
 | `MutableTranslatableInterface` | interface | Extends `TranslatableInterface` with `addTranslation()` for explicit translation creation |
+| `CodifiedContextSessionStoreInterface` | interface | Read-only port for codified-context session rows consumed by `CodifiedContextController`; Telescope implements via adapter |
 
 ### routing
 
