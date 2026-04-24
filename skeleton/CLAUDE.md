@@ -100,27 +100,17 @@ $queue->dispatch(new SendWelcomeEmail($userId));
 | `src/Entity/**` | `waaseyaa:entity-system` | entity-system.md |
 | `src/Access/**` | `waaseyaa:access-control` | access-control.md |
 | `src/Provider/**` | `feature-dev` | — |
-| `.claude/rules/**` | `updating-codified-context` | — |
-| `docs/specs/**` | `updating-codified-context` | — |
+| `.claude/rules/**` | `waaseyaa:spec-maintenance` | — |
+| `docs/specs/**` | `waaseyaa:spec-maintenance` | — |
 
 <!-- Note: waaseyaa:* skills are placeholders. They will not function
      until the skills are built. The entries document intended routing. -->
 
-## MCP Federation
+## Specs and Spec Kitty
 
-Register Waaseyaa's MCP server in `.claude/settings.json` for on-demand framework specs:
+Framework subsystem specs ship in the `waaseyaa/framework` repo under `docs/specs/`. Read them from checkout or upstream; there is no bundled Node spec MCP in the framework.
 
-```json
-{
-  "mcpServers": {
-    "waaseyaa": {
-      "command": "node",
-      "args": ["vendor/waaseyaa/mcp/server.js"],
-      "cwd": "."
-    }
-  }
-}
-```
+This repository may adopt **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** for structured spec/plan/task workflows (see framework `CLAUDE.md`). GitHub issues and milestones remain authoritative per `docs/specs/workflow.md`.
 
 ## Development
 
@@ -138,15 +128,13 @@ Set `WAASEYAA_GOLDEN_SHA` or add `.waaseyaa-golden-sha` for CI drift gates (see 
 
 **Per-site convergence audits:** follow [per-site-convergence-audit.md](https://github.com/waaseyaa/framework/blob/main/docs/specs/per-site-convergence-audit.md) in the Waaseyaa monorepo; record findings under `docs/audits/` per that spec.
 
-## Codified Context
+## Agent context
 
-This app uses a three-tier codified context system inherited from Waaseyaa:
-
-| Tier | Location | Purpose |
+| Layer | Location | Purpose |
 |------|----------|---------|
 | **Constitution** | `CLAUDE.md` (this file) | Architecture, conventions, orchestration |
 | **Rules** | `.claude/rules/waaseyaa-*.md` | Framework invariants (always active, never cited) |
-| **Specs** | `docs/specs/*.md` | Domain contracts for each subsystem |
+| **Specs** | `docs/specs/*.md` | Domain contracts — read from disk; optional Spec Kitty in framework repo |
 
 Framework rules are owned by Waaseyaa. Update them via `./vendor/bin/waaseyaa sync-rules` after `composer update`.
 

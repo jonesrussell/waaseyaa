@@ -241,4 +241,4 @@ For repositories that **do not** ship a Waaseyaa `composer.json` app root (e.g. 
 
 ## Orchestration index
 
-When adding this spec to `CLAUDE.md` orchestration tables, use specialist skill **`updating-codified-context`** for edits to `docs/specs/**`.
+When adding this spec to `CLAUDE.md` orchestration tables, use specialist skill **`waaseyaa:spec-maintenance`** for edits to `docs/specs/**`.
