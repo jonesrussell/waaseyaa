@@ -139,7 +139,7 @@ All work in this repo follows a GitHub-first workflow. See `docs/specs/workflow.
 - **Specialist skills:** `skills/waaseyaa/*` — load on demand for a subsystem; each skill lists related specs.
 - **Cold specs:** `docs/specs/*.md` — read directly from disk when you need contracts, file maps, and edge cases (no spec MCP server).
 
-This repo also uses **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** for optional spec/plan/task workflows (`.kittify/`, slash commands such as `/spec-kitty.specify`, `spec-kitty dashboard`). Install: `pip install spec-kitty-cli` (or `uv tool install spec-kitty-cli`). Run `spec-kitty upgrade` in the repo after upgrading the CLI.
+This repo also uses **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** for optional spec/plan/task workflows (`.kittify/`, slash commands such as `/spec-kitty.specify`, `spec-kitty dashboard`). Install: `pip install spec-kitty-cli` (or `uv tool install spec-kitty-cli`). Run `spec-kitty upgrade` in the repo after upgrading the CLI. The CLI may create `.claude/skills/` symlinks to your global Spec Kitty skill pack — that directory is gitignored here because paths are machine-specific; re-run `spec-kitty init` (or upgrade) on a fresh clone after installing the CLI.
 
 **Workflow precedence:** GitHub issues and milestones remain authoritative for what ships (`docs/specs/workflow.md`). Spec Kitty missions, work packages, and worktrees structure implementation and review alongside that process — they do not replace issue assignment or PR title conventions.
 

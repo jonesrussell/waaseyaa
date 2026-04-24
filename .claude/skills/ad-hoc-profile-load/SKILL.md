@@ -1,1 +1,0 @@
-/home/jones/.claude/skills/ad-hoc-profile-load/SKILL.md

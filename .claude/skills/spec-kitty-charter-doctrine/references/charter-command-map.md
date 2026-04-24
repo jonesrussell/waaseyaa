@@ -1,1 +1,0 @@
-/home/jones/.claude/skills/spec-kitty-charter-doctrine/references/charter-command-map.md

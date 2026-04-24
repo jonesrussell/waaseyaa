@@ -1,1 +1,0 @@
-/home/jones/.claude/skills/spec-kitty-mission-review/SKILL.md

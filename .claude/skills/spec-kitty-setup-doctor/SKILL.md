@@ -1,1 +1,0 @@
-/home/jones/.claude/skills/spec-kitty-setup-doctor/SKILL.md

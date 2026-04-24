@@ -66,6 +66,8 @@ node-compile-cache/
 
 # Added by Spec Kitty CLI (auto-managed)
 # Note: do not ignore .claude/ root — this repo tracks .claude/settings.json and rules.
+# Spec Kitty installs per-project symlinks under .claude/skills/ → global CLI; do not commit.
+.claude/skills/
 .codex/
 .vibe/
 .opencode/
