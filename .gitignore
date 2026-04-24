@@ -18,6 +18,12 @@ packages/*/.phpunit.cache/
 # PHPStan
 phpstan/
 
+# Layer 0 / local audit bundles (regenerate via scripts/layer0_audit/)
+artifacts/
+
+# Claude Code local scheduler lock (machine-specific)
+.claude/scheduled_tasks.lock
+
 # Background sync tool stray working dirs
 waaseyaa-sync-*/
 

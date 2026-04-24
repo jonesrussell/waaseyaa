@@ -98,15 +98,20 @@ final class GitHubOAuthProvider implements OAuthProviderInterface
         $email = '';
         $emailVerified = false;
         foreach ($emailsData as $entry) {
-            if (isset($entry['primary'], $entry['verified']) && $entry['primary'] && $entry['verified']) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            $primary = $entry['primary'] ?? false;
+            $verified = $entry['verified'] ?? false;
+            if ($primary === true && $verified === true && isset($entry['email'])) {
                 $email = (string) $entry['email'];
                 $emailVerified = true;
                 break;
             }
         }
 
-        $name = isset($userData['name']) && $userData['name'] !== null
-            ? (string) $userData['name']
+        $name = isset($userData['name']) && is_string($userData['name']) && $userData['name'] !== ''
+            ? $userData['name']
             : (string) $userData['login'];
 
         return new OAuthUserProfile(

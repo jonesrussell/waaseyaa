@@ -102,6 +102,7 @@ return [
     'Waaseyaa\Entity\ConfigEntityInterface' => 'public',
     'Waaseyaa\Entity\EntityTypeInterface' => 'public',
     'Waaseyaa\Entity\EntityTypeManagerInterface' => 'public',
+    'Waaseyaa\Entity\DefinesEntityType' => 'public',
     'Waaseyaa\Entity\FieldableInterface' => 'public',
     'Waaseyaa\Entity\RevisionableInterface' => 'public',
     'Waaseyaa\Entity\TranslatableInterface' => 'public',

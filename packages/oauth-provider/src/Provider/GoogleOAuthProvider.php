@@ -81,7 +81,7 @@ final class GoogleOAuthProvider implements OAuthProviderInterface
             email: (string) $data['email'],
             name: (string) $data['name'],
             avatarUrl: isset($data['picture']) ? (string) $data['picture'] : null,
-            emailVerified: !empty($data['verified_email']),
+            emailVerified: ($data['verified_email'] ?? false) === true,
         );
     }
 

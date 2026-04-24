@@ -1,5 +1,6 @@
 # Ingestion Defaults
 
+<!-- Spec reviewed 2026-04-24 - EnvelopeValidator: removed redundant (string) cast on entity_type before validateEntityData (PHPStan); envelope validation semantics unchanged -->
 <!-- Spec reviewed 2026-04-11 - Note entity: widened constructor for duplicateInstance re-entry; no ingestion envelope or pipeline behavior change (#alpha-119) -->
 <!-- Spec reviewed 2026-04-04a - @internal annotations added to EnvelopeValidator and PayloadValidatorInterface, no behavioral changes -->
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/ingestion and packages/note; no ingestion runtime behavior change -->

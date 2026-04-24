@@ -72,7 +72,7 @@ abstract class EnvelopeValidator implements PayloadValidatorInterface
         }
 
         if ($errors === []) {
-            $errors = $this->validateEntityData((string) $envelope['entity_type'], $envelope['data']);
+            $errors = $this->validateEntityData($envelope['entity_type'], $envelope['data']);
         }
 
         return new ValidationResult($errors);

@@ -16,26 +16,34 @@ parameters:
         - packages/ai-schema/src
         - packages/ai-vector/src
         - packages/api/src
+        - packages/analytics/src
         - packages/cache/src
         - packages/cli/src
         - packages/config/src
         - packages/database-legacy/src
         - packages/entity-storage/src
         - packages/entity/src
+        - packages/error-handler/src
         - packages/field/src
         - packages/foundation/src
+        - packages/geo/src
 
         - packages/i18n/src
+        - packages/http-client/src
+        - packages/ingestion/src
         - packages/mail/src
         - packages/mcp/src
         - packages/media/src
+        - packages/mercure/src
         - packages/menu/src
         - packages/node/src
         - packages/note/src
+        - packages/oauth-provider/src
         - packages/path/src
         - packages/plugin/src
         - packages/queue/src
         - packages/relationship/src
+        - packages/scheduler/src
         - packages/routing/src
         - packages/search/src
         - packages/seo/src

@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-04-24 - Layer 0 env variable contract subsection (APP_ENV, APP_DEBUG, WAASEYAA_DB, WAASEYAA_CONFIG_DIR, .env/EnvLoader) + assert/IO review note after boot guard -->
 <!-- Spec reviewed 2026-04-22 - PackageManifest: removed persisted commands/routes (ADR docs/adr/0001); legacy extra.waaseyaa.commands|routes log warning only; fromArray strips legacy cache keys; mergeRootWaaseyaa merges providers+permissions only; attributeEntityTypes; ProviderRegistry entity_auto_register; ServiceProvider::mergeChildProvider; BuiltinRouteRegistrar: MCP route owned by mcp package only, sortRoutesByPriority after provider routes; MigrationLoader InstalledVersions; queue/notification/scheduler extra.waaseyaa.migrations -->
 <!-- Spec reviewed 2026-04-22 - require-dev layer audit script + CI integration (warn-only), plus composer layer graph docs -->
 <!-- Spec reviewed 2026-04-21 - Composer layer graph (bin/check-package-layers), HTTP JSON-first error surface, database-legacy ADR 007 cross-link -->
@@ -1393,6 +1394,20 @@ Three protected methods provide environment awareness to all kernel subclasses:
 | `isDebugMode(): bool` | `APP_DEBUG` env var → config `'debug'` key → `false` | `true` when debug is enabled |
 
 **Boot guard:** Immediately after loading configuration, `boot()` checks `isDebugMode() && !isDevelopmentMode()`. If debug is enabled outside a development environment, it throws `RuntimeException` with the message `APP_DEBUG must not be enabled in production (APP_ENV=...)`. This prevents accidentally deploying with debug mode active.
+
+#### Layer 0 environment variable contract
+
+These variables and config keys are the primary **bootstrap surface** for operators and Layer 0 code. Prefer reading configuration from `ConfigLoader` output after `EnvLoader::load()`; direct `getenv` / `$_ENV` / `$_SERVER` reads in foundation-adjacent packages should stay limited to the seams below or be documented here when extended.
+
+| Name | Role |
+|------|------|
+| `APP_ENV` | Canonical environment name; falls back to config `environment`, then `'production'`. Drives `isDevelopmentMode()` and the production SQLite existence guard. |
+| `APP_DEBUG` | Boolean debug flag; falls back to config `debug`. **Must not be true** when the resolved environment is non-development (see boot guard above). |
+| `WAASEYAA_DB` | Optional override for the SQLite database file path when `config['database']` is not set (see `DatabaseBootstrapper`). |
+| `WAASEYAA_CONFIG_DIR` | Optional override for the sync config directory (used by `ConsoleKernel` alongside `config['config_dir']`). |
+| `.env` (file) | Loaded first from `$projectRoot/.env` via `EnvLoader::load()` before `config/waaseyaa.php`. `EnvLoader` writes to `putenv()`, `$_ENV`, and `$_SERVER` without overwriting keys already present in any of those stores (see source listing under Kernel Bootstrap file index). |
+
+**Review note (assert / IO):** Layer 0 code may use `assert()` for internal invariants and file/stream helpers for logging, caches, or HTTP clients. Production should assume `zend.assertions` may be off; hot paths must not rely on assertions for security. When adding `file_put_contents`, `fopen`, `unserialize`, or `base64_decode` in Layer 0 packages, document the trust boundary (operator-only paths vs request-derived input) in package-level docblocks or this spec.
 
 ### DatabaseBootstrapper
 

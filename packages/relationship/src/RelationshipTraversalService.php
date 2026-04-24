@@ -561,7 +561,8 @@ final class RelationshipTraversalService
             $entityIds = array_keys($idSet);
             $resolvedIds = [];
             foreach ($entityIds as $eid) {
-                $resolvedIds[] = ctype_digit($eid) ? (int) $eid : $eid;
+                $asInt = filter_var($eid, FILTER_VALIDATE_INT);
+                $resolvedIds[] = $asInt !== false ? $asInt : $eid;
             }
 
             try {
@@ -587,7 +588,8 @@ final class RelationshipTraversalService
                     continue;
                 }
 
-                $resolvedId = ctype_digit($entityId) ? (int) $entityId : $entityId;
+                $resolvedInt = filter_var($entityId, FILTER_VALIDATE_INT);
+                $resolvedId = $resolvedInt !== false ? $resolvedInt : $entityId;
                 $entity = $loaded[$resolvedId] ?? null;
                 if ($entity === null && is_int($resolvedId)) {
                     $entity = $loaded[(string) $resolvedId] ?? null;

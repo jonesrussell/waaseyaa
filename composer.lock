@@ -4250,7 +4250,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "4df63df57c85da6186f90797ab67feec4a6b1218"
+                "reference": "dc9ee093f3cc01e4bcc60a4d7cab5f87d0057ed3"
             },
             "require": {
                 "php": ">=8.4",
@@ -4269,11 +4269,6 @@
             ],
             "type": "library",
             "extra": {
-                "waaseyaa": {
-                    "providers": [
-                        "Waaseyaa\\CLI\\CliServiceProvider"
-                    ]
-                },
                 "branch-alias": {
                     "dev-main": "0.1.x-dev",
                     "dev-develop/v1.1": "0.1.x-dev"
@@ -4600,7 +4595,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/error-handler",
-                "reference": "da5c7e43253664c96a91f895c2cba7b74dd9a15c"
+                "reference": "8f47e5185aa425a9269441ed8df72b7a7e7aad41"
             },
             "require": {
                 "php": ">=8.4",
@@ -4614,11 +4609,6 @@
                 "branch-alias": {
                     "dev-main": "0.1.x-dev",
                     "dev-develop/v1.1": "0.1.x-dev"
-                },
-                "waaseyaa": {
-                    "providers": [
-                        "Waaseyaa\\ErrorHandler\\ErrorHandlerServiceProvider"
-                    ]
                 }
             },
             "autoload": {
@@ -4687,7 +4677,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/foundation",
-                "reference": "0250d1188103b71462b01e74fa0913725ed4768e"
+                "reference": "f896fce33c8b33ca5a304b3f7538b8ec5ae69942"
             },
             "require": {
                 "doctrine/dbal": "^4.0",
@@ -4701,7 +4691,9 @@
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5",
-                "waaseyaa/error-handler": "^0.1.0-alpha.150"
+                "waaseyaa/entity": "^0.1.0-alpha.150",
+                "waaseyaa/error-handler": "^0.1.0-alpha.150",
+                "waaseyaa/routing": "^0.1.0-alpha.150"
             },
             "type": "library",
             "extra": {
@@ -4739,23 +4731,25 @@
             "dist": {
                 "type": "path",
                 "url": "packages/genealogy",
-                "reference": "c7f7568d803890a41b19a5d4ec337f062548d956"
+                "reference": "2ec658e78cbe6cc81902cfd103783aefce48e07c"
             },
             "require": {
                 "php": ">=8.4",
                 "waaseyaa/access": "^0.1.0-alpha.150",
                 "waaseyaa/entity": "^0.1.0-alpha.150",
+                "waaseyaa/field": "^0.1.0-alpha.150",
                 "waaseyaa/foundation": "^0.1.0-alpha.150",
                 "waaseyaa/relationship": "^0.1.0-alpha.150",
                 "waaseyaa/routing": "^0.1.0-alpha.150",
-                "waaseyaa/ssr": "^0.1.0-alpha.150"
+                "waaseyaa/ssr": "^0.1.0-alpha.150",
+                "waaseyaa/user": "^0.1.0-alpha.150",
+                "waaseyaa/workflows": "^0.1.0-alpha.150"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5",
                 "waaseyaa/api": "^0.1.0-alpha.150",
                 "waaseyaa/database-legacy": "^0.1.0-alpha.150",
-                "waaseyaa/entity-storage": "^0.1.0-alpha.150",
-                "waaseyaa/user": "^0.1.0-alpha.150"
+                "waaseyaa/entity-storage": "^0.1.0-alpha.150"
             },
             "type": "library",
             "extra": {
@@ -4779,6 +4773,11 @@
                     "Waaseyaa\\Genealogy\\Tests\\": "tests/"
                 }
             },
+            "scripts": {
+                "verify:no-api-coupling": [
+                    "@php scripts/check-no-waaseyaa-api-coupling.php"
+                ]
+            },
             "license": [
                 "GPL-2.0-or-later"
             ],
@@ -4793,7 +4792,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/geo",
-                "reference": "ae0b791e88dc0e83c0a4dd82a2335d46d354884e"
+                "reference": "c40081877b7ccc11447dc20f905229eecb6457ac"
             },
             "require": {
                 "php": ">=8.4",
@@ -4804,11 +4803,6 @@
             },
             "type": "library",
             "extra": {
-                "waaseyaa": {
-                    "providers": [
-                        "Waaseyaa\\Geo\\GeoServiceProvider"
-                    ]
-                },
                 "branch-alias": {
                     "dev-main": "0.1.x-dev"
                 }
@@ -4876,7 +4870,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/graphql",
-                "reference": "9a0f794d41927b159d43e1deb3ec3807fef60a9d"
+                "reference": "93260c8b1bfd22046a692277d8cc423efa88efde"
             },
             "require": {
                 "php": ">=8.4",
@@ -4886,7 +4880,7 @@
                 "waaseyaa/field": "^0.1.0-alpha.150",
                 "waaseyaa/foundation": "^0.1.0-alpha.150",
                 "waaseyaa/routing": "^0.1.0-alpha.150",
-                "webonyx/graphql-php": "^15.0"
+                "webonyx/graphql-php": "^15.31.5"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -4928,7 +4922,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/groups",
-                "reference": "73ed892606c4fe8452348324444c6b504be20126"
+                "reference": "aa3a243a8441b8522fa0077227d28eb4286ef535"
             },
             "require": {
                 "php": ">=8.4",
@@ -4965,7 +4959,7 @@
             "license": [
                 "GPL-2.0-or-later"
             ],
-            "description": "Multi-bundle Group content entity type for Waaseyaa (extracted from Minoo)",
+            "description": "Multi-bundle Group content entity type for Waaseyaa (group + group_type; app-defined bundles)",
             "transport-options": {
                 "relative": true
             }
@@ -5568,7 +5562,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/notification",
-                "reference": "6c64c3e338beca6426efc4532c02e2e14246ae98"
+                "reference": "817ad290561ac51aebbbe10be90d6d25e7cc884a"
             },
             "require": {
                 "php": ">=8.4",
@@ -5588,7 +5582,8 @@
                 "waaseyaa": {
                     "providers": [
                         "Waaseyaa\\Notification\\NotificationServiceProvider"
-                    ]
+                    ],
+                    "migrations": "src/Migration"
                 }
             },
             "autoload": {
@@ -5788,7 +5783,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/queue",
-                "reference": "679a89e842ddaf57bbcdb5aff9a3db10ee16aaf3"
+                "reference": "b840c0d075ea05fd3c5b76809392fa877df63f2f"
             },
             "require": {
                 "php": ">=8.4",
@@ -5808,7 +5803,8 @@
                 "waaseyaa": {
                     "providers": [
                         "Waaseyaa\\Queue\\QueueServiceProvider"
-                    ]
+                    ],
+                    "migrations": "src/Migration"
                 }
             },
             "autoload": {
@@ -5922,7 +5918,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/scheduler",
-                "reference": "c58765f5004b3daa089b4da304ddb7150e830038"
+                "reference": "74339b2934697813a9e00db55b221bde84fe053a"
             },
             "require": {
                 "dragonmantank/cron-expression": "^3.0",
@@ -5942,7 +5938,8 @@
                 "waaseyaa": {
                     "providers": [
                         "Waaseyaa\\Scheduler\\SchedulerServiceProvider"
-                    ]
+                    ],
+                    "migrations": "src/Migration"
                 }
             },
             "autoload": {
@@ -6419,16 +6416,16 @@
         },
         {
             "name": "webonyx/graphql-php",
-            "version": "v15.31.4",
+            "version": "v15.32.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/webonyx/graphql-php.git",
-                "reference": "8868e83562d9178e316097489440158b487be5fd"
+                "reference": "e8f77f81dbe5de75551137955dd0fd3f779235cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/8868e83562d9178e316097489440158b487be5fd",
-                "reference": "8868e83562d9178e316097489440158b487be5fd",
+                "url": "https://api.github.com/repos/webonyx/graphql-php/zipball/e8f77f81dbe5de75551137955dd0fd3f779235cf",
+                "reference": "e8f77f81dbe5de75551137955dd0fd3f779235cf",
                 "shasum": ""
             },
             "require": {
@@ -6437,11 +6434,11 @@
                 "php": "^7.4 || ^8"
             },
             "require-dev": {
-                "amphp/amp": "^2.6",
-                "amphp/http-server": "^2.1",
+                "amphp/amp": "^2.6 || ^3",
+                "amphp/http-server": "^2.1 || ^3",
                 "dms/phpunit-arraysubset-asserts": "dev-master",
                 "ergebnis/composer-normalize": "^2.28",
-                "friendsofphp/php-cs-fixer": "3.94.2",
+                "friendsofphp/php-cs-fixer": "3.95.1",
                 "mll-lab/php-cs-fixer-config": "5.13.0",
                 "nyholm/psr7": "^1.5",
                 "phpbench/phpbench": "^1.2",
@@ -6457,9 +6454,10 @@
                 "symfony/polyfill-php81": "^1.23",
                 "symfony/var-exporter": "^5 || ^6 || ^7 || ^8",
                 "thecodingmachine/safe": "^1.3 || ^2 || ^3",
-                "ticketswap/phpstan-error-formatter": "1.2.6"
+                "ticketswap/phpstan-error-formatter": "1.3.0"
             },
             "suggest": {
+                "amphp/amp": "To leverage async resolving on AMPHP platform (v3 with AmpFutureAdapter, v2 with AmpPromiseAdapter)",
                 "amphp/http-server": "To leverage async resolving with webserver on AMPHP platform",
                 "psr/http-message": "To use standard GraphQL server",
                 "react/promise": "To leverage async resolving on React PHP platform"
@@ -6482,7 +6480,7 @@
             ],
             "support": {
                 "issues": "https://github.com/webonyx/graphql-php/issues",
-                "source": "https://github.com/webonyx/graphql-php/tree/v15.31.4"
+                "source": "https://github.com/webonyx/graphql-php/tree/v15.32.1"
             },
             "funding": [
                 {
@@ -6494,7 +6492,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2026-04-02T07:20:06+00:00"
+            "time": "2026-04-21T09:42:39+00:00"
         }
     ],
     "packages-dev": [
@@ -10453,5 +10451,5 @@
         "php": ">=8.4"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

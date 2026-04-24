@@ -19,7 +19,8 @@ final class UmamiClient
         private readonly string $siteId,
         string $appUrl,
     ) {
-        $this->hostname = (string) (parse_url($appUrl, PHP_URL_HOST) ?: $appUrl);
+        $host = parse_url($appUrl, PHP_URL_HOST);
+        $this->hostname = is_string($host) && $host !== '' ? $host : $appUrl;
     }
 
     public function send(string $event, array $data = [], string $url = '/'): void
