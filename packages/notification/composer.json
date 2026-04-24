@@ -51,7 +51,7 @@
             "providers": [
                 "Waaseyaa\\Notification\\NotificationServiceProvider"
             ],
-            "migrations": "src/Migration"
+            "migrations": "migrations"
         }
     },
     "config": {
