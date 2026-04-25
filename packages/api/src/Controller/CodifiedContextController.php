@@ -14,7 +14,7 @@ final class CodifiedContextController
     public function __construct(private readonly ?CodifiedContextSessionStoreInterface $store = null) {}
 
     /**
-     * GET /api/telescope/codified-context/sessions
+     * GET /api/telescope/agent-context/sessions (legacy alias: /api/telescope/codified-context/sessions)
      *
      * Groups cc_session entries by session_id, merges start/end, enriches with latest drift scores.
      *
@@ -65,7 +65,7 @@ final class CodifiedContextController
     }
 
     /**
-     * GET /api/telescope/codified-context/sessions/{sessionId}
+     * GET /api/telescope/agent-context/sessions/{sessionId} (legacy: …/codified-context/…)
      *
      * @return array{data: array<string, mixed>|null}
      */
@@ -93,7 +93,7 @@ final class CodifiedContextController
     }
 
     /**
-     * GET /api/telescope/codified-context/sessions/{sessionId}/events
+     * GET /api/telescope/agent-context/sessions/{sessionId}/events (legacy: …/codified-context/…)
      *
      * Returns only cc_event type entries for the session.
      *
@@ -124,7 +124,7 @@ final class CodifiedContextController
     }
 
     /**
-     * GET /api/telescope/codified-context/sessions/{sessionId}/validation
+     * GET /api/telescope/agent-context/sessions/{sessionId}/validation (legacy: …/codified-context/…)
      *
      * Returns latest cc_validation entry for the session.
      *

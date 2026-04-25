@@ -60,7 +60,7 @@ const mockValidation = {
 }
 
 async function mockAllRoutes(page: import('@playwright/test').Page) {
-  await page.route('**/api/telescope/codified-context/sessions**', (route) => {
+  await page.route('**/api/telescope/agent-context/sessions**', (route) => {
     const url = route.request().url()
     // Session detail
     if (url.includes('/sessions/sess-abcdef12/events')) {
@@ -139,7 +139,7 @@ test.describe('Telescope: Codified Context', () => {
   })
 
   test('empty state shown when no sessions', async ({ page }) => {
-    await page.route('**/api/telescope/codified-context/sessions**', (route) =>
+    await page.route('**/api/telescope/agent-context/sessions**', (route) =>
       route.fulfill({ json: { data: [] } }),
     )
     await page.goto('/telescope/codified-context')

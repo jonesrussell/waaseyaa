@@ -1,5 +1,6 @@
 # Admin SPA
 
+<!-- Spec reviewed 2026-04-24 - useCodifiedContext + E2E: `/api/telescope/agent-context/…` (legacy HTTP alias on server); Nuxt routes still `/telescope/codified-context/*`; cross-link telescope-agent-context-telemetry.md -->
 <!-- Spec reviewed 2026-04-21 - IngestSummaryWidget: NC sync status from `/api/staff/nc-sync-status`; dashboard link `/staff/ingestion` (staff surface, not admin SPA catch-all) -->
 <!-- Spec reviewed 2026-04-08 - normalizeAppBaseURL (ufo cleanDoubleSlashes + joinURL): shared by admin plugin and auth.global so adminPathBase matches normalized base; surface $fetch uses joinURL paths; packages/admin/app/runtime/normalizeAppBaseURL.ts -->
 <!-- Spec reviewed 2026-04-08 - Admin fetch baseURL: useRuntimeConfig().app.baseURL (trailing slash) for $fetch/apiFetch and auth.global navigateTo; plugins/admin tests stub app.baseURL (#814); ufo joinURL for path joins -->
@@ -382,7 +383,7 @@ Key categories:
 - Entity type labels: `entity_type_user`, `entity_type_node`, `entity_type_node_type`, `entity_type_taxonomy_term`, etc.
 - Field labels: `field_title`, `field_machine_name`, `field_published`, `field_description`, `field_weight`, `field_email`, etc.
 - Parameterized: `create_entity`, `edit_entity` (with `{type}` token)
-- Telescope: `telescope_codified_context`, `telescope_cc_sessions`, `telescope_cc_drift_score`, etc.
+- Telescope: `telescope_codified_context`, `telescope_cc_sessions`, `telescope_cc_drift_score`, etc. Session telemetry API calls use **`/api/telescope/agent-context/…`** (`useCodifiedContext.ts`); see **`docs/specs/telescope-agent-context-telemetry.md`**.
 
 Token replacement pattern: `t('key', { token: 'value' })` replaces `{token}` in the string.
 

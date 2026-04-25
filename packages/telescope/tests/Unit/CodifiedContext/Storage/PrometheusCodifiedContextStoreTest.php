@@ -32,11 +32,13 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
     {
         $metrics = $this->store->getMetrics();
 
-        $this->assertSame(0, $metrics['waaseyaa_cc_sessions_total']);
-        $this->assertSame(0, $metrics['waaseyaa_cc_events_total']);
-        $this->assertSame(0, $metrics['waaseyaa_cc_drift_events_total']);
-        $this->assertSame(0, $metrics['waaseyaa_cc_validations_total']);
-        $this->assertSame(0.0, $metrics['waaseyaa_cc_drift_score_avg']);
+        $this->assertSame(0, $metrics['waaseyaa_agent_context_sessions_total']);
+        $this->assertSame(0, $metrics['waaseyaa_agent_context_events_total']);
+        $this->assertSame(0, $metrics['waaseyaa_agent_context_drift_events_total']);
+        $this->assertSame(0, $metrics['waaseyaa_agent_context_validations_total']);
+        $this->assertSame(0.0, $metrics['waaseyaa_agent_context_drift_score_avg']);
+        $this->assertSame($metrics['waaseyaa_agent_context_sessions_total'], $metrics['waaseyaa_cc_sessions_total']);
+        $this->assertSame($metrics['waaseyaa_agent_context_events_total'], $metrics['waaseyaa_cc_events_total']);
     }
 
     #[Test]
@@ -45,7 +47,7 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
         $this->store->store('some_event', ['session_id' => 'sess-1']);
         $this->store->store('some_event', ['session_id' => 'sess-2']);
 
-        $this->assertSame(2, $this->store->getMetrics()['waaseyaa_cc_events_total']);
+        $this->assertSame(2, $this->store->getMetrics()['waaseyaa_agent_context_events_total']);
     }
 
     #[Test]
@@ -55,8 +57,8 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
         $this->store->store('event', ['session_id' => 'sess-A']); // Same session.
         $this->store->store('event', ['session_id' => 'sess-B']);
 
-        $this->assertSame(2, $this->store->getMetrics()['waaseyaa_cc_sessions_total']);
-        $this->assertSame(3, $this->store->getMetrics()['waaseyaa_cc_events_total']);
+        $this->assertSame(2, $this->store->getMetrics()['waaseyaa_agent_context_sessions_total']);
+        $this->assertSame(3, $this->store->getMetrics()['waaseyaa_agent_context_events_total']);
     }
 
     #[Test]
@@ -66,7 +68,7 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
         $this->store->store('validation', ['session_id' => 'sess-1']);
         $this->store->store('drift_corrected', ['session_id' => 'sess-1']);
 
-        $this->assertSame(2, $this->store->getMetrics()['waaseyaa_cc_drift_events_total']);
+        $this->assertSame(2, $this->store->getMetrics()['waaseyaa_agent_context_drift_events_total']);
     }
 
     #[Test]
@@ -74,7 +76,7 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
     {
         $this->store->store('some_event', ['session_id' => 'sess-1', 'severity' => 'high']);
 
-        $this->assertSame(1, $this->store->getMetrics()['waaseyaa_cc_drift_events_total']);
+        $this->assertSame(1, $this->store->getMetrics()['waaseyaa_agent_context_drift_events_total']);
     }
 
     #[Test]
@@ -84,7 +86,7 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
         $this->store->store('validate_schema', ['session_id' => 'sess-2']);
         $this->store->store('drift_detected', ['session_id' => 'sess-3']);
 
-        $this->assertSame(2, $this->store->getMetrics()['waaseyaa_cc_validations_total']);
+        $this->assertSame(2, $this->store->getMetrics()['waaseyaa_agent_context_validations_total']);
     }
 
     #[Test]
@@ -93,7 +95,7 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
         $this->store->store('drift', ['session_id' => 's1', 'drift_score' => 0.4]);
         $this->store->store('drift', ['session_id' => 's2', 'drift_score' => 0.6]);
 
-        $avg = $this->store->getMetrics()['waaseyaa_cc_drift_score_avg'];
+        $avg = $this->store->getMetrics()['waaseyaa_agent_context_drift_score_avg'];
 
         $this->assertEqualsWithDelta(0.5, $avg, 0.0001);
     }
@@ -103,7 +105,7 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
     {
         $this->store->store('event', ['session_id' => 'sess-1']);
 
-        $this->assertSame(0.0, $this->store->getMetrics()['waaseyaa_cc_drift_score_avg']);
+        $this->assertSame(0.0, $this->store->getMetrics()['waaseyaa_agent_context_drift_score_avg']);
     }
 
     #[Test]
@@ -156,7 +158,7 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
         $store->store('event', ['session_id' => 'sess-1']);
 
         // Metrics tracked.
-        $this->assertSame(1, $store->getMetrics()['waaseyaa_cc_events_total']);
+        $this->assertSame(1, $store->getMetrics()['waaseyaa_agent_context_events_total']);
 
         // Also written to inner store.
         $entries = $store->query('event');
@@ -184,25 +186,28 @@ final class PrometheusCodifiedContextStoreTest extends TestCase
 
         $output = $this->store->renderPrometheusOutput();
 
-        $this->assertStringContainsString('# HELP waaseyaa_cc_sessions_total', $output);
-        $this->assertStringContainsString('# TYPE waaseyaa_cc_sessions_total counter', $output);
+        $this->assertStringContainsString('# HELP waaseyaa_agent_context_sessions_total', $output);
+        $this->assertStringContainsString('# TYPE waaseyaa_agent_context_sessions_total counter', $output);
+        $this->assertStringContainsString('waaseyaa_agent_context_sessions_total 2', $output);
+
+        $this->assertStringContainsString('# HELP waaseyaa_agent_context_events_total', $output);
+        $this->assertStringContainsString('# TYPE waaseyaa_agent_context_events_total counter', $output);
+        $this->assertStringContainsString('waaseyaa_agent_context_events_total 2', $output);
+
+        $this->assertStringContainsString('# HELP waaseyaa_agent_context_drift_events_total', $output);
+        $this->assertStringContainsString('# TYPE waaseyaa_agent_context_drift_events_total counter', $output);
+        $this->assertStringContainsString('waaseyaa_agent_context_drift_events_total 1', $output);
+
+        $this->assertStringContainsString('# HELP waaseyaa_agent_context_validations_total', $output);
+        $this->assertStringContainsString('# TYPE waaseyaa_agent_context_validations_total counter', $output);
+        $this->assertStringContainsString('waaseyaa_agent_context_validations_total 1', $output);
+
+        $this->assertStringContainsString('# HELP waaseyaa_agent_context_drift_score_avg', $output);
+        $this->assertStringContainsString('# TYPE waaseyaa_agent_context_drift_score_avg gauge', $output);
+        $this->assertStringContainsString('waaseyaa_agent_context_drift_score_avg', $output);
+
         $this->assertStringContainsString('waaseyaa_cc_sessions_total 2', $output);
-
-        $this->assertStringContainsString('# HELP waaseyaa_cc_events_total', $output);
-        $this->assertStringContainsString('# TYPE waaseyaa_cc_events_total counter', $output);
         $this->assertStringContainsString('waaseyaa_cc_events_total 2', $output);
-
-        $this->assertStringContainsString('# HELP waaseyaa_cc_drift_events_total', $output);
-        $this->assertStringContainsString('# TYPE waaseyaa_cc_drift_events_total counter', $output);
-        $this->assertStringContainsString('waaseyaa_cc_drift_events_total 1', $output);
-
-        $this->assertStringContainsString('# HELP waaseyaa_cc_validations_total', $output);
-        $this->assertStringContainsString('# TYPE waaseyaa_cc_validations_total counter', $output);
-        $this->assertStringContainsString('waaseyaa_cc_validations_total 1', $output);
-
-        $this->assertStringContainsString('# HELP waaseyaa_cc_drift_score_avg', $output);
-        $this->assertStringContainsString('# TYPE waaseyaa_cc_drift_score_avg gauge', $output);
-        $this->assertStringContainsString('waaseyaa_cc_drift_score_avg', $output);
     }
 
     #[Test]
