@@ -13,7 +13,8 @@ use Waaseyaa\Routing\WaaseyaaRouter;
  * Registers all built-in HTTP routes on the router.
  *
  * Handles JSON:API entity routes, schema, OpenAPI, discovery endpoints,
- * media upload, SSR page rendering, and app-level provider routes.
+ * media upload, Telescope agent-context (codified-context) JSON routes,
+ * SSR page rendering, and app-level provider routes.
  */
 final class BuiltinRouteRegistrar
 {
@@ -127,6 +128,73 @@ final class BuiltinRouteRegistrar
             RouteBuilder::create('/api/discovery/endpoint/{entity_type}/{id}')
                 ->controller('discovery.endpoint')
                 ->allowAll()
+                ->methods('GET')
+                ->build(),
+        );
+
+        $ccController = 'Waaseyaa\\Api\\Controller\\CodifiedContextController';
+        $router->addRoute(
+            'api.telescope.agent_context.sessions',
+            RouteBuilder::create('/api/telescope/agent-context/sessions')
+                ->controller($ccController . '::listSessions')
+                ->requireRole('admin')
+                ->methods('GET')
+                ->build(),
+        );
+        $router->addRoute(
+            'api.telescope.agent_context.session',
+            RouteBuilder::create('/api/telescope/agent-context/sessions/{sessionId}')
+                ->controller($ccController . '::getSession')
+                ->requireRole('admin')
+                ->methods('GET')
+                ->build(),
+        );
+        $router->addRoute(
+            'api.telescope.agent_context.session_events',
+            RouteBuilder::create('/api/telescope/agent-context/sessions/{sessionId}/events')
+                ->controller($ccController . '::getSessionEvents')
+                ->requireRole('admin')
+                ->methods('GET')
+                ->build(),
+        );
+        $router->addRoute(
+            'api.telescope.agent_context.session_validation',
+            RouteBuilder::create('/api/telescope/agent-context/sessions/{sessionId}/validation')
+                ->controller($ccController . '::getSessionValidation')
+                ->requireRole('admin')
+                ->methods('GET')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'api.telescope.codified_context.sessions',
+            RouteBuilder::create('/api/telescope/codified-context/sessions')
+                ->controller($ccController . '::listSessions')
+                ->requireRole('admin')
+                ->methods('GET')
+                ->build(),
+        );
+        $router->addRoute(
+            'api.telescope.codified_context.session',
+            RouteBuilder::create('/api/telescope/codified-context/sessions/{sessionId}')
+                ->controller($ccController . '::getSession')
+                ->requireRole('admin')
+                ->methods('GET')
+                ->build(),
+        );
+        $router->addRoute(
+            'api.telescope.codified_context.session_events',
+            RouteBuilder::create('/api/telescope/codified-context/sessions/{sessionId}/events')
+                ->controller($ccController . '::getSessionEvents')
+                ->requireRole('admin')
+                ->methods('GET')
+                ->build(),
+        );
+        $router->addRoute(
+            'api.telescope.codified_context.session_validation',
+            RouteBuilder::create('/api/telescope/codified-context/sessions/{sessionId}/validation')
+                ->controller($ccController . '::getSessionValidation')
+                ->requireRole('admin')
                 ->methods('GET')
                 ->build(),
         );

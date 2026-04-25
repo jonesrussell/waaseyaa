@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-04-24 - CodifiedContextApiRouter + HttpKernel codified-context store getters/setters; BuiltinRouteRegistrar telescope agent-context + codified-context HTTP routes -->
 <!-- Spec reviewed 2026-04-24 - packages/http-client StreamHttpClient; packages/inertia InertiaServiceProvider (PHPStan-only); packages/queue timestamped migrations + CreateQueueTables DDL (waaseyaa_queue_jobs / waaseyaa_failed_jobs) -->
 <!-- Spec reviewed 2026-04-24 - Layer 0 env variable contract subsection (APP_ENV, APP_DEBUG, WAASEYAA_DB, WAASEYAA_CONFIG_DIR, .env/EnvLoader) + assert/IO review note after boot guard -->
 <!-- Spec reviewed 2026-04-22 - PackageManifest: removed persisted commands/routes (ADR docs/adr/0001); legacy extra.waaseyaa.commands|routes log warning only; fromArray strips legacy cache keys; mergeRootWaaseyaa merges providers+permissions only; attributeEntityTypes; ProviderRegistry entity_auto_register; ServiceProvider::mergeChildProvider; BuiltinRouteRegistrar: MCP route owned by mcp package only, sortRoutesByPriority after provider routes; MigrationLoader InstalledVersions; queue/notification/scheduler extra.waaseyaa.migrations -->
@@ -1083,7 +1084,7 @@ interface DomainRouterInterface
 
 Deterministic chain: `HttpKernel` iterates routers in order; first `supports()` match wins.
 
-**Merge order:** Built-in foundation routers end at `McpRouter`. Each discovered `ServiceProvider` may implement `httpDomainRouters(?HttpKernel $httpKernel)` to return additional `DomainRouterInterface` instances; those run in **package manifest order** (same order as provider registration). `BroadcastRouter` is always appended last. Example contributors: `ApiServiceProvider` (`DiscoveryRouter` in `Waaseyaa\Api\Http\Router`), `MediaServiceProvider` (`MediaRouter`), `GraphQlServiceProvider` (`GraphQlRouter`, merging `graphqlMutationOverrides()` from all providers), `SsrServiceProvider` (`SsrRouter`, `AppControllerRouter`).
+**Merge order:** Built-in foundation routers (in `HttpKernel::serveHttpRequest`) run as: `JsonApiRouter`, `EntityTypeLifecycleRouter`, `SchemaRouter`, **`CodifiedContextApiRouter`**, `SearchRouter`, `McpRouter`, then each discovered `ServiceProvider::httpDomainRouters(?HttpKernel)` in **package manifest order**, then **`BroadcastRouter`** last. Example provider routers: `ApiServiceProvider` (`DiscoveryRouter` in `Waaseyaa\Api\Http\Router`), `MediaServiceProvider` (`MediaRouter`), `GraphQlServiceProvider` (`GraphQlRouter`, merging `graphqlMutationOverrides()` from all providers), `SsrServiceProvider` (`SsrRouter`, `AppControllerRouter`).
 
 **Kernel hooks:** After access policies are registered and before `$kernel->booted` is set, `HttpKernel::finalizeBoot()` prepares shared cache backends, discovery handler, MCP/render cache listeners from `EventListenerRegistrar`, per-provider `registerRenderCacheListeners()` and `configureHttpKernel()` (SSR builds `SsrPageHandler` there so `EntityAccessGate` sees a fully wired `EntityAccessHandler`).
 
@@ -1112,6 +1113,7 @@ Optional follow-ups (full header map API, lazy adapter, JSON:API adoption) are t
 | `JsonApiRouter` | `jsonapi.*` | JSON:API CRUD delegation to `JsonApiController` |
 | `EntityTypeLifecycleRouter` | `entity_types`, `entity_type.disable`, `entity_type.enable` | Entity type listing and lifecycle management |
 | `SchemaRouter` | `openapi`, `schema.*` | OpenAPI and JSON Schema endpoints |
+| `CodifiedContextApiRouter` | `Waaseyaa\Api\Controller\CodifiedContextController::*` | Telescope agent-context session JSON (`BuiltinRouteRegistrar` routes under `/api/telescope/agent-context/…` plus legacy `/api/telescope/codified-context/…`); optional `CodifiedContextSessionStoreInterface` from `HttpKernel::getCodifiedContextSessionStore()` |
 | `DiscoveryRouter` (`Waaseyaa\Api\Http\Router`) | `discovery.topic_hub`, `discovery.cluster`, `discovery.timeline`, `discovery.endpoint` | Discovery API for topic hubs, clusters, timelines (registered from `ApiServiceProvider::httpDomainRouters()`) |
 | `SearchRouter` | `search.semantic` | Semantic search via embedding storage |
 | `MediaRouter` (`Waaseyaa\Media\Http\Router`) | `media.upload` | File upload with MIME validation, size limits, sanitization, move error handling (`MediaServiceProvider`) |
@@ -1499,7 +1501,7 @@ Kernel/
     EnvLoader.php                -- .env file parser; writes to putenv(), $_ENV, and $_SERVER (each destination guarded independently — preset keys in any destination are never overwritten)
     ConfigLoader.php             -- config/waaseyaa.php loader
     EventListenerRegistrar.php   -- registers cache invalidation listeners
-    BuiltinRouteRegistrar.php    -- registers shared foundation-owned HTTP routes (schema, discovery, entity-types, SSR catch-all)
+    BuiltinRouteRegistrar.php    -- registers shared foundation-owned HTTP routes (schema, discovery, entity-types, telescope agent-context JSON, SSR catch-all)
     Bootstrap/
         DatabaseBootstrapper.php     -- creates DBALDatabase connection
         ManifestBootstrapper.php     -- loads/compiles PackageManifest

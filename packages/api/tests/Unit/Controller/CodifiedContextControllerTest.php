@@ -75,7 +75,7 @@ final class CodifiedContextControllerTest extends TestCase
         $result = $controller->listSessions();
 
         $this->assertCount(2, $result['data']);
-        $sessionIds = array_column($result['data'], 'session_id');
+        $sessionIds = array_column($result['data'], 'sessionId');
         $this->assertContains('sess-A', $sessionIds);
         $this->assertContains('sess-B', $sessionIds);
     }
@@ -106,7 +106,7 @@ final class CodifiedContextControllerTest extends TestCase
         $result = $controller->getSession('sess-X');
 
         $this->assertNotNull($result['data']);
-        $this->assertSame('sess-X', $result['data']['session_id']);
+        $this->assertSame('sess-X', $result['data']['sessionId']);
     }
 
     #[Test]
@@ -120,7 +120,7 @@ final class CodifiedContextControllerTest extends TestCase
         ]);
         $inner->store('cc_event', [
             'session_id' => 'sess-Y',
-            'event_type' => 'cc_event',
+            'event_type' => 'context_load',
             'action' => 'load_spec',
         ]);
         $inner->store('cc_validation', [
@@ -134,7 +134,8 @@ final class CodifiedContextControllerTest extends TestCase
         $result = $controller->getSessionEvents('sess-Y');
 
         $this->assertCount(1, $result['data']);
-        $this->assertSame('cc_event', $result['data'][0]['type']);
+        $this->assertSame('context.load', $result['data'][0]['eventType']);
+        $this->assertArrayHasKey('createdAt', $result['data'][0]);
     }
 
     #[Test]
@@ -170,8 +171,9 @@ final class CodifiedContextControllerTest extends TestCase
         $result = $controller->getSessionValidation('sess-V');
 
         $this->assertNotNull($result['data']);
-        $this->assertSame('sess-V', $result['data']['session_id']);
-        $this->assertArrayHasKey('report', $result['data']);
-        $this->assertSame(0.85, $result['data']['report']['drift_score']);
+        $this->assertSame('sess-V', $result['data']['sessionId']);
+        $this->assertSame(85, $result['data']['driftScore']);
+        $this->assertArrayHasKey('components', $result['data']);
+        $this->assertArrayHasKey('issues', $result['data']);
     }
 }

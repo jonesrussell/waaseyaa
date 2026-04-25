@@ -12,6 +12,7 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\ErrorPageRendererInterface;
 use Waaseyaa\Access\Gate\EntityAccessGate;
 use Waaseyaa\Access\Middleware\AuthorizationMiddleware;
+use Waaseyaa\Api\CodifiedContext\CodifiedContextSessionStoreInterface;
 use Waaseyaa\Api\Controller\BroadcastStorage;
 use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Cache\Backend\DatabaseBackend;
@@ -55,6 +56,8 @@ final class HttpKernel extends AbstractKernel
     private ?CacheBackendInterface $discoveryCache = null;
     private ?CacheBackendInterface $mcpReadCache = null;
     private ?DiscoveryApiHandler $discoveryHandler = null;
+
+    private ?CodifiedContextSessionStoreInterface $codifiedContextSessionStore = null;
 
     public function handle(): HttpResponse
     {
@@ -140,6 +143,16 @@ final class HttpKernel extends AbstractKernel
     public function getInertiaFullPageRenderer(): ?InertiaFullPageRendererInterface
     {
         return $this->resolveInertiaFullPageRenderer();
+    }
+
+    public function getCodifiedContextSessionStore(): ?CodifiedContextSessionStoreInterface
+    {
+        return $this->codifiedContextSessionStore;
+    }
+
+    public function setCodifiedContextSessionStore(?CodifiedContextSessionStoreInterface $store): void
+    {
+        $this->codifiedContextSessionStore = $store;
     }
 
     /**
@@ -361,6 +374,7 @@ final class HttpKernel extends AbstractKernel
             new HttpRouter\JsonApiRouter($this->entityTypeManager, $this->accessHandler),
             new HttpRouter\EntityTypeLifecycleRouter($this->entityTypeManager, $this->lifecycleManager),
             new HttpRouter\SchemaRouter($this->entityTypeManager, $this->accessHandler),
+            new HttpRouter\CodifiedContextApiRouter($this->codifiedContextSessionStore),
             new HttpRouter\SearchRouter($this->config, $this->database, $this->entityTypeManager),
             new HttpRouter\McpRouter($this->entityTypeManager, $this->accessHandler, $this->database, $this->config, $this->mcpReadCache),
         ];

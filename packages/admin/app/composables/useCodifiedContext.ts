@@ -45,7 +45,7 @@ export function useCodifiedContext() {
     error.value = null
     try {
       const response = await apiFetch<{ data: CodifiedContextSession[] }>(
-        `/api/telescope/codified-context/sessions?limit=${limit}`,
+        `/api/telescope/agent-context/sessions?limit=${limit}`,
       )
       sessions.value = response.data ?? []
     } catch (e: any) {
@@ -60,7 +60,7 @@ export function useCodifiedContext() {
     error.value = null
     try {
       const response = await apiFetch<{ data: CodifiedContextSession }>(
-        `/api/telescope/codified-context/sessions/${id}`,
+        `/api/telescope/agent-context/sessions/${id}`,
       )
       currentSession.value = response.data ?? null
     } catch (e: any) {
@@ -75,7 +75,7 @@ export function useCodifiedContext() {
     error.value = null
     try {
       const response = await apiFetch<{ data: CodifiedContextEvent[] }>(
-        `/api/telescope/codified-context/sessions/${id}/events`,
+        `/api/telescope/agent-context/sessions/${id}/events`,
       )
       events.value = response.data ?? []
     } catch (e: any) {
@@ -90,7 +90,7 @@ export function useCodifiedContext() {
     error.value = null
     try {
       const response = await apiFetch<{ data: ValidationReport }>(
-        `/api/telescope/codified-context/sessions/${id}/validation`,
+        `/api/telescope/agent-context/sessions/${id}/validation`,
       )
       validationReport.value = response.data ?? null
     } catch (e: any) {

@@ -120,18 +120,28 @@ final class PrometheusCodifiedContextStore implements CodifiedContextStoreInterf
     /**
      * Get all tracked metric values.
      *
+     * Canonical series use the `waaseyaa_agent_context_*` prefix. The legacy
+     * `waaseyaa_cc_*` keys mirror the same values for transitional dashboards.
+     *
      * @return array<string, int|float>
      */
     public function getMetrics(): array
     {
+        $driftAvg = $this->driftScoreCount > 0
+            ? $this->driftScoreSum / $this->driftScoreCount
+            : 0.0;
+
         return [
+            'waaseyaa_agent_context_sessions_total' => $this->sessionsTotal,
+            'waaseyaa_agent_context_events_total' => $this->eventsTotal,
+            'waaseyaa_agent_context_drift_events_total' => $this->driftEventsTotal,
+            'waaseyaa_agent_context_validations_total' => $this->validationsTotal,
+            'waaseyaa_agent_context_drift_score_avg' => $driftAvg,
             'waaseyaa_cc_sessions_total' => $this->sessionsTotal,
             'waaseyaa_cc_events_total' => $this->eventsTotal,
             'waaseyaa_cc_drift_events_total' => $this->driftEventsTotal,
             'waaseyaa_cc_validations_total' => $this->validationsTotal,
-            'waaseyaa_cc_drift_score_avg' => $this->driftScoreCount > 0
-                ? $this->driftScoreSum / $this->driftScoreCount
-                : 0.0,
+            'waaseyaa_cc_drift_score_avg' => $driftAvg,
         ];
     }
 
@@ -144,23 +154,45 @@ final class PrometheusCodifiedContextStore implements CodifiedContextStoreInterf
 
         $lines = [];
 
-        $lines[] = '# HELP waaseyaa_cc_sessions_total Total number of unique codified context sessions observed.';
+        $lines[] = '# HELP waaseyaa_agent_context_sessions_total Total number of unique agent-context (codified-context) sessions observed.';
+        $lines[] = '# TYPE waaseyaa_agent_context_sessions_total counter';
+        $lines[] = 'waaseyaa_agent_context_sessions_total ' . $metrics['waaseyaa_agent_context_sessions_total'];
+
+        $lines[] = '# HELP waaseyaa_agent_context_events_total Total number of agent-context events stored.';
+        $lines[] = '# TYPE waaseyaa_agent_context_events_total counter';
+        $lines[] = 'waaseyaa_agent_context_events_total ' . $metrics['waaseyaa_agent_context_events_total'];
+
+        $lines[] = '# HELP waaseyaa_agent_context_drift_events_total Total number of drift-related agent-context events observed.';
+        $lines[] = '# TYPE waaseyaa_agent_context_drift_events_total counter';
+        $lines[] = 'waaseyaa_agent_context_drift_events_total ' . $metrics['waaseyaa_agent_context_drift_events_total'];
+
+        $lines[] = '# HELP waaseyaa_agent_context_validations_total Total number of agent-context validation events observed.';
+        $lines[] = '# TYPE waaseyaa_agent_context_validations_total counter';
+        $lines[] = 'waaseyaa_agent_context_validations_total ' . $metrics['waaseyaa_agent_context_validations_total'];
+
+        $lines[] = '# HELP waaseyaa_agent_context_drift_score_avg Running average of drift scores for agent-context telemetry.';
+        $lines[] = '# TYPE waaseyaa_agent_context_drift_score_avg gauge';
+        $lines[] = 'waaseyaa_agent_context_drift_score_avg ' . $metrics['waaseyaa_agent_context_drift_score_avg'];
+
+        $lines[] = '# waaseyaa_cc_* metrics below are deprecated duplicates of waaseyaa_agent_context_*; remove after downstream dashboards migrate.';
+
+        $lines[] = '# HELP waaseyaa_cc_sessions_total Deprecated: use waaseyaa_agent_context_sessions_total.';
         $lines[] = '# TYPE waaseyaa_cc_sessions_total counter';
         $lines[] = 'waaseyaa_cc_sessions_total ' . $metrics['waaseyaa_cc_sessions_total'];
 
-        $lines[] = '# HELP waaseyaa_cc_events_total Total number of codified context events stored.';
+        $lines[] = '# HELP waaseyaa_cc_events_total Deprecated: use waaseyaa_agent_context_events_total.';
         $lines[] = '# TYPE waaseyaa_cc_events_total counter';
         $lines[] = 'waaseyaa_cc_events_total ' . $metrics['waaseyaa_cc_events_total'];
 
-        $lines[] = '# HELP waaseyaa_cc_drift_events_total Total number of drift-related events observed.';
+        $lines[] = '# HELP waaseyaa_cc_drift_events_total Deprecated: use waaseyaa_agent_context_drift_events_total.';
         $lines[] = '# TYPE waaseyaa_cc_drift_events_total counter';
         $lines[] = 'waaseyaa_cc_drift_events_total ' . $metrics['waaseyaa_cc_drift_events_total'];
 
-        $lines[] = '# HELP waaseyaa_cc_validations_total Total number of validation events observed.';
+        $lines[] = '# HELP waaseyaa_cc_validations_total Deprecated: use waaseyaa_agent_context_validations_total.';
         $lines[] = '# TYPE waaseyaa_cc_validations_total counter';
         $lines[] = 'waaseyaa_cc_validations_total ' . $metrics['waaseyaa_cc_validations_total'];
 
-        $lines[] = '# HELP waaseyaa_cc_drift_score_avg Running average of drift scores.';
+        $lines[] = '# HELP waaseyaa_cc_drift_score_avg Deprecated: use waaseyaa_agent_context_drift_score_avg.';
         $lines[] = '# TYPE waaseyaa_cc_drift_score_avg gauge';
         $lines[] = 'waaseyaa_cc_drift_score_avg ' . $metrics['waaseyaa_cc_drift_score_avg'];
 

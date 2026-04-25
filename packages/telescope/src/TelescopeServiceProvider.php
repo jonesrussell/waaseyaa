@@ -128,7 +128,7 @@ final class TelescopeServiceProvider
             return null;
         }
 
-        if (!$this->isRecordingEnabled('codified_context')) {
+        if (!$this->isAgentContextRecordingEnabled()) {
             return null;
         }
 
@@ -142,6 +142,26 @@ final class TelescopeServiceProvider
     private function isRecordingEnabled(string $recorder): bool
     {
         return (bool) ($this->config['record'][$recorder] ?? true);
+    }
+
+    /**
+     * Agent-context (codified-context) observer toggle.
+     *
+     * When `record.agent_context` is present it wins; otherwise the legacy
+     * `record.codified_context` key is consulted.
+     */
+    private function isAgentContextRecordingEnabled(): bool
+    {
+        $record = $this->config['record'] ?? [];
+        if (!is_array($record)) {
+            return true;
+        }
+
+        if (array_key_exists('agent_context', $record)) {
+            return (bool) $record['agent_context'];
+        }
+
+        return (bool) ($record['codified_context'] ?? true);
     }
 
     private function createDefaultStore(): TelescopeStoreInterface

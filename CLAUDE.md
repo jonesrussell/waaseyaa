@@ -44,7 +44,7 @@ When working on files matching these patterns, retrieve the spec for deep contex
 | `packages/ssr/*` | — | — |
 | `packages/error-handler/*` | — | `docs/specs/debugging-dx.md` |
 | `packages/debug/*` | — | `docs/specs/debugging-dx.md` |
-| `packages/telescope/*` | — | — |
+| `packages/telescope/*` (agent-context / codified-context telemetry, Prometheus) | — | `docs/specs/telescope-agent-context-telemetry.md`, `docs/specs/api-layer.md` |
 | `packages/workflows/*` | — | — |
 | `packages/billing/*` | — | — |
 | `packages/github/*` | — | — |

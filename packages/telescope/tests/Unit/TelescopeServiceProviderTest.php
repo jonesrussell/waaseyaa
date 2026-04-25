@@ -216,6 +216,26 @@ final class TelescopeServiceProviderTest extends TestCase
     }
 
     #[Test]
+    public function agent_context_record_key_takes_precedence_when_present(): void
+    {
+        $provider = new TelescopeServiceProvider(config: [
+            'record' => ['agent_context' => false, 'codified_context' => true],
+        ]);
+
+        $this->assertNull($provider->getCodifiedContextObserver());
+    }
+
+    #[Test]
+    public function agent_context_true_enables_observer_even_when_codified_context_false(): void
+    {
+        $provider = new TelescopeServiceProvider(config: [
+            'record' => ['agent_context' => true, 'codified_context' => false],
+        ]);
+
+        $this->assertNotNull($provider->getCodifiedContextObserver());
+    }
+
+    #[Test]
     public function returnsSameRecorderInstanceOnMultipleCalls(): void
     {
         $provider = new TelescopeServiceProvider();
