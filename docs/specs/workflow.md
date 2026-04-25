@@ -1,4 +1,8 @@
-# GitHub Workflow Governance
+# Workflow governance (Spec Kitty–first)
+
+**Planning and execution** for substantive work are driven by **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** — missions, work packages, `spec-kitty next`, the dashboard, and `.kittify/` artifacts — not by GitHub issues alone. **`docs/specs/`** remains the contract layer agents read from disk.
+
+**GitHub** stays the **integration and visibility surface**: pull requests, Actions, releases, security, fork/contributor discovery, and **optional** issues (including M11 governed-change filings). CI and merge reality still live on GitHub; Spec Kitty does not replace the PR or the pipeline.
 
 ## Versioning Model
 
@@ -37,6 +41,22 @@ The Waaseyaa Framework and Minoo (the flagship consumer app) version independent
 
 **Update this table whenever milestones are added, closed, or redescribed.**
 
+## GitHub milestone tracks (mirror for issues)
+
+When a **GitHub issue** exists (community visibility, Dependabot, M11 templates, or contributor preference), assign it to **one** of the **five Track milestones** (*Track 1* … *Track 5* — not separate `v1.5` … `v2.0` titles on GitHub). That keeps the issue board consistent for anyone browsing GitHub only. The semantic table above remains the **capability narrative**; Tracks are a **slice label** for issues, parallel to how Spec Kitty missions group work.
+
+| GitHub milestone | Primary focus | Typical semantic alignment |
+|------------------|---------------|----------------------------|
+| Track 1 — Entity system & hydration | Core platform, entity stack, foundation, package discovery | v1.4 outcomes, entity/storage contracts, L0–L3 depth |
+| Track 2 — Bimaaji & agentic | Bimaaji, AI packages, agent-facing APIs | v1.5–v1.6 adjacent surfaces, L4–L5 |
+| Track 3 — Parity & performance | CI parity, coverage, PHPStan, DX, performance | Cross-cutting quality; supports all semantic versions |
+| Track 4 — Schema evolution | Schema and migration evolution workstreams | v2.0 preparatory work |
+| Track 5 — Ecosystem identity | Split/release, tokens, docs/tooling, northcloud ecosystem | Governance, packaging, consumer rollout |
+
+**Dependabot and dependency PRs:** Open **issues** (including bots) should still carry a Track milestone when they exist as issues. **Pull requests** that only bump dependencies may omit `(#N)` / mission reference in the title when there is no tracking artifact; if there is a chore or security issue or Spec Kitty WP, link it per rule #4.
+
+**Periodic audit:** After large roadmap changes, reconcile GitHub issue hygiene if you use issues — see [docs/audits/2026-04-25-github-milestones-issues-audit.md](../audits/2026-04-25-github-milestones-issues-audit.md) for an inventory template.
+
 ## Milestone Narrative Arc
 
 **Pre-v1 (platform foundation):**
@@ -62,28 +82,30 @@ The Waaseyaa Framework and Minoo (the flagship consumer app) version independent
 
 ## The 5 Workflow Rules
 
-### 1. All work begins with an issue
-No code is generated or written without an open GitHub issue. Claude must ask for the issue number before producing code. If no issue exists, Claude must propose creating one and assign it to the appropriate milestone before proceeding.
+### 1. Substantive work begins in Spec Kitty
+Do not drive multi-step implementation from a blank prompt. Use an **active Spec Kitty mission and work package** (or the next step from `spec-kitty next`) so intent, review gates, and merge discipline stay in `.kittify/` and the mission state machine. **M11 governed-change** and similar templates that require a **GitHub filing issue** still use that issue as the audit front door — link it from the mission or PR body so traceability stays intact.
 
-### 2. Every issue belongs to a milestone
-Issues must be assigned to exactly one milestone. Unassigned issues represent incomplete triage. Claude must prompt milestone assignment if an issue lacks one. Use `bin/check-milestones` to surface unassigned issues at any time.
+### 2. GitHub issues (when they exist) belong to a Track milestone
+If an issue is open on GitHub, assign **exactly one** Track milestone. Unassigned issues are incomplete triage for **that surface**. Use `bin/check-milestones` to surface gaps. Omitting GitHub issues entirely for Spec Kitty–only work is allowed; do not force an issue if the mission alone is sufficient for your slice.
 
-### 3. Milestones define the roadmap
-Milestones are the authoritative plan for the repo. Codified context describes philosophy; milestones describe execution. Claude must align all suggestions with the active milestone structure. Do not invent new milestones without explicit discussion.
+### 3. Roadmap intent is semantic + mission state
+The **Framework milestones** table and narrative in this document describe **capability intent** (v1.x / v2.0). **Spec Kitty mission structure** is the primary execution map for agents. **GitHub Track 1–5** names mirror rough themes for issue readers; they do not override mission ordering.
 
-### 4. PRs must reference issues
-Every PR title must include an issue number (e.g. `feat(#42): add SSR path resolution`). PRs without issue references should not be merged. Use the PR template checklist.
+### 4. PRs must be traceable
+Every PR must link **what it delivers**: prefer `feat(#N): …` when a GitHub issue exists; otherwise reference the **Spec Kitty mission / work package** (title, path under `.kittify/`, or link) in the title or body. Use `.github/pull_request_template.md`. Dependency-only PRs may follow the Dependabot exception above.
 
-### 5. Claude reads milestones before generating work
-At session start, `bin/check-milestones` runs automatically. Claude must read the report and flag any drift before beginning implementation work. Claude must also check which milestone is active and align output to it.
+### 5. Read mission context before generating work
+At session start, prefer **Spec Kitty** context (`spec-kitty next`, dashboard, active WP) when the repo is under a mission. **`bin/check-milestones`** remains a **supplementary** GitHub hygiene signal (SessionStart hook): read it when work touches GitHub issues or community triage.
 
 ## Drift Detection
 
-`bin/check-milestones` runs at every Claude session start via the SessionStart hook. It reports:
-- Open issues with no milestone (incomplete triage)
-- Open milestones with no open issues (possibly stale)
+**Specs:** `tools/drift-detector.sh` and manual reads of `docs/specs/` — see [ops/observability/drift-detection.md](../../ops/observability/drift-detection.md).
 
-The script exits 0 always. Output is a warning surface for Claude and contributors, not a CI gate.
+**GitHub issue hygiene:** `bin/check-milestones` (SessionStart hook) reports:
+- Open issues with no milestone (incomplete triage **on GitHub**)
+- Open milestones with no open issues (possibly stale **on GitHub**)
+
+The script exits 0 always. Output is a warning surface, not a CI gate. It does **not** replace Spec Kitty mission state or spec ownership.
 
 ## Composer Manifest Policy (Codified + Gated)
 
@@ -112,4 +134,4 @@ Failure format is machine- and human-readable, including:
 - current value
 - expected value
 
-The top-level M11 post-execution governance baseline is [m11-post-execution-governance-bootstrap.md](./m11-post-execution-governance-bootstrap.md). Governed changes enter that loop through [the governed-change issue template](../../.github/ISSUE_TEMPLATE/m11-governed-change.md), and this workflow spec serves as the repo-local backlink to that front-door artifact. The operating loop itself is [m11-steady-state-conformance-loop.md](./m11-steady-state-conformance-loop.md), and steady-state drift scans and C17+ logging use [m11-periodic-drift-scan-protocol.md](./m11-periodic-drift-scan-protocol.md) and the [M11 drift-scan log issue template](../../.github/ISSUE_TEMPLATE/m11-drift-scan-log.md).
+The top-level M11 post-execution governance baseline is [m11-post-execution-governance-bootstrap.md](./m11-post-execution-governance-bootstrap.md). Governed changes enter that loop through [the governed-change issue template](../../.github/ISSUE_TEMPLATE/m11-governed-change.md) (GitHub as **audit front door**); link the filing issue from the active **Spec Kitty** mission or PR when both exist. This workflow spec is the repo-local backlink to that artifact. The operating loop itself is [m11-steady-state-conformance-loop.md](./m11-steady-state-conformance-loop.md), and steady-state drift scans and C17+ logging use [m11-periodic-drift-scan-protocol.md](./m11-periodic-drift-scan-protocol.md) and the [M11 drift-scan log issue template](../../.github/ISSUE_TEMPLATE/m11-drift-scan-log.md).

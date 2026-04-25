@@ -9,7 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Contributor / agent workflow:** Retired the Node MCP spec-retrieval servers (`waaseyaa_list_specs`, `waaseyaa_get_spec`, `waaseyaa_search_specs`). Subsystem context is read from `docs/specs/` directly. Adopted [Spec Kitty](https://github.com/Priivacy-ai/spec-kitty) scaffold (`.kittify/`); see `CLAUDE.md` for GitHub-vs-Spec-Kitty precedence and optional CLI install. Spec Kitty’s `.claude/skills/` symlinks stay local (gitignored); install the CLI and run `spec-kitty init` after clone.
+- **Governance:** Document **Spec Kitty–first** workflow — missions and work packages are the primary execution ledger; GitHub is PR/CI/releases and optional issues (`docs/specs/workflow.md`, `CLAUDE.md`, `AGENTS.md`, PR template). `bin/check-milestones` remains supplementary GitHub hygiene. README **Contributing** and the PR template include an **Active Spec Kitty mission** line for traceability.
+
+- **Contributor / agent workflow:** Retired the Node MCP spec-retrieval servers (`waaseyaa_list_specs`, `waaseyaa_get_spec`, `waaseyaa_search_specs`). Subsystem context is read from `docs/specs/` directly. Adopted [Spec Kitty](https://github.com/Priivacy-ai/spec-kitty) scaffold (`.kittify/`); see `CLAUDE.md` for workflow and CLI install. Spec Kitty’s `.claude/skills/` symlinks stay local (gitignored); install the CLI and run `spec-kitty init` after clone.
 
 ### Removed
 

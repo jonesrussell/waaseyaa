@@ -16,7 +16,7 @@ Note: this protocol is the backstop component of the broader M11 steady-state co
 - `#990` provides the dependency expectations that anomalies must be evaluated against.
 - `#999` is the governed-change identity for the front-door mechanism used when intentional governed changes are recorded.
 - [.github/ISSUE_TEMPLATE/m11-governed-change.md](../../.github/ISSUE_TEMPLATE/m11-governed-change.md) is the repo-local template used to instantiate that front-door mechanism for every new or modified governed surface since the last scan.
-- The current repo state, drift detector output, milestone hygiene report, and the affected governed surfaces are the operational inputs for each scan.
+- The current repo state, drift detector output, Spec Kitty mission state (when applicable), optional GitHub milestone hygiene report, and the affected governed surfaces are the operational inputs for each scan.
 
 ## Scan Cadence
 
@@ -32,7 +32,7 @@ The scan is owned by the active conformance governor or, when that role is not e
 
 Every scan must include:
 
-- `bin/check-milestones` for milestone hygiene.
+- `bin/check-milestones` for GitHub Track milestone hygiene when issues are in use (supplementary to Spec Kitty; see `docs/specs/workflow.md`).
 - `bash tools/drift-detector.sh 5` for drift detection.
 - Inspection of changed routes, providers, manifests, contracts, adapters, and registries.
 

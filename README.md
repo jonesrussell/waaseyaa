@@ -179,7 +179,11 @@ composer phpstan     # Static analysis (level 5, PHPStan 2)
 
 ## Contributing
 
-Contributions are welcome. Please open an issue to discuss proposed changes before submitting a pull request.
+Contributions and **AI coding agents** should follow **[Spec Kitty–first workflow](docs/specs/workflow.md)** (missions / work packages under `.kittify/`) with **GitHub** for PRs, CI, and optional issues. Human-oriented entry points: [`CLAUDE.md`](CLAUDE.md) and [`AGENTS.md`](AGENTS.md).
+
+- **Spec Kitty:** `pip install spec-kitty-cli` or `uv tool install spec-kitty-cli`, then `spec-kitty init --here` (or `spec-kitty upgrade`) in a clone; use the PR template line **Active Spec Kitty mission** when the change comes from a mission.
+- **PRs:** Fill [`.github/pull_request_template.md`](.github/pull_request_template.md) — link a GitHub `#N` **or** the mission / WP you used.
+- **GitHub issues:** Optional for every change; when you open one, assign a **Track** milestone (see `docs/specs/workflow.md`). **M11 governed** work still uses the [governed-change template](.github/ISSUE_TEMPLATE/m11-governed-change.md) as the filing front door.
 
 ```bash
 # Clone the repository

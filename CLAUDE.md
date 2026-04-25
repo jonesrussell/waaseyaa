@@ -55,7 +55,7 @@ When working on files matching these patterns, retrieve the spec for deep contex
 | `packages/notification/*` | `waaseyaa:infrastructure` | `docs/specs/infrastructure.md` |
 | `packages/cms/*`, `packages/core/*`, `packages/full/*` | — (metapackages) | — |
 
-| GitHub issues, milestones, new features, roadmap | — | `docs/specs/workflow.md`, `docs/specs/per-site-convergence-audit.md`, `docs/specs/v1.5-verification-gate-contract.md`, `docs/specs/v1.6-verification-gate-contract.md` |
+| Workflow, Spec Kitty, GitHub (PRs/issues), roadmap | — | `docs/specs/workflow.md`, `docs/specs/per-site-convergence-audit.md`, `docs/specs/v1.5-verification-gate-contract.md`, `docs/specs/v1.6-verification-gate-contract.md` |
 | `skills/waaseyaa/app-development/*` | — | — |
 | `skills/waaseyaa/framework-extraction/*` | — | `docs/specs/extraction-log.md` |
 | `docs/audits/*` | — | — |
@@ -121,17 +121,17 @@ When the mapping is not obvious, search under `docs/specs/` (e.g. `rg -n "TopicO
 3. `boot()` — subscribe to events, register routes, warm caches (after all providers registered)
 4. Add `extra.waaseyaa.providers` to the package's `composer.json` for auto-discovery
 
-## GitHub Workflow
+## Workflow (Spec Kitty–first)
 
-All work in this repo follows a GitHub-first workflow. See `docs/specs/workflow.md` for the full governance model including the versioning strategy and current milestone structure.
+Substantive work is driven by **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** missions and work packages (`.kittify/`, `spec-kitty next`, dashboard); **GitHub** is the PR/CI/releases surface and optional issue visibility. Full rules: `docs/specs/workflow.md` (versioning, semantic milestones, Track mirror, PR traceability).
 
-**The 5 rules — enforced at every session start via `bin/check-milestones`:**
+**The 5 rules (summary — see `docs/specs/workflow.md` for nuance):**
 
-1. **All work begins with an issue.** Ask for the issue number before writing code. If none exists, create one and assign it to a milestone first.
-2. **Every issue belongs to a milestone.** Unassigned issues are incomplete triage — prompt assignment if missing.
-3. **Milestones define the roadmap.** Check the active milestone before proposing work. Do not invent new milestones without explicit discussion.
-4. **PRs must reference issues.** PR title format: `feat(#N): description`. Use `.github/pull_request_template.md`.
-5. **Read the drift report.** `bin/check-milestones` runs at session start. Flag any warnings before beginning work.
+1. **Substantive work begins in Spec Kitty** — active mission/WP or `spec-kitty next`; M11 filings may still require a GitHub issue as the audit front door (link it).
+2. **GitHub issues (when used) get a Track milestone** — `bin/check-milestones` surfaces gaps; issues are not mandatory for every change.
+3. **Roadmap intent** — semantic v1.x table + mission state; GitHub Tracks mirror themes for issue-only readers.
+4. **PRs must be traceable** — `#N` and/or Spec Kitty mission/WP reference per `docs/specs/workflow.md` and `.github/pull_request_template.md`.
+5. **Session context** — prefer Spec Kitty state when under a mission; read `bin/check-milestones` when touching GitHub issues.
 
 ## Agent context and Spec Kitty
 
@@ -139,9 +139,9 @@ All work in this repo follows a GitHub-first workflow. See `docs/specs/workflow.
 - **Specialist skills:** `skills/waaseyaa/*` — load on demand for a subsystem; each skill lists related specs.
 - **Cold specs:** `docs/specs/*.md` — read directly from disk when you need contracts, file maps, and edge cases (no spec MCP server).
 
-This repo also uses **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** for optional spec/plan/task workflows (`.kittify/`, slash commands such as `/spec-kitty.specify`, `spec-kitty dashboard`). Install: `pip install spec-kitty-cli` (or `uv tool install spec-kitty-cli`). Run `spec-kitty upgrade` in the repo after upgrading the CLI. The CLI may create `.claude/skills/` symlinks to your global Spec Kitty skill pack — that directory is gitignored here because paths are machine-specific; re-run `spec-kitty init` (or upgrade) on a fresh clone after installing the CLI.
+Install the CLI: `pip install spec-kitty-cli` or `uv tool install spec-kitty-cli`. Run `spec-kitty upgrade` in the repo after upgrading the CLI. The CLI may create `.claude/skills/` symlinks to your global Spec Kitty skill pack — that directory is gitignored here because paths are machine-specific; re-run `spec-kitty init` (or upgrade) on a fresh clone after installing the CLI.
 
-**Workflow precedence:** GitHub issues and milestones remain authoritative for what ships (`docs/specs/workflow.md`). Spec Kitty missions, work packages, and worktrees structure implementation and review alongside that process — they do not replace issue assignment or PR title conventions.
+**Workflow precedence:** **Spec Kitty** owns mission/work-package execution and structured review. **GitHub** owns merge mechanics, CI, releases, and optional issues. **`docs/specs/`** owns subsystem contracts — read from disk, update when behaviour changes.
 
 Design docs in `docs/plans/` are session artifacts (implementation history). Specs in `docs/specs/` are enduring architectural knowledge (kept current). When refactoring a subsystem, update its spec — run `tools/drift-detector.sh` to find stale specs.
 

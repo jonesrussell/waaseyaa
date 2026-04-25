@@ -12,7 +12,7 @@ Provide a **repeatable, adversarial, invariant-driven** checklist for each Waase
 ## Related specs
 
 - [version-provenance.md](./version-provenance.md) — golden SHA, `bin/waaseyaa-version`, strict vs report-only.
-- [workflow.md](./workflow.md) — GitHub-first work, issues, milestones.
+- [workflow.md](./workflow.md) — Spec Kitty–first workflow; GitHub for PR/CI and optional issues/milestones.
 - [extension-compatibility-matrix.md](./extension-compatibility-matrix.md) — package / surface compatibility.
 
 ## Audit artifact

@@ -15,7 +15,8 @@ Undetected drift causes agents to generate code that conflicts with recent chang
 |------|---------|-----------|
 | `tools/drift-detector.sh` | Finds stale specs by comparing last-modified dates | `bash tools/drift-detector.sh` |
 | Read / `rg` on `docs/specs/` | Cross-reference subsystem specs during development | Local files in the repo |
-| `bin/check-milestones` | Validates milestone hygiene at session start | `bin/check-milestones` |
+| Spec Kitty / `.kittify/` | Mission and work-package state for structured work | `spec-kitty next`, dashboard |
+| `bin/check-milestones` | Optional GitHub issue ↔ Track milestone hygiene | `bin/check-milestones` |
 
 ## Drift Categories
 
@@ -50,7 +51,8 @@ Database schema differs from what `SqlSchemaHandler` would generate.
 
 | When | Action |
 |------|--------|
-| Every development session | Run `bin/check-milestones` (session-start hook per `docs/specs/workflow.md`). |
+| Every development session | When using GitHub issues, review `bin/check-milestones` (session-start hook per `docs/specs/workflow.md`); prefer Spec Kitty mission context for active missions. |
+| Quarterly (or after major roadmap reshuffles) | Full GitHub milestone/issue audit: see template and history under `docs/audits/` (e.g. `2026-04-25-github-milestones-issues-audit.md`). |
 | Weekly (or before each release tag) | Run `bash tools/drift-detector.sh`; if output lists stale specs, update specs or touching code; log exceptional batch results via `.github/ISSUE_TEMPLATE/m11-drift-scan-log.md`. |
 | Intentional architecture or contract change | Open a governed-change issue from `.github/ISSUE_TEMPLATE/m11-governed-change.md` before large diffs. |
 | Composer/manifest edits | Run `composer check-composer-policy` (CI gate). |

@@ -19,17 +19,39 @@ if ! gh auth status &>/dev/null 2>&1; then
   exit 0
 fi
 
-# Open issues with no milestone
+# Open issues with no milestone (paginate: REST issue list caps at 100 per call)
 echo ""
 echo "--- Open issues with no milestone ---"
-NO_MILESTONE=$(gh issue list --repo "$REPO" --state open --search "no:milestone" --limit 100 --json number,title 2>/dev/null || echo "[]")
-COUNT=$(echo "$NO_MILESTONE" | grep -o '"number":' | wc -l | tr -d ' ')
+NO_MILESTONE='[]'
+if command -v jq &>/dev/null; then
+  PAGE=1
+  while true; do
+    CHUNK=$(gh api "GET /search/issues" \
+      -f q="repo:$REPO is:issue is:open no:milestone" \
+      -f per_page=100 \
+      -f page="$PAGE" \
+      --jq '.items | map({number: .number, title: .title})' 2>/dev/null) || CHUNK='[]'
+    N=$(echo "$CHUNK" | jq 'length')
+    [[ "${N:-0}" -eq 0 ]] && break
+    NO_MILESTONE=$(jq -n --argjson acc "$NO_MILESTONE" --argjson c "$CHUNK" '$acc + $c')
+    PAGE=$((PAGE + 1))
+    [[ "$N" -lt 100 ]] && break
+  done
+  COUNT=$(echo "$NO_MILESTONE" | jq 'length')
+else
+  NO_MILESTONE=$(gh issue list --repo "$REPO" --state open --search "no:milestone" --limit 500 --json number,title 2>/dev/null || echo "[]")
+  COUNT=$(echo "$NO_MILESTONE" | grep -o '"number":' | wc -l | tr -d ' ')
+fi
 
 if [[ "$COUNT" -gt 0 ]]; then
   echo "WARNING: $COUNT open issue(s) without a milestone (incomplete triage):"
-  echo "$NO_MILESTONE" | grep -oP '"number":\s*\K\d+|"title":\s*"\K[^"]+' | paste - - | while read -r num title; do
-    echo "  #$num — $title"
-  done
+  if command -v jq &>/dev/null; then
+    echo "$NO_MILESTONE" | jq -r '.[] | "  #\(.number) — \(.title)"'
+  else
+    echo "$NO_MILESTONE" | grep -oP '"number":\s*\K\d+|"title":\s*"\K[^"]+' | paste - - | while read -r num title; do
+      echo "  #$num — $title"
+    done
+  fi
   WARNINGS=1
 else
   echo "OK: All open issues have milestones"

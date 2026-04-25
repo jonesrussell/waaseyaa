@@ -110,7 +110,7 @@ $queue->dispatch(new SendWelcomeEmail($userId));
 
 Framework subsystem specs ship in the `waaseyaa/framework` repo under `docs/specs/`. Read them from checkout or upstream; there is no bundled Node spec MCP in the framework.
 
-This repository may adopt **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** for structured spec/plan/task workflows (see framework `CLAUDE.md`). GitHub issues and milestones remain authoritative per `docs/specs/workflow.md`.
+This repository may adopt **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** for structured spec/plan/task workflows (see framework `CLAUDE.md`). Framework governance is **Spec Kitty–first**; GitHub is PR/CI and optional issues per `docs/specs/workflow.md`.
 
 ## Development
 
