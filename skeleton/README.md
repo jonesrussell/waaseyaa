@@ -4,6 +4,15 @@ A Waaseyaa CMS application.
 
 [**Discord**](https://discord.gg/ZzQNhrBb7U) | [GitHub](https://github.com/waaseyaa/framework) | [Website](https://waaseyaa.org)
 
+## New project
+
+```bash
+composer create-project waaseyaa/waaseyaa my-app --stability=dev
+cd my-app
+```
+
+Use `./vendor/bin/waaseyaa` for the CLI. Optional path-linked `waaseyaa/*` checkouts: copy `composer.local.json.example` to `composer.local.json` (see [docs/local-dev.md](docs/local-dev.md)).
+
 ## Directory Structure
 
 ```

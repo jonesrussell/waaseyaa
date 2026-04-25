@@ -127,6 +127,31 @@ jobs:
             build/logs/clover.xml
           retention-days: 30
 
+  skeleton-create-project:
+    name: ci/skeleton-create-project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, sqlite3, mbstring, xml
+          coverage: none
+
+      - name: create-project (path skeleton) and audit-site
+        run: |
+          set -euo pipefail
+          work=$(mktemp -d)
+          cleanup() { rm -rf "$work"; }
+          trap cleanup EXIT
+          composer create-project waaseyaa/waaseyaa "$work/skel-proj" \
+            --repository='{"type":"path","url":"skeleton"}' \
+            --stability=dev \
+            --no-interaction
+          (cd "$work/skel-proj" && ./bin/waaseyaa-audit-site)
+
   packaged-form:
     name: packaged-form
     runs-on: ubuntu-latest

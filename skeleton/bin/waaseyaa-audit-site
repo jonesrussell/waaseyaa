@@ -12,10 +12,10 @@ err() {
 }
 
 [[ -f composer.json ]] || err "composer.json missing"
-[[ -f bin/waaseyaa ]] || err "bin/waaseyaa missing"
+[[ -f vendor/bin/waaseyaa ]] || err "vendor/bin/waaseyaa missing (run composer install)"
 [[ -f bin/waaseyaa-version ]] || err "bin/waaseyaa-version missing"
 [[ -f bin/verify-deploy-rsync ]] || err "bin/verify-deploy-rsync missing"
-[[ -x bin/waaseyaa ]] || err "bin/waaseyaa not executable (run: chmod +x bin/waaseyaa)"
+[[ -x vendor/bin/waaseyaa ]] || err "vendor/bin/waaseyaa not executable"
 [[ -x bin/waaseyaa-version ]] || err "bin/waaseyaa-version not executable (run: chmod +x bin/waaseyaa-version)"
 [[ -x bin/verify-deploy-rsync ]] || err "bin/verify-deploy-rsync not executable (run: chmod +x bin/verify-deploy-rsync)"
 

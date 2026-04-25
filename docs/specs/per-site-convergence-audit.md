@@ -100,7 +100,7 @@ Compare the app’s layout and Composer metadata to the skeleton. Deviations are
 | `extra.waaseyaa.providers` | **If** the app registers a custom `App\*` (or branded-namespace) service provider, it appears under `extra.waaseyaa.providers` |
 | `config.optimize-autoloader` | `true` |
 | `bin/waaseyaa-version` | Present; executable (`chmod +x` or equivalent in CI) |
-| `bin/waaseyaa` | Present for standard apps |
+| `vendor/bin/waaseyaa` | Present and executable (Composer proxy to `waaseyaa/cli`; project-root `bin/waaseyaa` is not part of the skeleton) |
 | `public/index.php` | Byte-identical to [`skeleton/public/index.php`](../skeleton/public/index.php) (compare to [`skeleton/bin/golden-public-index.php`](../skeleton/bin/golden-public-index.php)); enforced by `waaseyaa-audit-site` when `bin/golden-public-index.php` exists |
 | `bin/golden-public-index.php` | Shipped next to `waaseyaa-audit-site` when using the mechanical preflight from the skeleton |
 

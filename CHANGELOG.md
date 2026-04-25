@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Skeleton (`waaseyaa/waaseyaa`):** `composer create-project` from Packagist (or any directory) no longer fails on a monorepo-only `path` repository, a stale `post-create-project-cmd` `chmod` for a removed `bin/waaseyaa` wrapper, or a drifted `bin/golden-public-index.php` vs `public/index.php`. The audit script preflight now checks the Composer CLI proxy at `vendor/bin/waaseyaa`. Local `../waaseyaa/packages/*` path overrides are documented in `composer.local.json.example` only.
+
 ### Changed
 
 - **Telescope agent-context telemetry:** Canonical Prometheus series names are now `waaseyaa_agent_context_*`; `waaseyaa_cc_*` remain as deprecated duplicates in the same scrape for dashboard migration. Admin SPA and E2E call **`/api/telescope/agent-context/…`**; legacy **`/api/telescope/codified-context/…`** HTTP routes remain registered. Telescope `record.agent_context` overrides `record.codified_context` when set. See **`docs/specs/telescope-agent-context-telemetry.md`**.

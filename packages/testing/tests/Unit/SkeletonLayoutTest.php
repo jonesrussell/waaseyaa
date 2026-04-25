@@ -89,4 +89,40 @@ final class SkeletonLayoutTest extends TestCase
             'skeleton/bin/waaseyaa must not exist — use ./vendor/bin/waaseyaa (see ADR-005)',
         );
     }
+
+    /** Packagist installs must not require a monorepo-relative path repository. */
+    #[Test]
+    public function skeletonComposerJsonHasNoCheckedInPathRepositories(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        $composer = json_decode((string) file_get_contents($repoRoot . '/skeleton/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($composer);
+        self::assertArrayNotHasKey('repositories', $composer, 'skeleton must resolve waaseyaa/* from Packagist; use composer.local.json for local path overrides');
+    }
+
+    #[Test]
+    public function skeletonPostCreateProjectChmodDoesNotTargetRemovedBinWrapper(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        $composer = json_decode((string) file_get_contents($repoRoot . '/skeleton/composer.json'), true, 512, JSON_THROW_ON_ERROR);
+        $scripts = $composer['scripts'] ?? [];
+        $postCreate = $scripts['post-create-project-cmd'] ?? null;
+        self::assertIsArray($postCreate);
+        $joined = implode("\n", $postCreate);
+        $hasRemovedWrapper = (bool) preg_match('/(?:^|\s)bin\/waaseyaa(?:\s|$)/', $joined);
+        self::assertFalse(
+            $hasRemovedWrapper,
+            'post-create must not reference project-root bin/waaseyaa; use ./vendor/bin/waaseyaa (ADR-005). bin/waaseyaa-version is still allowed.',
+        );
+    }
+
+    #[Test]
+    public function waaseyaaAuditSitePrefersVendorBinCli(): void
+    {
+        $repoRoot = dirname(__DIR__, 4);
+        $path = $repoRoot . '/skeleton/bin/waaseyaa-audit-site';
+        $contents = (string) file_get_contents($path);
+        self::assertStringContainsString('vendor/bin/waaseyaa', $contents);
+        self::assertStringNotContainsString('[[ -f bin/waaseyaa ]]', $contents);
+    }
 }
