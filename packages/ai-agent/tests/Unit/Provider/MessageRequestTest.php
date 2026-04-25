@@ -35,5 +35,7 @@ final class MessageRequestTest extends TestCase
         $this->assertSame('You are helpful.', $array['system']);
         $this->assertSame(1024, $array['max_tokens']);
         $this->assertArrayNotHasKey('tools', $array);
+
+        $this->assertSame($array, $request->conversation()->toAnthropicFragment());
     }
 }

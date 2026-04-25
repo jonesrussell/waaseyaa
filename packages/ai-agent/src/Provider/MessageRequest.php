@@ -20,29 +20,26 @@ final readonly class MessageRequest
     ) {}
 
     /**
+     * Neutral conversation view for multi-provider serialization.
+     */
+    public function conversation(): LlmConversationRequest
+    {
+        return new LlmConversationRequest(
+            messages: $this->messages,
+            system: $this->system,
+            tools: $this->tools,
+            maxTokens: $this->maxTokens,
+            metadata: $this->metadata,
+        );
+    }
+
+    /**
      * Serialize to Anthropic API request format.
      *
      * @return array<string, mixed>
      */
     public function toArray(): array
     {
-        $data = [
-            'messages' => $this->messages,
-            'max_tokens' => $this->maxTokens,
-        ];
-
-        if ($this->system !== null) {
-            $data['system'] = $this->system;
-        }
-
-        if ($this->tools !== []) {
-            $data['tools'] = $this->tools;
-        }
-
-        if ($this->metadata !== []) {
-            $data['metadata'] = $this->metadata;
-        }
-
-        return $data;
+        return $this->conversation()->toAnthropicFragment();
     }
 }
