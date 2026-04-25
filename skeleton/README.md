@@ -16,6 +16,11 @@ Use `./vendor/bin/waaseyaa` for the CLI. Optional path-linked `waaseyaa/*` check
 ## Directory Structure
 
 ```
+bin/
+├── dev.sh               Local development runner (`composer run dev`)
+├── post-create-setup.php  One-time setup after `create-project`
+└── maintenance/         Audit/release helpers (optional for beginners)
+
 src/
 ├── Access/        Authorization policies
 ├── Controller/    HTTP controllers (thin orchestration)
@@ -52,6 +57,7 @@ composer run dev                    # Start backend (+ admin HMR when configured
 ./vendor/bin/waaseyaa optimize:manifest  # Rebuild provider manifest
 ./vendor/bin/waaseyaa serve              # Dev server
 ./vendor/bin/waaseyaa                    # CLI
+./bin/maintenance/waaseyaa-audit-site    # Optional convergence preflight
 ```
 
 ## First 60 Seconds

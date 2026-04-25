@@ -5,10 +5,10 @@
 # 2. export ARTIFACT_DIR=/absolute/path/to/that/tree
 # 3. Optionally add scripts/deploy-smoke-routes.txt (one URL path per line; lines starting with # ignored).
 #
-# Usage: ARTIFACT_DIR=/path/to/build ./bin/deploy-artifact-smoke [port]
+# Usage: ARTIFACT_DIR=/path/to/build ./bin/maintenance/deploy-artifact-smoke [port]
 # Suggested: run from workflow_dispatch or a scheduled workflow, not every PR.
 set -euo pipefail
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PORT="${1:-9875}"
 ARTIFACT_DIR="${ARTIFACT_DIR:-}"
 

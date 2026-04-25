@@ -3,7 +3,7 @@
 # See docs/specs/per-site-convergence-audit.md in the Waaseyaa monorepo.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 cd "$ROOT"
 
 err() {
@@ -13,13 +13,13 @@ err() {
 
 [[ -f composer.json ]] || err "composer.json missing"
 [[ -f vendor/bin/waaseyaa ]] || err "vendor/bin/waaseyaa missing (run composer install)"
-[[ -f bin/waaseyaa-version ]] || err "bin/waaseyaa-version missing"
-[[ -f bin/verify-deploy-rsync ]] || err "bin/verify-deploy-rsync missing"
+[[ -f bin/maintenance/waaseyaa-version ]] || err "bin/maintenance/waaseyaa-version missing"
+[[ -f bin/maintenance/verify-deploy-rsync ]] || err "bin/maintenance/verify-deploy-rsync missing"
 [[ -x vendor/bin/waaseyaa ]] || err "vendor/bin/waaseyaa not executable"
-[[ -x bin/waaseyaa-version ]] || err "bin/waaseyaa-version not executable (run: chmod +x bin/waaseyaa-version)"
-[[ -x bin/verify-deploy-rsync ]] || err "bin/verify-deploy-rsync not executable (run: chmod +x bin/verify-deploy-rsync)"
+[[ -x bin/maintenance/waaseyaa-version ]] || err "bin/maintenance/waaseyaa-version not executable (run: chmod +x bin/maintenance/waaseyaa-version)"
+[[ -x bin/maintenance/verify-deploy-rsync ]] || err "bin/maintenance/verify-deploy-rsync not executable (run: chmod +x bin/maintenance/verify-deploy-rsync)"
 
-./bin/verify-deploy-rsync
+./bin/maintenance/verify-deploy-rsync
 
 # Canonical HTTP entry (see docs/specs/http-entry-point.md). Set WAASEYAA_AUDIT_SKIP_PUBLIC_INDEX=1 for documented exceptions.
 if [[ "${WAASEYAA_AUDIT_SKIP_PUBLIC_INDEX:-}" == "1" ]]; then
@@ -27,11 +27,11 @@ if [[ "${WAASEYAA_AUDIT_SKIP_PUBLIC_INDEX:-}" == "1" ]]; then
 elif [[ -f public/index.php ]]; then
     GOLDEN="$SCRIPT_DIR/golden-public-index.php"
     [[ -f "$GOLDEN" ]] || err "golden-public-index.php missing (expected next to this script)"
-    cmp -s public/index.php "$GOLDEN" || err "public/index.php must match bin/golden-public-index.php byte-for-byte (copy from waaseyaa skeleton)"
+    cmp -s public/index.php "$GOLDEN" || err "public/index.php must match bin/maintenance/golden-public-index.php byte-for-byte (copy from waaseyaa skeleton)"
 fi
 
 composer validate --no-check-publish
 composer install --no-interaction --dry-run
 
-./bin/waaseyaa-version --report-only
+./bin/maintenance/waaseyaa-version --report-only
 echo "waaseyaa-audit-site: OK"

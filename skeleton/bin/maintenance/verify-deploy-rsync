@@ -2,7 +2,7 @@
 # Fail CI if deploy rsync uses an unanchored docs/ exclude (drops templates/docs/, etc.).
 # See docs/specs/per-site-convergence-audit.md in the Waaseyaa monorepo.
 set -euo pipefail
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 
 if [[ ! -d .github/workflows ]]; then

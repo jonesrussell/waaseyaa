@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 // Built-in PHP server: serve existing files from public/ directly.
 if (PHP_SAPI === 'cli-server') {
-    $file = __DIR__ . parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+    $file = __DIR__ . '/../../public' . parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
     if (is_file($file)) {
         return false;
     }
@@ -12,9 +12,9 @@ if (PHP_SAPI === 'cli-server') {
 
 use Symfony\Component\HttpFoundation\Response;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
-$projectRoot = dirname(__DIR__);
+$projectRoot = dirname(__DIR__, 2);
 if (is_file($projectRoot . '/.env')) {
     // Match Minoo: default missing APP_ENV to production (not Symfony's implicit "dev").
     (new \Symfony\Component\Dotenv\Dotenv())->loadEnv($projectRoot . '/.env', 'APP_ENV', 'production');

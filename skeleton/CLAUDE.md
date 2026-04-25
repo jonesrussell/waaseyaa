@@ -119,8 +119,8 @@ composer install                    # Install dependencies
 php -S localhost:8080 -t public     # Dev server
 ./vendor/bin/phpunit                # Run tests
 ./vendor/bin/waaseyaa               # CLI
-bin/waaseyaa-version                # Framework provenance (path SHA, lockfile, drift vs golden)
-bin/waaseyaa-audit-site             # Mechanical convergence preflight (validate + bins + provenance)
+bin/maintenance/waaseyaa-version    # Framework provenance (path SHA, lockfile, drift vs golden)
+bin/maintenance/waaseyaa-audit-site # Mechanical convergence preflight (validate + bins + provenance)
 ./vendor/bin/waaseyaa sync-rules    # Update framework rules from Waaseyaa
 ```
 
