@@ -1,6 +1,6 @@
 # API Layer
 
-<!-- Spec reviewed 2026-04-24 - CodifiedContextController + CodifiedContextApiRouter; agent-context HTTP paths; CodifiedContextSessionStoreInterface + CodifiedContextSessionRow (packages/api); telescope-agent-context-telemetry.md; waaseyaa/telescope ships CodifiedContextSessionStoreAdapter (#1339 L4/L6 boundary) -->
+<!-- Spec reviewed 2026-04-24 - CodifiedContextController JSON camelCase (admin useCodifiedContext); CodifiedContextApiRouter; agent-context HTTP paths; CodifiedContextSessionStoreInterface + CodifiedContextSessionRow (packages/api); telescope-agent-context-telemetry.md; waaseyaa/telescope ships CodifiedContextSessionStoreAdapter (#1339 L4/L6 boundary) -->
 <!-- Spec reviewed 2026-04-24 - Auth and OIDC HTTP route tables: AuthOidcRouteServiceProvider + OidcHttpRoutes in packages/routing (waaseyaa/routing requires auth+oidc); BuiltinRouteRegistrar still calls all providers' routes() -->
 <!-- Spec reviewed 2026-04-22 - WaaseyaaRouter: reject duplicate route names; RouteBuilder::priority + sortRoutesByPriority (_waaseyaa_priority) for deterministic ordering -->
 <!-- Spec reviewed 2026-04-22 - SchemaPresenter/ResourceSerializer consume normalized FieldDefinitionInterface contracts; legacy array inputs normalized at presenter boundary -->
@@ -30,6 +30,8 @@ Foundation still wires several shared HTTP surfaces that are not entity-package 
 ### Codified context session endpoints
 
 `CodifiedContextController` exposes operator JSON for **agent-context** (codified-context) **session** telemetry. Canonical paths are under `GET /api/telescope/agent-context/sessions` (see **`docs/specs/telescope-agent-context-telemetry.md`**). **`BuiltinRouteRegistrar`** also registers legacy `/api/telescope/codified-context/…` aliases for the same controller actions. Dispatch is handled by **`Waaseyaa\Foundation\Http\Router\CodifiedContextApiRouter`**, which constructs the controller with an optional **`CodifiedContextSessionStoreInterface`** from **`HttpKernel::getCodifiedContextSessionStore()`** (defaults to null until a host wires the store via **`HttpKernel::setCodifiedContextSessionStore()`**). The controller type-hints the port only; row shapes use **`CodifiedContextSessionRow`** (`packages/api/src/CodifiedContext/`). **`Waaseyaa\Telescope\CodifiedContext\Storage\CodifiedContextSessionStoreAdapter`** bridges Telescope’s SQLite codified-context store to the port; `waaseyaa/telescope` `require`s `waaseyaa/api` for those interfaces. Unit tests may register an in-memory or stub store without loading Telescope.
+
+**Response JSON (admin SPA):** Successful payloads use **camelCase** keys aligned with the admin composable **`useCodifiedContext`** (`packages/admin/app/composables/useCodifiedContext.ts`): session list and `GET …/sessions/{id}` return objects with `sessionId`, `startedAt`, `endedAt`, `durationMs`, `eventCount`, `latestDriftScore`, `latestSeverity`, etc. (timestamps as ISO-8601/RFC3339 strings). `GET …/events` returns rows with `eventType` (semantic type: stored `event_type` underscores mapped to dots, e.g. `context_load` → `context.load`), `createdAt`, and `data`. `GET …/validation` returns a single flat validation object (`driftScore` as 0–100 integer, `components`, `issues`, `recommendation`, `validatedAt`) — not a nested `report` envelope.
 
 ### packages/api/
 
