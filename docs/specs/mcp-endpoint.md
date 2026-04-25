@@ -1,5 +1,6 @@
 # MCP Endpoint
 
+<!-- Spec reviewed 2026-04-25 - McpEndpoint::handle typed injection (AccountInterface, Request) via AppControllerRouter; see docs/specs/app-controller-invocation.md -->
 <!-- Spec reviewed 2026-04-21 - Overview: kernel boot JSON-first policy cross-link to infrastructure.md -->
 <!-- Spec reviewed 2026-04-01 - post-M10 McpServiceProvider registration and provider-owned MCP routes, C18 drift remediation (#1017) -->
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/mcp; no MCP runtime behavior change -->
@@ -58,14 +59,12 @@ This means MCP route ownership no longer depends on foundation fallback registra
 
 ```php
 public function handle(
-    array $params,
-    array $query,
     AccountInterface $account,
     HttpRequest $request,
 ): McpResponse
 ```
 
-This follows the standard `AppControllerRouter` signature (`$params`, `$query`, `$account`, `$request`). It extracts the HTTP method, body, and `Authorization` header from the request and delegates to a private `dispatch()` method.
+This follows the typed `AppControllerRouter` contract (see **`docs/specs/app-controller-invocation.md`**): only framework services and explicit route bags are injected; `McpEndpoint` takes the account and request. It extracts the HTTP method, body, and `Authorization` header from the request and delegates to a private `dispatch()` method.
 
 ### dispatch() (private)
 

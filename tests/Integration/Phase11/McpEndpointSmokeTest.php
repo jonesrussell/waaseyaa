@@ -41,7 +41,7 @@ final class McpEndpointSmokeTest extends TestCase
 
         $request = HttpRequest::create('/_mcp', $method, [], [], [], $headers, $body);
 
-        return $endpoint->handle([], [], $account, $request);
+        return $endpoint->handle($account, $request);
     }
 
     #[Test]

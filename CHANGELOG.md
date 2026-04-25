@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **SSR app controllers (`waaseyaa/ssr`):** `Class::method` actions now use **typed parameter injection** only (services, route scalars/enums, entities via `EntityTypeManager`, optional `#[MapRoute]` / `#[MapQuery]`). Legacy `($params, $query, $account, $httpRequest)` invocation is removed. `AppControllerRouter` maps binding/argument errors to **404 / 400 / 500** (JSON:API vs `_render` HTML). Descriptor metadata is cached per controller method + route fingerprint (`waaseyaa/routing` `RouteFingerprint`). See **`docs/specs/app-controller-invocation.md`**.
+- **Entity:** class-level `#[ContentEntityType('id')]` + `ContentEntityTypeReader` for strict binding to route `entity:{id}` metadata.
+- **Routing:** `RouteBuilder::bind($name, class-string)` stores `_waaseyaa_app_bindings` for post-load class checks.
+- **MCP:** `McpEndpoint::handle` signature updated for the same dispatcher (`AccountInterface`, `Request`).
+
 ### Fixed
 
 - **Skeleton (`waaseyaa/waaseyaa`):** `composer create-project` from Packagist (or any directory) no longer fails on a monorepo-only `path` repository, a stale `post-create-project-cmd` `chmod` for a removed `bin/waaseyaa` wrapper, or a drifted `bin/golden-public-index.php` vs `public/index.php`. The audit script preflight now checks the Composer CLI proxy at `vendor/bin/waaseyaa`. Local `../waaseyaa/packages/*` path overrides are documented in `composer.local.json.example` only.

@@ -9,6 +9,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
+use Symfony\Component\Routing\Route;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Cache\CacheConfigResolver;
@@ -39,6 +40,13 @@ final class SsrPageHandlerInertiaDispatchTest extends TestCase
         );
     }
 
+    private function attachRoute(HttpRequest $request, string $path = '/'): void
+    {
+        $route = new Route($path);
+        $request->attributes->set('_route_object', $route);
+        $request->attributes->set('_route', 'test.inertia');
+    }
+
     #[Test]
     public function dispatch_app_controller_renders_inertia_full_page_when_renderer_configured(): void
     {
@@ -52,11 +60,11 @@ final class SsrPageHandlerInertiaDispatchTest extends TestCase
         $handler = $this->createHandler($renderer);
         $account = $this->createStub(AccountInterface::class);
         $request = HttpRequest::create('/my-community');
+        $this->attachRoute($request, '/{communitySlug}');
+        $request->attributes->set('communitySlug', 'my-community');
 
         $result = $handler->dispatchAppController(
             InertiaReturningController::class . '::page',
-            ['communitySlug' => 'my-community'],
-            [],
             $account,
             $request,
         );
@@ -78,12 +86,11 @@ final class SsrPageHandlerInertiaDispatchTest extends TestCase
         });
         $account = $this->createStub(AccountInterface::class);
         $request = HttpRequest::create('/my-community');
+        $this->attachRoute($request);
         $request->headers->set('X-Inertia', 'true');
 
         $result = $handler->dispatchAppController(
             InertiaReturningController::class . '::page',
-            [],
-            [],
             $account,
             $request,
         );
@@ -102,11 +109,10 @@ final class SsrPageHandlerInertiaDispatchTest extends TestCase
         $handler = $this->createHandler(null);
         $account = $this->createStub(AccountInterface::class);
         $request = HttpRequest::create('/x');
+        $this->attachRoute($request);
 
         $result = $handler->dispatchAppController(
             InertiaReturningController::class . '::page',
-            [],
-            [],
             $account,
             $request,
         );
@@ -120,13 +126,7 @@ final class SsrPageHandlerInertiaDispatchTest extends TestCase
 
 final class InertiaReturningController
 {
-    /**
-     * @param array<string, mixed> $params
-     * @param array<string, mixed> $query
-     */
     public function page(
-        array $params,
-        array $query,
         AccountInterface $account,
         HttpRequest $httpRequest,
     ): InertiaPageResultInterface {

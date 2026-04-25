@@ -1,5 +1,6 @@
 # API Layer
 
+<!-- Spec reviewed 2026-04-25 - RouteBuilder::bind + RouteFingerprint for SSR app-controller binding metadata; see docs/specs/app-controller-invocation.md -->
 <!-- Spec reviewed 2026-04-24 - CodifiedContextController JSON camelCase (admin useCodifiedContext); CodifiedContextApiRouter; agent-context HTTP paths; CodifiedContextSessionStoreInterface + CodifiedContextSessionRow (packages/api); telescope-agent-context-telemetry.md; waaseyaa/telescope ships CodifiedContextSessionStoreAdapter (#1339 L4/L6 boundary) -->
 <!-- Spec reviewed 2026-04-24 - Auth and OIDC HTTP route tables: AuthOidcRouteServiceProvider + OidcHttpRoutes in packages/routing (waaseyaa/routing requires auth+oidc); BuiltinRouteRegistrar still calls all providers' routes() -->
 <!-- Spec reviewed 2026-04-22 - WaaseyaaRouter: reject duplicate route names; RouteBuilder::priority + sortRoutesByPriority (_waaseyaa_priority) for deterministic ordering -->
@@ -70,7 +71,8 @@ Foundation still wires several shared HTTP surfaces that are not entity-package 
 | File | Namespace | Purpose |
 |------|-----------|---------|
 | `src/WaaseyaaRouter.php` | `Waaseyaa\Routing` | Wraps Symfony UrlMatcher + UrlGenerator |
-| `src/RouteBuilder.php` | `Waaseyaa\Routing` | Fluent API for building Symfony Route objects |
+| `src/RouteBuilder.php` | `Waaseyaa\Routing` | Fluent API for building Symfony Route objects; `entityParameter()` sets `options.parameters.*.type = entity:{id}`; `bind()` sets `options._waaseyaa_app_bindings` for SSR post-load class checks |
+| `src/RouteFingerprint.php` | `Waaseyaa\Routing` | Stable hash of path, methods, parameters, bindings, defaults for app-controller descriptor cache invalidation |
 | `src/RouteMatch.php` | `Waaseyaa\Routing` | Value object for matched route (name, route, parameters) |
 | `src/AccessChecker.php` | `Waaseyaa\Routing` | Route-level access checking via route options |
 | `src/AuthOidcRouteServiceProvider.php` | `Waaseyaa\Routing` | Registers `/api/auth/*`, `/api/user/me`, and OIDC discovery/authorize/token routes; depends on `waaseyaa/auth` and `waaseyaa/oidc` for controllers only |

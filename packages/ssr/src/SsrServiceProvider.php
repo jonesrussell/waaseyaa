@@ -142,7 +142,10 @@ final class SsrServiceProvider extends ServiceProvider implements LanguagePathSt
 
         return [
             new SsrRouter($this->ssrPageHandler),
-            new AppControllerRouter($this->ssrPageHandler),
+            new AppControllerRouter(
+                $this->ssrPageHandler,
+                $this->resolve(ErrorPageRendererInterface::class),
+            ),
         ];
     }
 

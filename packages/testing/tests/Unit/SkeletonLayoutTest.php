@@ -120,7 +120,7 @@ final class SkeletonLayoutTest extends TestCase
     public function waaseyaaAuditSitePrefersVendorBinCli(): void
     {
         $repoRoot = dirname(__DIR__, 4);
-        $path = $repoRoot . '/skeleton/bin/waaseyaa-audit-site';
+        $path = $repoRoot . '/skeleton/bin/maintenance/waaseyaa-audit-site';
         $contents = (string) file_get_contents($path);
         self::assertStringContainsString('vendor/bin/waaseyaa', $contents);
         self::assertStringNotContainsString('[[ -f bin/waaseyaa ]]', $contents);

@@ -31,6 +31,7 @@ final class SsrServiceProviderHttpRoutersTest extends TestCase
     public function httpDomainRouters_returns_ssr_then_app_controller_router(): void
     {
         $provider = new SsrServiceProvider();
+        $provider->register();
         $etm = new EntityTypeManager(new EventDispatcher());
         $db = DBALDatabase::createSqlite();
         $handler = new SsrPageHandler(

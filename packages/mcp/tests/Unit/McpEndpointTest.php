@@ -52,7 +52,7 @@ final class McpEndpointTest extends TestCase
 
         $request = HttpRequest::create('/_mcp', $method, [], [], [], $headers, $body);
 
-        return $endpoint->handle([], [], $this->account, $request);
+        return $endpoint->handle($this->account, $request);
     }
 
     #[Test]

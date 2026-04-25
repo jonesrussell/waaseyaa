@@ -1,5 +1,6 @@
 # Entity System
 
+<!-- Spec reviewed 2026-04-25 - #[ContentEntityType] + ContentEntityTypeReader (packages/entity/Attribute) for SSR strict app-controller entity binding; see docs/specs/app-controller-invocation.md -->
 <!-- Spec reviewed 2026-04-24 - packages/entity ValueCaster: PHPStan strict-rules / control-flow cleanup only; cast-in/cast-out semantics and typed-data delegation unchanged -->
 <!-- Spec reviewed 2026-04-22 - DefinesEntityType; PackageManifest attributeEntityTypes; optional config entity_auto_register in ProviderRegistry (default off) for attribute-driven type registration -->
 <!-- Spec reviewed 2026-04-22 - removed reflection hydration fallback; ContentEntityBase/ConfigEntityBase implement HydratableFromStorageInterface and EntityInstantiator now requires fromStorage -->
@@ -42,7 +43,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `EntityTypeRegistrationCollisionException`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints` |
+| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `EntityTypeRegistrationCollisionException`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints`, `Attribute\ContentEntityType`, `Attribute\ContentEntityTypeReader` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
 | field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldStorage`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |

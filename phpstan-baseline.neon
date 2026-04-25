@@ -1612,7 +1612,7 @@ parameters:
 		-
 			message: '#^Casting to string something that''s already string\.$#'
 			identifier: cast.useless
-			count: 3
+			count: 1
 			path: packages/ssr/src/SsrPageHandler.php
 
 		-
@@ -1630,12 +1630,6 @@ parameters:
 		-
 			message: '#^Using nullsafe property access "\?\-\>formatters" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
 			identifier: nullsafe.neverNull
-			count: 1
-			path: packages/ssr/src/SsrPageHandler.php
-
-		-
-			message: '#^Variable method call on object\.$#'
-			identifier: method.dynamicName
 			count: 1
 			path: packages/ssr/src/SsrPageHandler.php
 

@@ -19,15 +19,9 @@ final readonly class McpEndpoint
     ) {}
 
     /**
-     * Standard controller entry point — called by AppControllerRouter with
-     * ($params, $query, $account, $httpRequest).
-     *
-     * @param array<string, mixed> $params
-     * @param array<string, mixed> $query
+     * Standard controller entry point — called by AppControllerRouter with typed injection.
      */
     public function handle(
-        array $params,
-        array $query,
         AccountInterface $account,
         HttpRequest $request,
     ): McpResponse {

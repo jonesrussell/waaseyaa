@@ -82,6 +82,24 @@ final class RouteBuilder
     }
 
     /**
+     * Bind a route parameter name to an expected PHP entity class (validated after load).
+     *
+     * @param class-string $class
+     */
+    public function bind(string $name, string $class): self
+    {
+        if (!isset($this->options[RouteFingerprint::BINDINGS_OPTION])) {
+            $this->options[RouteFingerprint::BINDINGS_OPTION] = [];
+        }
+        /** @var array<string, class-string> $bindings */
+        $bindings = $this->options[RouteFingerprint::BINDINGS_OPTION];
+        $bindings[$name] = $class;
+        $this->options[RouteFingerprint::BINDINGS_OPTION] = $bindings;
+
+        return $this;
+    }
+
+    /**
      * Require that the user has a specific permission.
      */
     public function requirePermission(string $permission): self

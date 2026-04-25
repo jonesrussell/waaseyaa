@@ -7,6 +7,7 @@ namespace Waaseyaa\SSR;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Symfony\Component\Routing\Route;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Cache\CacheConfigResolver;
@@ -21,6 +22,9 @@ use Waaseyaa\Foundation\Log\NullLogger;
 use Waaseyaa\Path\PathAliasResolver;
 use Waaseyaa\Relationship\RelationshipDiscoveryService;
 use Waaseyaa\Relationship\RelationshipTraversalService;
+use Waaseyaa\SSR\Http\AppController\AppControllerArgumentResolver;
+use Waaseyaa\SSR\Http\AppController\AppControllerMethodInvoker;
+use Waaseyaa\SSR\Http\AppController\AppInvocationContext;
 use Waaseyaa\Workflows\EditorialVisibilityResolver;
 
 /**
@@ -37,7 +41,11 @@ final class SsrPageHandler
 
     private readonly LoggerInterface $logger;
     private readonly LanguageResolver $languageResolver;
+    private readonly AppControllerMethodInvoker $appControllerMethodInvoker;
 
+    /**
+     * @param list<AppControllerArgumentResolver> $appControllerArgumentResolvers
+     */
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
         private readonly DatabaseInterface $database,
@@ -54,9 +62,12 @@ final class SsrPageHandler
         private readonly ?\Waaseyaa\Access\Gate\GateInterface $gate = null,
         ?LanguageResolver $languageResolver = null,
         private readonly ?InertiaFullPageRendererInterface $inertiaFullPageRenderer = null,
+        private readonly array $appControllerArgumentResolvers = [],
+        ?AppControllerMethodInvoker $appControllerMethodInvoker = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
         $this->languageResolver = $languageResolver ?? new LanguageResolver(serviceResolver: $this->serviceResolver);
+        $this->appControllerMethodInvoker = $appControllerMethodInvoker ?? new AppControllerMethodInvoker();
     }
 
     /**
@@ -246,22 +257,34 @@ final class SsrPageHandler
      * Dispatch an app-level controller registered via ServiceProvider::routes().
      *
      * Controllers use Class::method format. Constructor dependencies are
-     * resolved via reflection — supported types: EntityTypeManager,
-     * \Twig\Environment, HttpRequest, AccountInterface.
-     * The method receives ($params, $query, $account, $httpRequest).
+     * resolved via reflection. Action methods use typed parameters only
+     * (see docs/specs/app-controller-invocation.md).
      *
-     * @param array<string, mixed> $params
-     * @param array<string, mixed> $query
      * @return array{type: string, status: int, content: string|array, headers: array<string, string>}|HttpResponse
      */
     public function dispatchAppController(
         string $controller,
-        array $params,
-        array $query,
         AccountInterface $account,
         HttpRequest $httpRequest,
     ): array|HttpResponse {
         [$class, $method] = explode('::', $controller, 2);
+
+        $routeObject = $httpRequest->attributes->get('_route_object');
+        if (!$routeObject instanceof Route) {
+            throw new \Waaseyaa\SSR\Http\AppController\Exception\InvalidAppControllerBindingException(
+                'Request is missing _route_object; app controllers require a matched Route.',
+            );
+        }
+
+        $routeName = $httpRequest->attributes->get('_route');
+        $routeName = is_string($routeName) ? $routeName : null;
+
+        /** @var array<string, mixed> $routeParams */
+        $routeParams = array_filter(
+            $httpRequest->attributes->all(),
+            static fn(string $key): bool => !str_starts_with($key, '_'),
+            ARRAY_FILTER_USE_KEY,
+        );
 
         $twig = SsrServiceProvider::getTwigEnvironment();
         if ($twig === null) {
@@ -269,12 +292,33 @@ final class SsrPageHandler
         }
 
         $instance = $this->resolveControllerInstance($class, $twig, $account, $httpRequest);
-        $response = $instance->{$method}($params, $query, $account, $httpRequest);
+
+        $ctx = new AppInvocationContext(
+            request: $httpRequest,
+            route: $routeObject,
+            account: $account,
+            entityTypeManager: $this->entityTypeManager,
+            twig: $twig,
+            routeParams: $routeParams,
+            query: $httpRequest->query->all(),
+            gate: $this->gate,
+            serviceResolver: $this->serviceResolver,
+        );
+
+        $response = $this->appControllerMethodInvoker->invoke(
+            $instance,
+            $method,
+            $routeObject,
+            $routeName,
+            $ctx,
+            $this->appControllerStrict(),
+            $this->gate,
+            $this->serviceResolver,
+            $this->appControllerArgumentResolvers,
+        );
 
         if (!$response instanceof HttpResponse && !$response instanceof InertiaPageResultInterface) {
-            $route = $httpRequest->attributes->get('_route_object');
-            $isRenderRoute = $route instanceof \Symfony\Component\Routing\Route
-                && $route->getOption('_render') === true;
+            $isRenderRoute = $routeObject->getOption('_render') === true;
             if (!$isRenderRoute) {
                 $this->logger->warning(sprintf(
                     'Controller %s::%s returned an unsupported value (expected HttpResponse or Inertia page). '
@@ -333,6 +377,23 @@ final class SsrPageHandler
         }
 
         return $this->htmlResult(500, '<h1>Internal Server Error</h1>', []);
+    }
+
+    private function appControllerStrict(): bool
+    {
+        $env = getenv('WAASEYAA_APP_CONTROLLER_STRICT');
+        if ($env !== false && $env !== '') {
+            return filter_var($env, FILTER_VALIDATE_BOOLEAN)
+                || $env === '1'
+                || strtolower($env) === 'true';
+        }
+
+        $ac = $this->config['app_controller'] ?? null;
+        if (is_array($ac) && array_key_exists('strict', $ac)) {
+            return (bool) $ac['strict'];
+        }
+
+        return true;
     }
 
     private function applyRenderCacheControlHeader(HttpResponse $response, AccountInterface $account): void
@@ -543,7 +604,7 @@ final class SsrPageHandler
             $graphContext = $renderContext['relationship_navigation'];
             if ($graphContext !== []) {
                 $serialized = json_encode($this->discoveryHandler->normalizeForCacheKey($graphContext), JSON_THROW_ON_ERROR);
-                $graphHash = substr(sha1((string) $serialized), 0, 12);
+                $graphHash = substr(sha1($serialized), 0, 12);
             }
         }
 
@@ -603,7 +664,7 @@ final class SsrPageHandler
                 $this->discoveryHandler->normalizeForCacheKey($renderContext['relationship_navigation']),
                 JSON_THROW_ON_ERROR,
             );
-            $graphHash = substr(sha1((string) $serialized), 0, 12);
+            $graphHash = substr(sha1($serialized), 0, 12);
         }
 
         $keys = array_values(array_unique([
