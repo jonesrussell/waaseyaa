@@ -154,12 +154,12 @@ abstract class AbstractKernel
         $this->entityTypeManager = new EntityTypeManager(
             $dispatcher,
             function (EntityTypeInterface $definition) use ($database, $dispatcher, $fieldRegistry): SqlEntityStorage {
-                $schemaHandler = new SqlSchemaHandler($definition, $database, $fieldRegistry);
+                $schemaHandler = new SqlSchemaHandler($definition, $database, $fieldRegistry, null, $this->logger);
                 $schemaHandler->ensureTable();
                 return new SqlEntityStorage($definition, $database, $dispatcher, $fieldRegistry);
             },
             function (string $_entityTypeId, EntityTypeInterface $definition) use ($database, $dispatcher, $fieldRegistry): EntityRepositoryInterface {
-                $schemaHandler = new SqlSchemaHandler($definition, $database, $fieldRegistry);
+                $schemaHandler = new SqlSchemaHandler($definition, $database, $fieldRegistry, null, $this->logger);
                 $schemaHandler->ensureTable();
                 if ($definition->isRevisionable()) {
                     $schemaHandler->ensureRevisionTable();

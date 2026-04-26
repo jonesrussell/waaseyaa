@@ -626,7 +626,7 @@ Multi-bundle entity types (declaring `bundleEntityType`) may register bundle-spe
 File: `packages/entity-storage/src/SqlSchemaHandler.php`
 Class: `final class SqlSchemaHandler`
 
-Constructor: `(EntityTypeInterface $entityType, DatabaseInterface $database)`
+Constructor: `(EntityTypeInterface $entityType, DatabaseInterface $database, ?FieldDefinitionRegistryInterface $fieldRegistry = null, ?\Closure $bundleEnumerator = null, ?LoggerInterface $logger = null)` — the optional logger receives `warning` events when `deriveColumnSpec()` encounters an unknown field type (see below); callers that omit it get `NullLogger`.
 
 Key methods:
 - `ensureTable(): void` -- creates entity table if it does not exist
@@ -635,6 +635,8 @@ Key methods:
 - `addTranslationFieldColumns(array $fieldSchemas): void` -- adds columns to translation table
 - `getTableName(): string` -- returns entity type id
 - `getTranslationTableName(): string` -- returns `{type}_translations`
+
+**Field type → SQL column.** `deriveColumnSpec(string $fieldType, array $fieldDef): array` maps field-definition type strings to column shapes consumed by the schema layer (`type`, optional `length`, etc.), including explicit handling for `text_long`, `uri`, and `entity_reference`. Unknown types log at `warning` and fall back to `text`. Full mapping table, URI length default, `FieldStorage::Data` note, and vendor nuance: [`field/column-derivation.md`](./field/column-derivation.md).
 
 ### EntitySchemaSync
 

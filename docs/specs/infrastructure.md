@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-04-26 - AbstractKernel bootEntityTypeManager: SqlSchemaHandler constructed with kernel LoggerInterface for deriveColumnSpec unknown-type warnings (#1305); see docs/specs/field/column-derivation.md -->
 <!-- Spec reviewed 2026-04-25 - packages/testing stub entities: constructor/metadata alignment for EntityTypeManager parity tests only; no kernel/bootstrap contract change -->
 <!-- Spec reviewed 2026-04-24 - CodifiedContextApiRouter + HttpKernel codified-context store getters/setters; BuiltinRouteRegistrar telescope agent-context + codified-context HTTP routes -->
 <!-- Spec reviewed 2026-04-24 - packages/http-client StreamHttpClient; packages/inertia InertiaServiceProvider (PHPStan-only); packages/queue timestamped migrations + CreateQueueTables DDL (waaseyaa_queue_jobs / waaseyaa_failed_jobs) -->
@@ -1380,6 +1381,8 @@ EnvLoader::load(.env)
 ```
 
 Early boot initializes the entity lifecycle manager (for disabling entity types at runtime) and the entity audit logger (for write audit trails). The `EntityWriteAuditListener` is registered on the event dispatcher before any entity storage is created, ensuring all entity writes are audited from boot onward.
+
+`bootEntityTypeManager()` wires storage for each registered entity type. Every `SqlSchemaHandler` instantiated in that path receives the kernel's `LoggerInterface` as its fifth constructor argument (after entity type, database, shared `FieldDefinitionRegistry`, and optional `null` bundle enumerator) so schema derivation can log unknown field types without failing boot. Column mapping contract: [`field/column-derivation.md`](./field/column-derivation.md).
 
 `loadAppEntityTypes()` reads `config/entity-types.php` and registers any `EntityTypeInterface` instances found there. Non-conforming entries are logged as warnings. Registration failures (duplicate IDs, invalid definitions) are logged as errors but do not halt boot.
 

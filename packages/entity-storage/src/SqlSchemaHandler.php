@@ -9,6 +9,8 @@ use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\FieldStorage;
+use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\Log\NullLogger;
 
 /**
  * Handles entity table schema creation and management.
@@ -22,6 +24,8 @@ use Waaseyaa\Field\FieldStorage;
 final class SqlSchemaHandler
 {
     private readonly string $tableName;
+
+    private readonly LoggerInterface $logger;
 
     /**
      * @param \Closure|null $bundleEnumerator fn(EntityTypeInterface): iterable<string>
@@ -41,8 +45,10 @@ final class SqlSchemaHandler
         private readonly DatabaseInterface $database,
         private readonly ?FieldDefinitionRegistryInterface $fieldRegistry = null,
         private readonly ?\Closure $bundleEnumerator = null,
+        ?LoggerInterface $logger = null,
     ) {
         $this->tableName = $this->entityType->id();
+        $this->logger = $logger ?? new NullLogger();
     }
 
     /**
@@ -639,24 +645,41 @@ final class SqlSchemaHandler
     /**
      * Maps a FieldDefinition's type to a Waaseyaa column spec.
      *
-     * Conservative defaults: unknown types fall back to text. Settings keys
-     * `length`, `not_null`, and `default` are honored when present; otherwise
-     * they default to nullable with no default.
+     * Unknown types fall back to `text` and emit a {@see LoggerInterface::warning()}
+     * so operators see typos or missing mappings at schema-build time. Settings keys
+     * `length`, `not_null`, and `default` are honored when present; otherwise they
+     * default to nullable with no default.
      *
      * @return array<string, mixed>
      */
     private function deriveColumnSpec(FieldDefinitionInterface $field): array
     {
         $settings = $field->getSettings();
+        $typeKey = strtolower($field->getType());
 
-        $spec = match (strtolower($field->getType())) {
+        $spec = match ($typeKey) {
             'string' => ['type' => 'varchar', 'length' => (int) ($settings['length'] ?? 255)],
             'text' => ['type' => 'text'],
+            'text_long' => ['type' => 'text'],
+            'uri' => ['type' => 'varchar', 'length' => (int) ($settings['length'] ?? 2048)],
+            'entity_reference' => ['type' => 'int'],
             'integer', 'int' => ['type' => 'int'],
             'boolean', 'bool' => ['type' => 'boolean'],
             'float', 'decimal', 'numeric', 'number' => ['type' => 'float'],
-            default => ['type' => 'text'],
+            default => null,
         };
+
+        if ($spec === null) {
+            $this->logger->warning(
+                'SqlSchemaHandler::deriveColumnSpec: unknown field type; using text column. Prefer an explicit match arm.',
+                [
+                    'entity_type' => $this->tableName,
+                    'field' => $field->getName(),
+                    'field_type' => $field->getType(),
+                ],
+            );
+            $spec = ['type' => 'text'];
+        }
 
         $spec['not null'] = (bool) ($settings['not_null'] ?? false);
 

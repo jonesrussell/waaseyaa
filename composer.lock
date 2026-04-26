@@ -4552,7 +4552,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/entity-storage",
-                "reference": "c552d9421e1688597e82caac1d0a925437ea7f16"
+                "reference": "930d9bbe10f2e5d179d9b3ce987e006d8f5a9b29"
             },
             "require": {
                 "php": ">=8.4",
@@ -4560,7 +4560,8 @@
                 "waaseyaa/cache": "^0.1.0-alpha.150",
                 "waaseyaa/database-legacy": "^0.1.0-alpha.150",
                 "waaseyaa/entity": "^0.1.0-alpha.150",
-                "waaseyaa/field": "^0.1.0-alpha.150"
+                "waaseyaa/field": "^0.1.0-alpha.150",
+                "waaseyaa/foundation": "^0.1.0-alpha.150"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -5563,7 +5564,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/notification",
-                "reference": "817ad290561ac51aebbbe10be90d6d25e7cc884a"
+                "reference": "8c0aa57b1fdf01615ca2b7ee14497ce3ef6ad50f"
             },
             "require": {
                 "php": ">=8.4",
@@ -5584,7 +5585,7 @@
                     "providers": [
                         "Waaseyaa\\Notification\\NotificationServiceProvider"
                     ],
-                    "migrations": "src/Migration"
+                    "migrations": "migrations"
                 }
             },
             "autoload": {
@@ -5784,7 +5785,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/queue",
-                "reference": "b840c0d075ea05fd3c5b76809392fa877df63f2f"
+                "reference": "a7c659e47bb42432e1d982c45742e8b36798ceec"
             },
             "require": {
                 "php": ">=8.4",
@@ -5805,7 +5806,7 @@
                     "providers": [
                         "Waaseyaa\\Queue\\QueueServiceProvider"
                     ],
-                    "migrations": "src/Migration"
+                    "migrations": "migrations"
                 }
             },
             "autoload": {
@@ -5926,7 +5927,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/scheduler",
-                "reference": "74339b2934697813a9e00db55b221bde84fe053a"
+                "reference": "f922d7e6a8563c98a32cef646bd98a6ae1500be5"
             },
             "require": {
                 "dragonmantank/cron-expression": "^3.0",
@@ -5947,7 +5948,7 @@
                     "providers": [
                         "Waaseyaa\\Scheduler\\SchedulerServiceProvider"
                     ],
-                    "migrations": "src/Migration"
+                    "migrations": "migrations"
                 }
             },
             "autoload": {

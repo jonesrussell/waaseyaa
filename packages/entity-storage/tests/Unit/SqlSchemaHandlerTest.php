@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Waaseyaa\EntityStorage\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
+use ReflectionMethod;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestConfigEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestStorageEntity;
-use PHPUnit\Framework\TestCase;
+use Waaseyaa\Field\FieldDefinition;
+use Waaseyaa\Field\FieldDefinitionInterface;
+use Waaseyaa\Foundation\Log\LoggerInterface;
 
 final class SqlSchemaHandlerTest extends TestCase
 {
@@ -200,6 +204,46 @@ final class SqlSchemaHandlerTest extends TestCase
         $this->assertTrue($db->schema()->fieldExists('node', 'revision_id'));
     }
 
+    public function testDeriveColumnSpecMapsTextLongUriAndEntityReference(): void
+    {
+        $handler = new SqlSchemaHandler($this->entityType, $this->database);
+        $m = new ReflectionMethod(SqlSchemaHandler::class, 'deriveColumnSpec');
+        $m->setAccessible(true);
+
+        $textLong = new FieldDefinition('description', 'text_long');
+        self::assertSame('text', $this->invokeDeriveColumnSpec($m, $handler, $textLong)['type']);
+
+        $uri = new FieldDefinition('url', 'uri');
+        $uriSpec = $this->invokeDeriveColumnSpec($m, $handler, $uri);
+        self::assertSame('varchar', $uriSpec['type']);
+        self::assertSame(2048, $uriSpec['length']);
+
+        $uriCustom = new FieldDefinition('booking_url', 'uri', settings: ['length' => 512]);
+        self::assertSame(512, $this->invokeDeriveColumnSpec($m, $handler, $uriCustom)['length']);
+
+        $ref = new FieldDefinition('community_id', 'entity_reference', targetEntityTypeId: 'node');
+        self::assertSame('int', $this->invokeDeriveColumnSpec($m, $handler, $ref)['type']);
+    }
+
+    public function testDeriveColumnSpecLogsWarningForUnknownType(): void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())->method('warning')->with(
+            self::stringContains('unknown field type'),
+            self::callback(static function (array $context): bool {
+                return ($context['field_type'] ?? '') === 'not_a_real_field_type'
+                    && ($context['field'] ?? '') === 'weird';
+            }),
+        );
+
+        $handler = new SqlSchemaHandler($this->entityType, $this->database, null, null, $logger);
+        $m = new ReflectionMethod(SqlSchemaHandler::class, 'deriveColumnSpec');
+        $m->setAccessible(true);
+        $field = new FieldDefinition('weird', 'not_a_real_field_type');
+        $spec = $this->invokeDeriveColumnSpec($m, $handler, $field);
+        self::assertSame('text', $spec['type']);
+    }
+
     public function testSeedRevisionsCreatesRevision1ForExistingRows(): void
     {
         $entityType = new EntityType(
@@ -245,6 +289,15 @@ final class SqlSchemaHandlerTest extends TestCase
         foreach ($result as $row) {
             $this->assertSame(1, (int) ((array) $row)['cnt']);
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function invokeDeriveColumnSpec(ReflectionMethod $method, SqlSchemaHandler $handler, FieldDefinitionInterface $field): array
+    {
+        /** @var array<string, mixed> */
+        return $method->invoke($handler, $field);
     }
 
     private function ensureConfigTable(): void
