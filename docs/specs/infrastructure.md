@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-04-26 - Package-declared migrations: extra.waaseyaa.migrations path, MigrationLoader glob order, OIDC exemplar migration (#1286) -->
 <!-- Spec reviewed 2026-04-26 - AbstractKernel bootEntityTypeManager: SqlSchemaHandler constructed with kernel LoggerInterface for deriveColumnSpec unknown-type warnings (#1305); see docs/specs/field/column-derivation.md -->
 <!-- Spec reviewed 2026-04-25 - packages/testing stub entities: constructor/metadata alignment for EntityTypeManager parity tests only; no kernel/bootstrap contract change -->
 <!-- Spec reviewed 2026-04-24 - CodifiedContextApiRouter + HttpKernel codified-context store getters/setters; BuiltinRouteRegistrar telescope agent-context + codified-context HTTP routes -->
@@ -745,6 +746,28 @@ final readonly class MigrationResult
     ) {}
 }
 ```
+
+### Package-declared migrations (`extra.waaseyaa.migrations`)
+
+Packages ship SQL DDL migrations under a **single directory** registered in `composer.json`:
+
+```json
+"extra": {
+    "waaseyaa": {
+        "migrations": "migrations"
+    }
+}
+```
+
+`PackageManifestCompiler` copies `packageName => relativePath` into `PackageManifest::$migrations`. `MigrationLoader` resolves the directory (vendor install path or monorepo path), loads every `*.php` file in **lexicographic filename order**, and requires each file to return a `Migration` instance. Migration identity in the ledger is `"{package}:{filename_without_extension}"` (e.g. `waaseyaa/oidc:2026_04_26_000001_oidc_client_schema`).
+
+**Ordering:** Prefer numeric or ISO-date prefixes in filenames so `glob` + `sort` order matches intended apply order. Use `Migration::$after` with **Composer package names** when one package’s migrations must run after another’s (see `Migrator::topologicalSort()`).
+
+**Entity tables:** Kernel `SqlSchemaHandler::ensureTable()` creates base columns (`id`, `uuid`, `bundle`, label/langcode keys, `_data`, …) when storage is first resolved. **Additive** columns (field-backed lookups, indexes) belong in package migrations so they run on **`db:init`** / `migrate` paths that do not eagerly touch every entity type. Do **not** add recurring `SqlSchemaHandler::addFieldColumns()` calls in `ServiceProvider::boot()` for the same DDL — that duplicates schema truth and runs every request.
+
+**SQLite / `down()`:** Additive column migrations may use a no-op `down()` when portable `DROP COLUMN` is not guaranteed; prefer compensating migrations for breaking changes.
+
+**Reference packages:** `waaseyaa/queue`, `waaseyaa/notification`, `waaseyaa/scheduler`, `waaseyaa/ai-observability` register `migrations`; `waaseyaa/oidc` registers `migrations/2026_04_26_000001_oidc_client_schema.php` for the `oidc_client` table and lookup columns (#1286).
 
 ## HTTP Client
 

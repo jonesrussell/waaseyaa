@@ -9,7 +9,6 @@ use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
-use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Oidc\Authorize\AuthorizationRequestValidator;
 use Waaseyaa\Oidc\Authorize\AuthorizeController;
@@ -179,40 +178,7 @@ final class OidcServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->ensureOidcClientSchema();
         $this->seedOidcClientsFromConfig();
-    }
-
-    /**
-     * Ensure the columns we need for indexed lookups exist on the oidc_client table.
-     *
-     * The kernel's storage factory calls ensureTable() (id/uuid/langcode/_data) when
-     * storage is first resolved; addFieldColumns() is idempotent, so re-running on
-     * each boot is safe. When package-level migrations land, this should move there.
-     */
-    private function ensureOidcClientSchema(): void
-    {
-        try {
-            $database = $this->resolve(DatabaseInterface::class);
-            $entityTypeManager = $this->resolve(EntityTypeManager::class);
-        } catch (\Throwable) {
-            return;
-        }
-
-        if (!$entityTypeManager->hasDefinition('oidc_client')) {
-            return;
-        }
-
-        $definition = $entityTypeManager->getDefinition('oidc_client');
-
-        $handler = new SqlSchemaHandler($definition, $database);
-        $handler->ensureTable();
-        $handler->addFieldColumns([
-            'client_id' => ['type' => 'varchar', 'length' => 255, 'not null' => true],
-            'name' => ['type' => 'varchar', 'length' => 255, 'not null' => true],
-            'is_confidential' => ['type' => 'int', 'not null' => true, 'default' => 0],
-            'client_secret_hash' => ['type' => 'varchar', 'length' => 255, 'not null' => false],
-        ]);
     }
 
     private function seedOidcClientsFromConfig(): void

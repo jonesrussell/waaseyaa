@@ -2,15 +2,17 @@
 
 **Done:** [#1305](https://github.com/waaseyaa/framework/issues/1305) — explicit `deriveColumnSpec()` mappings for `text_long` / `uri` / `entity_reference`, tests, optional logging on unknown types, spec table, vendor/FK nuance and `FieldStorage` context (folded from closed duplicate [#1314](https://github.com/waaseyaa/framework/issues/1314)).
 
-**Active anchor:** [#1286](https://github.com/waaseyaa/framework/issues/1286) — package-level migrations via `extra.waaseyaa.migrations`. **Design mission:** `.kittify/missions/1286-package-migrations/spec.md` (Spec Kitty software-dev; links GitHub + phased plan).
+**Done:** [#1286](https://github.com/waaseyaa/framework/issues/1286) — package-level migrations exemplar (`waaseyaa/oidc` + `docs/specs/infrastructure.md` § package-declared migrations). **Design mission:** `.kittify/missions/1286-package-migrations/spec.md` (north-star / follow-on phases).
+
+**Active anchor:** [#529](https://github.com/waaseyaa/framework/issues/529) — schema evolution v2 / diffing baseline.
 
 ## Dependency order (execute in this order)
 
 | Order | Issue | Role |
 |------:|-------|------|
 | 1 | ~~**#1305**~~ | **Closed** — column derivation contract (`docs/specs/field/column-derivation.md`). |
-| 2 | **#1286** | **Current** — package-level migrations convention + spec; north-star evolution in mission spec. |
-| 3 | **#529** | Schema evolution v2.0 / diffing baseline (epic-scale; follows concrete migration + column behavior). |
+| 2 | ~~**#1286**~~ | **Closed** — `extra.waaseyaa.migrations` on OIDC; boot-time `addFieldColumns` removed from `OidcServiceProvider`. |
+| 3 | **#529** | **Current** — schema evolution v2.0 / diffing baseline (epic-scale). |
 | 4 | **#1310** | Deploy / RP003 verify-tag-parity noise (after baseline schema work is clearer). |
 | — | *(optional)* | New follow-ups filed after #1305 lands if scope splits. |
 
