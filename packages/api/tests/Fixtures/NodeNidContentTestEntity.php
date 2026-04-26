@@ -10,11 +10,11 @@ use Waaseyaa\Entity\Attribute\EntityMetadataReader;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
- * Simple test entity for API tests.
+ * Node fixture with Drupal-style {@code nid} storage key (schema / MCP tool tests).
  */
-#[ContentEntityType(id: 'article')]
-#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode')]
-class TestEntity extends ContentEntityBase
+#[ContentEntityType(id: 'node')]
+#[ContentEntityKeys(id: 'nid', uuid: 'uuid', label: 'title', bundle: 'type')]
+final class NodeNidContentTestEntity extends ContentEntityBase
 {
     public function __construct(
         array $values = [],

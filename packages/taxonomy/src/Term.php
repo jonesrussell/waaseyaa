@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Taxonomy;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
@@ -13,17 +15,10 @@ use Waaseyaa\Entity\ContentEntityBase;
  * They support hierarchical relationships through parent term IDs,
  * and can be published or unpublished.
  */
+#[ContentEntityType(id: 'taxonomy_term')]
+#[ContentEntityKeys(id: 'tid', uuid: 'uuid', label: 'name', bundle: 'vid')]
 final class Term extends ContentEntityBase
 {
-    protected string $entityTypeId = 'taxonomy_term';
-
-    protected array $entityKeys = [
-        'id' => 'tid',
-        'uuid' => 'uuid',
-        'label' => 'name',
-        'bundle' => 'vid',
-    ];
-
     /**
      * @param array<string, mixed> $values Initial entity values.
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
@@ -47,9 +42,6 @@ final class Term extends ContentEntityBase
         if (!array_key_exists('status', $values)) {
             $values['status'] = true;
         }
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }

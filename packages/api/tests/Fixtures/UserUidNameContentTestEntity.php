@@ -10,11 +10,11 @@ use Waaseyaa\Entity\Attribute\EntityMetadataReader;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
- * Simple test entity for API tests.
+ * User fixture with {@code uid} as id key (multi-type schema registry tests).
  */
-#[ContentEntityType(id: 'article')]
-#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode')]
-class TestEntity extends ContentEntityBase
+#[ContentEntityType(id: 'user')]
+#[ContentEntityKeys(id: 'uid', uuid: 'uuid', label: 'name')]
+final class UserUidNameContentTestEntity extends ContentEntityBase
 {
     public function __construct(
         array $values = [],

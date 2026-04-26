@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Groups;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Field\FieldDefinitionInterface;
 
@@ -14,18 +16,10 @@ use Waaseyaa\Field\FieldDefinitionInterface;
  * stored in per-bundle subtables (`group__{bundle}`); core keys live on the
  * base `group` table. See docs/specs/bundle-scoped-storage.md.
  */
+#[ContentEntityType(id: 'group')]
+#[ContentEntityKeys(id: 'gid', uuid: 'uuid', bundle: 'type', label: 'name', langcode: 'langcode')]
 final class Group extends ContentEntityBase
 {
-    protected string $entityTypeId = 'group';
-
-    protected array $entityKeys = [
-        'id' => 'gid',
-        'uuid' => 'uuid',
-        'bundle' => 'type',
-        'label' => 'name',
-        'langcode' => 'langcode',
-    ];
-
     /**
      * @param array<string, mixed> $values Initial entity values.
      * @param string $entityTypeId Override machine name (defaults to `group` when empty).
@@ -38,9 +32,6 @@ final class Group extends ContentEntityBase
         array $entityKeys = [],
         array $fieldDefinitions = [],
     ) {
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
-
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 

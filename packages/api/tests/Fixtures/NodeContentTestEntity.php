@@ -10,11 +10,11 @@ use Waaseyaa\Entity\Attribute\EntityMetadataReader;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
- * Simple test entity for API tests.
+ * Content entity fixture for JSON:API / integration tests that use entity type id {@code node}.
  */
-#[ContentEntityType(id: 'article')]
-#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode')]
-class TestEntity extends ContentEntityBase
+#[ContentEntityType(id: 'node')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type')]
+final class NodeContentTestEntity extends ContentEntityBase
 {
     public function __construct(
         array $values = [],

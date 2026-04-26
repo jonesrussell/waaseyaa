@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Note;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
@@ -12,16 +14,10 @@ use Waaseyaa\Entity\ContentEntityBase;
  * A Note is the minimal default content type shipped with Waaseyaa.
  * It is non-deletable via API — use NoteAccessPolicy to enforce that.
  */
+#[ContentEntityType(id: 'note')]
+#[ContentEntityKeys(label: 'title')]
 final class Note extends ContentEntityBase
 {
-    protected string $entityTypeId = 'note';
-
-    protected array $entityKeys = [
-        'id' => 'id',
-        'uuid' => 'uuid',
-        'label' => 'title',
-    ];
-
     /**
      * @param array<string, mixed> $values Initial entity values.
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
@@ -32,9 +28,6 @@ final class Note extends ContentEntityBase
         array $entityKeys = [],
         array $fieldDefinitions = [],
     ) {
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
-
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 

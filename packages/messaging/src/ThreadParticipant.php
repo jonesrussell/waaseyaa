@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Messaging;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
+#[ContentEntityType(id: 'thread_participant')]
+#[ContentEntityKeys(id: 'tpid', uuid: 'uuid', label: 'role')]
 final class ThreadParticipant extends ContentEntityBase
 {
-    protected string $entityTypeId = 'thread_participant';
-
-    protected array $entityKeys = [
-        'id' => 'tpid',
-        'uuid' => 'uuid',
-        'label' => 'role',
-    ];
-
     /**
      * @param array<string, mixed> $values
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
@@ -44,9 +40,6 @@ final class ThreadParticipant extends ContentEntityBase
         if (!array_key_exists('last_read_at', $values)) {
             $values['last_read_at'] = 0;
         }
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }

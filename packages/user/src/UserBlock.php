@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\User;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
+#[ContentEntityType(id: 'user_block')]
+#[ContentEntityKeys(id: 'ubid', uuid: 'uuid', label: 'blocker_id')]
 final class UserBlock extends ContentEntityBase
 {
-    protected string $entityTypeId = 'user_block';
-
-    protected array $entityKeys = [
-        'id' => 'ubid',
-        'uuid' => 'uuid',
-        'label' => 'blocker_id',
-    ];
-
     /**
      * @param array<string, mixed> $values
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
@@ -39,9 +35,6 @@ final class UserBlock extends ContentEntityBase
         if (!array_key_exists('created_at', $values)) {
             $values['created_at'] = time();
         }
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }

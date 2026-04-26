@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Tests\Fixtures;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\EntityMetadataReader;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\TranslatableInterface;
 
@@ -13,32 +16,29 @@ use Waaseyaa\Entity\TranslatableInterface;
  * returns a 422 when store() is called on an entity that only supports
  * reading translations, not creating them.
  */
+#[ContentEntityType(id: 'readonly')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode')]
 class ReadOnlyTranslatableTestEntity extends ContentEntityBase implements TranslatableInterface
 {
     public function __construct(
         array $values = [],
-        string $entityTypeId = 'readonly',
+        string $entityTypeId = '',
         array $entityKeys = [],
         array $fieldDefinitions = [],
     ) {
-        $defaultKeys = [
-            'id' => 'id',
-            'uuid' => 'uuid',
-            'label' => 'title',
-            'bundle' => 'type',
-            'langcode' => 'langcode',
-        ];
-
         if (!isset($values['langcode'])) {
             $values['langcode'] = 'en';
         }
 
-        parent::__construct(
-            $values,
-            $entityTypeId,
-            $entityKeys !== [] ? $entityKeys : $defaultKeys,
-            $fieldDefinitions,
-        );
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function definitionKeys(): array
+    {
+        return EntityMetadataReader::forClass(self::class)->keys;
     }
 
     public function language(): string

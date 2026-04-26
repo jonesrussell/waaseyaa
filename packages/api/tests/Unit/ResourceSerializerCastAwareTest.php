@@ -11,6 +11,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Tests\Fixtures\ApiSerializeTestEnum;
 use Waaseyaa\Api\Tests\Fixtures\CastAwareSerializeTestEntity;
+use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 
@@ -25,12 +26,7 @@ final class ResourceSerializerCastAwareTest extends TestCase
             id: 'cast_article',
             label: 'Cast article',
             class: CastAwareSerializeTestEntity::class,
-            keys: [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'title',
-                'bundle' => 'type',
-            ],
+            keys: TestEntity::definitionKeys(),
             fieldDefinitions: [],
         ));
 
@@ -58,12 +54,7 @@ final class ResourceSerializerCastAwareTest extends TestCase
             id: 'cast_article',
             label: 'Cast article',
             class: CastAwareSerializeTestEntity::class,
-            keys: [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'title',
-                'bundle' => 'type',
-            ],
+            keys: TestEntity::definitionKeys(),
             fieldDefinitions: [
                 'published_at' => ['type' => 'timestamp'],
             ],

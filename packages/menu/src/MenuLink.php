@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Menu;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
@@ -12,6 +14,8 @@ use Waaseyaa\Entity\ContentEntityBase;
  * Menu links are individual navigation items that belong to a menu.
  * They can be organized hierarchically via parent/child relationships.
  */
+#[ContentEntityType(id: 'menu_link')]
+#[ContentEntityKeys(label: 'title', bundle: 'menu_name')]
 final class MenuLink extends ContentEntityBase
 {
     /**
@@ -30,14 +34,6 @@ final class MenuLink extends ContentEntityBase
             'expanded' => false,
             'weight' => 0,
             'parent_id' => null,
-        ];
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'menu_link';
-        $entityKeys = $entityKeys !== [] ? $entityKeys : [
-            'id' => 'id',
-            'uuid' => 'uuid',
-            'label' => 'title',
-            'bundle' => 'menu_name',
         ];
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);

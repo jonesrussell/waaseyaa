@@ -6,6 +6,7 @@ namespace Waaseyaa\Api\Tests\Unit;
 
 use Waaseyaa\Api\JsonApiRouteProvider;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
+use Waaseyaa\Api\Tests\Fixtures\UserNameContentTestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Routing\WaaseyaaRouter;
@@ -33,6 +34,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -56,6 +58,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -75,6 +78,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -93,6 +97,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -111,6 +116,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -129,6 +135,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -147,6 +154,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -166,6 +174,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -184,11 +193,13 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'user',
             label: 'User',
-            class: TestEntity::class,
+            class: UserNameContentTestEntity::class,
+            keys: UserNameContentTestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -209,6 +220,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager, '/jsonapi');
@@ -239,6 +251,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -259,6 +272,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $provider = new JsonApiRouteProvider($this->entityTypeManager);
@@ -282,6 +296,7 @@ final class JsonApiRouteProviderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $context = new \Symfony\Component\Routing\RequestContext('', 'GET');

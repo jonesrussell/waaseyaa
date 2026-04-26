@@ -40,7 +40,7 @@ final class EntityResolverTest extends TestCase
             id: 'article',
             label: 'Article',
             class: \Waaseyaa\Api\Tests\Fixtures\TestEntity::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
+            keys: \Waaseyaa\Api\Tests\Fixtures\TestEntity::definitionKeys(),
             fieldDefinitions: [
                 'id' => ['type' => 'integer'],
                 'uuid' => ['type' => 'string'],

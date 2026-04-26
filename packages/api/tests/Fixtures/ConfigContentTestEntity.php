@@ -10,11 +10,11 @@ use Waaseyaa\Entity\Attribute\EntityMetadataReader;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
- * Simple test entity for API tests.
+ * Non-translatable config-style fixture (entity type id {@code config}).
  */
-#[ContentEntityType(id: 'article')]
-#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode')]
-class TestEntity extends ContentEntityBase
+#[ContentEntityType(id: 'config')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title')]
+final class ConfigContentTestEntity extends ContentEntityBase
 {
     public function __construct(
         array $values = [],

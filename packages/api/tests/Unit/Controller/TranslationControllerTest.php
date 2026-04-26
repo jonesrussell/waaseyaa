@@ -7,8 +7,8 @@ namespace Waaseyaa\Api\Tests\Unit\Controller;
 use Waaseyaa\Api\Controller\TranslationController;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
+use Waaseyaa\Api\Tests\Fixtures\ConfigContentTestEntity;
 use Waaseyaa\Api\Tests\Fixtures\ReadOnlyTranslatableTestEntity;
-use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Api\Tests\Fixtures\TranslatableTestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
@@ -45,13 +45,7 @@ final class TranslationControllerTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TranslatableTestEntity::class,
-            keys: [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'title',
-                'bundle' => 'type',
-                'langcode' => 'langcode',
-            ],
+            keys: TranslatableTestEntity::definitionKeys(),
             translatable: true,
         ));
 
@@ -59,8 +53,8 @@ final class TranslationControllerTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'config',
             label: 'Config',
-            class: TestEntity::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
+            class: ConfigContentTestEntity::class,
+            keys: ConfigContentTestEntity::definitionKeys(),
             translatable: false,
         ));
 
@@ -71,13 +65,7 @@ final class TranslationControllerTest extends TestCase
             id: 'readonly',
             label: 'Read-Only Translatable',
             class: ReadOnlyTranslatableTestEntity::class,
-            keys: [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'title',
-                'bundle' => 'type',
-                'langcode' => 'langcode',
-            ],
+            keys: ReadOnlyTranslatableTestEntity::definitionKeys(),
             translatable: true,
         ));
 

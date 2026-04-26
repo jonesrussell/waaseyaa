@@ -44,8 +44,15 @@ final class ResourceSerializer
         $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
         $keys = $entityType->getKeys();
 
-        // Content entities use UUID as resource ID; config entities use their string ID.
-        $resourceId = $entity->uuid() !== '' ? $entity->uuid() : (string) $entity->id();
+        // Config-style entities expose a string machine name as id; content entities with a numeric
+        // internal id use UUID as the public resource id when present.
+        $id = $entity->id();
+        $uuid = $entity->uuid();
+        $resourceId = match (true) {
+            $id !== null && $id !== '' && !\is_int($id) => $id,
+            $uuid !== '' => $uuid,
+            default => (string) ($id ?? ''),
+        };
 
         $attributes = $this->attributesFromEntity($entity, $keys);
 

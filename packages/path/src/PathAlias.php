@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Path;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
@@ -13,6 +15,8 @@ use Waaseyaa\Entity\ContentEntityBase;
  * (e.g. '/about-us'). Supports language-specific aliases and a published
  * status to control alias visibility.
  */
+#[ContentEntityType(id: 'path_alias')]
+#[ContentEntityKeys(label: 'alias', langcode: 'langcode')]
 final class PathAlias extends ContentEntityBase
 {
     /**
@@ -29,14 +33,6 @@ final class PathAlias extends ContentEntityBase
         $values += [
             'langcode' => 'en',
             'status' => true,
-        ];
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'path_alias';
-        $entityKeys = $entityKeys !== [] ? $entityKeys : [
-            'id' => 'id',
-            'uuid' => 'uuid',
-            'label' => 'alias',
-            'langcode' => 'langcode',
         ];
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);

@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Messaging;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
+#[ContentEntityType(id: 'thread_message')]
+#[ContentEntityKeys(id: 'tmid', uuid: 'uuid', label: 'body')]
 final class ThreadMessage extends ContentEntityBase
 {
-    protected string $entityTypeId = 'thread_message';
-
-    protected array $entityKeys = [
-        'id' => 'tmid',
-        'uuid' => 'uuid',
-        'label' => 'body',
-    ];
-
     /**
      * @param array<string, mixed> $values
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
@@ -50,9 +46,6 @@ final class ThreadMessage extends ContentEntityBase
         if (!array_key_exists('deleted_at', $values)) {
             $values['deleted_at'] = null;
         }
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }

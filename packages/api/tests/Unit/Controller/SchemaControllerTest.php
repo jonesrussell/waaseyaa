@@ -9,6 +9,7 @@ use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Api\Controller\SchemaController;
 use Waaseyaa\Api\Schema\SchemaPresenter;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
+use Waaseyaa\Api\Tests\Fixtures\NodeNidContentTestEntity;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
@@ -36,12 +37,7 @@ final class SchemaControllerTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
-            keys: [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'title',
-                'bundle' => 'type',
-            ],
+            keys: TestEntity::definitionKeys(),
             translatable: true,
         ));
 
@@ -127,8 +123,8 @@ final class SchemaControllerTest extends TestCase
         $manager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Content',
-            class: TestEntity::class,
-            keys: ['id' => 'nid', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
+            class: NodeNidContentTestEntity::class,
+            keys: NodeNidContentTestEntity::definitionKeys(),
             fieldDefinitions: [
                 'status' => [
                     'type' => 'boolean',

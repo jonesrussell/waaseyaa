@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Waaseyaa\Api\Tests\Fixtures;
 
 use Waaseyaa\Api\MutableTranslatableInterface;
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\EntityMetadataReader;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
@@ -13,6 +16,8 @@ use Waaseyaa\Entity\ContentEntityBase;
  * Each TranslatableTestEntity object represents one language. Translations
  * are stored as separate entity objects tracked by the original entity.
  */
+#[ContentEntityType(id: 'article')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode')]
 class TranslatableTestEntity extends ContentEntityBase implements MutableTranslatableInterface
 {
     /**
@@ -24,29 +29,24 @@ class TranslatableTestEntity extends ContentEntityBase implements MutableTransla
 
     public function __construct(
         array $values = [],
-        string $entityTypeId = 'article',
+        string $entityTypeId = '',
         array $entityKeys = [],
         array $fieldDefinitions = [],
     ) {
-        $defaultKeys = [
-            'id' => 'id',
-            'uuid' => 'uuid',
-            'label' => 'title',
-            'bundle' => 'type',
-            'langcode' => 'langcode',
-        ];
-
         // Set default langcode if not provided.
         if (!isset($values['langcode'])) {
             $values['langcode'] = 'en';
         }
 
-        parent::__construct(
-            $values,
-            $entityTypeId,
-            $entityKeys !== [] ? $entityKeys : $defaultKeys,
-            $fieldDefinitions,
-        );
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function definitionKeys(): array
+    {
+        return EntityMetadataReader::forClass(self::class)->keys;
     }
 
     public function language(): string

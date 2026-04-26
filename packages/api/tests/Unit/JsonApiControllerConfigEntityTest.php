@@ -7,6 +7,7 @@ namespace Waaseyaa\Api\Tests\Unit;
 use Waaseyaa\Api\JsonApiController;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
+use Waaseyaa\Api\Tests\Fixtures\NodeTypeConfigTestEntity;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
@@ -102,12 +103,7 @@ final class JsonApiControllerConfigEntityTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
-            keys: [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'title',
-                'bundle' => 'type',
-            ],
+            keys: TestEntity::definitionKeys(),
         ));
 
         $controller = new JsonApiController(
@@ -137,10 +133,10 @@ final class JsonApiControllerConfigEntityTest extends TestCase
         $configStorage = new class('node_type') extends InMemoryEntityStorage {
             public function create(array $values = []): \Waaseyaa\Entity\EntityInterface
             {
-                return new TestEntity(
+                return new NodeTypeConfigTestEntity(
                     values: $values,
                     entityTypeId: 'node_type',
-                    entityKeys: ['id' => 'type', 'label' => 'name'],
+                    entityKeys: NodeTypeConfigTestEntity::definitionKeys(),
                 );
             }
         };
@@ -152,8 +148,8 @@ final class JsonApiControllerConfigEntityTest extends TestCase
         $configManager->registerEntityType(new EntityType(
             id: 'node_type',
             label: 'Content Type',
-            class: TestEntity::class,
-            keys: ['id' => 'type', 'label' => 'name'],
+            class: NodeTypeConfigTestEntity::class,
+            keys: NodeTypeConfigTestEntity::definitionKeys(),
         ));
 
         return new JsonApiController(

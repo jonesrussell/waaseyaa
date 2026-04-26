@@ -41,7 +41,7 @@ final class ReferenceLoaderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: \Waaseyaa\Api\Tests\Fixtures\TestEntity::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
+            keys: \Waaseyaa\Api\Tests\Fixtures\TestEntity::definitionKeys(),
         ));
 
         $this->account = $this->createStub(AccountInterface::class);
@@ -267,7 +267,7 @@ final class ReferenceLoaderTest extends TestCase
             id: 'article',
             label: 'Article',
             class: \Waaseyaa\Api\Tests\Fixtures\TestEntity::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
+            keys: \Waaseyaa\Api\Tests\Fixtures\TestEntity::definitionKeys(),
         ));
 
         foreach (['A', 'B', 'C'] as $title) {

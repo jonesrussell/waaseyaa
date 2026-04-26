@@ -4,18 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Engagement;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
+#[ContentEntityType(id: 'follow')]
+#[ContentEntityKeys(id: 'fid', uuid: 'uuid', label: 'target_type')]
 final class Follow extends ContentEntityBase
 {
-    protected string $entityTypeId = 'follow';
-
-    protected array $entityKeys = [
-        'id' => 'fid',
-        'uuid' => 'uuid',
-        'label' => 'target_type',
-    ];
-
     /**
      * @param array<string, mixed> $values
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
@@ -35,9 +31,6 @@ final class Follow extends ContentEntityBase
         if (!array_key_exists('created_at', $values)) {
             $values['created_at'] = time();
         }
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }

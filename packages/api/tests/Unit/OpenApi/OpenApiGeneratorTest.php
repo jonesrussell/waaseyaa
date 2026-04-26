@@ -6,7 +6,10 @@ namespace Waaseyaa\Api\Tests\Unit\OpenApi;
 
 use Waaseyaa\Api\OpenApi\OpenApiGenerator;
 use Waaseyaa\Api\OpenApi\SchemaBuilder;
+use Waaseyaa\Api\Tests\Fixtures\NodeContentTestEntity;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
+use Waaseyaa\Api\Tests\Fixtures\UserNameContentTestEntity;
+use Waaseyaa\Api\Tests\Fixtures\UserRoleContentTestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -96,6 +99,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -124,11 +128,13 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'user',
             label: 'User',
-            class: TestEntity::class,
+            class: UserNameContentTestEntity::class,
+            keys: UserNameContentTestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -150,6 +156,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -169,7 +176,8 @@ final class OpenApiGeneratorTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'user_role',
             label: 'User Role',
-            class: TestEntity::class,
+            class: UserRoleContentTestEntity::class,
+            keys: UserRoleContentTestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -189,7 +197,8 @@ final class OpenApiGeneratorTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Content',
-            class: TestEntity::class,
+            class: NodeContentTestEntity::class,
+            keys: NodeContentTestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -216,6 +225,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -255,6 +265,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -274,6 +285,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -308,6 +320,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -335,6 +348,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator(
@@ -355,6 +369,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -374,6 +389,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -393,6 +409,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -410,6 +427,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -471,11 +489,13 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'user',
             label: 'User',
-            class: TestEntity::class,
+            class: UserNameContentTestEntity::class,
+            keys: UserNameContentTestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -507,6 +527,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -541,6 +562,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);
@@ -557,6 +579,7 @@ final class OpenApiGeneratorTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
+            keys: TestEntity::definitionKeys(),
         ));
 
         $generator = new OpenApiGenerator($this->entityTypeManager);

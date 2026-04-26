@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Waaseyaa\Node;
 
 use DateTimeInterface;
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
 use Waaseyaa\Entity\Hydration\HydrationContext;
@@ -16,17 +18,10 @@ use Waaseyaa\Entity\Hydration\HydrationContext;
  * to a node type (bundle) and has properties like title, author, status,
  * and timestamps.
  */
+#[ContentEntityType(id: 'node')]
+#[ContentEntityKeys(id: 'nid', uuid: 'uuid', label: 'title', bundle: 'type')]
 final class Node extends ContentEntityBase implements HydratableFromStorageInterface
 {
-    protected string $entityTypeId = 'node';
-
-    protected array $entityKeys = [
-        'id' => 'nid',
-        'uuid' => 'uuid',
-        'label' => 'title',
-        'bundle' => 'type',
-    ];
-
     /**
      * @var array<string, string|array<string, mixed>>
      */
@@ -61,9 +56,6 @@ final class Node extends ContentEntityBase implements HydratableFromStorageInter
         if (!array_key_exists('changed', $values)) {
             $values['changed'] = 0;
         }
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }

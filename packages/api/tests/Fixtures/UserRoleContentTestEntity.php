@@ -9,12 +9,9 @@ use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\Attribute\EntityMetadataReader;
 use Waaseyaa\Entity\ContentEntityBase;
 
-/**
- * Simple test entity for API tests.
- */
-#[ContentEntityType(id: 'article')]
+#[ContentEntityType(id: 'user_role')]
 #[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode')]
-class TestEntity extends ContentEntityBase
+final class UserRoleContentTestEntity extends ContentEntityBase
 {
     public function __construct(
         array $values = [],

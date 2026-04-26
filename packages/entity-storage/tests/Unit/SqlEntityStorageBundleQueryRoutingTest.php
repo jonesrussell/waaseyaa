@@ -9,6 +9,8 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Waaseyaa\Database\DBALDatabase;
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\EntityStorage\Exception\UnknownFieldException;
@@ -180,20 +182,12 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
  * Test-only entity that participates in the registry routing but has no
  * production semantics. Lives in the same file to keep the contract local.
  */
+#[ContentEntityType(id: 'widget')]
+#[ContentEntityKeys(id: 'wid', uuid: 'uuid', bundle: 'type', label: 'name', langcode: 'langcode')]
 final class TestRoutingWidget extends ContentEntityBase
 {
     public function __construct(array $values = [])
     {
-        parent::__construct(
-            $values,
-            'widget',
-            [
-                'id' => 'wid',
-                'uuid' => 'uuid',
-                'bundle' => 'type',
-                'label' => 'name',
-                'langcode' => 'langcode',
-            ],
-        );
+        parent::__construct($values);
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+use Waaseyaa\Entity\Attribute\EntityMetadataReader;
+use Waaseyaa\Entity\Exception\EntityMetadataException;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
 use Waaseyaa\Entity\Hydration\HydrationContext;
@@ -55,6 +57,23 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
         array $entityKeys = [],
         array $fieldDefinitions = [],
     ) {
+        if ($entityTypeId === '' || $entityKeys === []) {
+            $meta = EntityMetadataReader::forClass(static::class);
+            if ($entityTypeId === '') {
+                $entityTypeId = $meta->typeId ?? '';
+            }
+            if ($entityKeys === []) {
+                $entityKeys = $meta->keys;
+            }
+        }
+
+        if ($entityTypeId === '') {
+            throw new EntityMetadataException(\sprintf(
+                'Concrete content entity %s must declare #[ContentEntityType(id: "…")].',
+                static::class,
+            ));
+        }
+
         parent::__construct($values, $entityTypeId, $entityKeys);
         $this->fieldDefinitions = $fieldDefinitions;
     }

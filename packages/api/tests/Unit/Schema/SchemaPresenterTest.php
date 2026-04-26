@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Api\Tests\Unit\Schema;
 
 use Waaseyaa\Api\Schema\SchemaPresenter;
+use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -392,12 +393,7 @@ final class SchemaPresenterTest extends TestCase
         array $keys = [],
     ): EntityType {
         if ($keys === []) {
-            $keys = [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'title',
-                'bundle' => 'type',
-            ];
+            $keys = TestEntity::definitionKeys();
         }
 
         return new EntityType(

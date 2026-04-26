@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Oidc\Entity;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
 use Waaseyaa\Entity\Hydration\HydrationContext;
@@ -16,19 +18,10 @@ use Waaseyaa\Entity\Hydration\HydrationContext;
  * user-defined at creation time and never rewritten. The `id` column is an internal
  * auto-increment primary key for entity-system consistency.
  */
+#[ContentEntityType(id: 'oidc_client')]
+#[ContentEntityKeys(label: 'name')]
 final class OidcClient extends ContentEntityBase implements HydratableFromStorageInterface
 {
-    private const ENTITY_TYPE_ID = 'oidc_client';
-
-    /**
-     * @var array<string, string>
-     */
-    private const ENTITY_KEYS = [
-        'id' => 'id',
-        'uuid' => 'uuid',
-        'label' => 'name',
-    ];
-
     /**
      * @var array<string, string|array<string, mixed>>
      */
@@ -54,9 +47,6 @@ final class OidcClient extends ContentEntityBase implements HydratableFromStorag
             'is_confidential' => false,
             'client_secret_hash' => null,
         ];
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : self::ENTITY_TYPE_ID;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : self::ENTITY_KEYS;
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }

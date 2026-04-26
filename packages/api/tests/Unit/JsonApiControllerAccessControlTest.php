@@ -39,12 +39,7 @@ final class JsonApiControllerAccessControlTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
-            keys: [
-                'id' => 'id',
-                'uuid' => 'uuid',
-                'label' => 'title',
-                'bundle' => 'type',
-            ],
+            keys: TestEntity::definitionKeys(),
         ));
 
         $this->serializer = new ResourceSerializer($this->entityTypeManager);

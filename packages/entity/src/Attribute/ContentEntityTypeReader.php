@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity\Attribute;
 
 /**
- * Reads {@see ContentEntityType} from a concrete entity class.
+ * Reads {@see ContentEntityType} from a concrete entity class (including parent classes).
  */
 final class ContentEntityTypeReader
 {
@@ -14,15 +14,6 @@ final class ContentEntityTypeReader
      */
     public static function entityTypeIdForClass(string $class): ?string
     {
-        if (!class_exists($class)) {
-            return null;
-        }
-
-        $ref = new \ReflectionClass($class);
-        foreach ($ref->getAttributes(ContentEntityType::class) as $attr) {
-            return $attr->newInstance()->id;
-        }
-
-        return null;
+        return EntityMetadataReader::forClass($class)->typeId;
     }
 }

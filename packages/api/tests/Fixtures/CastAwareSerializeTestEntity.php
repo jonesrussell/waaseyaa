@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Tests\Fixtures;
 
+use Waaseyaa\Entity\Attribute\ContentEntityType;
+
 /**
  * Article-like entity with {@see $casts} for API serialization tests (#1181 ST-7).
  */
+#[ContentEntityType(id: 'cast_article')]
 final class CastAwareSerializeTestEntity extends TestEntity
 {
     /**

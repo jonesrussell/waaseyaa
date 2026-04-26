@@ -4,19 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Genealogy\Entity;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
+#[ContentEntityType(id: 'genealogy_person')]
+#[ContentEntityKeys(label: 'display_name')]
 final class GenealogyPerson extends ContentEntityBase
 {
-    protected string $entityTypeId = 'genealogy_person';
-
-    /** @var array<string, string> */
-    protected array $entityKeys = [
-        'id' => 'id',
-        'uuid' => 'uuid',
-        'label' => 'display_name',
-    ];
-
     /**
      * @param array<string, mixed> $values
      * @param array<string, string> $entityKeys
@@ -32,9 +27,6 @@ final class GenealogyPerson extends ContentEntityBase
             'status' => 0,
             'is_living' => true,
         ];
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : $this->entityTypeId;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : $this->entityKeys;
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }

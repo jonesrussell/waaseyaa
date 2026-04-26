@@ -46,6 +46,9 @@ class MakeEntityTypeCommandTest extends TestCase
         $output = $tester->getDisplay();
         $this->assertStringContainsString('class Article extends ContentEntityBase', $output);
         $this->assertStringContainsString('use Waaseyaa\\Entity\\ContentEntityBase;', $output);
+        $this->assertStringContainsString('ContentEntityType', $output);
+        $this->assertStringContainsString('ContentEntityKeys', $output);
+        $this->assertStringContainsString("id: 'article'", $output);
         $this->assertStringContainsString('HydratableFromStorageInterface', $output);
         $this->assertStringContainsString('function fromStorage', $output);
         $this->assertStringContainsString('function make', $output);

@@ -32,7 +32,7 @@ final class SchemaPresenterFieldAccessTest extends TestCase
             id: 'article',
             label: 'Article',
             class: \Waaseyaa\Api\Tests\Fixtures\TestEntity::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
+            keys: \Waaseyaa\Api\Tests\Fixtures\TestEntity::definitionKeys(),
         );
     }
 

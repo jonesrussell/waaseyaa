@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Waaseyaa\Media;
 
 use DateTimeInterface;
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
@@ -14,6 +16,8 @@ use Waaseyaa\Entity\ContentEntityBase;
  * that can be reused across the site. Each media entity belongs to a media type
  * (bundle) which determines the source plugin and field configuration.
  */
+#[ContentEntityType(id: 'media')]
+#[ContentEntityKeys(id: 'mid', uuid: 'uuid', label: 'name', bundle: 'bundle')]
 final class Media extends ContentEntityBase
 {
     /**
@@ -33,14 +37,6 @@ final class Media extends ContentEntityBase
         array $entityKeys = [],
         array $fieldDefinitions = [],
     ) {
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'media';
-        $entityKeys = $entityKeys !== [] ? $entityKeys : [
-            'id' => 'mid',
-            'uuid' => 'uuid',
-            'label' => 'name',
-            'bundle' => 'bundle',
-        ];
-
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 

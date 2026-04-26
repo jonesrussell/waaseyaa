@@ -41,7 +41,7 @@ final class JsonApiControllerFieldAccessTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
+            keys: TestEntity::definitionKeys(),
         ));
 
         $this->account = $this->createMock(AccountInterface::class);

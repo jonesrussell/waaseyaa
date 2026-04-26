@@ -31,8 +31,14 @@ class MakeEntityTypeCommand extends Command
 
         $className = str_replace('_', '', ucwords($name, '_'));
         $baseClass = $isContent ? 'ContentEntityBase' : 'ConfigEntityBase';
+        $typeId = strtolower((string) $name);
+
         $baseImport = $isContent
-            ? 'use Waaseyaa\Entity\ContentEntityBase;'
+            ? <<<'PHP'
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\ContentEntityBase;
+PHP
             : 'use Waaseyaa\Entity\ConfigEntityBase;';
 
         $hydrationUse = $isContent
@@ -45,23 +51,13 @@ class MakeEntityTypeCommand extends Command
         if ($isContent) {
             $extraBody = <<<'PHP'
 
-    /**
-     * Widen the constructor so {@see \Waaseyaa\Entity\ContentEntityBase::duplicateInstance()} can reconstruct instances.
-     * Replace the defaults below with your entity type id and key map (must match EntityType registration).
-     */
+
     public function __construct(
         array $values = [],
         string $entityTypeId = '',
         array $entityKeys = [],
         array $fieldDefinitions = [],
     ) {
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'CHANGE_ME';
-        $entityKeys = $entityKeys !== [] ? $entityKeys : [
-            'id' => 'id',
-            'uuid' => 'uuid',
-            'label' => 'label',
-        ];
-
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 
@@ -116,6 +112,8 @@ PHP;
 PHP;
         }
 
+        $attrs = $isContent ? "\n#[ContentEntityType(id: '{$typeId}')]\n#[ContentEntityKeys]\n" : "\n";
+
         $template = <<<PHP
 <?php
 
@@ -125,8 +123,7 @@ namespace App\Entity;
 
 {$baseImport}
 {$hydrationUse}
-
-class {$className} extends {$baseClass}{$implements}
+{$attrs}class {$className} extends {$baseClass}{$implements}
 {
 {$extraBody}
 }

@@ -1,5 +1,6 @@
 # Entity System
 
+<!-- Spec reviewed 2026-04-26 - #[ContentEntityKeys], EntityMetadataReader: class-level key map + cached resolution; EntityTypeManager asserts registered keys match class metadata; ContentEntityBase throws EntityMetadataException without #[ContentEntityType] -->
 <!-- Spec reviewed 2026-04-25 - #[ContentEntityType] + ContentEntityTypeReader (packages/entity/Attribute) for SSR strict app-controller entity binding; see docs/specs/app-controller-invocation.md -->
 <!-- Spec reviewed 2026-04-24 - packages/entity ValueCaster: PHPStan strict-rules / control-flow cleanup only; cast-in/cast-out semantics and typed-data delegation unchanged -->
 <!-- Spec reviewed 2026-04-22 - DefinesEntityType; PackageManifest attributeEntityTypes; optional config entity_auto_register in ProviderRegistry (default off) for attribute-driven type registration -->
@@ -43,7 +44,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `EntityTypeRegistrationCollisionException`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints`, `Attribute\ContentEntityType`, `Attribute\ContentEntityTypeReader` |
+| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `EntityTypeRegistrationCollisionException`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints`, `Attribute\ContentEntityType`, `Attribute\ContentEntityKeys`, `Attribute\EntityClassMetadata`, `Attribute\EntityMetadataReader`, `Attribute\ContentEntityTypeReader`, `Exception\EntityMetadataException` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
 | field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldStorage`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
@@ -62,6 +63,18 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 | entity-storage | `packages/entity-storage/` | `Waaseyaa\EntityStorage\` | SQL storage, schema handler, query builder, repository, unit of work. |
 | field | `packages/field/` | `Waaseyaa\Field\` | Field type plugins, field definitions, field item lists. |
 | config | `packages/config/` | `Waaseyaa\Config\` | Config objects, config factory, import/export, storage backends. |
+
+## Class-level metadata (content entities)
+
+**Identity:** Each concrete `ContentEntityBase` **must** declare `#[ContentEntityType(id: '…')]` (machine name). The constructor throws `EntityMetadataException` if the type id is still empty after resolution. Explicit `$entityTypeId` / non-empty `$entityKeys` in `__construct` remain supported for tests and `fromStorage`.
+
+**Key map:** `#[ContentEntityKeys(…)]` is optional. Logical keys supported: `id`, `uuid`, `label`, `bundle`, `revision`, `langcode` — each parameter is a storage field name; omitted/`null` means “not overridden in this attribute pass.” After merging attributes along the class hierarchy, **identity defaults** apply for any of `id` / `uuid` / `label` still missing (`id`→`id`, `uuid`→`uuid`, `label`→`label`). `EntityMetadataReader::forClass()` returns the resolved key map; results are **cached per class-string** for the process.
+
+**Fields:** Class attributes describe **only** entity type id and the logical→storage key map. They do **not** define field lists; `fieldDefinitions` on `EntityType`, the field registry, and YAML/config remain the source of field shape.
+
+**Registration parity:** `EntityTypeManager` validates that, for any registered type whose `getClass()` is a `ContentEntityBase` subclass, `EntityType::id()` matches `#[ContentEntityType]`, and `EntityType::getKeys()` (sorted) exactly matches `EntityMetadataReader::forClass($class)->keys` (sorted). Mismatch throws `InvalidArgumentException` at registration time.
+
+**SSR:** `ContentEntityTypeReader` delegates to `EntityMetadataReader` and resolves the type id from the class or its parents (see app-controller spec).
 
 ## Casting & hydration architecture (ST-9, #1181)
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Waaseyaa\User;
 
 use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
 use Waaseyaa\Entity\Hydration\HydrationContext;
@@ -21,22 +23,10 @@ use Waaseyaa\Entity\Hydration\HydrationContext;
  * service) is responsible for populating the permissions from role
  * definitions.
  */
+#[ContentEntityType(id: 'user')]
+#[ContentEntityKeys(id: 'uid', uuid: 'uuid', label: 'name')]
 final class User extends ContentEntityBase implements AccountInterface, HydratableFromStorageInterface
 {
-    /**
-     * The entity type machine name.
-     */
-    private const ENTITY_TYPE_ID = 'user';
-
-    /**
-     * Entity key mappings for the user entity type.
-     */
-    private const ENTITY_KEYS = [
-        'id' => 'uid',
-        'uuid' => 'uuid',
-        'label' => 'name',
-    ];
-
     /**
      * @var array<string, string|array<string, mixed>>
      */
@@ -63,9 +53,6 @@ final class User extends ContentEntityBase implements AccountInterface, Hydratab
             'permissions' => [],
             'status' => 1,
         ];
-
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : self::ENTITY_TYPE_ID;
-        $entityKeys = $entityKeys !== [] ? $entityKeys : self::ENTITY_KEYS;
 
         parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
 
