@@ -8,7 +8,7 @@ Source: [github-issues-open-snapshot.json](github-issues-open-snapshot.json).
 
 | Cluster | Count |
 |---------|------:|
-| other | 68 |
+| other | 65 |
 | remediation_mseries | 19 |
 | audit_contracts_testing | 16 |
 | phpdoc_covers | 7 |
@@ -25,11 +25,4 @@ Source: [github-issues-open-snapshot.json](github-issues-open-snapshot.json).
 ## Full table (CSV)
 
 See [github-issues-triage-enriched.csv](github-issues-triage-enriched.csv) for `number`, `cluster`, `merged_prs`, `suggest`.
-
-## Code verification and actions (2026-04-26)
-
-- Per-cluster verification and closed issues: [github-issues-cluster-verification.md](github-issues-cluster-verification.md).
-- **Track 4 sprint order (anchor #1305):** [track4-sprint-sequence.md](track4-sprint-sequence.md).
-- **Sprint filter (Track 4):** `is:open milestone:"Track 4 — Schema evolution" label:sprint-candidate` (open count varies; #1314 closed as duplicate of #1305).
-- **Epic consolidation** (remediation M5–M7, PHPDoc families): deferred — needs human pass to avoid closing valid distinct work as duplicates.
 

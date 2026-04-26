@@ -9,19 +9,16 @@ number,title,milestone,cluster,merged_prs,graphql_error,suggest
 1336,Follow-up: Layer 2 audit — PHPDoc @covers backlog (42 symbols),Track 1 — Entity system & hydration,phpdoc_covers,,,verify_ac
 1335,Follow-up: Layer 3 audit — close remaining PHPDoc @covers gaps (21 symbols),Track 1 — Entity system & hydration,phpdoc_covers,,,verify_ac
 1315,Kernel-path integration test for extractions (postmortem: five-release adoption chain),Track 1 — Entity system & hydration,other,PR#1321: docs(plan): anchor Task 2 grep; clarify mutation recipe | PR#1322: docs(plan): editorial pass on Phase 1 plan | PR#1323: refactor: drain MinimalTestKernel | PR#1324: test: SqlSchemaHandlerRegistryFallbackTest + mutation-recipe | PR#1325: test: forbid named kernel subclasses in tests/**,,verify_ac
-1314,deriveColumnSpec — explicit mappings for text_long / uri / entity_reference,Track 4 — Schema evolution,other,,,verify_ac
 1313,Shadow-collision guard + clear duplicate-registration error,Track 1 — Entity system & hydration,other,PR#1329: docs(plan): Phase 3 — shadow-collision guard + duplicate-reg | PR#1330: feat: add provenance-aware collision exception in the regist | PR#1331: test: add real-kernel entity-type collision coverage | PR#1332: fix: emit missing bundle-subtable notice on save path | PR#1333: docs: add upgrade note for shadow-collision guard,,verify_ac
 1310,deploy: RP003 verify-tag-parity false alarms on alpha.146-.149,Track 4 — Schema evolution,other,,,verify_ac
 1309,operator-diagnostics: detect column-vs-data storage drift,Track 3 — Parity & performance,other,,,verify_ac
 1308,entity-storage: symmetric query-side handling for FieldStorage::Data when legacy column exists,Track 1 — Entity system & hydration,other,,,verify_ac
-1305,"Explicit type mappings in SqlSchemaHandler::deriveColumnSpec() for text_long, uri, entity_reference",Track 4 — Schema evolution,other,,,verify_ac
 1304,Move tenancy opt-in from HasCommunityInterface marker to EntityType/storage registration,Track 1 — Entity system & hydration,other,,,verify_ac
 1301,Portable ORPHAN_BUNDLE_SUBTABLE detection for MySQL and PostgreSQL,Track 1 — Entity system & hydration,other,PR#1302: docs(#1297): log post-review follow-ups + refresh entity-sys,,verify_ac
 1300,Extract HealthChecker's entity/entity-storage dependencies to preserve layer discipline,Track 1 — Entity system & hydration,other,PR#1302: docs(#1297): log post-review follow-ups + refresh entity-sys,,verify_ac
 1299,Log warning when load() encounters a registered-field bundle with no subtable,Track 1 — Entity system & hydration,other,PR#1302: docs(#1297): log post-review follow-ups + refresh entity-sys,,verify_ac
 1298,Centralize bundle-subtable name helper with `__` separator guard,Track 1 — Entity system & hydration,other,PR#1302: docs(#1297): log post-review follow-ups + refresh entity-sys,,verify_ac
 1290,oidc: login_path with pre-existing query string produces malformed return_to URL,Track 5 — Ecosystem identity,other,,,verify_ac
-1286,feat(framework): wire package-level migrations via extra.waaseyaa.migrations,Track 4 — Schema evolution,other,PR#1287: feat(#1283): authorization code repository,,verify_ac
 1276,Rotate `SPLIT_GITHUB_TOKEN` to fine-grained PAT excluding `waaseyaa/framework`,Track 5 — Ecosystem identity,ops_tokens,,,verify_ac
 1275,ADR-004 follow-up: teach package discovery to synthesize installed.json entries for `replace`d packages,Track 1 — Entity system & hydration,ecosystem_rollout,,,verify_ac
 1266,Roll out waaseyaa/northcloud: alpha → Minoo migration → stable,Track 5 — Ecosystem identity,ecosystem_rollout,,,verify_ac

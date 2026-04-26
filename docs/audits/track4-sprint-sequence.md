@@ -4,7 +4,7 @@
 
 **Done:** [#1286](https://github.com/waaseyaa/framework/issues/1286) — package-level migrations exemplar (`waaseyaa/oidc` + `docs/specs/infrastructure.md` § package-declared migrations). **Design mission:** `.kittify/missions/1286-package-migrations/spec.md` (north-star / follow-on phases).
 
-**Active anchor:** [#529](https://github.com/waaseyaa/framework/issues/529) — schema evolution v2 / diffing baseline.
+**Active anchor:** [#529](https://github.com/waaseyaa/framework/issues/529) — schema evolution v2 / diffing baseline. **Design mission:** `.kittify/missions/529-schema-evolution-v2/spec.md` (SchemaDiff, ledger, manifest, execution model).
 
 ## Dependency order (execute in this order)
 
@@ -18,7 +18,7 @@
 
 **Closed (not in queue):** #1314 — duplicate of #1305.
 
-**Open issues in this milestone (snapshot):** #529, #1286, #1310 — use label `sprint-candidate` on the slice you are actively pulling (see GitHub).
+**Open issues in this milestone (snapshot):** #529, #1310 — use label `sprint-candidate` on the slice you are actively pulling (see GitHub). Closed items (#1286, #1305, …) should drop `sprint-candidate` so the label matches the current sprint slice.
 
 ## After milestone progress — enrich pipeline
 
