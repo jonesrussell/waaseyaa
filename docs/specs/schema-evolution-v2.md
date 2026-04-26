@@ -1,0 +1,316 @@
+# Schema evolution v2.0 — SchemaDiff engine (design)
+
+**Status:** Design draft (Phase 1 — WP01 / [#522](https://github.com/waaseyaa/framework/issues/522))  
+**Epic:** [#529](https://github.com/waaseyaa/framework/issues/529) Schema Evolution v2.0  
+**Mission (authoritative checkpoint):** `.kittify/missions/529-schema-evolution-v2/spec.md`  
+**Architecture rule:** Waaseyaa owns diffing rules, migration generation, and safety gates; **applications** own timing and operational rollout of generated schema changes.
+
+This document is the **canonical design contract** for the SchemaDiff pivot. It does not prescribe implementation filenames or package layout; those follow in [#521](https://github.com/waaseyaa/framework/issues/521). Until implementation lands, **no behavior change** is implied for production installs.
+
+---
+
+## 1. Goals
+
+1. Represent structural schema change as **immutable, typed, serializable data** (SchemaDiff), not as ad-hoc imperative SQL in application code.
+2. Compile diffs to **executable plans** (SQLite first), with a **deterministic** ordering story and **explicit** safety gates for destructive operations.
+3. Extend the **migration ledger** so applied work is **auditable** (checksums, optional diff hashes) and **verifiable** against live databases.
+4. Support **execution modes**: apply, dry-run, verify, and bounded replay — without “run once and hope” semantics.
+5. Evolve **Composer manifest** discovery toward **declarative, ordered** migration registration while **coexisting** with the [#1286](https://github.com/waaseyaa/framework/issues/1286) string-path convention until a deprecation window closes.
+6. **Coexist** with the existing `Migration` / `Migrator` / `MigrationLoader` stack until a deliberate deprecation phase; no big-bang removal.
+
+---
+
+## 2. Related specifications
+
+| Document | Relevance |
+|----------|-----------|
+| [field/column-derivation.md](./field/column-derivation.md) | Column specs for field types → storage columns; compiler and diff producers **must** stay aligned with this contract. |
+| [infrastructure.md](./infrastructure.md) | Current `Migrator`, `MigrationRepository`, `MigrationLoader`, package-declared migrations (`extra.waaseyaa.migrations`). |
+| [bundle-scoped-storage.md](./bundle-scoped-storage.md) | `{base}__{bundle}` subtables; entity-level vs bundle-level diff scope. |
+| [workflow.md](./workflow.md) | Semantic milestone v2.0; PR traceability to #521 / #522 / #518 / #529. |
+
+---
+
+## 3. SchemaDiff data model
+
+### 3.1 Design principles
+
+- **Pure data at the core boundary:** SchemaDiff and atomic operations contain **no SQL strings**. SQL appears only at the **compiler output** seam (see §6).
+- **PHP 8.4-native:** Prefer **`readonly` classes**, **constructor-promoted properties**, **`enum`-backed** discriminated operation kinds where it improves exhaustiveness and serialization contracts.
+- **Immutability:** Every operation type is immutable after construction; “chaining” produces new instances or new `CompositeDiff` containers.
+- **Serialization:** Types SHOULD be JSON-serializable (for fixtures, CI, and checksum canonicalization) using a **stable** field order and normalized encoding (ADR to fix exact JSON rules).
+- **Equality / hashing:** Two diffs that represent the same intent MUST compare equal under a defined canonicalization and produce the same **checksum** input (§8).
+
+### 3.2 Column and index specs (shared vocabulary)
+
+Column specifications at the diff boundary SHOULD reuse the same **semantic** shape as storage today: `type`, optional `length`, `not null`, `default`, etc., aligned with [`column-derivation.md`](./field/column-derivation.md) and `SqlSchemaHandler::deriveColumnSpec()` outcomes so there is a single conceptual mapping from **field definition** → **column spec** → **compiler**.
+
+**Open (human):** Whether the diff layer references `FieldDefinitionInterface` shapes, a dedicated `ColumnSpec` DTO, or a normalized array — pick one and document in ADR before Phase 2.
+
+### 3.3 Atomic operations (minimum set)
+
+Each operation is a **named, readonly** type (exact class names TBD in implementation). The list below is the **minimum** supported set for v2; extensions require ADR.
+
+| Operation | Fields (conceptual) | Notes |
+|-----------|---------------------|--------|
+| **AddColumn** | `table`, `column`, `spec` | Additive; default gate: allowed. |
+| **AlterColumn** | `table`, `column`, `new_spec` | May be restricted on SQLite (rewrite-table semantics); policy may require explicit migration split. |
+| **DropColumn** | `table`, `column` | **Destructive**; blocked by default or requires explicit danger flag at plan level. |
+| **AddIndex** | `table`, `columns[]`, optional `name`, `unique` | Composite columns allowed. |
+| **DropIndex** | `table`, `name` or `columns[]` identity | Resolver defines how anonymous indexes are addressed on SQLite. |
+| **AddForeignKey** | `table`, constraint definition (referencing table/columns, ON DELETE/UPDATE) | SQLite vs MySQL/Postgres capability matrix in ADR; unsupported combos must fail at compile time with a clear code. |
+| **DropForeignKey** | `table`, constraint `name` | Same as above. |
+| **RenameColumn** | `table`, `from`, `to` | Never infer rename from “drop + add” without explicit op. |
+| **RenameTable** | `from`, `to` | Rare for entity types; supported for completeness and tooling. |
+
+### 3.4 Composite and scoped diffs
+
+| Type | Purpose |
+|------|---------|
+| **CompositeDiff** | Ordered, immutable list of atomic operations. **Transaction boundary:** one `CompositeDiff` applied in a **single** DB transaction unless an ADR splits unsafe bundles (e.g. SQLite table rebuild). |
+| **EntityLevelDiff** | Binds to one `entity_type_id` (logical): targets **base table** `entity_type_id` and any **known** `{base}__{bundle}` subtables per [bundle-scoped-storage.md](./bundle-scoped-storage.md). Producers MAY emit only `CompositeDiff` internally; the entity wrapper carries metadata for verify and UI. |
+| **BundleLevelDiff** | Subset of entity scope: exactly one bundle’s subtable (and optional base-table touches if required by FK rules — document if forbidden). |
+
+**Ordering:** Atomic ops inside `CompositeDiff` MUST be in **apply order** (compiler may not reorder without explicit pass). Topological dependencies between ops (e.g. add column before index on that column) are the **producer’s** responsibility; the compiler validates and fails fast on illegal sequences.
+
+---
+
+## 4. MigrationInterface v2 (authoring contract)
+
+### 4.1 Interface shape (design-level)
+
+- **`MigrationInterfaceV2`** (name illustrative): implemented by **`readonly` concrete classes** (final where possible).
+- **No `up()` / `down()`** on this interface. Legacy imperative migrations keep `Migration::up` / `down` until deprecated.
+- **Payload:** Each v2 migration holds **either** a single `SchemaDiff` root **or** an immutable `list` of atomic ops / `CompositeDiff` — **no** SQL, **no** `SchemaBuilder` callbacks inside the type.
+- **Optional `MigrationPlan`:** Separates **intent** (immutable diff + metadata) from **materialization** (compiled steps for apply vs dry-run). Dry-run consumes the same plan without mutating ledger.
+
+### 4.2 Metadata (required for ledger and ordering)
+
+Each v2 migration value MUST expose (names illustrative):
+
+| Metadata | Purpose |
+|----------|---------|
+| `migration_id` | Stable string ID (not only Composer display name); used in ledger and verify. |
+| `package` | Composer package name (`waaseyaa/…`). |
+| `dependencies` | Ordered list of **package names** or **migration_id** strings this entry must run after (extends today’s `$after` semantics conceptually). |
+
+### 4.3 Interop with compilation
+
+- v2 types **do not** execute DB I/O.
+- A **compiler service** (Phase 3) accepts `SchemaDiff` + **platform** + optional **connection capabilities** and returns a **`CompiledMigrationPlan`**: ordered steps (e.g. SQL DTOs or DBAL operations) — the only layer where SQL is produced.
+
+---
+
+## 5. Diff → SQL compiler contract (SQLite-first)
+
+### 5.1 Inputs
+
+- **Root:** `SchemaDiff` (or `CompositeDiff`).
+- **Platform:** `sqlite` in v1 of compiler; `mysql` / `postgres` later behind explicit platform enum and capability tables.
+- **Options:** Strict vs permissive mode; whether to allow destructive ops; max operation count (DoS guard).
+
+### 5.2 Outputs
+
+- **`CompiledMigrationPlan`** (immutable): ordered list of **atomic executable steps**.
+- Each step is a **narrow DTO** (e.g. `ExecuteStatement`, `CreateTable`, `AlterTableAddColumn`) — **not** arbitrary strings from callers. Only the compiler constructs these.
+- **Determinism:** Same `SchemaDiff` + same platform + same compiler version ⇒ **byte-identical** ordered steps (required for golden tests and `diff_hash`).
+
+### 5.3 Validation rules (compiler gates)
+
+- Reject unknown operation kinds.
+- Reject destructive ops when policy forbids (`DropColumn`, `DropForeignKey`, etc.).
+- Reject FK definitions SQLite cannot enforce (document matrix).
+- Detect illegal ordering (index before column) and fail with structured errors (codes suitable for operator diagnostics).
+
+### 5.4 Alignment with existing storage
+
+- Column type semantics MUST remain consistent with **`deriveColumnSpec()`** / [`column-derivation.md`](./field/column-derivation.md).
+- Entity / bundle table naming MUST match [`bundle-scoped-storage.md`](./bundle-scoped-storage.md) and `SqlSchemaHandler` naming rules (`{base}__{bundle}`, separator invariants).
+
+---
+
+## 6. Ledger contract (extensions)
+
+Today (`waaseyaa_migrations`): `migration`, `package`, `batch`, `ran_at` (see [infrastructure.md](./infrastructure.md) § Migrator / MigrationRepository).
+
+### 6.1 New or renamed columns (design intent)
+
+| Field | Type (illustrative) | Purpose |
+|-------|---------------------|---------|
+| `migration_id` | `VARCHAR(255)` | Stable logical id for v2 (and legacy rows may mirror current `migration` string). **Human decision:** one column vs overload `migration`; ADR must pick to avoid duplicate truth. |
+| `checksum` | `VARCHAR(64)` or `BINARY` | Hash of **canonical serialized** diff (or v1 migration source file hash for legacy) at apply time. |
+| `diff_hash` | `VARCHAR(64)` nullable | Hash of **compiled plan** (normalized SQL DTO sequence) for verify mode. |
+| `applied_at` | timestamp | Same semantics as current `ran_at` OR rename in ADR with migration path. |
+
+### 6.2 Rules
+
+- On **apply**, persist `checksum` (and `diff_hash` if computed) **after** successful transaction commit.
+- **Verify** recomputes expected hashes from **registered** definitions + ledger and compares to live introspection snapshot.
+- **Replay:** **Production** MUST NOT silently re-apply the same `migration_id` with a **different** `checksum`. **Development** MAY allow `replay` on scratch DB only (explicit CLI flag, documented risk).
+
+### 6.3 Backfill
+
+Existing rows lack `checksum` / `diff_hash`. **ADR:** sentinel value, nullable columns, or one-time backfill script; verify mode defines behavior for “legacy unknown.”
+
+---
+
+## 7. Execution model
+
+### 7.1 Apply
+
+- Extends current **`Migrator::run`** semantics: a **merged ordered graph** of **legacy** `Migration` instances and **v2** compiled plans (exact merge algorithm ADR — e.g. all legacy for a batch, then v2, or interleaved by migration_id sort + dependency edges only if safe).
+- One **batch number** per successful apply batch (unchanged conceptually).
+
+### 7.2 Dry-run
+
+- Compiles `SchemaDiff` → `CompiledMigrationPlan` **without** committing and **without** ledger writes.
+- Emits **human-readable** summary and **machine-readable** JSON (schema TBD) for CI and operators.
+
+### 7.3 Verify
+
+- Inputs: live connection + **expected** schema fingerprint (from entity types + field registry + ledger history, per ADR).
+- Output: pass/fail + **diagnostic codes** (align with operator diagnostics conventions where applicable).
+- **Production output** MUST NOT leak raw filesystem paths in error strings (see mission Phase 5).
+
+### 7.4 Replay
+
+- **Dev:** optional command to drop/recreate scratch DB and re-run full chain (explicit).
+- **Prod:** no implicit replay; any repair path is operator-driven and documented.
+
+### 7.5 CLI surface
+
+- Prefer **flags on existing** `migrate` / `migrate:status` (`--dry-run`, `--verify`) unless an ADR introduces new command names — avoid duplicate surfaces.
+
+---
+
+## 8. Composer manifest evolution
+
+### 8.1 Today (#1286)
+
+```json
+"extra": {
+  "waaseyaa": {
+    "migrations": "migrations"
+  }
+}
+```
+
+`PackageManifestCompiler` records `packageName => string path`. `MigrationLoader` resolves the directory and loads `*.php` files in **lexicographic** order.
+
+### 8.2 Target (Phase 6)
+
+Ordered **array** of entries (namespace and/or path strings):
+
+```json
+"extra": {
+  "waaseyaa": {
+    "migrations": [
+      "Waaseyaa\\Groups\\Migrations\\v1",
+      "../patches/schema-v2"
+    ]
+  }
+}
+```
+
+**Semantics:**
+
+- **Array order** is the **authoritative** apply order within that package (before cross-package `$after` / dependency merge).
+- **Entries:** FQCN namespace roots for class-discovered v2 migrations **and/or** filesystem path strings during transition — exact discovery rules in ADR (no class-string **registries** stored as opaque JSON blobs without validation).
+
+### 8.3 Coexistence rule
+
+- **String** value remains valid indefinitely until deprecation is announced; **array** form is additive.
+- `PackageManifest` typing must represent `string|list<string>` without losing order (PHP `array` list preservation).
+
+---
+
+## 9. Coexistence with the current migration engine
+
+| Layer | Rule |
+|-------|------|
+| **Legacy `Migration`** | Continues to run unchanged; `up`/`down` + `SchemaBuilder` remain supported. |
+| **v2 migrations** | Run through the same **ledger** and **batch** concepts; different code path in `Migrator` (or adapter) once implemented. |
+| **Ordering** | Legacy package topological sort **extends** to include v2 nodes; **edges** defined by `dependencies` / `$after` must not introduce cycles (fail boot or fail migrate with clear error). |
+| **`ensureTable()`** | Remains the kernel path for **base** entity tables; v2 does **not** replace it in Phase 1–3. v2 handles **additive and evolved** schema beyond that contract per epic acceptance. |
+| **Producers** | Field-definition diff engine (future) may emit `SchemaDiff` that compile to SQL **or** to calls that align with `SqlSchemaHandler` where appropriate — convergence is incremental. |
+
+---
+
+## 10. Non-goals (explicit)
+
+The following are **out of scope** for initial delivery unless the epic is explicitly expanded:
+
+1. **Timestamp-prefixed** migration filenames as the **source of truth** for ordering (lexicographic sort is not a product feature; ordered manifest + deps are).
+2. **Folder scanning** as the **only** discovery mechanism long-term — Phase 6 replaces with declarative manifest; until then, #1286 directory loading remains for string paths.
+3. **Imperative SQL** or string-concatenated DDL **inside** SchemaDiff or `MigrationInterfaceV2` implementations from integrators — only the **compiler** emits SQL DTOs.
+4. **Global mutable state** during diff or compile (no static caches of connection or config).
+5. **Class-string registries** without validation (no unchecked `::class` strings from untrusted JSON).
+6. **Admin UI** for migrations.
+7. **Automatic apply** on HTTP kernel boot.
+8. **Replacing `ensureTable()`** in one shot for all entity types.
+
+---
+
+## 11. Safety gates (policy layer)
+
+Design-level requirements (implementation in [#521](https://github.com/waaseyaa/framework/issues/521)):
+
+- **Classify** operations: additive / ambiguous / destructive.
+- **Default:** additive allowed; destructive **blocked** unless an explicit operator flag or signed “danger accepted” channel (ADR).
+- **Rename-like** patterns (drop + add with compatible types) MUST either be rejected or normalized to **RenameColumn** — no silent coalescing without human-visible warning.
+
+---
+
+## 12. Test strategy ([#518](https://github.com/waaseyaa/framework/issues/518))
+
+### 12.1 Unit
+
+- **Diff algebra:** equality, hashing, composite ordering, immutability.
+- **Compiler golden files:** `SchemaDiff` → SQLite `CompiledMigrationPlan` snapshots (stable SQL or stable DTO JSON); version golden files when compiler output intentionally changes.
+- **Policy:** destructive ops blocked unless flag set.
+
+### 12.2 Idempotency
+
+- Applying the **same** compiled plan twice: second run is **no-op** at ledger + DB level (or explicit “already applied” without error — pick one in ADR).
+
+### 12.3 Integration
+
+- SQLite file or `:memory:`: register entity type change → produce diff → compile → apply → introspect schema.
+- **Bundle subtable** scenarios per [bundle-scoped-storage.md](./bundle-scoped-storage.md).
+
+### 12.4 Cross-database
+
+- **CI default:** SQLite only.
+- **MySQL / Postgres:** optional matrix job when compiler gains platforms; same `SchemaDiff` may produce different compiled plans — separate golden files per platform if needed.
+
+### 12.5 Round-trip (limited)
+
+- Where feasible: introspected schema → diff against expected model. **Non-goal:** perfect round-trip for all SQLite DDL edge cases in v1.
+
+---
+
+## 13. Acceptance mapping (#529 epic)
+
+From GitHub epic: child issues **#522** (this document + refinements), **#521** (implementation), **#518** (tests) complete; supported changes produce **deterministic** output; **unsafe** changes blocked or surfaced with operator-facing detail.
+
+---
+
+## 14. Open questions and ambiguities (human decisions before Phase 2)
+
+1. **`migration_id` vs current `migration` column:** Rename vs new column vs overload string format — affects migrations table migration and verify queries.
+2. **Checksum algorithm:** SHA-256 vs BLAKE3 vs truncated hash; canonical JSON rules for diff serialization.
+3. **`MigrationPlan` vs single `CompositeDiff`:** Whether the plan type is always a composite root or a tagged union including “empty plan.”
+4. **Merge algorithm** for legacy + v2 in one batch: strict “legacy first” vs interleaved by explicit `(package, migration_id)` total order — affects reproducibility.
+5. **SQLite `AlterColumn`:** Support level (full rewrite vs subset); which alter shapes v1 refuses and surfaces as “manual intervention required.”
+6. **FK on SQLite:** Which referential actions are supported in v1 compiler vs explicitly unsupported.
+7. **EntityLevelDiff producer:** Lives in `entity-storage` vs `foundation` vs new package — layer graph must be respected ([CLAUDE.md](../CLAUDE.md) layer table).
+8. **CLI UX:** Single `migrate --dry-run` for both legacy and v2 or separate subcommand — product preference.
+9. **Deprecation calendar** for directory-only `migrations` string paths — communicate in CHANGELOG and [workflow.md](./workflow.md).
+
+---
+
+## Document history
+
+| Date | Change |
+|------|--------|
+| 2026-04-26 | Initial design draft (Spec Kitty mission 529-schema-evolution-v2, Phase 1 / WP01). |
