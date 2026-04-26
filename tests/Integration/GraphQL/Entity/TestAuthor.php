@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Tests\Integration\GraphQL\Entity;
 
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 
+#[ContentEntityType(id: 'author')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'name')]
 final class TestAuthor extends ContentEntityBase
 {
     public function __construct(

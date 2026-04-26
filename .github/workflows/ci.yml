@@ -150,7 +150,7 @@ jobs:
             --repository='{"type":"path","url":"skeleton"}' \
             --stability=dev \
             --no-interaction
-          (cd "$work/skel-proj" && ./bin/waaseyaa-audit-site)
+          (cd "$work/skel-proj" && ./bin/maintenance/waaseyaa-audit-site)
 
   packaged-form:
     name: packaged-form
