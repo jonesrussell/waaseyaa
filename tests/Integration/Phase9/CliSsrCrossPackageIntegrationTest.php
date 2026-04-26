@@ -71,7 +71,7 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'article',
             label: 'Article',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class,
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',
@@ -83,7 +83,7 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'user',
             label: 'User',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\UserNameContentTestEntity::class,
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',

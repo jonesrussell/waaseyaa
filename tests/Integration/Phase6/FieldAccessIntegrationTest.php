@@ -53,7 +53,7 @@ final class FieldAccessIntegrationTest extends TestCase
         $this->entityType = new EntityType(
             id: 'article',
             label: 'Article',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
         );
         $this->entityTypeManager->registerEntityType($this->entityType);

@@ -15,6 +15,8 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Access\PermissionHandler;
 use Waaseyaa\Database\DBALDatabase;
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityType;
@@ -473,6 +475,8 @@ final class FullStackIntegrationTest extends TestCase
 /**
  * Concrete article entity for full-stack integration tests.
  */
+#[ContentEntityType(id: 'article')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'bundle', langcode: 'langcode')]
 class TestFullStackArticle extends ContentEntityBase
 {
     public function __construct(

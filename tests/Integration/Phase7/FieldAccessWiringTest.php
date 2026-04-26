@@ -18,7 +18,6 @@ use Waaseyaa\Api\JsonApiController;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Schema\SchemaPresenter;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
-use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
@@ -50,7 +49,7 @@ final class FieldAccessWiringTest extends TestCase
         $this->entityType = new EntityType(
             id: 'article',
             label: 'Article',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
         );
         $this->entityTypeManager->registerEntityType($this->entityType);

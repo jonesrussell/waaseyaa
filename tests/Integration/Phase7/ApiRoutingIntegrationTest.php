@@ -14,7 +14,6 @@ use Waaseyaa\Api\ApiServiceProvider;
 use Waaseyaa\Api\JsonApiController;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
-use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Routing\WaaseyaaRouter;
@@ -46,7 +45,7 @@ final class ApiRoutingIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Node',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\NodeContentTestEntity::class,
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',
@@ -280,14 +279,14 @@ final class ApiRoutingIntegrationTest extends TestCase
         $entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Node',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\NodeContentTestEntity::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
         ));
 
         $entityTypeManager->registerEntityType(new EntityType(
             id: 'taxonomy_term',
             label: 'Taxonomy Term',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\TaxonomyTermContentTestEntity::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name', 'bundle' => 'vid'],
         ));
 

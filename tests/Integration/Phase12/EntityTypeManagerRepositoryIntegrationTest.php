@@ -71,7 +71,7 @@ final class EntityTypeManagerRepositoryIntegrationTest extends TestCase
         );
 
         $type = new EntityType(
-            id: 'repo_integration_entity',
+            id: 'test_entity',
             label: 'Repo integration',
             class: TestStorageEntity::class,
             keys: [
@@ -84,11 +84,11 @@ final class EntityTypeManagerRepositoryIntegrationTest extends TestCase
         );
         $manager->registerEntityType($type);
 
-        $repository = $manager->getRepository('repo_integration_entity');
+        $repository = $manager->getRepository('test_entity');
 
         $entity = new TestStorageEntity(
             values: ['id' => '1', 'label' => 'Hello', 'bundle' => 'article', 'langcode' => 'en'],
-            entityTypeId: 'repo_integration_entity',
+            entityTypeId: 'test_entity',
             entityKeys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
         );
         $entity->enforceIsNew();

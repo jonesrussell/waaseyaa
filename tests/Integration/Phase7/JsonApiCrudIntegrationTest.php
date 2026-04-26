@@ -12,7 +12,6 @@ use Waaseyaa\Api\JsonApiController;
 use Waaseyaa\Api\JsonApiDocument;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
-use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 
@@ -41,7 +40,7 @@ final class JsonApiCrudIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Node',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\NodeContentTestEntity::class,
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',

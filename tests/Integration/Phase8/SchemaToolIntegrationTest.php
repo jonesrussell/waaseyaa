@@ -14,7 +14,6 @@ use Waaseyaa\AI\Schema\Mcp\McpToolExecutor;
 use Waaseyaa\AI\Schema\Mcp\McpToolGenerator;
 use Waaseyaa\AI\Schema\SchemaRegistry;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
-use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 
@@ -47,7 +46,7 @@ final class SchemaToolIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Node',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\NodeNidContentTestEntity::class,
             keys: [
                 'id' => 'nid',
                 'uuid' => 'uuid',
@@ -264,13 +263,13 @@ final class SchemaToolIntegrationTest extends TestCase
         $entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Node',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\NodeNidContentTestEntity::class,
             keys: ['id' => 'nid', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
         ));
         $entityTypeManager->registerEntityType(new EntityType(
             id: 'user',
             label: 'User',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\UserUidNameContentTestEntity::class,
             keys: ['id' => 'uid', 'uuid' => 'uuid', 'label' => 'name'],
         ));
 

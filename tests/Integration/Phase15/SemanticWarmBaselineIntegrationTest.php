@@ -22,7 +22,6 @@ use Waaseyaa\AI\Vector\SemanticIndexWarmer;
 use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
 use Waaseyaa\AI\Vector\Testing\FakeEmbeddingProvider;
 use Waaseyaa\Api\ResourceSerializer;
-use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityType;
@@ -68,7 +67,7 @@ final class SemanticWarmBaselineIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Node',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\NodeContentTestEntity::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
             fieldDefinitions: [
                 'title' => ['type' => 'string'],

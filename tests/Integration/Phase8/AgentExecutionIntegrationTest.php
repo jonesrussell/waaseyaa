@@ -20,7 +20,6 @@ use Waaseyaa\AI\Schema\Mcp\McpToolExecutor;
 use Waaseyaa\AI\Schema\Mcp\McpToolGenerator;
 use Waaseyaa\AI\Schema\SchemaRegistry;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
-use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\User\User;
@@ -54,7 +53,7 @@ final class AgentExecutionIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Node',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\NodeNidContentTestEntity::class,
             keys: [
                 'id' => 'nid',
                 'uuid' => 'uuid',

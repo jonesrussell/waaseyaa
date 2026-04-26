@@ -7,6 +7,8 @@ namespace Waaseyaa\Tests\Integration\Phase25;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\Exception\EntityTypeRegistrationCollisionException;
@@ -166,6 +168,10 @@ final class Phase25DistinctEntityTypeProvider extends ServiceProvider
     }
 }
 
+#[ContentEntityType(id: 'group')]
+#[ContentEntityKeys(id: 'gid', uuid: 'uuid', label: 'name')]
 final class Phase25ShadowGroup extends ContentEntityBase {}
 
+#[ContentEntityType(id: 'consumer_group_extension')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'label')]
 final class Phase25ConsumerGroupExtension extends ContentEntityBase {}

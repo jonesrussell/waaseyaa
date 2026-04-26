@@ -20,7 +20,6 @@ use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\AI\Vector\SearchController;
 use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
 use Waaseyaa\Api\ResourceSerializer;
-use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityType;
@@ -63,7 +62,7 @@ final class DiscoveryFixtureConsumersIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Node',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\NodeContentTestEntity::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
             fieldDefinitions: [
                 'title' => ['type' => 'string'],

@@ -225,4 +225,6 @@ return [
     'Waaseyaa\Telescope\CodifiedContext\Storage\CodifiedContextStoreInterface' => 'internal',
     'Waaseyaa\CLI\Command\Make\AbstractMakeCommand' => 'internal',
     'Waaseyaa\Mcp\Tools\McpTool' => 'internal',
+    'Waaseyaa\SSR\Http\AppController\AppControllerArgumentResolver' => 'public',
+    'Waaseyaa\SSR\Http\AppController\AppParameterKind' => 'public',
 ];

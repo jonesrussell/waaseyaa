@@ -70,7 +70,7 @@ final class AIFullStackIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'node',
             label: 'Node',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\NodeNidContentTestEntity::class,
             keys: [
                 'id' => 'nid',
                 'uuid' => 'uuid',

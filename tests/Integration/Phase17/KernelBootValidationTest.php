@@ -122,8 +122,8 @@ PHP);
     {
         $this->writeEntityTypes(<<<'PHP'
 [
-    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
-    new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
+    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title']),
+    new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type']),
 ]
 PHP);
 
@@ -138,7 +138,7 @@ PHP);
     {
         $this->writeEntityTypes(<<<'PHP'
 [
-    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
+    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title']),
 ]
 PHP);
 
@@ -155,8 +155,8 @@ PHP);
     {
         $this->writeEntityTypes(<<<'PHP'
 [
-    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
-    new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id']),
+    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title']),
+    new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type']),
 ]
 PHP);
 

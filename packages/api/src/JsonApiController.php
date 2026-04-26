@@ -218,10 +218,13 @@ final class JsonApiController
         }
 
         // Auto-generate machine name for config entities if ID is empty.
-        // Config types use a non-default id storage field (e.g. `type` for node_type); they may still
-        // declare a uuid column on the class, so we key off the id field mapping, not only uuid absence.
+        // Config types can still expose UUID, so we treat same-id-and-bundle mappings as config-style
+        // entities (e.g. node_type: id=type, bundle=type) while keeping content entities like node
+        // (id=nid, bundle=type) on numeric/uuid identity semantics.
         $idKey = $keys['id'] ?? 'id';
-        $usesConfigMachineIds = ($idKey !== 'id') || !isset($keys['uuid']);
+        $bundleMatchesId = isset($keys['bundle']) && $keys['bundle'] === $idKey;
+        $nonDefaultIdWithoutBundle = $idKey !== 'id' && !isset($keys['bundle']);
+        $usesConfigMachineIds = $bundleMatchesId || $nonDefaultIdWithoutBundle || !isset($keys['uuid']);
         if ($usesConfigMachineIds) {
             $configLabelKey = $keys['label'] ?? 'label';
             if ((!isset($attributes[$idKey]) || $attributes[$idKey] === '')

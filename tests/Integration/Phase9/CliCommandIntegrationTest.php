@@ -11,7 +11,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
-use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\Command\CacheClearCommand;
 use Waaseyaa\CLI\Command\ConfigExportCommand;
@@ -79,7 +78,7 @@ final class CliCommandIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'article',
             label: 'Article',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class,
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',
@@ -91,7 +90,7 @@ final class CliCommandIntegrationTest extends TestCase
         $this->entityTypeManager->registerEntityType(new EntityType(
             id: 'user',
             label: 'User',
-            class: TestEntity::class,
+            class: \Waaseyaa\Api\Tests\Fixtures\UserNameContentTestEntity::class,
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',

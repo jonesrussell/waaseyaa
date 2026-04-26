@@ -462,7 +462,7 @@ final class JsonApiAccessIntegrationTest extends TestCase
     {
         $entities = $this->storage->loadMultiple();
         foreach ($entities as $entity) {
-            if ($entity->uuid() === $uuid) {
+            if ($entity->uuid() === $uuid || (string) $entity->id() === $uuid) {
                 return $entity->id();
             }
         }
