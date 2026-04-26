@@ -1,6 +1,6 @@
 # API Layer
 
-<!-- Spec reviewed 2026-04-25b - ResourceSerializer prefers non-integer string id() for JSON:API resource id (config machine names); JsonApiController store: machine-name path when id storage field is not `id` even if uuid exists in keys; API test fixtures use definitionKeys() aligned with EntityMetadataReader -->
+<!-- Spec reviewed 2026-04-26 - ResourceSerializer prefers non-integer string id() for JSON:API resource id (config machine names); JsonApiController store machine-name path uses config heuristics (id=bundle, or non-default id without bundle, or no uuid); API integration fixtures now map per-entity metadata classes -->
 <!-- Spec reviewed 2026-04-25 - RouteBuilder::bind + RouteFingerprint for SSR app-controller binding metadata; see docs/specs/app-controller-invocation.md -->
 <!-- Spec reviewed 2026-04-24 - CodifiedContextController JSON camelCase (admin useCodifiedContext); CodifiedContextApiRouter; agent-context HTTP paths; CodifiedContextSessionStoreInterface + CodifiedContextSessionRow (packages/api); telescope-agent-context-telemetry.md; waaseyaa/telescope ships CodifiedContextSessionStoreAdapter (#1339 L4/L6 boundary) -->
 <!-- Spec reviewed 2026-04-24 - Auth and OIDC HTTP route tables: AuthOidcRouteServiceProvider + OidcHttpRoutes in packages/routing (waaseyaa/routing requires auth+oidc); BuiltinRouteRegistrar still calls all providers' routes() -->
