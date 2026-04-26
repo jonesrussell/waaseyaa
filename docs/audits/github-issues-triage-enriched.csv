@@ -1,0 +1,126 @@
+number,title,milestone,cluster,merged_prs,graphql_error,suggest
+1344,"[Layer 4 — API] PHPDoc @covers backlog (L4-COV-AGG, 64 symbols)",Track 3 — Parity & performance,phpdoc_covers,,,verify_ac
+1343,"[Layer 6 — Interfaces] PHPDoc @covers backlog (L6-COV-AGG, 226 symbols)",Track 3 — Parity & performance,phpdoc_covers,,,verify_ac
+1342,[Layer 6 — Interfaces] Add missing L6 packages to phpstan.neon (PHPStan CI gaps),Track 3 — Parity & performance,layer_tagged,,,verify_ac
+1341,"[Layer 5 — AI] PHPDoc @covers backlog (L5-COV-AGG, 70 symbols)",Track 2 — Bimaaji & agentic,phpdoc_covers,,,verify_ac
+1340,[Layer 5 — AI] Sync CLAUDE + phpstan.neon for ai-observability; fix AnomalyDetector PHPStan,Track 2 — Bimaaji & agentic,layer_tagged,,,verify_ac
+1338,"[Layer 0 — Foundation] PHPDoc @covers backlog (L0-COV-AGG, 269 symbols)",Track 1 — Entity system & hydration,phpdoc_covers,,,verify_ac
+1337,Epic: Layer 1 audit — PHPDoc @covers / contract surface (177 symbols),Track 1 — Entity system & hydration,phpdoc_covers,,,verify_ac
+1336,Follow-up: Layer 2 audit — PHPDoc @covers backlog (42 symbols),Track 1 — Entity system & hydration,phpdoc_covers,,,verify_ac
+1335,Follow-up: Layer 3 audit — close remaining PHPDoc @covers gaps (21 symbols),Track 1 — Entity system & hydration,phpdoc_covers,,,verify_ac
+1315,Kernel-path integration test for extractions (postmortem: five-release adoption chain),Track 1 — Entity system & hydration,other,PR#1321: docs(plan): anchor Task 2 grep; clarify mutation recipe | PR#1322: docs(plan): editorial pass on Phase 1 plan | PR#1323: refactor: drain MinimalTestKernel | PR#1324: test: SqlSchemaHandlerRegistryFallbackTest + mutation-recipe | PR#1325: test: forbid named kernel subclasses in tests/**,,verify_ac
+1314,deriveColumnSpec — explicit mappings for text_long / uri / entity_reference,Track 4 — Schema evolution,other,,,verify_ac
+1313,Shadow-collision guard + clear duplicate-registration error,Track 1 — Entity system & hydration,other,PR#1329: docs(plan): Phase 3 — shadow-collision guard + duplicate-reg | PR#1330: feat: add provenance-aware collision exception in the regist | PR#1331: test: add real-kernel entity-type collision coverage | PR#1332: fix: emit missing bundle-subtable notice on save path | PR#1333: docs: add upgrade note for shadow-collision guard,,verify_ac
+1310,deploy: RP003 verify-tag-parity false alarms on alpha.146-.149,Track 4 — Schema evolution,other,,,verify_ac
+1309,operator-diagnostics: detect column-vs-data storage drift,Track 3 — Parity & performance,other,,,verify_ac
+1308,entity-storage: symmetric query-side handling for FieldStorage::Data when legacy column exists,Track 1 — Entity system & hydration,other,,,verify_ac
+1305,"Explicit type mappings in SqlSchemaHandler::deriveColumnSpec() for text_long, uri, entity_reference",Track 4 — Schema evolution,other,,,verify_ac
+1304,Move tenancy opt-in from HasCommunityInterface marker to EntityType/storage registration,Track 1 — Entity system & hydration,other,,,verify_ac
+1301,Portable ORPHAN_BUNDLE_SUBTABLE detection for MySQL and PostgreSQL,Track 1 — Entity system & hydration,other,PR#1302: docs(#1297): log post-review follow-ups + refresh entity-sys,,verify_ac
+1300,Extract HealthChecker's entity/entity-storage dependencies to preserve layer discipline,Track 1 — Entity system & hydration,other,PR#1302: docs(#1297): log post-review follow-ups + refresh entity-sys,,verify_ac
+1299,Log warning when load() encounters a registered-field bundle with no subtable,Track 1 — Entity system & hydration,other,PR#1302: docs(#1297): log post-review follow-ups + refresh entity-sys,,verify_ac
+1298,Centralize bundle-subtable name helper with `__` separator guard,Track 1 — Entity system & hydration,other,PR#1302: docs(#1297): log post-review follow-ups + refresh entity-sys,,verify_ac
+1290,oidc: login_path with pre-existing query string produces malformed return_to URL,Track 5 — Ecosystem identity,other,,,verify_ac
+1286,feat(framework): wire package-level migrations via extra.waaseyaa.migrations,Track 4 — Schema evolution,other,PR#1287: feat(#1283): authorization code repository,,verify_ac
+1276,Rotate `SPLIT_GITHUB_TOKEN` to fine-grained PAT excluding `waaseyaa/framework`,Track 5 — Ecosystem identity,ops_tokens,,,verify_ac
+1275,ADR-004 follow-up: teach package discovery to synthesize installed.json entries for `replace`d packages,Track 1 — Entity system & hydration,ecosystem_rollout,,,verify_ac
+1266,Roll out waaseyaa/northcloud: alpha → Minoo migration → stable,Track 5 — Ecosystem identity,ecosystem_rollout,,,verify_ac
+1257,fix(entity-query): _data integer fields fail string comparisons in SQLite,Track 1 — Entity system & hydration,other,,,verify_ac
+1256,refactor: migrate test extending GenericAdminSurfaceHost to enable final,Track 3 — Parity & performance,other,,,verify_ac
+1255,refactor: extract interface for AuthMailer to enable final,Track 3 — Parity & performance,other,,,verify_ac
+1254,refactor: migrate tests mocking EntityAccessHandler to enable final,Track 3 — Parity & performance,other,,,verify_ac
+1253,refactor: migrate 57 tests mocking EntityTypeManager to mock EntityTypeManagerInterface,Track 3 — Parity & performance,other,,,verify_ac
+1249,perf: cache or X-Sendfile for admin SPA index.html serving,Track 3 — Parity & performance,other,,,verify_ac
+1248,chore: add phpstan-strict-rules to composer.lock,Track 3 — Parity & performance,other,,,verify_ac
+1247,chore: extract admin SPA serve logic into testable method,Track 3 — Parity & performance,other,,,verify_ac
+1244,chore: triage REVIEW_NEEDED final classes from keyword audit,Track 3 — Parity & performance,chore_triage_final,,,verify_ac
+1243,refactor: extract interfaces for Interface-layer registries and handlers,Track 3 — Parity & performance,refactor_extract_interfaces,,,verify_ac
+1242,refactor: extract interfaces for AI layer final classes,Track 3 — Parity & performance,refactor_extract_interfaces,,,verify_ac
+1241,refactor: extract interfaces for API layer final classes,Track 3 — Parity & performance,refactor_extract_interfaces,,,verify_ac
+1240,refactor: extract interfaces for Services layer final classes,Track 3 — Parity & performance,refactor_extract_interfaces,,,verify_ac
+1239,refactor: extract interfaces for Core Data final classes,Track 3 — Parity & performance,refactor_extract_interfaces,,,verify_ac
+1227,"Inertia: `RootTemplateRenderer` ships `data-page=""true""` but client reader expects `data-page=""app""`",Track 3 — Parity & performance,inertia_ssr,"PR#79: docs(#66, #72, #73): comment phase-A workarounds",,verify_ac
+1224,Epic — InboundHttpRequest: SSR boundary & request model,Track 1 — Entity system & hydration,epic,,,verify_ac
+1223,Remediation Planning: Entity System & Hydration,Track 1 — Entity system & hydration,other,,,verify_ac
+1214,Layer Gate: Enforce package-level import and dependency rules,Track 1 — Entity system & hydration,layer_gate,,,verify_ac
+1107,feat: wrap Symfony dependencies so app code never imports Symfony directly,Track 1 — Entity system & hydration,symfony_wrap,,,verify_ac
+1100,Inconsistent accessor naming on AccountInterface: id() vs getRoles(),Track 1 — Entity system & hydration,other,,,verify_ac
+1071,Repeat codified context A/B test experiment for waaseyaa/framework,Track 2 — Bimaaji & agentic,other,,,verify_ac
+893,impl(remediation)(M7): public command exposure and operator reachability track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+892,impl(remediation)(M7): root workflow entry-point unification track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+891,impl(remediation)(M7): dev-process coupling and local ergonomics cleanup track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+890,impl(remediation)(M7): operator and playbook polish track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+889,impl(remediation)(M7): bootstrap and workflow gate,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+888,impl(remediation)(M6): subsystem authority and contract-spec sync track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+887,impl(remediation)(M6): canonical architecture and codified-context sync track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+886,impl(remediation)(M6): milestone and workflow governance sync track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+885,impl(remediation)(M6): onboarding and package discoverability cleanup track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+884,impl(remediation)(M6): bootstrap and governance gate,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+883,impl(remediation)(M5): authoritative seam contract verification track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+882,impl(remediation)(M5): admin-surface integration and shared-boundary verification track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+881,impl(remediation)(M5): lower-layer placement and collaborator isolation cleanup track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+880,impl(remediation)(M5): foundation harness and stable-seam cleanup track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+879,impl(remediation)(M5): bootstrap and verification gate,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+878,impl(remediation)(M4): API and entity-system public surface alignment track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+877,impl(remediation)(M4): foundation provider authority recovery track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+876,impl(remediation)(M4): admin-surface boundary authority recovery track,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+875,impl(remediation)(M4): bootstrap and authority-decision gate,Track 1 — Entity system & hydration,remediation_mseries,,,verify_ac
+858,audit(dx-tooling)(cross-layer): implemented CLI operator and scaffolding commands are missing from the registered console surface,Track 1 — Entity system & hydration,other,,,verify_ac
+857,audit(dx-tooling)(cross-layer): package-local discoverability is uneven because many active packages have no README surface,Track 1 — Entity system & hydration,other,,,verify_ac
+856,audit(dx-tooling)(cross-layer): the root workflow surface lacks a unified verification entry point for the full monorepo,Track 1 — Entity system & hydration,other,,,verify_ac
+855,audit(dx-tooling)(cross-layer): composer dev couples two long-running processes through a brittle shell one-liner,Track 1 — Entity system & hydration,other,,,verify_ac
+854,audit(dx-tooling)(cross-layer): package discovery tooling is not the authoritative registration path for active command and route surfaces,Track 1 — Entity system & hydration,other,,,verify_ac
+852,audit(docs-governance)(cross-layer): workflow milestone table no longer reflects the repos actual GitHub roadmap,Track 1 — Entity system & hydration,other,,,verify_ac
+851,audit(docs-governance)(L6-interfaces): admin-surface documentation splits authority between the contract package and a contradictory subsystem spec,Track 1 — Entity system & hydration,other,,,verify_ac
+850,audit(docs-governance)(cross-layer): codified context does not cover the full active subsystem surface or authoritative ownership,Track 1 — Entity system & hydration,other,,,verify_ac
+849,audit(docs-governance)(cross-layer): subsystem specs continue to present stale public contracts as authoritative sources,Track 1 — Entity system & hydration,other,,,verify_ac
+848,audit(docs-governance)(cross-layer): canonical architecture documents publish an incomplete framework package topology,Track 1 — Entity system & hydration,other,,,verify_ac
+847,audit(testing)(L0-foundation): foundation unit suites import higher-layer collaborators instead of testing through lower-layer seams,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+846,audit(testing)(L6-interfaces): admin-surface route and host wiring has package-local unit tests but no root integration coverage,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+845,audit(testing)(L0-foundation): kernel unit tests rely on reflection and private state instead of stable public seams,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+844,audit(testing)(L4-api): serializer and schema field-access tests do not cover invalid partial access-context states,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+843,"audit(testing)(L0-foundation): foundation tests do not verify service-provider hook coherence across interface, base class, and kernel call sites",Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+842,audit(testing)(L6-interfaces): admin-surface integration boundary lacks shared contract-verification tests for session and catalog payload shape,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+841,audit(contracts)(L4-api): JsonApiRouteProvider contract omits the public api.discovery route and ApiDiscoveryController surface,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+840,audit(contracts)(L6-interfaces): admin-surface catalog contract omits description emitted by backend and consumed by SPA runtime,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+839,audit(contracts)(L6-interfaces): admin-surface session contract omits email verification state used by backend and SPA runtime,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+838,audit(contracts)(L0-foundation): ServiceProviderInterface omits documented extension hooks invoked by kernel call sites,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+837,audit(contracts)(L1-core-data): entity-system spec publishes outdated RevisionableStorageInterface signatures,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+836,audit(contracts)(L6-interfaces): admin-surface host extension surface is bound to concrete EntityTypeManager rather than the entity manager interface,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+835,audit(contracts)(L1-core-data): entity-system spec omits public EntityTypeManagerInterface registration methods,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+834,audit(contracts)(L4-api): paired-nullable access context is documented but unenforced in ResourceSerializer and SchemaPresenter,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+833,audit(contracts)(L0-foundation): ServiceProvider extension hooks expose concrete EntityTypeManager instead of the public interface surface,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+832,audit(contracts)(L4-api): access-control and API specs place AccessChecker in routing while the public class lives in access,Track 1 — Entity system & hydration,audit_contracts_testing,,,verify_ac
+831,audit(boundaries)(L6-interfaces): admin-surface provider rebuilds core access wiring from manifest storage,Track 1 — Entity system & hydration,other,,,verify_ac
+830,audit(boundaries)(L0-foundation): EventListenerRegistrar carries multi-layer orchestration outside the named kernel exemption,Track 1 — Entity system & hydration,other,,,verify_ac
+829,audit(boundaries)(L1-core-data): user package reaches into interface-layer SSR through provider wiring,Track 1 — Entity system & hydration,other,,,verify_ac
+828,audit(boundaries)(cross-layer): provider resolver enables synchronous cross-provider coupling outside documented upward seams,Track 1 — Entity system & hydration,other,,,verify_ac
+827,audit(boundaries)(L0-foundation): extracted kernel bootstrappers carry cross-layer imports outside the documented kernel exemption,Track 1 — Entity system & hydration,other,,,verify_ac
+825,audit(boundaries)(cross-layer): composer package topology exceeds documented layer model,Track 1 — Entity system & hydration,other,,,verify_ac
+824,audit(boundaries)(L6-interfaces): admin is modeled as a layer package but implemented outside the Composer package graph,Track 1 — Entity system & hydration,other,,,verify_ac
+796,Manifest cache: fingerprint + root extra merge on load,Track 3 — Parity & performance,other,"PR#1169: feat(perf): milestone 45 query optimization (#584–#588, #796",,verify_ac
+795,Ensure entity system supports JSON and timestamp field types,Track 1 — Entity system & hydration,other,,,verify_ac
+728,chore: register waaseyaa/oauth-provider on Packagist,Track 3 — Parity & performance,other,,,verify_ac
+702,Add messaging infrastructure package (waaseyaa/messaging),Track 3 — Parity & performance,other,PR#714: feat(user): add AuthMailer + wire all Batch 2 services — Ref,,verify_ac
+701,Add engagement entities package (waaseyaa/engagement),Track 3 — Parity & performance,other,PR#596: refactor: swap Minoo engagement/messaging for framework pack | PR#717: fix(engagement): skip reaction type validation when no allow,,verify_ac
+698,Add UploadService to waaseyaa/media,Track 3 — Parity & performance,other,,,verify_ac
+697,Add flash messaging to framework (waaseyaa/flash or waaseyaa/ssr),Track 3 — Parity & performance,other,PR#1166: feat(#798): consolidate mail on MailerInterface and SendGrid,,verify_ac
+694,Add Mercure publisher package (waaseyaa/mercure),Track 3 — Parity & performance,other,PR#709: feat(mercure): new package with MercurePublisher for real-ti,,verify_ac
+628,feat: webhook handling abstraction (signature verification + payload routing),Track 3 — Parity & performance,other,,,verify_ac
+623,"feat: ai-agent kernel extensions — planning, routing, reflection, multi-agent",Track 2 — Bimaaji & agentic,other,,,verify_ac
+621,"feat: ai-guardrails package — permissions, safety, and assurance",Track 2 — Bimaaji & agentic,other,,,verify_ac
+620,"feat: ai-memory package — conversation, semantic, and episodic memory",Track 2 — Bimaaji & agentic,other,,,verify_ac
+619,epic: Waaseyaa Native Agentic Framework,Track 2 — Bimaaji & agentic,other,,,verify_ac
+595,feat: add content moderation / editorial workflow support,Track 3 — Parity & performance,other,,,verify_ac
+594,feat: add Form API or form handling abstraction,Track 3 — Parity & performance,other,,,verify_ac
+593,feat: add factory/seeder framework for development and testing,Track 3 — Parity & performance,other,,,verify_ac
+592,feat: add notification system (multi-channel),Track 3 — Parity & performance,other,,,verify_ac
+591,feat: add task scheduling / cron system,Track 3 — Parity & performance,other,PR#1287: feat(#1283): authorization code repository,,verify_ac
+590,feat: add OAuth2/OIDC provider support,Track 3 — Parity & performance,other,,,verify_ac
+589,feat: add Redis and Memcached cache backends,Track 3 — Parity & performance,other,,,verify_ac
+588,perf: replace in-memory array pagination in RelationshipDiscoveryService,Track 3 — Parity & performance,other,"PR#1169: feat(perf): milestone 45 query optimization (#584–#588, #796",,verify_ac
+587,perf: add DataLoader pattern for GraphQL nested field resolution,Track 3 — Parity & performance,other,"PR#1169: feat(perf): milestone 45 query optimization (#584–#588, #796",,verify_ac
+586,perf: add query result caching to SqlEntityQuery,Track 3 — Parity & performance,other,"PR#1169: feat(perf): milestone 45 query optimization (#584–#588, #796",,verify_ac
+585,perf: add eager loading support to EntityRepository,Track 3 — Parity & performance,other,"PR#1169: feat(perf): milestone 45 query optimization (#584–#588, #796",,verify_ac
+584,perf: fix N+1 queries in EntityReferenceItem resolution,Track 3 — Parity & performance,other,"PR#1169: feat(perf): milestone 45 query optimization (#584–#588, #796",,verify_ac
+529,Schema Evolution v2.0,Track 4 — Schema evolution,other,,,verify_ac
