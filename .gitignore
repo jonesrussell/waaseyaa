@@ -16,7 +16,7 @@ packages/*/.phpunit.cache/
 .php-cs-fixer.cache
 
 # PHPStan
-phpstan/
+tmp/phpstan/
 
 # Layer 0 / local audit bundles (regenerate via scripts/layer0_audit/)
 artifacts/

@@ -283,4 +283,50 @@ final class FieldTypeInferrerTest extends TestCase
             self::assertStringContainsString('Hint:', $e->getMessage());
         }
     }
+
+    #[Test]
+    public function compatibilityGroupsExposesPrivateConstantVerbatim(): void
+    {
+        $expected = [
+            ['string', 'text', 'email', 'link'],
+            ['integer', 'list'],
+            ['float', 'decimal'],
+            ['datetime', 'date'],
+        ];
+
+        self::assertSame($expected, FieldTypeInferrer::compatibilityGroups());
+    }
+
+    /**
+     * @return iterable<string, array{0: ?string, 1: ?string}>
+     */
+    public static function inferFromPhpTypeNameProvider(): iterable
+    {
+        yield 'null'         => [null, null];
+        yield 'string'       => ['string', 'string'];
+        yield 'int'          => ['int', 'integer'];
+        yield 'bool'         => ['bool', 'boolean'];
+        yield 'float'        => ['float', 'float'];
+        yield 'array'        => ['array', 'json'];
+        yield 'datetime'     => [\DateTimeImmutable::class, 'datetime'];
+        yield 'unsupported'  => [\stdClass::class, null];
+    }
+
+    #[Test]
+    #[DataProvider('inferFromPhpTypeNameProvider')]
+    public function inferFromPhpTypeNameMatchesInferenceTable(?string $phpTypeName, ?string $expected): void
+    {
+        $settings = [];
+        self::assertSame($expected, FieldTypeInferrer::inferFromPhpTypeName($phpTypeName, $settings));
+    }
+
+    #[Test]
+    public function inferFromPhpTypeNamePopulatesEnumClassForBackedEnum(): void
+    {
+        $settings = [];
+        $result = FieldTypeInferrer::inferFromPhpTypeName(InferrerSampleEnum::class, $settings);
+
+        self::assertSame('enum', $result);
+        self::assertSame(['enum_class' => InferrerSampleEnum::class], $settings);
+    }
 }

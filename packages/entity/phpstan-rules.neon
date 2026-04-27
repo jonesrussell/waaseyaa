@@ -1,0 +1,5 @@
+services:
+    -
+        class: Waaseyaa\Entity\PhpStan\FieldAttributeRule
+        tags:
+            - phpstan.rules.rule

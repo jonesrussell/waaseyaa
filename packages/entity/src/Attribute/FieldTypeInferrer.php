@@ -194,6 +194,38 @@ final class FieldTypeInferrer
         return false;
     }
 
+    /**
+     * Public seam for static analysis: returns the same compatibility-group
+     * table {@see self::isCompatible()} consults at runtime.
+     *
+     * @return list<list<string>>
+     */
+    public static function compatibilityGroups(): array
+    {
+        return self::COMPATIBILITY_GROUPS;
+    }
+
+    /**
+     * Public seam for static analysis: maps a PHP type name to a field-type id
+     * without requiring a {@see \ReflectionProperty}. Mirrors the inference
+     * branch of {@see self::infer()}.
+     *
+     * Returns null when `$phpTypeName` is null or not in the inference table.
+     * Callers should pass null for union/intersection/missing types.
+     *
+     * @param array<string, mixed> $settings  Out-parameter for backed-enum metadata.
+     *                                        Required (no default) so callers cannot
+     *                                        silently drop the enum_class side effect.
+     */
+    public static function inferFromPhpTypeName(?string $phpTypeName, array &$settings): ?string
+    {
+        if ($phpTypeName === null) {
+            return null;
+        }
+
+        return self::mapPhpTypeToFieldType($phpTypeName, $settings);
+    }
+
     private static function assertValidTypeId(string $typeId, \ReflectionProperty $property): void
     {
         if (\in_array($typeId, self::VALID_TYPE_IDS, true)) {

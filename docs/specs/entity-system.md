@@ -487,6 +487,29 @@ $this->entityType(EntityType::fromClass(Note::class));
 
 `EntityType::fromClass(string $class, ...$overrides): self` reads the class-level `#[ContentEntityType]` and `#[ContentEntityKeys]` plus all `#[Field]`-decorated properties, infers the field shape from each property's PHP type (with `FieldTypeInferrer`), and returns a fully-formed `EntityType`. Named arguments after `$class` override any inferred slot (`storageClass`, `keys`, `revisionable`, `bundleEntityType`, `constraints`, etc.).
 
+### Static analysis of `#[Field]`
+
+`packages/entity/src/PhpStan/FieldAttributeRule.php` is a custom PHPStan rule that lints `#[Field]` usage at static-analysis time so attribute typos and misuses surface in CI rather than at kernel boot. It mirrors `FieldTypeInferrer::infer()`'s checks exactly — error messages produced by the rule are byte-identical to the runtime `EntityMetadataException` messages you would see at registration time, enforced by a runtime cross-check in `FieldAttributeRuleTest`.
+
+The rule emits one of these stable identifiers when a misuse is detected:
+
+| Identifier | Triggered when |
+|------------|----------------|
+| `field.notEntity`        | `#[Field]` is placed on a property of a class that does not extend `ContentEntityBase` (cascade gate — suppresses the other identifiers for that property). |
+| `field.nonPublic`        | `#[Field]` is on a non-public property. |
+| `field.cannotInfer`      | No explicit `type:` argument is given and the property's PHP type is missing, a union, or an intersection. |
+| `field.unknownType`      | An explicit `type:` value is not in `FieldTypeInferrer::VALID_TYPE_IDS` (the 16 registered field-type ids). |
+| `field.incompatibleType` | An explicit `type:` is incompatible with the property's PHP type per `FieldTypeInferrer::compatibilityGroups()`. |
+
+The rule is registered through a package-local config `packages/entity/phpstan-rules.neon`, included from this monorepo's repo-root `phpstan.neon`. Downstream apps depending on `waaseyaa/entity` opt in with one line in their own `phpstan.neon`:
+
+```neon
+includes:
+    - vendor/waaseyaa/entity/phpstan-rules.neon
+```
+
+The rule depends only on PHPStan's `Rule` interface and `ReflectionProvider` — it has no dependency on the kernel, the DI container, or any runtime service, so it runs purely from source files at PHPStan-level analysis. It runs at PHPStan level 5 or higher and adds no measurable wall-clock cost (warm-run median on `packages/entity/src` is within noise of parity, well under the 10% ceiling — see `kitty-specs/attribute-first-entity-static-analysis-01KQ6XW7/notes/benchmark.md`).
+
 The `Waaseyaa\Entity\Attribute\Field` attribute supports: `name:`, `type:`, `required:`, `default:`, `settings:`, plus other slots aligned with `FieldDefinition`. Omitted parameters fall through to inference from the PHP property type. See [`quickstart.md`](../../kitty-specs/attribute-first-entity-definition-01KQ6DXE/quickstart.md) for the full inference table.
 
 ### Raw constructor (advanced / non-content uses)
