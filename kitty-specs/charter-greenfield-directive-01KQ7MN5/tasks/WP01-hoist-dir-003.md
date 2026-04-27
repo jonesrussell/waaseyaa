@@ -308,3 +308,4 @@ spec-kitty agent action implement WP01 --agent <agent-name>
 ## Activity Log
 
 - 2026-04-27T14:39:46Z – claude:sonnet-4-6:implementer:implementer – shell_pid=7560 – Assigned agent via action command
+- 2026-04-27T14:45:59Z – claude:sonnet-4-6:implementer:implementer – shell_pid=7560 – Ready for review — DIR-003 hoisted, sync idempotent, compact context verified for specify/plan/tasks actions
