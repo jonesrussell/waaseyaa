@@ -27,8 +27,8 @@ subtasks:
 - T004
 - T005
 - T006
-shell_pid: "7560"
-agent: "claude:sonnet-4-6:implementer:implementer"
+shell_pid: "30240"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-04-27'
   note: Generated from spec.md + plan.md + research.md + quickstart.md.
@@ -309,3 +309,4 @@ spec-kitty agent action implement WP01 --agent <agent-name>
 
 - 2026-04-27T14:39:46Z – claude:sonnet-4-6:implementer:implementer – shell_pid=7560 – Assigned agent via action command
 - 2026-04-27T14:45:59Z – claude:sonnet-4-6:implementer:implementer – shell_pid=7560 – Ready for review — DIR-003 hoisted, sync idempotent, compact context verified for specify/plan/tasks actions
+- 2026-04-27T14:46:28Z – claude:opus-4-7:reviewer:reviewer – shell_pid=30240 – Started review via action command
