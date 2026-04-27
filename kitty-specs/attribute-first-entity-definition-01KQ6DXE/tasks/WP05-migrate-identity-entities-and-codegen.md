@@ -15,6 +15,8 @@ subtasks:
 - T026
 - T027
 - T028
+agent: "claude:opus-4-7:implementer:implementer"
+shell_pid: "37476"
 history:
 - date: '2026-04-27'
   note: Initial generation by /spec-kitty.tasks.
@@ -167,3 +169,7 @@ Read these:
 ```
 spec-kitty agent action implement WP05 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-04-27T04:30:30Z – claude:opus-4-7:implementer:implementer – shell_pid=37476 – Started implementation via action command
