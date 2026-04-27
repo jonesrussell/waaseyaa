@@ -32,10 +32,10 @@
 | T022 | Implement `AttachmentRepository` with `listFor`, `getActive`, `save`, `delete` methods backed by `EntityRepositoryInterface` + `DatabaseInterface` | WP05 | — | [D] |
 | T023 | Implement `AttachmentRepository::setActive()` using direct `DatabaseInterface::transaction()` with two UPDATE statements per research.md Q6 | WP05 | — | [D] |
 | T024 | Wire `AttachmentRepository` and entity-type registration in `packages/attachment/src/ServiceProvider.php`; unit-test `AttachmentRepository` against SQLite | WP05 | — | [D] |
-| T025 | Implement `ParentDelegatedAccessPolicy` in `packages/attachment/src/Policy/ParentDelegatedAccessPolicy.php` with `#[PolicyAttribute(entityType: 'attachment')]` | WP06 | — |
-| T026 | Unit-test `ParentDelegatedAccessPolicy`: view delegates to parent, update delegates to parent, returns Neutral if parent missing | WP06 | — |
-| T027 | Concurrency test: 50 concurrent `setActive` calls against the same parent leave exactly one active attachment (NFR-010) | WP06 | — |
-| T028 | Add to `packages/attachment/tests/Integration/`: `setActive` invariant, parent-delegated access end-to-end | WP06 | — |
+| T025 | Implement `ParentDelegatedAccessPolicy` in `packages/attachment/src/Policy/ParentDelegatedAccessPolicy.php` with `#[PolicyAttribute(entityType: 'attachment')]` | WP06 | — | [D] |
+| T026 | Unit-test `ParentDelegatedAccessPolicy`: view delegates to parent, update delegates to parent, returns Neutral if parent missing | WP06 | — | [D] |
+| T027 | Concurrency test: 50 concurrent `setActive` calls against the same parent leave exactly one active attachment (NFR-010) | WP06 | — | [D] |
+| T028 | Add to `packages/attachment/tests/Integration/`: `setActive` invariant, parent-delegated access end-to-end | WP06 | — | [D] |
 | T029 | Implement `FieldAutoSaveController::update()` in `packages/api/src/Controller/FieldAutoSaveController.php` (load entity, validate field key against registry, run access policies, persist via `EntityRepository`, return JSON:API-shaped response) | WP07 | — |
 | T030 | Implement body-size guard producing 422 without buffering full payload (NFR-002) and content-type negotiation producing 415 for non-`application/json` requests | WP07 | — |
 | T031 | Edit `packages/api/src/JsonApiRouteProvider.php` to register `PUT {basePath}/{entityType}/{id}/field/{key}` for every entity type via the existing iteration loop | WP07 | — |
@@ -229,10 +229,10 @@
 3. Under 50 concurrent `setActive` calls against the same parent, exactly one row has `is_active = true` post-test.
 
 **Included subtasks**:
-- [ ] T025 Implement `ParentDelegatedAccessPolicy` (WP06)
-- [ ] T026 Unit-test policy: view/update delegation, missing parent (WP06)
-- [ ] T027 Concurrency test for `setActive` invariant (NFR-010) (WP06)
-- [ ] T028 Integration tests for parent-delegated access + setActive end-to-end (WP06)
+- [x] T025 Implement `ParentDelegatedAccessPolicy` (WP06)
+- [x] T026 Unit-test policy: view/update delegation, missing parent (WP06)
+- [x] T027 Concurrency test for `setActive` invariant (NFR-010) (WP06)
+- [x] T028 Integration tests for parent-delegated access + setActive end-to-end (WP06)
 
 **Implementation sketch**: see WP06 prompt.
 
