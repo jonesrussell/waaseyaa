@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9337be098f3df90436310ae43e969ef9",
+    "content-hash": "bcaa15c940aae8fbf286f75939e5aac0",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -4065,6 +4065,51 @@
             }
         },
         {
+            "name": "waaseyaa/attachment",
+            "version": "dev-kitty/mission-single-entity-work-surface-01KQ7M1P-lane-a",
+            "dist": {
+                "type": "path",
+                "url": "packages/attachment",
+                "reference": "0c7f9203e8bec1b8295adae08bb82f6b389a04ee"
+            },
+            "require": {
+                "php": "^8.4",
+                "waaseyaa/access": "@dev",
+                "waaseyaa/database-legacy": "@dev",
+                "waaseyaa/entity": "@dev",
+                "waaseyaa/entity-storage": "@dev",
+                "waaseyaa/foundation": "@dev"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "waaseyaa": {
+                    "providers": [
+                        "Waaseyaa\\Attachment\\AttachmentServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waaseyaa\\Attachment\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Waaseyaa\\Attachment\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Attachment content type with parent-entity reference and at-most-one-active invariant.",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
             "name": "waaseyaa/auth",
             "version": "dev-main",
             "dist": {
@@ -4501,7 +4546,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/entity",
-                "reference": "1a59a58fecb68d20176ece5298ff088ada8c2aeb"
+                "reference": "38c7fd978e89644219de6dfa94ecc3fbe7d88044"
             },
             "require": {
                 "php": ">=8.4",
@@ -4516,6 +4561,7 @@
                 "waaseyaa/validation": "^0.1.0-alpha.150"
             },
             "require-dev": {
+                "phpstan/phpstan": "^2.0",
                 "phpunit/phpunit": "^10.5"
             },
             "suggest": {
@@ -4637,10 +4683,11 @@
             "dist": {
                 "type": "path",
                 "url": "packages/field",
-                "reference": "7993e65c6fbe7800d65944ce2ecb38d93b641ee3"
+                "reference": "154de78dc7764aa9f7e786b91e959baaad255567"
             },
             "require": {
                 "php": ">=8.4",
+                "waaseyaa/access": "^0.1.0-alpha.150",
                 "waaseyaa/entity": "^0.1.0-alpha.150",
                 "waaseyaa/plugin": "^0.1.0-alpha.150",
                 "waaseyaa/typed-data": "^0.1.0-alpha.150"
@@ -4653,6 +4700,11 @@
                 "branch-alias": {
                     "dev-main": "0.1.x-dev",
                     "dev-develop/v1.1": "0.1.x-dev"
+                },
+                "waaseyaa": {
+                    "providers": [
+                        "Waaseyaa\\Field\\FieldServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -5651,7 +5703,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/oidc",
-                "reference": "76634c5013add5895352ef0f0bf72438bd20af84"
+                "reference": "6aa71356a26ccc95ea745a9d4103d01e2c6eb71f"
             },
             "require": {
                 "lcobucci/jwt": "^5.3",
@@ -5668,6 +5720,7 @@
             "extra": {
                 "waaseyaa": {
                     "layer": 6,
+                    "migrations": "migrations",
                     "providers": [
                         "Waaseyaa\\Oidc\\OidcServiceProvider"
                     ]
@@ -6156,6 +6209,48 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Key-value state storage for Waaseyaa",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "waaseyaa/structured-import",
+            "version": "dev-kitty/mission-single-entity-work-surface-01KQ7M1P-lane-a",
+            "dist": {
+                "type": "path",
+                "url": "packages/structured-import",
+                "reference": "847732407b04afe9b97a0b621ced0512052ac7ce"
+            },
+            "require": {
+                "php": "^8.4",
+                "waaseyaa/field": "@dev",
+                "waaseyaa/foundation": "@dev"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "waaseyaa": {
+                    "providers": [
+                        "Waaseyaa\\StructuredImport\\StructuredImportServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waaseyaa\\StructuredImport\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Waaseyaa\\StructuredImport\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Pluggable structured-import pipeline for entity-template ingestion (default: GFM 2-column table).",
             "transport-options": {
                 "relative": true
             }
@@ -10401,6 +10496,7 @@
         "waaseyaa/ai-vector": 20,
         "waaseyaa/analytics": 20,
         "waaseyaa/api": 20,
+        "waaseyaa/attachment": 20,
         "waaseyaa/auth": 20,
         "waaseyaa/billing": 20,
         "waaseyaa/bimaaji": 20,
@@ -10447,6 +10543,7 @@
         "waaseyaa/seo": 20,
         "waaseyaa/ssr": 20,
         "waaseyaa/state": 20,
+        "waaseyaa/structured-import": 20,
         "waaseyaa/taxonomy": 20,
         "waaseyaa/telescope": 20,
         "waaseyaa/testing": 20,

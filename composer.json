@@ -51,6 +51,10 @@
         },
         {
             "type": "path",
+            "url": "packages/attachment"
+        },
+        {
+            "type": "path",
             "url": "packages/user"
         },
         {
@@ -187,6 +191,10 @@
         },
         {
             "type": "path",
+            "url": "packages/structured-import"
+        },
+        {
+            "type": "path",
             "url": "packages/i18n"
         },
         {
@@ -273,14 +281,15 @@
         "symfony/dotenv": "^8.0",
         "symfony/html-sanitizer": "^8.0",
         "waaseyaa/access": "@dev",
-        "waaseyaa/analytics": "@dev",
         "waaseyaa/admin-surface": "@dev",
         "waaseyaa/ai-agent": "@dev",
         "waaseyaa/ai-observability": "@dev",
         "waaseyaa/ai-pipeline": "@dev",
         "waaseyaa/ai-schema": "@dev",
         "waaseyaa/ai-vector": "@dev",
+        "waaseyaa/analytics": "@dev",
         "waaseyaa/api": "@dev",
+        "waaseyaa/attachment": "@dev",
         "waaseyaa/auth": "@dev",
         "waaseyaa/billing": "@dev",
         "waaseyaa/bimaaji": "@dev",
@@ -296,8 +305,8 @@
         "waaseyaa/error-handler": "@dev",
         "waaseyaa/field": "@dev",
         "waaseyaa/foundation": "@dev",
-        "waaseyaa/geo": "@dev",
         "waaseyaa/genealogy": "@dev",
+        "waaseyaa/geo": "@dev",
         "waaseyaa/github": "@dev",
         "waaseyaa/graphql": "@dev",
         "waaseyaa/groups": "@dev",
@@ -327,6 +336,7 @@
         "waaseyaa/seo": "@dev",
         "waaseyaa/ssr": "@dev",
         "waaseyaa/state": "@dev",
+        "waaseyaa/structured-import": "@dev",
         "waaseyaa/taxonomy": "@dev",
         "waaseyaa/telescope": "@dev",
         "waaseyaa/typed-data": "@dev",
@@ -369,6 +379,8 @@
             "Waaseyaa\\ErrorHandler\\Tests\\": "packages/error-handler/tests/",
             "Waaseyaa\\Access\\Tests\\": "packages/access/tests/",
             "Waaseyaa\\Api\\Tests\\": "packages/api/tests/",
+            "Waaseyaa\\Attachment\\Tests\\": "packages/attachment/tests/",
+            "Waaseyaa\\StructuredImport\\Tests\\": "packages/structured-import/tests/",
             "Waaseyaa\\Queue\\Tests\\": "packages/queue/tests/",
             "Waaseyaa\\State\\Tests\\": "packages/state/tests/",
             "Waaseyaa\\Mcp\\Tests\\": "packages/mcp/tests/",

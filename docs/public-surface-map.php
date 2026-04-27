@@ -220,6 +220,9 @@ return [
     'Waaseyaa\OAuthProvider\OAuthProviderInterface' => 'public',
     'Waaseyaa\OAuthProvider\SessionInterface' => 'public',
 
+    // Layer 3: Services — public (single-entity-work-surface-01KQ7M1P)
+    'Waaseyaa\StructuredImport\StructuredImporterInterface' => 'public',
+
     // Layer 6: Interfaces — internal
     'Waaseyaa\Telescope\Storage\TelescopeStoreInterface' => 'internal',
     'Waaseyaa\Telescope\CodifiedContext\Validator\EmbeddingProviderInterface' => 'internal',

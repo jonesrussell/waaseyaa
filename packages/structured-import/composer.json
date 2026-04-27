@@ -1,0 +1,46 @@
+{
+    "name": "waaseyaa/structured-import",
+    "description": "Pluggable structured-import pipeline for entity-template ingestion (default: GFM 2-column table).",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../field"
+        },
+        {
+            "type": "path",
+            "url": "../foundation"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "waaseyaa/field": "@dev",
+        "waaseyaa/foundation": "@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Waaseyaa\\StructuredImport\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Waaseyaa\\StructuredImport\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "waaseyaa": {
+            "providers": [
+                "Waaseyaa\\StructuredImport\\StructuredImportServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

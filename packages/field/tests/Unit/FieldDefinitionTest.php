@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Field\Tests\Unit;
 
+use PHPUnit\Framework\TestCase;
 use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\TypedData\DataDefinitionInterface;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers \Waaseyaa\Field\FieldDefinition
@@ -112,6 +112,52 @@ class FieldDefinitionTest extends TestCase
         $definition = new FieldDefinition(name: 'title', type: 'string');
 
         $this->assertSame('string', $definition->getDataType());
+    }
+
+    // group and promptAliases tests
+
+    public function testGetGroupReturnsSuppliedValue(): void
+    {
+        $definition = new FieldDefinition(name: 'title', type: 'string', group: 'about');
+
+        $this->assertSame('about', $definition->getGroup());
+    }
+
+    public function testGetGroupReturnsEmptyStringByDefault(): void
+    {
+        $definition = new FieldDefinition(name: 'title', type: 'string');
+
+        $this->assertSame('', $definition->getGroup());
+    }
+
+    public function testGetPromptAliasesReturnsSuppliedList(): void
+    {
+        $definition = new FieldDefinition(name: 'title', type: 'string', promptAliases: ['heading', 'Title', 'name']);
+
+        $this->assertSame(['heading', 'Title', 'name'], $definition->getPromptAliases());
+    }
+
+    public function testGetPromptAliasesReturnsEmptyArrayByDefault(): void
+    {
+        $definition = new FieldDefinition(name: 'title', type: 'string');
+
+        $this->assertSame([], $definition->getPromptAliases());
+    }
+
+    public function testInterfaceEnforcesGroupAndPromptAliasesMethods(): void
+    {
+        $definition = new FieldDefinition(
+            name: 'bio',
+            type: 'text',
+            group: 'personal',
+            promptAliases: ['biography', 'bio'],
+        );
+
+        /** @var FieldDefinitionInterface $iface */
+        $iface = $definition;
+
+        $this->assertSame('personal', $iface->getGroup());
+        $this->assertSame(['biography', 'bio'], $iface->getPromptAliases());
     }
 
     // JSON Schema tests

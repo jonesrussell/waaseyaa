@@ -12,13 +12,14 @@ use Waaseyaa\Routing\WaaseyaaRouter;
  * Automatically registers JSON:API routes for all known entity types.
  *
  * For each entity type registered with the EntityTypeManager, this provider
- * creates five routes:
+ * creates five CRUD routes plus one field auto-save route:
  *
- *   GET    /api/{entityType}       — collection (index)
- *   GET    /api/{entityType}/{id}  — single resource (show)
- *   POST   /api/{entityType}       — create (store)
- *   PATCH  /api/{entityType}/{id}  — update
- *   DELETE /api/{entityType}/{id}  — delete
+ *   GET    /api/{entityType}                    — collection (index)
+ *   GET    /api/{entityType}/{id}               — single resource (show)
+ *   POST   /api/{entityType}                    — create (store)
+ *   PATCH  /api/{entityType}/{id}               — update
+ *   DELETE /api/{entityType}/{id}               — delete
+ *   PUT    /api/{entityType}/{id}/field/{key}   — per-field auto-save (F3)
  */
 final class JsonApiRouteProvider
 {
@@ -44,6 +45,7 @@ final class JsonApiRouteProvider
 
         foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $definition) {
             $this->registerEntityTypeRoutes($router, $entityTypeId);
+            $this->registerFieldAutoSave($router, $entityTypeId);
         }
     }
 
@@ -105,6 +107,26 @@ final class JsonApiRouteProvider
             RouteBuilder::create($resourcePath)
                 ->controller('Waaseyaa\\Api\\JsonApiController::destroy')
                 ->methods('DELETE')
+                ->requireAuthentication()
+                ->default('_entity_type', $entityTypeId)
+                ->build(),
+        );
+    }
+
+    /**
+     * Register the per-field auto-save route for a single entity type (F3).
+     *
+     * PUT /api/{entityType}/{id}/field/{key}
+     */
+    private function registerFieldAutoSave(WaaseyaaRouter $router, string $entityTypeId): void
+    {
+        $fieldPath = $this->basePath . '/' . $entityTypeId . '/{id}/field/{key}';
+
+        $router->addRoute(
+            "api.{$entityTypeId}.field_autosave",
+            RouteBuilder::create($fieldPath)
+                ->controller('Waaseyaa\\Api\\Controller\\FieldAutoSaveController::update')
+                ->methods('PUT')
                 ->requireAuthentication()
                 ->default('_entity_type', $entityTypeId)
                 ->build(),

@@ -1,0 +1,157 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Api\Controller;
+
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\EntityAccessHandler;
+use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
+
+/**
+ * Per-field auto-save endpoint.
+ *
+ * PUT {api_segment}/{entityType}/{id}/field/{key}
+ * Content-Type: application/json
+ *
+ * {"value": "<string>"}
+ *
+ * Status codes per contracts/README.md F3:
+ *   200 — success
+ *   401 — not authenticated
+ *   403 — entity-level or field-level access denied
+ *   404 — entity not found, entity type unknown, or field key not registered
+ *   415 — wrong Content-Type
+ *   422 — body too large, malformed JSON, or missing/non-string value
+ *
+ * Body-size guard (NFR-002): Content-Length header is checked before the full
+ * body is read. When Content-Length is absent (e.g. chunked transfer), the
+ * guard falls through to post-read validation — callers in production should
+ * always send Content-Length for early rejection.
+ */
+final class FieldAutoSaveController
+{
+    public function __construct(
+        private readonly EntityTypeManagerInterface $entityTypeManager,
+        private readonly EntityAccessHandler $accessHandler,
+        private readonly FieldDefinitionRegistryInterface $fieldRegistry,
+        private readonly int $maxBodyBytes = 65536,
+    ) {}
+
+    public function update(Request $request, string $entityType, string $id, string $key): Response
+    {
+        // 1. Content-type negotiation (415).
+        if (!$this->isJsonContentType($request)) {
+            return $this->error(415, 'unsupported_media_type', 'Content-Type must be application/json');
+        }
+
+        // 2. Body size guard before full read (NFR-002).
+        //    Trust Content-Length for fast short-circuit; fall through when absent.
+        $contentLengthHeader = $request->headers->get('Content-Length');
+        if ($contentLengthHeader !== null) {
+            $contentLength = (int) $contentLengthHeader;
+            if ($contentLength > $this->maxBodyBytes) {
+                return $this->error(
+                    422,
+                    'payload_too_large',
+                    "Body exceeds maximum {$this->maxBodyBytes} bytes",
+                );
+            }
+        }
+
+        // 3. Parse body (422 on malformed or oversize after read).
+        $rawBody = $request->getContent();
+        if (strlen($rawBody) > $this->maxBodyBytes) {
+            return $this->error(
+                422,
+                'payload_too_large',
+                "Body exceeds maximum {$this->maxBodyBytes} bytes",
+            );
+        }
+
+        try {
+            $body = json_decode($rawBody, true, 16, JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return $this->error(422, 'malformed_json', 'Body is not valid JSON');
+        }
+
+        if (!is_array($body) || !array_key_exists('value', $body) || !is_string($body['value'])) {
+            return $this->error(422, 'malformed_body', 'Body must be {"value": "<string>"}');
+        }
+
+        // 4. Load entity type and entity (404 if missing).
+        if (!$this->entityTypeManager->hasDefinition($entityType)) {
+            return $this->error(404, 'entity_type_not_found', "Unknown entity type '{$entityType}'");
+        }
+
+        $storage = $this->entityTypeManager->getStorage($entityType);
+        $entity = $storage->load($id);
+        if ($entity === null) {
+            return $this->error(404, 'entity_not_found', "Entity '{$entityType}/{$id}' not found");
+        }
+
+        // 5. Validate field key against bundle fields (404 if not registered).
+        //    Bundle resolved from the loaded entity, not from the URL.
+        $bundle = $entity->bundle();
+        $coreFields = $this->fieldRegistry->coreFieldsFor($entityType);
+        $bundleFields = $this->fieldRegistry->bundleFieldsFor($entityType, $bundle);
+        $allFields = $coreFields + $bundleFields;
+        if (!isset($allFields[$key])) {
+            return $this->error(
+                404,
+                'field_not_registered',
+                "Field '{$key}' not registered for {$entityType}:{$bundle}",
+            );
+        }
+
+        // 6. Account from request (set by SessionMiddleware as '_account').
+        $account = $request->attributes->get('_account');
+        if (!$account instanceof AccountInterface) {
+            return $this->error(401, 'unauthenticated', 'Authentication required');
+        }
+
+        // 7. Entity-level access (403). Entity policy uses isAllowed() — deny on Neutral.
+        $entityAccess = $this->accessHandler->check($entity, 'update', $account);
+        if (!$entityAccess->isAllowed()) {
+            return $this->error(403, 'forbidden', "Update denied for {$entityType}/{$id}");
+        }
+
+        // 8. Field-level access (403). Field policy uses isForbidden() — allow on Neutral.
+        $fieldAccess = $this->accessHandler->checkFieldAccess($entity, $key, 'edit', $account);
+        if ($fieldAccess->isForbidden()) {
+            return $this->error(403, 'field_forbidden', "Update denied for field '{$key}'");
+        }
+
+        // 9. Persist.
+        $entity->set($key, $body['value']);
+        $storage->save($entity);
+
+        // 10. 200 response per contracts/README.md F3.
+        return new JsonResponse([
+            'data' => [
+                'id' => (string) $entity->id(),
+                'type' => $entityType,
+                'attributes' => [$key => $entity->get($key)],
+            ],
+        ]);
+    }
+
+    private function isJsonContentType(Request $request): bool
+    {
+        $type = strtolower((string) $request->headers->get('Content-Type', ''));
+
+        return str_starts_with($type, 'application/json');
+    }
+
+    private function error(int $status, string $code, string $title): JsonResponse
+    {
+        return new JsonResponse(
+            ['errors' => [['status' => (string) $status, 'code' => $code, 'title' => $title]]],
+            $status,
+        );
+    }
+}

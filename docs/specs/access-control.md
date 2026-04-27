@@ -619,3 +619,47 @@ packages/user/src/
 
 public/index.php                     - Front controller; wires the pipeline
 ```
+
+---
+
+## Parent-Delegated Policies
+
+Added in mission `single-entity-work-surface-01KQ7M1P`. A **parent-delegated access policy** delegates access decisions for a child entity to the policy registered for its parent entity.
+
+### Pattern
+
+```php
+#[PolicyAttribute('attachment')]
+final class ParentDelegatedAccessPolicy implements AccessPolicyInterface
+{
+    public function access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResult
+    {
+        $parentType = (string) $entity->get('parent_entity_type');
+        $parentId = (string) $entity->get('parent_entity_id');
+
+        if ($parentType === '' || $parentId === '') {
+            return AccessResult::neutral('Attachment has no parent entity reference.');
+        }
+
+        $parent = $this->entityTypeManager->getStorage($parentType)->load($parentId);
+        if ($parent === null) {
+            return AccessResult::neutral('Parent entity not found.');
+        }
+
+        return $this->accessHandler->check($parent, $operation, $account);
+    }
+}
+```
+
+### Semantics
+
+- `AccessResult::neutral()` (not `forbidden()`) is returned when the parent cannot be resolved. Under entity-level `isAllowed()` semantics, neutral effectively denies access without encoding an explicit Forbidden decision. This is intentional — orphaned child entities must not silently become accessible.
+- `createAccess()` is not delegated by this policy — create access for child entities is governed at the API layer (e.g., require `update` on the parent before allowing attachment creation).
+- The policy auto-discovers its entity type via `#[PolicyAttribute('attachment')]`.
+
+### Canonical implementation
+
+`Waaseyaa\Attachment\Policy\ParentDelegatedAccessPolicy` in `packages/attachment/src/Policy/`.
+
+→ See `docs/specs/work-surface.md` F4 for the attachment wire-up.
+→ See `docs/specs/field-access.md` for field-level access semantics (open-by-default).

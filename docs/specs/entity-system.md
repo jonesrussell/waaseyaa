@@ -1543,3 +1543,36 @@ final class FieldType extends WaaseyaaPlugin
 ### Test fixtures
 - `packages/api/tests/Fixtures/InMemoryEntityStorage.php` -- implements EntityStorageInterface for tests
 - `packages/entity-storage/tests/Fixtures/LifecycleTrackingEntity.php` -- extends `TestStorageEntity`, records lifecycle hook calls (`preSave`, `postSave`, `preDelete`, `postDelete`) into a public `$hookLog` array for verification in tests
+
+---
+
+## Field templates and the bundle registry
+
+Bundle-scoped field definitions can be declared declaratively using PHP attributes on template classes, then compiled into the `FieldDefinitionRegistry` at boot time.
+
+### Attributes
+
+**`#[BundleTemplate(entityType: string, bundle: string)]`** (class-level) — marks a class as a template for the given `(entityType, bundle)` pair.
+
+**`#[FieldTemplate(key: string, type: string, label?: string, group?: string, promptAliases?: list<string>, required?: bool, readOnly?: bool)]`** (property or method) — declares one field. Properties are processed before methods, both in declaration order.
+
+### FieldDefinition extensions (mission `single-entity-work-surface-01KQ7M1P`)
+
+`FieldDefinition` gained two trailing optional constructor parameters:
+- `string $group = ''` — logical grouping key (e.g. `'identity'`, `'about'`). Consumed by `FormDescriptorBuilder` to emit `FormFieldDescriptor::$group`.
+- `array $promptAliases = []` — normalized synonyms for AI / structured-import matching. Consumed by `GfmTableImporter`. Uniqueness (normalized UTF-8 lowercase + whitespace collapse) is enforced at compile time.
+
+`FieldDefinitionInterface` correspondingly gained `getGroup(): string` and `getPromptAliases(): array`.
+
+### BundleTemplateCompiler
+
+`Waaseyaa\Field\BundleTemplateCompiler` accepts an explicit list of class names and registers the resulting `FieldDefinition` objects with `FieldDefinitionRegistry::registerBundleFields()`. Compilation is idempotent — subsequent calls are no-ops.
+
+```php
+$compiler = new BundleTemplateCompiler($fieldDefinitionRegistry);
+$compiler->compile([ProfileTemplate::class, ArticleTemplate::class]);
+```
+
+Duplicate field keys or duplicate normalized prompt aliases within the same bundle throw `\InvalidArgumentException`.
+
+→ See `docs/specs/work-surface.md` F2 for usage and `docs/specs/bundle-scoped-fields.md` for the full bundle-scoped field contract.

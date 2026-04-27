@@ -1,0 +1,61 @@
+{
+    "name": "waaseyaa/attachment",
+    "description": "Attachment content type with parent-entity reference and at-most-one-active invariant.",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../access"
+        },
+        {
+            "type": "path",
+            "url": "../database-legacy"
+        },
+        {
+            "type": "path",
+            "url": "../entity"
+        },
+        {
+            "type": "path",
+            "url": "../entity-storage"
+        },
+        {
+            "type": "path",
+            "url": "../foundation"
+        }
+    ],
+    "require": {
+        "php": "^8.4",
+        "waaseyaa/access": "@dev",
+        "waaseyaa/database-legacy": "@dev",
+        "waaseyaa/entity": "@dev",
+        "waaseyaa/entity-storage": "@dev",
+        "waaseyaa/foundation": "@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Waaseyaa\\Attachment\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Waaseyaa\\Attachment\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "waaseyaa": {
+            "providers": [
+                "Waaseyaa\\Attachment\\AttachmentServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

@@ -6,6 +6,10 @@
     "repositories": [
         {
             "type": "path",
+            "url": "../access"
+        },
+        {
+            "type": "path",
             "url": "../entity"
         },
         {
@@ -27,6 +31,7 @@
     ],
     "require": {
         "php": ">=8.4",
+        "waaseyaa/access": "^0.1.0-alpha.150",
         "waaseyaa/entity": "^0.1.0-alpha.150",
         "waaseyaa/plugin": "^0.1.0-alpha.150",
         "waaseyaa/typed-data": "^0.1.0-alpha.150"
@@ -50,6 +55,11 @@
         "branch-alias": {
             "dev-main": "0.1.x-dev",
             "dev-develop/v1.1": "0.1.x-dev"
+        },
+        "waaseyaa": {
+            "providers": [
+                "Waaseyaa\\Field\\FieldServiceProvider"
+            ]
         }
     },
     "config": {

@@ -1,0 +1,251 @@
+# Work Surface
+
+## Overview
+
+The **Single-Entity Work Surface** is a set of six framework primitives that downstream applications use to build per-entity editing workspaces. Each primitive is independent and composable; they do not require each other at runtime.
+
+| # | Primitive | Package | Layer |
+|---|---|---|---|
+| F1 | Deep-link route builder | `waaseyaa/routing` | L4 |
+| F2 | Bundle template compiler | `waaseyaa/field` | L1 |
+| F3 | Per-field auto-save endpoint | `waaseyaa/api` | L4 |
+| F4 | Attachment repository | `waaseyaa/attachment` | L2 |
+| F5 | Structured importer | `waaseyaa/structured-import` | L3 |
+| F6 | Form descriptor builder | `waaseyaa/field` | L1 |
+
+For a hands-on walkthrough see `kitty-specs/single-entity-work-surface-01KQ7M1P/quickstart.md`.
+
+---
+
+## F1 — EntityDeepLinkRouteBuilder
+
+Produces a Symfony `Route` at `{segment}/{entityType}/{id}` wired for entity upcasting.
+
+```php
+use Waaseyaa\Routing\EntityDeepLinkRouteBuilder;
+
+$route = EntityDeepLinkRouteBuilder::for('/edit', 'node')
+    ->controller(NodeEditController::class . '::view')
+    ->requireAuthentication()
+    ->build();
+// Path: GET /edit/node/{id}
+// options.parameters.id.type = 'entity:node'
+```
+
+**Key contract**: the `id` parameter option carries `type: 'entity:node'` for upcasting by `EntityParamConverter`. The builder delegates to `RouteBuilder::create()` so all `RouteBuilder` options are chainable after `->controller(...)`.
+
+→ See `docs/specs/api-layer.md` for the full route catalog.
+
+---
+
+## F2 — BundleTemplate / FieldTemplate + BundleTemplateCompiler
+
+Declare bundle-scoped field definitions directly on PHP classes using attributes.
+
+```php
+use Waaseyaa\Field\Attribute\BundleTemplate;
+use Waaseyaa\Field\Attribute\FieldTemplate;
+
+#[BundleTemplate(entityType: 'node', bundle: 'profile')]
+final class ProfileTemplate
+{
+    #[FieldTemplate(key: 'name', type: 'string', label: 'Display Name',
+        group: 'identity', promptAliases: ['name', 'display name'], required: true)]
+    public string $name = '';
+
+    #[FieldTemplate(key: 'bio', type: 'text', label: 'Biography', group: 'about',
+        promptAliases: ['bio', 'biography'])]
+    public string $bio = '';
+}
+```
+
+**Compile at boot**:
+
+```php
+use Waaseyaa\Field\BundleTemplateCompiler;
+
+$compiler = new BundleTemplateCompiler($fieldDefinitionRegistry);
+$compiler->compile([ProfileTemplate::class]); // idempotent
+```
+
+**Uniqueness invariants**: duplicate field key or normalized prompt alias within a bundle throws `\InvalidArgumentException`. Normalization is UTF-8 lowercase + whitespace collapse — no transliteration.
+
+→ See `docs/specs/entity-system.md` § "Field templates and the bundle registry".
+
+---
+
+## F3 — FieldAutoSaveController
+
+Per-field PUT endpoint registered under `PUT /api/{entityType}/{id}/field/{key}`.
+
+```
+Content-Type: application/json
+{"value": "<string>"}
+```
+
+**Status codes** (per contracts/README.md F3):
+
+| Code | Condition |
+|------|-----------|
+| 200 | Field saved |
+| 401 | No `_account` on request |
+| 403 | Entity-level or field-level access denied |
+| 404 | Unknown entity type, entity not found, or field not registered |
+| 415 | Content-Type is not `application/json` |
+| 422 | Body too large (> 65 536 bytes), malformed JSON, or missing `value` key |
+
+**Constructor**:
+```php
+new FieldAutoSaveController(
+    entityTypeManager: $entityTypeManager,
+    accessHandler: $accessHandler,
+    fieldRegistry: $fieldRegistry,
+    maxBodyBytes: 65536,  // optional, default 65 536
+)
+```
+
+**Performance budget (NFR-001)**: p95 ≤ 50 ms under typical load.
+
+→ See `docs/specs/api-layer.md` for route wiring.
+
+---
+
+## F4 — Attachment + AttachmentRepository
+
+`Attachment` is a Layer-2 content entity linked to a parent entity. `AttachmentRepository` enforces the **at-most-one-active invariant** via a two-UPDATE transaction.
+
+```php
+// Save three attachments.
+foreach (range(1, 3) as $i) {
+    $a = new Attachment(['parent_entity_type' => 'node',
+        'parent_entity_id' => $nodeId, 'filename' => "file{$i}.pdf"]);
+    $a->enforceIsNew();
+    $repo->save($a);
+}
+
+// Atomically promote second attachment; all siblings cleared.
+$repo->setActive($id2);
+
+// Returns the single active attachment, or null.
+$active = $repo->getActive('node', $nodeId);
+```
+
+**Access**: `ParentDelegatedAccessPolicy` delegates view/update/delete decisions to the parent entity's registered policy. Orphaned attachments (no parent) return `AccessResult::neutral()` which denies under entity-level `isAllowed()` semantics.
+
+→ See `docs/specs/access-control.md` § "Parent-delegated policies".
+
+---
+
+## F5 — StructuredImporterInterface / GfmTableImporter
+
+Parse structured text (currently GFM 2-column tables) into matched/unmatched field values using the field registry's prompt aliases.
+
+```php
+use Waaseyaa\StructuredImport\Gfm\GfmTableImporter;
+use Waaseyaa\StructuredImport\Gfm\GfmTableParser;
+use Waaseyaa\StructuredImport\Gfm\PromptNormalizer;
+
+$importer = new GfmTableImporter($fieldRegistry, new GfmTableParser(), new PromptNormalizer());
+
+$result = $importer->import($payload, 'node', 'profile');
+// $result->matched   — array<field-key, raw-value>
+// $result->unmatched — list<UnmatchedRow{prompt, value}>
+// $result->errors    — list<string> (parser errors)
+```
+
+**Matching rules**: field name is an implicit alias; declared `promptAliases` take precedence. Normalization is UTF-8 lowercase + whitespace collapse (no transliteration — C-012). `bundle` defaults to `entityTypeId` when `null`.
+
+**Performance budget (NFR-004)**: peak memory ≤ 2× payload size.
+
+---
+
+## F6 — FormDescriptorBuilder
+
+Produces an ordered list of `FormFieldDescriptor` value objects for a bundle. No HTML, no rendering — pure value objects for the template or SPA layer.
+
+```php
+use Waaseyaa\Field\Form\FormDescriptorBuilder;
+
+$builder = new FormDescriptorBuilder(
+    registry: $fieldRegistry,
+    accessHandler: $accessHandler,  // optional
+);
+
+$descriptors = $builder->build($entity, 'profile', $account); // account optional
+```
+
+Each `FormFieldDescriptor` carries: `name`, `type`, `label`, `group`, `value` (raw from `EntityInterface::get()`), `readOnly`, `required`, `errors`.
+
+When `accessHandler` + `account` are both provided, fields whose `update` access returns `Forbidden` are upgraded to `readOnly = true` (open-by-default field semantics — Neutral leaves the field editable).
+
+**Performance budget (NFR-003)**: compiler ≤ 5 ms for ≤ 100 fields.
+
+---
+
+## Wire-up Reference
+
+Minimum wire-up for all six primitives in a service provider `boot()`:
+
+```php
+// F2: compile bundle templates
+$compiler = new BundleTemplateCompiler($this->resolve(FieldDefinitionRegistryInterface::class));
+$compiler->compile([ProfileTemplate::class]);
+
+// F1: register deep-link routes
+$router = $this->resolve(WaaseyaaRouter::class);
+$router->addRoute('edit.node', EntityDeepLinkRouteBuilder::for('/edit', 'node')
+    ->controller(NodeEditController::class . '::view')
+    ->requireAuthentication()
+    ->build());
+
+// F3: route already registered by FieldServiceProvider via api package conventions
+//     PUT /api/{entityType}/{id}/field/{key} → FieldAutoSaveController::update
+
+// F4: attachment repo injected from container (AttachmentServiceProvider registers it)
+
+// F5: importer injected from container (StructuredImportServiceProvider registers it)
+
+// F6: builder injected from container or constructed inline
+$builder = new FormDescriptorBuilder($this->resolve(FieldDefinitionRegistryInterface::class));
+```
+
+---
+
+## Security
+
+### Parent-delegated policy semantics
+
+`ParentDelegatedAccessPolicy` returns `AccessResult::neutral()` (not `forbidden()`) when the parent cannot be found. Under entity-level access semantics (`isAllowed()` — deny unless granted), neutral effectively denies without encoding an explicit decision. This prevents orphaned attachments from becoming publicly accessible.
+
+### Body size cap (NFR-002)
+
+`FieldAutoSaveController` enforces a 65 536-byte cap on the request body:
+1. `Content-Length` header is checked first (fast path — no body read).
+2. After `getContent()`, the raw body size is re-checked.
+
+Chunked transfer without `Content-Length` falls through to step 2.
+
+---
+
+## Performance Budgets
+
+| Ref | Primitive | Budget |
+|-----|-----------|--------|
+| NFR-001 | FieldAutoSaveController::update() | p95 ≤ 50 ms |
+| NFR-003 | BundleTemplateCompiler::compile() | ≤ 5 ms for ≤ 100 fields |
+| NFR-004 | GfmTableImporter::import() | peak memory ≤ 2× payload |
+
+---
+
+## Cross-references
+
+- `docs/specs/entity-system.md` — field templates and bundle registry
+- `docs/specs/api-layer.md` — F3 route catalog entry; status code matrix
+- `docs/specs/access-control.md` — parent-delegated policy pattern
+- `docs/specs/field-access.md` — field-level access semantics (open-by-default)
+
+---
+
+> **DIR-003**: No compatibility shims, no `@deprecated` annotations, no `Legacy*` classes.
+> Downstream callers that relied on any removed API must update in-place.
+> See `.kittify/charter/charter.md` § DIR-003 (Greenfield Removal Policy).

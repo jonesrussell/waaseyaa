@@ -1,5 +1,42 @@
 # Upgrading
 
+## Unreleased
+
+### `FieldDefinition` constructor parameters added (Waaseyaa\Field)
+
+`Waaseyaa\Field\FieldDefinition::__construct` gained two trailing optional
+parameters: `string $group = ''` and `array $promptAliases = []`.
+
+- **Named-argument call sites** (recommended idiom) continue to work unchanged.
+  No action required.
+- **Positional call sites that pass `$fieldTypeManager` as the last argument**
+  continue to work unchanged.
+- **Positional call sites that pass arguments after `$fieldTypeManager`** —
+  none should exist before this release because no such positional slots
+  existed. If you have such call sites, switch to named arguments:
+
+  ```php
+  // Before:
+  new FieldDefinition('title', 'string', 1, [], '', null, false, false, null, 'Title');
+
+  // After (recommended — works regardless of constructor evolution):
+  new FieldDefinition(
+      name: 'title',
+      type: 'string',
+      label: 'Title',
+  );
+  ```
+
+`getGroup(): string` and `getPromptAliases(): array` were added to
+`FieldDefinitionInterface`. Custom implementations of the interface must
+implement these two methods.
+
+Reason: support for bundle-keyed field templates (mission
+`single-entity-work-surface-01KQ7M1P`) requires per-field grouping and
+alias metadata as first-class properties of the field definition. Per
+`DIR-003`, no compatibility shim is provided — implementers update in
+the same release.
+
 ## 2026-04-27 - Attribute-first entity definition (M1)
 
 The `EntityType` constructor no longer accepts `fieldDefinitions:`. The entity class itself is the source of truth for field shape — declare fields with `#[Waaseyaa\Entity\Attribute\Field]` on typed PHP properties and register the type via `EntityType::fromClass()`. The class-level `#[ContentEntityType]` attribute also gained `label:` and `description:` parameters so the human-facing strings live next to the id.

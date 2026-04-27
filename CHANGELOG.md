@@ -8,6 +8,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] — Attribute-first entity definition (M1)
 
 ### Added
+
+- **Single-Entity Work Surface** — six new primitives for downstream apps building per-entity editing workspaces. Full subsystem doc: `docs/specs/work-surface.md`. Mission: `single-entity-work-surface-01KQ7M1P`.
+  - `Waaseyaa\Routing\EntityDeepLinkRouteBuilder` — deep-link route helper producing `GET /{segment}/{entityType}/{id}` with entity upcasting wired via `EntityParamConverter`.
+  - `Waaseyaa\Field\Attribute\BundleTemplate` and `Waaseyaa\Field\Attribute\FieldTemplate` — declarative bundle field registration via PHP attributes. Property order = registration order. Uniqueness of field keys and normalized prompt aliases enforced at compile time.
+  - `Waaseyaa\Field\BundleTemplateCompiler` — attribute-driven field discovery → `FieldDefinitionRegistry::registerBundleFields()`. Idempotent.
+  - `PUT /api/{entityType}/{id}/field/{key}` — per-field auto-save endpoint (`FieldAutoSaveController`). Status code matrix: 200/401/403/404/415/422. Body size cap 65 536 bytes (NFR-002).
+  - `Waaseyaa\Field\Form\FormDescriptorBuilder` — schema-driven form descriptor builder. Returns `list<FormFieldDescriptor>` in registry insertion order; no HTML emitted.
+- **`waaseyaa/attachment`** — new package at Layer 2. `Attachment` content entity for files attached to a parent entity. `AttachmentRepository::setActive()` enforces the at-most-one-active invariant via a two-UPDATE transaction. `ParentDelegatedAccessPolicy` delegates view/update/delete decisions to the parent entity's registered policy.
+- **`waaseyaa/structured-import`** — new package at Layer 3. `StructuredImporterInterface` + `GfmTableImporter` (in-house GFM 2-column table parser, no CommonMark dependency). Matches prompts to field keys via `promptAliases`; normalization is UTF-8 lowercase + whitespace collapse (no transliteration — C-012).
+
+### Changed
+
+- **`Waaseyaa\Field\FieldDefinition`** constructor gained two trailing optional parameters: `string $group = ''` and `array $promptAliases = []`. `FieldDefinitionInterface` gained `getGroup(): string` and `getPromptAliases(): array`. Custom `FieldDefinitionInterface` implementations must add the two new methods. See `UPGRADING.md` § "FieldDefinition constructor parameters added". Per `DIR-003`, no compatibility shim is provided. ([single-entity-work-surface-01KQ7M1P](kitty-specs/single-entity-work-surface-01KQ7M1P/spec.md))
+
+---
+
 - Charter directive **DIR-003 (Greenfield Removal Policy)** hoisted from
   a sub-bullet inside DIR-001 into its own top-level directive, so it
   surfaces in compact charter context loaded by every `/spec-kitty.specify`

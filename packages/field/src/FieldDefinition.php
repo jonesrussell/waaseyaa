@@ -29,6 +29,8 @@ final readonly class FieldDefinition implements FieldDefinitionInterface, \Array
         private array $constraints = [],
         private FieldStorage $stored = FieldStorage::Column,
         private ?FieldTypeManager $fieldTypeManager = null,
+        private string $group = '',
+        private array $promptAliases = [],
     ) {}
 
     public function getName(): string
@@ -146,6 +148,17 @@ final readonly class FieldDefinition implements FieldDefinitionInterface, \Array
     public function getLabel(): string
     {
         return $this->label;
+    }
+
+    public function getGroup(): string
+    {
+        return $this->group;
+    }
+
+    /** @return list<string> */
+    public function getPromptAliases(): array
+    {
+        return $this->promptAliases;
     }
 
     public function getDescription(): string

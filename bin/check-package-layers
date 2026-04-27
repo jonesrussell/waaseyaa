@@ -46,6 +46,7 @@ LAYER_BY_SHORT = {
     "testing": 1,
     "oidc": 1,
     # 2 — Content types
+    "attachment": 2,
     "node": 2,
     "taxonomy": 2,
     "media": 2,
@@ -64,6 +65,7 @@ LAYER_BY_SHORT = {
     "billing": 3,
     "github": 3,
     "northcloud": 3,
+    "structured-import": 3,
     # 4 — API
     "api": 4,
     "routing": 4,

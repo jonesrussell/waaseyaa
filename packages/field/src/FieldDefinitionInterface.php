@@ -33,4 +33,18 @@ interface FieldDefinitionInterface extends DataDefinitionInterface
     public function toJsonSchema(): array;
 
     public function getStored(): FieldStorage;
+
+    /**
+     * The optional group key used by the form descriptor builder for grouping fields visually.
+     * Empty string means "no group".
+     */
+    public function getGroup(): string;
+
+    /**
+     * Optional prompt aliases used by the structured-import pipeline for fuzzy-tolerant matching.
+     * Empty list means "match by field name only".
+     *
+     * @return list<string>
+     */
+    public function getPromptAliases(): array;
 }

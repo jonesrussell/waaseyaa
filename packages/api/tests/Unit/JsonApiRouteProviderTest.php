@@ -42,8 +42,8 @@ final class JsonApiRouteProviderTest extends TestCase
 
         $routes = $this->router->getRouteCollection();
 
-        // Five routes per entity type, plus the discovery route.
-        $this->assertCount(6, $routes);
+        // Six routes per entity type (5 CRUD + 1 field auto-save), plus the discovery route.
+        $this->assertCount(7, $routes);
         $this->assertNotNull($routes->get('api.article.index'));
         $this->assertNotNull($routes->get('api.article.show'));
         $this->assertNotNull($routes->get('api.article.store'));
@@ -207,8 +207,8 @@ final class JsonApiRouteProviderTest extends TestCase
 
         $routes = $this->router->getRouteCollection();
 
-        // 5 routes per entity type x 2 entity types + 1 discovery route = 11 routes.
-        $this->assertCount(11, $routes);
+        // 6 routes per entity type x 2 entity types + 1 discovery route = 13 routes.
+        $this->assertCount(13, $routes);
         $this->assertNotNull($routes->get('api.article.index'));
         $this->assertNotNull($routes->get('api.user.index'));
     }

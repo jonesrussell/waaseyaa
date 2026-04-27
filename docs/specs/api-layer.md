@@ -371,6 +371,45 @@ final class SchemaController
 
 Creates a prototype entity (`new $class([])`) for field access checking. Wraps in try-catch and logs failures via `error_log()`. Returns the schema in `meta.schema` of a `JsonApiDocument`.
 
+## Per-Field Auto-Save Endpoint (F3)
+
+Added in mission `single-entity-work-surface-01KQ7M1P`. Enables single-field saves without a full entity PUT.
+
+**Route**: `PUT /api/{entityType}/{id}/field/{key}`
+
+```
+Content-Type: application/json
+{"value": "<string>"}
+```
+
+**Controller**: `Waaseyaa\Api\Controller\FieldAutoSaveController`
+
+```php
+new FieldAutoSaveController(
+    entityTypeManager: $entityTypeManager,
+    accessHandler: $accessHandler,
+    fieldRegistry: $fieldRegistry,
+    maxBodyBytes: 65536,  // optional
+)
+```
+
+**Status code matrix** (per contracts/README.md F3):
+
+| Code | Condition |
+|------|-----------|
+| 200 | Field saved successfully |
+| 401 | No `_account` attribute on the request (SessionMiddleware did not run or returned anonymous) |
+| 403 | Entity-level `isAllowed()` denied, or field-level `isForbidden()` |
+| 404 | Unknown entity type, entity not found, or field key not registered for the entity's bundle |
+| 415 | Content-Type is not `application/json` |
+| 422 | Body > `maxBodyBytes`, malformed JSON, or `value` key missing or non-string |
+
+**Access semantics**: entity-level uses `isAllowed()` (deny on Neutral); field-level uses `isForbidden()` (allow on Neutral — open-by-default). Field validation against the `edit` operation; `update` used for entity-level check.
+
+**Body-size guard (NFR-002)**: `Content-Length` header is checked before reading the body (fast rejection). If absent, the raw body is checked after `getContent()`. Chunked transfer without `Content-Length` falls through to post-read check.
+
+→ See `docs/specs/work-surface.md` F3 for the full wire-up reference.
+
 ## Query Pipeline
 
 ### QueryParser
