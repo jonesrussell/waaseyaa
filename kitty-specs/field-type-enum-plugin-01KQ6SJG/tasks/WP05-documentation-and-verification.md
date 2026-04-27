@@ -14,8 +14,8 @@ subtasks:
 - T019
 - T020
 - T021
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "30336"
+agent: "claude:sonnet:reviewer:reviewer"
+shell_pid: "13164"
 history:
 - timestamp: '2026-04-27T06:43:14Z'
   action: created
@@ -191,3 +191,4 @@ spec-kitty agent action implement WP05 --agent <name>
 
 - 2026-04-27T07:24:03Z – claude:sonnet:implementer:implementer – shell_pid=30336 – Started implementation via action command
 - 2026-04-27T07:31:27Z – claude:sonnet:implementer:implementer – shell_pid=30336 – Ready for review: transitional gap closed in docs/specs/entity-system.md; CHANGELOG+UPGRADING updated; LabeledCase added to public-surface-map; verification report committed on main. SC-001 holds (2 justified docblock hits). Field+entity unit tests green. Documented follow-ups: production wiring of FieldTypeManager + legacyJsonSchema enum arm.
+- 2026-04-27T07:32:05Z – claude:sonnet:reviewer:reviewer – shell_pid=13164 – Started review via action command
