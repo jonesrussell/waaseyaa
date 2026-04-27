@@ -210,3 +210,4 @@ spec-kitty agent action implement WP08 --agent <name>
 - 2026-04-27T05:48:38Z – claude:opus-4-7:implementer:implementer – shell_pid=6804 – Ready for review: docs updated for attribute-first flow, CHANGELOG/UPGRADING entries added, 4 follow-on missions lifted to ready, 5 transitional gaps documented in entity-system.md
 - 2026-04-27T05:49:34Z – claude:opus-4-7:reviewer:reviewer – shell_pid=31320 – Started review via action command
 - 2026-04-27T05:50:47Z – claude:opus-4-7:reviewer:reviewer – shell_pid=31320 – Review passed: docs/CHANGELOG/UPGRADING accurate, all 5 transitional gaps captured, 4 follow-on missions correctly lifted to ready on planning main, lane branch clean of kitty-specs churn, latent-bug TODO marker present
+- 2026-04-27T06:13:26Z – claude:opus-4-7:reviewer:reviewer – shell_pid=31320 – Done override: Mission merged in ce123bfe
