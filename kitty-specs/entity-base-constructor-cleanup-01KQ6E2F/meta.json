@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-27T03:00:07.535860+00:00",
+  "friendly_name": "entity base constructor cleanup",
+  "mission_id": "01KQ6E2FYCPR38PAXP2GXD5P0Z",
+  "mission_number": null,
+  "mission_slug": "entity-base-constructor-cleanup-01KQ6E2F",
+  "mission_type": "software-dev",
+  "slug": "entity-base-constructor-cleanup-01KQ6E2F",
+  "target_branch": "main"
+}
