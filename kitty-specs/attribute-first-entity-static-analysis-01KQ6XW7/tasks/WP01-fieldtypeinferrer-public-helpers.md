@@ -126,3 +126,4 @@ Extend `packages/entity/tests/Unit/Attribute/FieldTypeInferrerTest.php`:
 - 2026-04-27T07:57:53Z – claude – shell_pid=36176 – Assigned agent via action command
 - 2026-04-27T08:01:30Z – claude – shell_pid=36176 – WP01 implemented: 2 additive public helpers on FieldTypeInferrer + 5 unit tests; all 38 FieldTypeInferrerTest cases pass; infer() untouched.
 - 2026-04-27T08:03:51Z – claude – shell_pid=36176 – Self-review via code-reviewer subagent: clean. Single advisory issue (silent settings drop on default arg) fixed in 1efd6923.
+- 2026-04-27T08:20:48Z – claude – shell_pid=36176 – Squash-merged into main as e6bd07c2. | Done override: Mission squash-merged into main as e6bd07c2; spec-kitty merge command's WP-completion recording step was interrupted by an unrelated post-merge invariant (untracked sibling-mission status files), but the actual lane→main squash succeeded and the lane branch was cleanly deleted.
