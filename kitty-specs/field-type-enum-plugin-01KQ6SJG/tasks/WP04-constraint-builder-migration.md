@@ -143,3 +143,4 @@ spec-kitty agent action implement WP04 --agent <name>
 - 2026-04-27T07:21:15Z – claude:sonnet:implementer:implementer – shell_pid=37536 – Ready for review
 - 2026-04-27T07:21:46Z – claude:sonnet:reviewer:reviewer – shell_pid=29072 – Started review via action command
 - 2026-04-27T07:23:27Z – claude:sonnet:reviewer:reviewer – shell_pid=29072 – Review passed: enum_class read scoped to type==='enum' branch; legacy 'string'+enum_class bridge removed; EnumItem::casesForEnumClass is the sole case-enumeration path; null/non-string coerced to '' preserving MissingEnumClass error contract (NFR-002); 4 tests cover happy path (string+int backings), no-op string+enum_class, and missing enum_class error; entity 341/341 and field 314/314 green; no setting-key reads of camelCase enumClass remain anywhere in packages/.
+- 2026-04-27T07:34:54Z – claude:sonnet:reviewer:reviewer – shell_pid=29072 – Done override: Mission merged to main as a3a5bb29
