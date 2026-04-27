@@ -41,12 +41,12 @@
 | T031 | Edit `packages/api/src/JsonApiRouteProvider.php` to register `PUT {basePath}/{entityType}/{id}/field/{key}` for every entity type via the existing iteration loop | WP07 | — | [D] |
 | T032 | Add `PayloadTooLargeException` (or extend existing `ApiException` if present) in `packages/api/src/Exception/` | WP07 | [D] |
 | T033 | Integration test: PUT happy path, 401, 403 (entity policy), 403 (field policy), 404 (entity), 404 (field key), 415, 422 (oversize), 422 (malformed), idempotency | WP07 | — | [D] |
-| T034 | Create `packages/structured-import/composer.json` declaring the package at L3 with deps on field, foundation | WP08 | — |
-| T035 | Add `StructuredImporterInterface` in `packages/structured-import/src/StructuredImporterInterface.php` per contracts/README.md F5 | WP08 | — |
-| T036 | Add `ImportResult` and `UnmatchedRow` readonly value objects | WP08 | [P] |
-| T037 | Implement `GfmTableParser` in `packages/structured-import/src/Gfm/GfmTableParser.php` per research.md Q7 (pipe-delimited, optional leading/trailing pipe, header separator required, escaped pipes, exactly 2 columns) | WP08 | — |
-| T038 | Unit-test `GfmTableParser`: happy path, optional pipes, escaped pipes, alignment markers ignored, multi-table doc (first parsed, rest in errors), 3+ column row error, missing header separator error, multi-line cell error | WP08 | — |
-| T039 | Wire structured-import package via `packages/structured-import/src/ServiceProvider.php` | WP08 | [P] |
+| T034 | Create `packages/structured-import/composer.json` declaring the package at L3 with deps on field, foundation | WP08 | — | [D] |
+| T035 | Add `StructuredImporterInterface` in `packages/structured-import/src/StructuredImporterInterface.php` per contracts/README.md F5 | WP08 | — | [D] |
+| T036 | Add `ImportResult` and `UnmatchedRow` readonly value objects | WP08 | [D] |
+| T037 | Implement `GfmTableParser` in `packages/structured-import/src/Gfm/GfmTableParser.php` per research.md Q7 (pipe-delimited, optional leading/trailing pipe, header separator required, escaped pipes, exactly 2 columns) | WP08 | — | [D] |
+| T038 | Unit-test `GfmTableParser`: happy path, optional pipes, escaped pipes, alignment markers ignored, multi-table doc (first parsed, rest in errors), 3+ column row error, missing header separator error, multi-line cell error | WP08 | — | [D] |
+| T039 | Wire structured-import package via `packages/structured-import/src/ServiceProvider.php` | WP08 | [D] |
 | T040 | Implement `PromptNormalizer::normalize()` per research.md Q8 (`mb_strtolower` + Unicode whitespace collapse + trim) | WP09 | [P] |
 | T041 | Implement `GfmTableImporter::import()` (calls parser, normalizes prompts, looks up `FieldDefinition::getPromptAliases()` from registry, builds `ImportResult`) | WP09 | — |
 | T042 | Unit-test `GfmTableImporter`: matched, unmatched, errors paths; alias normalization; bundle param handling (null fallback to entity_type as implicit single bundle) | WP09 | — |
@@ -291,12 +291,12 @@
 5. `bin/check-package-layers` passes — `structured-import` declares deps only on L0–L2.
 
 **Included subtasks**:
-- [ ] T034 Create package `composer.json` (WP08)
-- [ ] T035 Add `StructuredImporterInterface` (WP08)
-- [ ] T036 Add `ImportResult` and `UnmatchedRow` value objects (WP08)
-- [ ] T037 Implement `GfmTableParser` (WP08)
-- [ ] T038 Unit-test `GfmTableParser` (WP08)
-- [ ] T039 Wire ServiceProvider (WP08)
+- [x] T034 Create package `composer.json` (WP08)
+- [x] T035 Add `StructuredImporterInterface` (WP08)
+- [x] T036 Add `ImportResult` and `UnmatchedRow` value objects (WP08)
+- [x] T037 Implement `GfmTableParser` (WP08)
+- [x] T038 Unit-test `GfmTableParser` (WP08)
+- [x] T039 Wire ServiceProvider (WP08)
 
 **Implementation sketch**: see WP08 prompt.
 
