@@ -19,6 +19,8 @@ owned_files:
 - packages/groups/src/Group.php
 - packages/groups/src/GroupsServiceProvider.php
 tags: []
+assignee: "claude"
+agent: "claude"
 ---
 
 # WP02 — Migrate `Group` to attribute-first; collapse `GroupsServiceProvider`
@@ -82,3 +84,7 @@ bin/waaseyaa optimize:manifest
 - Preserve `final class Group extends ContentEntityBase`.
 - `EntityType::fromClass()` already infers id, label, description, keys, and field definitions from the `#[ContentEntityType]` / `#[ContentEntityKeys]` / `#[Field]` attributes — no manual `bundleEntityType` or `keys` arrays needed.
 - If `EntityType::fromClass()` does not currently honour `bundleEntityType`/`group` from class attributes, fall back to passing those positional kwargs at the call site only — DO NOT regress to `_fieldDefinitions:`.
+
+## Activity Log
+
+- 2026-04-27T22:32:05Z – claude – Moved to in_progress
