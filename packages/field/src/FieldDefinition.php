@@ -28,6 +28,7 @@ final readonly class FieldDefinition implements FieldDefinitionInterface, \Array
         private bool $readOnly = false,
         private array $constraints = [],
         private FieldStorage $stored = FieldStorage::Column,
+        private ?FieldTypeManager $fieldTypeManager = null,
     ) {}
 
     public function getName(): string
@@ -87,7 +88,32 @@ final readonly class FieldDefinition implements FieldDefinitionInterface, \Array
 
     public function toJsonSchema(): array
     {
-        $schema = match ($this->type) {
+        $schema = $this->fieldTypeManager !== null
+            ? $this->fieldTypeManager->jsonSchemaFor($this)
+            : $this->legacyJsonSchema();
+
+        if ($this->isMultiple()) {
+            return [
+                'type' => 'array',
+                'items' => $schema,
+            ];
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Fallback JSON Schema mapping used when no FieldTypeManager has been
+     * threaded through construction.
+     *
+     * Mirrors FieldItemBase::jsonSchemaFor() exactly so manager-less
+     * construction (unit tests, ad-hoc callers) and manager-driven
+     * construction emit bit-identical output for every existing field type.
+     * EnumItem (WP02) only takes effect when a manager is present.
+     */
+    private function legacyJsonSchema(): array
+    {
+        return match ($this->type) {
             'string' => ['type' => 'string'],
             'integer' => ['type' => 'integer'],
             'boolean' => ['type' => 'boolean'],
@@ -108,15 +134,6 @@ final readonly class FieldDefinition implements FieldDefinitionInterface, \Array
             ],
             default => ['type' => 'string'],
         };
-
-        if ($this->isMultiple()) {
-            return [
-                'type' => 'array',
-                'items' => $schema,
-            ];
-        }
-
-        return $schema;
     }
 
     // DataDefinitionInterface methods

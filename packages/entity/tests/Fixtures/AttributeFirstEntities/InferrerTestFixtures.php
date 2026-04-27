@@ -5,12 +5,22 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities;
 
 /**
- * Backed enum fixture for the inferrer tests.
+ * Backed enum fixture for the inferrer tests (string-backed).
  */
 enum InferrerSampleEnum: string
 {
     case Foo = 'foo';
     case Bar = 'bar';
+}
+
+/**
+ * Int-backed enum fixture used to verify the inferrer emits a single 'enum'
+ * type id regardless of backing type (column shape is owned by EnumItem).
+ */
+enum InferrerSampleIntEnum: int
+{
+    case One = 1;
+    case Two = 2;
 }
 
 /**
@@ -44,6 +54,8 @@ final class InferrerTestFixtures
     public ?\DateTimeImmutable $aNullableDateTime = null;
     public InferrerSampleEnum $anEnum;
     public ?InferrerSampleEnum $aNullableEnum = null;
+    public InferrerSampleIntEnum $anIntEnum;
+    public ?InferrerSampleIntEnum $aNullableIntEnum = null;
 
     public string|int $aUnion;
     public mixed $untyped;

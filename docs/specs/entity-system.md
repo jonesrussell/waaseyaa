@@ -26,7 +26,7 @@
 <!-- Spec reviewed 2026-04-09 - field-definition → Symfony constraints + save merge (#1182) -->
 <!-- Spec reviewed 2026-04-09 - P3 branching: duplicate/with/withValues, duplicateInstance hook, EntityValuesSnapshot, shallow-copy invariant -->
 <!-- Spec reviewed 2026-04-08g - symfony/* require ^7.0 on entity + entity-storage (#1151); no entity behavior change — symfony-version-floors.md -->
-<!-- Spec reviewed 2026-04-09 - backed enum invalid-value policy + value_object casts (#1184), FromArrayEntityValueInterface, EntityValues VO JSON normalization; cross-links #1181 -->
+<!-- Spec reviewed 2026-04-27 - enum field-type plugin landed (mission field-type-enum-plugin-01KQ6SJG); transitional 'string' + settings.enum_class bridge closed -->
 <!-- Spec reviewed 2026-04-10 - waaseyaa/testing EntityTypeFixtureValues + EntityFactory::defineFromEntityType (#1186) -->
 <!-- Spec reviewed 2026-04-10b - P3 duplicate constructor arity contract; Hydratable scaffold; core User/Node hydration (#1188 follow-up) -->
 <!-- Spec reviewed 2026-04-16 - EntityStorageDriverInterface::write returns effective id; EntityRepository::doSave back-fills auto-increment pk before POST_SAVE (waaseyaa/giiken#57) -->
@@ -548,14 +548,16 @@ public int $created;
 
 A future `field-type-timestamp-plugin` mission will ship the proper plugin so the canonical declaration becomes `#[Field(type: 'timestamp')] public int $created;`.
 
-**`enum` field type missing.** Backed-enum properties currently map to `'string'` with the enum class carried in `settings`:
+**Closed: `enum` field type missing.** Resolved by mission [`field-type-enum-plugin-01KQ6SJG`](../../kitty-specs/field-type-enum-plugin-01KQ6SJG/). Backed-enum properties now resolve to the dedicated `'enum'` field-type plugin (`packages/field/src/Item/EnumItem.php`), which owns validation against the declared cases and emits JSON Schema with explicit `enum: [...]`. The canonical declaration is:
 
 ```php
-#[Field(type: 'string', settings: ['enum_class' => CourseStatus::class])]
+#[Field(type: 'enum', settings: ['enum_class' => CourseStatus::class])]
 public CourseStatus $status;
 ```
 
-A future `field-type-enum-plugin` mission will ship the proper plugin so the canonical declaration becomes `#[Field(type: 'enum', settings: ['class' => CourseStatus::class])]` (or equivalent).
+`FieldTypeInferrer` emits `type: 'enum'` automatically for backed-enum-typed properties, so most callers can omit `type:` and `settings:` entirely. The transitional `'string' + settings.enum_class` bridge in `FieldDefinitionConstraintBuilder` has been removed; the setting is honored only on `'enum'`-typed fields. The `enumClass` (camelCase) settings alias has also been removed in favor of `enum_class` (snake_case).
+
+*Documented follow-ups carried forward from this mission:* (1) the per-definition `FieldTypeInterface::jsonSchemaFor()` path is currently exercised only by tests — no production `FieldDefinition` construction site threads the `FieldTypeManager` yet, because doing so requires converting `EntityMetadataReader`'s static API to instance-based and updating its caller sites; (2) `FieldDefinition::legacyJsonSchema()` lacks an explicit `'enum'` arm and falls through to `['type' => 'string']`, which is unreached today but will need attention once production wiring lands. A follow-up mission ("plumb `FieldTypeManager` into `EntityMetadataReader` and add the `'enum'` arm to `legacyJsonSchema`") is recommended.
 
 ### 3. `#[Field]` attribute gaps surfaced by M1
 

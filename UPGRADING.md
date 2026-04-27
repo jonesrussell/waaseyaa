@@ -70,7 +70,7 @@ See `kitty-specs/attribute-first-entity-definition-01KQ6DXE/quickstart.md` for t
 These specific cases need workarounds until follow-on missions ship; see the *Known Transitional Gaps* section in `docs/specs/entity-system.md` for details:
 
 - `timestamp` field-type plugin not yet implemented — use `#[Field(type: 'integer', settings: ['subtype' => 'timestamp'])]`.
-- `enum` field-type plugin not yet implemented — use `#[Field(type: 'string', settings: ['enum_class' => MyEnum::class])]`.
+- ~~`enum` field-type plugin not yet implemented~~ — **Closed (mission `field-type-enum-plugin-01KQ6SJG`):** backed-enum-typed properties now resolve to the dedicated `'enum'` field-type plugin (`packages/field/src/Item/EnumItem.php`). `FieldTypeInferrer` emits `type: 'enum'` automatically; the canonical explicit form is `#[Field(type: 'enum', settings: ['enum_class' => MyEnum::class])]`. The transitional `'string' + settings.enum_class` bridge has been removed.
 - `#[Field]` has no `stored:` parameter yet — entities that require `FieldStorage::Data` for universal core fields must keep using the raw `EntityType()` constructor for now.
 - `FieldTypeInferrer` rejects `?int` / `?string` for `entity_reference` — declare those properties without a typed scalar (use `@var` PHPDoc) until the inferrer is extended.
 - `packages/cli/stubs/provider-domain.stub` still emits the legacy `fieldDefinitions:` form; hand-edit scaffolded providers until the stub is updated.

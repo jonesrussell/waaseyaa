@@ -53,4 +53,55 @@ final class FieldTypeManager extends DefaultPluginManager implements FieldTypeMa
 
         return $class::schema();
     }
+
+    /**
+     * Resolve the JSON Schema fragment for a field definition by delegating
+     * to the field type plugin's jsonSchemaFor() seam.
+     */
+    public function jsonSchemaFor(FieldDefinitionInterface $def): array
+    {
+        $class = $this->resolveItemClass($def->getType());
+
+        if ($class === null) {
+            // Unknown plugin: preserve legacy default emission.
+            return ['type' => 'string'];
+        }
+
+        return $class::jsonSchemaFor($def);
+    }
+
+    /**
+     * Resolve the storage column shape for a field definition by delegating
+     * to the field type plugin's schemaFor() seam.
+     *
+     * @return array<string, array{type: string, description?: string}>
+     */
+    public function schemaFor(FieldDefinitionInterface $def): array
+    {
+        $class = $this->resolveItemClass($def->getType());
+
+        if ($class === null) {
+            return [];
+        }
+
+        return $class::schemaFor($def);
+    }
+
+    /**
+     * @return class-string<FieldTypeInterface>|null
+     */
+    private function resolveItemClass(string $fieldType): ?string
+    {
+        if (!$this->hasDefinition($fieldType)) {
+            return null;
+        }
+
+        $class = $this->getDefinition($fieldType)->class;
+
+        if (!is_subclass_of($class, FieldTypeInterface::class)) {
+            return null;
+        }
+
+        return $class;
+    }
 }

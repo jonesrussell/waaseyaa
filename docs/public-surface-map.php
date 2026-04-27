@@ -152,6 +152,7 @@ return [
     'Waaseyaa\Field\FieldFormatterInterface' => 'public',
     'Waaseyaa\Field\FieldTypeManagerInterface' => 'public',
     'Waaseyaa\Field\FieldItemBase' => 'public',
+    'Waaseyaa\Field\Item\LabeledCase' => 'public',
     'Waaseyaa\Field\ViewModeConfigInterface' => 'public',
 
     // Layer 1: Core Data — internal

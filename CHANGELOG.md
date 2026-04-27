@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `Waaseyaa\Entity\EntityType` constructor no longer accepts a `fieldDefinitions:` parameter. Field definitions must come from `#[Field]`-decorated entity properties via `EntityType::fromClass(MyEntity::class)`. Tests that need to inject raw field definitions for fixture entity types can use `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()`.
 - `Waaseyaa\Entity\EntityTypeManager::assertClassMetadataMatchesEntityType()` removed. With a single source of truth (the entity class itself), the validator has no purpose.
+- **`enum` field-type plugin (mission `field-type-enum-plugin-01KQ6SJG`):** `FieldTypeInferrer` now emits `type: 'enum'` for backed-enum-typed properties, replacing the transitional `type: 'string' + settings.enum_class` bridge. `FieldDefinitionConstraintBuilder` no longer recognises `settings.enum_class` on `'string'`-typed fields; the setting is honored only on `'enum'`-typed fields. The `enumClass` (camelCase) settings alias has been removed; use `enum_class` (snake_case). Explicit `type='string'` annotation on a backed-enum property is no longer accepted by the inferrer. The transitional bridge documented in `docs/specs/entity-system.md` §"Known Transitional Gaps" is closed.
 
 ### Added
 
@@ -19,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Waaseyaa\Entity\Attribute\ContentEntityType` extended with `label` and `description` parameters so the human-facing strings live on the class alongside the id.
 - `Waaseyaa\Entity\Attribute\FieldTypeInferrer` — maps PHP property types to canonical field types (`string`, `integer`, `boolean`, `datetime`, `json`, etc.) with override-friendly compatibility groups.
 - `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()` — test-only helper for raw-shape `EntityType` construction (replaces direct use of the removed `fieldDefinitions:` parameter in fixtures).
+- `enum` field-type plugin (`packages/field/src/Item/EnumItem.php`) for backed-enum-typed fields. Validates against the declared enum, emits JSON Schema with explicit `enum: [...]`, and surfaces case labels via the optional `LabeledCase` interface (`packages/field/src/Item/LabeledCase.php`).
+- `Waaseyaa\Field\FieldTypeInterface::jsonSchemaFor(FieldDefinition $definition): array` and `schemaFor(FieldDefinition $definition): array` — per-definition schema resolution seams. Default implementations preserve the existing per-type behavior; plugins can override to specialize on `settings`.
 
 ### Migration
 

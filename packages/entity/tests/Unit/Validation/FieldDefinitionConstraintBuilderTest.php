@@ -8,10 +8,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Validation;
+use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleIntEnum;
 use Waaseyaa\Entity\Tests\Unit\Cast\Fixture\SampleStringEnum;
 use Waaseyaa\Entity\Tests\Unit\Validation\Fixture\FieldableEntityDouble;
 use Waaseyaa\Entity\Validation\EntityValidator;
 use Waaseyaa\Entity\Validation\FieldDefinitionConstraintBuilder;
+use Waaseyaa\Field\Item\EnumFieldTypeException;
 
 #[CoversClass(FieldDefinitionConstraintBuilder::class)]
 final class FieldDefinitionConstraintBuilderTest extends TestCase
@@ -118,17 +120,72 @@ final class FieldDefinitionConstraintBuilderTest extends TestCase
     }
 
     #[Test]
-    public function enumClassUsesBackedEnumValues(): void
+    public function enumTypeRejectsValueOutsideStringBackedCases(): void
     {
         $entity = $this->stubEntity(['letter' => 'z']);
         $constraints = FieldDefinitionConstraintBuilder::build([
-            'letter' => ['type' => 'string', 'enumClass' => SampleStringEnum::class],
+            'letter' => ['type' => 'enum', 'enum_class' => SampleStringEnum::class],
         ]);
 
         $violations = (new EntityValidator(Validation::createValidator()))->validate($entity, $constraints);
 
         self::assertGreaterThan(0, $violations->count());
         self::assertSame('letter', $violations->get(0)->getPropertyPath());
+    }
+
+    #[Test]
+    public function enumTypeAcceptsValidStringBackedCase(): void
+    {
+        $entity = $this->stubEntity(['letter' => 'a']);
+        $constraints = FieldDefinitionConstraintBuilder::build([
+            'letter' => ['type' => 'enum', 'enum_class' => SampleStringEnum::class],
+        ]);
+
+        $violations = (new EntityValidator(Validation::createValidator()))->validate($entity, $constraints);
+
+        self::assertCount(0, $violations);
+    }
+
+    #[Test]
+    public function enumTypeRejectsValueOutsideIntBackedCases(): void
+    {
+        $entity = $this->stubEntity(['count' => 99]);
+        $constraints = FieldDefinitionConstraintBuilder::build([
+            'count' => ['type' => 'enum', 'enum_class' => SampleIntEnum::class],
+        ]);
+
+        $violations = (new EntityValidator(Validation::createValidator()))->validate($entity, $constraints);
+
+        self::assertGreaterThan(0, $violations->count());
+        self::assertSame('count', $violations->get(0)->getPropertyPath());
+    }
+
+    #[Test]
+    public function stringTypeWithEnumClassDoesNotAddChoiceConstraint(): void
+    {
+        // Legacy 'string + enum_class' bridge is gone (C-004): a value outside
+        // the enum cases must NOT produce a violation when type is 'string'.
+        $entity = $this->stubEntity(['letter' => 'z']);
+        $constraints = FieldDefinitionConstraintBuilder::build([
+            'letter' => ['type' => 'string', 'enum_class' => SampleStringEnum::class],
+        ]);
+
+        $violations = (new EntityValidator(Validation::createValidator()))->validate($entity, $constraints);
+
+        self::assertCount(0, $violations);
+    }
+
+    #[Test]
+    public function enumTypeWithoutEnumClassPropagatesMissingEnumClass(): void
+    {
+        try {
+            FieldDefinitionConstraintBuilder::build([
+                'letter' => ['type' => 'enum'],
+            ]);
+            self::fail('Expected EnumFieldTypeException::MISSING_ENUM_CLASS to propagate.');
+        } catch (EnumFieldTypeException $e) {
+            self::assertSame(EnumFieldTypeException::MISSING_ENUM_CLASS, $e->variant);
+        }
     }
 
     #[Test]

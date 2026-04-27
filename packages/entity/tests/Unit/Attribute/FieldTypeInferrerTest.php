@@ -13,6 +13,7 @@ use Waaseyaa\Entity\Attribute\FieldTypeInferrer;
 use Waaseyaa\Entity\Exception\EntityMetadataException;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\InferrerNonEnumClass;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\InferrerSampleEnum;
+use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\InferrerSampleIntEnum;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\InferrerTestFixtures;
 
 /**
@@ -75,13 +76,21 @@ final class FieldTypeInferrerTest extends TestCase
                 'aNullableDateTime', null,
                 ['type' => 'datetime', 'required' => false, 'settings' => []],
             ],
-            'BackedEnum → string + enum_class (required)' => [
+            'BackedEnum → enum + enum_class (required)' => [
                 'anEnum', null,
-                ['type' => 'string', 'required' => true, 'settings' => ['enum_class' => InferrerSampleEnum::class]],
+                ['type' => 'enum', 'required' => true, 'settings' => ['enum_class' => InferrerSampleEnum::class]],
             ],
-            '?BackedEnum → string + enum_class (optional)' => [
+            '?BackedEnum → enum + enum_class (optional)' => [
                 'aNullableEnum', null,
-                ['type' => 'string', 'required' => false, 'settings' => ['enum_class' => InferrerSampleEnum::class]],
+                ['type' => 'enum', 'required' => false, 'settings' => ['enum_class' => InferrerSampleEnum::class]],
+            ],
+            'IntBackedEnum → enum + enum_class (required)' => [
+                'anIntEnum', null,
+                ['type' => 'enum', 'required' => true, 'settings' => ['enum_class' => InferrerSampleIntEnum::class]],
+            ],
+            '?IntBackedEnum → enum + enum_class (optional)' => [
+                'aNullableIntEnum', null,
+                ['type' => 'enum', 'required' => false, 'settings' => ['enum_class' => InferrerSampleIntEnum::class]],
             ],
             'string property with explicit text override' => [
                 'aStringForOverride', 'text',
@@ -148,15 +157,20 @@ final class FieldTypeInferrerTest extends TestCase
     }
 
     #[Test]
-    public function explicit_string_type_on_backed_enum_keeps_inferred_enum_class(): void
+    public function explicit_string_type_on_backed_enum_is_rejected(): void
     {
         $property = new \ReflectionProperty(InferrerTestFixtures::class, 'anEnum');
         $attribute = new Field(type: 'string');
 
-        $result = FieldTypeInferrer::infer($property, $attribute);
-
-        self::assertSame('string', $result['type']);
-        self::assertSame(InferrerSampleEnum::class, $result['settings']['enum_class']);
+        try {
+            FieldTypeInferrer::infer($property, $attribute);
+            self::fail('Expected EntityMetadataException');
+        } catch (EntityMetadataException $e) {
+            self::assertStringContainsString("explicit type='string'", $e->getMessage());
+            self::assertStringContainsString('backed-enum', $e->getMessage());
+            self::assertStringContainsString('anEnum', $e->getMessage());
+            self::assertStringContainsString("type='enum'", $e->getMessage());
+        }
     }
 
     // -----------------------------------------------------------------

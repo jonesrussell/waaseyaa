@@ -12,6 +12,16 @@ namespace Waaseyaa\Entity\Attribute;
  * the registered field-type ids (and must be compatible with the declared PHP
  * property type, when one is present).
  *
+ * Backed-enum properties infer canonically as `type='enum'` with
+ * `settings.enum_class` populated automatically. The legacy
+ * `'string' + settings.enum_class` bridge is no longer supported: explicitly
+ * passing `type: 'string'` on a backed-enum property is rejected.
+ *
+ * Example:
+ *
+ *     #[Field]
+ *     public Status $status; // → type='enum', settings={enum_class: Status::class}
+ *
  * The attribute is data-only — all parameters are exposed as public readonly
  * properties; logic lives in `FieldTypeInferrer` and `EntityMetadataReader`.
  */

@@ -32,6 +32,7 @@ final class FieldTypeInferrer
         'decimal',
         'email',
         'entity_reference',
+        'enum',
         'file',
         'float',
         'image',
@@ -82,6 +83,15 @@ final class FieldTypeInferrer
 
         if ($attribute->type !== null) {
             self::assertValidTypeId($attribute->type, $property);
+
+            // AS-8 / C-004 hard cutover: explicit type='string' on a backed-enum
+            // property is no longer supported. The legacy bridge ('string' +
+            // settings.enum_class) was retired when EnumItem became the
+            // canonical home for enum schema. Raise a clear diagnostic instead
+            // of silently coercing the type or swallowing the user's intent.
+            if ($inferredType === 'enum' && $attribute->type === 'string') {
+                throw self::backedEnumExplicitStringRejection($property);
+            }
 
             // If both inferred and explicit are present, require compatibility.
             if ($inferredType !== null && !self::isCompatible($inferredType, $attribute->type)) {
@@ -144,7 +154,10 @@ final class FieldTypeInferrer
         if (\class_exists($phpTypeName) && \is_subclass_of($phpTypeName, \BackedEnum::class)) {
             $settings['enum_class'] = $phpTypeName;
 
-            return 'string';
+            // The inferrer no longer chooses a backing-type-specific id (string
+            // vs integer). Column shape is owned by EnumItem::schemaFor(), which
+            // inspects the cases on demand.
+            return 'enum';
         }
 
         return null;
@@ -195,6 +208,17 @@ final class FieldTypeInferrer
             $typeId,
             $location,
             $valid,
+        ));
+    }
+
+    private static function backedEnumExplicitStringRejection(\ReflectionProperty $property): EntityMetadataException
+    {
+        $location = self::propertyLocation($property);
+
+        return new EntityMetadataException(\sprintf(
+            "Field %s: explicit type='string' on backed-enum property %s is no longer supported. Remove the explicit type or use type='enum' (enum_class is inferred automatically).",
+            $location,
+            $property->getName(),
         ));
     }
 

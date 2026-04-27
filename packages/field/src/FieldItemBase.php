@@ -159,4 +159,57 @@ abstract class FieldItemBase extends PluginBase implements FieldItemInterface, F
     {
         return null;
     }
+
+    /**
+     * Default per-definition JSON Schema.
+     *
+     * Reproduces the legacy per-type mapping that previously lived as a
+     * hardcoded match in FieldDefinition::toJsonSchema(). Field types that
+     * need per-definition variation (e.g. EnumItem reading
+     * settings.enum_class) override this method. Field types that are happy
+     * with the legacy mapping (string, integer, boolean, float, text,
+     * entity_reference) get bit-identical behavior with zero overrides.
+     *
+     * Note: this intentionally returns the legacy mapping rather than
+     * delegating to static::jsonSchema(). The latter is the richer per-type
+     * schema (e.g. StringItem::jsonSchema() includes maxLength) but
+     * FieldDefinition::toJsonSchema() has historically emitted a minimal
+     * shape; preserving that emission contract is mandated by WP01's
+     * regression test.
+     */
+    public static function jsonSchemaFor(FieldDefinitionInterface $def): array
+    {
+        return match ($def->getType()) {
+            'string' => ['type' => 'string'],
+            'integer' => ['type' => 'integer'],
+            'boolean' => ['type' => 'boolean'],
+            'float' => ['type' => 'number'],
+            'text' => [
+                'type' => 'object',
+                'properties' => [
+                    'value' => ['type' => 'string'],
+                    'format' => ['type' => 'string'],
+                ],
+            ],
+            'entity_reference' => [
+                'type' => 'object',
+                'properties' => [
+                    'target_id' => ['type' => 'integer'],
+                    'target_type' => ['type' => 'string'],
+                ],
+            ],
+            default => ['type' => 'string'],
+        };
+    }
+
+    /**
+     * Default per-definition storage schema. Delegates to the static
+     * schema() method, preserving behavior for every existing field type.
+     *
+     * @return array<string, array{type: string, description?: string}>
+     */
+    public static function schemaFor(FieldDefinitionInterface $def): array
+    {
+        return static::schema();
+    }
 }

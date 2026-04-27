@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity\Validation;
 
-use BackedEnum;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Email;
@@ -15,6 +14,7 @@ use Symfony\Component\Validator\Constraints\Type;
 use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\FieldStorage;
+use Waaseyaa\Field\Item\EnumItem;
 
 /**
  * Builds per-field Symfony {@see Constraint} lists from entity field definitions.
@@ -69,12 +69,15 @@ final class FieldDefinitionConstraintBuilder
             $constraints[] = new Choice(choices: array_values($allowed));
         }
 
-        $enumClass = $def->getSetting('enum_class') ?? $def->getSetting('enumClass');
-        if (is_string($enumClass) && $enumClass !== '' && enum_exists($enumClass)
-            && is_subclass_of($enumClass, BackedEnum::class)) {
-            /** @var class-string<BackedEnum> $enumClass */
-            $choices = array_map(static fn(BackedEnum $e): string|int => $e->value, $enumClass::cases());
-            $constraints[] = new Choice(choices: $choices);
+        if ($type === 'enum') {
+            $enumClass = $def->getSetting('enum_class');
+            // Coerce null/non-string to '' so EnumItem raises MissingEnumClass
+            // rather than a TypeError.
+            if (!is_string($enumClass)) {
+                $enumClass = '';
+            }
+            $values = array_keys(EnumItem::casesForEnumClass($enumClass));
+            $constraints[] = new Choice(choices: $values);
         }
 
         $typeConstraint = self::scalarTypeConstraint($type);
