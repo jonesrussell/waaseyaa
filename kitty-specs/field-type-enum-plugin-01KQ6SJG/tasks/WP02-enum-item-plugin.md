@@ -22,6 +22,8 @@ subtasks:
 - T009
 - T010
 - T011
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "34440"
 history:
 - timestamp: '2026-04-27T06:43:14Z'
   action: created
@@ -266,3 +268,7 @@ Do not modify the inferrer, constraint builder, or docs — those land in WP03/W
 ```bash
 spec-kitty agent action implement WP02 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-04-27T06:59:57Z – claude:sonnet:implementer:implementer – shell_pid=34440 – Started implementation via action command
