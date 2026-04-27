@@ -201,3 +201,4 @@ Depends on WP01.
 ## Activity Log
 
 - 2026-04-27T16:12:05Z – claude:sonnet-4-6:implementer:implementer – shell_pid=28968 – Started implementation via action command
+- 2026-04-27T16:16:56Z – claude:sonnet-4-6:implementer:implementer – shell_pid=28968 – F6 builder + descriptor; structured arrays only, no HTML; 20 tests pass; phpstan level 5 clean; cs-fixer clean. Added waaseyaa/access to field composer.json require for EntityAccessHandler type-hint.
