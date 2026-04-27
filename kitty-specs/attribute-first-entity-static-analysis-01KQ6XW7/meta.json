@@ -1,6 +1,8 @@
 {
   "created_at": "2026-04-27T07:36:21.204558+00:00",
-  "friendly_name": "attribute first entity static analysis",
+  "friendly_name": "Attribute-First Entity Static Analysis",
+  "source_description": "Add a custom PHPStan rule that lints #[Field] attribute usage at static-analysis time, surfacing the same errors FieldTypeInferrer::infer() raises at runtime, so typos and misuses are caught in CI before kernel boot. Builds on M1 (attribute-first-entity-definition-01KQ6DXE, merged as ce123bfe).",
+  "vcs": "git",
   "mission_id": "01KQ6XW7Y3QD0JJ7JTP9JCSDPM",
   "mission_number": null,
   "mission_slug": "attribute-first-entity-static-analysis-01KQ6XW7",
