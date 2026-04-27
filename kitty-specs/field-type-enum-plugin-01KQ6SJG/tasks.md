@@ -22,12 +22,12 @@ This file decomposes [plan.md](./plan.md) into work packages. Each WP has its ow
 | T003 | Add `jsonSchemaFor()` and `schemaFor()` helpers on `FieldTypeManager` that resolve plugin and forward | WP01 |  | [D] |
 | T004 | Refactor `FieldDefinition::toJsonSchema()` to delegate via `FieldTypeManager::jsonSchemaFor($this)`; thread `FieldTypeManager` through construction | WP01 |  | [D] |
 | T005 | Add regression test asserting `FieldDefinition::toJsonSchema()` output is bit-identical for every existing field-type id | WP01 |  | [D] |
-| T006 | Create `LabeledCase` interface at `packages/field/src/Item/LabeledCase.php` (single method `getLabel(): string`) | WP02 |  |
-| T007 | Create `EnumItem` plugin at `packages/field/src/Item/EnumItem.php` with `#[FieldType(id: 'enum', label: 'Enum')]` extending `FieldItemBase` | WP02 |  |
-| T008 | Implement `EnumItem::defaultSettings()` and runtime configuration validation (`MissingEnumClass`, `UnknownEnumClass`, `NotABackedEnum`, `UnsupportedBackingType`) | WP02 |  |
-| T009 | Implement `EnumItem::schemaFor(FieldDefinitionInterface)` and `EnumItem::jsonSchemaFor(FieldDefinitionInterface)` per data-model.md §2 and §3 | WP02 |  |
-| T010 | Implement `EnumItem::castToCase()`, `EnumItem::hydrate()`, and `EnumItem::casesForEnumClass()` per contracts/enum-item.md | WP02 |  |
-| T011 | Write `EnumItemTest` covering NFR-003 surface (string/int happy paths, invalid stored, invalid input, invalid enum_class config, JSON Schema shape, label resolution, empty-enum EC-5) | WP02 |  |
+| T006 | Create `LabeledCase` interface at `packages/field/src/Item/LabeledCase.php` (single method `getLabel(): string`) | WP02 |  | [D] |
+| T007 | Create `EnumItem` plugin at `packages/field/src/Item/EnumItem.php` with `#[FieldType(id: 'enum', label: 'Enum')]` extending `FieldItemBase` | WP02 |  | [D] |
+| T008 | Implement `EnumItem::defaultSettings()` and runtime configuration validation (`MissingEnumClass`, `UnknownEnumClass`, `NotABackedEnum`, `UnsupportedBackingType`) | WP02 |  | [D] |
+| T009 | Implement `EnumItem::schemaFor(FieldDefinitionInterface)` and `EnumItem::jsonSchemaFor(FieldDefinitionInterface)` per data-model.md §2 and §3 | WP02 |  | [D] |
+| T010 | Implement `EnumItem::castToCase()`, `EnumItem::hydrate()`, and `EnumItem::casesForEnumClass()` per contracts/enum-item.md | WP02 |  | [D] |
+| T011 | Write `EnumItemTest` covering NFR-003 surface (string/int happy paths, invalid stored, invalid input, invalid enum_class config, JSON Schema shape, label resolution, empty-enum EC-5) | WP02 |  | [D] |
 | T012 | Add `'enum'` to `VALID_TYPE_IDS` in `FieldTypeInferrer.php` (lines 27–44) | WP03 | [P] |
 | T013 | Flip `FieldTypeInferrer.php:144-148` emission from `'string'` to `'enum'` | WP03 | [P] |
 | T014 | Update `Field` attribute docstring in `packages/entity/src/Attribute/Field.php` to show `enum` field-type example | WP03 | [P] |
@@ -77,12 +77,12 @@ This file decomposes [plan.md](./plan.md) into work packages. Each WP has its ow
 
 **Subtasks**:
 
-- [ ] T006 Create `LabeledCase` interface (WP02)
-- [ ] T007 Create `EnumItem` plugin scaffold with `#[FieldType]` attribute (WP02)
-- [ ] T008 Settings validation with full error taxonomy (WP02)
-- [ ] T009 `schemaFor` + `jsonSchemaFor` overrides (WP02)
-- [ ] T010 Coercion / hydration / cases helper (WP02)
-- [ ] T011 Unit tests covering NFR-003 surface (WP02)
+- [x] T006 Create `LabeledCase` interface (WP02)
+- [x] T007 Create `EnumItem` plugin scaffold with `#[FieldType]` attribute (WP02)
+- [x] T008 Settings validation with full error taxonomy (WP02)
+- [x] T009 `schemaFor` + `jsonSchemaFor` overrides (WP02)
+- [x] T010 Coercion / hydration / cases helper (WP02)
+- [x] T011 Unit tests covering NFR-003 surface (WP02)
 
 **Risks**:
 - Storage layer may call static `schema()` rather than going through `schemaFor()`; trace `FieldTypeInterface::schema` callers and confirm WP01's delegation reaches the storage path. If not, scope expands to plumb through.
