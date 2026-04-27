@@ -212,3 +212,4 @@ Depends on WP05.
 - 2026-04-27T16:47:46Z – claude:sonnet-4-6:implementer:implementer – shell_pid=23200 – ParentDelegatedAccessPolicy + concurrency test (NFR-010); 29 tests pass (1 skipped on Windows/non-pcntl); PHPStan level 5 clean; CS clean
 - 2026-04-27T16:48:09Z – claude:opus-4-7:reviewer:reviewer – shell_pid=11068 – Started review via action command
 - 2026-04-27T16:51:46Z – claude:opus-4-7:reviewer:reviewer – shell_pid=11068 – Review passed: 14 unit tests + 5 integration tests + concurrency test (skipped on Windows, will run on Linux CI). Policy correctly delegates to EntityAccessHandler::check(); Neutral on edge cases per spec. PHPStan errors are environmental (root config not yet wired for waaseyaa/attachment — WP05 territory); package autoload works (PHPUnit: 29 tests, 1 skipped). DIR-003 clean. Owned-files only.
+- 2026-04-27T18:21:59Z – claude:opus-4-7:reviewer:reviewer – shell_pid=11068 – Done override: Mission merged at ca0ff03
