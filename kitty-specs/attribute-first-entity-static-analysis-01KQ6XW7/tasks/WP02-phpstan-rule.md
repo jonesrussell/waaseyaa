@@ -180,3 +180,4 @@ This mechanically enforces FR-007 for FR-002..FR-005. For FR-001 and FR-006 (no 
 
 - 2026-04-27T08:04:03Z – claude – shell_pid=30892 – Started implementation via action command
 - 2026-04-27T08:10:26Z – claude – shell_pid=30892 – WP02 implemented: full FieldAttributeRule with 6 detection branches, 7 fixtures, RuleTestCase suite. 7/7 tests pass; full-repo phpstan analyse green; FR-007 enforced via runtime cross-check pattern in tests.
+- 2026-04-27T08:13:55Z – claude – shell_pid=30892 – Self-review via code-reviewer: 1 high-priority FR-007 gap (testCannotInferUnion using hard-coded message instead of runtime cross-check) and 1 dead-code finding fixed in 5a544179. 7/7 tests pass, full repo phpstan green.
