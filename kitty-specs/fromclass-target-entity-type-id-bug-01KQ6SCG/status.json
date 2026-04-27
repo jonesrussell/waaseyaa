@@ -1,16 +1,16 @@
 {
-  "event_count": 17,
-  "last_event_id": "01KQ71VJXT2GDZ4686MDT8FMFJ",
-  "materialized_at": "2026-04-27T08:45:52.442062+00:00",
+  "event_count": 18,
+  "last_event_id": "01KQ71VPDPT1007ZKRQB6H7PM8",
+  "materialized_at": "2026-04-27T08:45:56.022557+00:00",
   "mission_number": "4",
   "mission_slug": "fromclass-target-entity-type-id-bug-01KQ6SCG",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 1,
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 1,
+    "done": 2,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
@@ -26,10 +26,10 @@
     },
     "WP02": {
       "actor": "user",
-      "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KQ71NMV0VQZKEJFF60SXVK1B",
-      "last_transition_at": "2026-04-27T08:42:37.792379+00:00"
+      "force_count": 3,
+      "lane": "done",
+      "last_event_id": "01KQ71VPDPT1007ZKRQB6H7PM8",
+      "last_transition_at": "2026-04-27T08:45:56.022557+00:00"
     }
   }
 }

@@ -115,3 +115,4 @@ search for `targetEntityTypeId` and `fromClass` references and audit.
 - 2026-04-27T08:39:09Z – claude – shell_pid=7160 – Genealogy tests pass with registry as fieldRegistry kwarg (4th param, not 3rd as initially noted in spec). Doc item 4 removed; trailing item renumbered. 11/11 genealogy tests green.
 - 2026-04-27T08:42:33Z – claude – shell_pid=19372 – Started review via action command
 - 2026-04-27T08:42:37Z – claude – shell_pid=19372 – Independent code review approved. Used fieldRegistry named arg (4th param) — correct. Doc gap item 4 removed in fc79a228; trailing item renumbered. WP02 task prompt prose fixed to reflect named-arg pattern.
+- 2026-04-27T08:45:56Z – claude – shell_pid=19372 – Merged into main as 85890880 (squash). | Done override: Mission squash-merged into main as commit 85890880; merge bookkeeping interrupted by unrelated dirty state.
