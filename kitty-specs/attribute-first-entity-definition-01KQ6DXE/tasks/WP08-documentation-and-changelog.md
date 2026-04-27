@@ -207,3 +207,4 @@ spec-kitty agent action implement WP08 --agent <name>
 ## Activity Log
 
 - 2026-04-27T05:42:56Z – claude:opus-4-7:implementer:implementer – shell_pid=6804 – Started implementation via action command
+- 2026-04-27T05:48:38Z – claude:opus-4-7:implementer:implementer – shell_pid=6804 – Ready for review: docs updated for attribute-first flow, CHANGELOG/UPGRADING entries added, 4 follow-on missions lifted to ready, 5 transitional gaps documented in entity-system.md
