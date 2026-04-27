@@ -14,6 +14,8 @@ subtasks:
 - T013
 - T014
 - T015
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "35584"
 history:
 - timestamp: '2026-04-27T06:43:14Z'
   action: created
@@ -166,3 +168,7 @@ Do **not** modify the constraint builder (WP04) or `entity-system.md` (WP05).
 ```bash
 spec-kitty agent action implement WP03 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-04-27T07:09:33Z – claude:sonnet:implementer:implementer – shell_pid=35584 – Started implementation via action command
