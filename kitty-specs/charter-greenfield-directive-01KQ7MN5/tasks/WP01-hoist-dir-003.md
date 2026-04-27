@@ -17,6 +17,9 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-charter-greenfield-directive-01KQ7MN5
+base_commit: 96cf74039d55458efd0c4bc387542e455fd76331
+created_at: '2026-04-27T14:39:44.200315+00:00'
 subtasks:
 - T001
 - T002
@@ -24,6 +27,7 @@ subtasks:
 - T004
 - T005
 - T006
+shell_pid: '7560'
 history:
 - date: '2026-04-27'
   note: Generated from spec.md + plan.md + research.md + quickstart.md.
