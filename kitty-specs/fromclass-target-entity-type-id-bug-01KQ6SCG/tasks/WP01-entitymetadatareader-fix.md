@@ -9,7 +9,9 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
-created_at: '2026-04-27T08:30:00Z'
+base_branch: kitty/mission-fromclass-target-entity-type-id-bug-01KQ6SCG
+base_commit: 5bf074515b7b6f468d802bb42172027e6398e48c
+created_at: '2026-04-27T08:32:47.835850+00:00'
 subtasks:
 - T001
 - T002
@@ -17,7 +19,8 @@ subtasks:
 - T004
 phase: Phase 1 - Core fix
 assignee: ''
-agent: "claude"
+agent: claude
+shell_pid: '24164'
 authoritative_surface: packages/entity/src/Attribute/EntityMetadataReader
 execution_mode: code_change
 mission_id: 01KQ6SCG3RCT25Q7WCEAKBFSTQ
