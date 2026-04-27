@@ -341,3 +341,4 @@ No dependencies — independent of WP01.
 ## Activity Log
 
 - 2026-04-27T16:26:53Z – claude:sonnet-4-6:implementer:implementer – shell_pid=29476 – Started implementation via action command
+- 2026-04-27T16:37:31Z – claude:sonnet-4-6:implementer:implementer – shell_pid=29476 – Attachment entity, schema, repository, ServiceProvider; setActive atomic transaction; 10 unit tests pass; PHPStan clean; CS clean; layer check passes
