@@ -33,12 +33,12 @@
 | T020 | Migrate `packages/taxonomy/src/{Term,Vocabulary}.php` to `#[Field]` | WP04 | [D] |
 | T021 | Migrate `packages/user/src/User.php` to `#[Field]` | WP04 | [D] |
 | T022 | Update content-track ServiceProviders (genealogy, node, note, taxonomy, user) to call `EntityType::fromClass()` | WP04 |  | [D] |
-| T023 | Migrate `packages/oidc/src/Entity/OidcClient.php` + `OidcServiceProvider.php` | WP05 | [P] |
-| T024 | Migrate engagement entity class(es) + `EngagementServiceProvider.php` | WP05 | [P] |
-| T025 | Migrate groups entity class(es) + `GroupsServiceProvider.php` | WP05 | [P] |
-| T026 | Migrate messaging entity class(es) + `MessagingServiceProvider.php` | WP05 | [P] |
-| T027 | Migrate path entity class(es) + `PathServiceProvider.php` | WP05 | [P] |
-| T028 | Update `packages/cli/src/Command/MakeEntityTypeCommand.php` to emit attribute-first scaffold | WP05 |  |
+| T023 | Migrate `packages/oidc/src/Entity/OidcClient.php` + `OidcServiceProvider.php` | WP05 | [D] |
+| T024 | Migrate engagement entity class(es) + `EngagementServiceProvider.php` | WP05 | [D] |
+| T025 | Migrate groups entity class(es) + `GroupsServiceProvider.php` | WP05 | [D] |
+| T026 | Migrate messaging entity class(es) + `MessagingServiceProvider.php` | WP05 | [D] |
+| T027 | Migrate path entity class(es) + `PathServiceProvider.php` | WP05 | [D] |
+| T028 | Update `packages/cli/src/Command/MakeEntityTypeCommand.php` to emit attribute-first scaffold | WP05 |  | [D] |
 | T029 | Migrate `packages/entity/tests/Unit/` fixtures to attribute-first form (3 files) | WP06 | [P] |
 | T030 | Migrate `packages/entity-storage/tests/Unit/` fixtures (4 files) | WP06 | [P] |
 | T031 | Migrate `packages/api/tests/` fixtures (3 files including `Fixtures/TranslatableTestEntity.php`) | WP06 | [P] |
@@ -236,12 +236,12 @@ WP01 ──► WP02 ──► WP03 ──┬──► WP04 ──┬──► WP
 **Independent test**: phpunit for `packages/{oidc,engagement,groups,messaging,path,cli}/` is green; `vendor/bin/waaseyaa make:entity-type` (smoke test) generates attribute-decorated output.
 
 **Included subtasks**:
-- [ ] T023 Migrate `packages/oidc/src/Entity/OidcClient.php` + provider (WP05)
-- [ ] T024 Migrate engagement entity + provider (WP05)
-- [ ] T025 Migrate groups entity + provider (WP05)
-- [ ] T026 Migrate messaging entity + provider (WP05)
-- [ ] T027 Migrate path entity + provider (WP05)
-- [ ] T028 Update `MakeEntityTypeCommand` to emit attribute-first scaffold (WP05)
+- [x] T023 Migrate `packages/oidc/src/Entity/OidcClient.php` + provider (WP05)
+- [x] T024 Migrate engagement entity + provider (WP05)
+- [x] T025 Migrate groups entity + provider (WP05)
+- [x] T026 Migrate messaging entity + provider (WP05)
+- [x] T027 Migrate path entity + provider (WP05)
+- [x] T028 Update `MakeEntityTypeCommand` to emit attribute-first scaffold (WP05)
 
 **Implementation sketch**: Same pattern as WP04 per entity. The `MakeEntityTypeCommand` template change is its own WP-internal sub-step — find the current template, rewrite to emit `#[ContentEntityType]` + `#[Field]` annotations + `EntityType::fromClass()` registration line.
 
