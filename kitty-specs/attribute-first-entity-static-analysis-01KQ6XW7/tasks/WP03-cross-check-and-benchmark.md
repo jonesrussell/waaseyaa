@@ -65,3 +65,4 @@ Capture wall-clock of `vendor/bin/phpstan analyse --no-progress packages/entity/
 
 - 2026-04-27T08:13:58Z – claude – shell_pid=37360 – Started implementation via action command
 - 2026-04-27T08:16:57Z – claude – shell_pid=37360 – Notes on main; lane cleanup committed.
+- 2026-04-27T08:20:55Z – claude – shell_pid=37360 – Squash-merged into main as e6bd07c2. | Done override: Mission squash-merged into main as e6bd07c2; spec-kitty merge command's WP-completion recording step was interrupted by an unrelated post-merge invariant (untracked sibling-mission status files), but the actual lane→main squash succeeded and the lane branch was cleanly deleted.
