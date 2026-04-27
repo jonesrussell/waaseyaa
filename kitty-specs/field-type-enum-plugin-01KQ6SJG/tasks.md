@@ -35,9 +35,9 @@ This file decomposes [plan.md](./plan.md) into work packages. Each WP has its ow
 | T016 | Refactor `FieldDefinitionConstraintBuilder.php:67-78` to scope enum logic to `$def->getType() === 'enum'` and delegate case-value lookup to `EnumItem::casesForEnumClass()` | WP04 | [D] |
 | T017 | Remove the legacy `enumClass` alias read; remove the `'string' + enum_class` legacy branch entirely (C-004) | WP04 | [D] |
 | T018 | Update or add tests under `packages/entity/tests/Unit/Validation/` to assert: `'enum'` field produces `Choice` constraint with case backing values; `'string' + enum_class` no longer adds a `Choice` constraint | WP04 | [D] |
-| T019 | Close the transitional-gap entry for the enum bridge in `docs/specs/entity-system.md` §"Known Transitional Gaps", referencing this mission | WP05 |  |
-| T020 | Add CHANGELOG entry (if `CHANGELOG.md` exists at repo root) describing the new `enum` field type and the breaking refactor of `FieldTypeInferrer`/`FieldDefinitionConstraintBuilder`; if no CHANGELOG, skip and document the skip in the WP | WP05 |  |
-| T021 | Final grep sweep: assert no `enum_class` references remain outside `EnumItem.php`, `FieldTypeInferrer.php`, `FieldDefinitionConstraintBuilder.php`, and tests/fixtures (SC-001) | WP05 |  |
+| T019 | Close the transitional-gap entry for the enum bridge in `docs/specs/entity-system.md` §"Known Transitional Gaps", referencing this mission | WP05 |  | [D] |
+| T020 | Add CHANGELOG entry (if `CHANGELOG.md` exists at repo root) describing the new `enum` field type and the breaking refactor of `FieldTypeInferrer`/`FieldDefinitionConstraintBuilder`; if no CHANGELOG, skip and document the skip in the WP | WP05 |  | [D] |
+| T021 | Final grep sweep: assert no `enum_class` references remain outside `EnumItem.php`, `FieldTypeInferrer.php`, `FieldDefinitionConstraintBuilder.php`, and tests/fixtures (SC-001) | WP05 |  | [D] |
 
 ---
 
@@ -150,9 +150,9 @@ This file decomposes [plan.md](./plan.md) into work packages. Each WP has its ow
 
 **Subtasks**:
 
-- [ ] T019 Close transitional-gap entry (WP05)
-- [ ] T020 CHANGELOG entry (or document skip) (WP05)
-- [ ] T021 Final grep sweep (WP05)
+- [x] T019 Close transitional-gap entry (WP05)
+- [x] T020 CHANGELOG entry (or document skip) (WP05)
+- [x] T021 Final grep sweep (WP05)
 
 **Risks**:
 - A leftover `enum_class` hit may appear in docs or comments outside the four allowed sites; resolve by editing the doc rather than carving out an exception.
