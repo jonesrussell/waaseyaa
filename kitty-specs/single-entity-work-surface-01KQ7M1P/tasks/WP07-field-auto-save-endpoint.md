@@ -321,3 +321,4 @@ Depends on WP01 + WP02.
 ## Activity Log
 
 - 2026-04-27T16:52:23Z – claude:sonnet-4-6:implementer:implementer – shell_pid=32616 – Started implementation via action command
+- 2026-04-27T17:22:40Z – claude:sonnet-4-6:implementer:implementer – shell_pid=32616 – F3 auto-save endpoint; access enforced (check + checkFieldAccess); Content-Length size cap before body read; 12 integration tests pass (all F3 status codes + idempotency); PHPStan level 5 clean; 373 API tests pass
