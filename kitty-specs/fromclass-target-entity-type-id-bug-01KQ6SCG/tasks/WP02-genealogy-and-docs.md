@@ -27,6 +27,7 @@ owned_files:
 - packages/genealogy/tests/Unit/GenealogyPedigreeServiceTest.php
 - docs/specs/entity-system.md
 tags: []
+shell_pid: "7160"
 ---
 
 # Work Package Prompt: WP02 — Genealogy tests wire registry; doc cleanup
@@ -107,3 +108,7 @@ search for `targetEntityTypeId` and `fromClass` references and audit.
 - Refactoring how the genealogy tests build the manager beyond the registry
   argument fix.
 - Adding new genealogy tests beyond the existing two.
+
+## Activity Log
+
+- 2026-04-27T08:37:23Z – claude – shell_pid=7160 – Started implementation via action command
