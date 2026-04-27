@@ -14,8 +14,8 @@ subtasks:
 - T041
 - T042
 - T043
-agent: "claude:opus-4-7:implementer:implementer"
-shell_pid: "6804"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "31320"
 history:
 - date: '2026-04-27'
   note: Initial generation by /spec-kitty.tasks.
@@ -208,3 +208,4 @@ spec-kitty agent action implement WP08 --agent <name>
 
 - 2026-04-27T05:42:56Z – claude:opus-4-7:implementer:implementer – shell_pid=6804 – Started implementation via action command
 - 2026-04-27T05:48:38Z – claude:opus-4-7:implementer:implementer – shell_pid=6804 – Ready for review: docs updated for attribute-first flow, CHANGELOG/UPGRADING entries added, 4 follow-on missions lifted to ready, 5 transitional gaps documented in entity-system.md
+- 2026-04-27T05:49:34Z – claude:opus-4-7:reviewer:reviewer – shell_pid=31320 – Started review via action command
