@@ -16,8 +16,8 @@ subtasks:
 - T012
 - T013
 - T014
-agent: "claude:sonnet-4-6:implementer:implementer"
-shell_pid: "28968"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "29496"
 history:
 - date: '2026-04-27'
   note: Generated from plan.md + data-model.md + contracts/.
@@ -202,3 +202,4 @@ Depends on WP01.
 
 - 2026-04-27T16:12:05Z – claude:sonnet-4-6:implementer:implementer – shell_pid=28968 – Started implementation via action command
 - 2026-04-27T16:16:56Z – claude:sonnet-4-6:implementer:implementer – shell_pid=28968 – F6 builder + descriptor; structured arrays only, no HTML; 20 tests pass; phpstan level 5 clean; cs-fixer clean. Added waaseyaa/access to field composer.json require for EntityAccessHandler type-hint.
+- 2026-04-27T16:17:22Z – claude:opus-4-7:reviewer:reviewer – shell_pid=29496 – Started review via action command
