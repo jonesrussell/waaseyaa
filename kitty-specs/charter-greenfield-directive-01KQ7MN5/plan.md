@@ -1,108 +1,118 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Implementation Plan: Greenfield Removal Directive (Charter Amendment)
 
-
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
-
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+**Branch**: `main` | **Date**: 2026-04-27 | **Spec**: [spec.md](spec.md)
+**Input**: [spec.md](spec.md)
+**Mission**: `charter-greenfield-directive-01KQ7MN5`
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Hoist the existing greenfield-removal sub-clause out of `DIR-001` into its own top-level directive `DIR-003` with `severity: error`, so it (a) appears in the compact charter context every agent loads on `/spec-kitty.specify` and `/spec-kitty.plan`, and (b) is referenceable by stable ID in mission specs. The substantive policy is unchanged; only structural placement, identifier, and severity are. No code changes.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [Project-specific test approach or NEEDS CLARIFICATION]
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+**Language/Version**: N/A — documentation-only amendment.
+**Primary Dependencies**: Spec Kitty CLI 3.1.6 (`spec-kitty charter sync`, `spec-kitty charter context`).
+**Storage**: N/A.
+**Testing**: Manual verification of compact-context output + idempotent-sync check.
+**Target Platform**: N/A.
+**Project Type**: Governance amendment.
+**Performance Goals**: N/A.
+**Constraints**: Diff ≤ 100 lines across `charter.md`, `directives.yaml`, `CHANGELOG.md`. No other files touched.
+**Scale/Scope**: 3 files. Single PR.
 
 ## Charter Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on charter file]
+This mission **amends** the charter, so it operates under the charter's own Amendment Process rather than gating against it:
+
+- **Amendment Process compliance**: ✅ A mission targeting `.kittify/charter/` is open with a spec describing the change and rationale. Implementation will run `spec-kitty charter generate --from-interview --force` *only if necessary*; we expect to edit `charter.md` directly and run `spec-kitty charter sync` since this is a structural reorg, not an interview-driven regeneration. Plan will verify which path the CLI supports.
+- **DIR-001 (Risk Boundaries)**: ✅ The amendment removes a sub-bullet from DIR-001 and replaces it with a cross-reference; it does not delete or weaken any non-negotiable. The greenfield clause is preserved verbatim under DIR-003.
+- **DIR-002 (Documentation Synchronization)**: ✅ The amendment includes a CHANGELOG.md entry. `directives.yaml` is regenerated from `charter.md` via `charter sync`, keeping documentation and structured config in sync.
+- **Tightening vs loosening**: This is a *tightening* amendment (visibility increase, severity raised). Per charter § Amendment Process, tightening amendments take effect on the next mission and require no operational-evidence justification.
+- **No charter-exception needed**: The amendment ships through the standard implement/review/accept loop.
+
+**Result**: Charter Check passes. No violations to track in Complexity Tracking.
 
 ## Project Structure
 
 ### Documentation (this feature)
 
 ```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
+kitty-specs/charter-greenfield-directive-01KQ7MN5/
+├── plan.md              # this file
+├── research.md          # Phase 0 — severity vocabulary + sync-vs-generate decision
+├── quickstart.md        # Phase 1 — exact editing recipe + verification commands
+├── spec.md              # mission spec
+├── meta.json            # mission identity
+├── checklists/
+│   └── requirements.md
+└── tasks/               # populated by /spec-kitty.tasks
 ```
+
+No `data-model.md` or `contracts/` — this mission has no entities and no API contracts. (Skipped per template guidance: "remove unused options.")
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+
+Only governance files are modified:
 
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+.kittify/charter/
+├── charter.md            # edit: hoist DIR-003, replace DIR-001 sub-bullet, relocate beta paragraph
+└── directives.yaml       # regenerated by `spec-kitty charter sync`
 
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+CHANGELOG.md              # add entry under next-release header
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+**Structure Decision**: Documentation-only amendment. No `packages/` or `src/` modifications. No new files created.
+
+## Phase 0 — Research (see research.md)
+
+Open questions, all to be resolved before Phase 1:
+
+1. **Severity vocabulary** — `directives.yaml` uses `severity: warn` today. Verify `error` is an accepted value; if not, identify the strongest available level.
+2. **`charter sync` vs `charter generate --from-interview --force`** — the charter explicitly mentions `generate --from-interview --force` for amendments. Determine whether direct editing of `charter.md` followed by `charter sync` produces the same end state (regenerated `directives.yaml`) or whether the interview path is mandatory for substantive amendments.
+3. **Cross-reference rendering** — `directives.yaml` is auto-generated from `charter.md` headings. Verify that adding a top-level numbered directive ("3. Greenfield Removal Policy: ...") in the same `## Project Directives` list produces a `DIR-003` ID with the expected `title`/`description` fields.
+4. **Severity expression in markdown** — does `charter.md` need an explicit `**Severity:** error` annotation, or is severity assigned by another mechanism (e.g., a sibling YAML override)?
+
+## Phase 1 — Design (see quickstart.md)
+
+The "design" for this mission is an editing recipe:
+
+1. **Edit `charter.md` § Project Directives**:
+   - Add a new top-level numbered entry "3. Greenfield Removal Policy:" with the directive text from spec.md § Source of policy text.
+   - In DIR-001's "Public-API removal policy is phase-dependent" sub-clause, remove the alpha-phase paragraph and replace it with: *"During alpha — see DIR-003."*
+   - Move the "At beta entry and beyond" paragraph out of DIR-001's sub-clause and into DIR-003 as a "Post-alpha transition" subsection (text unchanged), so the alpha and post-alpha rules are co-located.
+2. **Express severity** — pending Phase 0 question 4. Most likely: add an explicit `**Severity:** error` line under DIR-003. Fallback: edit `directives.yaml` manually post-sync if charter.md cannot express severity directly. (Manual edit risks being overwritten by future syncs; resolve in research.)
+3. **Run `spec-kitty charter sync --force`** to regenerate `directives.yaml`. Verify DIR-003 entry appears with correct title, description, severity.
+4. **Verify compact context** — run `spec-kitty charter context --action specify --json` and confirm `Directives: DIR-001, DIR-002, DIR-003` appears in the `text` field.
+5. **Run `spec-kitty charter sync --force` a second time** — confirm no diff (NFR-003).
+6. **Add CHANGELOG.md entry** under the next-release section, describing the directive hoist and citing this mission ID.
+7. **Diff check** — confirm combined diff ≤ 100 lines (NFR-001).
+
+No data model, no API contracts, no quickstart-as-onboarding-guide. The "quickstart" doc is the editing recipe above with exact commands.
+
+## Implementation Sequencing
+
+A natural single-WP mission. The plan-to-tasks step will likely produce one work package:
+
+- **WP01 — Hoist DIR-003 and verify**: edits to `charter.md`, run `charter sync`, verify compact context, add CHANGELOG entry. Single review pass.
+
+If Phase 0 reveals that severity must be expressed outside `charter.md` (e.g., a separate YAML override), a small WP02 may be added for that override.
+
+## Risks
+
+| Risk | Likelihood | Mitigation |
+|---|---|---|
+| `charter sync` overwrites manual edits to `directives.yaml` | High if we touch the YAML directly | Keep all edits in `charter.md`. If severity must be set in YAML, document the regeneration risk in research.md and resolve before implementing. |
+| `severity: error` not supported by Spec Kitty 3.1.6 | Unknown | Phase 0 research; fallback to strongest supported level (likely `warn`). |
+| Hoisting renumbers DIR-001/DIR-002 if directives are auto-numbered by position | Medium | Verify in research; structural placement should add DIR-003 after existing entries without renumbering. |
+| Charter generate-from-interview is mandatory for amendments | Low (charter.md says "generate --from-interview --force" but `sync` is offered as a separate command) | Phase 0 research; if mandatory, the implementation pivots to running the interview path with the new directive answer. |
 
 ## Complexity Tracking
 
-*Fill ONLY if Charter Check has violations that must be justified*
-
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+| (none) | | |
+
+No charter violations. No complexity to justify.
