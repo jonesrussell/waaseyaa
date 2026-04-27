@@ -6,8 +6,10 @@ namespace Waaseyaa\Groups;
 
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Field\FieldDefinitionInterface;
+use Waaseyaa\Field\FieldStorage;
 
 /**
  * Multi-bundle Group content entity.
@@ -20,6 +22,15 @@ use Waaseyaa\Field\FieldDefinitionInterface;
 #[ContentEntityKeys(id: 'gid', uuid: 'uuid', bundle: 'type', label: 'name', langcode: 'langcode')]
 final class Group extends ContentEntityBase
 {
+    #[Field(type: 'integer', default: 1, label: 'Status', description: 'Whether the group is published.', stored: FieldStorage::Data)]
+    public ?int $status = null;
+
+    #[Field(type: 'integer', label: 'Created at', stored: FieldStorage::Data)]
+    public ?int $created_at = null;
+
+    #[Field(type: 'integer', label: 'Updated at', stored: FieldStorage::Data)]
+    public ?int $updated_at = null;
+
     /**
      * @param array<string, mixed> $values Initial entity values.
      * @param string $entityTypeId Override machine name (defaults to `group` when empty).

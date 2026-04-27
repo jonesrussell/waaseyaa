@@ -6,7 +6,6 @@ namespace Waaseyaa\Groups;
 
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Field\FieldDefinition;
-use Waaseyaa\Field\FieldStorage;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
 /**
@@ -21,52 +20,10 @@ final class GroupsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        // The `group` content entity declares its core fields with
-        // `stored: FieldStorage::Data` so registry-aware queries can resolve
-        // `status`/`created_at`/`updated_at` via json_extract on the bundle-
-        // partitioned data table. The current `#[Field]` attribute does not
-        // expose `stored:`, so we register the content type explicitly here
-        // (using the @internal `_fieldDefinitions` slot) instead of via
-        // EntityType::fromClass(). The Group class still carries
-        // #[ContentEntityType] / #[ContentEntityKeys] for type-id discovery,
-        // and bundle-scoped fields remain consumer-defined via
-        // EntityTypeManager::addBundleFields().
-        $this->entityType(new EntityType(
-            id: 'group',
-            label: 'Group',
-            description: 'Multi-bundle group of members, actors, or subjects.',
-            class: Group::class,
-            keys: [
-                'id' => 'gid',
-                'uuid' => 'uuid',
-                'bundle' => 'type',
-                'label' => 'name',
-                'langcode' => 'langcode',
-            ],
+        $this->entityType(EntityType::fromClass(
+            Group::class,
             bundleEntityType: 'group_type',
             group: 'groups',
-            _fieldDefinitions: [
-                'status' => new FieldDefinition(
-                    name: 'status',
-                    type: 'integer',
-                    defaultValue: 1,
-                    label: 'Status',
-                    description: 'Whether the group is published.',
-                    stored: FieldStorage::Data,
-                ),
-                'created_at' => new FieldDefinition(
-                    name: 'created_at',
-                    type: 'integer',
-                    label: 'Created at',
-                    stored: FieldStorage::Data,
-                ),
-                'updated_at' => new FieldDefinition(
-                    name: 'updated_at',
-                    type: 'integer',
-                    label: 'Updated at',
-                    stored: FieldStorage::Data,
-                ),
-            ],
         ));
 
         // GroupType is a config entity (extends ConfigEntityBase). Attribute
