@@ -190,3 +190,4 @@ spec-kitty agent action implement WP05 --agent <name>
 ## Activity Log
 
 - 2026-04-27T07:24:03Z – claude:sonnet:implementer:implementer – shell_pid=30336 – Started implementation via action command
+- 2026-04-27T07:31:27Z – claude:sonnet:implementer:implementer – shell_pid=30336 – Ready for review: transitional gap closed in docs/specs/entity-system.md; CHANGELOG+UPGRADING updated; LabeledCase added to public-surface-map; verification report committed on main. SC-001 holds (2 justified docblock hits). Field+entity unit tests green. Documented follow-ups: production wiring of FieldTypeManager + legacyJsonSchema enum arm.
