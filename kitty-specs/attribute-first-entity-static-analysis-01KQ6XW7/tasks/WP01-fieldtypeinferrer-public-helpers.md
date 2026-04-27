@@ -124,3 +124,4 @@ Extend `packages/entity/tests/Unit/Attribute/FieldTypeInferrerTest.php`:
 ## Activity Log
 
 - 2026-04-27T07:57:53Z – claude – shell_pid=36176 – Assigned agent via action command
+- 2026-04-27T08:01:30Z – claude – shell_pid=36176 – WP01 implemented: 2 additive public helpers on FieldTypeInferrer + 5 unit tests; all 38 FieldTypeInferrerTest cases pass; infer() untouched.
