@@ -17,7 +17,8 @@ subtasks:
 - T003
 - T004
 - T005
-shell_pid: '36224'
+shell_pid: "36224"
+agent: "claude:sonnet:implementer:implementer"
 history:
 - timestamp: '2026-04-27T06:43:14Z'
   action: created
@@ -194,3 +195,7 @@ Do not modify any other files in this WP. If you discover the storage layer or a
 ```bash
 spec-kitty agent action implement WP01 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-04-27T06:50:51Z – claude:sonnet:implementer:implementer – shell_pid=36224 – Assigned agent via action command
