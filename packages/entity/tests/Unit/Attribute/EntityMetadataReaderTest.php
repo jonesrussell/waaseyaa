@@ -14,8 +14,10 @@ use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\MetadataNoLabelEntity;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\MetadataNonEntity;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\MetadataParentEntity;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\MetadataSimpleEntity;
+use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\MetadataStoredMixedEntity;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\MetadataTypedOverrideEntity;
 use Waaseyaa\Field\FieldDefinition;
+use Waaseyaa\Field\FieldStorage;
 
 // Trigger fixture file load (multi-class file is not autoloaded by FQN of secondary classes).
 require_once __DIR__ . '/../../Fixtures/AttributeFirstEntities/MetadataTestFixtures.php';
@@ -99,6 +101,18 @@ final class EntityMetadataReaderTest extends TestCase
         self::assertArrayHasKey('body', $fields);
         self::assertSame('text', $fields['body']->getType());
         self::assertSame('Body', $fields['body']->getLabel());
+    }
+
+    #[Test]
+    public function resolve_fields_forwards_stored_into_field_definition(): void
+    {
+        $fields = EntityMetadataReader::resolveFields(MetadataStoredMixedEntity::class);
+
+        self::assertArrayHasKey('title', $fields);
+        self::assertArrayHasKey('status', $fields);
+
+        self::assertSame(FieldStorage::Column, $fields['title']->getStored());
+        self::assertSame(FieldStorage::Data, $fields['status']->getStored());
     }
 
     #[Test]

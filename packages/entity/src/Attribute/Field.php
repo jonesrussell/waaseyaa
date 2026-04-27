@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity\Attribute;
 
+use Waaseyaa\Field\FieldStorage;
+
 /**
  * Marks a public typed property of a content entity class as a persistable field.
  *
@@ -16,6 +18,12 @@ namespace Waaseyaa\Entity\Attribute;
  * `settings.enum_class` populated automatically. The legacy
  * `'string' + settings.enum_class` bridge is no longer supported: explicitly
  * passing `type: 'string'` on a backed-enum property is rejected.
+ *
+ * `stored:` selects how the field is persisted: {@see FieldStorage::Column}
+ * (default) materializes a dedicated SQL column; {@see FieldStorage::Data}
+ * keeps the value in the entity's `_data` JSON blob and routes queries via
+ * `json_extract`. Forwarded verbatim to `FieldDefinition` by
+ * {@see EntityMetadataReader::resolveFields()}.
  *
  * Example:
  *
@@ -41,5 +49,6 @@ final readonly class Field
         public bool $readOnly = false,
         public bool $translatable = false,
         public bool $revisionable = false,
+        public FieldStorage $stored = FieldStorage::Column,
     ) {}
 }

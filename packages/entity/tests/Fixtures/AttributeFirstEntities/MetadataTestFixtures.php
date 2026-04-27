@@ -7,6 +7,7 @@ namespace Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
+use Waaseyaa\Field\FieldStorage;
 
 /**
  * Simple entity with label, description, and a mix of inferred field types.
@@ -83,4 +84,19 @@ final class MetadataNonEntity
 {
     #[Field]
     public string $ignored = '';
+}
+
+/**
+ * Entity with one column-stored field and one data-stored field. Used to
+ * assert that `EntityMetadataReader::resolveFields()` forwards `stored:`
+ * verbatim into `FieldDefinition`.
+ */
+#[ContentEntityType(id: 'metadata_stored_mixed', label: 'Stored Mixed')]
+final class MetadataStoredMixedEntity extends ContentEntityBase
+{
+    #[Field(label: 'Title')]
+    public string $title = '';
+
+    #[Field(stored: FieldStorage::Data, label: 'Status')]
+    public ?int $status = null;
 }
