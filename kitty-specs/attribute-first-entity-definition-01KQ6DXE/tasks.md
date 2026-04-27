@@ -39,12 +39,12 @@
 | T026 | Migrate messaging entity class(es) + `MessagingServiceProvider.php` | WP05 | [D] |
 | T027 | Migrate path entity class(es) + `PathServiceProvider.php` | WP05 | [D] |
 | T028 | Update `packages/cli/src/Command/MakeEntityTypeCommand.php` to emit attribute-first scaffold | WP05 |  | [D] |
-| T029 | Migrate `packages/entity/tests/Unit/` fixtures to attribute-first form (3 files) | WP06 | [P] |
-| T030 | Migrate `packages/entity-storage/tests/Unit/` fixtures (4 files) | WP06 | [P] |
-| T031 | Migrate `packages/api/tests/` fixtures (3 files including `Fixtures/TranslatableTestEntity.php`) | WP06 | [P] |
-| T032 | Migrate `packages/mcp/tests/Unit/` fixtures (5 files) | WP06 | [P] |
-| T033 | Migrate `packages/graphql/tests/Unit/` fixtures (4 files) | WP06 | [P] |
-| T034 | Run package-scoped phpunit for entity, entity-storage, api, mcp, graphql; verify green | WP06 |  |
+| T029 | Migrate `packages/entity/tests/Unit/` fixtures to attribute-first form (3 files) | WP06 | [D] |
+| T030 | Migrate `packages/entity-storage/tests/Unit/` fixtures (4 files) | WP06 | [D] |
+| T031 | Migrate `packages/api/tests/` fixtures (3 files including `Fixtures/TranslatableTestEntity.php`) | WP06 | [D] |
+| T032 | Migrate `packages/mcp/tests/Unit/` fixtures (5 files) | WP06 | [D] |
+| T033 | Migrate `packages/graphql/tests/Unit/` fixtures (4 files) | WP06 | [D] |
+| T034 | Run package-scoped phpunit for entity, entity-storage, api, mcp, graphql; verify green | WP06 |  | [D] |
 | T035 | Migrate `packages/genealogy/tests/Unit/` fixtures (2 files) | WP07 | [P] |
 | T036 | Migrate `packages/ssr/tests/Unit/` fixtures (2 files) | WP07 | [P] |
 | T037 | Migrate `packages/testing/tests/Unit/` fixtures (2 files) | WP07 | [P] |
@@ -267,12 +267,12 @@ WP01 ──► WP02 ──► WP03 ──┬──► WP04 ──┬──► WP
 **Independent test**: phpunit for `packages/{entity,entity-storage,api,mcp,graphql}/` is green.
 
 **Included subtasks**:
-- [ ] T029 Migrate `packages/entity/tests/Unit/` fixtures (WP06)
-- [ ] T030 Migrate `packages/entity-storage/tests/Unit/` fixtures (WP06)
-- [ ] T031 Migrate `packages/api/tests/` fixtures (WP06)
-- [ ] T032 Migrate `packages/mcp/tests/Unit/` fixtures (WP06)
-- [ ] T033 Migrate `packages/graphql/tests/Unit/` fixtures (WP06)
-- [ ] T034 Run package phpunit; verify green (WP06)
+- [x] T029 Migrate `packages/entity/tests/Unit/` fixtures (WP06)
+- [x] T030 Migrate `packages/entity-storage/tests/Unit/` fixtures (WP06)
+- [x] T031 Migrate `packages/api/tests/` fixtures (WP06)
+- [x] T032 Migrate `packages/mcp/tests/Unit/` fixtures (WP06)
+- [x] T033 Migrate `packages/graphql/tests/Unit/` fixtures (WP06)
+- [x] T034 Run package phpunit; verify green (WP06)
 
 **Implementation sketch**: For each test file currently using `new EntityType(... fieldDefinitions: [...])`, decide:
 - If the test exercises real entity behavior → create a small attribute-decorated test entity in `packages/<pkg>/tests/Fixtures/AttributeFirstEntities/<Name>.php` and use `EntityType::fromClass(...)`.
