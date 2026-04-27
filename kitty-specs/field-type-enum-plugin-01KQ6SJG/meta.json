@@ -1,6 +1,8 @@
 {
   "created_at": "2026-04-27T06:21:08.453412+00:00",
-  "friendly_name": "field type enum plugin",
+  "friendly_name": "Enum Field-Type Plugin",
+  "source_description": "Add an `enum` field-type plugin (EnumItem) that stores PHP backed-enum values via their backing scalar, validates against the declared enum class, emits JSON Schema `enum` for ai-schema, and surfaces case labels in admin widgets. Refactor FieldTypeInferrer to map backed enums to `enum` and remove the transitional `string + settings.enum_class` bridge documented in entity-system.md (Known Transitional Gaps).",
+  "vcs": "git",
   "mission_id": "01KQ6SJGTFFN73ZS746T06NMFV",
   "mission_number": null,
   "mission_slug": "field-type-enum-plugin-01KQ6SJG",
