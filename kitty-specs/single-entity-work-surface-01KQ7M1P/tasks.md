@@ -26,12 +26,12 @@
 | T016 | Unit-test `EntityDeepLinkRouteBuilder::for()->controller()` produces a Symfony `Route` with the expected path, method, parameter resolver, and option flags | WP04 | — | [D] |
 | T017 | Integration test: deep-link route resolves entity via `EntityRepository` and runs access policy before invoking controller; 404 on missing entity; 403 on access denied | WP04 | — | [D] |
 | T018 | Author-side example in routing docstring showing the `for(...)->controller(...)->methods(...)->build()` chain pattern | WP04 | [D] |
-| T019 | Create `packages/attachment/composer.json` declaring the package at L2 with deps on entity, entity-storage, access, foundation | WP05 | — |
-| T020 | Implement `Attachment` content entity (extends `ContentEntityBase`) with required entity keys | WP05 | — |
-| T021 | Implement `AttachmentSchema` for `SqlSchemaHandler` (columns, indexes, `_data` blob fields per data-model.md § 1) | WP05 | — |
-| T022 | Implement `AttachmentRepository` with `listFor`, `getActive`, `save`, `delete` methods backed by `EntityRepositoryInterface` + `DatabaseInterface` | WP05 | — |
-| T023 | Implement `AttachmentRepository::setActive()` using direct `DatabaseInterface::transaction()` with two UPDATE statements per research.md Q6 | WP05 | — |
-| T024 | Wire `AttachmentRepository` and entity-type registration in `packages/attachment/src/ServiceProvider.php`; unit-test `AttachmentRepository` against SQLite | WP05 | — |
+| T019 | Create `packages/attachment/composer.json` declaring the package at L2 with deps on entity, entity-storage, access, foundation | WP05 | — | [D] |
+| T020 | Implement `Attachment` content entity (extends `ContentEntityBase`) with required entity keys | WP05 | — | [D] |
+| T021 | Implement `AttachmentSchema` for `SqlSchemaHandler` (columns, indexes, `_data` blob fields per data-model.md § 1) | WP05 | — | [D] |
+| T022 | Implement `AttachmentRepository` with `listFor`, `getActive`, `save`, `delete` methods backed by `EntityRepositoryInterface` + `DatabaseInterface` | WP05 | — | [D] |
+| T023 | Implement `AttachmentRepository::setActive()` using direct `DatabaseInterface::transaction()` with two UPDATE statements per research.md Q6 | WP05 | — | [D] |
+| T024 | Wire `AttachmentRepository` and entity-type registration in `packages/attachment/src/ServiceProvider.php`; unit-test `AttachmentRepository` against SQLite | WP05 | — | [D] |
 | T025 | Implement `ParentDelegatedAccessPolicy` in `packages/attachment/src/Policy/ParentDelegatedAccessPolicy.php` with `#[PolicyAttribute(entityType: 'attachment')]` | WP06 | — |
 | T026 | Unit-test `ParentDelegatedAccessPolicy`: view delegates to parent, update delegates to parent, returns Neutral if parent missing | WP06 | — |
 | T027 | Concurrency test: 50 concurrent `setActive` calls against the same parent leave exactly one active attachment (NFR-010) | WP06 | — |
@@ -198,12 +198,12 @@
 5. `bin/check-package-layers` passes — `attachment` declares deps only on L0–L1.
 
 **Included subtasks**:
-- [ ] T019 Create package `composer.json` (WP05)
-- [ ] T020 Implement `Attachment` entity (WP05)
-- [ ] T021 Implement `AttachmentSchema` (WP05)
-- [ ] T022 Implement `AttachmentRepository` core methods (WP05)
-- [ ] T023 Implement `AttachmentRepository::setActive()` with transaction (WP05)
-- [ ] T024 Wire ServiceProvider + repository unit tests (WP05)
+- [x] T019 Create package `composer.json` (WP05)
+- [x] T020 Implement `Attachment` entity (WP05)
+- [x] T021 Implement `AttachmentSchema` (WP05)
+- [x] T022 Implement `AttachmentRepository` core methods (WP05)
+- [x] T023 Implement `AttachmentRepository::setActive()` with transaction (WP05)
+- [x] T024 Wire ServiceProvider + repository unit tests (WP05)
 
 **Implementation sketch**: see WP05 prompt.
 
