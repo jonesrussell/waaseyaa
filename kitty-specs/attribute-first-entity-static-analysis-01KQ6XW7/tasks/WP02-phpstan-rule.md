@@ -35,7 +35,8 @@ subtasks:
 - T019
 phase: Phase 2 - Rule
 assignee: ''
-agent: ''
+agent: "claude"
+shell_pid: "30892"
 history:
 - timestamp: '2026-04-27T07:42:00Z'
   agent: system
@@ -174,3 +175,7 @@ This mechanically enforces FR-007 for FR-002..FR-005. For FR-001 and FR-006 (no 
 - [ ] Cascade suppression works: `notEntityClass.php` reports exactly one error.
 - [ ] `vendor/bin/phpstan analyse --no-progress` against the entire monorepo exits 0 with no new errors on existing entity-using packages.
 - [ ] `vendor/bin/phpunit packages/entity/tests/PhpStan` green.
+
+## Activity Log
+
+- 2026-04-27T08:04:03Z – claude – shell_pid=30892 – Started implementation via action command
