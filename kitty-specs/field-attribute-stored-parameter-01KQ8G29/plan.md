@@ -1,108 +1,99 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Implementation Plan: `#[Field(stored:)]` parameter
 
-
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
-
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
-
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+**Branch**: `main` (small change; landed directly on main per project workflow)
+**Date**: 2026-04-27
+**Spec**: [spec.md](./spec.md)
+**Research**: [research.md](./research.md)
+**Data model**: [data-model.md](./data-model.md)
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+Add `public FieldStorage $stored = FieldStorage::Column` as the final constructor parameter on `#[Field]` (`packages/entity/src/Attribute/Field.php`). Forward `$field->stored` from `EntityMetadataReader::resolveFields()` into `FieldDefinition::__construct(stored: ...)`. Migrate `Waaseyaa\Groups\Group` to declare `status`, `created_at`, `updated_at` as `#[Field(stored: FieldStorage::Data)]` properties. Collapse `GroupsServiceProvider` to `EntityType::fromClass(Group::class)`. Close the gap entry in `docs/specs/entity-system.md`.
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [Project-specific test approach or NEEDS CLARIFICATION]
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+- **Language/Version:** PHP 8.4+, `declare(strict_types=1)` everywhere.
+- **Primary dependencies:** Symfony 7.x components; PHPUnit 10.5; Doctrine DBAL.
+- **Storage:** No on-disk schema change. `Group` continues to persist `status`/`created_at`/`updated_at` in the bundle-partitioned `_data` JSON blob.
+- **Testing:** PHPUnit unit tests in `packages/entity/tests/Unit/` and `packages/groups/tests/`.
+- **Target Platform:** Same as repo — PHP runtime, web + CLI.
+- **Project type:** Monorepo PHP package.
+- **Performance:** N/A — pure metadata path.
+- **Constraints:** Backwards compatibility — every existing `#[Field]` call site must continue to work without source changes.
+- **Scale:** Affects 1 attribute, 1 reader, 2 entity-package files, plus 1 doc, plus 3 test files.
 
 ## Charter Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+- **DIR-001 / DIR-002 / DIR-003** (mission charter directives) — read at start of each WP via `spec-kitty agent context resolve --action implement`.
+- **Layer rule:** `entity` and `field` are both Layer 1; same-layer cross-import is permitted. `bin/check-package-layers` is the gate.
+- **Architectural quality over backward compatibility (user feedback memory):** No `@deprecated` shims, no `Legacy*` classes; remove the `_fieldDefinitions:` workaround outright in WP02 — callers get updated in the same change.
+- **Composer policy:** No new packages, no new path repositories. `bin/check-composer-policy` should remain green.
 
-[Gates determined based on charter file]
+## Phase 0 — Research
 
-## Project Structure
+Captured in [research.md](./research.md). Five decisions (D1–D5):
+1. `stored:` is appended last on `#[Field]`.
+2. `EntityMetadataReader::resolveFields()` is the single forwarding point.
+3. `FieldTypeInferrer::infer()` is unchanged (regression test only).
+4. Migrate `Group` to attribute-first; keep `EntityType::fromClass()` as canonical.
+5. No layer-graph movement.
 
-### Documentation (this feature)
+## Phase 1 — Design
+
+### File map (changes)
+
+| File | Change |
+|---|---|
+| `packages/entity/src/Attribute/Field.php` | Add `public FieldStorage $stored = FieldStorage::Column` last parameter; add `use Waaseyaa\Field\FieldStorage;`; update docblock. |
+| `packages/entity/src/Attribute/EntityMetadataReader.php` | At lines 108–121, append `stored: $field->stored,` to the `FieldDefinition` constructor call. |
+| `packages/entity/tests/Unit/Attribute/FieldAttributeTest.php` | Update `it_constructs_with_default_values` to assert `stored === Column`; add `it_accepts_stored_data` test. |
+| `packages/entity/tests/Unit/Attribute/FieldTypeInferrerTest.php` | Add one regression case asserting `stored:` does not change inferred `{type, required, settings}`. |
+| `packages/entity/tests/Unit/Attribute/EntityMetadataReaderTest.php` (or new file) | Add a fixture class with one `Column` field and one `Data` field; assert `resolveFields()` returns FieldDefinitions whose storage matches. |
+| `packages/groups/src/Group.php` | Add three public typed `int` properties decorated with `#[Field(stored: FieldStorage::Data)]`. |
+| `packages/groups/src/GroupsServiceProvider.php` | Replace lines 24–70 with `$this->entityType(EntityType::fromClass(Group::class));`; drop unused imports (`FieldDefinition`, `FieldStorage`, comment block). |
+| `docs/specs/entity-system.md` | Mark Known Transitional Gaps §3 closed (referencing mission slug `field-attribute-stored-parameter-01KQ8G29`). |
+
+### Key design decisions
+
+- **Append-only attribute parameter.** `stored:` goes after `revisionable` to avoid touching any current call site. Named-argument and positional callers both stay valid.
+- **No inferrer changes.** A regression test makes the asymmetry explicit and prevents drift.
+- **Group stays a `final class`.** Only public typed properties are added — same shape as `Node` and `User`. `ContentEntityBase` populates from `$values` at construction.
+- **No re-introduction of the `_fieldDefinitions:` slot.** Once WP02 lands, no first-party caller relies on it; if a future need arises it remains available, but Group is no longer the proof case.
+
+## Phase 2 — Tasks (preview)
+
+Driven by `/spec-kitty.tasks` in the next phase. Expected WP graph:
 
 ```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
+WP01 (attribute + reader + tests)
+   └─→ WP02 (Group migration + ServiceProvider cleanup)
+          └─→ WP03 (close gap entry in entity-system.md)
 ```
 
-### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+## Verification (acceptance gate)
 
-```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+```bash
+./vendor/bin/phpunit packages/entity/tests/Unit/Attribute/
+./vendor/bin/phpunit packages/groups/tests/        # 13/13 expected
+./vendor/bin/phpunit                                # full suite green
+composer phpstan
+composer cs-check
+bin/check-package-layers
+bin/check-composer-policy
+bin/waaseyaa optimize:manifest                      # boot smoke
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+End-to-end: `Group` registration via `EntityType::fromClass()` produces an entity type whose three transitional fields resolve through `json_extract` against the `_data` blob — same behavior as today, but driven entirely from class metadata.
 
-## Complexity Tracking
+## Risks
 
-*Fill ONLY if Charter Check has violations that must be justified*
+- **Low — Group test drift.** Mitigated by re-running `packages/groups/tests/` after each WP and treating any deviation from 13/13 as a fail.
+- **Low — Reader test coverage gap.** Mitigated by adding a fixture-based test asserting end-to-end forwarding (attribute → reader → FieldDefinition).
+- **Low — phpstan signature change on `Field::__construct`.** New required-shape parameter has a default; signatures stay PHPStan-clean.
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+## Out of scope
+
+- Migrating other entities to `FieldStorage::Data`.
+- Changes to `FieldDefinition`, schema handlers, or query routing.
+- Layer-graph movement.
+- Any new field types or attributes.
