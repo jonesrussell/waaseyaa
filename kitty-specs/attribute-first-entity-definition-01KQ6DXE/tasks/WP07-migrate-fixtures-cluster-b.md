@@ -14,8 +14,8 @@ subtasks:
 - T037
 - T038
 - T039
-agent: "claude:opus-4-7:implementer:implementer"
-shell_pid: "28680"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "20088"
 history:
 - date: '2026-04-27'
   note: Initial generation by /spec-kitty.tasks.
@@ -155,3 +155,4 @@ spec-kitty agent action implement WP07 --agent <name>
 
 - 2026-04-27T05:22:09Z – claude:opus-4-7:implementer:implementer – shell_pid=28680 – Started implementation via action command
 - 2026-04-27T05:37:28Z – claude:opus-4-7:implementer:implementer – shell_pid=28680 – Ready for review: 8 test files migrated across 6 packages; all tests green; WP06 smoke check (1208 tests) passes.
+- 2026-04-27T05:38:36Z – claude:opus-4-7:reviewer:reviewer – shell_pid=20088 – Started review via action command
