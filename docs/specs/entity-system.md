@@ -487,6 +487,8 @@ $this->entityType(EntityType::fromClass(Note::class));
 
 `EntityType::fromClass(string $class, ...$overrides): self` reads the class-level `#[ContentEntityType]` and `#[ContentEntityKeys]` plus all `#[Field]`-decorated properties, infers the field shape from each property's PHP type (with `FieldTypeInferrer`), and returns a fully-formed `EntityType`. Named arguments after `$class` override any inferred slot (`storageClass`, `keys`, `revisionable`, `bundleEntityType`, `constraints`, etc.).
 
+`#[Field]` accepts a `stored: FieldStorage` parameter (default `FieldStorage::Column`) that `EntityMetadataReader::resolveFields()` forwards verbatim into `FieldDefinition`. Properties that should live in the `_data` JSON blob (low-traffic universals like `status`, `created_at`, `updated_at` on bundle-partitioned entities) declare `#[Field(stored: FieldStorage::Data)]` directly — no fallback to raw `EntityType()` construction is needed.
+
 ### Static analysis of `#[Field]`
 
 `packages/entity/src/PhpStan/FieldAttributeRule.php` is a custom PHPStan rule that lints `#[Field]` usage at static-analysis time so attribute typos and misuses surface in CI rather than at kernel boot. It mirrors `FieldTypeInferrer::infer()`'s checks exactly — error messages produced by the rule are byte-identical to the runtime `EntityMetadataException` messages you would see at registration time, enforced by a runtime cross-check in `FieldAttributeRuleTest`.
@@ -584,7 +586,7 @@ public CourseStatus $status;
 
 ### 3. `#[Field]` attribute gaps surfaced by M1
 
-**No `stored:` parameter on `#[Field]`.** Entities with universal core fields that need explicit storage placement (e.g., `groups/Group` declares `status`, `created_at`, `updated_at` all requiring `stored: FieldStorage::Data`) cannot express that on the attribute today. The workaround is to fall back to the raw `EntityType()` constructor with the internal `_fieldDefinitions:` slot for those registrations. A future `field-attribute-stored-parameter` mission will add the parameter so the storage placement can live on the attribute alongside `type:` / `default:` / `settings:`.
+**~~No `stored:` parameter on `#[Field]`.~~** **Closed in mission `field-attribute-stored-parameter-01KQ8G29`.** `#[Field]` now exposes `stored: FieldStorage` (default `FieldStorage::Column`); `EntityMetadataReader::resolveFields()` forwards it into `FieldDefinition`. The `groups/Group` entity is migrated to attribute-first declaration and `GroupsServiceProvider` registers via `EntityType::fromClass()` — the `_fieldDefinitions:` slot is no longer used here.
 
 **`entity_reference` is rejected on scalar PHP types by `FieldTypeInferrer`.** The inferrer doesn't currently have a compatibility group for `?int` or `?string` → `entity_reference`. Properties like `Node.uid`, `Term.parent_id`, etc. work around this with untyped properties + `@var` PHPDoc:
 
