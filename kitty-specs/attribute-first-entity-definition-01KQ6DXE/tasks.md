@@ -50,10 +50,10 @@
 | T037 | Migrate `packages/testing/tests/Unit/` fixtures (2 files) | WP07 | [D] |
 | T038 | Migrate remaining test fixtures: ai-vector (1), admin-surface (1), cli (1) | WP07 | [D] |
 | T039 | Run package-scoped phpunit for genealogy, ssr, testing, ai-vector, admin-surface, cli; verify green | WP07 |  | [D] |
-| T040 | Update `docs/specs/entity-system.md` — replace EntityType definition section with attribute-first patterns; refresh §Public Surface | WP08 |  |
-| T041 | Update `CHANGELOG.md` with breaking-change note (`EntityType` constructor signature change; new `#[Field]` attribute) | WP08 | [P] |
-| T042 | Update `UPGRADING.md` with migration recipe for any consumers carrying the old shape | WP08 | [P] |
-| T043 | Update mission status meta and stub follow-on missions to reference M1 having merged | WP08 | [P] |
+| T040 | Update `docs/specs/entity-system.md` — replace EntityType definition section with attribute-first patterns; refresh §Public Surface | WP08 |  | [D] |
+| T041 | Update `CHANGELOG.md` with breaking-change note (`EntityType` constructor signature change; new `#[Field]` attribute) | WP08 | [D] |
+| T042 | Update `UPGRADING.md` with migration recipe for any consumers carrying the old shape | WP08 | [D] |
+| T043 | Update mission status meta and stub follow-on missions to reference M1 having merged | WP08 | [D] |
 | T044 | Refresh `phpstan-baseline.neon` and run `vendor/bin/phpstan analyse` clean | WP09 |  |
 | T045 | Run full `vendor/bin/phpunit` suite; resolve any residual failures | WP09 |  |
 | T046 | Verify success criteria SC-001 through SC-005 with explicit grep/test assertions | WP09 |  |
@@ -328,10 +328,10 @@ Keep changes line-for-line minimal — same field shapes, same test assertions.
 **Independent test**: Documentation reads correctly; `docs/specs/entity-system.md` no longer shows `EntityType(fieldDefinitions: …)` examples.
 
 **Included subtasks**:
-- [ ] T040 Update `docs/specs/entity-system.md` (WP08)
-- [ ] T041 Update `CHANGELOG.md` with breaking-change entry (WP08)
-- [ ] T042 Update `UPGRADING.md` with migration recipe (WP08)
-- [ ] T043 Update mission status meta + stub follow-on missions to reference M1 merging (WP08)
+- [x] T040 Update `docs/specs/entity-system.md` (WP08)
+- [x] T041 Update `CHANGELOG.md` with breaking-change entry (WP08)
+- [x] T042 Update `UPGRADING.md` with migration recipe (WP08)
+- [x] T043 Update mission status meta + stub follow-on missions to reference M1 merging (WP08)
 
 **Implementation sketch**:
 1. Replace §EntityType Definition in entity-system.md with the new attribute-first example. Mark the §Public Surface section to list `EntityType::fromClass()` as the canonical content-entity registration entry point. Update any code samples elsewhere in the doc.
