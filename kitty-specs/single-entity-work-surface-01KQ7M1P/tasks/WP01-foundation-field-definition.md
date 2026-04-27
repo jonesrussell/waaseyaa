@@ -236,3 +236,4 @@ No dependencies — can start immediately from `main`.
 ## Activity Log
 
 - 2026-04-27T15:53:23Z – claude:sonnet-4-6:implementer:implementer – shell_pid=12988 – Assigned agent via action command
+- 2026-04-27T15:58:35Z – claude:sonnet-4-6:implementer:implementer – shell_pid=12988 – FieldDefinition enriched; UPGRADING.md authored; tests + phpstan + cs all pass
