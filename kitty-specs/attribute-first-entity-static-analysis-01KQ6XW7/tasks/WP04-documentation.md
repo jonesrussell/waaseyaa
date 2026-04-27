@@ -13,7 +13,8 @@ subtasks:
 - T023
 phase: Phase 4 - Documentation
 assignee: ''
-agent: ''
+agent: "claude"
+shell_pid: "36192"
 history:
 - timestamp: '2026-04-27T07:42:00Z'
   agent: system
@@ -70,3 +71,7 @@ Under the next unreleased version add:
 - [ ] `docs/specs/entity-system.md` includes the new section with all 6 rules listed.
 - [ ] `CHANGELOG.md` entry present under unreleased.
 - [ ] No code changes in this WP.
+
+## Activity Log
+
+- 2026-04-27T08:15:41Z – claude – shell_pid=36192 – Started implementation via action command
