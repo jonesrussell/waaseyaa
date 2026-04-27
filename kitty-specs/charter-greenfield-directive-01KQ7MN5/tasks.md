@@ -8,12 +8,12 @@
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
-| T001 | Replace DIR-001 alpha-phase removal sub-bullet with cross-reference to DIR-003 in `charter.md` | WP01 | — |
-| T002 | Add DIR-003 (Greenfield Removal Policy) as a third top-level numbered item in `charter.md` § Project Directives | WP01 | — |
-| T003 | Run `spec-kitty charter sync --force` and verify `directives.yaml` contains DIR-003 with the expected description | WP01 | — |
-| T004 | Verify compact charter context output via `spec-kitty charter context --action specify --json` lists `DIR-003` in the `Directives:` line | WP01 | — |
-| T005 | Verify sync idempotency: re-run `charter sync --force`, confirm zero diff in `directives.yaml` | WP01 | — |
-| T006 | Add CHANGELOG.md entry under `## [Unreleased]` describing the directive hoist and citing the mission ID | WP01 | — |
+| T001 | Replace DIR-001 alpha-phase removal sub-bullet with cross-reference to DIR-003 in `charter.md` | WP01 | — | [D] |
+| T002 | Add DIR-003 (Greenfield Removal Policy) as a third top-level numbered item in `charter.md` § Project Directives | WP01 | — | [D] |
+| T003 | Run `spec-kitty charter sync --force` and verify `directives.yaml` contains DIR-003 with the expected description | WP01 | — | [D] |
+| T004 | Verify compact charter context output via `spec-kitty charter context --action specify --json` lists `DIR-003` in the `Directives:` line | WP01 | — | [D] |
+| T005 | Verify sync idempotency: re-run `charter sync --force`, confirm zero diff in `directives.yaml` | WP01 | — | [D] |
+| T006 | Add CHANGELOG.md entry under `## [Unreleased]` describing the directive hoist and citing the mission ID | WP01 | — | [D] |
 
 All 6 subtasks belong to a single work package: WP01 — Hoist DIR-003 and verify.
 
@@ -37,12 +37,12 @@ This mission is intentionally small and linear. There is no foundational/setup p
 
 **Included subtasks**:
 
-- [ ] T001 Replace DIR-001 alpha-phase removal sub-bullet with cross-reference (WP01)
-- [ ] T002 Add DIR-003 as a third top-level numbered item in charter.md (WP01)
-- [ ] T003 Run `spec-kitty charter sync --force` and verify directives.yaml (WP01)
-- [ ] T004 Verify compact charter context lists DIR-003 (WP01)
-- [ ] T005 Verify idempotent sync (WP01)
-- [ ] T006 Add CHANGELOG.md entry (WP01)
+- [x] T001 Replace DIR-001 alpha-phase removal sub-bullet with cross-reference (WP01)
+- [x] T002 Add DIR-003 as a third top-level numbered item in charter.md (WP01)
+- [x] T003 Run `spec-kitty charter sync --force` and verify directives.yaml (WP01)
+- [x] T004 Verify compact charter context lists DIR-003 (WP01)
+- [x] T005 Verify idempotent sync (WP01)
+- [x] T006 Add CHANGELOG.md entry (WP01)
 
 **Implementation sketch**: follow [quickstart.md](quickstart.md) verbatim — Steps 1 through 7 map 1:1 to T001–T006.
 
