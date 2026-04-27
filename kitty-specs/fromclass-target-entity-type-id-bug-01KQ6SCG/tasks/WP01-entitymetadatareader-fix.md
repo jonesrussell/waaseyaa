@@ -136,3 +136,4 @@ those tests don't pass an id — they continue to receive fields with empty
 - 2026-04-27T08:37:08Z – claude – shell_pid=24164 – Red→green TDD verified. Reproduced bug message exactly, applied two-line fix, re-ran: entity package 360/360.
 - 2026-04-27T08:39:57Z – claude – shell_pid=15544 – Started review via action command
 - 2026-04-27T08:42:24Z – claude – shell_pid=15544 – Independent code review (APPROVE-WITH-NITS): fix is mechanically sound, integration test exercises both object-path and manager-path with real registry, no public API changes beyond optional reader param.
+- 2026-04-27T08:45:52Z – claude – shell_pid=15544 – Merged into main as 85890880 (squash). | Done override: Mission squash-merged into main as commit 85890880; merge bookkeeping interrupted by unrelated dirty state in other in-flight missions' status.json files.
