@@ -130,3 +130,7 @@ those tests don't pass an id — they continue to receive fields with empty
 - Genealogy test refactor — owned by WP02.
 - Doc cleanup of `entity-system.md` — owned by WP02.
 - Auditing other `FieldDefinition` construction sites for missing target id.
+
+## Activity Log
+
+- 2026-04-27T08:37:08Z – claude – shell_pid=24164 – Red→green TDD verified. Reproduced bug message exactly, applied two-line fix, re-ran: entity package 360/360.
