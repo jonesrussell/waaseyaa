@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-27T06:17:35.645788+00:00",
+  "friendly_name": "inferrer entity reference compat",
+  "mission_id": "01KQ6SC0W3PQQ0BYBYRKBEKWTX",
+  "mission_number": null,
+  "mission_slug": "inferrer-entity-reference-compat-01KQ6SC0",
+  "mission_type": "software-dev",
+  "slug": "inferrer-entity-reference-compat-01KQ6SC0",
+  "target_branch": "main"
+}
