@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-27T02:57:22.406590+00:00",
+  "friendly_name": "attribute first entity definition",
+  "mission_id": "01KQ6DXEQ01S6PVPT6KF5946TA",
+  "mission_number": null,
+  "mission_slug": "attribute-first-entity-definition-01KQ6DXE",
+  "mission_type": "software-dev",
+  "slug": "attribute-first-entity-definition-01KQ6DXE",
+  "target_branch": "main"
+}
