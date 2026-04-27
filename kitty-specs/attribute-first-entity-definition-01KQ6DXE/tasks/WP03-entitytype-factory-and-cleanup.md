@@ -11,7 +11,7 @@ requirement_refs:
 - FR-012
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Worktree per lane; lane A continues here. The API-break commit. After this WP merges, the test suite will be red across packages until WP04-WP07 land.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T011
 - T012

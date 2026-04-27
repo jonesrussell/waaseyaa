@@ -1,0 +1,157 @@
+{
+  "version": 1,
+  "mission_slug": "attribute-first-entity-definition-01KQ6DXE",
+  "mission_id": "01KQ6DXEQ01S6PVPT6KF5946TA",
+  "mission_branch": "kitty/mission-attribute-first-entity-definition-01KQ6DXE",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05",
+        "WP06",
+        "WP07",
+        "WP08",
+        "WP09"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "UPGRADING.md",
+        "docs/specs/entity-system.md",
+        "kitty-specs/attribute-entity-classmap-discovery-01KQ6E2B/meta.json",
+        "kitty-specs/attribute-first-entity-definition-01KQ6DXE/meta.json",
+        "kitty-specs/bundle-scoped-field-attribute-01KQ6E2D/meta.json",
+        "kitty-specs/entity-base-constructor-cleanup-01KQ6E2F/meta.json",
+        "kitty-specs/entity-vector-indexed-attribute-01KQ6E2J/meta.json",
+        "packages/admin-surface/tests/**",
+        "packages/ai-vector/tests/**",
+        "packages/api/tests/**",
+        "packages/cli/src/Command/MakeEntityTypeCommand.php",
+        "packages/cli/tests/**",
+        "packages/engagement/src/**",
+        "packages/entity-storage/tests/**",
+        "packages/entity/src/Attribute/ContentEntityType.php",
+        "packages/entity/src/Attribute/EntityClassMetadata.php",
+        "packages/entity/src/Attribute/EntityMetadataReader.php",
+        "packages/entity/src/Attribute/Field.php",
+        "packages/entity/src/Attribute/FieldTypeInferrer.php",
+        "packages/entity/src/EntityType.php",
+        "packages/entity/src/EntityTypeManager.php",
+        "packages/entity/tests/Fixtures/AttributeFirstEntities/FactoryTestFixtures.php",
+        "packages/entity/tests/Fixtures/AttributeFirstEntities/InferrerTestFixtures.php",
+        "packages/entity/tests/Fixtures/AttributeFirstEntities/MetadataTestFixtures.php",
+        "packages/entity/tests/Helper/TestEntityType.php",
+        "packages/entity/tests/Unit/Attribute/ContentEntityTypeTest.php",
+        "packages/entity/tests/Unit/Attribute/EntityClassMetadataTest.php",
+        "packages/entity/tests/Unit/Attribute/EntityMetadataReaderTest.php",
+        "packages/entity/tests/Unit/Attribute/FieldAttributeTest.php",
+        "packages/entity/tests/Unit/Attribute/FieldTypeInferrerTest.php",
+        "packages/entity/tests/Unit/ContentEntityBaseTest.php",
+        "packages/entity/tests/Unit/EntityTypeFromClassBenchmarkTest.php",
+        "packages/entity/tests/Unit/EntityTypeFromClassTest.php",
+        "packages/entity/tests/Unit/EntityTypeManagerBundleFieldsTest.php",
+        "packages/entity/tests/Unit/EntityTypeTest.php",
+        "packages/entity/tests/Unit/Helper/TestEntityTypeTest.php",
+        "packages/entity/tests/Unit/Validation/EntityTypeValidationConstraintsTest.php",
+        "packages/genealogy/src/Entity/**",
+        "packages/genealogy/src/GenealogyServiceProvider.php",
+        "packages/genealogy/tests/**",
+        "packages/graphql/tests/**",
+        "packages/groups/src/**",
+        "packages/mcp/tests/**",
+        "packages/messaging/src/**",
+        "packages/node/src/Node.php",
+        "packages/node/src/NodeServiceProvider.php",
+        "packages/note/src/Note.php",
+        "packages/note/src/NoteServiceProvider.php",
+        "packages/oidc/src/Entity/**",
+        "packages/oidc/src/OidcServiceProvider.php",
+        "packages/path/src/**",
+        "packages/ssr/tests/**",
+        "packages/taxonomy/src/TaxonomyServiceProvider.php",
+        "packages/taxonomy/src/Term.php",
+        "packages/taxonomy/src/Vocabulary.php",
+        "packages/testing/tests/**",
+        "packages/user/src/User.php",
+        "packages/user/src/UserServiceProvider.php",
+        "phpstan-baseline.neon",
+        "phpstan.neon"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "dashboard",
+        "legacy-cleanup",
+        "tests",
+        "tracker-integration",
+        "workspace"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-04-27T03:39:57.726236+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP03"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP03"
+      },
+      {
+        "wp_a": "WP06",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP06 depends on WP03"
+      },
+      {
+        "wp_a": "WP07",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP07 depends on WP03"
+      },
+      {
+        "wp_a": "WP08",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP08 depends on WP04"
+      },
+      {
+        "wp_a": "WP09",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP09 depends on WP04"
+      }
+    ],
+    "total_merges": 8,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 8
+    }
+  }
+}

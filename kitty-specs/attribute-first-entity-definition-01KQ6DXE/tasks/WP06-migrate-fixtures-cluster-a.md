@@ -7,7 +7,7 @@ requirement_refs:
 - FR-009
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Worktree per lane; lane D (high-density test fixtures). Parallel with WP04/WP05/WP07.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T029
 - T030
@@ -18,7 +18,7 @@ subtasks:
 history:
 - date: '2026-04-27'
   note: Initial generation by /spec-kitty.tasks.
-authoritative_surface: packages/entity/tests/Unit,packages/entity-storage/tests,packages/api/tests,packages/mcp/tests,packages/graphql/tests
+authoritative_surface: packages/entity/tests/Unit
 execution_mode: code_change
 mission_id: 01KQ6DXEQ01S6PVPT6KF5946TA
 mission_slug: attribute-first-entity-definition-01KQ6DXE
