@@ -52,3 +52,4 @@ tools/drift-detector.sh                  # no unexpected stale specs
 ## Activity Log
 
 - 2026-04-27T22:38:19Z – claude – Moved to in_progress
+- 2026-04-27T22:39:28Z – claude – Moved to for_review
