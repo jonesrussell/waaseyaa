@@ -14,6 +14,8 @@ subtasks:
 - T019
 - T020
 - T021
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "30336"
 history:
 - timestamp: '2026-04-27T06:43:14Z'
   action: created
@@ -184,3 +186,7 @@ Close the audit trail for this mission. Update `docs/specs/entity-system.md` to 
 ```bash
 spec-kitty agent action implement WP05 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-04-27T07:24:03Z – claude:sonnet:implementer:implementer – shell_pid=30336 – Started implementation via action command
