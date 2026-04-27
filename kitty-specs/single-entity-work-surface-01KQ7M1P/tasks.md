@@ -12,12 +12,12 @@
 | T002 | Add `getGroup()` and `getPromptAliases()` to `FieldDefinitionInterface` and implement in `FieldDefinition` | WP01 | — | [D] |
 | T003 | Update `FieldDefinitionTest` to cover the two new constructor parameters and getters | WP01 | — | [D] |
 | T004 | Write `UPGRADING.md` entry explaining the constructor signature change with named-arg migration recipe | WP01 | [D] |
-| T005 | Add `BundleTemplate` class-level attribute in `packages/field/src/Attribute/BundleTemplate.php` | WP02 | — |
-| T006 | Add `FieldTemplate` repeatable attribute in `packages/field/src/Attribute/FieldTemplate.php` | WP02 | [P] |
-| T007 | Implement `BundleTemplateCompiler` (attribute discovery via `PackageManifestCompiler` → `FieldDefinitionRegistry::registerBundleFields()`) | WP02 | — |
-| T008 | Wire `BundleTemplateCompiler` to run at boot (new `FieldServiceProvider` or hook into existing field registration path) | WP02 | — |
-| T009 | Unit-test `BundleTemplateCompiler`: discovery, ordering, alias-uniqueness validation, key-uniqueness validation | WP02 | — |
-| T010 | Integration test: declared `#[BundleTemplate]` + `#[FieldTemplate]` classes produce expected registry contents | WP02 | — |
+| T005 | Add `BundleTemplate` class-level attribute in `packages/field/src/Attribute/BundleTemplate.php` | WP02 | — | [D] |
+| T006 | Add `FieldTemplate` repeatable attribute in `packages/field/src/Attribute/FieldTemplate.php` | WP02 | [D] |
+| T007 | Implement `BundleTemplateCompiler` (attribute discovery via `PackageManifestCompiler` → `FieldDefinitionRegistry::registerBundleFields()`) | WP02 | — | [D] |
+| T008 | Wire `BundleTemplateCompiler` to run at boot (new `FieldServiceProvider` or hook into existing field registration path) | WP02 | — | [D] |
+| T009 | Unit-test `BundleTemplateCompiler`: discovery, ordering, alias-uniqueness validation, key-uniqueness validation | WP02 | — | [D] |
+| T010 | Integration test: declared `#[BundleTemplate]` + `#[FieldTemplate]` classes produce expected registry contents | WP02 | — | [D] |
 | T011 | Add `FormFieldDescriptor` readonly value object in `packages/field/src/Form/FormFieldDescriptor.php` | WP03 | — |
 | T012 | Implement `FormDescriptorBuilder::build()` in `packages/field/src/Form/FormDescriptorBuilder.php` (registry walk, value extraction, `readOnly` resolution via `FieldAccessPolicyInterface`) | WP03 | — |
 | T013 | Unit-test `FormFieldDescriptor` constructor, immutability, defaults | WP03 | [P] |
@@ -104,12 +104,12 @@
 4. Duplicate normalized `promptAlias` within a bundle throws at compile time.
 
 **Included subtasks**:
-- [ ] T005 Add `BundleTemplate` attribute (WP02)
-- [ ] T006 Add `FieldTemplate` attribute (WP02)
-- [ ] T007 Implement `BundleTemplateCompiler` (WP02)
-- [ ] T008 Wire compiler at boot (WP02)
-- [ ] T009 Unit-test `BundleTemplateCompiler` (WP02)
-- [ ] T010 Integration test: declared template → registry contents (WP02)
+- [x] T005 Add `BundleTemplate` attribute (WP02)
+- [x] T006 Add `FieldTemplate` attribute (WP02)
+- [x] T007 Implement `BundleTemplateCompiler` (WP02)
+- [x] T008 Wire compiler at boot (WP02)
+- [x] T009 Unit-test `BundleTemplateCompiler` (WP02)
+- [x] T010 Integration test: declared template → registry contents (WP02)
 
 **Implementation sketch**: see WP02 prompt.
 
