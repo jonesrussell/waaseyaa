@@ -51,12 +51,12 @@
 | T041 | Implement `GfmTableImporter::import()` (calls parser, normalizes prompts, looks up `FieldDefinition::getPromptAliases()` from registry, builds `ImportResult`) | WP09 | — | [D] |
 | T042 | Unit-test `GfmTableImporter`: matched, unmatched, errors paths; alias normalization; bundle param handling (null fallback to entity_type as implicit single bundle) | WP09 | — | [D] |
 | T043 | Contract test (`Contract/StructuredImporterContractTest.php`) — abstract base verifying any `StructuredImporterInterface` implementation respects the contract | WP09 | — | [D] |
-| T044 | End-to-end integration test in `tests/Integration/Phase##/SingleEntityWorkSurfaceTest.php` exercising all six primitives in one method (Success Criterion 5) | WP10 | — |
-| T045 | Create `docs/specs/work-surface.md` capturing the six-primitive subsystem; update orchestration table in `CLAUDE.md` to include the new spec | WP10 | — |
-| T046 | Update `docs/specs/entity-system.md`, `docs/specs/api-layer.md`, `docs/specs/access-control.md` for the additions (FieldDefinition extension, auto-save endpoint, parent-delegated policy pattern) | WP10 | [P] |
-| T047 | Add CHANGELOG.md entries (Added: F1/F2/F3/F4/F5/F6 features, two new packages; Changed: `FieldDefinition` constructor breaking change with cross-reference to UPGRADING.md) | WP10 | [P] |
-| T048 | Update root `composer.json` to add `@dev` constraints for `waaseyaa/attachment` and `waaseyaa/structured-import`; update meta-packages (`waaseyaa/full`) if appropriate | WP10 | — |
-| T049 | Run `bin/check-package-layers`, `bin/check-composer-policy`, `composer phpstan`, `composer cs-check`, full PHPUnit suite — all must pass before WP10 review | WP10 | — |
+| T044 | End-to-end integration test in `tests/Integration/Phase##/SingleEntityWorkSurfaceTest.php` exercising all six primitives in one method (Success Criterion 5) | WP10 | — | [D] |
+| T045 | Create `docs/specs/work-surface.md` capturing the six-primitive subsystem; update orchestration table in `CLAUDE.md` to include the new spec | WP10 | — | [D] |
+| T046 | Update `docs/specs/entity-system.md`, `docs/specs/api-layer.md`, `docs/specs/access-control.md` for the additions (FieldDefinition extension, auto-save endpoint, parent-delegated policy pattern) | WP10 | [D] |
+| T047 | Add CHANGELOG.md entries (Added: F1/F2/F3/F4/F5/F6 features, two new packages; Changed: `FieldDefinition` constructor breaking change with cross-reference to UPGRADING.md) | WP10 | [D] |
+| T048 | Update root `composer.json` to add `@dev` constraints for `waaseyaa/attachment` and `waaseyaa/structured-import`; update meta-packages (`waaseyaa/full`) if appropriate | WP10 | — | [D] |
+| T049 | Run `bin/check-package-layers`, `bin/check-composer-policy`, `composer phpstan`, `composer cs-check`, full PHPUnit suite — all must pass before WP10 review | WP10 | — | [D] |
 
 ## Work Packages
 
@@ -355,12 +355,12 @@
 5. Root `composer.json` includes `waaseyaa/attachment` and `waaseyaa/structured-import` under `require-dev` or `require` per project convention; `waaseyaa/full` metapackage references both.
 
 **Included subtasks**:
-- [ ] T044 End-to-end integration test (WP10)
-- [ ] T045 Create `docs/specs/work-surface.md` + `CLAUDE.md` orchestration entry (WP10)
-- [ ] T046 Update existing specs (`entity-system.md`, `api-layer.md`, `access-control.md`) (WP10)
-- [ ] T047 CHANGELOG entries (WP10)
-- [ ] T048 Root `composer.json` + metapackage updates (WP10)
-- [ ] T049 Run all gate scripts; fix any failures before requesting review (WP10)
+- [x] T044 End-to-end integration test (WP10)
+- [x] T045 Create `docs/specs/work-surface.md` + `CLAUDE.md` orchestration entry (WP10)
+- [x] T046 Update existing specs (`entity-system.md`, `api-layer.md`, `access-control.md`) (WP10)
+- [x] T047 CHANGELOG entries (WP10)
+- [x] T048 Root `composer.json` + metapackage updates (WP10)
+- [x] T049 Run all gate scripts; fix any failures before requesting review (WP10)
 
 **Implementation sketch**: see WP10 prompt.
 
