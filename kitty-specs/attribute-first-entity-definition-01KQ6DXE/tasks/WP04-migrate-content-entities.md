@@ -200,3 +200,4 @@ spec-kitty agent action implement WP04 --agent <name>
 - 2026-04-27T04:16:40Z – claude:opus-4-7:implementer:implementer – shell_pid=28820 – Started implementation via action command
 - 2026-04-27T04:26:29Z – claude:opus-4-7:implementer:implementer – shell_pid=28820 – Ready for review
 - 2026-04-27T04:28:17Z – claude:opus-4-7:reviewer:reviewer – shell_pid=28868 – Started review via action command
+- 2026-04-27T04:29:53Z – claude:opus-4-7:reviewer:reviewer – shell_pid=28868 – All 5 deviations defensible: timestamp/integer collapse is field-package gap; entity_reference workaround acceptable pending WP01 inferrer extension; config entities (NodeType, Vocabulary) use new EntityType per plan AD-3; UserBlock changes bounded to migration recipe; residual fieldDefinitions: are ContentEntityBase parent::__construct calls per spec C-006. Tests 375/375, PHPStan clean, only the 2 expected config-entity exceptions remain.
