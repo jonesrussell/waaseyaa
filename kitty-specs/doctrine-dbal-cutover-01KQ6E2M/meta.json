@@ -1,10 +1,14 @@
 {
   "created_at": "2026-04-27T03:00:12.009401+00:00",
-  "friendly_name": "doctrine dbal cutover",
+  "friendly_name": "Doctrine DBAL Cutover",
   "mission_id": "01KQ6E2MAB6FEKS8SQA8NBBGKE",
   "mission_number": null,
   "mission_slug": "doctrine-dbal-cutover-01KQ6E2M",
   "mission_type": "software-dev",
   "slug": "doctrine-dbal-cutover-01KQ6E2M",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "status": "stub",
+  "coordinates_with": ["#529-schema-evolution-v2", "#1286-package-migrations"],
+  "source_description": "Replace waaseyaa/database-legacy (Drupal-DBAL wrapper) with native Doctrine DBAL. Largest piece of explicitly-named legacy debt in the framework."
 }
