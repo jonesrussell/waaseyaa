@@ -15,6 +15,7 @@ use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\InferrerNonEnumClass;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\InferrerSampleEnum;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\InferrerSampleIntEnum;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\InferrerTestFixtures;
+use Waaseyaa\Field\FieldStorage;
 
 /**
  * @covers \Waaseyaa\Entity\Attribute\FieldTypeInferrer
@@ -119,6 +120,17 @@ final class FieldTypeInferrerTest extends TestCase
         $result = FieldTypeInferrer::infer($property, $attribute);
 
         self::assertSame($expected, $result);
+    }
+
+    #[Test]
+    public function stored_does_not_affect_inferred_triple(): void
+    {
+        $property = new \ReflectionProperty(InferrerTestFixtures::class, 'aString');
+
+        $base = FieldTypeInferrer::infer($property, new Field());
+        $stored = FieldTypeInferrer::infer($property, new Field(stored: FieldStorage::Data));
+
+        self::assertSame($base, $stored);
     }
 
     #[Test]

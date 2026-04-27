@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Entity\Attribute\Field;
+use Waaseyaa\Field\FieldStorage;
 
 /**
  * @covers \Waaseyaa\Entity\Attribute\Field
@@ -29,6 +30,7 @@ final class FieldAttributeTest extends TestCase
         self::assertFalse($field->readOnly);
         self::assertFalse($field->translatable);
         self::assertFalse($field->revisionable);
+        self::assertSame(FieldStorage::Column, $field->stored);
     }
 
     #[Test]
@@ -44,6 +46,7 @@ final class FieldAttributeTest extends TestCase
             readOnly: true,
             translatable: true,
             revisionable: true,
+            stored: FieldStorage::Data,
         );
 
         self::assertSame('string', $field->type);
@@ -55,6 +58,15 @@ final class FieldAttributeTest extends TestCase
         self::assertTrue($field->readOnly);
         self::assertTrue($field->translatable);
         self::assertTrue($field->revisionable);
+        self::assertSame(FieldStorage::Data, $field->stored);
+    }
+
+    #[Test]
+    public function it_accepts_stored_data(): void
+    {
+        $field = new Field(stored: FieldStorage::Data);
+
+        self::assertSame(FieldStorage::Data, $field->stored);
     }
 
     #[Test]
