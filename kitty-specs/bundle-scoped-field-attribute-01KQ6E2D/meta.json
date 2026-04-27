@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-27T03:00:05.319555+00:00",
+  "friendly_name": "bundle scoped field attribute",
+  "mission_id": "01KQ6E2DSCA31BZQGAYSWW220N",
+  "mission_number": null,
+  "mission_slug": "bundle-scoped-field-attribute-01KQ6E2D",
+  "mission_type": "software-dev",
+  "slug": "bundle-scoped-field-attribute-01KQ6E2D",
+  "target_branch": "main"
+}
