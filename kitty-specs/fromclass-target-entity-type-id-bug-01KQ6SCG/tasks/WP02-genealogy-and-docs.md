@@ -27,7 +27,7 @@ owned_files:
 - packages/genealogy/tests/Unit/GenealogyPedigreeServiceTest.php
 - docs/specs/entity-system.md
 tags: []
-shell_pid: "7160"
+shell_pid: "19372"
 ---
 
 # Work Package Prompt: WP02 — Genealogy tests wire registry; doc cleanup
@@ -63,7 +63,7 @@ passed to `EntityTypeManager` without throwing.
 
 In `packages/genealogy/tests/Unit/GenealogyFamilyServiceTest.php::makeManager()`:
 
-- Pass `$registry` as the 3rd positional argument to `new EntityTypeManager(...)`.
+- Pass `$registry` as the `fieldRegistry` argument to `new EntityTypeManager(...)`. (It is the 4th constructor parameter — the signature is `(EventDispatcherInterface, ?Closure $storageFactory, ?Closure $repositoryFactory, ?FieldDefinitionRegistryInterface $fieldRegistry)`. Use the named argument so the `$repositoryFactory` slot stays defaulted.)
 - Remove any "workaround" or "TODO" comment that referenced the missing
   registry link.
 - The rest of the closure body is unchanged — `$registry` is already in scope.
@@ -113,3 +113,4 @@ search for `targetEntityTypeId` and `fromClass` references and audit.
 
 - 2026-04-27T08:37:23Z – claude – shell_pid=7160 – Started implementation via action command
 - 2026-04-27T08:39:09Z – claude – shell_pid=7160 – Genealogy tests pass with registry as fieldRegistry kwarg (4th param, not 3rd as initially noted in spec). Doc item 4 removed; trailing item renumbered. 11/11 genealogy tests green.
+- 2026-04-27T08:42:33Z – claude – shell_pid=19372 – Started review via action command
