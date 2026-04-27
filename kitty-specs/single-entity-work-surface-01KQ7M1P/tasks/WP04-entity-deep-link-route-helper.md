@@ -192,3 +192,4 @@ No dependencies — independent of WP01-WP03.
 ## Activity Log
 
 - 2026-04-27T16:20:14Z – claude:sonnet-4-6:implementer:implementer – shell_pid=32380 – Started implementation via action command
+- 2026-04-27T16:24:08Z – claude:sonnet-4-6:implementer:implementer – shell_pid=32380 – F1 deep-link helper; composes RouteBuilder; tests + phpstan + cs all pass
