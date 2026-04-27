@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "mission_slug": "attribute-first-entity-static-analysis-01KQ6XW7",
+  "mission_id": "01KQ6XW7Y3QD0JJ7JTP9JCSDPM",
+  "mission_branch": "kitty/mission-attribute-first-entity-static-analysis-01KQ6XW7",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "docs/specs/entity-system.md",
+        "kitty-specs/attribute-first-entity-static-analysis-01KQ6XW7/notes/baseline.md",
+        "kitty-specs/attribute-first-entity-static-analysis-01KQ6XW7/notes/benchmark.md",
+        "packages/entity/composer.json",
+        "packages/entity/phpstan-rules.neon",
+        "packages/entity/src/Attribute/FieldTypeInferrer.php",
+        "packages/entity/src/PhpStan/FieldAttributeRule.php",
+        "packages/entity/tests/PhpStan/FieldAttributeRuleTest.php",
+        "packages/entity/tests/PhpStan/data/cannotInferUnion.php",
+        "packages/entity/tests/PhpStan/data/cannotInferUntyped.php",
+        "packages/entity/tests/PhpStan/data/compatibleOverride.php",
+        "packages/entity/tests/PhpStan/data/incompatibleType.php",
+        "packages/entity/tests/PhpStan/data/nonPublicProperty.php",
+        "packages/entity/tests/PhpStan/data/notEntityClass.php",
+        "packages/entity/tests/PhpStan/data/unknownTypeId.php",
+        "packages/entity/tests/Unit/Attribute/FieldTypeInferrerTest.php",
+        "phpstan.neon"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-04-27T07:57:08.867993+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP03"
+      }
+    ],
+    "total_merges": 3,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 3
+    }
+  }
+}

@@ -1,30 +1,31 @@
 ---
-work_package_id: "WP01"
-title: "FieldTypeInferrer public helpers"
+work_package_id: WP01
+title: FieldTypeInferrer public helpers
 dependencies: []
-planning_base_branch: "main"
-merge_target_branch: "main"
-branch_strategy: "Planning artifacts were generated on main; completed changes must merge back into main."
+requirement_refs:
+- FR-005
+planning_base_branch: main
+merge_target_branch: main
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
-  - "T001"
-  - "T002"
-  - "T003"
-phase: "Phase 1 - Foundations"
-assignee: ""
-agent: ""
-shell_pid: ""
-authoritative_surface: "packages/entity/src/Attribute/FieldTypeInferrer"
-execution_mode: "code_change"
-mission_id: "01KQ6XW7Y3QD0JJ7JTP9JCSDPM"
-mission_slug: "attribute-first-entity-static-analysis-01KQ6XW7"
-owned_files:
-  - "packages/entity/src/Attribute/FieldTypeInferrer.php"
-  - "packages/entity/tests/Unit/Attribute/FieldTypeInferrerTest.php"
-tags: []
+- T001
+- T002
+- T003
+phase: Phase 1 - Foundations
+assignee: ''
+agent: ''
 history:
-  - timestamp: "2026-04-27T07:42:00Z"
-    agent: "system"
-    action: "Prompt generated via /spec-kitty.tasks"
+- timestamp: '2026-04-27T07:42:00Z'
+  agent: system
+  action: Prompt generated via /spec-kitty.tasks
+authoritative_surface: packages/entity/src/Attribute/FieldTypeInferrer
+execution_mode: code_change
+mission_id: 01KQ6XW7Y3QD0JJ7JTP9JCSDPM
+mission_slug: attribute-first-entity-static-analysis-01KQ6XW7
+owned_files:
+- packages/entity/src/Attribute/FieldTypeInferrer.php
+- packages/entity/tests/Unit/Attribute/FieldTypeInferrerTest.php
+tags: []
 ---
 
 # Work Package Prompt: WP01 — FieldTypeInferrer public helpers
