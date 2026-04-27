@@ -1,0 +1,171 @@
+schema_version: 1.0.0
+mission: software-dev
+profile: comprehensive
+answers:
+  project_intent: |
+    Waaseyaa is a modern, entity-first, AI-native PHP content management
+    framework targeting PHP 8.4+. It is a clean-room replacement for Drupal's
+    runtime: takes the conceptual lessons (entity model, fieldable content,
+    pluggable storage) but ships none of the legacy code, none of the global
+    state, and no compatibility shims. The framework is delivered as a
+    Composer monorepo of independent packages organized in seven architectural
+    layers (Foundation → Core Data → Content Types → Services → API → AI →
+    Interfaces). Each package has explicit interfaces and is independently
+    testable. AI-first means the framework's own metadata (entity schemas,
+    field types, route definitions) is automatically discoverable and
+    actionable by AI agents — MCP tools generate from entity definitions,
+    schema flows into authoring assistance, and vector indexing is a
+    first-class capability rather than a bolt-on.
+
+  languages_frameworks: |
+    PHP 8.4+ as the runtime baseline (no support for older versions). Symfony
+    7 components (HttpFoundation, Console, Routing, DependencyInjection,
+    Validator, etc.) as the foundation libraries. Doctrine DBAL (in-flight via
+    the doctrine-dbal-cutover mission) for the database layer. Twig for SSR.
+    Vue 3 + TypeScript + Nuxt 3 for the admin SPA. PHPUnit 11 for tests.
+    PHPStan for static analysis. Composer 2.x for package management. Spec
+    Kitty for governance and mission management.
+
+  testing_requirements: |
+    Every package ships with unit tests in its own `tests/` directory.
+    Integration tests cover cross-package boundaries. Each subsystem provides
+    in-memory implementations of its key interfaces so consuming packages can
+    test against them without booting a real database or full kernel. The
+    test suite must be green on PHP 8.4+ across SQLite (default) and ideally
+    PostgreSQL/MySQL for storage-touching code. Benchmark tests asserting
+    performance budgets (e.g., entity reflection under 5 ms, cached lookups
+    under 0.1 ms) are encouraged where NFRs warrant them. Tests are part of
+    the contract of every Spec Kitty work package — no WP merges without its
+    tests passing.
+
+  quality_gates: |
+    Mandatory before merge:
+      - Full PHPUnit suite green (no skipped tests without justification).
+      - PHPStan analysis clean against the committed baseline; new violations
+        are fixed or explicitly added to the baseline with reviewer
+        acknowledgement.
+      - `bin/check-composer-policy` passes (no wildcard internal `waaseyaa/*`
+        constraints, `@dev` only in root composer.json, `config.sort-packages`
+        true on all first-party manifests).
+      - Spec Kitty work-package framing for any non-trivial change. Direct
+        commits to main without a mission are discouraged for substantive
+        feature work but allowed for typos, infrastructure tweaks, and
+        documentation-only changes.
+      - `docs/specs/<subsystem>.md` updated in the same PR when a subsystem's
+        contract changes (the orchestration table in CLAUDE.md identifies
+        which spec each file pattern maps to).
+      - CHANGELOG.md entry for any breaking change.
+      - License headers and SPDX-License-Identifier preserved on every file
+        (`GPL-2.0-or-later`).
+
+  review_policy: |
+    During alpha (current state), the governance model is solo-author with
+    AI-driven review via the Spec Kitty implement-review loop. The author
+    opens a Spec Kitty mission, AI agents implement and review work packages,
+    rejection cycles surface issues, and the author makes the final merge
+    decision. A second human reviewer is not required for alpha. As the
+    framework approaches v1.0 stable, this policy will tighten: public-API
+    changes will require explicit author approval after AI review, and a
+    later milestone will introduce a two-author rule for core packages.
+    Mission and PR traceability is enforced — every PR must link to its Spec
+    Kitty mission and any associated GitHub issue (used as a tracker only,
+    not as the source of governance truth).
+
+  performance_targets: |
+    Performance is treated as a contract with explicit thresholds, not as
+    "fast enough." Where an NFR or benchmark exists, it must be asserted by a
+    test or codified in a baseline. Examples:
+      - Entity reflection: under 5 ms for first call, under 0.1 ms cached.
+      - Schema generation from entity types: bounded by the size of the
+        registered entity catalog, no quadratic scans.
+      - Test suite: full suite under 60 seconds locally where feasible.
+    Performance regressions surfaced by benchmarks block merge until
+    investigated. The framework prefers honest budgets over aspirational
+    ones — a 5 ms budget is a real commitment, not marketing.
+
+  deployment_constraints: |
+    The framework is delivered as Composer packages on Packagist. Releases
+    are coordinated through `scripts/release.sh` (semver-tagged on the
+    monorepo root) and `splitsh-lite` (per-package read-only mirror repos).
+    Each package on Packagist is a split mirror; the monorepo root is the
+    development source. New packages must be split-published and registered
+    on Packagist before any released package can declare a transitive
+    dependency on them (the WP Mar 2025 oidc submission was the canonical
+    example). CI handles split + tag publishing; manual splits are an
+    escape hatch, not the default.
+    Apps consuming Waaseyaa are expected to manage their own infrastructure
+    (database, queue, cache backends) and supply concrete bindings via
+    service providers; the framework ships interfaces and in-memory or SQL
+    defaults but takes no opinion on production deployment topology.
+
+  documentation_policy: |
+    Three tiers of documentation, each with a distinct purpose:
+      - **Constitution** (`CLAUDE.md`): architecture, conventions,
+        orchestration table, gotchas. Authoritative for agents and humans.
+      - **Specs** (`docs/specs/*.md`): durable subsystem contracts. Updated
+        in the same PR that changes the subsystem's behavior.
+      - **Missions** (`kitty-specs/<mission>/` and `.kittify/missions/`): in-flight
+        feature work. Lifecycle: planned → done → merged → archived.
+    User-facing documentation in `README.md` and `UPGRADING.md` is updated
+    for every release with breaking changes. Inline code documentation
+    (PHPDoc) is required on public class methods; package READMEs describe
+    the package's purpose and how to consume it.
+
+  risk_boundaries: |
+    Absolute non-negotiables:
+      - No re-introduction of any Drupal-runtime dependency or
+        Drupal-shaped global state. The `waaseyaa/database-legacy` package
+        exists explicitly as a transitional bridge (named "legacy" to
+        flag its temporary nature) and is being replaced by Doctrine DBAL.
+      - No backwards-compat shims that retain known-bad patterns. Greenfield
+        principle: when a better pattern lands, the old one is removed
+        outright, not deprecated indefinitely.
+      - No bypassing of `bin/check-composer-policy`, the layered architecture
+        rules, or the access-control semantics codified in `docs/specs/`.
+      - No registration of services or entity types outside the documented
+        provider mechanism. No global `$GLOBALS`, no service locators
+        masquerading as DI containers.
+      - No silent breaking changes to public PHP API. Breaking changes are
+        explicit, called out in CHANGELOG.md, and accompanied by an
+        UPGRADING.md migration recipe.
+      - No skipping of git hooks (--no-verify) or signing bypasses without
+        explicit justification.
+      - No committing of secrets, credentials, or generated artifacts to the
+        repository.
+
+  amendment_process: |
+    Charter amendments follow the Spec Kitty mission flow: open a mission
+    targeting `.kittify/charter/`, write a spec describing the policy change
+    and rationale, generate a new charter via `spec-kitty charter generate
+    --from-interview --force`, and merge through the standard implement /
+    review / accept loop. Amendments that tighten constraints (e.g., adding
+    a mandatory quality gate) take effect on the next mission. Amendments
+    that loosen constraints (e.g., relaxing a performance budget) require
+    explicit author rationale citing operational evidence. The charter is
+    not a snapshot — it is expected to evolve as the framework matures from
+    alpha through v1.0 and beyond.
+
+  exception_policy: |
+    Genuine exceptions to charter rules are rare and are documented inline
+    where they apply (e.g., a `// charter-exception: <issue#> <rationale>`
+    comment near the offending code). Exceptions must:
+      1. Have a tracked issue or mission explaining why the exception
+         exists.
+      2. Have a target removal date or condition (e.g., "removed when
+         doctrine-dbal-cutover lands").
+      3. Be visible in code review and not buried.
+    Routine deviations from the charter (skipping a quality gate, breaking
+    public API silently, etc.) are not exceptions — they are charter
+    violations and the PR is rejected.
+
+selected_paradigms:
+  - domain-driven-design
+  - clean-architecture
+selected_directives: []
+available_tools:
+  - git
+  - github
+  - composer
+  - phpunit
+  - phpstan
+  - spec-kitty
