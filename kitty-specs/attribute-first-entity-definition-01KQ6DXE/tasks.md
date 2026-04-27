@@ -54,10 +54,10 @@
 | T041 | Update `CHANGELOG.md` with breaking-change note (`EntityType` constructor signature change; new `#[Field]` attribute) | WP08 | [D] |
 | T042 | Update `UPGRADING.md` with migration recipe for any consumers carrying the old shape | WP08 | [D] |
 | T043 | Update mission status meta and stub follow-on missions to reference M1 having merged | WP08 | [D] |
-| T044 | Refresh `phpstan-baseline.neon` and run `vendor/bin/phpstan analyse` clean | WP09 |  |
-| T045 | Run full `vendor/bin/phpunit` suite; resolve any residual failures | WP09 |  |
-| T046 | Verify success criteria SC-001 through SC-005 with explicit grep/test assertions | WP09 |  |
-| T047 | Verify NFR-001 / NFR-002 benchmarks pass on a fresh checkout | WP09 |  |
+| T044 | Refresh `phpstan-baseline.neon` and run `vendor/bin/phpstan analyse` clean | WP09 |  | [D] |
+| T045 | Run full `vendor/bin/phpunit` suite; resolve any residual failures | WP09 |  | [D] |
+| T046 | Verify success criteria SC-001 through SC-005 with explicit grep/test assertions | WP09 |  | [D] |
+| T047 | Verify NFR-001 / NFR-002 benchmarks pass on a fresh checkout | WP09 |  | [D] |
 
 47 subtasks across 9 work packages.
 
@@ -359,10 +359,10 @@ Keep changes line-for-line minimal — same field shapes, same test assertions.
 **Independent test**: All checks below pass.
 
 **Included subtasks**:
-- [ ] T044 Refresh `phpstan-baseline.neon`; `vendor/bin/phpstan analyse` clean (WP09)
-- [ ] T045 Run full `vendor/bin/phpunit`; suite green (WP09)
-- [ ] T046 Verify success criteria SC-001 through SC-005 with grep + manual checks (WP09)
-- [ ] T047 Verify NFR-001/NFR-002 benchmarks (WP09)
+- [x] T044 Refresh `phpstan-baseline.neon`; `vendor/bin/phpstan analyse` clean (WP09)
+- [x] T045 Run full `vendor/bin/phpunit`; suite green (WP09)
+- [x] T046 Verify success criteria SC-001 through SC-005 with grep + manual checks (WP09)
+- [x] T047 Verify NFR-001/NFR-002 benchmarks (WP09)
 
 **Implementation sketch**:
 1. Run `vendor/bin/phpstan analyse --memory-limit=2G`; capture any new errors. If genuine bugs, fix in WP09 (don't roll back to earlier WPs unless something fundamental is broken). If noise, regenerate baseline: `vendor/bin/phpstan analyse --generate-baseline`.
