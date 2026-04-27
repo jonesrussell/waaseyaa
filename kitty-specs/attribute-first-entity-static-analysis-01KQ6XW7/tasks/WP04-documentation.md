@@ -75,3 +75,4 @@ Under the next unreleased version add:
 ## Activity Log
 
 - 2026-04-27T08:15:41Z – claude – shell_pid=36192 – Started implementation via action command
+- 2026-04-27T08:18:17Z – claude – shell_pid=36192 – Docs: entity-system.md section + CHANGELOG entry committed (732e4a7a). C-005 satisfied.
