@@ -209,3 +209,4 @@ Depends on WP05.
 ## Activity Log
 
 - 2026-04-27T16:41:02Z – claude:sonnet-4-6:implementer:implementer – shell_pid=23200 – Started implementation via action command
+- 2026-04-27T16:47:46Z – claude:sonnet-4-6:implementer:implementer – shell_pid=23200 – ParentDelegatedAccessPolicy + concurrency test (NFR-010); 29 tests pass (1 skipped on Windows/non-pcntl); PHPStan level 5 clean; CS clean
