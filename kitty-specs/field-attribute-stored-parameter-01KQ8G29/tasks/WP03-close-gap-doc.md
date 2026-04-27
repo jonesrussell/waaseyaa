@@ -15,6 +15,8 @@ execution_mode: code_change
 owned_files:
 - docs/specs/entity-system.md
 tags: []
+assignee: "claude"
+agent: "claude"
 ---
 
 # WP03 — Close transitional-gap entry in `docs/specs/entity-system.md`
@@ -46,3 +48,7 @@ Mark the documented transitional gap that this mission closes as done, with a ba
 git diff docs/specs/entity-system.md   # only intended edits
 tools/drift-detector.sh                  # no unexpected stale specs
 ```
+
+## Activity Log
+
+- 2026-04-27T22:38:19Z – claude – Moved to in_progress
