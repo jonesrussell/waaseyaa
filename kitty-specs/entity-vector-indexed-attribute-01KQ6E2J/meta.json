@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-27T03:00:09.791047+00:00",
+  "friendly_name": "entity vector indexed attribute",
+  "mission_id": "01KQ6E2J53WE4RGA3E9TS10VT9",
+  "mission_number": null,
+  "mission_slug": "entity-vector-indexed-attribute-01KQ6E2J",
+  "mission_type": "software-dev",
+  "slug": "entity-vector-indexed-attribute-01KQ6E2J",
+  "target_branch": "main"
+}
