@@ -319,26 +319,36 @@ defaults but takes no opinion on production deployment topology.
   - No committing of secrets, credentials, or generated artifacts to the
     repository.
 
-Public-API removal policy is phase-dependent:
-  - During alpha (current state): greenfield principle applies. When a
-    better pattern lands, the old one is removed outright; no
-    deprecation window is required. Backwards-compat shims that retain
-    known-bad patterns are forbidden.
-  - At beta entry and beyond: removals from the public API surface
-    (defined in Documentation Policy) must first pass through
-    deprecation. Deprecations:
-      - Use the `@deprecated <since-version> <reason and migration
-        target>` PHPDoc tag at the symbol's declaration site.
-      - Reference a target removal version (e.g., "since 1.2.0 — remove
-        in 2.0.0") and a one-line migration note pointing at the
-        replacement symbol or recipe.
-      - Remain in place for at least two minor releases unless the
-        symbol is security-critical, in which case removal cadence
-        follows the security-advisory timeline.
-      - Are listed under a `### Deprecated` heading in `CHANGELOG.md`
-        for the release that introduces them.
+Public-API removal policy is phase-dependent. During alpha, see DIR-003
+(Greenfield Removal Policy). At beta entry and beyond, removals from
+the public API surface follow formal deprecation:
+  - Use the `@deprecated <since-version> <reason and migration target>`
+    PHPDoc tag at the symbol's declaration site.
+  - Reference a target removal version (e.g., "since 1.2.0 — remove
+    in 2.0.0") and a one-line migration note pointing at the replacement
+    symbol or recipe.
+  - Remain in place for at least two minor releases unless the symbol
+    is security-critical, in which case removal cadence follows the
+    security-advisory timeline.
+  - Are listed under a `### Deprecated` heading in `CHANGELOG.md` for
+    the release that introduces them.
 
 2. Keep documentation synchronized with workflow and behavior changes.
+
+3. Greenfield Removal Policy: during alpha (current state), the
+greenfield principle applies. When a better pattern lands, the old one
+is removed outright. No deprecation window is required. Backwards-compat
+shims that retain known-bad patterns are forbidden. `@deprecated`
+wrappers, `Legacy*` namespaces, parallel `v2` interfaces, and "for
+backward compatibility" comments are not acceptable substitutes for
+deletion. Architecture quality is preferred over API stability for the
+duration of alpha. Breaking changes are still announced explicitly per
+DIR-001 (CHANGELOG.md entry, UPGRADING.md migration recipe) —
+communication discipline is preserved; compatibility debt is not.
+Severity is policy-binding regardless of the `severity: warn` field in
+`directives.yaml` (Spec Kitty 3.1.6 hardcodes severity for all
+directives synced from `charter.md`); the binding force of this
+directive comes from its text.
 
 ## Reference Index
 

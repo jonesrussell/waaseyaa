@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] — Attribute-first entity definition (M1)
 
+### Added
+- Charter directive **DIR-003 (Greenfield Removal Policy)** hoisted from
+  a sub-bullet inside DIR-001 into its own top-level directive, so it
+  surfaces in compact charter context loaded by every `/spec-kitty.specify`
+  and `/spec-kitty.plan` invocation. No policy change — the alpha-phase
+  greenfield removal rule was already charter law inside DIR-001. See
+  `.kittify/charter/charter.md`. (mission `charter-greenfield-directive-01KQ7MN5`)
+
 ### Breaking changes
 
 - `Waaseyaa\Entity\EntityType` constructor no longer accepts a `fieldDefinitions:` parameter. Field definitions must come from `#[Field]`-decorated entity properties via `EntityType::fromClass(MyEntity::class)`. Tests that need to inject raw field definitions for fixture entity types can use `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()`.
