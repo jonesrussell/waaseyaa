@@ -17,11 +17,11 @@ This file decomposes [plan.md](./plan.md) into work packages. Each WP has its ow
 
 | ID | Description | WP | Parallel |
 |----|-------------|----|----------|
-| T001 | Add `jsonSchemaFor(FieldDefinitionInterface): array` and `schemaFor(FieldDefinitionInterface): array` to `FieldTypeInterface` | WP01 |  |
-| T002 | Add default implementations on `FieldItemBase` that delegate to existing static `jsonSchema()` / `schema()` | WP01 |  |
-| T003 | Add `jsonSchemaFor()` and `schemaFor()` helpers on `FieldTypeManager` that resolve plugin and forward | WP01 |  |
-| T004 | Refactor `FieldDefinition::toJsonSchema()` to delegate via `FieldTypeManager::jsonSchemaFor($this)`; thread `FieldTypeManager` through construction | WP01 |  |
-| T005 | Add regression test asserting `FieldDefinition::toJsonSchema()` output is bit-identical for every existing field-type id | WP01 |  |
+| T001 | Add `jsonSchemaFor(FieldDefinitionInterface): array` and `schemaFor(FieldDefinitionInterface): array` to `FieldTypeInterface` | WP01 |  | [D] |
+| T002 | Add default implementations on `FieldItemBase` that delegate to existing static `jsonSchema()` / `schema()` | WP01 |  | [D] |
+| T003 | Add `jsonSchemaFor()` and `schemaFor()` helpers on `FieldTypeManager` that resolve plugin and forward | WP01 |  | [D] |
+| T004 | Refactor `FieldDefinition::toJsonSchema()` to delegate via `FieldTypeManager::jsonSchemaFor($this)`; thread `FieldTypeManager` through construction | WP01 |  | [D] |
+| T005 | Add regression test asserting `FieldDefinition::toJsonSchema()` output is bit-identical for every existing field-type id | WP01 |  | [D] |
 | T006 | Create `LabeledCase` interface at `packages/field/src/Item/LabeledCase.php` (single method `getLabel(): string`) | WP02 |  |
 | T007 | Create `EnumItem` plugin at `packages/field/src/Item/EnumItem.php` with `#[FieldType(id: 'enum', label: 'Enum')]` extending `FieldItemBase` | WP02 |  |
 | T008 | Implement `EnumItem::defaultSettings()` and runtime configuration validation (`MissingEnumClass`, `UnknownEnumClass`, `NotABackedEnum`, `UnsupportedBackingType`) | WP02 |  |
@@ -52,11 +52,11 @@ This file decomposes [plan.md](./plan.md) into work packages. Each WP has its ow
 
 **Subtasks**:
 
-- [ ] T001 Add `jsonSchemaFor`/`schemaFor` to `FieldTypeInterface` (WP01)
-- [ ] T002 Add default impls on `FieldItemBase` (WP01)
-- [ ] T003 Add `FieldTypeManager` helpers (WP01)
-- [ ] T004 Refactor `FieldDefinition::toJsonSchema()` to delegate (WP01)
-- [ ] T005 Regression test for behavior preservation (WP01)
+- [x] T001 Add `jsonSchemaFor`/`schemaFor` to `FieldTypeInterface` (WP01)
+- [x] T002 Add default impls on `FieldItemBase` (WP01)
+- [x] T003 Add `FieldTypeManager` helpers (WP01)
+- [x] T004 Refactor `FieldDefinition::toJsonSchema()` to delegate (WP01)
+- [x] T005 Regression test for behavior preservation (WP01)
 
 **Risks**:
 - `FieldDefinition` may not currently hold a `FieldTypeManager` reference; threading one through construction might widen the diff.
