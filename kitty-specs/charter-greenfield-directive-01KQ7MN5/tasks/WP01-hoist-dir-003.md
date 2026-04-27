@@ -27,7 +27,8 @@ subtasks:
 - T004
 - T005
 - T006
-shell_pid: '7560'
+shell_pid: "7560"
+agent: "claude:sonnet-4-6:implementer:implementer"
 history:
 - date: '2026-04-27'
   note: Generated from spec.md + plan.md + research.md + quickstart.md.
@@ -303,3 +304,7 @@ spec-kitty agent action implement WP01 --agent <agent-name>
 ```
 
 (`--agent` selects the implementing agent profile — pick whichever the user prefers. The mission has no dependencies, so no preceding WPs need to land first.)
+
+## Activity Log
+
+- 2026-04-27T14:39:46Z – claude:sonnet-4-6:implementer:implementer – shell_pid=7560 – Assigned agent via action command
