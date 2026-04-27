@@ -173,3 +173,4 @@ spec-kitty agent action implement WP05 --agent <name>
 ## Activity Log
 
 - 2026-04-27T04:30:30Z – claude:opus-4-7:implementer:implementer – shell_pid=37476 – Started implementation via action command
+- 2026-04-27T04:40:39Z – claude:opus-4-7:implementer:implementer – shell_pid=37476 – Ready for review: oidc/engagement/messaging/path migrated to EntityType::fromClass(); groups uses _fieldDefinitions slot due to FieldStorage::Data dependency (Field attribute does not yet expose stored:); MakeEntityTypeCommand emits attribute-first content scaffolds.
