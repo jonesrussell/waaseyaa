@@ -16,7 +16,7 @@ with the registry wired through) requires the fix to be in place.
 
 | ID | Description | WP | Parallel |
 |----|-------------|----|----------|
-| T001 | Add `?string $entityTypeId = null` parameter to `EntityMetadataReader::resolveFields()` and pass it as `targetEntityTypeId: $entityTypeId ?? ''` into the `FieldDefinition` constructor | WP01 | [D] |
+| T001 | Add `?string $entityTypeId = null` parameter to `EntityMetadataReader::resolveFields()` and pass it as `targetEntityTypeId: $entityTypeId ?? ''` into the `FieldDefinition` constructor | WP01 | [D] | [D] |
 | T002 | Update `EntityMetadataReader::forClass()` to call `self::resolveFields($class, $typeId)` so the already-resolved id flows through | WP01 | [D] |
 | T003 | Create `packages/entity/tests/Integration/EntityTypeRegistrationTest.php` exercising `EntityType::fromClass()` + real `FieldDefinitionRegistry` + `EntityTypeManager::registerEntityType()` end-to-end; assert each registered field's `getTargetEntityTypeId()` matches the entity type id | WP01 | [D] |
 | T004 | Verify existing `EntityMetadataReaderTest` cases still pass with the new optional parameter (no source change expected) | WP01 | [D] |
