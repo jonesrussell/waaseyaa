@@ -36,11 +36,11 @@
 | T026 | Unit-test `ParentDelegatedAccessPolicy`: view delegates to parent, update delegates to parent, returns Neutral if parent missing | WP06 | — | [D] |
 | T027 | Concurrency test: 50 concurrent `setActive` calls against the same parent leave exactly one active attachment (NFR-010) | WP06 | — | [D] |
 | T028 | Add to `packages/attachment/tests/Integration/`: `setActive` invariant, parent-delegated access end-to-end | WP06 | — | [D] |
-| T029 | Implement `FieldAutoSaveController::update()` in `packages/api/src/Controller/FieldAutoSaveController.php` (load entity, validate field key against registry, run access policies, persist via `EntityRepository`, return JSON:API-shaped response) | WP07 | — |
-| T030 | Implement body-size guard producing 422 without buffering full payload (NFR-002) and content-type negotiation producing 415 for non-`application/json` requests | WP07 | — |
-| T031 | Edit `packages/api/src/JsonApiRouteProvider.php` to register `PUT {basePath}/{entityType}/{id}/field/{key}` for every entity type via the existing iteration loop | WP07 | — |
-| T032 | Add `PayloadTooLargeException` (or extend existing `ApiException` if present) in `packages/api/src/Exception/` | WP07 | [P] |
-| T033 | Integration test: PUT happy path, 401, 403 (entity policy), 403 (field policy), 404 (entity), 404 (field key), 415, 422 (oversize), 422 (malformed), idempotency | WP07 | — |
+| T029 | Implement `FieldAutoSaveController::update()` in `packages/api/src/Controller/FieldAutoSaveController.php` (load entity, validate field key against registry, run access policies, persist via `EntityRepository`, return JSON:API-shaped response) | WP07 | — | [D] |
+| T030 | Implement body-size guard producing 422 without buffering full payload (NFR-002) and content-type negotiation producing 415 for non-`application/json` requests | WP07 | — | [D] |
+| T031 | Edit `packages/api/src/JsonApiRouteProvider.php` to register `PUT {basePath}/{entityType}/{id}/field/{key}` for every entity type via the existing iteration loop | WP07 | — | [D] |
+| T032 | Add `PayloadTooLargeException` (or extend existing `ApiException` if present) in `packages/api/src/Exception/` | WP07 | [D] |
+| T033 | Integration test: PUT happy path, 401, 403 (entity policy), 403 (field policy), 404 (entity), 404 (field key), 415, 422 (oversize), 422 (malformed), idempotency | WP07 | — | [D] |
 | T034 | Create `packages/structured-import/composer.json` declaring the package at L3 with deps on field, foundation | WP08 | — |
 | T035 | Add `StructuredImporterInterface` in `packages/structured-import/src/StructuredImporterInterface.php` per contracts/README.md F5 | WP08 | — |
 | T036 | Add `ImportResult` and `UnmatchedRow` readonly value objects | WP08 | [P] |
@@ -259,11 +259,11 @@
 4. p95 latency ≤ 50 ms server-side under nominal load against SQLite.
 
 **Included subtasks**:
-- [ ] T029 Implement `FieldAutoSaveController::update()` (WP07)
-- [ ] T030 Body-size guard + content-type negotiation (WP07)
-- [ ] T031 Edit `JsonApiRouteProvider` to register the route (WP07)
-- [ ] T032 Add `PayloadTooLargeException` (WP07)
-- [ ] T033 Integration test exercising all status codes + idempotency (WP07)
+- [x] T029 Implement `FieldAutoSaveController::update()` (WP07)
+- [x] T030 Body-size guard + content-type negotiation (WP07)
+- [x] T031 Edit `JsonApiRouteProvider` to register the route (WP07)
+- [x] T032 Add `PayloadTooLargeException` (WP07)
+- [x] T033 Integration test exercising all status codes + idempotency (WP07)
 
 **Implementation sketch**: see WP07 prompt.
 
