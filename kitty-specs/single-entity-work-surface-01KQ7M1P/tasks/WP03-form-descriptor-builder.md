@@ -10,7 +10,7 @@ requirement_refs:
 - NFR-009
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Plan from main; lane execution branch is allocated by finalize-tasks via lanes.json. Final merge target is main.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T011
 - T012
