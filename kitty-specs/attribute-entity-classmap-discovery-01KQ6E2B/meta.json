@@ -10,6 +10,7 @@
   "vcs": "git",
   "track_position": "M2 of 2",
   "predecessor_mission": "attribute-first-entity-definition-01KQ6DXE",
-  "status": "stub",
+  "status": "ready",
+  "predecessor_merged": true,
   "source_description": "Composer-classmap auto-discovery of attribute-decorated entity classes; eliminates manual EntityType::fromClass() and EntityTypeManager::registerEntityType() ceremony."
 }

@@ -9,6 +9,7 @@
   "target_branch": "main",
   "vcs": "git",
   "predecessor_mission": "attribute-first-entity-definition-01KQ6DXE",
-  "status": "stub",
+  "status": "ready",
+  "predecessor_merged": true,
   "source_description": "#[VectorIndexed] attribute on entity properties auto-wires content into waaseyaa/ai-vector for semantic search; first end-to-end demo of the framework's AI-first claim."
 }

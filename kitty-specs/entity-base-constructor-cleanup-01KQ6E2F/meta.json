@@ -9,6 +9,7 @@
   "target_branch": "main",
   "vcs": "git",
   "predecessor_mission": "attribute-first-entity-definition-01KQ6DXE",
-  "status": "stub",
+  "status": "ready",
+  "predecessor_merged": true,
   "source_description": "Tighten ContentEntityBase::__construct signature to drop the legacy $entityTypeId/$entityKeys/$fieldDefinitions parameters now that attributes are the only metadata source."
 }
