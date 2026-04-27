@@ -89,3 +89,4 @@ bin/waaseyaa optimize:manifest
 
 - 2026-04-27T22:32:05Z – claude – Moved to in_progress
 - 2026-04-27T22:37:56Z – claude – Moved to for_review
+- 2026-04-27T22:38:00Z – claude – Self-review: 13/13 groups tests green; 376/376 entity+groups; phpstan green; cs-check clean on touched files; optimize:manifest boots.
