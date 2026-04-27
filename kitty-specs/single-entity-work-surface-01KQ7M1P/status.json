@@ -1,7 +1,7 @@
 {
-  "event_count": 31,
-  "last_event_id": "01KQ7VTN9CZTPR1VZC2WG56Q4N",
-  "materialized_at": "2026-04-27T16:19:45.068463+00:00",
+  "event_count": 33,
+  "last_event_id": "01KQ7VVJ90Q2P0ADAF2E5GMNNG",
+  "materialized_at": "2026-04-27T16:20:14.752455+00:00",
   "mission_number": "",
   "mission_slug": "single-entity-work-surface-01KQ7M1P",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 7
+    "planned": 6
   },
   "work_packages": {
     "WP01": {
@@ -39,11 +39,11 @@
       "last_transition_at": "2026-04-27T16:19:45.068463+00:00"
     },
     "WP04": {
-      "actor": "finalize-tasks",
+      "actor": "claude:sonnet-4-6:implementer:implementer",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQ7RMRPTASEPDBC7H6PPC755",
-      "last_transition_at": "2026-04-27T15:24:06.234994+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KQ7VVJ90Q2P0ADAF2E5GMNNG",
+      "last_transition_at": "2026-04-27T16:20:14.752455+00:00"
     },
     "WP05": {
       "actor": "finalize-tasks",
