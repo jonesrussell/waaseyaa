@@ -17,8 +17,8 @@ subtasks:
 - T003
 - T004
 - T005
-shell_pid: "36224"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "29352"
+agent: "claude:sonnet:reviewer:reviewer"
 history:
 - timestamp: '2026-04-27T06:43:14Z'
   action: created
@@ -200,3 +200,4 @@ spec-kitty agent action implement WP01 --agent <name>
 
 - 2026-04-27T06:50:51Z – claude:sonnet:implementer:implementer – shell_pid=36224 – Assigned agent via action command
 - 2026-04-27T06:56:43Z – claude:sonnet:implementer:implementer – shell_pid=36224 – Ready for review: delegation seams added, regression test green (286 field tests + 52 integration tests pass)
+- 2026-04-27T06:57:16Z – claude:sonnet:reviewer:reviewer – shell_pid=29352 – Started review via action command
