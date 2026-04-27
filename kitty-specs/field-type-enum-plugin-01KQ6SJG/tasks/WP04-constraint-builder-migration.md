@@ -12,6 +12,8 @@ subtasks:
 - T016
 - T017
 - T018
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "37536"
 history:
 - timestamp: '2026-04-27T06:43:14Z'
   action: created
@@ -134,3 +136,7 @@ If the test file uses a different name in the actual repo, rename `owned_files` 
 ```bash
 spec-kitty agent action implement WP04 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-04-27T07:16:57Z – claude:sonnet:implementer:implementer – shell_pid=37536 – Started implementation via action command
