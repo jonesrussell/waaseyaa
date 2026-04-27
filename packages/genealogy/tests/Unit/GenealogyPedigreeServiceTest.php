@@ -40,6 +40,7 @@ final class GenealogyPedigreeServiceTest extends TestCase
 
                 return new SqlEntityStorage($definition, $database, $dispatcher, $registry);
             },
+            fieldRegistry: $registry,
         );
 
         ContentEntityBase::setFieldRegistry($registry);

@@ -32,7 +32,7 @@ final class EntityMetadataReader
         $typeId = self::resolveTypeId($class);
         $keys = self::resolveKeys($class);
         $labelDescription = self::resolveLabelAndDescription($class);
-        $fields = self::resolveFields($class);
+        $fields = self::resolveFields($class, $typeId);
 
         return self::$cache[$class] = new EntityClassMetadata(
             typeId: $typeId,
@@ -62,9 +62,13 @@ final class EntityMetadataReader
      * override parent fields with the same property name.
      *
      * @param class-string $class
+     * @param string|null $entityTypeId Resolved entity type id to stamp on each
+     *   FieldDefinition. When null, fields are produced with an empty
+     *   targetEntityTypeId (matching the pre-FR-1 default for callers that
+     *   don't yet know the id).
      * @return array<string, FieldDefinition>
      */
-    public static function resolveFields(string $class): array
+    public static function resolveFields(string $class, ?string $entityTypeId = null): array
     {
         if (!is_subclass_of($class, ContentEntityBase::class)) {
             return [];
@@ -106,6 +110,7 @@ final class EntityMetadataReader
                     type: $inferred['type'],
                     cardinality: 1,
                     settings: $inferred['settings'],
+                    targetEntityTypeId: $entityTypeId ?? '',
                     translatable: $field->translatable,
                     revisionable: $field->revisionable,
                     defaultValue: $field->default,

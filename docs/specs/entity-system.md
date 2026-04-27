@@ -596,13 +596,7 @@ public $uid;
 
 A future `inferrer-entity-reference-compat` mission will extend `FieldTypeInferrer` so `?int` / `?string` are accepted as compatible PHP types for `entity_reference` and the typed declaration becomes `#[Field(type: 'entity_reference', settings: [...])] public ?int $uid;`.
 
-### 4. Latent bug: `EntityType::fromClass()` + `FieldDefinitionRegistry::registerCoreFields()` interaction
-
-**Known issue, M1 acceptance is conditional on this being filed as a follow-up.** TODO: file follow-up mission.
-
-`EntityType::fromClass()` produces `FieldDefinition` instances whose `targetEntityTypeId` is the empty string. `FieldDefinitionRegistry::registerCoreFields()` rejects field definitions with an empty `targetEntityTypeId`, so passing an `EntityType` constructed via `fromClass()` through both surfaces simultaneously throws. Tests work around this by skipping the registry registration step in `EntityTypeManager` for fixture types. The fix is to either back-fill `targetEntityTypeId` inside `EntityType::fromClass()` or relax the registry's acceptance check — either is a small diff but is out of scope for M1.
-
-### 5. Provider stub still emits legacy form
+### 4. Provider stub still emits legacy form
 
 The CLI scaffold at `packages/cli/stubs/provider-domain.stub` still emits `new EntityType(... fieldDefinitions: ...)` because WP05 only updated the entity-class scaffold. New entities scaffolded via `bin/waaseyaa make:entity` will produce a working entity class but a service-provider stub that uses the (now-removed) `fieldDefinitions:` parameter. This is a known migration site for a small documentation / scaffolding follow-up; the entity-class portion of the scaffold is correct.
 
