@@ -78,3 +78,4 @@ composer cs-check
 
 - 2026-04-27T22:24:48Z – claude – Moved to in_progress
 - 2026-04-27T22:30:44Z – claude – Moved to for_review
+- 2026-04-27T22:31:34Z – claude – Self-review: 65/65 entity attribute tests pass; cs-check clean on touched files; phpstan green.
