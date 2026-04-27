@@ -1,18 +1,18 @@
 {
-  "event_count": 16,
-  "last_event_id": "01KQ6W79ZBDEAN5ZF7P644DH0B",
-  "materialized_at": "2026-04-27T07:07:25.035748+00:00",
+  "event_count": 19,
+  "last_event_id": "01KQ6WA71GW4M4XF0C4MCWKB8A",
+  "materialized_at": "2026-04-27T07:09:00.336938+00:00",
   "mission_number": "",
   "mission_slug": "field-type-enum-plugin-01KQ6SJG",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 1,
+    "approved": 2,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 3
   },
@@ -25,11 +25,11 @@
       "last_transition_at": "2026-04-27T06:59:12.751971+00:00"
     },
     "WP02": {
-      "actor": "claude:sonnet:reviewer:reviewer",
+      "actor": "user",
       "force_count": 2,
-      "lane": "in_progress",
-      "last_event_id": "01KQ6W79ZBDEAN5ZF7P644DH0B",
-      "last_transition_at": "2026-04-27T07:07:25.035748+00:00"
+      "lane": "approved",
+      "last_event_id": "01KQ6WA71GW4M4XF0C4MCWKB8A",
+      "last_transition_at": "2026-04-27T07:09:00.336938+00:00"
     },
     "WP03": {
       "actor": "finalize-tasks",
