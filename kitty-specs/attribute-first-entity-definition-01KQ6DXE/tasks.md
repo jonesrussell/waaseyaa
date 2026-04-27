@@ -11,11 +11,11 @@
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
-| T001 | Create `Waaseyaa\Entity\Attribute\Field` attribute class | WP01 |  |
-| T002 | Create `Waaseyaa\Entity\Attribute\FieldTypeInferrer` helper | WP01 |  |
-| T003 | Unit tests for `Field` attribute (instantiation, parameters) | WP01 | [P] |
-| T004 | Unit tests for `FieldTypeInferrer` (full PHP-type → field-type mapping table) | WP01 | [P] |
-| T005 | Error-path tests: untyped property, unsupported type, type-conflict, unknown type id | WP01 | [P] |
+| T001 | Create `Waaseyaa\Entity\Attribute\Field` attribute class | WP01 |  | [D] |
+| T002 | Create `Waaseyaa\Entity\Attribute\FieldTypeInferrer` helper | WP01 |  | [D] |
+| T003 | Unit tests for `Field` attribute (instantiation, parameters) | WP01 | [D] |
+| T004 | Unit tests for `FieldTypeInferrer` (full PHP-type → field-type mapping table) | WP01 | [D] |
+| T005 | Error-path tests: untyped property, unsupported type, type-conflict, unknown type id | WP01 | [D] |
 | T006 | Extend `#[ContentEntityType]` with `label` and `description` parameters | WP02 |  |
 | T007 | Extend `EntityClassMetadata` to carry `label`, `description`, `fields` | WP02 |  |
 | T008 | Update `EntityMetadataReader::forClass()` to populate the new metadata fields | WP02 |  |
@@ -95,11 +95,11 @@ WP01 ──► WP02 ──► WP03 ──┬──► WP04 ──┬──► WP
 **Independent test**: All WP01 unit tests pass; `Field` attribute can be instantiated; `FieldTypeInferrer::infer()` returns expected results across the full mapping table.
 
 **Included subtasks**:
-- [ ] T001 Create `Waaseyaa\Entity\Attribute\Field` attribute class (WP01)
-- [ ] T002 Create `Waaseyaa\Entity\Attribute\FieldTypeInferrer` helper (WP01)
-- [ ] T003 Unit tests for `Field` attribute (WP01)
-- [ ] T004 Unit tests for `FieldTypeInferrer` (full mapping) (WP01)
-- [ ] T005 Error-path tests (WP01)
+- [x] T001 Create `Waaseyaa\Entity\Attribute\Field` attribute class (WP01)
+- [x] T002 Create `Waaseyaa\Entity\Attribute\FieldTypeInferrer` helper (WP01)
+- [x] T003 Unit tests for `Field` attribute (WP01)
+- [x] T004 Unit tests for `FieldTypeInferrer` (full mapping) (WP01)
+- [x] T005 Error-path tests (WP01)
 
 **Implementation sketch**:
 1. Add `Field.php` to `packages/entity/src/Attribute/` next to existing `ContentEntityType.php`. Mirror the readonly-class style.
