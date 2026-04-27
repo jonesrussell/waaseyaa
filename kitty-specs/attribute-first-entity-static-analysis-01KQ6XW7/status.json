@@ -1,7 +1,7 @@
 {
-  "event_count": 9,
-  "last_event_id": "01KQ6YKQVBETZZNAW82GNKSSBZ",
-  "materialized_at": "2026-04-27T07:49:09.611110+00:00",
+  "event_count": 11,
+  "last_event_id": "01KQ6Z3NE6MKWXPKYJS3DWJVDX",
+  "materialized_at": "2026-04-27T07:57:51.430474+00:00",
   "mission_number": "",
   "mission_slug": "attribute-first-entity-static-analysis-01KQ6XW7",
   "mission_type": "software-dev",
@@ -12,17 +12,17 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 9
+    "planned": 8
   },
   "work_packages": {
     "WP01": {
-      "actor": "finalize-tasks",
+      "actor": "implement-command",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQ6YKQF5WH34A6KK25VX10ZY",
-      "last_transition_at": "2026-04-27T07:49:09.221402+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KQ6Z3NE6MKWXPKYJS3DWJVDX",
+      "last_transition_at": "2026-04-27T07:57:51.430474+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",
