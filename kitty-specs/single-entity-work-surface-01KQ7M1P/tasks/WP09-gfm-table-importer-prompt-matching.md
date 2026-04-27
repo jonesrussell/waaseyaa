@@ -235,3 +235,4 @@ Depends on WP01 + WP02 + WP08.
 ## Activity Log
 
 - 2026-04-27T17:46:25Z – claude:sonnet-4-6:implementer:implementer – shell_pid=23804 – Started implementation via action command
+- 2026-04-27T17:51:09Z – claude:sonnet-4-6:implementer:implementer – shell_pid=23804 – F5b GfmTableImporter; mb_strtolower normalization preserves diacritics; contract test base; tests pass
