@@ -16,11 +16,11 @@
 | T003 | Unit tests for `Field` attribute (instantiation, parameters) | WP01 | [D] |
 | T004 | Unit tests for `FieldTypeInferrer` (full PHP-type → field-type mapping table) | WP01 | [D] |
 | T005 | Error-path tests: untyped property, unsupported type, type-conflict, unknown type id | WP01 | [D] |
-| T006 | Extend `#[ContentEntityType]` with `label` and `description` parameters | WP02 |  |
-| T007 | Extend `EntityClassMetadata` to carry `label`, `description`, `fields` | WP02 |  |
-| T008 | Update `EntityMetadataReader::forClass()` to populate the new metadata fields | WP02 |  |
-| T009 | Add `EntityMetadataReader::resolveFields()` with hierarchy walk + cache extension | WP02 |  |
-| T010 | Tests for extended `ContentEntityType`, `EntityClassMetadata`, and `resolveFields()` | WP02 | [P] |
+| T006 | Extend `#[ContentEntityType]` with `label` and `description` parameters | WP02 |  | [D] |
+| T007 | Extend `EntityClassMetadata` to carry `label`, `description`, `fields` | WP02 |  | [D] |
+| T008 | Update `EntityMetadataReader::forClass()` to populate the new metadata fields | WP02 |  | [D] |
+| T009 | Add `EntityMetadataReader::resolveFields()` with hierarchy walk + cache extension | WP02 |  | [D] |
+| T010 | Tests for extended `ContentEntityType`, `EntityClassMetadata`, and `resolveFields()` | WP02 | [D] |
 | T011 | Add `EntityType::fromClass(string $class): self` static factory | WP03 |  |
 | T012 | Remove `fieldDefinitions:` parameter from `EntityType` constructor; introduce internalized `_fieldDefinitions` slot | WP03 |  |
 | T013 | Delete `EntityTypeManager::assertClassMetadataMatchesEntityType()` and its call site in `registerEntityType()` | WP03 |  |
@@ -128,11 +128,11 @@ WP01 ──► WP02 ──► WP03 ──┬──► WP04 ──┬──► WP
 **Independent test**: `EntityClassMetadata::$fields` is populated correctly for sample test entities; `resolveFields()` walks inheritance; cache is hit on second call.
 
 **Included subtasks**:
-- [ ] T006 Extend `#[ContentEntityType]` with `label`, `description` (WP02)
-- [ ] T007 Extend `EntityClassMetadata` (WP02)
-- [ ] T008 Update `EntityMetadataReader::forClass()` (WP02)
-- [ ] T009 Add `EntityMetadataReader::resolveFields()` (WP02)
-- [ ] T010 Tests for the above (WP02)
+- [x] T006 Extend `#[ContentEntityType]` with `label`, `description` (WP02)
+- [x] T007 Extend `EntityClassMetadata` (WP02)
+- [x] T008 Update `EntityMetadataReader::forClass()` (WP02)
+- [x] T009 Add `EntityMetadataReader::resolveFields()` (WP02)
+- [x] T010 Tests for the above (WP02)
 
 **Implementation sketch**:
 1. Add `label`, `description` parameters to `ContentEntityType` constructor with sensible defaults.
