@@ -1,18 +1,18 @@
 {
-  "event_count": 68,
-  "last_event_id": "01KQ80M9XDJ13AB994SJ0TZ7DD",
-  "materialized_at": "2026-04-27T17:43:39.693696+00:00",
+  "event_count": 71,
+  "last_event_id": "01KQ80R8SCC09Y2S9P9SPRK2ZH",
+  "materialized_at": "2026-04-27T17:45:49.612034+00:00",
   "mission_number": "",
   "mission_slug": "single-entity-work-surface-01KQ7M1P",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 7,
+    "approved": 8,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 2
   },
@@ -67,11 +67,11 @@
       "last_transition_at": "2026-04-27T17:25:30.970130+00:00"
     },
     "WP08": {
-      "actor": "claude:opus-4-7:reviewer:reviewer",
+      "actor": "user",
       "force_count": 3,
-      "lane": "in_progress",
-      "last_event_id": "01KQ80M9XDJ13AB994SJ0TZ7DD",
-      "last_transition_at": "2026-04-27T17:43:39.693696+00:00"
+      "lane": "approved",
+      "last_event_id": "01KQ80R8SCC09Y2S9P9SPRK2ZH",
+      "last_transition_at": "2026-04-27T17:45:49.612034+00:00"
     },
     "WP09": {
       "actor": "finalize-tasks",
