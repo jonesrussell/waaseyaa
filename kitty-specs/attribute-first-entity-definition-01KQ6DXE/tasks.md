@@ -21,12 +21,12 @@
 | T008 | Update `EntityMetadataReader::forClass()` to populate the new metadata fields | WP02 |  | [D] |
 | T009 | Add `EntityMetadataReader::resolveFields()` with hierarchy walk + cache extension | WP02 |  | [D] |
 | T010 | Tests for extended `ContentEntityType`, `EntityClassMetadata`, and `resolveFields()` | WP02 | [D] |
-| T011 | Add `EntityType::fromClass(string $class): self` static factory | WP03 |  |
-| T012 | Remove `fieldDefinitions:` parameter from `EntityType` constructor; introduce internalized `_fieldDefinitions` slot | WP03 |  |
-| T013 | Delete `EntityTypeManager::assertClassMetadataMatchesEntityType()` and its call site in `registerEntityType()` | WP03 |  |
-| T014 | Create `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()` test helper | WP03 |  |
-| T015 | Tests for `fromClass()`: happy path, inheritance, missing attribute, errors, caching | WP03 | [P] |
-| T016 | Performance benchmark test asserting NFR-001 (< 5 ms first call) and NFR-002 (< 0.1 ms cached) | WP03 | [P] |
+| T011 | Add `EntityType::fromClass(string $class): self` static factory | WP03 |  | [D] |
+| T012 | Remove `fieldDefinitions:` parameter from `EntityType` constructor; introduce internalized `_fieldDefinitions` slot | WP03 |  | [D] |
+| T013 | Delete `EntityTypeManager::assertClassMetadataMatchesEntityType()` and its call site in `registerEntityType()` | WP03 |  | [D] |
+| T014 | Create `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()` test helper | WP03 |  | [D] |
+| T015 | Tests for `fromClass()`: happy path, inheritance, missing attribute, errors, caching | WP03 | [D] |
+| T016 | Performance benchmark test asserting NFR-001 (< 5 ms first call) and NFR-002 (< 0.1 ms cached) | WP03 | [D] |
 | T017 | Migrate genealogy entity classes to `#[Field]` (4 files: GenealogyEvent, GenealogyFamily, GenealogyPerson, GenealogyTree) | WP04 |  |
 | T018 | Migrate `packages/node/src/Node.php` to `#[Field]` | WP04 | [P] |
 | T019 | Migrate `packages/note/src/Note.php` to `#[Field]` | WP04 | [P] |
@@ -163,12 +163,12 @@ WP01 ──► WP02 ──► WP03 ──┬──► WP04 ──┬──► WP
 **Independent test**: `EntityType::fromClass(SampleEntity::class)` returns an `EntityType` whose field map matches the class's `#[Field]` declarations. Cache assertions pass. NFR benchmarks pass.
 
 **Included subtasks**:
-- [ ] T011 Add `EntityType::fromClass()` factory (WP03)
-- [ ] T012 Remove `fieldDefinitions:` from `EntityType` constructor (WP03)
-- [ ] T013 Delete `assertClassMetadataMatchesEntityType()` from `EntityTypeManager` (WP03)
-- [ ] T014 Add `TestEntityType::stub()` helper (WP03)
-- [ ] T015 Tests for `fromClass()` (WP03)
-- [ ] T016 Performance benchmark test (NFR-001/002) (WP03)
+- [x] T011 Add `EntityType::fromClass()` factory (WP03)
+- [x] T012 Remove `fieldDefinitions:` from `EntityType` constructor (WP03)
+- [x] T013 Delete `assertClassMetadataMatchesEntityType()` from `EntityTypeManager` (WP03)
+- [x] T014 Add `TestEntityType::stub()` helper (WP03)
+- [x] T015 Tests for `fromClass()` (WP03)
+- [x] T016 Performance benchmark test (NFR-001/002) (WP03)
 
 **Implementation sketch**:
 1. Add `EntityType::fromClass(string $class, ...$overrides): self` — accepts `group`, `storageClass`, `revisionable`, etc. as named overrides; pulls everything else from attributes.
