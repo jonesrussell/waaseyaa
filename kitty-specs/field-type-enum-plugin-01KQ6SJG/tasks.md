@@ -32,9 +32,9 @@ This file decomposes [plan.md](./plan.md) into work packages. Each WP has its ow
 | T013 | Flip `FieldTypeInferrer.php:144-148` emission from `'string'` to `'enum'` | WP03 | [D] |
 | T014 | Update `Field` attribute docstring in `packages/entity/src/Attribute/Field.php` to show `enum` field-type example | WP03 | [D] |
 | T015 | Update `FieldTypeInferrerTest.php` (lines 78–85, 139–148, 150) to assert new `'enum' + enum_class` shape; reconsider `explicit_string_type_on_backed_enum_keeps_inferred_enum_class` per AS-8 (now an error path) | WP03 | [D] |
-| T016 | Refactor `FieldDefinitionConstraintBuilder.php:67-78` to scope enum logic to `$def->getType() === 'enum'` and delegate case-value lookup to `EnumItem::casesForEnumClass()` | WP04 | [P] |
-| T017 | Remove the legacy `enumClass` alias read; remove the `'string' + enum_class` legacy branch entirely (C-004) | WP04 | [P] |
-| T018 | Update or add tests under `packages/entity/tests/Unit/Validation/` to assert: `'enum'` field produces `Choice` constraint with case backing values; `'string' + enum_class` no longer adds a `Choice` constraint | WP04 | [P] |
+| T016 | Refactor `FieldDefinitionConstraintBuilder.php:67-78` to scope enum logic to `$def->getType() === 'enum'` and delegate case-value lookup to `EnumItem::casesForEnumClass()` | WP04 | [D] |
+| T017 | Remove the legacy `enumClass` alias read; remove the `'string' + enum_class` legacy branch entirely (C-004) | WP04 | [D] |
+| T018 | Update or add tests under `packages/entity/tests/Unit/Validation/` to assert: `'enum'` field produces `Choice` constraint with case backing values; `'string' + enum_class` no longer adds a `Choice` constraint | WP04 | [D] |
 | T019 | Close the transitional-gap entry for the enum bridge in `docs/specs/entity-system.md` §"Known Transitional Gaps", referencing this mission | WP05 |  |
 | T020 | Add CHANGELOG entry (if `CHANGELOG.md` exists at repo root) describing the new `enum` field type and the breaking refactor of `FieldTypeInferrer`/`FieldDefinitionConstraintBuilder`; if no CHANGELOG, skip and document the skip in the WP | WP05 |  |
 | T021 | Final grep sweep: assert no `enum_class` references remain outside `EnumItem.php`, `FieldTypeInferrer.php`, `FieldDefinitionConstraintBuilder.php`, and tests/fixtures (SC-001) | WP05 |  |
@@ -128,9 +128,9 @@ This file decomposes [plan.md](./plan.md) into work packages. Each WP has its ow
 
 **Subtasks**:
 
-- [ ] T016 [P] Scope enum logic to `type='enum'` and delegate to `EnumItem` (WP04)
-- [ ] T017 [P] Remove legacy alias and bridge branch (WP04)
-- [ ] T018 [P] Update validation tests (WP04)
+- [x] T016 [P] Scope enum logic to `type='enum'` and delegate to `EnumItem` (WP04)
+- [x] T017 [P] Remove legacy alias and bridge branch (WP04)
+- [x] T018 [P] Update validation tests (WP04)
 
 **Risks**:
 - `FieldDefinitionConstraintBuilder` may be called from multiple validators; make sure removing the `enumClass` alias doesn't silently strip behavior elsewhere. Search for `enumClass` (camelCase) usages.
