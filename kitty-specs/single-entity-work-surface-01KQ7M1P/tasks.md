@@ -22,10 +22,10 @@
 | T012 | Implement `FormDescriptorBuilder::build()` in `packages/field/src/Form/FormDescriptorBuilder.php` (registry walk, value extraction, `readOnly` resolution via `FieldAccessPolicyInterface`) | WP03 | — | [D] |
 | T013 | Unit-test `FormFieldDescriptor` constructor, immutability, defaults | WP03 | [D] |
 | T014 | Unit-test `FormDescriptorBuilder`: ordering, value extraction, `readOnly` from `FieldDefinition` and from `FieldAccessPolicyInterface`, ungrouped + grouped fields, missing entity values | WP03 | — | [D] |
-| T015 | Add `EntityDeepLinkRouteBuilder` in `packages/routing/src/EntityDeepLinkRouteBuilder.php` (composes `RouteBuilder::create()` + `entityParameter()`) | WP04 | — |
-| T016 | Unit-test `EntityDeepLinkRouteBuilder::for()->controller()` produces a Symfony `Route` with the expected path, method, parameter resolver, and option flags | WP04 | — |
-| T017 | Integration test: deep-link route resolves entity via `EntityRepository` and runs access policy before invoking controller; 404 on missing entity; 403 on access denied | WP04 | — |
-| T018 | Author-side example in routing docstring showing the `for(...)->controller(...)->methods(...)->build()` chain pattern | WP04 | [P] |
+| T015 | Add `EntityDeepLinkRouteBuilder` in `packages/routing/src/EntityDeepLinkRouteBuilder.php` (composes `RouteBuilder::create()` + `entityParameter()`) | WP04 | — | [D] |
+| T016 | Unit-test `EntityDeepLinkRouteBuilder::for()->controller()` produces a Symfony `Route` with the expected path, method, parameter resolver, and option flags | WP04 | — | [D] |
+| T017 | Integration test: deep-link route resolves entity via `EntityRepository` and runs access policy before invoking controller; 404 on missing entity; 403 on access denied | WP04 | — | [D] |
+| T018 | Author-side example in routing docstring showing the `for(...)->controller(...)->methods(...)->build()` chain pattern | WP04 | [D] |
 | T019 | Create `packages/attachment/composer.json` declaring the package at L2 with deps on entity, entity-storage, access, foundation | WP05 | — |
 | T020 | Implement `Attachment` content entity (extends `ContentEntityBase`) with required entity keys | WP05 | — |
 | T021 | Implement `AttachmentSchema` for `SqlSchemaHandler` (columns, indexes, `_data` blob fields per data-model.md § 1) | WP05 | — |
@@ -167,10 +167,10 @@
 4. Route `_gate` access option enforces `AccessPolicyInterface::access('view')` before controller invocation.
 
 **Included subtasks**:
-- [ ] T015 Add `EntityDeepLinkRouteBuilder` class (WP04)
-- [ ] T016 Unit-test the builder produces expected `Route` configuration (WP04)
-- [ ] T017 Integration test: deep-link route resolution + access enforcement (WP04)
-- [ ] T018 Author-side docstring example (WP04)
+- [x] T015 Add `EntityDeepLinkRouteBuilder` class (WP04)
+- [x] T016 Unit-test the builder produces expected `Route` configuration (WP04)
+- [x] T017 Integration test: deep-link route resolution + access enforcement (WP04)
+- [x] T018 Author-side docstring example (WP04)
 
 **Implementation sketch**: see WP04 prompt.
 
