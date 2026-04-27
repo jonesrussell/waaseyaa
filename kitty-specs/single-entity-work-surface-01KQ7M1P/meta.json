@@ -6,5 +6,7 @@
   "mission_slug": "single-entity-work-surface-01KQ7M1P",
   "mission_type": "software-dev",
   "slug": "single-entity-work-surface-01KQ7M1P",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-04-27T15:53:19.432626+00:00"
 }
