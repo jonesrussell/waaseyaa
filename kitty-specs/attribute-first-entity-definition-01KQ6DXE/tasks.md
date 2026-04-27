@@ -27,12 +27,12 @@
 | T014 | Create `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()` test helper | WP03 |  | [D] |
 | T015 | Tests for `fromClass()`: happy path, inheritance, missing attribute, errors, caching | WP03 | [D] |
 | T016 | Performance benchmark test asserting NFR-001 (< 5 ms first call) and NFR-002 (< 0.1 ms cached) | WP03 | [D] |
-| T017 | Migrate genealogy entity classes to `#[Field]` (4 files: GenealogyEvent, GenealogyFamily, GenealogyPerson, GenealogyTree) | WP04 |  |
-| T018 | Migrate `packages/node/src/Node.php` to `#[Field]` | WP04 | [P] |
-| T019 | Migrate `packages/note/src/Note.php` to `#[Field]` | WP04 | [P] |
-| T020 | Migrate `packages/taxonomy/src/{Term,Vocabulary}.php` to `#[Field]` | WP04 | [P] |
-| T021 | Migrate `packages/user/src/User.php` to `#[Field]` | WP04 | [P] |
-| T022 | Update content-track ServiceProviders (genealogy, node, note, taxonomy, user) to call `EntityType::fromClass()` | WP04 |  |
+| T017 | Migrate genealogy entity classes to `#[Field]` (4 files: GenealogyEvent, GenealogyFamily, GenealogyPerson, GenealogyTree) | WP04 |  | [D] |
+| T018 | Migrate `packages/node/src/Node.php` to `#[Field]` | WP04 | [D] |
+| T019 | Migrate `packages/note/src/Note.php` to `#[Field]` | WP04 | [D] |
+| T020 | Migrate `packages/taxonomy/src/{Term,Vocabulary}.php` to `#[Field]` | WP04 | [D] |
+| T021 | Migrate `packages/user/src/User.php` to `#[Field]` | WP04 | [D] |
+| T022 | Update content-track ServiceProviders (genealogy, node, note, taxonomy, user) to call `EntityType::fromClass()` | WP04 |  | [D] |
 | T023 | Migrate `packages/oidc/src/Entity/OidcClient.php` + `OidcServiceProvider.php` | WP05 | [P] |
 | T024 | Migrate engagement entity class(es) + `EngagementServiceProvider.php` | WP05 | [P] |
 | T025 | Migrate groups entity class(es) + `GroupsServiceProvider.php` | WP05 | [P] |
@@ -200,12 +200,12 @@ WP01 ──► WP02 ──► WP03 ──┬──► WP04 ──┬──► WP
 **Independent test**: phpunit for `packages/{genealogy,node,note,taxonomy,user}/` is green.
 
 **Included subtasks**:
-- [ ] T017 Migrate genealogy entity classes (WP04)
-- [ ] T018 Migrate `packages/node/src/Node.php` (WP04)
-- [ ] T019 Migrate `packages/note/src/Note.php` (WP04)
-- [ ] T020 Migrate `packages/taxonomy/src/{Term,Vocabulary}.php` (WP04)
-- [ ] T021 Migrate `packages/user/src/User.php` (WP04)
-- [ ] T022 Update content-track ServiceProviders (WP04)
+- [x] T017 Migrate genealogy entity classes (WP04)
+- [x] T018 Migrate `packages/node/src/Node.php` (WP04)
+- [x] T019 Migrate `packages/note/src/Note.php` (WP04)
+- [x] T020 Migrate `packages/taxonomy/src/{Term,Vocabulary}.php` (WP04)
+- [x] T021 Migrate `packages/user/src/User.php` (WP04)
+- [x] T022 Update content-track ServiceProviders (WP04)
 
 **Implementation sketch**:
 1. For each entity class, add `#[ContentEntityType(id: …, label: …, description: …)]` (taking values from the corresponding ServiceProvider's current `EntityType` instantiation); add `#[Field]` to public typed properties matching the existing `fieldDefinitions:` map.
