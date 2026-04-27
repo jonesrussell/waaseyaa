@@ -5,3 +5,8 @@ agents:
   - cursor
   - claude
   auto_commit: true
+project:
+  uuid: 97e661da-9e78-40c8-881f-0945bd3376e9
+  slug: framework
+  node_id: 3a6d4f2cea16
+  build_id: 0969ebd6-aaeb-4908-a8d6-d536e2f605a2
