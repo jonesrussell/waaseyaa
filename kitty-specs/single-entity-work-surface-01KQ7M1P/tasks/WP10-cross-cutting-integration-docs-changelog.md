@@ -24,6 +24,8 @@ subtasks:
 - T047
 - T048
 - T049
+agent: "claude:sonnet-4-6:implementer:implementer"
+shell_pid: "8140"
 history:
 - date: '2026-04-27'
   note: Generated from plan.md + spec.md Success Criterion 5.
@@ -280,3 +282,7 @@ spec-kitty agent action implement WP10 --agent <agent-name> --mission single-ent
 ```
 
 Depends on WP02, WP03, WP04, WP06, WP07, WP09 — all must be approved before WP10 starts.
+
+## Activity Log
+
+- 2026-04-27T17:53:35Z – claude:sonnet-4-6:implementer:implementer – shell_pid=8140 – Started implementation via action command
