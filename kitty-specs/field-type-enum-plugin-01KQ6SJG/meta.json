@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-04-27T06:21:08.453412+00:00",
+  "friendly_name": "field type enum plugin",
+  "mission_id": "01KQ6SJGTFFN73ZS746T06NMFV",
+  "mission_number": null,
+  "mission_slug": "field-type-enum-plugin-01KQ6SJG",
+  "mission_type": "software-dev",
+  "slug": "field-type-enum-plugin-01KQ6SJG",
+  "target_branch": "main"
+}
