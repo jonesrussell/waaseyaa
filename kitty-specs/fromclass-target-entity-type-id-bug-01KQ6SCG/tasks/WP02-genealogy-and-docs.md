@@ -112,3 +112,4 @@ search for `targetEntityTypeId` and `fromClass` references and audit.
 ## Activity Log
 
 - 2026-04-27T08:37:23Z – claude – shell_pid=7160 – Started implementation via action command
+- 2026-04-27T08:39:09Z – claude – shell_pid=7160 – Genealogy tests pass with registry as fieldRegistry kwarg (4th param, not 3rd as initially noted in spec). Doc item 4 removed; trailing item renumbered. 11/11 genealogy tests green.

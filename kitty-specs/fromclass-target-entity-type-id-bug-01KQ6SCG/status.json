@@ -1,7 +1,7 @@
 {
-  "event_count": 7,
-  "last_event_id": "01KQ71C22M6193FH9AZHPKNPCR",
-  "materialized_at": "2026-04-27T08:37:23.668929+00:00",
+  "event_count": 8,
+  "last_event_id": "01KQ71F9AJ4SV8Y6S55XQFV0KG",
+  "materialized_at": "2026-04-27T08:39:09.394127+00:00",
   "mission_number": "",
   "mission_slug": "fromclass-target-entity-type-id-bug-01KQ6SCG",
   "mission_type": "software-dev",
@@ -11,8 +11,8 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 1,
-    "in_progress": 1,
+    "for_review": 2,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 0
   },
@@ -25,11 +25,11 @@
       "last_transition_at": "2026-04-27T08:37:08.023874+00:00"
     },
     "WP02": {
-      "actor": "claude",
+      "actor": "user",
       "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KQ71C22M6193FH9AZHPKNPCR",
-      "last_transition_at": "2026-04-27T08:37:23.668929+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KQ71F9AJ4SV8Y6S55XQFV0KG",
+      "last_transition_at": "2026-04-27T08:39:09.394127+00:00"
     }
   }
 }
