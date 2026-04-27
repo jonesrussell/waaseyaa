@@ -6,27 +6,28 @@ namespace Waaseyaa\Genealogy\Entity;
 
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 
-#[ContentEntityType(id: 'genealogy_event')]
+#[ContentEntityType(id: 'genealogy_event', label: 'Genealogy event', description: 'A vital or narrative event')]
 #[ContentEntityKeys(label: 'display_name')]
 final class GenealogyEvent extends ContentEntityBase
 {
-    /**
-     * @param array<string, mixed> $values
-     * @param array<string, string> $entityKeys
-     * @param array<string, mixed> $fieldDefinitions
-     */
-    public function __construct(
-        array $values = [],
-        string $entityTypeId = '',
-        array $entityKeys = [],
-        array $fieldDefinitions = [],
-    ) {
-        $values += [
-            'status' => 0,
-        ];
+    #[Field(label: 'Display name', required: true, settings: ['weight' => 0])]
+    public string $display_name = '';
 
-        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
-    }
+    #[Field(label: 'Event type', settings: ['weight' => 1])]
+    public ?string $event_type = null;
+
+    #[Field(label: 'Event date', settings: ['weight' => 2])]
+    public ?string $event_date = null;
+
+    #[Field(type: 'integer', label: 'Tree', settings: ['weight' => 3, 'not_null' => false])]
+    public ?int $tree_id = null;
+
+    #[Field(label: 'Deleted at', default: '', settings: ['weight' => 9, 'length' => 32])]
+    public string $deleted_at = '';
+
+    #[Field(type: 'boolean', label: 'Published', default: false, settings: ['weight' => 10])]
+    public bool $status = false;
 }

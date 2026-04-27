@@ -107,10 +107,10 @@ class TranslatableTestEntity extends ContentEntityBase implements MutableTransla
         $values[$langcodeKey] = $langcode;
 
         $translation = new static(
-            values: $values,
-            entityTypeId: $this->entityTypeId,
-            entityKeys: $this->entityKeys,
-            fieldDefinitions: $this->fieldDefinitions,
+            $values,
+            $this->entityTypeId,
+            $this->entityKeys,
+            $this->fieldDefinitions,
         );
 
         // Share the same ID and UUID as the source entity.

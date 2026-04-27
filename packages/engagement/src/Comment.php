@@ -6,12 +6,31 @@ namespace Waaseyaa\Engagement;
 
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 
-#[ContentEntityType(id: 'comment')]
+#[ContentEntityType(id: 'comment', label: 'Comment')]
 #[ContentEntityKeys(id: 'cid', uuid: 'uuid', label: 'body')]
 final class Comment extends ContentEntityBase
 {
+    #[Field(type: 'text', label: 'Body', settings: ['weight' => 0, 'subtype' => 'text_long'])]
+    public string $body = '';
+
+    #[Field(label: 'User ID', settings: ['weight' => 1])]
+    public int $user_id = 0;
+
+    #[Field(label: 'Target Entity Type', settings: ['weight' => 2])]
+    public string $target_type = '';
+
+    #[Field(label: 'Target Entity ID', settings: ['weight' => 3])]
+    public int $target_id = 0;
+
+    #[Field(type: 'boolean', label: 'Published', default: 1, settings: ['weight' => 5])]
+    public bool $status = true;
+
+    #[Field(type: 'integer', label: 'Created', settings: ['weight' => 10, 'subtype' => 'timestamp'])]
+    public ?int $created_at = null;
+
     /**
      * @param array<string, mixed> $values
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.

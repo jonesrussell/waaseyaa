@@ -16,7 +16,7 @@ use Waaseyaa\Field\FieldDefinitionInterface;
  * stored in per-bundle subtables (`group__{bundle}`); core keys live on the
  * base `group` table. See docs/specs/bundle-scoped-storage.md.
  */
-#[ContentEntityType(id: 'group')]
+#[ContentEntityType(id: 'group', label: 'Group', description: 'Multi-bundle group of members, actors, or subjects.')]
 #[ContentEntityKeys(id: 'gid', uuid: 'uuid', bundle: 'type', label: 'name', langcode: 'langcode')]
 final class Group extends ContentEntityBase
 {

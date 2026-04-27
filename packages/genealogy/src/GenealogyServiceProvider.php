@@ -102,53 +102,33 @@ final class GenealogyServiceProvider extends ServiceProvider
 
     private function treeEntityType(): EntityType
     {
-        return new EntityType(
-            id: 'genealogy_tree',
-            label: 'Genealogy tree',
-            description: 'Tenancy root for genealogy workspace (owner, grants, community overlays).',
-            class: GenealogyTree::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'display_name'],
+        return EntityType::fromClass(
+            GenealogyTree::class,
             group: 'content',
-            fieldDefinitions: GenealogyFieldDefinitions::treeFields(),
         );
     }
 
     private function personEntityType(): EntityType
     {
-        return new EntityType(
-            id: 'genealogy_person',
-            label: 'Genealogy person',
-            description: 'An individual in a genealogy dataset',
-            class: GenealogyPerson::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'display_name'],
+        return EntityType::fromClass(
+            GenealogyPerson::class,
             group: 'content',
-            fieldDefinitions: GenealogyFieldDefinitions::personFields(),
         );
     }
 
     private function familyEntityType(): EntityType
     {
-        return new EntityType(
-            id: 'genealogy_family',
-            label: 'Genealogy family',
-            description: 'A family or household group',
-            class: GenealogyFamily::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'display_name'],
+        return EntityType::fromClass(
+            GenealogyFamily::class,
             group: 'content',
-            fieldDefinitions: GenealogyFieldDefinitions::familyFields(),
         );
     }
 
     private function eventEntityType(): EntityType
     {
-        return new EntityType(
-            id: 'genealogy_event',
-            label: 'Genealogy event',
-            description: 'A vital or narrative event',
-            class: GenealogyEvent::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'display_name'],
+        return EntityType::fromClass(
+            GenealogyEvent::class,
             group: 'content',
-            fieldDefinitions: GenealogyFieldDefinitions::eventFields(),
         );
     }
 }

@@ -57,10 +57,11 @@ final class MakeProviderCommandTest extends TestCase
 
         $output = $tester->getDisplay();
         $this->assertStringContainsString('class BlogServiceProvider extends ServiceProvider', $output);
-        $this->assertStringContainsString("id: 'blog'", $output);
-        $this->assertStringContainsString("label: 'Blog'", $output);
-        $this->assertStringContainsString('fieldDefinitions:', $output);
+        $this->assertStringContainsString('EntityType::fromClass(', $output);
         $this->assertStringContainsString('Blog::class', $output);
+        $this->assertStringContainsString("group: 'blog'", $output);
+        $this->assertStringNotContainsString('fieldDefinitions:', $output);
+        $this->assertStringNotContainsString('new EntityType(', $output);
     }
 
     #[Test]
@@ -71,7 +72,7 @@ final class MakeProviderCommandTest extends TestCase
 
         $output = $tester->getDisplay();
         $this->assertStringContainsString('class UserProfileServiceProvider extends ServiceProvider', $output);
-        $this->assertStringContainsString("id: 'user_profile'", $output);
+        $this->assertStringContainsString("group: 'user_profile'", $output);
     }
 
     private function createTester(): CommandTester

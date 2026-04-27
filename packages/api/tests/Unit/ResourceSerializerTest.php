@@ -9,6 +9,8 @@ use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
+use Waaseyaa\Field\FieldDefinition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -23,17 +25,17 @@ final class ResourceSerializerTest extends TestCase
     protected function setUp(): void
     {
         $this->entityTypeManager = new EntityTypeManager(new EventDispatcher());
-        $this->entityTypeManager->registerEntityType(new EntityType(
-            id: 'article',
-            label: 'Article',
-            class: TestEntity::class,
-            keys: TestEntity::definitionKeys(),
-            fieldDefinitions: [
-                'status' => ['type' => 'boolean'],
-                'promote' => ['type' => 'boolean'],
-                'created' => ['type' => 'timestamp'],
-                'changed' => ['type' => 'timestamp'],
+        $this->entityTypeManager->registerEntityType(TestEntityType::stub(
+            'article',
+            [
+                'status' => new FieldDefinition(name: 'status', type: 'boolean'),
+                'promote' => new FieldDefinition(name: 'promote', type: 'boolean'),
+                'created' => new FieldDefinition(name: 'created', type: 'timestamp'),
+                'changed' => new FieldDefinition(name: 'changed', type: 'timestamp'),
             ],
+            keys: TestEntity::definitionKeys(),
+            class: TestEntity::class,
+            label: 'Article',
         ));
 
         $this->serializer = new ResourceSerializer($this->entityTypeManager);

@@ -30,7 +30,9 @@ class MakeEntityTypeCommandTest extends TestCase
         $this->assertStringContainsString('use Waaseyaa\\Entity\\ConfigEntityBase;', $output);
         $this->assertStringContainsString('declare(strict_types=1);', $output);
         $this->assertStringContainsString('string $entityTypeId = \'\'', $output);
-        $this->assertStringContainsString('CHANGE_ME', $output);
+        $this->assertStringContainsString("'event'", $output);
+        $this->assertStringContainsString("'id' => 'id'", $output);
+        $this->assertStringContainsString("'label' => 'label'", $output);
     }
 
     #[Test]
@@ -44,13 +46,12 @@ class MakeEntityTypeCommandTest extends TestCase
 
         $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
         $output = $tester->getDisplay();
-        $this->assertStringContainsString('class Article extends ContentEntityBase', $output);
+        $this->assertStringContainsString('final class Article extends ContentEntityBase', $output);
         $this->assertStringContainsString('use Waaseyaa\\Entity\\ContentEntityBase;', $output);
-        $this->assertStringContainsString('ContentEntityType', $output);
-        $this->assertStringContainsString('ContentEntityKeys', $output);
+        $this->assertStringContainsString('#[ContentEntityType(', $output);
+        $this->assertStringContainsString('#[ContentEntityKeys(', $output);
+        $this->assertStringContainsString('#[Field]', $output);
         $this->assertStringContainsString("id: 'article'", $output);
-        $this->assertStringContainsString('HydratableFromStorageInterface', $output);
-        $this->assertStringContainsString('function fromStorage', $output);
-        $this->assertStringContainsString('function make', $output);
+        $this->assertStringContainsString("EntityType::fromClass(Article::class, group: 'content')", $output);
     }
 }

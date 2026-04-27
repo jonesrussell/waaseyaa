@@ -48,6 +48,14 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
         $this->database = DBALDatabase::createSqlite(':memory:');
         $this->registry = new FieldDefinitionRegistry();
 
+        // The widget's core fields (notably the FieldStorage::Data-stored
+        // `status`) and the bundleEntityType slot are not expressible via
+        // `#[Field]` in M1 — `#[Field]` doesn't carry a `stored:` parameter,
+        // and bundle attributes are deferred to a follow-on mission. We
+        // therefore build the minimal EntityType through the public
+        // constructor and register the data-stored core field directly into
+        // the FieldDefinitionRegistry, which is the runtime contract the
+        // SqlEntityStorage / SqlSchemaHandler bundle-substrate code consults.
         $this->entityType = new EntityType(
             id: 'widget',
             label: 'Widget',
@@ -60,19 +68,20 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
                 'langcode' => 'langcode',
             ],
             bundleEntityType: 'widget_type',
-            fieldDefinitions: [
-                'status' => [
-                    'type' => 'integer',
-                    'default' => 1,
-                    'stored' => FieldStorage::Data,
-                    'label' => 'Status',
-                ],
-            ],
         );
 
         $this->registry->registerCoreFields(
             $this->entityType->id(),
-            $this->entityType->getFieldDefinitions(),
+            [
+                'status' => new FieldDefinition(
+                    name: 'status',
+                    type: 'integer',
+                    targetEntityTypeId: 'widget',
+                    defaultValue: 1,
+                    label: 'Status',
+                    stored: FieldStorage::Data,
+                ),
+            ],
         );
 
         $this->registry->registerBundleFields('widget', 'gizmo', [

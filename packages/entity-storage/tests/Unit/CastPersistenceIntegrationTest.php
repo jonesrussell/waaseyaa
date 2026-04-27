@@ -11,6 +11,7 @@ use ReflectionClass;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\EntityStorage\Driver\InMemoryStorageDriver;
 use Waaseyaa\EntityStorage\EntityRepository;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
@@ -19,6 +20,7 @@ use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceLeafVo;
 use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceOuterVo;
 use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceStringEnum;
 use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceTestEntity;
+use Waaseyaa\Field\FieldDefinition;
 
 /**
  * Verifies #1181 persistence invariant: hydrate/load keeps storage-shaped $values;
@@ -193,15 +195,15 @@ final class CastPersistenceIntegrationTest extends TestCase
     public function sql_storage_extra_fields_round_trip_through_data_blob(): void
     {
         $database = DBALDatabase::createSqlite();
-        $entityType = new EntityType(
-            id: 'cast_persist_entity',
-            label: 'Cast Persist',
-            class: CastPersistenceTestEntity::class,
-            keys: self::ENTITY_KEYS,
-            fieldDefinitions: [
-                'created' => ['type' => 'timestamp'],
-                'changed' => ['type' => 'timestamp'],
+        $entityType = TestEntityType::stub(
+            'cast_persist_entity',
+            [
+                'created' => new FieldDefinition(name: 'created', type: 'timestamp'),
+                'changed' => new FieldDefinition(name: 'changed', type: 'timestamp'),
             ],
+            keys: self::ENTITY_KEYS,
+            class: CastPersistenceTestEntity::class,
+            label: 'Cast Persist',
         );
         $schemaHandler = new SqlSchemaHandler($entityType, $database);
         $schemaHandler->ensureTable();
@@ -241,15 +243,15 @@ final class CastPersistenceIntegrationTest extends TestCase
     public function sql_storage_nested_value_object_round_trip_in_data_blob(): void
     {
         $database = DBALDatabase::createSqlite();
-        $entityType = new EntityType(
-            id: 'cast_persist_entity',
-            label: 'Cast Persist',
-            class: CastPersistenceTestEntity::class,
-            keys: self::ENTITY_KEYS,
-            fieldDefinitions: [
-                'created' => ['type' => 'timestamp'],
-                'changed' => ['type' => 'timestamp'],
+        $entityType = TestEntityType::stub(
+            'cast_persist_entity',
+            [
+                'created' => new FieldDefinition(name: 'created', type: 'timestamp'),
+                'changed' => new FieldDefinition(name: 'changed', type: 'timestamp'),
             ],
+            keys: self::ENTITY_KEYS,
+            class: CastPersistenceTestEntity::class,
+            label: 'Cast Persist',
         );
         $schemaHandler = new SqlSchemaHandler($entityType, $database);
         $schemaHandler->ensureTable();

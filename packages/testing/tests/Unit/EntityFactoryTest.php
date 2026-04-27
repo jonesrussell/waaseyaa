@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Testing\Tests\Unit;
 
-use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\Testing\Factory\EntityFactory;
 use Waaseyaa\Testing\Tests\Fixture\StubFieldableEntity;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -233,10 +233,10 @@ final class EntityFactoryTest extends TestCase
     #[Test]
     public function defineFromEntityTypeRegistersDefaults(): void
     {
-        $type = new EntityType(
+        $type = TestEntityType::stub(
             id: 'article',
-            label: 'Article',
             class: StubFieldableEntity::class,
+            label: 'Article',
             fieldDefinitions: [
                 'title' => ['type' => 'string', 'required' => true],
                 'status' => [

@@ -9,6 +9,7 @@ use Waaseyaa\Entity\EntityConstants;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
+use Waaseyaa\EntityStorage\Tests\Fixtures\AttributeFirstEntities\RequiredLabelFixture;
 use Waaseyaa\EntityStorage\Connection\SingleConnectionResolver;
 use Waaseyaa\EntityStorage\Driver\InMemoryStorageDriver;
 use Waaseyaa\EntityStorage\Driver\SqlStorageDriver;
@@ -25,6 +26,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Validator\Constraints\Type;
 use Waaseyaa\EntityStorage\Tests\Fixtures\CastPersistenceStringEnum;
+
+require_once __DIR__ . '/../Fixtures/AttributeFirstEntities/RequiredLabelFixture.php';
 
 #[CoversClass(EntityRepository::class)]
 final class EntityRepositoryTest extends TestCase
@@ -776,16 +779,8 @@ final class EntityRepositoryTest extends TestCase
     #[Test]
     public function saveThrowsWhenOnlyFieldDefinitionsRequireLabel(): void
     {
-        $type = new EntityType(
-            id: 'test_entity',
-            label: 'Test Entity',
-            class: TestStorageEntity::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
-            constraints: [],
-            fieldDefinitions: [
-                'label' => ['type' => 'string', 'required' => true],
-            ],
-        );
+        EntityType::clearFromClassCache();
+        $type = EntityType::fromClass(class: RequiredLabelFixture::class);
 
         $db = DBALDatabase::createSqlite();
         $driver = new SqlStorageDriver(new SingleConnectionResolver($db));
@@ -803,10 +798,8 @@ final class EntityRepositoryTest extends TestCase
             validator: $validator,
         );
 
-        $entity = new TestStorageEntity(
+        $entity = new RequiredLabelFixture(
             values: ['id' => '1', 'label' => '', 'bundle' => 'article', 'langcode' => 'en'],
-            entityTypeId: 'test_entity',
-            entityKeys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
         );
         $entity->enforceIsNew(true);
 
@@ -817,17 +810,10 @@ final class EntityRepositoryTest extends TestCase
     #[Test]
     public function saveReplacesDerivedFieldConstraintsWhenManualConstraintsPresentForField(): void
     {
-        $type = new EntityType(
-            id: 'test_entity',
-            label: 'Test Entity',
-            class: TestStorageEntity::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
-            fieldDefinitions: [
-                'label' => ['type' => 'string', 'required' => true],
-            ],
-            constraints: [
-                'label' => [new \Symfony\Component\Validator\Constraints\Length(max: 80)],
-            ],
+        EntityType::clearFromClassCache();
+        $type = EntityType::fromClass(
+            class: RequiredLabelFixture::class,
+            constraints: ['label' => [new \Symfony\Component\Validator\Constraints\Length(max: 80)]],
         );
 
         $db = DBALDatabase::createSqlite();
@@ -846,10 +832,8 @@ final class EntityRepositoryTest extends TestCase
             validator: $validator,
         );
 
-        $entity = new TestStorageEntity(
+        $entity = new RequiredLabelFixture(
             values: ['id' => '1', 'label' => '', 'bundle' => 'article', 'langcode' => 'en'],
-            entityTypeId: 'test_entity',
-            entityKeys: ['id' => 'id', 'uuid' => 'uuid', 'bundle' => 'bundle', 'label' => 'label', 'langcode' => 'langcode'],
         );
         $entity->enforceIsNew(true);
 

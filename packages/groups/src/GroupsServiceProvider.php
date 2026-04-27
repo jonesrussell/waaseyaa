@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Groups;
 
 use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldStorage;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
@@ -20,6 +21,16 @@ final class GroupsServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        // The `group` content entity declares its core fields with
+        // `stored: FieldStorage::Data` so registry-aware queries can resolve
+        // `status`/`created_at`/`updated_at` via json_extract on the bundle-
+        // partitioned data table. The current `#[Field]` attribute does not
+        // expose `stored:`, so we register the content type explicitly here
+        // (using the @internal `_fieldDefinitions` slot) instead of via
+        // EntityType::fromClass(). The Group class still carries
+        // #[ContentEntityType] / #[ContentEntityKeys] for type-id discovery,
+        // and bundle-scoped fields remain consumer-defined via
+        // EntityTypeManager::addBundleFields().
         $this->entityType(new EntityType(
             id: 'group',
             label: 'Group',
@@ -34,27 +45,33 @@ final class GroupsServiceProvider extends ServiceProvider
             ],
             bundleEntityType: 'group_type',
             group: 'groups',
-            fieldDefinitions: [
-                'status' => [
-                    'type' => 'integer',
-                    'default' => 1,
-                    'stored' => FieldStorage::Data,
-                    'label' => 'Status',
-                    'description' => 'Whether the group is published.',
-                ],
-                'created_at' => [
-                    'type' => 'integer',
-                    'stored' => FieldStorage::Data,
-                    'label' => 'Created at',
-                ],
-                'updated_at' => [
-                    'type' => 'integer',
-                    'stored' => FieldStorage::Data,
-                    'label' => 'Updated at',
-                ],
+            _fieldDefinitions: [
+                'status' => new FieldDefinition(
+                    name: 'status',
+                    type: 'integer',
+                    defaultValue: 1,
+                    label: 'Status',
+                    description: 'Whether the group is published.',
+                    stored: FieldStorage::Data,
+                ),
+                'created_at' => new FieldDefinition(
+                    name: 'created_at',
+                    type: 'integer',
+                    label: 'Created at',
+                    stored: FieldStorage::Data,
+                ),
+                'updated_at' => new FieldDefinition(
+                    name: 'updated_at',
+                    type: 'integer',
+                    label: 'Updated at',
+                    stored: FieldStorage::Data,
+                ),
             ],
         ));
 
+        // GroupType is a config entity (extends ConfigEntityBase). Attribute
+        // reflection only applies to ContentEntityBase subclasses, so the
+        // config entity registration stays explicit per AD-3 in the plan.
         $this->entityType(new EntityType(
             id: 'group_type',
             label: 'Group type',
@@ -65,13 +82,14 @@ final class GroupsServiceProvider extends ServiceProvider
                 'label' => 'label',
             ],
             group: 'groups',
-            fieldDefinitions: [
-                'description' => [
-                    'type' => 'text',
-                    'label' => 'Description',
-                    'description' => 'Human-readable description of this group type.',
-                    'weight' => 5,
-                ],
+            _fieldDefinitions: [
+                'description' => new FieldDefinition(
+                    name: 'description',
+                    type: 'text',
+                    label: 'Description',
+                    description: 'Human-readable description of this group type.',
+                    settings: ['weight' => 5],
+                ),
             ],
         ));
     }

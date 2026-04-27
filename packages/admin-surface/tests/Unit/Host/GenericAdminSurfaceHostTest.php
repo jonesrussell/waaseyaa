@@ -20,6 +20,7 @@ use Waaseyaa\AdminSurface\Host\GenericAdminSurfaceHost;
 use Waaseyaa\Entity\ConfigEntityBase;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\AdminSurface\Query\SurfaceFilterOperator;
 use Waaseyaa\AdminSurface\Query\SurfaceQuery;
 use Waaseyaa\Entity\EntityTypeManager;
@@ -139,9 +140,6 @@ final class GenericAdminSurfaceHostTest extends TestCase
                 class: \stdClass::class,
                 keys: ['id' => 'eid'],
                 group: 'events',
-                fieldDefinitions: [
-                    'title' => ['type' => 'string', 'label' => 'Title'],
-                ],
             ),
         ]);
 
@@ -782,22 +780,22 @@ final class GenericAdminSurfaceHostTest extends TestCase
         $etm = $this->createMock(EntityTypeManager::class);
         $etm->method('hasDefinition')->willReturn(true);
         $etm->method('getDefinitions')->willReturn([
-            new EntityType(
+            TestEntityType::stub(
                 id: 'event',
-                label: 'Event',
                 class: \stdClass::class,
                 keys: ['id' => 'eid'],
+                label: 'Event',
                 fieldDefinitions: [
                     'title' => ['type' => 'string', 'label' => 'Title'],
                 ],
             ),
         ]);
         $etm->method('getDefinition')->willReturn(
-            new EntityType(
+            TestEntityType::stub(
                 id: 'event',
-                label: 'Event',
                 class: \stdClass::class,
                 keys: ['id' => 'eid'],
+                label: 'Event',
                 fieldDefinitions: [
                     'title' => ['type' => 'string', 'label' => 'Title'],
                 ],

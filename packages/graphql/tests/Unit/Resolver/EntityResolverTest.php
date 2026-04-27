@@ -18,6 +18,8 @@ use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
+use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\GraphQL\Access\GraphQlAccessGuard;
 use Waaseyaa\GraphQL\Resolver\EntityResolver;
 
@@ -36,17 +38,17 @@ final class EntityResolverTest extends TestCase
             new EventDispatcher(),
             fn () => $this->storage,
         );
-        $this->entityTypeManager->registerCoreEntityType(new EntityType(
-            id: 'article',
-            label: 'Article',
-            class: \Waaseyaa\Api\Tests\Fixtures\TestEntity::class,
-            keys: \Waaseyaa\Api\Tests\Fixtures\TestEntity::definitionKeys(),
-            fieldDefinitions: [
-                'id' => ['type' => 'integer'],
-                'uuid' => ['type' => 'string'],
-                'title' => ['type' => 'string'],
-                'status' => ['type' => 'boolean'],
+        $this->entityTypeManager->registerCoreEntityType(TestEntityType::stub(
+            'article',
+            [
+                'id' => new FieldDefinition(name: 'id', type: 'integer'),
+                'uuid' => new FieldDefinition(name: 'uuid', type: 'string'),
+                'title' => new FieldDefinition(name: 'title', type: 'string'),
+                'status' => new FieldDefinition(name: 'status', type: 'boolean'),
             ],
+            keys: \Waaseyaa\Api\Tests\Fixtures\TestEntity::definitionKeys(),
+            class: \Waaseyaa\Api\Tests\Fixtures\TestEntity::class,
+            label: 'Article',
         ));
 
         $this->account = $this->createStub(AccountInterface::class);

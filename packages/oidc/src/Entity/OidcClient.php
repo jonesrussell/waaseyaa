@@ -6,6 +6,7 @@ namespace Waaseyaa\Oidc\Entity;
 
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
 use Waaseyaa\Entity\Hydration\HydrationContext;
@@ -18,7 +19,7 @@ use Waaseyaa\Entity\Hydration\HydrationContext;
  * user-defined at creation time and never rewritten. The `id` column is an internal
  * auto-increment primary key for entity-system consistency.
  */
-#[ContentEntityType(id: 'oidc_client')]
+#[ContentEntityType(id: 'oidc_client', label: 'OIDC Client', description: 'Relying-party clients registered with the OIDC issuer.')]
 #[ContentEntityKeys(label: 'name')]
 final class OidcClient extends ContentEntityBase implements HydratableFromStorageInterface
 {
@@ -28,6 +29,42 @@ final class OidcClient extends ContentEntityBase implements HydratableFromStorag
     protected array $casts = [
         'is_confidential' => 'bool',
     ];
+
+    #[Field(label: 'Client ID', description: 'Stable public identifier for the client (OIDC spec).', settings: ['weight' => 0])]
+    public string $client_id = '';
+
+    #[Field(label: 'Name', description: 'Human-readable name shown in admin UIs.', settings: ['weight' => 1])]
+    public string $name = '';
+
+    /**
+     * Registered redirect URIs. Matched byte-for-byte per OIDC spec §3.1.2.1.
+     *
+     * @var string[]
+     */
+    #[Field(label: 'Redirect URIs', description: 'Registered redirect URIs. Matched byte-for-byte per OIDC spec §3.1.2.1.', settings: ['weight' => 2, 'subtype' => 'string_list'])]
+    public array $redirect_uris = [];
+
+    /**
+     * Scopes the client may request.
+     *
+     * @var string[]
+     */
+    #[Field(label: 'Scopes', description: 'Scopes the client may request.', settings: ['weight' => 3, 'subtype' => 'string_list'])]
+    public array $scopes = ['openid'];
+
+    /**
+     * OAuth grant types the client may use.
+     *
+     * @var string[]
+     */
+    #[Field(label: 'Grant types', description: 'OAuth grant types the client may use.', settings: ['weight' => 4, 'subtype' => 'string_list'])]
+    public array $grant_types = ['authorization_code'];
+
+    #[Field(label: 'Confidential', description: 'Whether the client authenticates with a secret.', settings: ['weight' => 5])]
+    public bool $is_confidential = false;
+
+    #[Field(label: 'Client secret hash', description: 'Hashed client secret. Never exposed through the API.', settings: ['weight' => 6], readOnly: true)]
+    public ?string $client_secret_hash = null;
 
     /**
      * @param array<string, mixed> $values

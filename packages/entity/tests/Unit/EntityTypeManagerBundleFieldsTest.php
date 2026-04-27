@@ -11,7 +11,10 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
+use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\GroupBundleFixture;
 use Waaseyaa\Field\FieldDefinitionInterface;
+
+require_once __DIR__ . '/../Fixtures/AttributeFirstEntities/BundleFieldsFixtures.php';
 
 #[CoversClass(EntityTypeManager::class)]
 final class EntityTypeManagerBundleFieldsTest extends TestCase
@@ -97,13 +100,14 @@ final class EntityTypeManagerBundleFieldsTest extends TestCase
         $registry = new SpyRegistry();
         $manager = new EntityTypeManager($this->dispatcher, null, null, $registry);
 
-        $coreFieldMeta = ['name' => ['type' => 'string']];
-        $manager->registerEntityType(new EntityType(
-            id: 'group',
-            label: 'Group',
-            class: TestEntity::class,
+        // Pattern 1: an attribute-first fixture with `#[Field] public string $name`
+        // produces a core `name` field of type `string`. EntityType::fromClass()
+        // is the canonical attribute-first entry point; bundle-scoped fields are
+        // injected separately via `addBundleFields()` (deferred to a follow-on
+        // mission for attribute support).
+        $manager->registerEntityType(EntityType::fromClass(
+            class: GroupBundleFixture::class,
             bundleEntityType: 'group_type',
-            fieldDefinitions: $coreFieldMeta,
         ));
 
         self::assertCount(1, $registry->coreCalls);

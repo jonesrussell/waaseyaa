@@ -13,23 +13,20 @@ use {{ entity_namespace }}\{{ entity_class }};
  *
  * Registers entity types, repositories, and services for this domain.
  * Each domain should have its own provider to maintain clear boundaries.
+ *
+ * Entity type metadata (id, label, keys, fields) is declared on the entity
+ * class itself via #[ContentEntityType], #[ContentEntityKeys], and #[Field]
+ * attributes. EntityType::fromClass() reads those attributes to build the
+ * runtime EntityType instance.
  */
 final class {{ class }} extends ServiceProvider
 {
     public function register(): void
     {
         // Register entity types for this domain.
-        $this->entityType(new EntityType(
-            id: '{{ entity_type_id }}',
-            label: '{{ entity_label }}',
-            class: {{ entity_class }}::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'label'],
-            fieldDefinitions: [
-                'id' => ['type' => 'integer'],
-                'uuid' => ['type' => 'string'],
-                'label' => ['type' => 'string', 'required' => true],
-                // Add field definitions here.
-            ],
+        $this->entityType(EntityType::fromClass(
+            {{ entity_class }}::class,
+            group: '{{ entity_type_id }}',
         ));
     }
 

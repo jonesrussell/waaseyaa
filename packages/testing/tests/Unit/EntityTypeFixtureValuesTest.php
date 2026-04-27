@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\Entity\Validation\EntityTypeValidationConstraints;
 use Waaseyaa\Entity\Validation\EntityValidator;
 use Waaseyaa\Testing\Factory\EntityTypeFixtureValues;
@@ -57,10 +58,10 @@ final class EntityTypeFixtureValuesTest extends TestCase
     #[Test]
     public function respectsLengthMax(): void
     {
-        $type = new EntityType(
+        $type = TestEntityType::stub(
             id: 'code_item',
-            label: 'Code',
             class: StubFieldableEntity::class,
+            label: 'Code',
             fieldDefinitions: [
                 'code' => ['type' => 'string', 'maxLength' => 4],
             ],
@@ -79,10 +80,10 @@ final class EntityTypeFixtureValuesTest extends TestCase
     #[Test]
     public function choiceCyclesWithSequence(): void
     {
-        $type = new EntityType(
+        $type = TestEntityType::stub(
             id: 'status_item',
-            label: 'Status',
             class: StubFieldableEntity::class,
+            label: 'Status',
             fieldDefinitions: [
                 'status' => [
                     'type' => 'string',
@@ -100,10 +101,10 @@ final class EntityTypeFixtureValuesTest extends TestCase
     #[Test]
     public function emailFieldUsesValidAddress(): void
     {
-        $type = new EntityType(
+        $type = TestEntityType::stub(
             id: 'user_stub',
-            label: 'User',
             class: StubFieldableEntity::class,
+            label: 'User',
             fieldDefinitions: [
                 'mail' => ['type' => 'email'],
             ],
@@ -155,9 +156,8 @@ final class EntityTypeFixtureValuesTest extends TestCase
     #[Test]
     public function entityKeyDefaultsPopulateUuidAndTitle(): void
     {
-        $type = new EntityType(
+        $type = TestEntityType::stub(
             id: 'node_like',
-            label: 'Node',
             class: StubFieldableEntity::class,
             keys: [
                 'uuid' => 'uuid',
@@ -165,6 +165,7 @@ final class EntityTypeFixtureValuesTest extends TestCase
                 'bundle' => 'type',
                 'langcode' => 'langcode',
             ],
+            label: 'Node',
             fieldDefinitions: [
                 'body' => ['type' => 'text', 'required' => true],
             ],
@@ -182,10 +183,10 @@ final class EntityTypeFixtureValuesTest extends TestCase
 
     private function makeArticleType(): EntityTypeInterface
     {
-        return new EntityType(
+        return TestEntityType::stub(
             id: 'article',
-            label: 'Article',
             class: StubFieldableEntity::class,
+            label: 'Article',
             fieldDefinitions: [
                 'title' => ['type' => 'string', 'required' => true],
                 'status' => [

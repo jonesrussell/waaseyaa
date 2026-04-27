@@ -7,6 +7,7 @@ namespace Waaseyaa\Node;
 use DateTimeInterface;
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
 use Waaseyaa\Entity\Hydration\HydrationContext;
@@ -18,7 +19,7 @@ use Waaseyaa\Entity\Hydration\HydrationContext;
  * to a node type (bundle) and has properties like title, author, status,
  * and timestamps.
  */
-#[ContentEntityType(id: 'node')]
+#[ContentEntityType(id: 'node', label: 'Content', description: 'Published content items')]
 #[ContentEntityKeys(id: 'nid', uuid: 'uuid', label: 'title', bundle: 'type')]
 final class Node extends ContentEntityBase implements HydratableFromStorageInterface
 {
@@ -29,6 +30,34 @@ final class Node extends ContentEntityBase implements HydratableFromStorageInter
         'created' => ['type' => 'datetime_immutable', 'storage' => 'unix'],
         'changed' => ['type' => 'datetime_immutable', 'storage' => 'unix'],
     ];
+
+    #[Field(label: 'Title', description: 'The title of the content.', required: true, settings: ['weight' => 0])]
+    public string $title = '';
+
+    #[Field(label: 'Content type', description: 'The bundle (content type) of this node.', required: true, readOnly: true, settings: ['weight' => 1])]
+    public string $type = '';
+
+    #[Field(label: 'Slug', description: 'The URL-friendly identifier for this content.', required: true, settings: ['weight' => 2])]
+    public string $slug = '';
+
+    #[Field(type: 'boolean', label: 'Published', description: 'Whether the content is published.', default: 1, settings: ['weight' => 10])]
+    public bool $status = true;
+
+    #[Field(type: 'boolean', label: 'Promoted to front page', description: 'Whether the content is promoted to the front page.', default: 0, settings: ['weight' => 11])]
+    public bool $promote = false;
+
+    #[Field(type: 'boolean', label: 'Sticky at top of lists', description: 'Whether the content is sticky at the top of lists.', default: 0, settings: ['weight' => 12])]
+    public bool $sticky = false;
+
+    /** @var int|null */
+    #[Field(type: 'entity_reference', label: 'Author', description: 'The user who authored this content.', settings: ['weight' => 20, 'target_entity_type_id' => 'user'])]
+    public $uid = null;
+
+    #[Field(type: 'integer', label: 'Authored on', description: 'The date and time the content was created.', settings: ['weight' => 30, 'subtype' => 'timestamp'])]
+    public ?int $created = null;
+
+    #[Field(type: 'integer', label: 'Last updated', description: 'The date and time the content was last updated.', settings: ['weight' => 31, 'subtype' => 'timestamp'])]
+    public ?int $changed = null;
 
     /**
      * @param array<string, mixed> $values Initial entity values.

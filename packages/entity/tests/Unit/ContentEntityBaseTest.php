@@ -34,10 +34,7 @@ class ContentEntityBaseTest extends TestCase
 
     public function testHasFieldReturnsTrueForDefinedField(): void
     {
-        $entity = new TestContentEntity(
-            values: [],
-            fieldDefinitions: ['body' => ['type' => 'text']],
-        );
+        $entity = new TestContentEntity([], '', [], ['body' => ['type' => 'text']]);
 
         $this->assertTrue($entity->hasField('body'));
     }
@@ -88,10 +85,7 @@ class ContentEntityBaseTest extends TestCase
             'title' => ['type' => 'string', 'label' => 'Title'],
             'body' => ['type' => 'text', 'label' => 'Body'],
         ];
-        $entity = new TestContentEntity(
-            values: [],
-            fieldDefinitions: $definitions,
-        );
+        $entity = new TestContentEntity([], '', [], $definitions);
 
         $this->assertSame($definitions, $entity->getFieldDefinitions());
     }
@@ -162,10 +156,7 @@ class ContentEntityBaseTest extends TestCase
     public function testDuplicatePreservesFieldDefinitions(): void
     {
         $definitions = ['body' => ['type' => 'text']];
-        $entity = new TestContentEntity(
-            values: ['title' => 'T'],
-            fieldDefinitions: $definitions,
-        );
+        $entity = new TestContentEntity(['title' => 'T'], '', [], $definitions);
         $dup = $entity->duplicate();
 
         $this->assertNotSame($entity, $dup);

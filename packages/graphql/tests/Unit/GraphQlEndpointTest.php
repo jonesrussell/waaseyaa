@@ -9,11 +9,13 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
-use Waaseyaa\Entity\EntityBase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\GraphQL\GraphQlEndpoint;
+use Waaseyaa\GraphQL\Tests\Fixtures\AttributeFirstEntities\PageSchemaFixture;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+
+require_once __DIR__ . '/../Fixtures/AttributeFirstEntities/PageSchemaFixture.php';
 
 #[CoversClass(GraphQlEndpoint::class)]
 final class GraphQlEndpointTest extends TestCase
@@ -23,18 +25,9 @@ final class GraphQlEndpointTest extends TestCase
 
     protected function setUp(): void
     {
+        EntityType::clearFromClassCache();
         $this->entityTypeManager = new EntityTypeManager(new EventDispatcher());
-        $this->entityTypeManager->registerCoreEntityType(new EntityType(
-            id: 'page',
-            label: 'Page',
-            class: EntityBase::class,
-            keys: ['id' => 'id'],
-            fieldDefinitions: [
-                'id' => ['type' => 'integer'],
-                'title' => ['type' => 'string', 'required' => true],
-                'body' => ['type' => 'text'],
-            ],
-        ));
+        $this->entityTypeManager->registerCoreEntityType(EntityType::fromClass(PageSchemaFixture::class));
 
         // Authenticated user (id !== 0) by default.
         $authenticatedAccount = $this->createStub(AccountInterface::class);

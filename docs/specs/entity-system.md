@@ -44,7 +44,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityTypeManagerInterface`, `EntityTypeRegistrationCollisionException`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints`, `Attribute\ContentEntityType`, `Attribute\ContentEntityKeys`, `Attribute\EntityClassMetadata`, `Attribute\EntityMetadataReader`, `Attribute\ContentEntityTypeReader`, `Exception\EntityMetadataException` |
+| entity | `EntityInterface`, `EntityBase`, `ContentEntityBase`, `ContentEntityInterface`, `ConfigEntityBase`, `ConfigEntityInterface`, `EntityTypeInterface`, `EntityType` (incl. `EntityType::fromClass()` static factory), `EntityTypeManagerInterface`, `EntityTypeRegistrationCollisionException`, `FieldableInterface`, `RevisionableInterface`, `TranslatableInterface`, `RevisionableEntityTrait`, `EntityRepositoryInterface`, `EntityEventFactoryInterface`, `EntityStorageInterface`, `RevisionableStorageInterface`, `EntityQueryInterface`, `HydratableFromStorageInterface`, `HydrationContext`, `EntityValues`, `CastDefinition`, `ValueCaster`, `CastException`, `FromArrayEntityValueInterface`, `FieldDefinitionConstraintBuilder`, `EntityTypeValidationConstraints`, `Attribute\ContentEntityType` (with `label`, `description` parameters), `Attribute\ContentEntityKeys`, `Attribute\Field`, `Attribute\EntityClassMetadata`, `Attribute\EntityMetadataReader`, `Attribute\ContentEntityTypeReader`, `Exception\EntityMetadataException` |
 | entity-storage | `EntityStorageDriverInterface`, `ConnectionResolverInterface` |
 | field | `FieldItemInterface`, `FieldItemListInterface`, `FieldDefinitionInterface`, `FieldStorage`, `FieldTypeInterface`, `FieldFormatterInterface`, `FieldTypeManagerInterface`, `FieldItemBase`, `ViewModeConfigInterface` |
 | config | `ConfigInterface`, `ConfigFactoryInterface`, `ConfigManagerInterface`, `StorageInterface`, `TranslatableConfigFactoryInterface` |
@@ -457,7 +457,41 @@ final class EntityConstants
 
 File: `packages/entity/src/EntityType.php`
 
-`EntityType` is a `final readonly class` implementing `EntityTypeInterface`. Constructed with named parameters:
+`EntityType` is a `final readonly class` implementing `EntityTypeInterface`. **Post-M1, the canonical entry point for content entity types is `EntityType::fromClass()`** — the class itself is the spec. The constructor no longer accepts a `fieldDefinitions:` parameter; field definitions are derived from `#[Field]`-decorated typed properties on the entity class.
+
+### Attribute-first definition (canonical)
+
+```php
+// src/Entity/Note.php
+namespace App\Entity;
+
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
+use Waaseyaa\Entity\ContentEntityBase;
+
+#[ContentEntityType(id: 'note', label: 'Note', description: 'Free-form authored content.')]
+#[ContentEntityKeys(label: 'title', bundle: 'bundle', langcode: 'langcode')]
+final class Note extends ContentEntityBase
+{
+    #[Field] public string $title;
+    #[Field(type: 'text')] public ?string $body;
+    #[Field(default: 'draft')] public string $status;
+}
+```
+
+```php
+// In NoteServiceProvider::register():
+$this->entityType(EntityType::fromClass(Note::class));
+```
+
+`EntityType::fromClass(string $class, ...$overrides): self` reads the class-level `#[ContentEntityType]` and `#[ContentEntityKeys]` plus all `#[Field]`-decorated properties, infers the field shape from each property's PHP type (with `FieldTypeInferrer`), and returns a fully-formed `EntityType`. Named arguments after `$class` override any inferred slot (`storageClass`, `keys`, `revisionable`, `bundleEntityType`, `constraints`, etc.).
+
+The `Waaseyaa\Entity\Attribute\Field` attribute supports: `name:`, `type:`, `required:`, `default:`, `settings:`, plus other slots aligned with `FieldDefinition`. Omitted parameters fall through to inference from the PHP property type. See [`quickstart.md`](../../kitty-specs/attribute-first-entity-definition-01KQ6DXE/quickstart.md) for the full inference table.
+
+### Raw constructor (advanced / non-content uses)
+
+The `EntityType` constructor remains available for non-content entity types, generated registrations (e.g., from manifests), and tests. Named parameters:
 
 ```php
 new EntityType(
@@ -471,17 +505,17 @@ new EntityType(
     translatable: false,
     bundleEntityType: 'node_type',
     constraints: [],
-    fieldDefinitions: [],
     group: null,
     description: null,
 );
 ```
 
-New parameters added to `EntityType`:
+Parameters of note:
 - `revisionDefault: bool` -- whether new revisions are created by default on save (when `revisionable` is true)
-- `fieldDefinitions: array` -- field definitions keyed by field name, used by `SchemaController`, `GraphQL`, and `EntityTypeBuilder`
 - `group: ?string` -- admin sidebar group key (e.g., `'content'`, `'taxonomy'`) for catalog grouping
 - `description: ?string` -- human-readable description of the entity type, displayed in admin catalog
+
+> **Note:** the constructor's previous `fieldDefinitions:` parameter was removed in M1. Tests that need to inject raw field definitions for fixture entity types can use `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()`.
 
 For multi-bundle entity types (those declaring `bundleEntityType`), fields may additionally be registered per-bundle via `EntityTypeManager::addBundleFields()`. `ContentEntityBase::getFieldDefinitions()` returns the union of core fields plus the active bundle's fields. See [`bundle-scoped-fields.md`](./bundle-scoped-fields.md) for the full contract.
 
@@ -491,7 +525,61 @@ Entity types are registered explicitly with `EntityTypeManager::registerEntityTy
 
 File: `packages/entity/src/Attribute/EntityTypeAttribute.php`
 
-PHP attribute `#[EntityTypeAttribute(...)]` for class-level discovery. Extends `WaaseyaaPlugin`. Not currently used for registration (types are registered manually) but wired for future plugin-based discovery.
+PHP attribute `#[EntityTypeAttribute(...)]` for class-level discovery. Extends `WaaseyaaPlugin`. Not currently used for registration (types are still registered manually via `EntityType::fromClass()` + `EntityTypeManager::registerEntityType()`); composer-classmap auto-discovery of `#[ContentEntityType]`-decorated classes is the **M2 mission** ([`attribute-entity-classmap-discovery`](../../kitty-specs/attribute-entity-classmap-discovery-01KQ6E2B/)). Once M2 lands, the explicit registration step disappears.
+
+## Known Transitional Gaps (M1)
+
+The M1 *attribute-first entity definition* mission shipped the canonical surface (`#[Field]`, `EntityType::fromClass()`, extended `#[ContentEntityType]`). The list below captures gaps surfaced during M1 implementation that are **deliberately deferred** to follow-on missions. Each entry names the workaround callers should use today and the mission that resolves it.
+
+### 1. `EntityMetadataReader` cache is per-process only
+
+`EntityMetadataReader` and `FieldTypeInferrer` cache resolved class metadata in-memory for the duration of a single PHP request/CLI process. There is **no persistent cache** in M1 — each process pays the reflection cost on first access for each entity class. This is acceptable for current load. Production deployments wanting cross-process caching can layer one of: APCu (`apcu_store`/`apcu_fetch`), opcache preloading (PHP 7.4+), or generated metadata files emitted at deploy time. **This is a deferred optimization, not an M1 deliverable** — there is no follow-on mission filed for it yet because no benchmark has demonstrated it as a hot path.
+
+### 2. Field-type plugin gaps in M1
+
+Two specific PHP property types map to fallbacks in M1 because the matching field-type plugins haven't been implemented yet. When the proper plugins ship, entities can update their `#[Field]` attributes from the fallback to the canonical type without any other code changes.
+
+**`timestamp` field type missing.** Properties intended to store Unix-epoch timestamps (`User.created`, `UserBlock.created_at`, `Node.created`, `Node.changed`, the engagement and messaging timestamp fields, etc.) currently use:
+
+```php
+#[Field(type: 'integer', settings: ['subtype' => 'timestamp'])]
+public int $created;
+```
+
+A future `field-type-timestamp-plugin` mission will ship the proper plugin so the canonical declaration becomes `#[Field(type: 'timestamp')] public int $created;`.
+
+**`enum` field type missing.** Backed-enum properties currently map to `'string'` with the enum class carried in `settings`:
+
+```php
+#[Field(type: 'string', settings: ['enum_class' => CourseStatus::class])]
+public CourseStatus $status;
+```
+
+A future `field-type-enum-plugin` mission will ship the proper plugin so the canonical declaration becomes `#[Field(type: 'enum', settings: ['class' => CourseStatus::class])]` (or equivalent).
+
+### 3. `#[Field]` attribute gaps surfaced by M1
+
+**No `stored:` parameter on `#[Field]`.** Entities with universal core fields that need explicit storage placement (e.g., `groups/Group` declares `status`, `created_at`, `updated_at` all requiring `stored: FieldStorage::Data`) cannot express that on the attribute today. The workaround is to fall back to the raw `EntityType()` constructor with the internal `_fieldDefinitions:` slot for those registrations. A future `field-attribute-stored-parameter` mission will add the parameter so the storage placement can live on the attribute alongside `type:` / `default:` / `settings:`.
+
+**`entity_reference` is rejected on scalar PHP types by `FieldTypeInferrer`.** The inferrer doesn't currently have a compatibility group for `?int` or `?string` → `entity_reference`. Properties like `Node.uid`, `Term.parent_id`, etc. work around this with untyped properties + `@var` PHPDoc:
+
+```php
+#[Field(type: 'entity_reference', settings: ['target_type' => 'user'])]
+/** @var int|null */
+public $uid;
+```
+
+A future `inferrer-entity-reference-compat` mission will extend `FieldTypeInferrer` so `?int` / `?string` are accepted as compatible PHP types for `entity_reference` and the typed declaration becomes `#[Field(type: 'entity_reference', settings: [...])] public ?int $uid;`.
+
+### 4. Latent bug: `EntityType::fromClass()` + `FieldDefinitionRegistry::registerCoreFields()` interaction
+
+**Known issue, M1 acceptance is conditional on this being filed as a follow-up.** TODO: file follow-up mission.
+
+`EntityType::fromClass()` produces `FieldDefinition` instances whose `targetEntityTypeId` is the empty string. `FieldDefinitionRegistry::registerCoreFields()` rejects field definitions with an empty `targetEntityTypeId`, so passing an `EntityType` constructed via `fromClass()` through both surfaces simultaneously throws. Tests work around this by skipping the registry registration step in `EntityTypeManager` for fixture types. The fix is to either back-fill `targetEntityTypeId` inside `EntityType::fromClass()` or relax the registry's acceptance check — either is a small diff but is out of scope for M1.
+
+### 5. Provider stub still emits legacy form
+
+The CLI scaffold at `packages/cli/stubs/provider-domain.stub` still emits `new EntityType(... fieldDefinitions: ...)` because WP05 only updated the entity-class scaffold. New entities scaffolded via `bin/waaseyaa make:entity` will produce a working entity class but a service-provider stub that uses the (now-removed) `fieldDefinitions:` parameter. This is a known migration site for a small documentation / scaffolding follow-up; the entity-class portion of the scaffold is correct.
 
 ## Entity Lifecycle
 

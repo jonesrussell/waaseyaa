@@ -12,7 +12,7 @@ use Waaseyaa\AI\Vector\EmbeddingStorageInterface;
 use Waaseyaa\AI\Vector\SearchController;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Entity\EntityInterface;
-use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
@@ -32,11 +32,11 @@ final class SearchControllerTest extends TestCase
             ->with([2, 1])
             ->willReturn([1 => $entityA, 2 => $entityB]);
 
-        $definition = new EntityType(
+        $definition = TestEntityType::stub(
             id: 'node',
-            label: 'Node',
             class: SearchEntity::class,
             keys: ['id' => 'id', 'label' => 'title'],
+            label: 'Node',
             fieldDefinitions: ['title' => ['type' => 'string']],
         );
 
@@ -113,11 +113,11 @@ final class SearchControllerTest extends TestCase
             ->with([5, 6])
             ->willReturn([5 => $entityA, 6 => $entityB]);
 
-        $definition = new EntityType(
+        $definition = TestEntityType::stub(
             id: 'node',
-            label: 'Node',
             class: SearchEntity::class,
             keys: ['id' => 'id', 'label' => 'title'],
+            label: 'Node',
             fieldDefinitions: ['title' => ['type' => 'string']],
         );
 
@@ -174,11 +174,11 @@ final class SearchControllerTest extends TestCase
             ->with([42])
             ->willReturn([42 => $entity]);
 
-        $definition = new EntityType(
+        $definition = TestEntityType::stub(
             id: 'node',
-            label: 'Node',
             class: SearchEntity::class,
             keys: ['id' => 'id', 'label' => 'title'],
+            label: 'Node',
             fieldDefinitions: ['title' => ['type' => 'string']],
         );
 
@@ -250,11 +250,11 @@ final class SearchControllerTest extends TestCase
                 ]),
             ]);
 
-        $definition = new EntityType(
+        $definition = TestEntityType::stub(
             id: 'node',
-            label: 'Node',
             class: SearchEntity::class,
             keys: ['id' => 'id', 'label' => 'title'],
+            label: 'Node',
             fieldDefinitions: ['title' => ['type' => 'string']],
         );
 

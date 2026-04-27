@@ -12,8 +12,10 @@ use Waaseyaa\Entity\EntityConstants;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\EntityStorage\Tests\Fixtures\IsoAtTimestampEntity;
 use Waaseyaa\EntityStorage\Tests\Fixtures\SpyEntityEventFactory;
 use Waaseyaa\EntityStorage\Tests\Fixtures\TestConfigEntity;
@@ -32,10 +34,12 @@ final class SqlEntityStorageTest extends TestCase
     protected function setUp(): void
     {
         $this->database = DBALDatabase::createSqlite();
-        $this->entityType = new EntityType(
-            id: 'test_entity',
-            label: 'Test Entity',
-            class: TestStorageEntity::class,
+        $this->entityType = TestEntityType::stub(
+            'test_entity',
+            [
+                'created' => new FieldDefinition(name: 'created', type: 'timestamp'),
+                'changed' => new FieldDefinition(name: 'changed', type: 'timestamp'),
+            ],
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',
@@ -43,10 +47,8 @@ final class SqlEntityStorageTest extends TestCase
                 'label' => 'label',
                 'langcode' => 'langcode',
             ],
-            fieldDefinitions: [
-                'created' => ['type' => 'timestamp'],
-                'changed' => ['type' => 'timestamp'],
-            ],
+            class: TestStorageEntity::class,
+            label: 'Test Entity',
         );
         $this->eventDispatcher = new EventDispatcher();
 
@@ -342,10 +344,12 @@ final class SqlEntityStorageTest extends TestCase
     {
         $database = DBALDatabase::createSqlite();
         $fixed = new DateTimeImmutable('@1700000000');
-        $entityType = new EntityType(
-            id: 'iso_at_entity',
-            label: 'ISO @',
-            class: IsoAtTimestampEntity::class,
+        $entityType = TestEntityType::stub(
+            'iso_at_entity',
+            [
+                'created_at' => new FieldDefinition(name: 'created_at', type: 'timestamp'),
+                'updated_at' => new FieldDefinition(name: 'updated_at', type: 'timestamp'),
+            ],
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',
@@ -353,10 +357,8 @@ final class SqlEntityStorageTest extends TestCase
                 'label' => 'label',
                 'langcode' => 'langcode',
             ],
-            fieldDefinitions: [
-                'created_at' => ['type' => 'timestamp'],
-                'updated_at' => ['type' => 'timestamp'],
-            ],
+            class: IsoAtTimestampEntity::class,
+            label: 'ISO @',
         );
         (new SqlSchemaHandler($entityType, $database))->ensureTable();
 
@@ -393,10 +395,12 @@ final class SqlEntityStorageTest extends TestCase
     {
         $database = DBALDatabase::createSqlite();
         $fixed = new DateTimeImmutable('@1800000000');
-        $entityType = new EntityType(
-            id: 'unix_cast_ts_entity',
-            label: 'Unix cast',
-            class: UnixCastTimestampEntity::class,
+        $entityType = TestEntityType::stub(
+            'unix_cast_ts_entity',
+            [
+                'created_at' => new FieldDefinition(name: 'created_at', type: 'timestamp'),
+                'updated_at' => new FieldDefinition(name: 'updated_at', type: 'timestamp'),
+            ],
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',
@@ -404,10 +408,8 @@ final class SqlEntityStorageTest extends TestCase
                 'label' => 'label',
                 'langcode' => 'langcode',
             ],
-            fieldDefinitions: [
-                'created_at' => ['type' => 'timestamp'],
-                'updated_at' => ['type' => 'timestamp'],
-            ],
+            class: UnixCastTimestampEntity::class,
+            label: 'Unix cast',
         );
         (new SqlSchemaHandler($entityType, $database))->ensureTable();
 
@@ -562,13 +564,20 @@ final class SqlEntityStorageTest extends TestCase
         $configStorage->save($entity);
     }
 
-    /** @param array<string, array<string, mixed>> $fieldDefinitions */
-    private function createStorageWithFields(string $id, array $fieldDefinitions): SqlEntityStorage
+    /** @param array<string, array<string, mixed>> $fields */
+    private function createStorageWithFields(string $id, array $fields): SqlEntityStorage
     {
-        $entityType = new EntityType(
-            id: $id,
-            label: ucfirst($id),
-            class: TestStorageEntity::class,
+        $defs = [];
+        foreach ($fields as $name => $meta) {
+            $defs[$name] = new FieldDefinition(
+                name: $name,
+                type: (string) ($meta['type'] ?? 'string'),
+                defaultValue: $meta['default'] ?? null,
+            );
+        }
+        $entityType = TestEntityType::stub(
+            $id,
+            $defs,
             keys: [
                 'id' => 'id',
                 'uuid' => 'uuid',
@@ -576,7 +585,8 @@ final class SqlEntityStorageTest extends TestCase
                 'label' => 'label',
                 'langcode' => 'langcode',
             ],
-            fieldDefinitions: $fieldDefinitions,
+            class: TestStorageEntity::class,
+            label: ucfirst($id),
         );
 
         $schemaHandler = new SqlSchemaHandler($entityType, $this->database);

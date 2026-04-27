@@ -14,6 +14,7 @@ use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Cache\CacheBackendInterface;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\Mcp\McpController;
 use Waaseyaa\Mcp\Tests\Unit\Fixtures\PermissionAwareNodeVisibilityPolicy;
 use Waaseyaa\Mcp\Tests\Unit\Fixtures\TestMcpAccount;
@@ -125,19 +126,17 @@ final class McpControllerCacheTest extends TestCase
         int|string $userId,
         CacheBackendInterface $cache,
     ): McpController {
-        $nodeDefinition = new EntityType(
-            id: 'node',
-            label: 'Node',
-            class: \stdClass::class,
+        $nodeDefinition = TestEntityType::stub(
+            'node',
             keys: ['id' => 'id', 'label' => 'title', 'bundle' => 'type'],
-            fieldDefinitions: [],
-        );
-        $relationshipDefinition = new EntityType(
-            id: 'relationship',
-            label: 'Relationship',
             class: \stdClass::class,
+            label: 'Node',
+        );
+        $relationshipDefinition = TestEntityType::stub(
+            'relationship',
             keys: ['id' => 'id', 'label' => 'relationship_type'],
-            fieldDefinitions: [],
+            class: \stdClass::class,
+            label: 'Relationship',
         );
 
         $nodeStorage = new InMemoryEntityStorage('node');

@@ -13,6 +13,8 @@ use Waaseyaa\Api\Tests\Fixtures\NodeNidContentTestEntity;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
+use Waaseyaa\Field\FieldDefinition;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -120,24 +122,25 @@ final class SchemaControllerTest extends TestCase
         $storage = new InMemoryEntityStorage('node');
         $manager = new EntityTypeManager(new EventDispatcher(), fn() => $storage);
 
-        $manager->registerEntityType(new EntityType(
-            id: 'node',
-            label: 'Content',
-            class: NodeNidContentTestEntity::class,
-            keys: NodeNidContentTestEntity::definitionKeys(),
-            fieldDefinitions: [
-                'status' => [
-                    'type' => 'boolean',
-                    'label' => 'Published',
-                    'weight' => 10,
-                ],
-                'uid' => [
-                    'type' => 'entity_reference',
-                    'label' => 'Author',
-                    'target_entity_type_id' => 'user',
-                    'weight' => 20,
-                ],
+        $manager->registerEntityType(TestEntityType::stub(
+            'node',
+            [
+                'status' => new FieldDefinition(
+                    name: 'status',
+                    type: 'boolean',
+                    settings: ['weight' => 10],
+                    label: 'Published',
+                ),
+                'uid' => new FieldDefinition(
+                    name: 'uid',
+                    type: 'entity_reference',
+                    settings: ['target_entity_type_id' => 'user', 'weight' => 20],
+                    label: 'Author',
+                ),
             ],
+            keys: NodeNidContentTestEntity::definitionKeys(),
+            class: NodeNidContentTestEntity::class,
+            label: 'Content',
         ));
 
         $controller = new SchemaController($manager, new SchemaPresenter());

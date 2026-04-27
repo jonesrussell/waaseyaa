@@ -51,7 +51,7 @@ final class NoteRbacIntegrationTest extends TestCase
             label: 'Note',
             class: Note::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
-            fieldDefinitions: [
+            _fieldDefinitions: [
                 'id'         => ['type' => 'integer', 'label' => 'ID'],
                 'uuid'       => ['type' => 'string',  'label' => 'UUID'],
                 'title'      => ['type' => 'string',  'label' => 'Title'],

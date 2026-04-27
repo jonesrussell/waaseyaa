@@ -45,7 +45,7 @@ abstract class GraphQlIntegrationTestBase extends TestCase
             label: 'Article',
             class: TestArticle::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
-            fieldDefinitions: [
+            _fieldDefinitions: [
                 'id' => ['type' => 'integer'],
                 'uuid' => ['type' => 'string'],
                 'title' => ['type' => 'string', 'required' => true],
@@ -60,7 +60,7 @@ abstract class GraphQlIntegrationTestBase extends TestCase
             label: 'Author',
             class: TestAuthor::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
-            fieldDefinitions: [
+            _fieldDefinitions: [
                 'id' => ['type' => 'integer'],
                 'uuid' => ['type' => 'string'],
                 'name' => ['type' => 'string', 'required' => true],
@@ -75,7 +75,7 @@ abstract class GraphQlIntegrationTestBase extends TestCase
             label: 'Organization',
             class: TestOrganization::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
-            fieldDefinitions: [
+            _fieldDefinitions: [
                 'id' => ['type' => 'integer'],
                 'uuid' => ['type' => 'string'],
                 'name' => ['type' => 'string', 'required' => true],

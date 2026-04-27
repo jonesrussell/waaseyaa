@@ -11,14 +11,20 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\Access\AccessResult;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
-use Waaseyaa\Entity\EntityBase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\GraphQL\Access\GraphQlAccessGuard;
 use Waaseyaa\GraphQL\Resolver\EntityResolver;
 use Waaseyaa\GraphQL\Resolver\ReferenceLoader;
 use Waaseyaa\GraphQL\Schema\SchemaFactory;
+use Waaseyaa\GraphQL\Tests\Fixtures\AttributeFirstEntities\ArticleSchemaFixture;
+use Waaseyaa\GraphQL\Tests\Fixtures\AttributeFirstEntities\LogEntrySchemaFixture;
+use Waaseyaa\GraphQL\Tests\Fixtures\AttributeFirstEntities\PageSchemaFixture;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+
+require_once __DIR__ . '/../Fixtures/AttributeFirstEntities/ArticleSchemaFixture.php';
+require_once __DIR__ . '/../Fixtures/AttributeFirstEntities/LogEntrySchemaFixture.php';
+require_once __DIR__ . '/../Fixtures/AttributeFirstEntities/PageSchemaFixture.php';
 
 #[CoversClass(SchemaFactory::class)]
 final class SchemaFactoryTest extends TestCase
@@ -30,24 +36,11 @@ final class SchemaFactoryTest extends TestCase
     protected function setUp(): void
     {
         SchemaFactory::resetCache();
+        EntityType::clearFromClassCache();
 
         $this->entityTypeManager = new EntityTypeManager(new EventDispatcher());
 
-        $articleType = new EntityType(
-            id: 'article',
-            label: 'Article',
-            class: EntityBase::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid'],
-            fieldDefinitions: [
-                'id' => ['type' => 'integer'],
-                'uuid' => ['type' => 'string'],
-                'title' => ['type' => 'string', 'required' => true],
-                'body' => ['type' => 'text'],
-                'status' => ['type' => 'boolean'],
-                'created' => ['type' => 'timestamp'],
-            ],
-        );
-        $this->entityTypeManager->registerCoreEntityType($articleType);
+        $this->entityTypeManager->registerCoreEntityType(EntityType::fromClass(ArticleSchemaFixture::class));
 
         // Open access — allow everything
         $this->accessHandler = new EntityAccessHandler([]);
@@ -216,17 +209,7 @@ final class SchemaFactoryTest extends TestCase
         $schema1 = $factory->build();
 
         // Register a new entity type — changes the definitions
-        $pageType = new EntityType(
-            id: 'page',
-            label: 'Page',
-            class: EntityBase::class,
-            keys: ['id' => 'id'],
-            fieldDefinitions: [
-                'id' => ['type' => 'integer'],
-                'title' => ['type' => 'string'],
-            ],
-        );
-        $this->entityTypeManager->registerCoreEntityType($pageType);
+        $this->entityTypeManager->registerCoreEntityType(EntityType::fromClass(PageSchemaFixture::class));
 
         $schema2 = $factory->build();
 
@@ -237,18 +220,7 @@ final class SchemaFactoryTest extends TestCase
     public function inputTypeExcludesReadOnlyFields(): void
     {
         // Register a type with a readOnly field
-        $typeWithReadOnly = new EntityType(
-            id: 'log_entry',
-            label: 'Log Entry',
-            class: EntityBase::class,
-            keys: ['id' => 'id'],
-            fieldDefinitions: [
-                'id' => ['type' => 'integer', 'readOnly' => true],
-                'message' => ['type' => 'string', 'required' => true],
-                'timestamp' => ['type' => 'timestamp', 'readOnly' => true],
-            ],
-        );
-        $this->entityTypeManager->registerCoreEntityType($typeWithReadOnly);
+        $this->entityTypeManager->registerCoreEntityType(EntityType::fromClass(LogEntrySchemaFixture::class));
 
         $guard = new GraphQlAccessGuard($this->accessHandler, $this->account);
         $referenceLoader = new ReferenceLoader($this->entityTypeManager, $guard);

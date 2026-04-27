@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Access\AccountInterface;
-use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
@@ -216,11 +216,11 @@ final class RenderControllerTest extends TestCase
             'node.full.html.twig' => '<article>{{ fields.title.formatted|raw }}</article>',
         ]));
 
-        $definition = new EntityType(
+        $definition = TestEntityType::stub(
             id: 'node',
-            label: 'Node',
             class: RenderControllerEntity::class,
             keys: ['id' => 'id', 'label' => 'title'],
+            label: 'Node',
             fieldDefinitions: ['title' => ['type' => 'string']],
         );
         $manager = $this->createMock(EntityTypeManagerInterface::class);
@@ -251,11 +251,11 @@ final class RenderControllerTest extends TestCase
             'node.full.html.twig' => '<article>{{ relationship_navigation.counts.total }}</article>',
         ]));
 
-        $definition = new EntityType(
+        $definition = TestEntityType::stub(
             id: 'node',
-            label: 'Node',
             class: RenderControllerEntity::class,
             keys: ['id' => 'id', 'label' => 'title'],
+            label: 'Node',
             fieldDefinitions: ['title' => ['type' => 'string']],
         );
         $manager = $this->createMock(EntityTypeManagerInterface::class);
@@ -290,11 +290,11 @@ final class RenderControllerTest extends TestCase
             'node.full.html.twig' => '<article>{% if account.isAuthenticated() %}in{% endif %}{{ fields.title.formatted|raw }}</article>',
         ]));
 
-        $definition = new EntityType(
+        $definition = TestEntityType::stub(
             id: 'node',
-            label: 'Node',
             class: RenderControllerEntity::class,
             keys: ['id' => 'id', 'label' => 'title'],
+            label: 'Node',
             fieldDefinitions: ['title' => ['type' => 'string']],
         );
         $manager = $this->createMock(EntityTypeManagerInterface::class);

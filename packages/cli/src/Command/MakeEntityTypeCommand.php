@@ -30,108 +30,91 @@ class MakeEntityTypeCommand extends Command
         $isContent = (bool) $input->getOption('content');
 
         $className = str_replace('_', '', ucwords($name, '_'));
-        $baseClass = $isContent ? 'ContentEntityBase' : 'ConfigEntityBase';
         $typeId = strtolower((string) $name);
+        $label = ucwords(str_replace('_', ' ', (string) $name));
 
-        $baseImport = $isContent
-            ? <<<'PHP'
-use Waaseyaa\Entity\Attribute\ContentEntityKeys;
-use Waaseyaa\Entity\Attribute\ContentEntityType;
-use Waaseyaa\Entity\ContentEntityBase;
-PHP
-            : 'use Waaseyaa\Entity\ConfigEntityBase;';
-
-        $hydrationUse = $isContent
-            ? "use Waaseyaa\\Entity\\Hydration\\HydratableFromStorageInterface;\nuse Waaseyaa\\Entity\\Hydration\\HydrationContext;"
-            : '';
-
-        $implements = $isContent ? ' implements HydratableFromStorageInterface' : '';
-
-        $extraBody = '';
-        if ($isContent) {
-            $extraBody = <<<'PHP'
-
-
-    public function __construct(
-        array $values = [],
-        string $entityTypeId = '',
-        array $entityKeys = [],
-        array $fieldDefinitions = [],
-    ) {
-        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
-    }
-
-    /**
-     * @param array<string, mixed> $values
-     */
-    public static function make(array $values): self
-    {
-        return new self($values);
-    }
-
-    public static function fromStorage(array $values, HydrationContext $context): static
-    {
-        return new self(
-            values: $values,
-            entityTypeId: $context->entityTypeId,
-            entityKeys: $context->entityKeys,
-            fieldDefinitions: [],
-        );
-    }
-
-    protected function duplicateInstance(array $values): static
-    {
-        return new static(
-            values: $values,
-            entityTypeId: $this->getEntityTypeId(),
-            entityKeys: $this->entityKeys,
-            fieldDefinitions: $this->getFieldDefinitions(),
-        );
-    }
-PHP;
-        } else {
-            $extraBody = <<<'PHP'
-
-    /**
-     * Widen the constructor so {@see \Waaseyaa\Entity\EntityBase::duplicateInstance()} can reconstruct instances.
-     * Replace the defaults below with your entity type id and key map (must match EntityType registration).
-     */
-    public function __construct(
-        array $values = [],
-        string $entityTypeId = '',
-        array $entityKeys = [],
-    ) {
-        $entityTypeId = $entityTypeId !== '' ? $entityTypeId : 'CHANGE_ME';
-        $entityKeys = $entityKeys !== [] ? $entityKeys : [
-            'id' => 'id',
-            'label' => 'label',
-        ];
-
-        parent::__construct($values, $entityTypeId, $entityKeys);
-    }
-PHP;
-        }
-
-        $attrs = $isContent ? "\n#[ContentEntityType(id: '{$typeId}')]\n#[ContentEntityKeys]\n" : "\n";
-
-        $template = <<<PHP
-<?php
-
-declare(strict_types=1);
-
-namespace App\Entity;
-
-{$baseImport}
-{$hydrationUse}
-{$attrs}class {$className} extends {$baseClass}{$implements}
-{
-{$extraBody}
-}
-
-PHP;
+        $template = $isContent
+            ? $this->renderContentTemplate($className, $typeId, $label)
+            : $this->renderConfigTemplate($className, $typeId);
 
         $output->write($template);
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * Emit an attribute-first content entity scaffold.
+     *
+     * The generated class declares fields as `#[Field]`-decorated public typed
+     * properties. Register it with `EntityType::fromClass()` in your
+     * ServiceProvider — type metadata flows automatically from the attributes.
+     */
+    private function renderContentTemplate(string $className, string $typeId, string $label): string
+    {
+        return <<<PHP
+<?php
+
+declare(strict_types=1);
+
+namespace App\\Entity;
+
+use Waaseyaa\\Entity\\Attribute\\ContentEntityKeys;
+use Waaseyaa\\Entity\\Attribute\\ContentEntityType;
+use Waaseyaa\\Entity\\Attribute\\Field;
+use Waaseyaa\\Entity\\ContentEntityBase;
+
+#[ContentEntityType(id: '{$typeId}', label: '{$label}')]
+#[ContentEntityKeys(label: 'title')]
+final class {$className} extends ContentEntityBase
+{
+    #[Field] public string \$title = '';
+    // Add additional #[Field] properties as needed.
+}
+
+// Register in your ServiceProvider:
+//
+//     \$this->entityType(EntityType::fromClass({$className}::class, group: 'content'));
+
+PHP;
+    }
+
+    /**
+     * Emit a config entity scaffold. Config entities continue to use the
+     * legacy `new EntityType(...)` registration since attribute reflection
+     * applies only to ContentEntityBase subclasses.
+     */
+    private function renderConfigTemplate(string $className, string $typeId): string
+    {
+        return <<<PHP
+<?php
+
+declare(strict_types=1);
+
+namespace App\\Entity;
+
+use Waaseyaa\\Entity\\ConfigEntityBase;
+
+class {$className} extends ConfigEntityBase
+{
+    /**
+     * Widen the constructor so {@see \\Waaseyaa\\Entity\\EntityBase::duplicateInstance()} can reconstruct instances.
+     * Replace the defaults below with your entity type id and key map (must match EntityType registration).
+     */
+    public function __construct(
+        array \$values = [],
+        string \$entityTypeId = '',
+        array \$entityKeys = [],
+    ) {
+        \$entityTypeId = \$entityTypeId !== '' ? \$entityTypeId : '{$typeId}';
+        \$entityKeys = \$entityKeys !== [] ? \$entityKeys : [
+            'id' => 'id',
+            'label' => 'label',
+        ];
+
+        parent::__construct(\$values, \$entityTypeId, \$entityKeys);
+    }
+}
+
+PHP;
     }
 }

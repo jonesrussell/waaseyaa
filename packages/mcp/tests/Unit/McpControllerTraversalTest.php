@@ -13,6 +13,7 @@ use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\Mcp\McpController;
 use Waaseyaa\Mcp\Tests\Unit\Fixtures\TestMcpAccount;
 use Waaseyaa\Mcp\Tests\Unit\Fixtures\TestNodeVisibilityPolicy;
@@ -143,19 +144,17 @@ final class McpControllerTraversalTest extends TestCase
 
     private function createTraversalController(int $sourceStatus, int $relatedStatus): McpController
     {
-        $nodeDefinition = new EntityType(
-            id: 'node',
-            label: 'Node',
-            class: \stdClass::class,
+        $nodeDefinition = TestEntityType::stub(
+            'node',
             keys: ['id' => 'id', 'label' => 'title', 'bundle' => 'type'],
-            fieldDefinitions: [],
-        );
-        $relationshipDefinition = new EntityType(
-            id: 'relationship',
-            label: 'Relationship',
             class: \stdClass::class,
+            label: 'Node',
+        );
+        $relationshipDefinition = TestEntityType::stub(
+            'relationship',
             keys: ['id' => 'id', 'label' => 'relationship_type'],
-            fieldDefinitions: [],
+            class: \stdClass::class,
+            label: 'Relationship',
         );
 
         $nodeStorage = new InMemoryEntityStorage('node');

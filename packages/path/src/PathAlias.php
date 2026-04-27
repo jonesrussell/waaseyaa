@@ -6,6 +6,7 @@ namespace Waaseyaa\Path;
 
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
@@ -15,10 +16,22 @@ use Waaseyaa\Entity\ContentEntityBase;
  * (e.g. '/about-us'). Supports language-specific aliases and a published
  * status to control alias visibility.
  */
-#[ContentEntityType(id: 'path_alias')]
+#[ContentEntityType(id: 'path_alias', label: 'Path Alias', description: 'URL aliases for human-readable paths')]
 #[ContentEntityKeys(label: 'alias', langcode: 'langcode')]
 final class PathAlias extends ContentEntityBase
 {
+    #[Field(label: 'System path', description: 'Internal path such as /node/1.')]
+    public string $path = '';
+
+    #[Field(label: 'Alias', description: 'Public alias path.')]
+    public string $alias = '';
+
+    #[Field(label: 'Language', description: 'Alias language code.')]
+    public string $langcode = 'en';
+
+    #[Field(type: 'boolean', label: 'Published', description: 'Whether this alias is active.', default: 1)]
+    public bool $status = true;
+
     /**
      * @param array<string, mixed> $values Initial entity values.
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.

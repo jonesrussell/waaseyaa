@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+use Waaseyaa\Entity\Attribute\EntityMetadataReader;
+use Waaseyaa\Entity\Exception\EntityMetadataException;
 use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\FieldStorage;
@@ -13,21 +15,36 @@ use Waaseyaa\Field\FieldStorage;
  *
  * Entity types are registered with the EntityTypeManager and describe
  * the structure and behavior of a class of entities.
+ *
+ * Content entity types should be built via {@see self::fromClass()}, which
+ * reflects on the class's `#[ContentEntityType]`, `#[ContentEntityKeys]`, and
+ * `#[Field]` attributes. The constructor's `$_fieldDefinitions` slot is
+ * `@internal` and is reserved for that factory plus the test stub helper.
  */
 final readonly class EntityType implements EntityTypeInterface
 {
     /**
+     * Default storage class FQN for content entity types built via fromClass().
+     *
+     * Stored as a string to avoid the entity package depending on entity-storage.
+     */
+    private const string DEFAULT_STORAGE_CLASS = 'Waaseyaa\\EntityStorage\\SqlEntityStorage';
+
+    /**
      * @param string $id Machine name of the entity type (e.g. 'node', 'user').
      * @param string $label Human-readable label.
      * @param class-string<EntityInterface> $class The entity class.
-     * @param class-string<Storage\EntityStorageInterface> $storageClass The storage handler class.
+     * @param class-string<Storage\EntityStorageInterface>|string $storageClass The storage handler class.
      * @param array<string, string> $keys Entity keys mapping (id, uuid, label, bundle, revision, langcode).
      * @param bool $revisionable Whether this entity type supports revisions.
      * @param bool $translatable Whether this entity type supports translations.
      * @param string|null $bundleEntityType The entity type ID that provides bundles (e.g. 'node_type' for 'node').
      * @param array<string, mixed> $constraints Validation constraints.
-     * @param array<string, FieldDefinitionInterface|array<string, mixed>> $fieldDefinitions Field definitions keyed by field name.
      * @param string|null $description Human-readable description of the entity type.
+     * @param array<string, FieldDefinitionInterface|array<string, mixed>> $_fieldDefinitions
+     *   @internal Field definitions keyed by field name. Populated only by
+     *   {@see self::fromClass()} and {@see \Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()}.
+     *   Application code MUST NOT pass this argument; doing so is unsupported.
      */
     public function __construct(
         private string $id,
@@ -40,10 +57,102 @@ final readonly class EntityType implements EntityTypeInterface
         private bool $translatable = false,
         private ?string $bundleEntityType = null,
         private array $constraints = [],
-        private array $fieldDefinitions = [],
         private ?string $group = null,
         private ?string $description = null,
+        private array $_fieldDefinitions = [],
     ) {}
+
+    /**
+     * Build an EntityType for a content entity class via attribute reflection.
+     *
+     * Reads:
+     *   - #[ContentEntityType(id, label, description)]
+     *   - #[ContentEntityKeys(...)]
+     *   - #[Field(...)] on each public typed property
+     *
+     * Pass overrides for any EntityType property that isn't class-derived
+     * (e.g. group, storageClass, revisionable, bundleEntityType).
+     *
+     * Results are cached by class name; repeated calls with the same class
+     * return the identical instance (===). Callers that need different
+     * overrides per class should not rely on per-call override variation —
+     * the framework norm is one canonical EntityType per class.
+     *
+     * @param class-string<ContentEntityBase> $class
+     * @param class-string<Storage\EntityStorageInterface>|string $storageClass
+     * @param array<string, mixed> $constraints
+     * @throws EntityMetadataException When the class does not declare #[ContentEntityType].
+     */
+    public static function fromClass(
+        string $class,
+        string $storageClass = self::DEFAULT_STORAGE_CLASS,
+        bool $revisionable = false,
+        bool $revisionDefault = false,
+        bool $translatable = false,
+        ?string $bundleEntityType = null,
+        array $constraints = [],
+        ?string $group = null,
+    ): self {
+        $cache = &self::fromClassCacheRef();
+        if (isset($cache[$class])) {
+            return $cache[$class];
+        }
+
+        $metadata = EntityMetadataReader::forClass($class);
+
+        if ($metadata->typeId === null) {
+            throw new EntityMetadataException(\sprintf(
+                'Class %s must declare #[ContentEntityType] to be used with EntityType::fromClass().',
+                $class,
+            ));
+        }
+
+        $label = $metadata->label !== '' ? $metadata->label : \ucfirst($metadata->typeId);
+        $description = $metadata->description !== '' ? $metadata->description : null;
+
+        return $cache[$class] = new self(
+            id: $metadata->typeId,
+            label: $label,
+            class: $class,
+            storageClass: $storageClass,
+            keys: $metadata->keys,
+            revisionable: $revisionable,
+            revisionDefault: $revisionDefault,
+            translatable: $translatable,
+            bundleEntityType: $bundleEntityType,
+            constraints: $constraints,
+            group: $group,
+            description: $description,
+            _fieldDefinitions: $metadata->fields,
+        );
+    }
+
+    /**
+     * Clear the fromClass() instance cache.
+     *
+     * Intended for tests; production code should not need this.
+     */
+    public static function clearFromClassCache(): void
+    {
+        $cache = &self::fromClassCacheRef();
+        $cache = [];
+    }
+
+    /**
+     * Storage for the fromClass() cache.
+     *
+     * Stored as a function-static instead of a class-static because PHP
+     * disallows static properties on `readonly` classes.
+     *
+     * @return array<class-string, self>
+     */
+    private static function &fromClassCacheRef(): array
+    {
+        /** @var array<class-string, self> $cache */
+        static $cache = [];
+
+        return $cache;
+    }
 
     public function id(): string
     {
@@ -102,7 +211,7 @@ final readonly class EntityType implements EntityTypeInterface
     public function getFieldDefinitions(): array
     {
         $normalized = [];
-        foreach ($this->fieldDefinitions as $name => $definition) {
+        foreach ($this->_fieldDefinitions as $name => $definition) {
             if ($definition instanceof FieldDefinitionInterface) {
                 $normalized[$name] = $definition;
                 continue;

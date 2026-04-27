@@ -11,30 +11,13 @@ final class NoteServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->entityType(new EntityType(
-            id: 'note',
-            label: 'Note',
-            description: 'Quick-entry content items with minimal structure',
-            class: Note::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
+        // Note's type metadata (id, label, keys, fields) lives on the Note class
+        // via #[ContentEntityType], #[ContentEntityKeys], and #[Field] attributes.
+        // The defaults/core.note.yaml file remains authoritative for content-seed
+        // defaults, not type metadata.
+        $this->entityType(EntityType::fromClass(
+            Note::class,
             group: 'content',
-            // Field definitions mirror defaults/core.note.yaml — keep in sync.
-            fieldDefinitions: [
-                'title' => [
-                    'type' => 'string',
-                    'label' => 'Title',
-                    'description' => 'Note title.',
-                    'required' => true,
-                    'weight' => 0,
-                ],
-                'body' => [
-                    'type' => 'text',
-                    'label' => 'Body',
-                    'description' => 'Note body. Plain text or Markdown.',
-                    'required' => false,
-                    'weight' => 1,
-                ],
-            ],
         ));
     }
 }

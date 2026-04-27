@@ -6,27 +6,22 @@ namespace Waaseyaa\Genealogy\Entity;
 
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 
-#[ContentEntityType(id: 'genealogy_family')]
+#[ContentEntityType(id: 'genealogy_family', label: 'Genealogy family', description: 'A family or household group')]
 #[ContentEntityKeys(label: 'display_name')]
 final class GenealogyFamily extends ContentEntityBase
 {
-    /**
-     * @param array<string, mixed> $values
-     * @param array<string, string> $entityKeys
-     * @param array<string, mixed> $fieldDefinitions
-     */
-    public function __construct(
-        array $values = [],
-        string $entityTypeId = '',
-        array $entityKeys = [],
-        array $fieldDefinitions = [],
-    ) {
-        $values += [
-            'status' => 0,
-        ];
+    #[Field(label: 'Display name', required: true, settings: ['weight' => 0])]
+    public string $display_name = '';
 
-        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
-    }
+    #[Field(type: 'integer', label: 'Tree', settings: ['weight' => 1, 'not_null' => false])]
+    public ?int $tree_id = null;
+
+    #[Field(label: 'Deleted at', default: '', settings: ['weight' => 9, 'length' => 32])]
+    public string $deleted_at = '';
+
+    #[Field(type: 'boolean', label: 'Published', default: false, settings: ['weight' => 10])]
+    public bool $status = false;
 }

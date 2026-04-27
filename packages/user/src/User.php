@@ -7,6 +7,7 @@ namespace Waaseyaa\User;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\Hydration\HydratableFromStorageInterface;
 use Waaseyaa\Entity\Hydration\HydrationContext;
@@ -23,7 +24,7 @@ use Waaseyaa\Entity\Hydration\HydrationContext;
  * service) is responsible for populating the permissions from role
  * definitions.
  */
-#[ContentEntityType(id: 'user')]
+#[ContentEntityType(id: 'user', label: 'User', description: 'Manage user accounts, roles, and authentication')]
 #[ContentEntityKeys(id: 'uid', uuid: 'uuid', label: 'name')]
 final class User extends ContentEntityBase implements AccountInterface, HydratableFromStorageInterface
 {
@@ -34,6 +35,18 @@ final class User extends ContentEntityBase implements AccountInterface, Hydratab
         // status stays 0/1 in storage and in get()/validate(); use isActive() for booleans.
         'email_verified' => 'bool',
     ];
+
+    #[Field(type: 'email', label: 'Email address', description: 'The email address of the user.', settings: ['weight' => 5])]
+    public ?string $mail = null;
+
+    #[Field(label: 'Email verified', description: 'Whether the user has verified their email address.', settings: ['weight' => 6])]
+    public bool $email_verified = false;
+
+    #[Field(type: 'boolean', label: 'Active', description: 'Whether the user account is active.', settings: ['weight' => 10])]
+    public bool $status = true;
+
+    #[Field(type: 'integer', label: 'Member since', description: 'The date the user account was created.', settings: ['weight' => 20, 'subtype' => 'timestamp'])]
+    public ?int $created = null;
 
     /**
      * @param array<string, mixed> $values Initial entity values.

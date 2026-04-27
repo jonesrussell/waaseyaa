@@ -6,12 +6,25 @@ namespace Waaseyaa\Engagement;
 
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 
-#[ContentEntityType(id: 'follow')]
+#[ContentEntityType(id: 'follow', label: 'Follow')]
 #[ContentEntityKeys(id: 'fid', uuid: 'uuid', label: 'target_type')]
 final class Follow extends ContentEntityBase
 {
+    #[Field(label: 'User ID', settings: ['weight' => 0])]
+    public int $user_id = 0;
+
+    #[Field(label: 'Target Entity Type', settings: ['weight' => 1])]
+    public string $target_type = '';
+
+    #[Field(label: 'Target Entity ID', settings: ['weight' => 2])]
+    public int $target_id = 0;
+
+    #[Field(type: 'integer', label: 'Created', settings: ['weight' => 10, 'subtype' => 'timestamp'])]
+    public ?int $created_at = null;
+
     /**
      * @param array<string, mixed> $values
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.

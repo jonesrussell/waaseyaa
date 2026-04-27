@@ -8,7 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Entity\EntityInterface;
-use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\SSR\ArrayViewModeConfig;
 use Waaseyaa\SSR\EntityRenderer;
@@ -21,11 +21,11 @@ final class EntityRendererTest extends TestCase
     #[Test]
     public function renders_fields_by_view_mode_config_and_weights(): void
     {
-        $definition = new EntityType(
+        $definition = TestEntityType::stub(
             id: 'node',
-            label: 'Node',
             class: RendererTestEntity::class,
             keys: ['id' => 'id', 'label' => 'title'],
+            label: 'Node',
             fieldDefinitions: [
                 'title' => ['type' => 'string'],
                 'body' => ['type' => 'text_long'],
@@ -73,11 +73,11 @@ final class EntityRendererTest extends TestCase
     #[Test]
     public function falls_back_to_default_display_when_no_view_mode_config_exists(): void
     {
-        $definition = new EntityType(
+        $definition = TestEntityType::stub(
             id: 'node',
-            label: 'Node',
             class: RendererTestEntity::class,
             keys: ['id' => 'id', 'label' => 'title'],
+            label: 'Node',
             fieldDefinitions: [
                 'body' => ['type' => 'text_long'],
                 'status' => ['type' => 'boolean'],

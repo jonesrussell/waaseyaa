@@ -6,6 +6,8 @@ namespace Waaseyaa\Entity\Tests\Unit;
 
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
+use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldDefinitionInterface;
 use PHPUnit\Framework\TestCase;
 
@@ -110,24 +112,25 @@ class EntityTypeTest extends TestCase
     public function testFieldDefinitionsWithValues(): void
     {
         $fields = [
-            'status' => [
-                'type' => 'boolean',
-                'label' => 'Published',
-                'weight' => 10,
-            ],
-            'uid' => [
-                'type' => 'entity_reference',
-                'label' => 'Author',
-                'target_entity_type_id' => 'user',
-                'weight' => 20,
-            ],
+            'status' => new FieldDefinition(
+                name: 'status',
+                type: 'boolean',
+                settings: ['weight' => 10],
+                label: 'Published',
+            ),
+            'uid' => new FieldDefinition(
+                name: 'uid',
+                type: 'entity_reference',
+                settings: ['target_entity_type_id' => 'user', 'weight' => 20],
+                label: 'Author',
+            ),
         ];
 
-        $type = new EntityType(
-            id: 'node',
-            label: 'Content',
+        $type = TestEntityType::stub(
+            'node',
+            $fields,
             class: 'Waaseyaa\\Entity\\Tests\\Unit\\TestEntity',
-            fieldDefinitions: $fields,
+            label: 'Content',
         );
 
         $defs = $type->getFieldDefinitions();

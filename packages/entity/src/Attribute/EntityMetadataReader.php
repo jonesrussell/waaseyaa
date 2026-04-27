@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity\Attribute;
 
 use Waaseyaa\Entity\ContentEntityBase;
+use Waaseyaa\Field\FieldDefinition;
 
 /**
- * Resolves {@see ContentEntityType} and {@see ContentEntityKeys} for a class with per-class caching.
+ * Resolves {@see ContentEntityType}, {@see ContentEntityKeys}, and {@see Field}
+ * attributes for a class with per-class caching.
  */
 final class EntityMetadataReader
 {
@@ -29,8 +31,16 @@ final class EntityMetadataReader
 
         $typeId = self::resolveTypeId($class);
         $keys = self::resolveKeys($class);
+        $labelDescription = self::resolveLabelAndDescription($class);
+        $fields = self::resolveFields($class);
 
-        return self::$cache[$class] = new EntityClassMetadata($typeId, $keys);
+        return self::$cache[$class] = new EntityClassMetadata(
+            typeId: $typeId,
+            keys: $keys,
+            label: $labelDescription['label'],
+            description: $labelDescription['description'],
+            fields: $fields,
+        );
     }
 
     /**
@@ -44,6 +54,70 @@ final class EntityMetadataReader
     public static function clearCache(): void
     {
         self::$cache = [];
+    }
+
+    /**
+     * Resolve the field map for a class by walking the hierarchy from the first
+     * concrete class below {@see ContentEntityBase} down to $class. Child classes
+     * override parent fields with the same property name.
+     *
+     * @param class-string $class
+     * @return array<string, FieldDefinition>
+     */
+    public static function resolveFields(string $class): array
+    {
+        if (!is_subclass_of($class, ContentEntityBase::class)) {
+            return [];
+        }
+
+        $chain = [];
+        $r = new \ReflectionClass($class);
+        while ($r->getName() !== ContentEntityBase::class) {
+            $chain[] = $r;
+            $parent = $r->getParentClass();
+            if ($parent === false) {
+                break;
+            }
+            $r = $parent;
+        }
+
+        $chain = array_reverse($chain);
+
+        $fields = [];
+        foreach ($chain as $ref) {
+            foreach ($ref->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
+                // Only consider properties declared on this class — inheritance is
+                // handled by walking the chain itself, so we avoid double-processing
+                // properties surfaced by the child reflection.
+                if ($property->getDeclaringClass()->getName() !== $ref->getName()) {
+                    continue;
+                }
+
+                $attributes = $property->getAttributes(Field::class);
+                if ($attributes === []) {
+                    continue;
+                }
+
+                $field = $attributes[0]->newInstance();
+                $inferred = FieldTypeInferrer::infer($property, $field);
+
+                $fields[$property->getName()] = new FieldDefinition(
+                    name: $property->getName(),
+                    type: $inferred['type'],
+                    cardinality: 1,
+                    settings: $inferred['settings'],
+                    translatable: $field->translatable,
+                    revisionable: $field->revisionable,
+                    defaultValue: $field->default,
+                    label: $field->label,
+                    description: $field->description,
+                    required: $inferred['required'],
+                    readOnly: $field->readOnly,
+                );
+            }
+        }
+
+        return $fields;
     }
 
     /**
@@ -64,6 +138,35 @@ final class EntityMetadataReader
         }
 
         return null;
+    }
+
+    /**
+     * Locate the nearest {@see ContentEntityType} attribute walking up the class
+     * hierarchy and surface its label/description fields.
+     *
+     * @param class-string $class
+     * @return array{label: string, description: string}
+     */
+    private static function resolveLabelAndDescription(string $class): array
+    {
+        $ref = new \ReflectionClass($class);
+        while (true) {
+            foreach ($ref->getAttributes(ContentEntityType::class) as $attr) {
+                $instance = $attr->newInstance();
+
+                return [
+                    'label' => $instance->label,
+                    'description' => $instance->description,
+                ];
+            }
+            $parent = $ref->getParentClass();
+            if ($parent === false || $parent->getName() === \Waaseyaa\Entity\EntityBase::class) {
+                break;
+            }
+            $ref = $parent;
+        }
+
+        return ['label' => '', 'description' => ''];
     }
 
     /**

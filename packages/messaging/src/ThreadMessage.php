@@ -6,12 +6,34 @@ namespace Waaseyaa\Messaging;
 
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 
-#[ContentEntityType(id: 'thread_message')]
+#[ContentEntityType(id: 'thread_message', label: 'Thread Message')]
 #[ContentEntityKeys(id: 'tmid', uuid: 'uuid', label: 'body')]
 final class ThreadMessage extends ContentEntityBase
 {
+    #[Field(label: 'Thread ID', settings: ['weight' => 0])]
+    public int $thread_id = 0;
+
+    #[Field(label: 'Sender ID', settings: ['weight' => 1])]
+    public int $sender_id = 0;
+
+    #[Field(type: 'text', label: 'Body', settings: ['weight' => 2, 'subtype' => 'text_long'])]
+    public string $body = '';
+
+    #[Field(type: 'boolean', label: 'Status', default: 1, settings: ['weight' => 3])]
+    public bool $status = true;
+
+    #[Field(type: 'integer', label: 'Created', settings: ['weight' => 10, 'subtype' => 'timestamp'])]
+    public ?int $created_at = null;
+
+    #[Field(type: 'integer', label: 'Edited At', default: null, settings: ['weight' => 11, 'subtype' => 'timestamp'])]
+    public ?int $edited_at = null;
+
+    #[Field(type: 'integer', label: 'Deleted At', default: null, settings: ['weight' => 12, 'subtype' => 'timestamp'])]
+    public ?int $deleted_at = null;
+
     /**
      * @param array<string, mixed> $values
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.

@@ -1,5 +1,94 @@
 # Upgrading
 
+## 2026-04-27 - Attribute-first entity definition (M1)
+
+The `EntityType` constructor no longer accepts `fieldDefinitions:`. The entity class itself is the source of truth for field shape — declare fields with `#[Waaseyaa\Entity\Attribute\Field]` on typed PHP properties and register the type via `EntityType::fromClass()`. The class-level `#[ContentEntityType]` attribute also gained `label:` and `description:` parameters so the human-facing strings live next to the id.
+
+### What changed
+
+- `Waaseyaa\Entity\EntityType::__construct` no longer accepts `fieldDefinitions:`. Passing it is a `TypeError`.
+- `Waaseyaa\Entity\EntityTypeManager::assertClassMetadataMatchesEntityType()` is removed (with a single source of truth, drift is impossible).
+- `Waaseyaa\Entity\Attribute\Field` is the canonical way to declare fields.
+- `Waaseyaa\Entity\EntityType::fromClass($class, ...$overrides)` is the canonical factory for content entity types.
+- `Waaseyaa\Entity\Attribute\ContentEntityType` accepts `label:` and `description:`.
+
+### Migration recipe
+
+**Before:**
+
+```php
+// src/Entity/Note.php
+#[ContentEntityType(id: 'note')]
+final class Note extends ContentEntityBase { /* properties only */ }
+```
+
+```php
+// In NoteServiceProvider::register():
+$this->entityType(new EntityType(
+    id: 'note',
+    label: 'Note',
+    class: Note::class,
+    keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'bundle', 'langcode' => 'langcode'],
+    fieldDefinitions: [
+        'title' => new FieldDefinition(name: 'title', type: 'string', required: true),
+        'body'  => new FieldDefinition(name: 'body', type: 'text'),
+        'status' => new FieldDefinition(name: 'status', type: 'string', defaultValue: 'draft'),
+    ],
+));
+```
+
+**After:**
+
+```php
+// src/Entity/Note.php
+namespace App\Entity;
+
+use Waaseyaa\Entity\Attribute\ContentEntityKeys;
+use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
+use Waaseyaa\Entity\ContentEntityBase;
+
+#[ContentEntityType(id: 'note', label: 'Note', description: 'Free-form authored content.')]
+#[ContentEntityKeys(label: 'title', bundle: 'bundle', langcode: 'langcode')]
+final class Note extends ContentEntityBase
+{
+    #[Field] public string $title;
+    #[Field(type: 'text')] public ?string $body;
+    #[Field(default: 'draft')] public string $status;
+}
+```
+
+```php
+// In NoteServiceProvider::register():
+$this->entityType(EntityType::fromClass(Note::class));
+```
+
+See `kitty-specs/attribute-first-entity-definition-01KQ6DXE/quickstart.md` for the full inference table (PHP type → field type) and override patterns.
+
+### Known transitional gaps (M1)
+
+These specific cases need workarounds until follow-on missions ship; see the *Known Transitional Gaps* section in `docs/specs/entity-system.md` for details:
+
+- `timestamp` field-type plugin not yet implemented — use `#[Field(type: 'integer', settings: ['subtype' => 'timestamp'])]`.
+- `enum` field-type plugin not yet implemented — use `#[Field(type: 'string', settings: ['enum_class' => MyEnum::class])]`.
+- `#[Field]` has no `stored:` parameter yet — entities that require `FieldStorage::Data` for universal core fields must keep using the raw `EntityType()` constructor for now.
+- `FieldTypeInferrer` rejects `?int` / `?string` for `entity_reference` — declare those properties without a typed scalar (use `@var` PHPDoc) until the inferrer is extended.
+- `packages/cli/stubs/provider-domain.stub` still emits the legacy `fieldDefinitions:` form; hand-edit scaffolded providers until the stub is updated.
+
+### Tests
+
+Test fixtures that previously passed `fieldDefinitions:` directly to the `EntityType` constructor should now use:
+
+```php
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
+
+$type = TestEntityType::stub(id: 'fake', class: Fake::class, fieldDefinitions: [
+    'title' => new FieldDefinition(name: 'title', type: 'string', required: true),
+]);
+```
+
+`TestEntityType::stub()` is intentionally test-only; production code should always go through `EntityType::fromClass()`.
+
 ## 2026-04-20 - Entity-type collision guard for canonical group types
 
 Framework packages now fail loudly when a consumer re-registers an entity type id that is already owned by the framework. The registry throws `Waaseyaa\Entity\Exception\EntityTypeRegistrationCollisionException` instead of a generic duplicate-registration error.

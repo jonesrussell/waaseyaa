@@ -69,7 +69,7 @@ final class SemanticWarmBaselineIntegrationTest extends TestCase
             label: 'Node',
             class: \Waaseyaa\Api\Tests\Fixtures\NodeContentTestEntity::class,
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
-            fieldDefinitions: [
+            _fieldDefinitions: [
                 'title' => ['type' => 'string'],
                 'body' => ['type' => 'text'],
                 'status' => ['type' => 'boolean'],
@@ -81,7 +81,7 @@ final class SemanticWarmBaselineIntegrationTest extends TestCase
             label: 'Relationship',
             class: Relationship::class,
             keys: ['id' => 'rid', 'uuid' => 'uuid', 'label' => 'relationship_type', 'bundle' => 'relationship_type'],
-            fieldDefinitions: [
+            _fieldDefinitions: [
                 'relationship_type' => ['type' => 'string'],
                 'from_entity_type' => ['type' => 'string'],
                 'from_entity_id' => ['type' => 'string'],

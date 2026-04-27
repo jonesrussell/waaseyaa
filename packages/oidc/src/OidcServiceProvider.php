@@ -30,57 +30,12 @@ final class OidcServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->entityType(new EntityType(
-            id: 'oidc_client',
-            label: 'OIDC Client',
-            description: 'Relying-party clients registered with the OIDC issuer.',
-            class: OidcClient::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
+        // OidcClient's type metadata (id, label, keys, fields) lives on the
+        // OidcClient class via #[ContentEntityType], #[ContentEntityKeys],
+        // and #[Field] attributes.
+        $this->entityType(EntityType::fromClass(
+            OidcClient::class,
             group: 'oidc',
-            fieldDefinitions: [
-                'client_id' => [
-                    'type' => 'string',
-                    'label' => 'Client ID',
-                    'description' => 'Stable public identifier for the client (OIDC spec).',
-                    'weight' => 0,
-                ],
-                'name' => [
-                    'type' => 'string',
-                    'label' => 'Name',
-                    'description' => 'Human-readable name shown in admin UIs.',
-                    'weight' => 1,
-                ],
-                'redirect_uris' => [
-                    'type' => 'string_list',
-                    'label' => 'Redirect URIs',
-                    'description' => 'Registered redirect URIs. Matched byte-for-byte per OIDC spec §3.1.2.1.',
-                    'weight' => 2,
-                ],
-                'scopes' => [
-                    'type' => 'string_list',
-                    'label' => 'Scopes',
-                    'description' => 'Scopes the client may request.',
-                    'weight' => 3,
-                ],
-                'grant_types' => [
-                    'type' => 'string_list',
-                    'label' => 'Grant types',
-                    'description' => 'OAuth grant types the client may use.',
-                    'weight' => 4,
-                ],
-                'is_confidential' => [
-                    'type' => 'boolean',
-                    'label' => 'Confidential',
-                    'description' => 'Whether the client authenticates with a secret.',
-                    'weight' => 5,
-                ],
-                'client_secret_hash' => [
-                    'type' => 'string',
-                    'label' => 'Client secret hash',
-                    'description' => 'Hashed client secret. Never exposed through the API.',
-                    'weight' => 6,
-                ],
-            ],
         ));
 
         $this->singleton(

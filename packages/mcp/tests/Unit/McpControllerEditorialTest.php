@@ -13,6 +13,7 @@ use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\Mcp\McpController;
 use Waaseyaa\Mcp\Tests\Unit\Fixtures\TestMcpAccount;
 use Waaseyaa\Mcp\Tests\Unit\Fixtures\TestNodeUpdatePolicy;
@@ -157,12 +158,11 @@ final class McpControllerEditorialTest extends TestCase
         string $workflowState,
         int $status,
     ): McpController {
-        $nodeDefinition = new EntityType(
-            id: 'node',
-            label: 'Node',
-            class: \stdClass::class,
+        $nodeDefinition = TestEntityType::stub(
+            'node',
             keys: ['id' => 'id', 'label' => 'title', 'bundle' => 'type'],
-            fieldDefinitions: [],
+            class: \stdClass::class,
+            label: 'Node',
         );
 
         $nodeStorage = new InMemoryEntityStorage('node');

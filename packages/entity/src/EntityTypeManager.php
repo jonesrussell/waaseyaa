@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Waaseyaa\Entity\Attribute\EntityMetadataReader;
 use Waaseyaa\Entity\Exception\EntityTypeRegistrationCollisionException;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
@@ -123,55 +122,10 @@ class EntityTypeManager implements EntityTypeManagerInterface
             );
         }
 
-        $this->assertClassMetadataMatchesEntityType($type);
-
         $this->definitions[$type->id()] = $type;
         $this->definitionRegistrants[$type->id()] = $registrant;
 
         $this->fieldRegistry?->registerCoreFields($type->id(), $type->getFieldDefinitions());
-    }
-
-    /**
-     * Ensures {@see ContentEntityType} / {@see ContentEntityKeys} on the PHP class match the {@see EntityType} definition.
-     */
-    private function assertClassMetadataMatchesEntityType(EntityTypeInterface $type): void
-    {
-        $class = $type->getClass();
-        if (!class_exists($class) || !is_subclass_of($class, ContentEntityBase::class)) {
-            return;
-        }
-
-        $meta = EntityMetadataReader::forClass($class);
-        if ($meta->typeId === null) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Entity type "%s" class %s must declare #[ContentEntityType] on a content entity.',
-                $type->id(),
-                $class,
-            ));
-        }
-
-        if ($meta->typeId !== $type->id()) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Entity type id "%s" does not match #[ContentEntityType(id: "%s")] on class %s.',
-                $type->id(),
-                $meta->typeId,
-                $class,
-            ));
-        }
-
-        $cfg = $type->getKeys();
-        $expected = $meta->keys;
-        $a = $cfg;
-        $b = $expected;
-        ksort($a);
-        ksort($b);
-        if ($a !== $b) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Entity type "%s" registered keys do not match class metadata for %s.',
-                $type->id(),
-                $class,
-            ));
-        }
     }
 
     /**

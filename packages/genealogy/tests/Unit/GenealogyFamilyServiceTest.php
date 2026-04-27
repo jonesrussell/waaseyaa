@@ -13,6 +13,7 @@ use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\Field\FieldDefinitionRegistry;
@@ -27,6 +28,7 @@ final class GenealogyFamilyServiceTest extends TestCase
 {
     private function makeManager(): EntityTypeManager
     {
+        EntityType::clearFromClassCache();
         $database = DBALDatabase::createSqlite();
         $database->getConnection()->executeStatement('PRAGMA foreign_keys = ON');
         $dispatcher = new EventDispatcher();
@@ -39,15 +41,12 @@ final class GenealogyFamilyServiceTest extends TestCase
 
                 return new SqlEntityStorage($definition, $database, $dispatcher, $registry);
             },
-            null,
-            $registry,
         );
 
         ContentEntityBase::setFieldRegistry($registry);
 
-        $manager->registerEntityType(new EntityType(
+        $manager->registerEntityType(TestEntityType::stub(
             id: 'relationship',
-            label: 'Relationship',
             class: Relationship::class,
             keys: [
                 'id' => 'rid',
@@ -55,7 +54,7 @@ final class GenealogyFamilyServiceTest extends TestCase
                 'label' => 'relationship_type',
                 'bundle' => 'relationship_type',
             ],
-            group: 'content',
+            label: 'Relationship',
             fieldDefinitions: [
                 'relationship_type' => ['type' => 'string', 'required' => true, 'weight' => 0],
                 'from_entity_type' => ['type' => 'string', 'required' => true, 'weight' => 1],
@@ -67,29 +66,8 @@ final class GenealogyFamilyServiceTest extends TestCase
             ],
         ));
 
-        $manager->registerEntityType(new EntityType(
-            id: 'genealogy_person',
-            label: 'Genealogy person',
-            class: GenealogyPerson::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'display_name'],
-            group: 'content',
-            fieldDefinitions: [
-                'display_name' => ['type' => 'string', 'required' => true, 'weight' => 0],
-                'status' => ['type' => 'boolean', 'weight' => 10, 'default' => 1],
-            ],
-        ));
-
-        $manager->registerEntityType(new EntityType(
-            id: 'genealogy_family',
-            label: 'Genealogy family',
-            class: GenealogyFamily::class,
-            keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'display_name'],
-            group: 'content',
-            fieldDefinitions: [
-                'display_name' => ['type' => 'string', 'required' => true, 'weight' => 0],
-                'status' => ['type' => 'boolean', 'weight' => 10, 'default' => 1],
-            ],
-        ));
+        $manager->registerEntityType(EntityType::fromClass(GenealogyPerson::class, group: 'content'));
+        $manager->registerEntityType(EntityType::fromClass(GenealogyFamily::class, group: 'content'));
 
         return $manager;
     }

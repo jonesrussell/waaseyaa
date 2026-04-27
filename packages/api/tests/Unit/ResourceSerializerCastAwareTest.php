@@ -14,6 +14,8 @@ use Waaseyaa\Api\Tests\Fixtures\CastAwareSerializeTestEntity;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\Tests\Helper\TestEntityType;
+use Waaseyaa\Field\FieldDefinition;
 
 #[CoversClass(ResourceSerializer::class)]
 final class ResourceSerializerCastAwareTest extends TestCase
@@ -22,12 +24,11 @@ final class ResourceSerializerCastAwareTest extends TestCase
     public function serializeUsesGetSoBackedEnumCastExposesBackingValueInAttributes(): void
     {
         $manager = new EntityTypeManager(new EventDispatcher());
-        $manager->registerEntityType(new EntityType(
-            id: 'cast_article',
-            label: 'Cast article',
-            class: CastAwareSerializeTestEntity::class,
+        $manager->registerEntityType(TestEntityType::stub(
+            'cast_article',
             keys: TestEntity::definitionKeys(),
-            fieldDefinitions: [],
+            class: CastAwareSerializeTestEntity::class,
+            label: 'Cast article',
         ));
 
         $serializer = new ResourceSerializer($manager);
@@ -50,14 +51,12 @@ final class ResourceSerializerCastAwareTest extends TestCase
     public function serializeFormatsDatetimeImmutableFromCastWhenFieldDefIsTimestamp(): void
     {
         $manager = new EntityTypeManager(new EventDispatcher());
-        $manager->registerEntityType(new EntityType(
-            id: 'cast_article',
-            label: 'Cast article',
-            class: CastAwareSerializeTestEntity::class,
+        $manager->registerEntityType(TestEntityType::stub(
+            'cast_article',
+            ['published_at' => new FieldDefinition(name: 'published_at', type: 'timestamp')],
             keys: TestEntity::definitionKeys(),
-            fieldDefinitions: [
-                'published_at' => ['type' => 'timestamp'],
-            ],
+            class: CastAwareSerializeTestEntity::class,
+            label: 'Cast article',
         ));
 
         $serializer = new ResourceSerializer($manager);

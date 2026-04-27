@@ -5,7 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [Unreleased] — Attribute-first entity definition (M1)
+
+### Breaking changes
+
+- `Waaseyaa\Entity\EntityType` constructor no longer accepts a `fieldDefinitions:` parameter. Field definitions must come from `#[Field]`-decorated entity properties via `EntityType::fromClass(MyEntity::class)`. Tests that need to inject raw field definitions for fixture entity types can use `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()`.
+- `Waaseyaa\Entity\EntityTypeManager::assertClassMetadataMatchesEntityType()` removed. With a single source of truth (the entity class itself), the validator has no purpose.
+
+### Added
+
+- `Waaseyaa\Entity\Attribute\Field` — declare entity fields directly on typed PHP properties; `name:` / `type:` / `required:` / `default:` / `settings:` are all optional and fall through to inference from the property's PHP type.
+- `Waaseyaa\Entity\EntityType::fromClass(string $class, ...$overrides): self` — static factory that builds an `EntityType` from a class's `#[ContentEntityType]` / `#[ContentEntityKeys]` / `#[Field]` attribute metadata. Named overrides after `$class` win over inferred slots.
+- `Waaseyaa\Entity\Attribute\ContentEntityType` extended with `label` and `description` parameters so the human-facing strings live on the class alongside the id.
+- `Waaseyaa\Entity\Attribute\FieldTypeInferrer` — maps PHP property types to canonical field types (`string`, `integer`, `boolean`, `datetime`, `json`, etc.) with override-friendly compatibility groups.
+- `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()` — test-only helper for raw-shape `EntityType` construction (replaces direct use of the removed `fieldDefinitions:` parameter in fixtures).
+
+### Migration
+
+See `UPGRADING.md` for the migration recipe and `docs/specs/entity-system.md` for the canonical reference, including a *Known Transitional Gaps* section that documents M1 deferrals (per-process metadata cache, missing `timestamp` / `enum` field-type plugins, missing `#[Field]` `stored:` parameter, scalar→`entity_reference` inferrer gap, and the `EntityType::fromClass()` + `FieldDefinitionRegistry` interaction bug).
 
 ### Changed
 

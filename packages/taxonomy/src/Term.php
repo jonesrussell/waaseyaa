@@ -6,6 +6,7 @@ namespace Waaseyaa\Taxonomy;
 
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Attribute\Field;
 use Waaseyaa\Entity\ContentEntityBase;
 
 /**
@@ -15,10 +16,22 @@ use Waaseyaa\Entity\ContentEntityBase;
  * They support hierarchical relationships through parent term IDs,
  * and can be published or unpublished.
  */
-#[ContentEntityType(id: 'taxonomy_term')]
+#[ContentEntityType(id: 'taxonomy_term', label: 'Taxonomy Term', description: 'Categorization terms for organizing content')]
 #[ContentEntityKeys(id: 'tid', uuid: 'uuid', label: 'name', bundle: 'vid')]
 final class Term extends ContentEntityBase
 {
+    #[Field(type: 'text', label: 'Description', description: 'A description of the term.', settings: ['weight' => 5])]
+    public ?string $description = null;
+
+    #[Field(type: 'integer', label: 'Weight', description: 'The weight of this term for ordering.', settings: ['weight' => 10])]
+    public int $weight = 0;
+
+    /** @var int|null */
+    #[Field(type: 'entity_reference', label: 'Parent term', description: 'The parent term for hierarchical vocabularies.', settings: ['weight' => 15, 'target_entity_type_id' => 'taxonomy_term'])]
+    public $parent_id = null;
+
+    #[Field(type: 'boolean', label: 'Published', description: 'Whether the term is published.', settings: ['weight' => 20])]
+    public bool $status = true;
     /**
      * @param array<string, mixed> $values Initial entity values.
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.

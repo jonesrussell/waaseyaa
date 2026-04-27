@@ -11,27 +11,29 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Validation;
 use Waaseyaa\Entity\EntityType;
-use Waaseyaa\Entity\Tests\Unit\TestEntity;
+use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\ConstraintsRequiredTitleFixture;
 use Waaseyaa\Entity\Tests\Unit\Validation\Fixture\FieldableEntityDouble;
 use Waaseyaa\Entity\Validation\EntityTypeValidationConstraints;
 use Waaseyaa\Entity\Validation\EntityValidator;
 
+require_once __DIR__ . '/../../Fixtures/AttributeFirstEntities/ValidationConstraintsFixtures.php';
+
 #[CoversClass(EntityTypeValidationConstraints::class)]
 final class EntityTypeValidationConstraintsTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        EntityType::clearFromClassCache();
+    }
+
     #[Test]
     public function manualConstraintsReplaceDerivedForSameField(): void
     {
-        $type = new EntityType(
-            id: 'x',
-            label: 'X',
-            class: TestEntity::class,
-            fieldDefinitions: [
-                'title' => ['type' => 'string', 'required' => true],
-            ],
-            constraints: [
-                'title' => [new Length(max: 3)],
-            ],
+        // Pattern 1: ConstraintsRequiredTitleFixture has `#[Field(required: true)]`
+        // on `title`; manual constraints come through fromClass() overrides.
+        $type = EntityType::fromClass(
+            class: ConstraintsRequiredTitleFixture::class,
+            constraints: ['title' => [new Length(max: 3)]],
         );
 
         $merged = EntityTypeValidationConstraints::forEntityType($type);
@@ -45,16 +47,9 @@ final class EntityTypeValidationConstraintsTest extends TestCase
     #[Test]
     public function manualConstraintsAugmentFieldsNotInManual(): void
     {
-        $type = new EntityType(
-            id: 'x',
-            label: 'X',
-            class: TestEntity::class,
-            fieldDefinitions: [
-                'title' => ['type' => 'string', 'required' => true],
-            ],
-            constraints: [
-                'slug' => [new NotBlank()],
-            ],
+        $type = EntityType::fromClass(
+            class: ConstraintsRequiredTitleFixture::class,
+            constraints: ['slug' => [new NotBlank()]],
         );
 
         $merged = EntityTypeValidationConstraints::forEntityType($type);
