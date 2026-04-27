@@ -19,8 +19,8 @@ subtasks:
 - T002
 - T003
 - T004
-shell_pid: "12988"
-agent: "claude:sonnet-4-6:implementer:implementer"
+shell_pid: "32328"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-04-27'
   note: Generated from plan.md + research.md + data-model.md.
@@ -237,3 +237,4 @@ No dependencies — can start immediately from `main`.
 
 - 2026-04-27T15:53:23Z – claude:sonnet-4-6:implementer:implementer – shell_pid=12988 – Assigned agent via action command
 - 2026-04-27T15:58:35Z – claude:sonnet-4-6:implementer:implementer – shell_pid=12988 – FieldDefinition enriched; UPGRADING.md authored; tests + phpstan + cs all pass
+- 2026-04-27T15:58:58Z – claude:opus-4-7:reviewer:reviewer – shell_pid=32328 – Started review via action command
