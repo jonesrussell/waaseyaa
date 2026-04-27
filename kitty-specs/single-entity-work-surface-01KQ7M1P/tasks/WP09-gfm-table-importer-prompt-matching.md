@@ -20,6 +20,8 @@ subtasks:
 - T041
 - T042
 - T043
+agent: "claude:sonnet-4-6:implementer:implementer"
+shell_pid: "23804"
 history:
 - date: '2026-04-27'
   note: Generated from plan.md + research.md Q8 + contracts/ F5.
@@ -229,3 +231,7 @@ spec-kitty agent action implement WP09 --agent <agent-name> --mission single-ent
 ```
 
 Depends on WP01 + WP02 + WP08.
+
+## Activity Log
+
+- 2026-04-27T17:46:25Z – claude:sonnet-4-6:implementer:implementer – shell_pid=23804 – Started implementation via action command
