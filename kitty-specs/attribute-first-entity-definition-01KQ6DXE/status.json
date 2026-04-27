@@ -1,28 +1,28 @@
 {
-  "event_count": 13,
-  "last_event_id": "01KQ6H8EJ8YX3ZCXDXS0HXVH01",
-  "materialized_at": "2026-04-27T03:55:48.168818+00:00",
+  "event_count": 16,
+  "last_event_id": "01KQ6HAVNV2CV4W8PFCD7KNEC6",
+  "materialized_at": "2026-04-27T03:57:07.131656+00:00",
   "mission_number": "",
   "mission_slug": "attribute-first-entity-definition-01KQ6DXE",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 0,
+    "approved": 1,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 8
   },
   "work_packages": {
     "WP01": {
-      "actor": "claude:opus-4-7:reviewer:reviewer",
+      "actor": "user",
       "force_count": 2,
-      "lane": "in_progress",
-      "last_event_id": "01KQ6H8EJ8YX3ZCXDXS0HXVH01",
-      "last_transition_at": "2026-04-27T03:55:48.168818+00:00"
+      "lane": "approved",
+      "last_event_id": "01KQ6HAVNV2CV4W8PFCD7KNEC6",
+      "last_transition_at": "2026-04-27T03:57:07.131656+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",
