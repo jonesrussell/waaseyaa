@@ -23,8 +23,8 @@ subtasks:
 - T022
 - T023
 - T024
-agent: "claude:sonnet-4-6:implementer:implementer"
-shell_pid: "29476"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "30760"
 history:
 - date: '2026-04-27'
   note: Generated from plan.md + research.md Q5/Q6 + data-model.md § 1.
@@ -342,3 +342,4 @@ No dependencies — independent of WP01.
 
 - 2026-04-27T16:26:53Z – claude:sonnet-4-6:implementer:implementer – shell_pid=29476 – Started implementation via action command
 - 2026-04-27T16:37:31Z – claude:sonnet-4-6:implementer:implementer – shell_pid=29476 – Attachment entity, schema, repository, ServiceProvider; setActive atomic transaction; 10 unit tests pass; PHPStan clean; CS clean; layer check passes
+- 2026-04-27T16:38:06Z – claude:opus-4-7:reviewer:reviewer – shell_pid=30760 – Started review via action command
