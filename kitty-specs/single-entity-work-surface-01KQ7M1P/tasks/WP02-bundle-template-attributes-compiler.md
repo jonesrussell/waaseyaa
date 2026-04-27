@@ -19,8 +19,8 @@ subtasks:
 - T008
 - T009
 - T010
-agent: "claude:sonnet-4-6:implementer:implementer"
-shell_pid: "27652"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "28196"
 history:
 - date: '2026-04-27'
   note: Generated from plan.md + research.md + data-model.md + contracts/.
@@ -248,3 +248,4 @@ Depends on WP01 being approved.
 
 - 2026-04-27T16:02:03Z – claude:sonnet-4-6:implementer:implementer – shell_pid=27652 – Started implementation via action command
 - 2026-04-27T16:09:00Z – claude:sonnet-4-6:implementer:implementer – shell_pid=27652 – F2 attributes + compiler implemented; 16 tests pass (9 unit + 5 integration + 2 existing); phpstan clean at level 5; CS clean on owned files
+- 2026-04-27T16:09:23Z – claude:opus-4-7:reviewer:reviewer – shell_pid=28196 – Started review via action command
