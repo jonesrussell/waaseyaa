@@ -157,3 +157,4 @@ spec-kitty agent action implement WP07 --agent <name>
 - 2026-04-27T05:37:28Z – claude:opus-4-7:implementer:implementer – shell_pid=28680 – Ready for review: 8 test files migrated across 6 packages; all tests green; WP06 smoke check (1208 tests) passes.
 - 2026-04-27T05:38:36Z – claude:opus-4-7:reviewer:reviewer – shell_pid=20088 – Started review via action command
 - 2026-04-27T05:42:14Z – claude:opus-4-7:reviewer:reviewer – shell_pid=20088 – Review passed: 87 migrated tests green, WP06 smoke 1208/1208, PHPStan improved 250->225 errors, only allowed fieldDefinitions: residuals (TestEntityType::stub) remain
+- 2026-04-27T06:13:23Z – claude:opus-4-7:reviewer:reviewer – shell_pid=20088 – Done override: Mission merged in ce123bfe
