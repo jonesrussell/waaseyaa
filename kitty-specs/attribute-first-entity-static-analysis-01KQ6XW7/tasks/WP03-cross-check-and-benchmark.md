@@ -13,7 +13,8 @@ subtasks:
 - T021
 phase: Phase 3 - Verification
 assignee: ''
-agent: ''
+agent: "claude"
+shell_pid: "37360"
 history:
 - timestamp: '2026-04-27T07:42:00Z'
   agent: system
@@ -59,3 +60,7 @@ Capture wall-clock of `vendor/bin/phpstan analyse --no-progress packages/entity/
 
 - [ ] `notes/baseline.md` exists and shows identical error counts on the listed packages.
 - [ ] `notes/benchmark.md` exists and shows ≤ 10% regression.
+
+## Activity Log
+
+- 2026-04-27T08:13:58Z – claude – shell_pid=37360 – Started implementation via action command
