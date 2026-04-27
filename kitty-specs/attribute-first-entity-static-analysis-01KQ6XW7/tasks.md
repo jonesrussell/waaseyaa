@@ -16,7 +16,7 @@ preserved as 6 named subtasks inside WP02.
 
 | ID | Description | WP | Parallel |
 |----|-------------|----|----------|
-| T001 | Add `FieldTypeInferrer::compatibilityGroups()` public helper | WP01 | [D] |
+| T001 | Add `FieldTypeInferrer::compatibilityGroups()` public helper | WP01 | [D] | [D] |
 | T002 | Add `FieldTypeInferrer::inferFromPhpTypeName(?string, array&): ?string` public helper | WP01 | [D] |
 | T003 | Extend `FieldTypeInferrerTest` with cases for both new helpers | WP01 | [D] |
 | T004 | Add `phpstan/phpstan` to `packages/entity/composer.json` require-dev | WP02 | [D] |
