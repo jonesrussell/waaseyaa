@@ -47,10 +47,10 @@
 | T037 | Implement `GfmTableParser` in `packages/structured-import/src/Gfm/GfmTableParser.php` per research.md Q7 (pipe-delimited, optional leading/trailing pipe, header separator required, escaped pipes, exactly 2 columns) | WP08 | — | [D] |
 | T038 | Unit-test `GfmTableParser`: happy path, optional pipes, escaped pipes, alignment markers ignored, multi-table doc (first parsed, rest in errors), 3+ column row error, missing header separator error, multi-line cell error | WP08 | — | [D] |
 | T039 | Wire structured-import package via `packages/structured-import/src/ServiceProvider.php` | WP08 | [D] |
-| T040 | Implement `PromptNormalizer::normalize()` per research.md Q8 (`mb_strtolower` + Unicode whitespace collapse + trim) | WP09 | [P] |
-| T041 | Implement `GfmTableImporter::import()` (calls parser, normalizes prompts, looks up `FieldDefinition::getPromptAliases()` from registry, builds `ImportResult`) | WP09 | — |
-| T042 | Unit-test `GfmTableImporter`: matched, unmatched, errors paths; alias normalization; bundle param handling (null fallback to entity_type as implicit single bundle) | WP09 | — |
-| T043 | Contract test (`Contract/StructuredImporterContractTest.php`) — abstract base verifying any `StructuredImporterInterface` implementation respects the contract | WP09 | — |
+| T040 | Implement `PromptNormalizer::normalize()` per research.md Q8 (`mb_strtolower` + Unicode whitespace collapse + trim) | WP09 | [D] |
+| T041 | Implement `GfmTableImporter::import()` (calls parser, normalizes prompts, looks up `FieldDefinition::getPromptAliases()` from registry, builds `ImportResult`) | WP09 | — | [D] |
+| T042 | Unit-test `GfmTableImporter`: matched, unmatched, errors paths; alias normalization; bundle param handling (null fallback to entity_type as implicit single bundle) | WP09 | — | [D] |
+| T043 | Contract test (`Contract/StructuredImporterContractTest.php`) — abstract base verifying any `StructuredImporterInterface` implementation respects the contract | WP09 | — | [D] |
 | T044 | End-to-end integration test in `tests/Integration/Phase##/SingleEntityWorkSurfaceTest.php` exercising all six primitives in one method (Success Criterion 5) | WP10 | — |
 | T045 | Create `docs/specs/work-surface.md` capturing the six-primitive subsystem; update orchestration table in `CLAUDE.md` to include the new spec | WP10 | — |
 | T046 | Update `docs/specs/entity-system.md`, `docs/specs/api-layer.md`, `docs/specs/access-control.md` for the additions (FieldDefinition extension, auto-save endpoint, parent-delegated policy pattern) | WP10 | [P] |
@@ -324,10 +324,10 @@
 5. Contract test passes against `GfmTableImporter`; another importer (e.g., a stub `JsonImporter` mock) also satisfies the contract via the abstract base.
 
 **Included subtasks**:
-- [ ] T040 Implement `PromptNormalizer::normalize()` (WP09)
-- [ ] T041 Implement `GfmTableImporter::import()` (WP09)
-- [ ] T042 Unit-test `GfmTableImporter` (WP09)
-- [ ] T043 Contract test for `StructuredImporterInterface` (WP09)
+- [x] T040 Implement `PromptNormalizer::normalize()` (WP09)
+- [x] T041 Implement `GfmTableImporter::import()` (WP09)
+- [x] T042 Unit-test `GfmTableImporter` (WP09)
+- [x] T043 Contract test for `StructuredImporterInterface` (WP09)
 
 **Implementation sketch**: see WP09 prompt.
 
