@@ -14,6 +14,8 @@ subtasks:
 - T041
 - T042
 - T043
+agent: "claude:opus-4-7:implementer:implementer"
+shell_pid: "6804"
 history:
 - date: '2026-04-27'
   note: Initial generation by /spec-kitty.tasks.
@@ -201,3 +203,7 @@ Update authoritative documentation to reflect the new attribute-first flow. Mark
 ```
 spec-kitty agent action implement WP08 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-04-27T05:42:56Z – claude:opus-4-7:implementer:implementer – shell_pid=6804 – Started implementation via action command
