@@ -17,6 +17,8 @@ subtasks:
 - T045
 - T046
 - T047
+agent: "claude:opus-4-7:implementer:implementer"
+shell_pid: "28380"
 history:
 - date: '2026-04-27'
   note: Initial generation by /spec-kitty.tasks.
@@ -177,3 +179,7 @@ Final gate before mission merge. PHPStan clean, full test suite green, performan
 ```
 spec-kitty agent action implement WP09 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-04-27T05:51:23Z – claude:opus-4-7:implementer:implementer – shell_pid=28380 – Started implementation via action command
