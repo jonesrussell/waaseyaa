@@ -19,8 +19,8 @@ subtasks:
 - T004
 phase: Phase 1 - Core fix
 assignee: ''
-agent: claude
-shell_pid: '24164'
+agent: "claude"
+shell_pid: "15544"
 authoritative_surface: packages/entity/src/Attribute/EntityMetadataReader
 execution_mode: code_change
 mission_id: 01KQ6SCG3RCT25Q7WCEAKBFSTQ
@@ -134,3 +134,4 @@ those tests don't pass an id — they continue to receive fields with empty
 ## Activity Log
 
 - 2026-04-27T08:37:08Z – claude – shell_pid=24164 – Red→green TDD verified. Reproduced bug message exactly, applied two-line fix, re-ran: entity package 360/360.
+- 2026-04-27T08:39:57Z – claude – shell_pid=15544 – Started review via action command
