@@ -8,10 +8,10 @@
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
-| T001 | Add `group` and `promptAliases` parameters to `FieldDefinition` constructor | WP01 | — |
-| T002 | Add `getGroup()` and `getPromptAliases()` to `FieldDefinitionInterface` and implement in `FieldDefinition` | WP01 | — |
-| T003 | Update `FieldDefinitionTest` to cover the two new constructor parameters and getters | WP01 | — |
-| T004 | Write `UPGRADING.md` entry explaining the constructor signature change with named-arg migration recipe | WP01 | [P] |
+| T001 | Add `group` and `promptAliases` parameters to `FieldDefinition` constructor | WP01 | — | [D] |
+| T002 | Add `getGroup()` and `getPromptAliases()` to `FieldDefinitionInterface` and implement in `FieldDefinition` | WP01 | — | [D] |
+| T003 | Update `FieldDefinitionTest` to cover the two new constructor parameters and getters | WP01 | — | [D] |
+| T004 | Write `UPGRADING.md` entry explaining the constructor signature change with named-arg migration recipe | WP01 | [D] |
 | T005 | Add `BundleTemplate` class-level attribute in `packages/field/src/Attribute/BundleTemplate.php` | WP02 | — |
 | T006 | Add `FieldTemplate` repeatable attribute in `packages/field/src/Attribute/FieldTemplate.php` | WP02 | [P] |
 | T007 | Implement `BundleTemplateCompiler` (attribute discovery via `PackageManifestCompiler` → `FieldDefinitionRegistry::registerBundleFields()`) | WP02 | — |
@@ -74,10 +74,10 @@
 3. `composer phpstan` (level 5) passes for `packages/field/`.
 
 **Included subtasks**:
-- [ ] T001 Add `group` and `promptAliases` parameters to FieldDefinition constructor (WP01)
-- [ ] T002 Add `getGroup()` and `getPromptAliases()` to interface and class (WP01)
-- [ ] T003 Update `FieldDefinitionTest` for new params (WP01)
-- [ ] T004 Write `UPGRADING.md` entry (WP01)
+- [x] T001 Add `group` and `promptAliases` parameters to FieldDefinition constructor (WP01)
+- [x] T002 Add `getGroup()` and `getPromptAliases()` to interface and class (WP01)
+- [x] T003 Update `FieldDefinitionTest` for new params (WP01)
+- [x] T004 Write `UPGRADING.md` entry (WP01)
 
 **Implementation sketch**: see `kitty-specs/single-entity-work-surface-01KQ7M1P/tasks/WP01-foundation-field-definition.md` for the WP-level prompt.
 
