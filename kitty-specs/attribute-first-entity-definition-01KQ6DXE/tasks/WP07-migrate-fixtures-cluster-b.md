@@ -14,6 +14,8 @@ subtasks:
 - T037
 - T038
 - T039
+agent: "claude:opus-4-7:implementer:implementer"
+shell_pid: "28680"
 history:
 - date: '2026-04-27'
   note: Initial generation by /spec-kitty.tasks.
@@ -148,3 +150,7 @@ Read WP06 prompt for the migration patterns and `TestEntityType::stub()` API. Th
 ```
 spec-kitty agent action implement WP07 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-04-27T05:22:09Z – claude:opus-4-7:implementer:implementer – shell_pid=28680 – Started implementation via action command
