@@ -45,11 +45,11 @@
 | T032 | Migrate `packages/mcp/tests/Unit/` fixtures (5 files) | WP06 | [D] |
 | T033 | Migrate `packages/graphql/tests/Unit/` fixtures (4 files) | WP06 | [D] |
 | T034 | Run package-scoped phpunit for entity, entity-storage, api, mcp, graphql; verify green | WP06 |  | [D] |
-| T035 | Migrate `packages/genealogy/tests/Unit/` fixtures (2 files) | WP07 | [P] |
-| T036 | Migrate `packages/ssr/tests/Unit/` fixtures (2 files) | WP07 | [P] |
-| T037 | Migrate `packages/testing/tests/Unit/` fixtures (2 files) | WP07 | [P] |
-| T038 | Migrate remaining test fixtures: ai-vector (1), admin-surface (1), cli (1) | WP07 | [P] |
-| T039 | Run package-scoped phpunit for genealogy, ssr, testing, ai-vector, admin-surface, cli; verify green | WP07 |  |
+| T035 | Migrate `packages/genealogy/tests/Unit/` fixtures (2 files) | WP07 | [D] |
+| T036 | Migrate `packages/ssr/tests/Unit/` fixtures (2 files) | WP07 | [D] |
+| T037 | Migrate `packages/testing/tests/Unit/` fixtures (2 files) | WP07 | [D] |
+| T038 | Migrate remaining test fixtures: ai-vector (1), admin-surface (1), cli (1) | WP07 | [D] |
+| T039 | Run package-scoped phpunit for genealogy, ssr, testing, ai-vector, admin-surface, cli; verify green | WP07 |  | [D] |
 | T040 | Update `docs/specs/entity-system.md` — replace EntityType definition section with attribute-first patterns; refresh §Public Surface | WP08 |  |
 | T041 | Update `CHANGELOG.md` with breaking-change note (`EntityType` constructor signature change; new `#[Field]` attribute) | WP08 | [P] |
 | T042 | Update `UPGRADING.md` with migration recipe for any consumers carrying the old shape | WP08 | [P] |
@@ -300,11 +300,11 @@ Keep changes line-for-line minimal — same field shapes, same test assertions.
 **Independent test**: phpunit for `packages/{genealogy,ssr,testing,ai-vector,admin-surface,cli}/` is green.
 
 **Included subtasks**:
-- [ ] T035 Migrate `packages/genealogy/tests/Unit/` fixtures (WP07)
-- [ ] T036 Migrate `packages/ssr/tests/Unit/` fixtures (WP07)
-- [ ] T037 Migrate `packages/testing/tests/Unit/` fixtures (WP07)
-- [ ] T038 Migrate remaining test fixtures: ai-vector, admin-surface, cli (WP07)
-- [ ] T039 Run package phpunit; verify green (WP07)
+- [x] T035 Migrate `packages/genealogy/tests/Unit/` fixtures (WP07)
+- [x] T036 Migrate `packages/ssr/tests/Unit/` fixtures (WP07)
+- [x] T037 Migrate `packages/testing/tests/Unit/` fixtures (WP07)
+- [x] T038 Migrate remaining test fixtures: ai-vector, admin-surface, cli (WP07)
+- [x] T039 Run package phpunit; verify green (WP07)
 
 **Implementation sketch**: Same approach as WP06.
 
