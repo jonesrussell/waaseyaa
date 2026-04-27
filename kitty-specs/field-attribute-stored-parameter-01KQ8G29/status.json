@@ -1,7 +1,7 @@
 {
-  "event_count": 3,
-  "last_event_id": "01KQ8GK3ZZQXXM5ZTAC5HYMPFW",
-  "materialized_at": "2026-04-27T22:22:38.079714+00:00",
+  "event_count": 5,
+  "last_event_id": "01KQ8GQ3J2Z27ZMTGN4MCE6Z7R",
+  "materialized_at": "2026-04-27T22:24:48.706685+00:00",
   "mission_number": "",
   "mission_slug": "field-attribute-stored-parameter-01KQ8G29",
   "mission_type": "software-dev",
@@ -12,17 +12,17 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 3
+    "planned": 2
   },
   "work_packages": {
     "WP01": {
-      "actor": "finalize-tasks",
+      "actor": "claude",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQ8GK3S099NMA2MH0HSGAVHX",
-      "last_transition_at": "2026-04-27T22:22:37.856317+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KQ8GQ3J2Z27ZMTGN4MCE6Z7R",
+      "last_transition_at": "2026-04-27T22:24:48.706685+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",

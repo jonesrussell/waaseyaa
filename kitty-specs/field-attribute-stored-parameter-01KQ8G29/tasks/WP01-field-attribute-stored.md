@@ -22,6 +22,8 @@ owned_files:
 - packages/entity/tests/Unit/Attribute/FieldTypeInferrerTest.php
 - packages/entity/tests/Unit/Attribute/EntityMetadataReaderTest.php
 tags: []
+assignee: "claude"
+agent: "claude"
 ---
 
 # WP01 — Add `stored:` parameter to `#[Field]` and forward via reader
@@ -71,3 +73,7 @@ composer cs-check
 
 - Use named-argument-only style in tests (`new Field(stored: FieldStorage::Data)`) to avoid relying on parameter ordering.
 - Keep changes minimal — no docblock cleanups outside the touched lines, no reformatting.
+
+## Activity Log
+
+- 2026-04-27T22:24:48Z – claude – Moved to in_progress
