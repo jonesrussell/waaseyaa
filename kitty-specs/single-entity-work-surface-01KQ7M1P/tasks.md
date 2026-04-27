@@ -18,10 +18,10 @@
 | T008 | Wire `BundleTemplateCompiler` to run at boot (new `FieldServiceProvider` or hook into existing field registration path) | WP02 | — | [D] |
 | T009 | Unit-test `BundleTemplateCompiler`: discovery, ordering, alias-uniqueness validation, key-uniqueness validation | WP02 | — | [D] |
 | T010 | Integration test: declared `#[BundleTemplate]` + `#[FieldTemplate]` classes produce expected registry contents | WP02 | — | [D] |
-| T011 | Add `FormFieldDescriptor` readonly value object in `packages/field/src/Form/FormFieldDescriptor.php` | WP03 | — |
-| T012 | Implement `FormDescriptorBuilder::build()` in `packages/field/src/Form/FormDescriptorBuilder.php` (registry walk, value extraction, `readOnly` resolution via `FieldAccessPolicyInterface`) | WP03 | — |
-| T013 | Unit-test `FormFieldDescriptor` constructor, immutability, defaults | WP03 | [P] |
-| T014 | Unit-test `FormDescriptorBuilder`: ordering, value extraction, `readOnly` from `FieldDefinition` and from `FieldAccessPolicyInterface`, ungrouped + grouped fields, missing entity values | WP03 | — |
+| T011 | Add `FormFieldDescriptor` readonly value object in `packages/field/src/Form/FormFieldDescriptor.php` | WP03 | — | [D] |
+| T012 | Implement `FormDescriptorBuilder::build()` in `packages/field/src/Form/FormDescriptorBuilder.php` (registry walk, value extraction, `readOnly` resolution via `FieldAccessPolicyInterface`) | WP03 | — | [D] |
+| T013 | Unit-test `FormFieldDescriptor` constructor, immutability, defaults | WP03 | [D] |
+| T014 | Unit-test `FormDescriptorBuilder`: ordering, value extraction, `readOnly` from `FieldDefinition` and from `FieldAccessPolicyInterface`, ungrouped + grouped fields, missing entity values | WP03 | — | [D] |
 | T015 | Add `EntityDeepLinkRouteBuilder` in `packages/routing/src/EntityDeepLinkRouteBuilder.php` (composes `RouteBuilder::create()` + `entityParameter()`) | WP04 | — |
 | T016 | Unit-test `EntityDeepLinkRouteBuilder::for()->controller()` produces a Symfony `Route` with the expected path, method, parameter resolver, and option flags | WP04 | — |
 | T017 | Integration test: deep-link route resolves entity via `EntityRepository` and runs access policy before invoking controller; 404 on missing entity; 403 on access denied | WP04 | — |
@@ -137,10 +137,10 @@
 5. Empty bundle returns empty array (no exception).
 
 **Included subtasks**:
-- [ ] T011 Add `FormFieldDescriptor` (WP03)
-- [ ] T012 Implement `FormDescriptorBuilder::build()` (WP03)
-- [ ] T013 Unit-test `FormFieldDescriptor` (WP03)
-- [ ] T014 Unit-test `FormDescriptorBuilder` (WP03)
+- [x] T011 Add `FormFieldDescriptor` (WP03)
+- [x] T012 Implement `FormDescriptorBuilder::build()` (WP03)
+- [x] T013 Unit-test `FormFieldDescriptor` (WP03)
+- [x] T014 Unit-test `FormDescriptorBuilder` (WP03)
 
 **Implementation sketch**: see WP03 prompt.
 
