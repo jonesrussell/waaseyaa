@@ -76,3 +76,4 @@ Under the next unreleased version add:
 
 - 2026-04-27T08:15:41Z – claude – shell_pid=36192 – Started implementation via action command
 - 2026-04-27T08:18:17Z – claude – shell_pid=36192 – Docs: entity-system.md section + CHANGELOG entry committed (732e4a7a). C-005 satisfied.
+- 2026-04-27T08:20:58Z – claude – shell_pid=36192 – Squash-merged into main as e6bd07c2. | Done override: Mission squash-merged into main as e6bd07c2; spec-kitty merge command's WP-completion recording step was interrupted by an unrelated post-merge invariant (untracked sibling-mission status files), but the actual lane→main squash succeeded and the lane branch was cleanly deleted.
