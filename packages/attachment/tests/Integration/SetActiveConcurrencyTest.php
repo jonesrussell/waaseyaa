@@ -188,7 +188,7 @@ final class SetActiveConcurrencyTest extends TestCase
         $assertDb = DBALDatabase::createSqlite($this->dbPath);
 
         $rows = $assertDb->select('attachment')
-            ->fields(['id'])
+            ->fields('attachment', ['id'])
             ->condition('parent_entity_type', 'node')
             ->condition('parent_entity_id', '1')
             ->condition('is_active', 1)
