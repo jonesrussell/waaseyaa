@@ -98,7 +98,7 @@ final class EnumItem extends FieldItemBase
         $enumClass = $reflectionEnum->getName();
 
         $cases = array_map(
-            static fn (\BackedEnum $case): int|string => $case->value,
+            static fn(\BackedEnum $case): int|string => $case->value,
             $enumClass::cases(),
         );
 
