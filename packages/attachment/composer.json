@@ -27,11 +27,11 @@
     ],
     "require": {
         "php": "^8.4",
-        "waaseyaa/access": "@dev",
-        "waaseyaa/database-legacy": "@dev",
-        "waaseyaa/entity": "@dev",
-        "waaseyaa/entity-storage": "@dev",
-        "waaseyaa/foundation": "@dev"
+        "waaseyaa/access": "^0.1.0-alpha.150",
+        "waaseyaa/database-legacy": "^0.1.0-alpha.150",
+        "waaseyaa/entity": "^0.1.0-alpha.150",
+        "waaseyaa/entity-storage": "^0.1.0-alpha.150",
+        "waaseyaa/foundation": "^0.1.0-alpha.150"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
