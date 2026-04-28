@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.164] - 2026-04-28
+
 ### Fixed
 
 - **Split Monorepo CI:** Five packages whose `composer.json` declared `name: waaseyaa/<X>` were missing from `.github/workflows/split.yml` matrix, causing `bin/check-release-tag-parity` to fail with `RP003` on every release tag since they were added: `ai-observability`, `attachment`, `genealogy`, `oidc`, `structured-import`. Added all five to the matrix in their respective layer sections. Created the three missing GitHub repos (`waaseyaa/ai-observability`, `waaseyaa/attachment`, `waaseyaa/structured-import`) so subtree pushes succeed. Second occurrence of split-matrix drift (#1137 was the first); a future refactor should derive the matrix dynamically from `packages/*/composer.json`.
