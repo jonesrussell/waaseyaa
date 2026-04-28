@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`ci/unit-tests` Integration step on Linux CI:** Two pre-existing bugs that masked each other in `packages/attachment/tests/Integration/SetActiveConcurrencyTest.php` (skipped on Windows due to `pcntl`, only surfaced on Linux). (1) Line 191 called `$select->fields(['id'])` but `DBALSelect::fields()` signature is `(string $tableAlias, array $fields = [])` — corrected to `->fields('attachment', ['id'])`. (2) Line 196 called `fetchAllAssociative()` on a `Generator` (since `DBALSelect::execute(): \Traversable` yields rows) — wrapped in `iterator_to_array(...)` to materialize the rows into an array for `assertCount()`. ([#1359](https://github.com/waaseyaa/framework/pull/1359), [#1360](https://github.com/waaseyaa/framework/pull/1360))
+- **`tests/Integration/Phase4/FieldTypeDiscoveryTest`:** Added `'enum'` to the expected field-type id list and bumped the count from 16 → 17. The test wasn't updated when `EnumItem` was added in mission `field-type-enum-plugin-01KQ6SJG`. ([#1359](https://github.com/waaseyaa/framework/pull/1359))
+
 ## [0.1.0-alpha.162] - 2026-04-28 — Attribute-first entity definition (M1)
 
 ### Added
