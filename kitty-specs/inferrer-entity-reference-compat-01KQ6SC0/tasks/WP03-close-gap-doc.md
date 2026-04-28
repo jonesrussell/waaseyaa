@@ -51,3 +51,4 @@ Update `docs/specs/entity-system.md` §"Known Transitional Gaps" item 3 to mark 
 
 - 2026-04-28T13:11:39Z – claude – shell_pid=12160 – Started implementation via action command
 - 2026-04-28T13:12:23Z – claude – shell_pid=12160 – Spec doc gap #3 closed; matches stored: bullet style.
+- 2026-04-28T13:13:51Z – claude – shell_pid=12160 – Self-review: spec doc bullet matches stored: closed-bullet style; uses canonical target_entity_type_id key in example; references mission slug.
