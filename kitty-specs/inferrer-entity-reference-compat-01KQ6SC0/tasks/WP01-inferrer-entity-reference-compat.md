@@ -71,3 +71,7 @@ TDD order: T001 → T002 → T003 → T004 (red) → T005 (green).
 - `./vendor/bin/phpunit packages/entity/tests/Unit/Attribute/` overall is green.
 - `composer cs-check` clean.
 - `composer phpstan` reports no new findings.
+
+## Activity Log
+
+- 2026-04-28T13:06:53Z – claude – shell_pid=38540 – Inferrer rule + tests; 53 inferrer tests + 79 attribute tests green.
