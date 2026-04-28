@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **`Waaseyaa\Field\FieldDefinition`** constructor gained two trailing optional parameters: `string $group = ''` and `array $promptAliases = []`. `FieldDefinitionInterface` gained `getGroup(): string` and `getPromptAliases(): array`. Custom `FieldDefinitionInterface` implementations must add the two new methods. See `UPGRADING.md` § "FieldDefinition constructor parameters added". Per `DIR-003`, no compatibility shim is provided. ([single-entity-work-surface-01KQ7M1P](kitty-specs/single-entity-work-surface-01KQ7M1P/spec.md))
+- **`FieldTypeInferrer::isCompatible()`** is now a public seam (was private). Both the runtime inferrer and the `FieldAttributeRule` PHPStan extension delegate to it, so static analysis and runtime share a single source of truth — including the new asymmetric `int`/`?int`/`string`/`?string` → `entity_reference` override rule. The symmetric `compatibilityGroups()` seam is unchanged. Closes transitional gap #3 in `docs/specs/entity-system.md`. `Node.uid` and `Term.parent_id` are migrated from untyped + `@var int|null` PHPDoc to typed `public ?int $... = null;`. ([inferrer-entity-reference-compat-01KQ6SC0](kitty-specs/inferrer-entity-reference-compat-01KQ6SC0/spec.md))
 
 ---
 
