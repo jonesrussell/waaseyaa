@@ -76,3 +76,4 @@ TDD order: T001 → T002 → T003 → T004 (red) → T005 (green).
 
 - 2026-04-28T13:06:53Z – claude – shell_pid=38540 – Inferrer rule + tests; 53 inferrer tests + 79 attribute tests green.
 - 2026-04-28T13:13:20Z – claude – shell_pid=38540 – asymmetric rule correctly impl; compatibilityGroups() seam unchanged; 53 inferrer tests + 79 entity attr tests green; TDD red->green confirmed.
+- 2026-04-28T13:23:48Z – claude – shell_pid=38540 – Mission merged 7090f6d7. | Done override: Mission merged via spec-kitty merge; --force needed because main has untracked files from other missions, unrelated to this work.
