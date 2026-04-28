@@ -76,3 +76,4 @@ The settings key `target_entity_type_id` is canonical (read by `EntityTypeBuilde
 ## Activity Log
 
 - 2026-04-28T13:07:34Z – claude – shell_pid=16816 – Started implementation via action command
+- 2026-04-28T13:11:15Z – claude – shell_pid=16816 – Node.uid and Term.parent_id typed as ?int; 144 Node+Term tests green; pre-existing failures unrelated.
