@@ -1,0 +1,6 @@
+id,finding,source,location,recorded_at
+E001,FieldTypeInferrer::isCompatible() has no group covering scalar -> entity_reference,packages/entity/src/Attribute/FieldTypeInferrer.php,L175-L205,2026-04-28
+E002,Node.uid declared untyped + @var int|null as M1 workaround,packages/node/src/Node.php,L52-L54,2026-04-28
+E003,Term.parent_id declared untyped + @var int|null as M1 workaround,packages/taxonomy/src/Term.php,L29-L31,2026-04-28
+E004,Transitional gap #3 documents this mission as the closer,docs/specs/entity-system.md,L587-L599,2026-04-28
+E005,EntityTypeBuilder consumes target_entity_type_id (not target_type),CLAUDE.md gotcha,"entity_reference field definitions need target_entity_type_id",2026-04-28
