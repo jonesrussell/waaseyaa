@@ -1,7 +1,7 @@
 {
-  "event_count": 9,
-  "last_event_id": "01KQA3E7T1Z3Z57AA206Y9PYDF",
-  "materialized_at": "2026-04-28T13:11:15.521778+00:00",
+  "event_count": 11,
+  "last_event_id": "01KQA3EZNTMSTH67EK04YQ4DT6",
+  "materialized_at": "2026-04-28T13:11:39.962735+00:00",
   "mission_number": "",
   "mission_slug": "inferrer-entity-reference-compat-01KQ6SC0",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 2,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 1
+    "planned": 0
   },
   "work_packages": {
     "WP01": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-04-28T13:11:15.521778+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
+      "actor": "claude",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQA2S1C1P8EJH6MTVHV9FMXR",
-      "last_transition_at": "2026-04-28T12:59:40.801532+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KQA3EZNTMSTH67EK04YQ4DT6",
+      "last_transition_at": "2026-04-28T13:11:39.962735+00:00"
     }
   }
 }

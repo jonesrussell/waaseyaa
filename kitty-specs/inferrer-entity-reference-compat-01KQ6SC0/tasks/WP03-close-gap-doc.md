@@ -17,6 +17,7 @@ owned_files:
 tags: []
 assignee: "claude"
 agent: "claude"
+shell_pid: "12160"
 ---
 
 # WP03 — Close transitional gap #3 in entity-system spec
@@ -45,3 +46,7 @@ Update `docs/specs/entity-system.md` §"Known Transitional Gaps" item 3 to mark 
 - `bash tools/drift-detector.sh` (or `tools/drift-detector.sh` per platform) reports no drift in `entity-system.md`.
 - Visual inspection: bullet matches the style on line 589.
 - No code change in this WP; CI/test-suite results from WP01/WP02 still hold.
+
+## Activity Log
+
+- 2026-04-28T13:11:39Z – claude – shell_pid=12160 – Started implementation via action command
