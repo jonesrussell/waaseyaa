@@ -595,7 +595,7 @@ public CourseStatus $status;
 public ?int $uid = null;
 ```
 
-The symmetric `compatibilityGroups()` public seam is unchanged.
+`FieldTypeInferrer::isCompatible(string $inferred, string $explicit): bool` is the canonical public seam consumed by both runtime (`FieldTypeInferrer::infer()`) and the `FieldAttributeRule` PHPStan extension — single source of truth for compatibility decisions, including the asymmetric `entity_reference` rule. The symmetric `compatibilityGroups()` public seam is unchanged; it remains the contract for "either-side-may-override" groups.
 
 ### 4. Provider stub still emits legacy form
 
