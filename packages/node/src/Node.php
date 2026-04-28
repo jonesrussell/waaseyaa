@@ -49,9 +49,8 @@ final class Node extends ContentEntityBase implements HydratableFromStorageInter
     #[Field(type: 'boolean', label: 'Sticky at top of lists', description: 'Whether the content is sticky at the top of lists.', default: 0, settings: ['weight' => 12])]
     public bool $sticky = false;
 
-    /** @var int|null */
     #[Field(type: 'entity_reference', label: 'Author', description: 'The user who authored this content.', settings: ['weight' => 20, 'target_entity_type_id' => 'user'])]
-    public $uid = null;
+    public ?int $uid = null;
 
     #[Field(type: 'integer', label: 'Authored on', description: 'The date and time the content was created.', settings: ['weight' => 30, 'subtype' => 'timestamp'])]
     public ?int $created = null;

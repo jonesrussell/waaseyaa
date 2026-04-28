@@ -588,15 +588,14 @@ public CourseStatus $status;
 
 **~~No `stored:` parameter on `#[Field]`.~~** **Closed in mission `field-attribute-stored-parameter-01KQ8G29`.** `#[Field]` now exposes `stored: FieldStorage` (default `FieldStorage::Column`); `EntityMetadataReader::resolveFields()` forwards it into `FieldDefinition`. The `groups/Group` entity is migrated to attribute-first declaration and `GroupsServiceProvider` registers via `EntityType::fromClass()` — the `_fieldDefinitions:` slot is no longer used here.
 
-**`entity_reference` is rejected on scalar PHP types by `FieldTypeInferrer`.** The inferrer doesn't currently have a compatibility group for `?int` or `?string` → `entity_reference`. Properties like `Node.uid`, `Term.parent_id`, etc. work around this with untyped properties + `@var` PHPDoc:
+**~~`entity_reference` is rejected on scalar PHP types by `FieldTypeInferrer`.~~** **Closed in mission `inferrer-entity-reference-compat-01KQ6SC0`.** `FieldTypeInferrer::isCompatible()` now accepts an asymmetric override rule: `int`/`?int`/`string`/`?string` PHP types may be explicitly overridden to `#[Field(type: 'entity_reference', ...)]`. The reverse direction is still rejected — `entity_reference` is never *inferred* from a bare scalar — and `bool`/`float`/etc. continue to raise the existing conflict diagnostic. `Node.uid` and `Term.parent_id` are migrated to the typed form:
 
 ```php
-#[Field(type: 'entity_reference', settings: ['target_type' => 'user'])]
-/** @var int|null */
-public $uid;
+#[Field(type: 'entity_reference', settings: ['target_entity_type_id' => 'user'])]
+public ?int $uid = null;
 ```
 
-A future `inferrer-entity-reference-compat` mission will extend `FieldTypeInferrer` so `?int` / `?string` are accepted as compatible PHP types for `entity_reference` and the typed declaration becomes `#[Field(type: 'entity_reference', settings: [...])] public ?int $uid;`.
+The symmetric `compatibilityGroups()` public seam is unchanged.
 
 ### 4. Provider stub still emits legacy form
 

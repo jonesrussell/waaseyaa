@@ -179,6 +179,20 @@ final class FieldTypeInferrer
         ['datetime', 'date'],
     ];
 
+    /**
+     * Asymmetric override rule: inferred field-type ids that may be explicitly
+     * overridden to `entity_reference`. The reverse direction is never
+     * permitted — `entity_reference` is not inferred from any PHP scalar, since
+     * a bare `int` or `string` is not, by itself, evidence of an FK intent.
+     *
+     * Kept separate from {@see self::COMPATIBILITY_GROUPS} (symmetric, exposed
+     * via {@see self::compatibilityGroups()} for static analysis) so the public
+     * seam's contract — "either side may override the other" — stays honest.
+     *
+     * @var list<string>
+     */
+    private const ENTITY_REFERENCE_COMPATIBLE_INFERRED = ['integer', 'string'];
+
     private static function isCompatible(string $inferred, string $explicit): bool
     {
         if ($inferred === $explicit) {
@@ -189,6 +203,11 @@ final class FieldTypeInferrer
             if (\in_array($inferred, $group, true) && \in_array($explicit, $group, true)) {
                 return true;
             }
+        }
+
+        if ($explicit === 'entity_reference'
+            && \in_array($inferred, self::ENTITY_REFERENCE_COMPATIBLE_INFERRED, true)) {
+            return true;
         }
 
         return false;

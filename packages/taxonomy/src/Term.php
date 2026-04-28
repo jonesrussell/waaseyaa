@@ -26,9 +26,8 @@ final class Term extends ContentEntityBase
     #[Field(type: 'integer', label: 'Weight', description: 'The weight of this term for ordering.', settings: ['weight' => 10])]
     public int $weight = 0;
 
-    /** @var int|null */
     #[Field(type: 'entity_reference', label: 'Parent term', description: 'The parent term for hierarchical vocabularies.', settings: ['weight' => 15, 'target_entity_type_id' => 'taxonomy_term'])]
-    public $parent_id = null;
+    public ?int $parent_id = null;
 
     #[Field(type: 'boolean', label: 'Published', description: 'Whether the term is published.', settings: ['weight' => 20])]
     public bool $status = true;

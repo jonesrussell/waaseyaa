@@ -101,6 +101,22 @@ final class FieldTypeInferrerTest extends TestCase
                 'aUserClassForOverride', 'entity_reference',
                 ['type' => 'entity_reference', 'required' => true, 'settings' => []],
             ],
+            'int → entity_reference (required)' => [
+                'anIntForRef', 'entity_reference',
+                ['type' => 'entity_reference', 'required' => true, 'settings' => []],
+            ],
+            '?int → entity_reference (optional)' => [
+                'aNullableIntForRef', 'entity_reference',
+                ['type' => 'entity_reference', 'required' => false, 'settings' => []],
+            ],
+            'string → entity_reference (required)' => [
+                'aStringForRef', 'entity_reference',
+                ['type' => 'entity_reference', 'required' => true, 'settings' => []],
+            ],
+            '?string → entity_reference (optional)' => [
+                'aNullableStringForRef', 'entity_reference',
+                ['type' => 'entity_reference', 'required' => false, 'settings' => []],
+            ],
         ];
     }
 
@@ -294,6 +310,62 @@ final class FieldTypeInferrerTest extends TestCase
             self::assertStringContainsString(InferrerTestFixtures::class, $e->getMessage());
             self::assertStringContainsString('Hint:', $e->getMessage());
         }
+    }
+
+    /**
+     * @return iterable<string, array{0: string}>
+     */
+    public static function entityReferenceIncompatibleScalarsProvider(): iterable
+    {
+        yield 'bool'     => ['aBool'];
+        yield '?bool'    => ['aNullableBool'];
+        yield 'float'    => ['aFloat'];
+        yield '?float'   => ['aNullableFloat'];
+        yield 'array'    => ['anArray'];
+        yield 'datetime' => ['aDateTime'];
+    }
+
+    #[Test]
+    #[DataProvider('entityReferenceIncompatibleScalarsProvider')]
+    public function it_rejects_incompatible_scalars_for_entity_reference(string $propertyName): void
+    {
+        $property = new \ReflectionProperty(InferrerTestFixtures::class, $propertyName);
+        $attribute = new Field(type: 'entity_reference');
+
+        try {
+            FieldTypeInferrer::infer($property, $attribute);
+            self::fail('Expected EntityMetadataException for ' . $propertyName);
+        } catch (EntityMetadataException $e) {
+            self::assertStringContainsString('Conflicting field type', $e->getMessage());
+            self::assertStringContainsString('"entity_reference"', $e->getMessage());
+            self::assertStringContainsString($propertyName, $e->getMessage());
+            self::assertStringContainsString(InferrerTestFixtures::class, $e->getMessage());
+            self::assertStringContainsString('Hint:', $e->getMessage());
+        }
+    }
+
+    /**
+     * @return iterable<string, array{0: string, 1: string}>
+     */
+    public static function bareScalarsDoNotInferEntityReferenceProvider(): iterable
+    {
+        yield 'int → integer'      => ['anIntForRef', 'integer'];
+        yield '?int → integer'     => ['aNullableIntForRef', 'integer'];
+        yield 'string → string'    => ['aStringForRef', 'string'];
+        yield '?string → string'   => ['aNullableStringForRef', 'string'];
+    }
+
+    #[Test]
+    #[DataProvider('bareScalarsDoNotInferEntityReferenceProvider')]
+    public function it_does_not_infer_entity_reference_from_scalars(string $propertyName, string $expectedInferredType): void
+    {
+        $property = new \ReflectionProperty(InferrerTestFixtures::class, $propertyName);
+        $attribute = new Field();
+
+        $result = FieldTypeInferrer::infer($property, $attribute);
+
+        self::assertSame($expectedInferredType, $result['type']);
+        self::assertNotSame('entity_reference', $result['type']);
     }
 
     #[Test]

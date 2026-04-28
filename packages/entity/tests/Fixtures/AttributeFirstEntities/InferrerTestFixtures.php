@@ -75,4 +75,14 @@ final class InferrerTestFixtures
      * PHP type bypasses inference (e.g. user class → `entity_reference`).
      */
     public InferrerNonEnumClass $aUserClassForOverride;
+
+    /**
+     * Properties used to verify the asymmetric scalar → entity_reference rule:
+     * an explicit `type: 'entity_reference'` is accepted on `int`/`?int`/`string`/`?string`,
+     * but `entity_reference` is never inferred from a bare scalar.
+     */
+    public ?int $aNullableIntForRef = null;
+    public int $anIntForRef = 0;
+    public ?string $aNullableStringForRef = null;
+    public string $aStringForRef = '';
 }
