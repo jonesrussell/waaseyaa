@@ -37,8 +37,10 @@ jobs:
           - { local: 'packages/user', remote: 'user' }
           - { local: 'packages/config', remote: 'config' }
           - { local: 'packages/field', remote: 'field' }
+          - { local: 'packages/oidc', remote: 'oidc' }
           # Layer 2: Content Types
           - { local: 'packages/node', remote: 'node' }
+          - { local: 'packages/attachment', remote: 'attachment' }
           - { local: 'packages/taxonomy', remote: 'taxonomy' }
           - { local: 'packages/media', remote: 'media' }
           - { local: 'packages/path', remote: 'path' }
@@ -54,6 +56,7 @@ jobs:
           # Layer 3: Services
           - { local: 'packages/search', remote: 'search' }
           - { local: 'packages/seo', remote: 'seo' }
+          - { local: 'packages/structured-import', remote: 'structured-import' }
           - { local: 'packages/workflows', remote: 'workflows' }
           # Layer 4: API
           - { local: 'packages/api', remote: 'api' }
@@ -63,10 +66,12 @@ jobs:
           - { local: 'packages/ai-agent', remote: 'ai-agent' }
           - { local: 'packages/ai-pipeline', remote: 'ai-pipeline' }
           - { local: 'packages/ai-vector', remote: 'ai-vector' }
+          - { local: 'packages/ai-observability', remote: 'ai-observability' }
           # Layer 5.5: GraphQL
           - { local: 'packages/graphql', remote: 'graphql' }
           # Layer 6: Interfaces
           - { local: 'packages/cli', remote: 'cli' }
+          - { local: 'packages/genealogy', remote: 'genealogy' }
           - { local: 'packages/inertia', remote: 'inertia' }
           - { local: 'packages/mcp', remote: 'mcp' }
           - { local: 'packages/ssr', remote: 'ssr' }
