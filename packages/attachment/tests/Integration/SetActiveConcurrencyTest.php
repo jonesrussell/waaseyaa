@@ -187,13 +187,12 @@ final class SetActiveConcurrencyTest extends TestCase
         // ── Assert invariant: exactly one active attachment ────────────────────
         $assertDb = DBALDatabase::createSqlite($this->dbPath);
 
-        $rows = $assertDb->select('attachment')
+        $rows = iterator_to_array($assertDb->select('attachment')
             ->fields('attachment', ['id'])
             ->condition('parent_entity_type', 'node')
             ->condition('parent_entity_id', '1')
             ->condition('is_active', 1)
-            ->execute()
-            ->fetchAllAssociative();
+            ->execute());
 
         self::assertCount(
             1,
