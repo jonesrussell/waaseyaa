@@ -22,6 +22,7 @@ owned_files:
 tags: []
 assignee: "claude"
 agent: "claude"
+shell_pid: "16816"
 ---
 
 # WP02 — Refactor Node.uid and Term.parent_id to typed `?int`
@@ -71,3 +72,7 @@ The settings key `target_entity_type_id` is canonical (read by `EntityTypeBuilde
 - `composer phpstan` no new findings.
 - `composer cs-check` clean.
 - Manual sanity: `EntityType::fromClass(Node::class)` and `EntityType::fromClass(Term::class)` resolve a `FieldDefinition` for the FK property without throwing.
+
+## Activity Log
+
+- 2026-04-28T13:07:34Z – claude – shell_pid=16816 – Started implementation via action command
