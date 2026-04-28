@@ -94,3 +94,4 @@ node-compile-cache/
 .kittify/missions/__pycache__/
 .kittify/runtime/
 .kittify/workspaces/
+.claude/worktrees/
