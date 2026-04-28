@@ -6,5 +6,7 @@
   "mission_slug": "inferrer-entity-reference-compat-01KQ6SC0",
   "mission_type": "software-dev",
   "slug": "inferrer-entity-reference-compat-01KQ6SC0",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-04-28T13:01:37.421286+00:00"
 }
