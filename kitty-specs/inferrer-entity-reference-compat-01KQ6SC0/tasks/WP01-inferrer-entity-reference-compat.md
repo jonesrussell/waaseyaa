@@ -75,3 +75,4 @@ TDD order: T001 → T002 → T003 → T004 (red) → T005 (green).
 ## Activity Log
 
 - 2026-04-28T13:06:53Z – claude – shell_pid=38540 – Inferrer rule + tests; 53 inferrer tests + 79 attribute tests green.
+- 2026-04-28T13:13:20Z – claude – shell_pid=38540 – asymmetric rule correctly impl; compatibilityGroups() seam unchanged; 53 inferrer tests + 79 entity attr tests green; TDD red->green confirmed.
