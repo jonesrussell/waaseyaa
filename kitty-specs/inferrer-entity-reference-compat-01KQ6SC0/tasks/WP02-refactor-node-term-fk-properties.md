@@ -78,3 +78,4 @@ The settings key `target_entity_type_id` is canonical (read by `EntityTypeBuilde
 - 2026-04-28T13:07:34Z – claude – shell_pid=16816 – Started implementation via action command
 - 2026-04-28T13:11:15Z – claude – shell_pid=16816 – Node.uid and Term.parent_id typed as ?int; 144 Node+Term tests green; pre-existing failures unrelated.
 - 2026-04-28T13:13:36Z – claude – shell_pid=16816 – Self-review: ?int declarations correct; target_entity_type_id key preserved; 144 Node+Term tests green; pre-existing failures unrelated to my changes.
+- 2026-04-28T13:23:52Z – claude – shell_pid=16816 – Mission merged 7090f6d7. | Done override: Mission merged via spec-kitty merge.
