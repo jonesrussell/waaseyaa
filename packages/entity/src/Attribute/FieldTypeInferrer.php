@@ -193,7 +193,17 @@ final class FieldTypeInferrer
      */
     private const ENTITY_REFERENCE_COMPATIBLE_INFERRED = ['integer', 'string'];
 
-    private static function isCompatible(string $inferred, string $explicit): bool
+    /**
+     * Public seam for static analysis: returns true when an inferred field-type
+     * id may be overridden with the explicit field-type id given on the `#[Field]`
+     * attribute. Mirrors the runtime check used by {@see self::infer()}.
+     *
+     * Consumed by `FieldAttributeRule` (PHPStan extension) so the static checker
+     * and the runtime inferrer share a single source of truth — including the
+     * asymmetric `entity_reference` rule which {@see self::compatibilityGroups()}
+     * deliberately does not expose.
+     */
+    public static function isCompatible(string $inferred, string $explicit): bool
     {
         if ($inferred === $explicit) {
             return true;

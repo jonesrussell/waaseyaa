@@ -271,12 +271,9 @@ final class FieldAttributeRule implements Rule
 
     private function areCompatible(string $inferred, string $explicit): bool
     {
-        foreach (FieldTypeInferrer::compatibilityGroups() as $group) {
-            if (\in_array($inferred, $group, true) && \in_array($explicit, $group, true)) {
-                return true;
-            }
-        }
-
-        return false;
+        // Delegate to the runtime inferrer so static analysis and runtime share
+        // a single source of truth — including the asymmetric scalar →
+        // entity_reference rule, which compatibilityGroups() does not expose.
+        return FieldTypeInferrer::isCompatible($inferred, $explicit);
     }
 }
