@@ -23,6 +23,8 @@ Examples:
 
 The double-underscore delimiter is reserved for this purpose. Bundle identifiers must not contain `__`.
 
+The naming rule and the `__`-in-bundle-id guard are codified in a single helper consumed by `SqlSchemaHandler`, `SqlEntityStorage`, and `SqlEntityQuery`; see [`entity-system.md` §EntityTypeManagerInterface](./entity-system.md) for the registration-time guard at `EntityTypeManager::addBundleFields()`. (Mission #1257 K1.)
+
 ## Ownership
 
 The **base table** owns:
@@ -86,7 +88,7 @@ The empty→non-empty transition is a first-class case, triggered whenever a rel
 
 **Same path as new-bundle creation.** From the schema handler's perspective, "new bundle with fields" and "existing bundle gains first field" are indistinguishable — both are a `(entityType, bundle)` pair with non-empty registered fields that has no subtable yet. One code path handles both.
 
-**Runtime notice on save-path mismatch.** `SqlEntityStorage::save()` is the first deterministic runtime hook that can truthfully tell whether bundle-scoped values are about to be dropped because a required `{base_table}__{bundle}` subtable is still missing. When bundle values are present, the entity has a concrete bundle, and the subtable does not exist, storage emits a `LoggerInterface::notice()` with diagnostic code `MISSING_BUNDLE_SUBTABLE` before continuing the base-row write without the bundle-field values. This is intentionally later than `addBundleFields()`: healthy boots can register bundle fields before the schema materializes, so warning there would false-positive.
+**Runtime notice on save-path mismatch (K4, mission #1257).** `SqlEntityStorage::save()` is the first deterministic runtime hook that can truthfully tell whether bundle-scoped values are about to be dropped because a required `{base_table}__{bundle}` subtable is still missing. When bundle values are present, the entity has a concrete bundle, and the subtable does not exist, storage emits a `LoggerInterface::warning()` with diagnostic code `MISSING_BUNDLE_SUBTABLE` **once per `(entity_type, bundle)` per process** (memoized on the bundle-subtable cache) and continues the base-row write without the bundle-field values. **No throw** — preserves the open-by-default, diagnostic-driven model from [`operator-diagnostics.md`](./operator-diagnostics.md). The same once-per-pair memoization applies to `mergeBundleSubtableRow()` / `mergeBundleSubtableRowsBatch()` on the load path. This is intentionally later than `addBundleFields()`: healthy boots can register bundle fields before the schema materializes, so warning there would false-positive.
 
 **Recommendation for products.** A release that ships new fields against a previously-empty bundle **should** ship an accompanying schema migration that calls `ensureBundleSubtable()` explicitly (or an equivalent manual DDL). Relying on `syncAll()` for structural changes works but is non-deterministic with respect to release and boot ordering; an explicit migration is reviewable, failure-loud on skipped upgrades, and consistent with how the project treats every other schema evolution.
 
@@ -103,6 +105,10 @@ The empty→non-empty transition is a first-class case, triggered whenever a rel
 
 See [`operator-diagnostics.md`](./operator-diagnostics.md) for the algorithm and diagnostic-code registry.
 
+**Dialect portability (K5, mission #1257).** `HealthChecker::findOrphanSubtables()` enumerates tables via DBAL `AbstractSchemaManager::listTableNames()` filtered against `{base}__%`, with SQLite's `sqlite_master` retained as a fast-path. Test matrix gates a non-SQLite run behind a docker-compose env var so MySQL/PostgreSQL coverage is mechanical.
+
+**Layer placement (K6, mission #1257).** `HealthChecker` lives in `packages/foundation/src/Diagnostic/` and imports from L1 (`Waaseyaa\Entity\*`, `Waaseyaa\EntityStorage\SqlSchemaHandler`, etc.) — kernel-adjacent because it is wired only from `ConsoleKernel`. The cross-layer privilege is codified in `bin/check-package-layers` `KERNEL_EXEMPT_FILES` per mission #824 WP02 surface C; entry rationale cites K6(c). See [`infrastructure.md` §Kernel exemption surface](./infrastructure.md).
+
 ## Non-goals
 
 - **No automatic migration of existing flat-fielded multi-bundle entities.** `node`, `taxonomy_term`, and `media` continue using flat-table storage with all fields on the base. Adoption of per-bundle storage for these is a deliberate future project tracked in [`extraction-log.md`](./extraction-log.md).
@@ -115,3 +121,5 @@ See [`operator-diagnostics.md`](./operator-diagnostics.md) for the algorithm and
 - Extraction rationale and commit plan: [`../plans/2026-04-18-groups-extraction-design.md`](../plans/2026-04-18-groups-extraction-design.md).
 - Future candidates for adoption: [`extraction-log.md`](./extraction-log.md).
 - Upstream: [`entity-system.md`](./entity-system.md), [`infrastructure.md`](./infrastructure.md), [`operator-diagnostics.md`](./operator-diagnostics.md).
+- Tenancy declaration on `EntityType`: [`entity-system.md` §Community Scoping](./entity-system.md).
+- Mission ratification: `.kittify/missions/1257-entity-storage-hardening/spec.md`.

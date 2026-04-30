@@ -1,5 +1,6 @@
 # Entity System
 
+<!-- Spec reviewed 2026-04-30 - mission #1257 WP02 ratification: K1-K7 conventions + C1 tenancy contract; HasCommunityInterface deprecated (declarative `tenancy:` on EntityType); see ./bundle-scoped-storage.md for K1/K4/K5 details -->
 <!-- Spec reviewed 2026-04-26 - #[ContentEntityKeys], EntityMetadataReader: class-level key map + cached resolution; EntityTypeManager asserts registered keys match class metadata; ContentEntityBase throws EntityMetadataException without #[ContentEntityType] -->
 <!-- Spec reviewed 2026-04-25 - #[ContentEntityType] + ContentEntityTypeReader (packages/entity/Attribute) for SSR strict app-controller entity binding; see docs/specs/app-controller-invocation.md -->
 <!-- Spec reviewed 2026-04-24 - packages/entity ValueCaster: PHPStan strict-rules / control-flow cleanup only; cast-in/cast-out semantics and typed-data delegation unchanged -->
@@ -197,6 +198,12 @@ $storage->save($entity); // toArray() carries ISO string suitable for _data
 - Admin SPA consumes JSON:API — attributes are already normalized for JSON: `docs/specs/admin-spa.md`.
 - AI/MCP/SSR/GraphQL: `docs/specs/ai-integration.md`, `docs/specs/relationship-modeling.md`.
 
+### Query-builder boundary (K3, mission #1257)
+
+`SqlEntityQuery::condition()` extends ST-9 to the read path: when comparing a value stored in `_data` (JSON-extracted), it inspects the field's declared `FieldDefinition` cast and either binds the parameter accordingly or wraps `json_extract(...)` in `CAST(... AS TEXT)` so string-vs-integer comparisons commute against SQLite's loose JSON typing. Same source-of-truth as ST-9 (the cast registry) — the query builder is just a second consumer.
+
+Reproduction case: integer `_data` field compared to a string literal. Pre-K3, the SQLite path returned an empty set silently. Post-K3, the comparison commutes against the declared cast.
+
 ## Core Interfaces (packages/entity/src/)
 
 ### EntityInterface
@@ -362,6 +369,12 @@ interface EntityTypeManagerInterface
 `getRepository()` returns `EntityRepositoryInterface` (the driver-backed repository with hydration, validation hooks, and transactional batch APIs). The kernel registers a repository factory alongside the storage factory so consumers can wrap `EntityTypeManager::getRepository($entityTypeId)` in thin domain repositories without manually assembling `SqlStorageDriver`, `RevisionableStorageDriver`, and `EntityRepository` dependencies.
 
 `registerEntityType()` and `registerCoreEntityType()` accept an optional registrant class so the registry can emit provenance-aware collision errors. When an entity type id is registered twice with the same class, the manager throws `EntityTypeRegistrationCollisionException` with the duplicate-registration message contract. When the same id is registered with a different class, the manager throws the shadow-collision variant naming the canonical and conflicting classes.
+
+**Duplicate registration (K7, mission #1257).** `EntityTypeRegistrationCollisionException::duplicate(...)` names **both** registrants — the existing one (FQCN of class + provenance) and the incoming one — so the operator can reach both call sites from one exception body. Convention only; no contract change.
+
+**Bundle-id structural guard (K1, mission #1257).** `EntityTypeManager::addBundleFields($entityTypeId, $bundleId, $fieldDefinitions)` rejects bundle ids containing `__` at registration time. The double-underscore is reserved for the `{base}__{bundle}` subtable naming; structural validation here prevents downstream collisions in `SqlSchemaHandler` / `SqlEntityStorage` / `SqlEntityQuery`.
+
+**Bundle-subtable absence notice (K4 part A, mission #1257).** When `addBundleFields()` registers fields for a `(type, bundle)` whose subtable is not yet materialized in storage, the manager emits `LoggerInterface::notice()` with diagnostic code `MISSING_BUNDLE_SUBTABLE` once per `(entity_type, bundle)` and continues — registration is pre-materialization and runtime DDL is forbidden. See [`bundle-scoped-storage.md`](./bundle-scoped-storage.md) §Lifecycle.
 
 ### EntityStorageInterface
 
@@ -529,6 +542,7 @@ new EntityType(
     revisionDefault: false,
     translatable: false,
     bundleEntityType: 'node_type',
+    tenancy: null,
     constraints: [],
     group: null,
     description: null,
@@ -539,6 +553,7 @@ Parameters of note:
 - `revisionDefault: bool` -- whether new revisions are created by default on save (when `revisionable` is true)
 - `group: ?string` -- admin sidebar group key (e.g., `'content'`, `'taxonomy'`) for catalog grouping
 - `description: ?string` -- human-readable description of the entity type, displayed in admin catalog
+- `tenancy: ?array` -- opt-in declarative tenancy scope (C1, mission #1257); `['scope' => 'community']` enables `CommunityScope` wiring without requiring the entity class to implement `HasCommunityInterface`. `null` (default) means non-tenant. Lives next to entity-keys / bundle-entity-type. See **Community Scoping** below for wiring + deprecation cycle.
 
 > **Note:** the constructor's previous `fieldDefinitions:` parameter was removed in M1. Tests that need to inject raw field definitions for fixture entity types can use `Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()`.
 
@@ -722,6 +737,8 @@ Multi-bundle entity types (declaring `bundleEntityType`) may register bundle-spe
 
 **Runtime notice follow-up.** `SqlEntityStorage::save()` now emits a `LoggerInterface::notice()` with diagnostic code `MISSING_BUNDLE_SUBTABLE` when bundle-scoped values are present but the matching `{base}__{bundle}` subtable is still absent at save time. The notice belongs on the save path rather than `addBundleFields()` because registration is pre-materialization and would false-positive on healthy boots.
 
+**Read–write routing parity (K2, mission #1257).** `SqlEntityQuery::routeFields()` consults the `FieldDefinitionRegistry::isDataStored()` hint (the same source `SqlEntityStorage::splitForStorage()` uses on write via `getDataStoredCoreFieldNames()`). The registry hint wins over `SchemaInterface::fieldExists()` on the query side, mirroring the write side. No silent dual-source: if a field has been promoted to `FieldStorage::Data` while a legacy column lingers in the table, both sides agree the canonical home is `_data` and reads come from there.
+
 **Drift diagnostics.** Three `DiagnosticCode` cases back this substrate, all surfaced by `HealthChecker`:
 - `MISSING_BUNDLE_SUBTABLE` (error) — bundle has registered fields but no subtable.
 - `ORPHAN_BUNDLE_SUBTABLE` (warning) — subtable exists with no matching registered bundle. Current detection queries `sqlite_master` and is SQLite-only; portable enumeration is tracked as issue #1301.
@@ -880,7 +897,7 @@ interface HasCommunityInterface
 
 File: `packages/entity-storage/src/Tenancy/CommunityScope.php`
 
-Strategy object injected into storage drivers at **wiring time**. Service providers check `is_a($entityType->getClass(), HasCommunityInterface::class, true)` and inject `CommunityScope` only for community-aware entity types. Config entities and system entities receive no `CommunityScope`.
+Strategy object injected into storage drivers at **wiring time**. Service providers consult `EntityType::getTenancy()` and inject `CommunityScope` when the declared scope is `'community'` (C1, mission #1257). Config entities and system entities receive no `CommunityScope`.
 
 ```php
 final class CommunityScope
@@ -894,11 +911,43 @@ final class CommunityScope
 #### Wiring pattern
 
 ```php
-// In an app service provider — only for entities implementing HasCommunityInterface:
+// In an app service provider — only for entity types declaring tenancy: ['scope' => 'community']:
 $scope  = $this->resolve(CommunityScope::class);
 $driver = new SqlStorageDriver($resolver, communityScope: $scope);
 $repo   = new EntityRepository($entityType, $driver, $dispatcher);
 ```
+
+#### Tenancy declaration (C1, mission #1257 WP10)
+
+**Status: canonical.** Entities opt into community scoping via `EntityType` registration:
+
+```php
+new EntityType(
+    id: 'group',
+    class: \Waaseyaa\Groups\Group::class,
+    tenancy: ['scope' => 'community'],
+    // ...
+);
+```
+
+`EntityType::getTenancy(): ?array` returns the declared shape (or `null` for non-tenant types). `SqlStorageDriver` and `MemoryStorageDriver` both wire `CommunityScope` based on this declaration; the entity class needs no marker interface.
+
+**Why declarative.** Framework-shipped `final` entity classes (e.g. `Waaseyaa\Groups\Group`) cannot be marked by consumers via interface — exactly the class-hierarchy coupling that bundle-scoped fields exist to avoid. Tenancy is a **registration-site** concern, not a class-hierarchy concern.
+
+#### Migration: `HasCommunityInterface` → declarative tenancy (mission #1257 WP10)
+
+**Status: deprecation cycle active. Removal in next minor release.**
+
+See `packages/groups/CHANGELOG.md` for the operator-facing migration recipe. In summary:
+
+| Before | After |
+|---|---|
+| `class MyEntity extends ContentEntityBase implements HasCommunityInterface { use HasCommunityTrait; }` | `class MyEntity extends ContentEntityBase { /* no marker */ }` |
+| Service provider: `is_a($entityType->getClass(), HasCommunityInterface::class, true)` | `EntityType` registration: `tenancy: ['scope' => 'community']` |
+
+During the deprecation cycle, `HasCommunityInterface` continues to function — wiring still injects `CommunityScope` for entities that implement it. On first wiring per `(entity-type id)` per process, `LoggerInterface::warning()` emits a one-time deprecation notice naming the entity type and pointing to the migration recipe. Removal scheduled for the next minor release.
+
+**Note for adopters mid-migration (e.g. Minoo).** Consumers running their own `App\Entity\Group` plus a composer dep on `waaseyaa/groups` should: (1) adopt `tenancy:` on their `EntityType` registration first; (2) verify cross-tenant isolation tests still pass; (3) only then collapse the local `App\Entity\Group` onto `Waaseyaa\Groups\Group`. Order matters because the `tenancy:` flip is wiring-local while the class collapse touches every call site.
 
 ### Connection Resolution
 
