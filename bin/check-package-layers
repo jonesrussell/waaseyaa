@@ -143,6 +143,12 @@ KERNEL_EXEMPT_FILES = {
     "foundation/src/Http/Router/WaaseyaaContext.php":
         "kernel-adjacent route registrar wired from HttpKernel",
 
+    # foundation — kernel-boot listener wiring extracted from HttpKernel for testability.
+    # Already covered by the implicit /src/Kernel/ dir exemption; the explicit entry
+    # records architectural intent per mission #824 WP02 surface B (issue #827).
+    "foundation/src/Kernel/EventListenerRegistrar.php":
+        "kernel-boot listener wiring; pure dispatcher::addListener calls; single caller (HttpKernel)",
+
     # cache — event listeners wired by ServiceProvider; subscribe to higher-layer events.
     "cache/src/Listener/ConfigCacheInvalidator.php":
         "event listener; subscribes to L1 config events for cache invalidation",
