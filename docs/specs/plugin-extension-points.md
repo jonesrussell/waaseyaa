@@ -70,33 +70,9 @@ Demonstrates:
 
 ## ServiceProvider Extension Hooks
 
-File: `packages/foundation/src/ServiceProvider/ServiceProvider.php`
+The `Waaseyaa\Foundation\ServiceProvider\ServiceProvider` extension hooks (kernel-invoked methods such as `register`, `boot`, `routes`, `commands`, `middleware`, `httpDomainRouters`, `registerRenderCacheListeners`, `configureHttpKernel`, `graphqlMutationOverrides`, plus the `KnowledgeToolingExtensionInterface` runner described above) are documented canonically in [`docs/specs/infrastructure.md`](infrastructure.md) under § ServiceProvider extension hooks. The interface ↔ abstract base ↔ kernel call-site lockstep is enforced by `packages/foundation/tests/Contract/ServiceProviderContractTest.php` (mission #824 WP03 surface B).
 
-Beyond `register()` and `boot()`, service providers expose five additional extension hooks called by the kernel during bootstrap. All return empty defaults — override in package providers to contribute.
-
-```php
-// Contribute CLI commands (called by ConsoleKernel)
-public function commands(
-    EntityTypeManager $entityTypeManager,
-    DatabaseInterface $database,
-    EventDispatcherInterface $dispatcher,
-): array;  // list<Command>
-
-// Contribute HTTP middleware instances (called by HttpKernel)
-public function middleware(EntityTypeManager $entityTypeManager): array;  // list<HttpMiddlewareInterface>
-
-// Register routes (called during boot)
-public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void;
-
-// Override GraphQL mutations (called by GraphQL bootstrap)
-public function graphqlMutationOverrides(EntityTypeManager $entityTypeManager): array;
-// Returns: array<string, array{args?: ..., resolve?: callable}>
-
-// Set kernel resolver for lazy service resolution
-public function setKernelResolver(\Closure $resolver): void;
-```
-
-These hooks are the stable contract for packages to extend the application without modifying kernel code. The kernel calls them during the appropriate boot phase — commands during console boot, middleware during HTTP boot, routes during provider boot.
+Plugin-specific extension via `KnowledgeToolingExtensionInterface` (above) is layered on top of those provider hooks but documented separately because it composes through the plugin manager rather than through the service-provider lifecycle.
 
 ## Compatibility Notes
 
