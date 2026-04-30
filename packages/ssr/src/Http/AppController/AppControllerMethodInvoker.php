@@ -6,6 +6,7 @@ namespace Waaseyaa\SSR\Http\AppController;
 
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
+use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\Routing\RouteFingerprint;
 use Waaseyaa\SSR\Http\AppController\Exception\AppControllerTypeMismatchException;
 use Waaseyaa\SSR\Http\AppController\Exception\InvalidAppControllerArgumentException;
@@ -31,7 +32,7 @@ final class AppControllerMethodInvoker
         AppInvocationContext $ctx,
         bool $strict,
         ?\Waaseyaa\Access\Gate\GateInterface $gate,
-        ?\Closure $serviceResolver,
+        ?HttpServiceResolverInterface $serviceResolver,
         array $customResolvers,
     ): mixed {
         $class = $instance::class;

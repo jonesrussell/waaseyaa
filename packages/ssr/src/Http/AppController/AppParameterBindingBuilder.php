@@ -12,6 +12,7 @@ use Waaseyaa\Entity\Attribute\ContentEntityTypeReader;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\Routing\RouteFingerprint;
 use Waaseyaa\SSR\Attribute\FromRoute;
 use Waaseyaa\SSR\Attribute\MapQuery;
@@ -43,7 +44,7 @@ final class AppParameterBindingBuilder
         Route $route,
         bool $strict,
         ?\Waaseyaa\Access\Gate\GateInterface $gate,
-        ?\Closure $serviceResolver,
+        ?HttpServiceResolverInterface $serviceResolver,
         array $customResolvers,
     ): array {
         $routeParameters = $route->getOption('parameters');
@@ -98,7 +99,7 @@ final class AppParameterBindingBuilder
         Route $route,
         bool $strict,
         ?\Waaseyaa\Access\Gate\GateInterface $gate,
-        ?\Closure $serviceResolver,
+        ?HttpServiceResolverInterface $serviceResolver,
         array $customResolvers,
         array $routeParameters,
         array $bindings,
@@ -356,7 +357,7 @@ final class AppParameterBindingBuilder
         int $index,
         string $typeName,
         ?\Waaseyaa\Access\Gate\GateInterface $gate,
-        ?\Closure $serviceResolver,
+        ?HttpServiceResolverInterface $serviceResolver,
         array &$seenServiceTypes,
     ): ?AppParameterBindingSpec {
         if ($typeName === \Waaseyaa\Access\Gate\GateInterface::class && $gate === null) {
@@ -386,7 +387,7 @@ final class AppParameterBindingBuilder
         }
 
         if ($serviceResolver !== null) {
-            $resolved = ($serviceResolver)($typeName);
+            $resolved = $serviceResolver->resolve($typeName);
             if ($resolved !== null) {
                 if (!is_a($resolved, $typeName, true)) {
                     throw new AppControllerTypeMismatchException(sprintf(

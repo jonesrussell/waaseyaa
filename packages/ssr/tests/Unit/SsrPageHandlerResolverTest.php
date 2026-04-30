@@ -15,6 +15,7 @@ use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Cache\CacheConfigResolver;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\SSR\SsrPageHandler;
 
 // Stub controller with a custom dependency
@@ -56,7 +57,7 @@ class StubControllerWithGate
 #[CoversClass(SsrPageHandler::class)]
 final class SsrPageHandlerResolverTest extends TestCase
 {
-    private function createHandler(?\Closure $serviceResolver = null, ?GateInterface $gate = null): SsrPageHandler
+    private function createHandler(?HttpServiceResolverInterface $serviceResolver = null, ?GateInterface $gate = null): SsrPageHandler
     {
         $entityTypeManager = new EntityTypeManager(new EventDispatcher());
         $database = DBALDatabase::createSqlite();
@@ -77,13 +78,25 @@ final class SsrPageHandlerResolverTest extends TestCase
         );
     }
 
+    private function makeServiceResolver(\Closure $resolver): HttpServiceResolverInterface
+    {
+        return new class ($resolver) implements HttpServiceResolverInterface {
+            public function __construct(private readonly \Closure $resolver) {}
+
+            public function resolve(string $className): ?object
+            {
+                return ($this->resolver)($className);
+            }
+        };
+    }
+
     #[Test]
     public function resolves_custom_dependency_via_service_resolver(): void
     {
         $dep = new StubDependency();
-        $resolver = function (string $className) use ($dep): ?object {
+        $resolver = $this->makeServiceResolver(function (string $className) use ($dep): ?object {
             return $className === StubDependency::class ? $dep : null;
-        };
+        });
 
         $handler = $this->createHandler($resolver);
         $twig = $this->createStub(\Twig\Environment::class);
@@ -105,9 +118,9 @@ final class SsrPageHandlerResolverTest extends TestCase
     public function resolves_pre_registered_controller_singleton_via_service_resolver(): void
     {
         $preBuilt = new StubController(new StubDependency());
-        $resolver = function (string $className) use ($preBuilt): ?object {
+        $resolver = $this->makeServiceResolver(function (string $className) use ($preBuilt): ?object {
             return $className === StubController::class ? $preBuilt : null;
-        };
+        });
 
         $handler = $this->createHandler($resolver);
         $twig = $this->createStub(\Twig\Environment::class);
@@ -127,7 +140,7 @@ final class SsrPageHandlerResolverTest extends TestCase
     #[Test]
     public function falls_back_to_default_when_resolver_returns_null(): void
     {
-        $resolver = fn (string $className): ?object => null;
+        $resolver = $this->makeServiceResolver(static fn (string $className): ?object => null);
 
         $handler = $this->createHandler($resolver);
         $twig = $this->createStub(\Twig\Environment::class);

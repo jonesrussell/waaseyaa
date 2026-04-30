@@ -22,10 +22,12 @@ use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\Foundation\Attribute\AsMiddleware;
 use Waaseyaa\Foundation\Http\ControllerDispatcher;
 use Waaseyaa\Foundation\Http\CorsHandler;
+use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
 use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
 use Waaseyaa\Foundation\Http\Router as HttpRouter;
+use Waaseyaa\Foundation\Kernel\Http\HttpKernelServiceResolver;
 use Waaseyaa\Foundation\Log\LogManager;
 use Waaseyaa\Foundation\Log\Processor\RequestContextProcessor;
 use Waaseyaa\Foundation\Middleware\DebugHeaderMiddleware;
@@ -155,30 +157,24 @@ final class HttpKernel extends AbstractKernel
         $this->codifiedContextSessionStore = $store;
     }
 
+    private ?HttpServiceResolverInterface $httpServiceResolver = null;
+
     /**
-     * @return \Closure(string): ?object
+     * Returns the SSR controller-method dependency resolver.
+     *
+     * Replaces the legacy `\Closure(string): ?object` shape with a typed
+     * interface; semantics unchanged (provider walk + narrow kernel-services
+     * fallback). Mirrors the typed-resolver pattern introduced for
+     * {@see \Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface} in
+     * mission #824 WP02 surface A.
      */
-    public function getHttpServiceResolver(): \Closure
+    public function getHttpServiceResolver(): HttpServiceResolverInterface
     {
-        return function (string $className): ?object {
-            foreach ($this->providers as $provider) {
-                if (isset($provider->getBindings()[$className])) {
-                    try {
-                        return $provider->resolve($className);
-                    } catch (\Throwable $e) {
-                        $this->logger->error(sprintf('Failed to resolve %s: %s', $className, $e->getMessage()));
-
-                        return null;
-                    }
-                }
-            }
-
-            $kernelServices = [
-                \Waaseyaa\Database\DatabaseInterface::class => $this->database,
-            ];
-
-            return $kernelServices[$className] ?? null;
-        };
+        return $this->httpServiceResolver ??= new HttpKernelServiceResolver(
+            providersAccessor: fn(): array => $this->providers,
+            database: $this->database,
+            logger: $this->logger,
+        );
     }
 
     private function resolveErrorPageRenderer(): ?ErrorPageRendererInterface

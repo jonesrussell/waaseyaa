@@ -15,6 +15,7 @@ use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\EntityValues;
+use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
 use Waaseyaa\Foundation\Http\Inertia\InertiaPageResultInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
@@ -56,8 +57,7 @@ final class SsrPageHandler
         /** @var array<string, mixed> */
         private readonly array $config,
         private readonly ?object $manifest = null,
-        /** @var (\Closure(string): ?object)|null */
-        private readonly ?\Closure $serviceResolver = null,
+        private readonly ?HttpServiceResolverInterface $serviceResolver = null,
         ?LoggerInterface $logger = null,
         private readonly ?\Waaseyaa\Access\Gate\GateInterface $gate = null,
         ?LanguageResolver $languageResolver = null,
@@ -419,7 +419,7 @@ final class SsrPageHandler
     ): object {
         // Check if the controller class itself is registered as a singleton
         if ($this->serviceResolver !== null) {
-            $resolved = ($this->serviceResolver)($class);
+            $resolved = $this->serviceResolver->resolve($class);
             if ($resolved !== null) {
                 return $resolved;
             }
@@ -460,7 +460,7 @@ final class SsrPageHandler
             }
 
             if (!$matched && $type instanceof \ReflectionNamedType && !$type->isBuiltin() && $this->serviceResolver !== null) {
-                $resolved = ($this->serviceResolver)($type->getName());
+                $resolved = $this->serviceResolver->resolve($type->getName());
                 if ($resolved !== null) {
                     $args[] = $resolved;
                     $matched = true;

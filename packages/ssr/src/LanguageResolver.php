@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\SSR;
 
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
+use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\I18n\LanguageManagerInterface;
 use Waaseyaa\Routing\Language\AcceptHeaderNegotiator;
 use Waaseyaa\Routing\Language\LanguageNegotiator;
@@ -19,8 +20,7 @@ use Waaseyaa\Routing\Language\UrlPrefixNegotiator;
 final class LanguageResolver
 {
     public function __construct(
-        /** @var (\Closure(string): ?object)|null */
-        private readonly ?\Closure $serviceResolver = null,
+        private readonly ?HttpServiceResolverInterface $serviceResolver = null,
     ) {}
 
     /**
@@ -132,7 +132,7 @@ final class LanguageResolver
     private function resolveLanguageManager(): ?LanguageManagerInterface
     {
         if ($this->serviceResolver !== null) {
-            $manager = ($this->serviceResolver)(LanguageManagerInterface::class);
+            $manager = $this->serviceResolver->resolve(LanguageManagerInterface::class);
             if ($manager instanceof LanguageManagerInterface) {
                 return $manager;
             }

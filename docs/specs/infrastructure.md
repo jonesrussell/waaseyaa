@@ -130,6 +130,12 @@ The provider list is read through a closure accessor so resolution sees the live
 
 **Propagation through `mergeChildProvider()`.** When a stack provider merges a child via `mergeChildProvider()`, the child receives the same `KernelServicesInterface` instance so `resolve()` keeps working inside the child’s `register()`.
 
+### HTTP service resolver (SSR controller-method DI)
+
+`HttpKernel::getHttpServiceResolver()` returns `Waaseyaa\Foundation\Http\HttpServiceResolverInterface` (default impl `Waaseyaa\Foundation\Kernel\Http\HttpKernelServiceResolver`). SSR uses this seam to satisfy app-controller method dependencies — given a class name from a `\ReflectionNamedType` parameter, the resolver returns an instance or `null`. Replaces the legacy `\Closure(string): ?object` shape; mirrors the typed-resolver pattern introduced for `KernelServicesInterface` above.
+
+`HttpServiceResolverInterface` is intentionally separate from `KernelServicesInterface`: the latter is finite, kernel-internal, and provider-scoped, while this surface is open-ended and driven by user-authored controller signatures. Naming the seam allows future tightening (allowed-types enforcement, caching, tracing) without affecting the kernel-services bus.
+
 ### HTTP error surface (JSON-first)
 
 Machine clients (Admin SPA, MCP, curl scripts) should assume **JSON:API-shaped errors** unless they explicitly negotiated HTML.
