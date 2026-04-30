@@ -16,6 +16,7 @@ use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\SSR\Flash\Flash;
 use Waaseyaa\SSR\Flash\FlashMessageService;
@@ -23,7 +24,7 @@ use Waaseyaa\SSR\Http\Router\AppControllerRouter;
 use Waaseyaa\SSR\Http\Router\SsrRouter;
 use Waaseyaa\SSR\Twig\FlashTwigExtension;
 
-final class SsrServiceProvider extends ServiceProvider implements LanguagePathStripperInterface
+final class SsrServiceProvider extends ServiceProvider implements HasRenderCacheListenersInterface, LanguagePathStripperInterface
 {
     private static ?Environment $twigEnvironment = null;
     private static ?FieldFormatterRegistry $formatterRegistry = null;

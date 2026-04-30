@@ -17,6 +17,7 @@ use SplFileInfo;
 use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProviderInterface;
 
@@ -60,7 +61,6 @@ final class ServiceProviderContractTest extends TestCase
     private const array ABSTRACT_BASE_ONLY = [
         'middleware',
         'httpDomainRouters',
-        'registerRenderCacheListeners',
         'configureHttpKernel',
     ];
 
@@ -76,6 +76,7 @@ final class ServiceProviderContractTest extends TestCase
         'stripLanguagePrefixForRouting' => LanguagePathStripperInterface::class,
         'graphqlMutationOverrides' => HasGraphqlMutationOverridesInterface::class,
         'commands' => HasCommandsInterface::class,
+        'registerRenderCacheListeners' => HasRenderCacheListenersInterface::class,
     ];
 
     #[Test]

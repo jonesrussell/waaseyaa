@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\ServiceProvider;
 
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Waaseyaa\Cache\CacheBackendInterface;
 use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
 
 abstract class ServiceProvider implements ServiceProviderInterface
@@ -59,12 +57,6 @@ abstract class ServiceProvider implements ServiceProviderInterface
     {
         return [];
     }
-
-    /**
-     * Register render-cache entity listeners. SSR wraps the render-bin backend
-     * in RenderCache when configured.
-     */
-    public function registerRenderCacheListeners(EventDispatcherInterface $dispatcher, ?CacheBackendInterface $renderCacheBackend): void {}
 
     /**
      * Late HTTP wiring after database caches exist (e.g. SsrPageHandler construction).

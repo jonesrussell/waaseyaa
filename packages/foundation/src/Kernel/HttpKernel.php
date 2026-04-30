@@ -33,6 +33,7 @@ use Waaseyaa\Foundation\Log\Processor\RequestContextProcessor;
 use Waaseyaa\Foundation\Middleware\DebugHeaderMiddleware;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
 use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\BearerAuthMiddleware;
@@ -117,6 +118,9 @@ final class HttpKernel extends AbstractKernel
 
         $listenerRegistrar = new EventListenerRegistrar($this->dispatcher, $this->logger);
         foreach ($this->providers as $provider) {
+            if (!$provider instanceof HasRenderCacheListenersInterface) {
+                continue;
+            }
             $provider->registerRenderCacheListeners($this->dispatcher, $this->renderCacheBackend);
         }
         $listenerRegistrar->registerDiscoveryCacheListeners($this->discoveryCache);
