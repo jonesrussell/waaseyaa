@@ -94,11 +94,202 @@ METAPACKAGES = frozenset({"cms", "core", "full"})
 
 WAASEYAA_NAME = re.compile(r"^waaseyaa/([a-z0-9-]+)$", re.I)
 
+# ---------------------------------------------------------------------------
+# Kernel exemption surface (mission #824 WP02 surface C)
+#
+# Two complementary mechanisms relax the file-level layer rule for
+# bootstrapper code that intentionally sees across layers.
+#
+# 1. KERNEL_EXEMPT_DIR_SUFFIXES — implicit dir-prefix exemption.
+#    Any PHP file whose path (relative to packages/) ends up under one of
+#    these suffixes is treated as kernel/bootstrapper code. This is the
+#    canonical exemption documented in CLAUDE.md "Layer Architecture".
+#
+# 2. KERNEL_EXEMPT_FILES — explicit named-file allowlist.
+#    Each entry maps a path (relative to packages/) to a one-line rationale.
+#    Use this for kernel-adjacent files that must live outside <pkg>/src/Kernel/
+#    (e.g. listeners, route registrars, diagnostics wired only from a kernel).
+#    Adding an entry is the deliberate way to land such files; future drift
+#    that does not earn an entry will fail the gate.
+# ---------------------------------------------------------------------------
+
+KERNEL_EXEMPT_DIR_SUFFIXES = ("/src/Kernel/",)
+
+KERNEL_EXEMPT_FILES = {
+    # foundation — kernel-adjacent diagnostics wired only from ConsoleKernel.
+    # Codified per mission #824 WP02 K6(c); HealthChecker is verified by
+    # mission #1257 WP02 / #1300.
+    "foundation/src/Diagnostic/HealthChecker.php":
+        "kernel-adjacent diagnostic wired only from ConsoleKernel; #1300 / mission 1257 K6(c)",
+    "foundation/src/Diagnostic/BootDiagnosticReport.php":
+        "kernel-adjacent diagnostic; companion to HealthChecker",
+
+    # foundation — kernel-adjacent HTTP route registrars wired only from HttpKernel.
+    # Long-term home is L4 (waaseyaa/routing); kept here until relocation lands.
+    "foundation/src/Http/Router/BroadcastRouter.php":
+        "kernel-adjacent route registrar wired from HttpKernel",
+    "foundation/src/Http/Router/CodifiedContextApiRouter.php":
+        "kernel-adjacent route registrar wired from HttpKernel",
+    "foundation/src/Http/Router/EntityTypeLifecycleRouter.php":
+        "kernel-adjacent route registrar wired from HttpKernel",
+    "foundation/src/Http/Router/JsonApiRouter.php":
+        "kernel-adjacent route registrar wired from HttpKernel",
+    "foundation/src/Http/Router/McpRouter.php":
+        "kernel-adjacent route registrar wired from HttpKernel",
+    "foundation/src/Http/Router/SchemaRouter.php":
+        "kernel-adjacent route registrar wired from HttpKernel",
+    "foundation/src/Http/Router/SearchRouter.php":
+        "kernel-adjacent route registrar wired from HttpKernel",
+    "foundation/src/Http/Router/WaaseyaaContext.php":
+        "kernel-adjacent route registrar wired from HttpKernel",
+
+    # cache — event listeners wired by ServiceProvider; subscribe to higher-layer events.
+    "cache/src/Listener/ConfigCacheInvalidator.php":
+        "event listener; subscribes to L1 config events for cache invalidation",
+    "cache/src/Listener/EntityCacheInvalidator.php":
+        "event listener; subscribes to L1 entity events for cache invalidation",
+    "cache/src/Listener/EntityCacheSubscriber.php":
+        "event listener; subscribes to L1 entity events for cache invalidation",
+
+    # cache — kernel-resolved cache key derivation; consumes AccountInterface.
+    "cache/src/CacheConfigResolver.php":
+        "kernel-resolved cache config; consumes AccountInterface for cache-key derivation",
+}
+
 
 def short_from_package_name(name: str) -> str | None:
     m = WAASEYAA_NAME.match(name.strip())
     return m.group(1).lower() if m else None
 
+
+def is_kernel_exempt(rel_to_packages: str) -> bool:
+    """Return True if a file (path relative to packages/) is kernel-exempt."""
+    norm = "/" + rel_to_packages
+    if any(suffix in norm for suffix in KERNEL_EXEMPT_DIR_SUFFIXES):
+        return True
+    if rel_to_packages in KERNEL_EXEMPT_FILES:
+        return True
+    return False
+
+
+# ---------------------------------------------------------------------------
+# Namespace → package short mapping for PHP `use` import scanning.
+# Keep aligned with PSR-4 prefixes declared in each package's composer.json.
+# ---------------------------------------------------------------------------
+
+NS_PREFIX_TO_SHORT = {
+    "Foundation": "foundation",
+    "Cache": "cache",
+    "Plugin": "plugin",
+    "TypedData": "typed-data",
+    "Database": "database-legacy",
+    "I18n": "i18n",
+    "Queue": "queue",
+    "Scheduler": "scheduler",
+    "State": "state",
+    "Validation": "validation",
+    "Mail": "mail",
+    "HttpClient": "http-client",
+    "Ingestion": "ingestion",
+    "ErrorHandler": "error-handler",
+    "Geo": "geo",
+    "Mercure": "mercure",
+    "Analytics": "analytics",
+    "OAuthProvider": "oauth-provider",
+    "Entity": "entity",
+    "EntityStorage": "entity-storage",
+    "Access": "access",
+    "User": "user",
+    "Config": "config",
+    "Field": "field",
+    "Auth": "auth",
+    "Testing": "testing",
+    "Oidc": "oidc",
+    "Node": "node",
+    "Taxonomy": "taxonomy",
+    "Media": "media",
+    "Path": "path",
+    "Menu": "menu",
+    "Note": "note",
+    "Relationship": "relationship",
+    "Groups": "groups",
+    "Engagement": "engagement",
+    "Messaging": "messaging",
+    "Workflows": "workflows",
+    "Search": "search",
+    "Seo": "seo",
+    "Notification": "notification",
+    "Billing": "billing",
+    "Github": "github",
+    "Northcloud": "northcloud",
+    "Api": "api",
+    "Routing": "routing",
+    "Bimaaji": "bimaaji",
+    # AI sub-namespaces are disambiguated via the second segment below.
+    "Cli": "cli",
+    "Admin": "admin",
+    "AdminSurface": "admin-surface",
+    "Graphql": "graphql",
+    "Mcp": "mcp",
+    "Ssr": "ssr",
+    "Genealogy": "genealogy",
+    "Telescope": "telescope",
+    "Deployer": "deployer",
+    "Inertia": "inertia",
+    "Debug": "debug",
+}
+
+AI_SUB_TO_SHORT = {
+    "Schema": "ai-schema",
+    "Agent": "ai-agent",
+    "Pipeline": "ai-pipeline",
+    "Vector": "ai-vector",
+    "Observability": "ai-observability",
+}
+
+USE_RE = re.compile(
+    r"^\s*use(?:\s+function|\s+const)?\s+Waaseyaa\\([A-Z][A-Za-z0-9]*)(?:\\([A-Z][A-Za-z0-9]*))?",
+    re.M,
+)
+
+
+def short_for_namespace(first: str, second: str | None) -> str | None:
+    if first == "AI":
+        return AI_SUB_TO_SHORT.get(second or "")
+    return NS_PREFIX_TO_SHORT.get(first)
+
+
+def scan_php_imports(pkg_dir: pathlib.Path, self_layer: int) -> list[tuple[str, str, int]]:
+    """Return list of (relative_path, dep_short, dep_layer) for cross-layer file-level imports."""
+    findings: list[tuple[str, str, int]] = []
+    src = pkg_dir / "src"
+    if not src.is_dir():
+        return findings
+    for php in src.rglob("*.php"):
+        rel = str(php.relative_to(root / "packages"))
+        if is_kernel_exempt(rel):
+            continue
+        try:
+            text = php.read_text(errors="replace")
+        except OSError:
+            continue
+        seen: set[str] = set()
+        for m in USE_RE.finditer(text):
+            short = short_for_namespace(m.group(1), m.group(2))
+            if short is None or short not in LAYER_BY_SHORT:
+                continue
+            if short in seen:
+                continue
+            seen.add(short)
+            dep_layer = LAYER_BY_SHORT[short]
+            if dep_layer > self_layer:
+                findings.append((rel, short, dep_layer))
+    return findings
+
+
+# ---------------------------------------------------------------------------
+# Run checks.
+# ---------------------------------------------------------------------------
 
 errors = 0
 packages_dir = root / "packages"
@@ -136,6 +327,7 @@ for pkg_dir in sorted(packages_dir.iterdir()):
 
     layer_self = LAYER_BY_SHORT[short]
 
+    # ----- composer.json runtime require edges -----
     # Runtime edges only: require-dev frequently pulls higher-layer packages for
     # PHPUnit fixtures (e.g. media -> api). Composer policy still applies to dev.
     for sec in ("require",):
@@ -161,9 +353,19 @@ for pkg_dir in sorted(packages_dir.iterdir()):
                     f"See CLAUDE.md Layer Architecture and GitHub #315/#316."
                 )
 
+    # ----- PHP file-level `use` imports -----
+    for rel, dep_short, dep_layer in scan_php_imports(pkg_dir, layer_self):
+        errors += 1
+        print(
+            f"FAIL [PL005] packages/{rel}: file-level layer violation — "
+            f"{short} (layer {layer_self}) imports waaseyaa/{dep_short} (layer {dep_layer}). "
+            f"If this file is kernel-adjacent, move it under {short}/src/Kernel/ or add an "
+            f"entry to KERNEL_EXEMPT_FILES in bin/check-package-layers with a one-line rationale."
+        )
+
 if errors:
     print(f"\nPackage layer check failed with {errors} error(s).", file=sys.stderr)
     sys.exit(1)
 
-print("OK — package layer constraints (waaseyaa/* in require) satisfied.")
+print("OK — package layer constraints (composer.json + PHP file-level) satisfied.")
 PY

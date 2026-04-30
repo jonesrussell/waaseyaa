@@ -7,6 +7,7 @@
 <!-- Spec reviewed 2026-04-24 - packages/http-client StreamHttpClient; packages/inertia InertiaServiceProvider (PHPStan-only); packages/queue timestamped migrations + CreateQueueTables DDL (waaseyaa_queue_jobs / waaseyaa_failed_jobs) -->
 <!-- Spec reviewed 2026-04-24 - Layer 0 env variable contract subsection (APP_ENV, APP_DEBUG, WAASEYAA_DB, WAASEYAA_CONFIG_DIR, .env/EnvLoader) + assert/IO review note after boot guard -->
 <!-- Spec reviewed 2026-04-22 - PackageManifest: removed persisted commands/routes (ADR docs/adr/0001); legacy extra.waaseyaa.commands|routes log warning only; fromArray strips legacy cache keys; mergeRootWaaseyaa merges providers+permissions only; attributeEntityTypes; ProviderRegistry entity_auto_register; ServiceProvider::mergeChildProvider; BuiltinRouteRegistrar: MCP route owned by mcp package only, sortRoutesByPriority after provider routes; MigrationLoader InstalledVersions; queue/notification/scheduler extra.waaseyaa.migrations -->
+<!-- Spec reviewed 2026-04-30 - layer-graph file-level scan + named-file kernel exemption surface (mission #824 WP02 surface C) -->
 <!-- Spec reviewed 2026-04-22 - require-dev layer audit script + CI integration (warn-only), plus composer layer graph docs -->
 <!-- Spec reviewed 2026-04-21 - Composer layer graph (bin/check-package-layers), HTTP JSON-first error surface, database-legacy ADR 007 cross-link -->
 <!-- Spec reviewed 2026-04-05 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation; SsrResponse removed, all controllers return Symfony Response/JsonResponse; ControllerDispatcher now delegates to DomainRouterInterface chain; both callable and router dispatch paths wrapped in try-catch returning 500 JSON:API errors; MediaRouter file move wrapped in try-catch; ViteAssetManager gained assetTags() method with devServerUrl constructor param for dev mode support; ControllerDispatcher uses Inertia::getRenderer() instead of hardcoded new RootTemplateRenderer(); RootTemplateRenderer accepts optional ViteAssetManager and injects Vite asset tags in default template; InertiaServiceProvider auto-configures renderer with ViteAssetManager for zero-config Inertia SPA support; AppControllerRouter added to dispatch Class::method controllers from ServiceProvider::routes() — delegates to SsrPageHandler::dispatchAppController, wired after SsrRouter in HttpKernel router chain (#1119); AppControllerRouter handle() relies on dispatchAppController's typed array shape contract (no runtime defensive casts); MediaRouter mkdir warning suppressed via @-prefix double-check idiom so a non-directory ancestor produces a clean 500 from the move catch block instead of a PHP warning under --fail-on-warning -->
@@ -84,6 +85,21 @@ Infrastructure-layer split packages that ship as Packagist libraries are expecte
 ### Composer layer graph
 
 The monorepo enforces the seven-layer rule from `CLAUDE.md` on **runtime** Composer edges: `bin/check-package-layers` walks `packages/*/composer.json` and fails if any `require` entry `waaseyaa/*` targets a package **strictly above** the declaring package’s layer. Metapackages (`cms`, `core`, `full`) are skipped. `require-dev` remains non-fatal; use `bin/audit-require-dev-layers` for a warn-only report that surfaces upward dev-only edges without blocking merges. The canonical short-name → layer map lives in `bin/check-package-layers`; when you add a new first-party package, extend the map and the Layer Architecture table in `CLAUDE.md` together. This supersedes ad-hoc checks for historical issues such as foundation → path or validation → entity at the manifest level.
+
+The same script also scans every package's `src/**/*.php` for `use Waaseyaa\X\…` imports and fails on any import whose target package sits **above** the importing package's layer. This catches cross-layer leaks that don't show up in `composer.json` (e.g. a Foundation listener referencing an L1 entity event class without declaring an upward `require`). Diagnostics are emitted as `FAIL [PL005]` and name the offending file, the importing package's layer, and the imported package's layer.
+
+### Kernel exemption surface (named files)
+
+Some bootstrapper code intentionally sees across layers — kernels wire entity-type managers, route registrars register controllers from any layer, cache invalidators subscribe to events from higher layers. Two complementary exemption tiers in `bin/check-package-layers` codify this:
+
+| Tier | Mechanism | Use for |
+|------|-----------|---------|
+| Implicit | `KERNEL_EXEMPT_DIR_SUFFIXES` (currently `/src/Kernel/`) | Files inside `<pkg>/src/Kernel/` — the canonical kernel/bootstrapper boundary documented in `CLAUDE.md` "Layer Architecture > Exemption" |
+| Explicit | `KERNEL_EXEMPT_FILES` (path → rationale) | Kernel-adjacent files that must live outside `Kernel/` (route registrars wired only from `HttpKernel`, diagnostics wired only from `ConsoleKernel`, listeners wired only from a `ServiceProvider`) |
+
+Each `KERNEL_EXEMPT_FILES` entry carries a one-line rationale string so future readers can audit whether the exemption is still load-bearing. To land a new kernel-adjacent file, either move it under `<pkg>/src/Kernel/` (preferred — the Composer-graph picture stays clean) or add an explicit named entry; the gate refuses to merge an unjustified cross-layer leak.
+
+The named-file surface was added in mission #824 WP02 surface C and is the prerequisite for mission #1257 K6(c) (`HealthChecker` codified as kernel-adjacent rather than relocated).
 
 ### ServiceProvider kernel-services bus
 
