@@ -37,18 +37,6 @@ abstract class ServiceProvider implements ServiceProviderInterface
     public function routes(\Waaseyaa\Routing\WaaseyaaRouter $router, \Waaseyaa\Entity\EntityTypeManager $entityTypeManager): void {}
 
     /**
-     * Return HTTP middleware instances to register with the kernel pipeline.
-     *
-     * Use #[AsMiddleware] on each class to set pipeline and priority.
-     *
-     * @return list<\Waaseyaa\Foundation\Middleware\HttpMiddlewareInterface>
-     */
-    public function middleware(\Waaseyaa\Entity\EntityTypeManager $entityTypeManager): array
-    {
-        return [];
-    }
-
-    /**
      * Contribute domain routers after foundation built-ins up to MCP and before BroadcastRouter.
      *
      * @return iterable<DomainRouterInterface>

@@ -34,6 +34,7 @@ use Waaseyaa\Foundation\Middleware\DebugHeaderMiddleware;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
 use Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
 use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\User\DevAdminAccount;
@@ -316,6 +317,9 @@ final class HttpKernel extends AbstractKernel
         }
 
         foreach ($this->providers as $provider) {
+            if (!$provider instanceof HasMiddlewareInterface) {
+                continue;
+            }
             foreach ($provider->middleware($this->entityTypeManager) as $mw) {
                 $middlewares[] = $mw;
             }

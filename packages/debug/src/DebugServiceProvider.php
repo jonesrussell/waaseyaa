@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Waaseyaa\Debug;
 
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
-final class DebugServiceProvider extends ServiceProvider
+final class DebugServiceProvider extends ServiceProvider implements HasMiddlewareInterface
 {
     public function register(): void {}
 

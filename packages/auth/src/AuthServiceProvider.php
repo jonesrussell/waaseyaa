@@ -6,9 +6,10 @@ namespace Waaseyaa\Auth;
 
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Middleware\HttpMiddlewareInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
-final class AuthServiceProvider extends ServiceProvider
+final class AuthServiceProvider extends ServiceProvider implements HasMiddlewareInterface
 {
     public function register(): void
     {
