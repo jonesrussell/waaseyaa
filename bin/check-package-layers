@@ -77,8 +77,9 @@ LAYER_BY_SHORT = {
     "ai-vector": 5,
     "ai-observability": 5,
     # 6 — Interfaces
+    # Note: packages/admin/ is a Nuxt SPA (no composer.json, no PHP source) —
+    # not part of the PHP layer graph. Its PHP host extension is waaseyaa/admin-surface.
     "cli": 6,
-    "admin": 6,
     "admin-surface": 6,
     "graphql": 6,
     "mcp": 6,

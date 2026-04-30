@@ -1,7 +1,7 @@
 # Waaseyaa
 
 ## Project Structure
-- Monorepo: 54 PHP packages in `packages/`, 3 meta-packages (core, cms, full), 1 JS admin SPA
+- Monorepo: 62 PHP packages in `packages/`, 3 meta-packages (core, cms, full), 1 JS admin SPA (`packages/admin/`, no composer.json)
 - 7-layer architecture (Foundation → Core Data → Content Types → Services → API → AI → Interfaces)
 - Each package has its own `composer.json` with path repository references
 - Root `composer.json` uses `@dev` constraints for all waaseyaa/* packages
@@ -74,7 +74,7 @@ When the mapping is not obvious, search under `docs/specs/` (e.g. `rg -n "TopicO
 | 3 | Services | workflows, search, seo, notification, billing, github, northcloud |
 | 4 | API | api, bimaaji, routing |
 | 5 | AI | ai-agent, ai-observability, ai-pipeline, ai-schema, ai-vector |
-| 6 | Interfaces | cli, admin, admin-surface, graphql, mcp, ssr, genealogy, telescope, deployer, inertia, debug |
+| 6 | Interfaces | cli, admin-surface, graphql, mcp, ssr, genealogy, telescope, deployer, inertia, debug |
 
 **Rule:** Packages can only import from their own layer or lower. Upward communication via DomainEvents.
 

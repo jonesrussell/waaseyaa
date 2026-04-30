@@ -86,6 +86,8 @@ Infrastructure-layer split packages that ship as Packagist libraries are expecte
 
 The monorepo enforces the seven-layer rule from `CLAUDE.md` on **runtime** Composer edges: `bin/check-package-layers` walks `packages/*/composer.json` and fails if any `require` entry `waaseyaa/*` targets a package **strictly above** the declaring package’s layer. Metapackages (`cms`, `core`, `full`) are skipped. `require-dev` remains non-fatal; use `bin/audit-require-dev-layers` for a warn-only report that surfaces upward dev-only edges without blocking merges. The canonical short-name → layer map lives in `bin/check-package-layers`; when you add a new first-party package, extend the map and the Layer Architecture table in `CLAUDE.md` together. This supersedes ad-hoc checks for historical issues such as foundation → path or validation → entity at the manifest level.
 
+The PHP layer graph covers the **62 PHP packages** under `packages/` plus the three metapackages (`cms`, `core`, `full`, all skipped). `packages/admin/` is a Nuxt SPA (no `composer.json`, zero PHP source) and is not part of the PHP layer hierarchy; its PHP host extension is `waaseyaa/admin-surface`, which is what L6 actually means here.
+
 The same script also scans every package's `src/**/*.php` for `use Waaseyaa\X\…` imports and fails on any import whose target package sits **above** the importing package's layer. This catches cross-layer leaks that don't show up in `composer.json` (e.g. a Foundation listener referencing an L1 entity event class without declaring an upward `require`). Diagnostics are emitted as `FAIL [PL005]` and name the offending file, the importing package's layer, and the imported package's layer.
 
 ### Kernel exemption surface (named files)
