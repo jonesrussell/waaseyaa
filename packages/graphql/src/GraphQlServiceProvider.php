@@ -6,6 +6,7 @@ namespace Waaseyaa\GraphQL;
 
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\GraphQL\Http\Router\GraphQlRouter;
 use Waaseyaa\Routing\WaaseyaaRouter;
@@ -18,6 +19,9 @@ final class GraphQlServiceProvider extends ServiceProvider
     {
         $gqlOverrides = [];
         foreach ($httpKernel->getProviders() as $provider) {
+            if (!$provider instanceof HasGraphqlMutationOverridesInterface) {
+                continue;
+            }
             foreach ($provider->graphqlMutationOverrides($httpKernel->getEntityTypeManager()) as $name => $override) {
                 $gqlOverrides[$name] = $override;
             }

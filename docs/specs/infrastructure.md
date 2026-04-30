@@ -35,6 +35,7 @@
 
 <!-- Spec reviewed 2026-04-20 - ServiceProvider now preserves entity-type registrant provenance and ProviderRegistry rethrows entity-type collision exceptions after logging so duplicate canonical registrations fail boot deterministically (#1313) -->
 <!-- Spec reviewed 2026-04-30 - ServiceProvider extension-hook enumeration: 10 interface methods, 6 abstract-base capability-split candidates, 1 capability interface (LanguagePathStripperInterface); lockstep enforced by ServiceProviderContractTest (mission #824 WP03 surface C) -->
+<!-- Spec reviewed 2026-04-30b - ServiceProvider capability split: graphqlMutationOverrides lifted from abstract base into HasGraphqlMutationOverridesInterface; GraphQlServiceProvider guards the call with instanceof; tier 2 down to 5 candidates, tier 3 up to 2 (mission #824 WP03 surface D) -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -132,13 +133,13 @@ Every `Waaseyaa\Foundation\ServiceProvider\ServiceProvider` exposes a fixed set 
 | `httpDomainRouters(HttpKernel): iterable<DomainRouterInterface>` | `HttpKernel::buildDomainRouterChain()` | Domain routers merged after foundation built-ins through `McpRouter` and before `BroadcastRouter`. |
 | `registerRenderCacheListeners(EventDispatcherInterface, ?CacheBackendInterface): void` | `HttpKernel::finalizeBoot()` | Render-cache entity listeners. |
 | `configureHttpKernel(HttpKernel): void` | `HttpKernel::finalizeBoot()` | Late HTTP wiring after database caches exist (e.g. `SsrPageHandler` construction). |
-| `graphqlMutationOverrides(EntityTypeManager): array<string, array{args?, resolve?}>` | `Waaseyaa\GraphQL\GraphQlEndpoint` | GraphQL mutation argument/resolver overrides. |
 
-**Tier 3 — capability interfaces (`instanceof`-guarded).** A provider opts in by implementing the named interface; the kernel checks `instanceof` before calling. The contract test's `CAPABILITY_INTERFACES` allowlist names which method belongs to which interface.
+**Tier 3 — capability interfaces (`instanceof`-guarded).** A provider opts in by implementing the named interface; the call site (kernel for foundation-owned hooks, the owning subsystem's bootstrap for cross-package hooks) checks `instanceof` before calling. The contract test's `CAPABILITY_INTERFACES` allowlist names which method belongs to which interface.
 
 | Method | Capability interface | Caller |
 |--------|---------------------|--------|
 | `stripLanguagePrefixForRouting(string): string` | `Waaseyaa\Foundation\Http\LanguagePathStripperInterface` | `HttpKernel::stripLanguagePrefixForHttpRouting()` |
+| `graphqlMutationOverrides(EntityTypeManager): array<string, array{args?, resolve?}>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface` | `Waaseyaa\GraphQL\GraphQlServiceProvider::httpDomainRouters()` |
 
 ### ServiceProvider kernel-services bus
 

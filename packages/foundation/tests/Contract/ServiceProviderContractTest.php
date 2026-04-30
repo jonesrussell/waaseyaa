@@ -15,6 +15,7 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use SplFileInfo;
 use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProviderInterface;
 
@@ -57,7 +58,6 @@ final class ServiceProviderContractTest extends TestCase
      */
     private const array ABSTRACT_BASE_ONLY = [
         'commands',
-        'graphqlMutationOverrides',
         'middleware',
         'httpDomainRouters',
         'registerRenderCacheListeners',
@@ -67,12 +67,14 @@ final class ServiceProviderContractTest extends TestCase
     /**
      * Provider methods invoked only after an `instanceof` guard against a
      * named capability interface. Each entry maps a method name to the
-     * capability interface that gates it at the kernel call site.
+     * capability interface that gates it at the call site (kernel or, for
+     * cross-package hooks like GraphQL, the owning subsystem's bootstrap).
      *
      * @var array<string, class-string>
      */
     private const array CAPABILITY_INTERFACES = [
         'stripLanguagePrefixForRouting' => LanguagePathStripperInterface::class,
+        'graphqlMutationOverrides' => HasGraphqlMutationOverridesInterface::class,
     ];
 
     #[Test]

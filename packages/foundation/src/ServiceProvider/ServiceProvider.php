@@ -52,19 +52,6 @@ abstract class ServiceProvider implements ServiceProviderInterface
     }
 
     /**
-     * Return GraphQL mutation overrides.
-     *
-     * Each key is a mutation name (e.g. 'updateScheduleEntry').
-     * Each value has optional 'args' (merged with defaults) and 'resolve' (replaces default).
-     *
-     * @return array<string, array{args?: array<string, mixed>, resolve?: callable}>
-     */
-    public function graphqlMutationOverrides(\Waaseyaa\Entity\EntityTypeManager $entityTypeManager): array
-    {
-        return [];
-    }
-
-    /**
      * Return HTTP middleware instances to register with the kernel pipeline.
      *
      * Use #[AsMiddleware] on each class to set pipeline and priority.
