@@ -7,7 +7,7 @@ WP01 was the decomposition phase (output: `decomposition.md`). WP02-WP09 each to
 | WP | Slug | Surface | Member issues | Status |
 |----|------|---------|---------------|--------|
 | WP01 | decomposition | n/a | n/a (this work) | done |
-| WP02 | layer-graph-and-manifest-authority | S1 | #824 #825 #827 #828 #829 #830 #831 #847 (8) | unscheduled |
+| WP02 | layer-graph-and-manifest-authority | S1 | #824 #825 #827 #828 #829 #830 #831 #847 (8) | done (surfaces A–F: 51d5a1503, afc058de2, a07d80f4f, 860076faf, ba380b469, f41b54d64) |
 | WP03 | service-provider-extension-contract | S2 | #833 #838 #843 (3) | unscheduled |
 | WP04 | entity-type-manager-public-surface | S3 | #835 #836 #837 (3) | unscheduled |
 | WP05 | access-checker-placement-and-paired-nullable | S4 | #832 #834 #844 (3) | unscheduled |
