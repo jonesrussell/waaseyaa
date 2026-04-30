@@ -85,6 +85,33 @@ Infrastructure-layer split packages that ship as Packagist libraries are expecte
 
 The monorepo enforces the seven-layer rule from `CLAUDE.md` on **runtime** Composer edges: `bin/check-package-layers` walks `packages/*/composer.json` and fails if any `require` entry `waaseyaa/*` targets a package **strictly above** the declaring package’s layer. Metapackages (`cms`, `core`, `full`) are skipped. `require-dev` remains non-fatal; use `bin/audit-require-dev-layers` for a warn-only report that surfaces upward dev-only edges without blocking merges. The canonical short-name → layer map lives in `bin/check-package-layers`; when you add a new first-party package, extend the map and the Layer Architecture table in `CLAUDE.md` together. This supersedes ad-hoc checks for historical issues such as foundation → path or validation → entity at the manifest level.
 
+### ServiceProvider kernel-services bus
+
+Service providers receive a typed bus of kernel-owned services through `Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface` (Contract A from mission #824 WP02). The interface declares a single method:
+
+```php
+public function get(string $abstract): ?object;
+```
+
+`KernelServicesInterface` replaces the legacy `\Closure(string): ?object` field that providers previously received via `setKernelResolver()`. The named contract makes the kernel surface explicit, restores PHPStan-visible types at the call boundary, and gives test doubles a stable seam.
+
+**Wiring.** `ProviderRegistry` constructs one `ProviderRegistryKernelServices` instance per registration pass and hands it to every discovered provider via `ServiceProvider::setKernelServices()`. The default implementation resolves these abstracts:
+
+| Abstract | Resolves to |
+|----------|-------------|
+| `Waaseyaa\Entity\EntityTypeManager` | The kernel’s entity-type manager |
+| `Waaseyaa\Database\DatabaseInterface` | The kernel’s `DBALDatabase` |
+| `Symfony\Contracts\EventDispatcher\EventDispatcherInterface` | The kernel’s event dispatcher |
+| `Waaseyaa\Foundation\Log\LoggerInterface` | The kernel’s logger |
+| `\PDO` | The native PDO connection beneath `DBALDatabase` |
+| anything else | The first sibling provider whose `getBindings()` declares the abstract, or `null` |
+
+The provider list is read through a closure accessor so resolution sees the live registration state — necessary when a provider’s `register()` resolves a binding declared by a sibling registered earlier in the same pass.
+
+**Resolution order in `ServiceProvider::resolve()`.** Local bindings (`singleton`/`bind`) win first; only when the abstract is unbound locally does the provider delegate to `KernelServicesInterface::get()`; if that returns `null`, the provider throws `RuntimeException("No binding registered for {$abstract}.")`.
+
+**Propagation through `mergeChildProvider()`.** When a stack provider merges a child via `mergeChildProvider()`, the child receives the same `KernelServicesInterface` instance so `resolve()` keeps working inside the child’s `register()`.
+
 ### HTTP error surface (JSON-first)
 
 Machine clients (Admin SPA, MCP, curl scripts) should assume **JSON:API-shaped errors** unless they explicitly negotiated HTML.

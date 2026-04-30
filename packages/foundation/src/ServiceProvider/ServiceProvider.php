@@ -30,8 +30,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
     /** @var list<array{entityType: \Waaseyaa\Entity\EntityTypeInterface, registrant: class-string}> */
     private array $entityTypeRegistrations = [];
 
-    /** @var (\Closure(string): ?object)|null */
-    protected ?\Closure $kernelResolver = null;
+    protected ?KernelServicesInterface $kernelServices = null;
 
     abstract public function register(): void;
 
@@ -125,13 +124,12 @@ abstract class ServiceProvider implements ServiceProviderInterface
     }
 
     /**
-     * Set a fallback resolver for kernel-level services (e.g. EntityTypeManager).
-     *
-     * @param \Closure(string): ?object $resolver
+     * Provide the typed kernel-services bus that backs {@see resolve()} fallbacks
+     * for abstracts the provider has not bound locally.
      */
-    public function setKernelResolver(\Closure $resolver): void
+    public function setKernelServices(KernelServicesInterface $services): void
     {
-        $this->kernelResolver = $resolver;
+        $this->kernelServices = $services;
     }
 
     /**
@@ -142,8 +140,8 @@ abstract class ServiceProvider implements ServiceProviderInterface
     final protected function mergeChildProvider(ServiceProvider $child): void
     {
         $child->setKernelContext($this->projectRoot, $this->config, $this->manifestFormatters);
-        if ($this->kernelResolver !== null) {
-            $child->setKernelResolver($this->kernelResolver);
+        if ($this->kernelServices !== null) {
+            $child->setKernelServices($this->kernelServices);
         }
         $child->register();
         foreach ($child->getBindings() as $abstract => $binding) {
@@ -185,8 +183,8 @@ abstract class ServiceProvider implements ServiceProviderInterface
         }
 
         if (!isset($this->bindings[$abstract])) {
-            if ($this->kernelResolver !== null) {
-                $resolved = ($this->kernelResolver)($abstract);
+            if ($this->kernelServices !== null) {
+                $resolved = $this->kernelServices->get($abstract);
                 if ($resolved !== null) {
                     return $resolved;
                 }

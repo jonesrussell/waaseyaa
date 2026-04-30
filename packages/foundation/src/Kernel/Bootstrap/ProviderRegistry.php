@@ -37,6 +37,14 @@ final class ProviderRegistry
     ): array {
         $this->providers = [];
 
+        $kernelServices = new ProviderRegistryKernelServices(
+            entityTypeManager: $entityTypeManager,
+            database: $database,
+            dispatcher: $dispatcher,
+            logger: $this->logger,
+            providersAccessor: fn(): array => $this->providers,
+        );
+
         foreach ($manifest->providers as $providerClass) {
             if (!class_exists($providerClass)) {
                 $this->logger->warning(sprintf(
@@ -54,33 +62,7 @@ final class ProviderRegistry
             }
 
             $provider->setKernelContext($projectRoot, $config, $manifest->formatters);
-            $provider->setKernelResolver(function (string $className) use ($entityTypeManager, $database, $dispatcher): ?object {
-                if ($className === \Waaseyaa\Entity\EntityTypeManager::class) {
-                    return $entityTypeManager;
-                }
-                if ($className === \Waaseyaa\Database\DatabaseInterface::class) {
-                    return $database;
-                }
-                if ($className === \Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class) {
-                    return $dispatcher;
-                }
-                if ($className === \Waaseyaa\Foundation\Log\LoggerInterface::class) {
-                    return $this->logger;
-                }
-                if ($className === \PDO::class) {
-                    assert($database instanceof \Waaseyaa\Database\DBALDatabase);
-                    $pdo = $database->getConnection()->getNativeConnection();
-                    assert($pdo instanceof \PDO);
-                    return $pdo;
-                }
-                foreach ($this->providers as $other) {
-                    if (isset($other->getBindings()[$className])) {
-                        return $other->resolve($className);
-                    }
-                }
-
-                return null;
-            });
+            $provider->setKernelServices($kernelServices);
 
             $this->providers[] = $provider;
         }

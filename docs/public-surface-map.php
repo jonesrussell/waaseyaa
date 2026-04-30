@@ -26,6 +26,7 @@ return [
     'Waaseyaa\Foundation\Schema\SchemaRegistryInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\ServiceProviderInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\ServiceProvider' => 'public',
+    'Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface' => 'public',
     'Waaseyaa\Foundation\Event\DomainEvent' => 'public',
     'Waaseyaa\Foundation\Ingestion\IngestionErrorCode' => 'public',
     'Waaseyaa\Foundation\Exception\WaaseyaaException' => 'public',

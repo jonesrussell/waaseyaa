@@ -7,6 +7,7 @@ namespace Waaseyaa\Foundation\Tests\Unit\ServiceProvider;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
 #[CoversClass(ServiceProvider::class)]
@@ -114,7 +115,7 @@ final class ServiceProviderResolveTest extends TestCase
     }
 
     #[Test]
-    public function resolve_falls_back_to_kernel_resolver_for_unbound_service(): void
+    public function resolve_falls_back_to_kernel_services_for_unbound_service(): void
     {
         $kernelService = new \stdClass();
         $kernelService->origin = 'kernel';
@@ -123,8 +124,13 @@ final class ServiceProviderResolveTest extends TestCase
             public function register(): void {}
         };
         $provider->register();
-        $provider->setKernelResolver(function (string $className) use ($kernelService): ?object {
-            return $className === \stdClass::class ? $kernelService : null;
+        $provider->setKernelServices(new class ($kernelService) implements KernelServicesInterface {
+            public function __construct(private readonly \stdClass $kernelService) {}
+
+            public function get(string $abstract): ?object
+            {
+                return $abstract === \stdClass::class ? $this->kernelService : null;
+            }
         });
 
         $resolved = $provider->resolve(\stdClass::class);
@@ -132,13 +138,18 @@ final class ServiceProviderResolveTest extends TestCase
     }
 
     #[Test]
-    public function resolve_throws_when_kernel_resolver_also_returns_null(): void
+    public function resolve_throws_when_kernel_services_also_returns_null(): void
     {
         $provider = new class extends ServiceProvider {
             public function register(): void {}
         };
         $provider->register();
-        $provider->setKernelResolver(fn(string $className): ?object => null);
+        $provider->setKernelServices(new class implements KernelServicesInterface {
+            public function get(string $abstract): ?object
+            {
+                return null;
+            }
+        });
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('No binding registered for');
