@@ -97,12 +97,8 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
      * If an app provides its own host via a higher-priority provider,
      * it should call registerRoutes() directly and skip this provider.
      */
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
-        if ($entityTypeManager === null) {
-            return;
-        }
-
         $host = new GenericAdminSurfaceHost(
             entityTypeManager: $entityTypeManager,
             accessHandler: $this->discoverAccessHandler(),

@@ -54,7 +54,7 @@ final class GenealogyServiceProvider extends ServiceProvider
         );
     }
 
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
         $router->addRoute(
             'genealogy.landing',

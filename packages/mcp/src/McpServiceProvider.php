@@ -12,7 +12,7 @@ final class McpServiceProvider extends ServiceProvider
 {
     public function register(): void {}
 
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
         (new McpRouteProvider())->registerRoutes($router);
     }

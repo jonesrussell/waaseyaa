@@ -11,12 +11,8 @@ use Waaseyaa\Media\Http\Router\MediaRouter;
 
 final class MediaServiceProvider extends ServiceProvider
 {
-    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
+    public function httpDomainRouters(HttpKernel $httpKernel): iterable
     {
-        if ($httpKernel === null) {
-            return [];
-        }
-
         return [
             new MediaRouter($httpKernel->getProjectRoot(), $httpKernel->getConfig()),
         ];

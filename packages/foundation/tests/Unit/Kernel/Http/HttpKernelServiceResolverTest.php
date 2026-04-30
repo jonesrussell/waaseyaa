@@ -143,12 +143,20 @@ final class HttpKernelServiceResolverTest extends TestCase
                 return $this->bindingsMap;
             }
 
-            public function resolve(string $abstract): mixed
+            public function resolve(string $abstract): object
             {
                 if ($this->resolveCallback !== null) {
-                    return ($this->resolveCallback)($abstract);
+                    $result = ($this->resolveCallback)($abstract);
+                    if (!is_object($result)) {
+                        throw new \RuntimeException("resolveCallback for {$abstract} did not produce an object");
+                    }
+                    return $result;
                 }
-                return $this->bindingsMap[$abstract] ?? null;
+                $value = $this->bindingsMap[$abstract] ?? null;
+                if (!is_object($value)) {
+                    throw new \RuntimeException("No binding registered for {$abstract}.");
+                }
+                return $value;
             }
         };
     }

@@ -12,6 +12,7 @@ use Waaseyaa\Api\Http\DiscoveryApiHandler;
 use Waaseyaa\Cache\CacheConfigResolver;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Foundation\Kernel\HttpKernel;
 use Waaseyaa\SSR\Http\Router\AppControllerRouter;
 use Waaseyaa\SSR\Http\Router\SsrRouter;
 use Waaseyaa\SSR\SsrPageHandler;
@@ -24,7 +25,8 @@ final class SsrServiceProviderHttpRoutersTest extends TestCase
     public function httpDomainRouters_returns_empty_when_handler_not_configured(): void
     {
         $provider = new SsrServiceProvider();
-        self::assertSame([], iterator_to_array($provider->httpDomainRouters()));
+        $kernel = new HttpKernel('/tmp');
+        self::assertSame([], iterator_to_array($provider->httpDomainRouters($kernel)));
     }
 
     #[Test]
@@ -49,7 +51,8 @@ final class SsrServiceProviderHttpRoutersTest extends TestCase
         $pageHandlerProp->setAccessible(true);
         $pageHandlerProp->setValue($provider, $handler);
 
-        $routers = array_values(iterator_to_array($provider->httpDomainRouters()));
+        $kernel = new HttpKernel('/tmp');
+        $routers = array_values(iterator_to_array($provider->httpDomainRouters($kernel)));
         self::assertCount(2, $routers);
         self::assertInstanceOf(SsrRouter::class, $routers[0]);
         self::assertInstanceOf(AppControllerRouter::class, $routers[1]);

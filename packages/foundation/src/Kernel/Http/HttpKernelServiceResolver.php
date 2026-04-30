@@ -53,7 +53,7 @@ final class HttpKernelServiceResolver implements HttpServiceResolverInterface
                 return null;
             }
 
-            return is_object($resolved) ? $resolved : null;
+            return $resolved;
         }
 
         if ($className === DatabaseInterface::class) {

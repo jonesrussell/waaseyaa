@@ -36,14 +36,4 @@ final class ApiServiceProviderTest extends TestCase
         $this->assertNotNull($routes->get('api.article.show'));
         $this->assertNotNull($routes->get('api.discovery'));
     }
-
-    #[Test]
-    public function does_not_register_routes_without_an_entity_type_manager(): void
-    {
-        $router = new WaaseyaaRouter();
-
-        (new ApiServiceProvider())->routes($router, null);
-
-        $this->assertCount(0, $router->getRouteCollection());
-    }
 }

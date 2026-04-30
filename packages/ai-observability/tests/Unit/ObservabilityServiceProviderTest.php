@@ -21,7 +21,7 @@ final class ObservabilityServiceProviderTest extends TestCase
     public function disabledModeBindsNullTraceRecorder(): void
     {
         $provider = new ObservabilityServiceProvider();
-        $provider->setKernelContext('', ['observability' => ['enabled' => false]]);
+        $provider->setKernelContext('', ['observability' => ['enabled' => false]], []);
         $provider->register();
 
         $recorder = $provider->resolve(TraceRecorderInterface::class);
@@ -33,7 +33,7 @@ final class ObservabilityServiceProviderTest extends TestCase
     public function registersLocalBindingsWithoutKernel(): void
     {
         $provider = new ObservabilityServiceProvider();
-        $provider->setKernelContext('', []);
+        $provider->setKernelContext('', [], []);
         $provider->register();
 
         self::assertInstanceOf(TraceContext::class, $provider->resolve(TraceContext::class));
@@ -45,7 +45,7 @@ final class ObservabilityServiceProviderTest extends TestCase
     public function registersTraceEntityType(): void
     {
         $provider = new ObservabilityServiceProvider();
-        $provider->setKernelContext('', []);
+        $provider->setKernelContext('', [], []);
         $provider->register();
 
         $entityTypes = $provider->getEntityTypes();

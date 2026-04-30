@@ -14,12 +14,8 @@ final class GraphQlServiceProvider extends ServiceProvider
 {
     public function register(): void {}
 
-    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
+    public function httpDomainRouters(HttpKernel $httpKernel): iterable
     {
-        if ($httpKernel === null) {
-            return [];
-        }
-
         $gqlOverrides = [];
         foreach ($httpKernel->getProviders() as $provider) {
             foreach ($provider->graphqlMutationOverrides($httpKernel->getEntityTypeManager()) as $name => $override) {
@@ -36,7 +32,7 @@ final class GraphQlServiceProvider extends ServiceProvider
         ];
     }
 
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
         (new GraphQlRouteProvider())->registerRoutes($router);
     }

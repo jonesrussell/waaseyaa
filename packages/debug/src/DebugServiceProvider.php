@@ -13,7 +13,7 @@ final class DebugServiceProvider extends ServiceProvider
 {
     public function register(): void {}
 
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
         if (!$this->isDebugEnabled()) {
             return;

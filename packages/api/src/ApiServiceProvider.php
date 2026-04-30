@@ -14,12 +14,8 @@ final class ApiServiceProvider extends ServiceProvider
 {
     public function register(): void {}
 
-    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
+    public function httpDomainRouters(HttpKernel $httpKernel): iterable
     {
-        if ($httpKernel === null) {
-            return [];
-        }
-
         return [
             new DiscoveryRouter(
                 $httpKernel->getDiscoveryApiHandler(),
@@ -28,12 +24,8 @@ final class ApiServiceProvider extends ServiceProvider
         ];
     }
 
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
-        if ($entityTypeManager === null) {
-            return;
-        }
-
         (new JsonApiRouteProvider($entityTypeManager))->registerRoutes($router);
     }
 }

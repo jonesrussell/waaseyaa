@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Waaseyaa\Foundation\ServiceProvider;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Waaseyaa\Cache\CacheBackendInterface;
 use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
-use Waaseyaa\Foundation\Kernel\HttpKernel;
 
 abstract class ServiceProvider implements ServiceProviderInterface
 {
@@ -21,7 +21,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
     /** @var array<string, array{concrete: string|callable, shared: bool}> */
     private array $bindings = [];
 
-    /** @var array<string, mixed> */
+    /** @var array<string, object> */
     private array $resolved = [];
 
     /** @var array<string, list<string>> */
@@ -36,7 +36,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
 
     public function boot(): void {}
 
-    public function routes(\Waaseyaa\Routing\WaaseyaaRouter $router, ?\Waaseyaa\Entity\EntityTypeManager $entityTypeManager = null): void {}
+    public function routes(\Waaseyaa\Routing\WaaseyaaRouter $router, \Waaseyaa\Entity\EntityTypeManager $entityTypeManager): void {}
 
     /**
      * Return plugin CLI commands to register with the console application.
@@ -46,7 +46,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
     public function commands(
         \Waaseyaa\Entity\EntityTypeManager $entityTypeManager,
         \Waaseyaa\Database\DatabaseInterface $database,
-        \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher,
+        EventDispatcherInterface $dispatcher,
     ): array {
         return [];
     }
@@ -57,9 +57,6 @@ abstract class ServiceProvider implements ServiceProviderInterface
      * Each key is a mutation name (e.g. 'updateScheduleEntry').
      * Each value has optional 'args' (merged with defaults) and 'resolve' (replaces default).
      *
-     * @return array<string, array{args?: array<string, mixed>, resolve?: callable}>
-     */
-    /**
      * @return array<string, array{args?: array<string, mixed>, resolve?: callable}>
      */
     public function graphqlMutationOverrides(\Waaseyaa\Entity\EntityTypeManager $entityTypeManager): array
@@ -84,21 +81,21 @@ abstract class ServiceProvider implements ServiceProviderInterface
      *
      * @return iterable<DomainRouterInterface>
      */
-    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
+    public function httpDomainRouters(\Waaseyaa\Foundation\Kernel\HttpKernel $httpKernel): iterable
     {
         return [];
     }
 
     /**
-     * Register render-cache entity listeners. The second argument is the render bin backend
-     * from the kernel (CacheBackendInterface); SSR wraps it in RenderCache.
+     * Register render-cache entity listeners. SSR wraps the render-bin backend
+     * in RenderCache when configured.
      */
-    public function registerRenderCacheListeners(EventDispatcherInterface $dispatcher, mixed $renderCacheBackend): void {}
+    public function registerRenderCacheListeners(EventDispatcherInterface $dispatcher, ?CacheBackendInterface $renderCacheBackend): void {}
 
     /**
      * Late HTTP wiring after database caches exist (e.g. SsrPageHandler construction).
      */
-    public function configureHttpKernel(HttpKernel $kernel): void {}
+    public function configureHttpKernel(\Waaseyaa\Foundation\Kernel\HttpKernel $kernel): void {}
 
     public function provides(): array
     {
@@ -116,7 +113,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
      * @param array<string, mixed> $config
      * @param array<string, class-string> $manifestFormatters
      */
-    public function setKernelContext(string $projectRoot, array $config, array $manifestFormatters = []): void
+    public function setKernelContext(string $projectRoot, array $config, array $manifestFormatters): void
     {
         $this->projectRoot = $projectRoot;
         $this->config = $config;
@@ -173,10 +170,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
         $this->tags[$tag][] = $abstract;
     }
 
-    /**
-     * Resolve a binding registered via singleton() or bind().
-     */
-    public function resolve(string $abstract): mixed
+    public function resolve(string $abstract): object
     {
         if (isset($this->resolved[$abstract])) {
             return $this->resolved[$abstract];
@@ -196,6 +190,10 @@ abstract class ServiceProvider implements ServiceProviderInterface
         $concrete = $binding['concrete'];
 
         $instance = is_callable($concrete) ? $concrete() : new $concrete();
+
+        if (!is_object($instance)) {
+            throw new \RuntimeException("Concrete for {$abstract} did not produce an object.");
+        }
 
         if ($binding['shared']) {
             $this->resolved[$abstract] = $instance;

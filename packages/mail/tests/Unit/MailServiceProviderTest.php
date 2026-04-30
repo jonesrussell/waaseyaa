@@ -21,7 +21,7 @@ final class MailServiceProviderTest extends TestCase
     public function register_binds_local_transport_by_default(): void
     {
         $provider = new MailServiceProvider();
-        $provider->setKernelContext('/tmp/test', []);
+        $provider->setKernelContext('/tmp/test', [], []);
         $provider->register();
 
         $bindings = $provider->getBindings();
@@ -33,7 +33,7 @@ final class MailServiceProviderTest extends TestCase
     public function register_binds_array_transport_when_configured(): void
     {
         $provider = new MailServiceProvider();
-        $provider->setKernelContext('/tmp/test', ['mail' => ['transport' => 'array']]);
+        $provider->setKernelContext('/tmp/test', ['mail' => ['transport' => 'array']], []);
         $provider->register();
 
         $bindings = $provider->getBindings();
@@ -45,7 +45,7 @@ final class MailServiceProviderTest extends TestCase
     public function register_binds_mailer_interface(): void
     {
         $provider = new MailServiceProvider();
-        $provider->setKernelContext('/tmp/test', ['mail' => ['transport' => 'array']]);
+        $provider->setKernelContext('/tmp/test', ['mail' => ['transport' => 'array']], []);
         $provider->register();
 
         $bindings = $provider->getBindings();
@@ -56,7 +56,7 @@ final class MailServiceProviderTest extends TestCase
     public function mailer_binding_factory_produces_mailer_instance(): void
     {
         $provider = new MailServiceProvider();
-        $provider->setKernelContext('/tmp/test', ['mail' => ['transport' => 'array', 'from_address' => 'test@example.com']]);
+        $provider->setKernelContext('/tmp/test', ['mail' => ['transport' => 'array', 'from_address' => 'test@example.com']], []);
         $provider->register();
 
         $bindings = $provider->getBindings();
@@ -74,7 +74,7 @@ final class MailServiceProviderTest extends TestCase
                 'sendgrid_api_key' => 'sg-key',
                 'from_address' => 'noreply@example.com',
             ],
-        ]);
+        ], []);
         $provider->register();
 
         $bindings = $provider->getBindings();
