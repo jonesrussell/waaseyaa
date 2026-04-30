@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:45:56+00:00",
+    "generated_at": "2026-04-30T17:02:15+00:00",
     "source": "bin/check-package-layers LAYER_BY_SHORT",
     "layer": 0,
     "packages": {
@@ -344,7 +344,7 @@
             ]
         },
         "foundation": {
-            "file_count": 134,
+            "file_count": 137,
             "symbols": [
                 {
                     "fqcn": "Waaseyaa\\Foundation\\Http\\Inbound\\InboundHttpRequestInterface",
@@ -383,6 +383,14 @@
                     "kind": "class",
                     "file": "packages/foundation/src/Http/ControllerDispatcher.php",
                     "line": 23,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Foundation\\Http\\Router\\CodifiedContextApiRouter",
+                    "kind": "class",
+                    "file": "packages/foundation/src/Http/Router/CodifiedContextApiRouter.php",
+                    "line": 16,
                     "internal": false,
                     "api": false
                 },
@@ -555,6 +563,14 @@
                     "api": false
                 },
                 {
+                    "fqcn": "Waaseyaa\\Foundation\\ServiceProvider\\KernelServicesInterface",
+                    "kind": "interface",
+                    "file": "packages/foundation/src/ServiceProvider/KernelServicesInterface.php",
+                    "line": 19,
+                    "internal": false,
+                    "api": false
+                },
+                {
                     "fqcn": "Waaseyaa\\Foundation\\ServiceProvider\\ServiceProviderInterface",
                     "kind": "interface",
                     "file": "packages/foundation/src/ServiceProvider/ServiceProviderInterface.php",
@@ -599,6 +615,14 @@
                     "kind": "class",
                     "file": "packages/foundation/src/Kernel/Bootstrap/AccessPolicyRegistry.php",
                     "line": 11,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Foundation\\Kernel\\Bootstrap\\ProviderRegistryKernelServices",
+                    "kind": "class",
+                    "file": "packages/foundation/src/Kernel/Bootstrap/ProviderRegistryKernelServices.php",
+                    "line": 24,
                     "internal": false,
                     "api": false
                 },
@@ -654,7 +678,7 @@
                     "fqcn": "Waaseyaa\\Foundation\\Kernel\\BuiltinRouteRegistrar",
                     "kind": "class",
                     "file": "packages/foundation/src/Kernel/BuiltinRouteRegistrar.php",
-                    "line": 18,
+                    "line": 19,
                     "internal": false,
                     "api": false
                 },
@@ -670,7 +694,7 @@
                     "fqcn": "Waaseyaa\\Foundation\\Kernel\\HttpKernel",
                     "kind": "class",
                     "file": "packages/foundation/src/Kernel/HttpKernel.php",
-                    "line": 50,
+                    "line": 51,
                     "internal": false,
                     "api": false
                 },

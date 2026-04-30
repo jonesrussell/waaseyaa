@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:14:00+00:00",
+    "generated_at": "2026-04-30T17:02:24+00:00",
     "test_files_parsed": 42,
     "at_covers_hits": 50,
     "per_symbol": {
@@ -324,5 +324,5 @@
             "api": false
         }
     ],
-    "methodology": "Only @covers lines are indexed; no inference from test class new/use."
+    "methodology": "@covers PHPDoc and #[CoversClass(...)] attributes are both indexed (Convention C1, mission #1335). Short refs resolved via file-local use statements; same-namespace refs without an alias are skipped."
 }

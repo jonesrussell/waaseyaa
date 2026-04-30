@@ -1,10 +1,10 @@
 {
-    "generated_at": "2026-04-24T21:14:04+00:00",
+    "generated_at": "2026-04-30T17:02:29+00:00",
     "source": "bin/check-package-layers LAYER_BY_SHORT",
     "layer": 5,
     "packages": {
         "ai-agent": {
-            "file_count": 23,
+            "file_count": 25,
             "symbols": [
                 {
                     "fqcn": "Waaseyaa\\AI\\Agent\\AgentAuditLog",
@@ -103,6 +103,14 @@
                     "api": false
                 },
                 {
+                    "fqcn": "Waaseyaa\\AI\\Agent\\Provider\\LlmConversationRequest",
+                    "kind": "class",
+                    "file": "packages/ai-agent/src/Provider/LlmConversationRequest.php",
+                    "line": 12,
+                    "internal": false,
+                    "api": false
+                },
+                {
                     "fqcn": "Waaseyaa\\AI\\Agent\\Provider\\ProviderInterface",
                     "kind": "interface",
                     "file": "packages/ai-agent/src/Provider/ProviderInterface.php",
@@ -179,6 +187,14 @@
                     "kind": "class",
                     "file": "packages/ai-agent/src/Provider/StreamChunk.php",
                     "line": 7,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\AI\\Agent\\Provider\\OpenAiCompatibleProvider",
+                    "kind": "class",
+                    "file": "packages/ai-agent/src/Provider/OpenAiCompatibleProvider.php",
+                    "line": 13,
                     "internal": false,
                     "api": false
                 },

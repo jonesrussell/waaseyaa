@@ -1,10 +1,527 @@
 {
-    "generated_at": "2026-04-24T21:45:56+00:00",
-    "test_files_parsed": 201,
-    "at_covers_hits": 2,
+    "generated_at": "2026-04-30T17:02:15+00:00",
+    "test_files_parsed": 203,
+    "at_covers_hits": 168,
     "per_symbol": {
+        "Waaseyaa\\Cache\\CacheConfigResolver": [
+            "packages/cache/tests/Unit/CacheConfigResolverTest.php"
+        ],
+        "Waaseyaa\\Cache\\CacheFactory": [
+            "packages/cache/tests/Unit/CacheFactoryTest.php"
+        ],
+        "Waaseyaa\\Cache\\Listener\\EntityCacheInvalidator": [
+            "packages/cache/tests/Unit/Listener/EntityCacheInvalidatorTest.php"
+        ],
+        "Waaseyaa\\Cache\\Listener\\ConfigCacheInvalidator": [
+            "packages/cache/tests/Unit/Listener/ConfigCacheInvalidatorTest.php"
+        ],
+        "Waaseyaa\\Cache\\Listener\\TranslationCacheInvalidator": [
+            "packages/cache/tests/Unit/Listener/TranslationCacheInvalidatorTest.php"
+        ],
+        "Waaseyaa\\Cache\\Backend\\DatabaseBackend": [
+            "packages/cache/tests/Unit/Backend/DatabaseBackendTest.php"
+        ],
+        "Waaseyaa\\Cache\\CacheConfiguration": [
+            "packages/cache/tests/Unit/CacheConfigurationTest.php"
+        ],
+        "Waaseyaa\\Database\\Query\\DBALInsert": [
+            "packages/database-legacy/tests/Unit/Query/DBALInsertTest.php"
+        ],
+        "Waaseyaa\\Database\\Query\\DBALUpdate": [
+            "packages/database-legacy/tests/Unit/Query/DBALUpdateTest.php"
+        ],
+        "Waaseyaa\\Database\\Query\\DBALSelect": [
+            "packages/database-legacy/tests/Unit/Query/DBALSelectTest.php"
+        ],
+        "Waaseyaa\\Database\\Query\\DBALDelete": [
+            "packages/database-legacy/tests/Unit/Query/DBALDeleteTest.php"
+        ],
+        "Waaseyaa\\Database\\Schema\\DBALSchema": [
+            "packages/database-legacy/tests/Unit/Schema/DBALSchemaTest.php"
+        ],
+        "Waaseyaa\\Database\\DBALTransaction": [
+            "packages/database-legacy/tests/Unit/DBALTransactionTest.php"
+        ],
+        "Waaseyaa\\Database\\DBALDatabase": [
+            "packages/database-legacy/tests/Unit/DBALDatabaseTest.php"
+        ],
+        "Waaseyaa\\ErrorHandler\\DevExceptionRenderer": [
+            "packages/error-handler/tests/Unit/DevExceptionRendererTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\Inbound\\InboundHttpRequest": [
+            "packages/foundation/tests/Unit/Http/Inbound/InboundHttpRequestTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\ControllerDispatcher": [
+            "packages/foundation/tests/Unit/Http/ControllerDispatcherTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\Router\\SchemaRouter": [
+            "packages/foundation/tests/Unit/Http/Router/SchemaRouterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\Router\\McpRouter": [
+            "packages/foundation/tests/Unit/Http/Router/McpRouterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\Router\\WaaseyaaContext": [
+            "packages/foundation/tests/Unit/Http/Router/WaaseyaaContextTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\Router\\BroadcastRouter": [
+            "packages/foundation/tests/Unit/Http/Router/BroadcastRouterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\Router\\JsonApiRouter": [
+            "packages/foundation/tests/Unit/Http/Router/JsonApiRouterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\Router\\EntityTypeLifecycleRouter": [
+            "packages/foundation/tests/Unit/Http/Router/EntityTypeLifecycleRouterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\Router\\SearchRouter": [
+            "packages/foundation/tests/Unit/Http/Router/SearchRouterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\Router\\CodifiedContextApiRouter": [
+            "packages/foundation/tests/Unit/Http/Router/CodifiedContextApiRouterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Http\\CorsHandler": [
+            "packages/foundation/tests/Unit/Http/CorsHandlerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Discovery\\PackageManifest": [
+            "packages/foundation/tests/Unit/Discovery/PackageManifestTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Discovery\\StaleManifestException": [
+            "packages/foundation/tests/Unit/Discovery/StaleManifestExceptionTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Discovery\\PackageManifestCompiler": [
+            "packages/foundation/tests/Unit/Discovery/PackageManifestCompilerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Diagnostic\\BootDiagnosticReport": [
+            "packages/foundation/tests/Unit/Diagnostic/BootDiagnosticReportTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Diagnostic\\HealthCheckResult": [
+            "packages/foundation/tests/Unit/Diagnostic/HealthCheckResultTest.php",
+            "packages/foundation/tests/Unit/Diagnostic/HealthCheckerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Diagnostic\\HealthChecker": [
+            "packages/foundation/tests/Unit/Diagnostic/HealthCheckerBundleSubtableDriftTest.php",
+            "packages/foundation/tests/Unit/Diagnostic/HealthCheckerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Diagnostic\\DiagnosticCode": [
+            "packages/foundation/tests/Unit/Diagnostic/DiagnosticEmitterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Diagnostic\\DiagnosticEmitter": [
+            "packages/foundation/tests/Unit/Diagnostic/DiagnosticEmitterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Diagnostic\\DiagnosticEntry": [
+            "packages/foundation/tests/Unit/Diagnostic/DiagnosticEmitterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\ServiceProvider\\ServiceProvider": [
+            "packages/foundation/tests/Unit/ServiceProvider/ServiceProviderResolveTest.php",
+            "packages/foundation/tests/Unit/ServiceProvider/KernelServicesInterfaceTest.php",
+            "packages/foundation/tests/Unit/ServiceProvider/ServiceProviderTest.php"
+        ],
+        "Waaseyaa\\Foundation\\ServiceProvider\\ContainerCompiler": [
+            "packages/foundation/tests/Unit/ServiceProvider/ContainerCompilerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\ServiceProvider\\ProviderDiscovery": [
+            "packages/foundation/tests/Unit/ServiceProvider/ProviderDiscoveryTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Kernel\\EnvLoader": [
+            "packages/foundation/tests/Unit/Kernel/EnvLoaderTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Kernel\\BuiltinRouteRegistrar": [
+            "packages/foundation/tests/Unit/Kernel/BuiltinRouteRegistrarExternalRoutesTest.php",
+            "packages/foundation/tests/Unit/Kernel/BuiltinRouteRegistrarTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Kernel\\ConfigLoader": [
+            "packages/foundation/tests/Unit/Kernel/ConfigLoaderTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Kernel\\AbstractKernel": [
+            "packages/foundation/tests/Unit/Kernel/AbstractKernelExtensionRunnerTest.php",
+            "packages/foundation/tests/Unit/Kernel/DebugModeTest.php",
+            "packages/foundation/tests/Unit/Kernel/AbstractKernelTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Kernel\\Bootstrap\\DatabaseBootstrapper": [
+            "packages/foundation/tests/Unit/Kernel/Bootstrap/DatabaseBootstrapperTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Kernel\\Bootstrap\\ProviderRegistry": [
+            "packages/foundation/tests/Unit/Kernel/Bootstrap/ProviderRegistryTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Kernel\\EventListenerRegistrar": [
+            "packages/foundation/tests/Unit/Kernel/EventListenerRegistrarTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Kernel\\HttpKernel": [
+            "packages/foundation/tests/Unit/Kernel/HttpKernelBootFailureTest.php",
+            "packages/foundation/tests/Unit/Kernel/HttpKernelTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Kernel\\ConsoleKernel": [
+            "packages/foundation/tests/Unit/Kernel/ConsoleKernelTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Schema\\DefaultsSchemaRegistry": [
+            "packages/foundation/tests/Unit/Schema/DefaultsSchemaRegistryTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Schema\\SchemaEntry": [
+            "packages/foundation/tests/Unit/Schema/DefaultsSchemaRegistryTest.php",
+            "packages/foundation/tests/Unit/Schema/SchemaEntryTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Result\\DomainError": [
+            "packages/foundation/tests/Unit/Result/DomainErrorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Result\\Result": [
+            "packages/foundation/tests/Unit/Result/ResultTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Tenant\\TenantContext": [
+            "packages/foundation/tests/Unit/Tenant/TenantTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Tenant\\NullTenantResolver": [
+            "packages/foundation/tests/Unit/Tenant/TenantTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Tenant\\TenantMiddleware": [
+            "packages/foundation/tests/Unit/Tenant/TenantTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\LegacyLoggerHandler": [
+            "packages/foundation/tests/Unit/Log/LegacyLoggerHandlerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\NullLogger": [
+            "packages/foundation/tests/Unit/Log/NullLoggerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Handler\\StackHandler": [
+            "packages/foundation/tests/Unit/Log/Handler/StackHandlerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Handler\\ErrorLogHandler": [
+            "packages/foundation/tests/Unit/Log/Handler/ErrorLogHandlerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Handler\\FileHandler": [
+            "packages/foundation/tests/Unit/Log/Handler/FileHandlerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Handler\\StreamHandler": [
+            "packages/foundation/tests/Unit/Log/Handler/StreamHandlerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Handler\\FingersCrossedHandler": [
+            "packages/foundation/tests/Unit/Log/FingersCrossedHandlerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\LogManager": [
+            "packages/foundation/tests/Unit/Log/LogManagerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\ChannelLogger": [
+            "packages/foundation/tests/Unit/Log/ChannelLoggerTest.php",
+            "packages/foundation/tests/Unit/Log/Processor/ProcessorPipelineTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\LogLevel": [
+            "packages/foundation/tests/Unit/Log/LogLevelSeverityTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\LogRecord": [
+            "packages/foundation/tests/Unit/Log/LogRecordTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Formatter\\JsonFormatter": [
+            "packages/foundation/tests/Unit/Log/Formatter/JsonFormatterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Formatter\\TextFormatter": [
+            "packages/foundation/tests/Unit/Log/Formatter/TextFormatterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Processor\\HostnameProcessor": [
+            "packages/foundation/tests/Unit/Log/Processor/HostnameProcessorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Processor\\RequestIdProcessor": [
+            "packages/foundation/tests/Unit/Log/Processor/RequestIdProcessorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Processor\\MemoryUsageProcessor": [
+            "packages/foundation/tests/Unit/Log/Processor/MemoryUsageProcessorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Log\\Processor\\RequestContextProcessor": [
+            "packages/foundation/tests/Unit/Log/Processor/RequestContextProcessorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\RateLimit\\InMemoryRateLimiter": [
+            "packages/foundation/tests/Unit/RateLimit/InMemoryRateLimiterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Cache\\DiscoveryCachePrimitives": [
+            "packages/foundation/tests/Unit/Cache/DiscoveryCachePrimitivesTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Sovereignty\\SovereigntyConfig": [
+            "packages/foundation/tests/Unit/Sovereignty/SovereigntyConfigTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Sovereignty\\SovereigntyProfile": [
+            "packages/foundation/tests/Unit/Sovereignty/SovereigntyConfigTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Sovereignty\\SovereigntyDefaults": [
+            "packages/foundation/tests/Unit/Sovereignty/SovereigntyConfigTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Event\\DomainEvent": [
+            "packages/foundation/tests/Unit/Event/DomainEventTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Asset\\TenantAssetResolver": [
+            "packages/foundation/tests/Unit/Asset/TenantAssetResolverTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Asset\\ViteAssetManager": [
+            "packages/foundation/tests/Unit/Asset/ViteAssetManagerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Broadcasting\\SseBroadcaster": [
+            "packages/foundation/tests/Unit/Broadcasting/SseBroadcasterTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Broadcasting\\BroadcastMessage": [
+            "packages/foundation/tests/Unit/Broadcasting/BroadcastMessageTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Migration\\SchemaBuilder": [
+            "packages/foundation/tests/Unit/Migration/SchemaBuilderTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Migration\\TableBuilder": [
+            "packages/foundation/tests/Unit/Migration/SchemaBuilderTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Migration\\Migration": [
+            "packages/foundation/tests/Unit/Migration/SchemaBuilderTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Migration\\Migrator": [
+            "packages/foundation/tests/Unit/Migration/MigratorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Migration\\MigrationRepository": [
+            "packages/foundation/tests/Unit/Migration/MigratorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Migration\\MigrationResult": [
+            "packages/foundation/tests/Unit/Migration/MigratorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Migration\\MigrationLoader": [
+            "packages/foundation/tests/Unit/Migration/MigrationLoaderTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Exception\\WaaseyaaException": [
+            "packages/foundation/tests/Unit/Exception/WaaseyaaExceptionTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Exception\\StorageException": [
+            "packages/foundation/tests/Unit/Exception/WaaseyaaExceptionTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Exception\\ConfigException": [
+            "packages/foundation/tests/Unit/Exception/WaaseyaaExceptionTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Exception\\AuthenticationException": [
+            "packages/foundation/tests/Unit/Exception/WaaseyaaExceptionTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Exception\\ExceptionHandler": [
+            "packages/foundation/tests/Unit/Exception/ExceptionHandlerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Exception\\RequestContext": [
+            "packages/foundation/tests/Unit/Exception/ExceptionHandlerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Attribute\\AsMiddleware": [
+            "packages/foundation/tests/Unit/Middleware/MiddlewareOrderingTest.php",
+            "packages/foundation/tests/Unit/Attribute/AsMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Middleware\\CompressionMiddleware": [
+            "packages/foundation/tests/Unit/Middleware/CompressionMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Middleware\\ETagMiddleware": [
+            "packages/foundation/tests/Unit/Middleware/ETagMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Middleware\\JobPipeline": [
+            "packages/foundation/tests/Unit/Middleware/JobPipelineTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Middleware\\DebugHeaderMiddleware": [
+            "packages/foundation/tests/Unit/Middleware/DebugHeaderMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Middleware\\BodySizeLimitMiddleware": [
+            "packages/foundation/tests/Unit/Middleware/BodySizeLimitMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Middleware\\HttpPipeline": [
+            "packages/foundation/tests/Unit/Middleware/HttpPipelineTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Middleware\\RateLimitMiddleware": [
+            "packages/foundation/tests/Unit/Middleware/RateLimitMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Middleware\\SecurityHeadersMiddleware": [
+            "packages/foundation/tests/Unit/Middleware/SecurityHeadersMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Middleware\\RequestLoggingMiddleware": [
+            "packages/foundation/tests/Unit/Middleware/RequestLoggingMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Foundation\\SlugGenerator": [
+            "packages/foundation/tests/Unit/SlugGeneratorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Ingestion\\IngestionError": [
+            "packages/foundation/tests/Unit/Ingestion/IngestionErrorTest.php",
+            "packages/foundation/tests/Unit/Ingestion/PayloadValidatorTest.php",
+            "packages/foundation/tests/Unit/Ingestion/EnvelopeValidatorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Ingestion\\IngestionErrorCode": [
+            "packages/foundation/tests/Unit/Ingestion/IngestionErrorCodeTest.php",
+            "packages/foundation/tests/Unit/Ingestion/PayloadValidatorTest.php",
+            "packages/foundation/tests/Unit/Ingestion/EnvelopeValidatorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Ingestion\\IngestionLogger": [
+            "packages/foundation/tests/Unit/Ingestion/IngestionLoggerTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Ingestion\\InvalidEnvelopeException": [
+            "packages/foundation/tests/Unit/Ingestion/InvalidEnvelopeExceptionTest.php",
+            "packages/foundation/tests/Unit/Ingestion/EnvelopeValidatorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Ingestion\\IngestionLogEntry": [
+            "packages/foundation/tests/Unit/Ingestion/IngestionLogEntryTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Ingestion\\Envelope": [
+            "packages/foundation/tests/Unit/Ingestion/EnvelopeTest.php",
+            "packages/foundation/tests/Unit/Ingestion/EnvelopeValidatorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Ingestion\\PayloadValidator": [
+            "packages/foundation/tests/Unit/Ingestion/PayloadValidatorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Ingestion\\EnvelopeValidator": [
+            "packages/foundation/tests/Unit/Ingestion/EnvelopeValidatorTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Attribute\\AsFieldType": [
+            "packages/foundation/tests/Unit/Attribute/AsFieldTypeTest.php"
+        ],
+        "Waaseyaa\\Foundation\\Attribute\\AsEntityType": [
+            "packages/foundation/tests/Unit/Attribute/AsEntityTypeTest.php"
+        ],
+        "Waaseyaa\\Geo\\GeoDistance": [
+            "packages/geo/tests/Unit/GeoDistanceTest.php"
+        ],
+        "Waaseyaa\\HttpClient\\StreamHttpClient": [
+            "packages/http-client/tests/Unit/StreamHttpClientTest.php"
+        ],
+        "Waaseyaa\\HttpClient\\HttpRequestException": [
+            "packages/http-client/tests/Unit/HttpRequestExceptionTest.php"
+        ],
+        "Waaseyaa\\HttpClient\\HttpResponse": [
+            "packages/http-client/tests/Unit/HttpResponseTest.php"
+        ],
+        "Waaseyaa\\I18n\\LanguageContext": [
+            "packages/i18n/tests/Unit/LanguageContextTest.php"
+        ],
+        "Waaseyaa\\I18n\\Twig\\TranslationTwigExtension": [
+            "packages/i18n/tests/Unit/TranslationTwigExtensionTest.php"
+        ],
+        "Waaseyaa\\I18n\\FallbackChain": [
+            "packages/i18n/tests/Unit/FallbackChainTest.php"
+        ],
+        "Waaseyaa\\I18n\\Language": [
+            "packages/i18n/tests/Unit/LanguageTest.php"
+        ],
+        "Waaseyaa\\I18n\\Translator": [
+            "packages/i18n/tests/Unit/TranslatorTest.php"
+        ],
+        "Waaseyaa\\I18n\\LanguageManager": [
+            "packages/i18n/tests/Unit/LanguageManagerTest.php"
+        ],
+        "Waaseyaa\\Ingestion\\ValidationResult": [
+            "packages/ingestion/tests/Unit/PayloadValidatorInterfaceTest.php",
+            "packages/ingestion/tests/Unit/ValidationResultTest.php"
+        ],
+        "Waaseyaa\\Ingestion\\EnvelopeValidator": [
+            "packages/ingestion/tests/Unit/EnvelopeValidatorTest.php"
+        ],
+        "Waaseyaa\\Mail\\Mailer": [
+            "packages/mail/tests/Unit/MailerTest.php"
+        ],
+        "Waaseyaa\\Mail\\Envelope": [
+            "packages/mail/tests/Unit/EnvelopeTest.php"
+        ],
+        "Waaseyaa\\Mail\\Twig\\TwigMailRenderer": [
+            "packages/mail/tests/Unit/Twig/TwigMailRendererTest.php"
+        ],
+        "Waaseyaa\\Mail\\MailServiceProvider": [
+            "packages/mail/tests/Unit/MailServiceProviderTest.php"
+        ],
+        "Waaseyaa\\Mail\\Transport\\LocalTransport": [
+            "packages/mail/tests/Unit/Transport/LocalTransportTest.php"
+        ],
+        "Waaseyaa\\Mail\\Transport\\ArrayTransport": [
+            "packages/mail/tests/Unit/Transport/ArrayTransportTest.php"
+        ],
+        "Waaseyaa\\Mail\\Transport\\SendGridTransport": [
+            "packages/mail/tests/Unit/Transport/SendGridTransportTest.php"
+        ],
+        "Waaseyaa\\Mercure\\MercurePublisher": [
+            "packages/mercure/tests/Unit/MercurePublisherTest.php"
+        ],
+        "Waaseyaa\\Queue\\Worker\\Worker": [
+            "packages/queue/tests/Unit/Worker/WorkerTest.php"
+        ],
+        "Waaseyaa\\Queue\\Worker\\WorkerOptions": [
+            "packages/queue/tests/Unit/Worker/WorkerTest.php"
+        ],
+        "Waaseyaa\\Queue\\FailedJobRepository": [
+            "packages/queue/tests/Unit/FailedJobRepositoryTest.php"
+        ],
+        "Waaseyaa\\Queue\\AttributeGuard": [
+            "packages/queue/tests/Unit/AttributeGuardTest.php",
+            "packages/queue/tests/Unit/SyncQueueTest.php"
+        ],
+        "Waaseyaa\\Queue\\Handler\\JobHandler": [
+            "packages/queue/tests/Unit/Handler/JobHandlerTest.php"
+        ],
+        "Waaseyaa\\Queue\\Job": [
+            "packages/queue/tests/Unit/JobTest.php"
+        ],
+        "Waaseyaa\\Queue\\DbalQueue": [
+            "packages/queue/tests/Unit/DbalQueueTest.php"
+        ],
+        "Waaseyaa\\Queue\\SyncQueue": [
+            "packages/queue/tests/Unit/SyncQueueTest.php"
+        ],
+        "Waaseyaa\\Queue\\Storage\\InMemoryFailedJobRepository": [
+            "packages/queue/tests/Unit/Storage/InMemoryFailedJobRepositoryTest.php"
+        ],
+        "Waaseyaa\\Queue\\Storage\\DatabaseFailedJobRepository": [
+            "packages/queue/tests/Unit/Storage/DatabaseFailedJobRepositoryTest.php"
+        ],
+        "Waaseyaa\\Queue\\Attribute\\UniqueJob": [
+            "packages/queue/tests/Unit/Attribute/UniqueJobTest.php"
+        ],
+        "Waaseyaa\\Queue\\Attribute\\RateLimited": [
+            "packages/queue/tests/Unit/Attribute/RateLimitedTest.php"
+        ],
+        "Waaseyaa\\Queue\\Attribute\\OnQueue": [
+            "packages/queue/tests/Unit/Attribute/OnQueueTest.php"
+        ],
+        "Waaseyaa\\Queue\\ChainedJobs": [
+            "packages/queue/tests/Unit/ChainedJobsTest.php"
+        ],
+        "Waaseyaa\\Queue\\BatchedJobs": [
+            "packages/queue/tests/Unit/BatchedJobsTest.php"
+        ],
+        "Waaseyaa\\Queue\\Transport\\DbalTransport": [
+            "packages/queue/tests/Unit/Transport/DbalTransportTest.php"
+        ],
+        "Waaseyaa\\Queue\\Transport\\InMemoryTransport": [
+            "packages/queue/tests/Unit/Transport/InMemoryTransportTest.php"
+        ],
+        "Waaseyaa\\Scheduler\\ScheduledTask": [
+            "packages/scheduler/tests/Unit/ScheduledTaskTest.php"
+        ],
+        "Waaseyaa\\Scheduler\\ScheduleRunner": [
+            "packages/scheduler/tests/Unit/ScheduleRunnerTest.php"
+        ],
+        "Waaseyaa\\Scheduler\\ScheduleRunResult": [
+            "packages/scheduler/tests/Unit/ScheduleRunnerTest.php"
+        ],
+        "Waaseyaa\\Scheduler\\Storage\\ScheduleStateRepository": [
+            "packages/scheduler/tests/Unit/Storage/ScheduleStateRepositoryTest.php"
+        ],
+        "Waaseyaa\\Scheduler\\ScheduleBuilder": [
+            "packages/scheduler/tests/Unit/ScheduleBuilderTest.php"
+        ],
+        "Waaseyaa\\Scheduler\\Schedule": [
+            "packages/scheduler/tests/Unit/ScheduleBuilderTest.php"
+        ],
+        "Waaseyaa\\TypedData\\TypedDataManager": [
+            "packages/typed-data/tests/Unit/TypedDataManagerTest.php"
+        ],
+        "Waaseyaa\\TypedData\\Type\\MapData": [
+            "packages/typed-data/tests/Unit/Type/MapDataTest.php"
+        ],
+        "Waaseyaa\\TypedData\\Type\\IntegerData": [
+            "packages/typed-data/tests/Unit/Type/IntegerDataTest.php"
+        ],
+        "Waaseyaa\\TypedData\\Type\\StringData": [
+            "packages/typed-data/tests/Unit/Type/StringDataTest.php"
+        ],
+        "Waaseyaa\\TypedData\\Type\\ListData": [
+            "packages/typed-data/tests/Unit/Type/ListDataTest.php"
+        ],
+        "Waaseyaa\\TypedData\\Type\\BooleanData": [
+            "packages/typed-data/tests/Unit/Type/BooleanDataTest.php"
+        ],
+        "Waaseyaa\\TypedData\\Type\\FloatData": [
+            "packages/typed-data/tests/Unit/Type/FloatDataTest.php"
+        ],
         "Waaseyaa\\TypedData\\Coercion\\EntityCastCoercion": [
             "packages/typed-data/tests/Unit/Coercion/EntityCastCoercionTest.php"
+        ],
+        "Waaseyaa\\TypedData\\DataDefinition": [
+            "packages/typed-data/tests/Unit/DataDefinitionTest.php"
         ],
         "Waaseyaa\\TypedData\\CastTokenMapper": [
             "packages/typed-data/tests/Unit/CastTokenMapperTest.php"
@@ -16,14 +533,6 @@
             "kind": "class",
             "file": "packages/analytics/src/UmamiClient.php",
             "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Cache\\CacheFactory",
-            "kind": "class",
-            "file": "packages/cache/src/CacheFactory.php",
-            "line": 9,
             "internal": false,
             "api": false
         },
@@ -52,42 +561,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Cache\\Listener\\TranslationCacheInvalidator",
-            "kind": "class",
-            "file": "packages/cache/src/Listener/TranslationCacheInvalidator.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Cache\\Listener\\EntityCacheSubscriber",
             "kind": "class",
             "file": "packages/cache/src/Listener/EntityCacheSubscriber.php",
             "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Cache\\Listener\\ConfigCacheInvalidator",
-            "kind": "class",
-            "file": "packages/cache/src/Listener/ConfigCacheInvalidator.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Cache\\Listener\\EntityCacheInvalidator",
-            "kind": "class",
-            "file": "packages/cache/src/Listener/EntityCacheInvalidator.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Cache\\Backend\\DatabaseBackend",
-            "kind": "class",
-            "file": "packages/cache/src/Backend/DatabaseBackend.php",
-            "line": 22,
             "internal": false,
             "api": false
         },
@@ -116,22 +593,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Cache\\CacheConfigResolver",
-            "kind": "class",
-            "file": "packages/cache/src/CacheConfigResolver.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Cache\\CacheConfiguration",
-            "kind": "class",
-            "file": "packages/cache/src/CacheConfiguration.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Cache\\CacheBackendInterface",
             "kind": "interface",
             "file": "packages/cache/src/CacheBackendInterface.php",
@@ -148,66 +609,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Database\\DBALDatabase",
-            "kind": "class",
-            "file": "packages/database-legacy/src/DBALDatabase.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Database\\Query\\DBALSelect",
-            "kind": "class",
-            "file": "packages/database-legacy/src/Query/DBALSelect.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Database\\Query\\DBALDelete",
-            "kind": "class",
-            "file": "packages/database-legacy/src/Query/DBALDelete.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Database\\Query\\DBALUpdate",
-            "kind": "class",
-            "file": "packages/database-legacy/src/Query/DBALUpdate.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Database\\Query\\DBALInsert",
-            "kind": "class",
-            "file": "packages/database-legacy/src/Query/DBALInsert.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Database\\DBALTransaction",
-            "kind": "class",
-            "file": "packages/database-legacy/src/DBALTransaction.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Database\\DeleteInterface",
             "kind": "interface",
             "file": "packages/database-legacy/src/DeleteInterface.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Database\\Schema\\DBALSchema",
-            "kind": "class",
-            "file": "packages/database-legacy/src/Schema/DBALSchema.php",
-            "line": 13,
             "internal": false,
             "api": false
         },
@@ -316,14 +721,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\ErrorHandler\\DevExceptionRenderer",
-            "kind": "class",
-            "file": "packages/error-handler/src/DevExceptionRenderer.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\ErrorHandler\\SolutionProviderRegistry",
             "kind": "class",
             "file": "packages/error-handler/src/SolutionProviderRegistry.php",
@@ -340,14 +737,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\Inbound\\InboundHttpRequest",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/Inbound/InboundHttpRequest.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Http\\LanguagePathStripperInterface",
             "kind": "interface",
             "file": "packages/foundation/src/Http/LanguagePathStripperInterface.php",
@@ -356,82 +745,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\CorsHandler",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/CorsHandler.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\ControllerDispatcher",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/ControllerDispatcher.php",
-            "line": 23,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\Router\\BroadcastRouter",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/Router/BroadcastRouter.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\Router\\SchemaRouter",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/Router/SchemaRouter.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Http\\Router\\DomainRouterInterface",
             "kind": "interface",
             "file": "packages/foundation/src/Http/Router/DomainRouterInterface.php",
             "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\Router\\SearchRouter",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/Router/SearchRouter.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\Router\\WaaseyaaContext",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/Router/WaaseyaaContext.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\Router\\JsonApiRouter",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/Router/JsonApiRouter.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\Router\\McpRouter",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/Router/McpRouter.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Http\\Router\\EntityTypeLifecycleRouter",
-            "kind": "class",
-            "file": "packages/foundation/src/Http/Router/EntityTypeLifecycleRouter.php",
-            "line": 14,
             "internal": false,
             "api": false
         },
@@ -452,70 +769,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Discovery\\PackageManifest",
-            "kind": "class",
-            "file": "packages/foundation/src/Discovery/PackageManifest.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Discovery\\PackageManifestCompiler",
-            "kind": "class",
-            "file": "packages/foundation/src/Discovery/PackageManifestCompiler.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Discovery\\StaleManifestException",
-            "kind": "class",
-            "file": "packages/foundation/src/Discovery/StaleManifestException.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Diagnostic\\BootDiagnosticReport",
-            "kind": "class",
-            "file": "packages/foundation/src/Diagnostic/BootDiagnosticReport.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Diagnostic\\DiagnosticEmitter",
-            "kind": "class",
-            "file": "packages/foundation/src/Diagnostic/DiagnosticEmitter.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Diagnostic\\HealthCheckResult",
-            "kind": "class",
-            "file": "packages/foundation/src/Diagnostic/HealthCheckResult.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Diagnostic\\HealthChecker",
-            "kind": "class",
-            "file": "packages/foundation/src/Diagnostic/HealthChecker.php",
-            "line": 24,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Diagnostic\\DiagnosticEntry",
-            "kind": "class",
-            "file": "packages/foundation/src/Diagnostic/DiagnosticEntry.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Diagnostic\\HealthCheckerInterface",
             "kind": "interface",
             "file": "packages/foundation/src/Diagnostic/HealthCheckerInterface.php",
@@ -524,10 +777,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Diagnostic\\DiagnosticCode",
-            "kind": "enum",
-            "file": "packages/foundation/src/Diagnostic/DiagnosticCode.php",
-            "line": 14,
+            "fqcn": "Waaseyaa\\Foundation\\ServiceProvider\\KernelServicesInterface",
+            "kind": "interface",
+            "file": "packages/foundation/src/ServiceProvider/KernelServicesInterface.php",
+            "line": 19,
             "internal": false,
             "api": false
         },
@@ -540,42 +793,18 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\ServiceProvider\\ServiceProvider",
-            "kind": "abstract_class",
-            "file": "packages/foundation/src/ServiceProvider/ServiceProvider.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\ServiceProvider\\ContainerCompiler",
-            "kind": "class",
-            "file": "packages/foundation/src/ServiceProvider/ContainerCompiler.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\ServiceProvider\\ProviderDiscovery",
-            "kind": "class",
-            "file": "packages/foundation/src/ServiceProvider/ProviderDiscovery.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Kernel\\ConfigLoader",
-            "kind": "class",
-            "file": "packages/foundation/src/Kernel/ConfigLoader.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Kernel\\Bootstrap\\AccessPolicyRegistry",
             "kind": "class",
             "file": "packages/foundation/src/Kernel/Bootstrap/AccessPolicyRegistry.php",
             "line": 11,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\Foundation\\Kernel\\Bootstrap\\ProviderRegistryKernelServices",
+            "kind": "class",
+            "file": "packages/foundation/src/Kernel/Bootstrap/ProviderRegistryKernelServices.php",
+            "line": 24,
             "internal": false,
             "api": false
         },
@@ -604,82 +833,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Kernel\\Bootstrap\\ProviderRegistry",
-            "kind": "class",
-            "file": "packages/foundation/src/Kernel/Bootstrap/ProviderRegistry.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Kernel\\Bootstrap\\KnowledgeExtensionBootstrapper",
             "kind": "class",
             "file": "packages/foundation/src/Kernel/Bootstrap/KnowledgeExtensionBootstrapper.php",
             "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Kernel\\Bootstrap\\DatabaseBootstrapper",
-            "kind": "class",
-            "file": "packages/foundation/src/Kernel/Bootstrap/DatabaseBootstrapper.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Kernel\\BuiltinRouteRegistrar",
-            "kind": "class",
-            "file": "packages/foundation/src/Kernel/BuiltinRouteRegistrar.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Kernel\\HttpKernel",
-            "kind": "class",
-            "file": "packages/foundation/src/Kernel/HttpKernel.php",
-            "line": 50,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Kernel\\EnvLoader",
-            "kind": "class",
-            "file": "packages/foundation/src/Kernel/EnvLoader.php",
-            "line": 20,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Kernel\\ConsoleKernel",
-            "kind": "class",
-            "file": "packages/foundation/src/Kernel/ConsoleKernel.php",
-            "line": 28,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Kernel\\EventListenerRegistrar",
-            "kind": "class",
-            "file": "packages/foundation/src/Kernel/EventListenerRegistrar.php",
-            "line": 26,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Schema\\DefaultsSchemaRegistry",
-            "kind": "class",
-            "file": "packages/foundation/src/Schema/DefaultsSchemaRegistry.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Schema\\SchemaEntry",
-            "kind": "class",
-            "file": "packages/foundation/src/Schema/SchemaEntry.php",
-            "line": 7,
             "internal": false,
             "api": false
         },
@@ -724,30 +881,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Result\\Result",
-            "kind": "class",
-            "file": "packages/foundation/src/Result/Result.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Result\\DomainError",
-            "kind": "class",
-            "file": "packages/foundation/src/Result/DomainError.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\LogRecord",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/LogRecord.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Log\\Handler\\HandlerInterface",
             "kind": "interface",
             "file": "packages/foundation/src/Log/Handler/HandlerInterface.php",
@@ -764,90 +897,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Handler\\StackHandler",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Handler/StackHandler.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Handler\\FileHandler",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Handler/FileHandler.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Handler\\StreamHandler",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Handler/StreamHandler.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Log\\Handler\\DailyFileHandler",
             "kind": "class",
             "file": "packages/foundation/src/Log/Handler/DailyFileHandler.php",
             "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Handler\\FingersCrossedHandler",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Handler/FingersCrossedHandler.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Handler\\ErrorLogHandler",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Handler/ErrorLogHandler.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\LogManager",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/LogManager.php",
-            "line": 23,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\LogLevel",
-            "kind": "enum",
-            "file": "packages/foundation/src/Log/LogLevel.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\ChannelLogger",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/ChannelLogger.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Formatter\\JsonFormatter",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Formatter/JsonFormatter.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Formatter\\TextFormatter",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Formatter/TextFormatter.php",
-            "line": 9,
             "internal": false,
             "api": false
         },
@@ -860,42 +913,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\NullLogger",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/NullLogger.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Log\\LoggerInterface",
             "kind": "interface",
             "file": "packages/foundation/src/Log/LoggerInterface.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Processor\\RequestContextProcessor",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Processor/RequestContextProcessor.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Processor\\HostnameProcessor",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Processor/HostnameProcessor.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Processor\\RequestIdProcessor",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Processor/RequestIdProcessor.php",
-            "line": 9,
             "internal": false,
             "api": false
         },
@@ -908,33 +929,9 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Log\\Processor\\MemoryUsageProcessor",
-            "kind": "class",
-            "file": "packages/foundation/src/Log/Processor/MemoryUsageProcessor.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\RateLimit\\InMemoryRateLimiter",
-            "kind": "class",
-            "file": "packages/foundation/src/RateLimit/InMemoryRateLimiter.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\RateLimit\\RateLimiterInterface",
             "kind": "interface",
             "file": "packages/foundation/src/RateLimit/RateLimiterInterface.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Cache\\DiscoveryCachePrimitives",
-            "kind": "class",
-            "file": "packages/foundation/src/Cache/DiscoveryCachePrimitives.php",
             "line": 7,
             "internal": false,
             "api": false
@@ -948,74 +945,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Sovereignty\\SovereigntyDefaults",
-            "kind": "class",
-            "file": "packages/foundation/src/Sovereignty/SovereigntyDefaults.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Sovereignty\\SovereigntyConfig",
-            "kind": "class",
-            "file": "packages/foundation/src/Sovereignty/SovereigntyConfig.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Sovereignty\\SovereigntyProfile",
-            "kind": "enum",
-            "file": "packages/foundation/src/Sovereignty/SovereigntyProfile.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Event\\DomainEvent",
-            "kind": "abstract_class",
-            "file": "packages/foundation/src/Event/DomainEvent.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Asset\\AssetManagerInterface",
             "kind": "interface",
             "file": "packages/foundation/src/Asset/AssetManagerInterface.php",
             "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Asset\\ViteAssetManager",
-            "kind": "class",
-            "file": "packages/foundation/src/Asset/ViteAssetManager.php",
-            "line": 23,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Asset\\TenantAssetResolver",
-            "kind": "class",
-            "file": "packages/foundation/src/Asset/TenantAssetResolver.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Broadcasting\\BroadcastMessage",
-            "kind": "class",
-            "file": "packages/foundation/src/Broadcasting/BroadcastMessage.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Broadcasting\\SseBroadcaster",
-            "kind": "class",
-            "file": "packages/foundation/src/Broadcasting/SseBroadcaster.php",
-            "line": 18,
             "internal": false,
             "api": false
         },
@@ -1028,122 +961,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Migration\\MigrationResult",
-            "kind": "class",
-            "file": "packages/foundation/src/Migration/MigrationResult.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Migration\\Migration",
-            "kind": "abstract_class",
-            "file": "packages/foundation/src/Migration/Migration.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Migration\\TableBuilder",
-            "kind": "class",
-            "file": "packages/foundation/src/Migration/TableBuilder.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Migration\\Migrator",
-            "kind": "class",
-            "file": "packages/foundation/src/Migration/Migrator.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Migration\\MigrationRepository",
-            "kind": "class",
-            "file": "packages/foundation/src/Migration/MigrationRepository.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Migration\\MigrationLoader",
-            "kind": "class",
-            "file": "packages/foundation/src/Migration/MigrationLoader.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Migration\\ColumnDefinition",
             "kind": "class",
             "file": "packages/foundation/src/Migration/ColumnDefinition.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Migration\\SchemaBuilder",
-            "kind": "class",
-            "file": "packages/foundation/src/Migration/SchemaBuilder.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Exception\\ConfigException",
-            "kind": "class",
-            "file": "packages/foundation/src/Exception/ConfigException.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Exception\\WaaseyaaException",
-            "kind": "abstract_class",
-            "file": "packages/foundation/src/Exception/WaaseyaaException.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Exception\\AuthenticationException",
-            "kind": "class",
-            "file": "packages/foundation/src/Exception/AuthenticationException.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Exception\\RequestContext",
-            "kind": "class",
-            "file": "packages/foundation/src/Exception/RequestContext.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Exception\\ExceptionHandler",
-            "kind": "class",
-            "file": "packages/foundation/src/Exception/ExceptionHandler.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Exception\\StorageException",
-            "kind": "class",
-            "file": "packages/foundation/src/Exception/StorageException.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Middleware\\DebugHeaderMiddleware",
-            "kind": "class",
-            "file": "packages/foundation/src/Middleware/DebugHeaderMiddleware.php",
-            "line": 25,
             "internal": false,
             "api": false
         },
@@ -1164,50 +985,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Middleware\\RateLimitMiddleware",
-            "kind": "class",
-            "file": "packages/foundation/src/Middleware/RateLimitMiddleware.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Foundation\\Middleware\\HttpMiddlewareInterface",
             "kind": "interface",
             "file": "packages/foundation/src/Middleware/HttpMiddlewareInterface.php",
             "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Middleware\\BodySizeLimitMiddleware",
-            "kind": "class",
-            "file": "packages/foundation/src/Middleware/BodySizeLimitMiddleware.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Middleware\\JobPipeline",
-            "kind": "class",
-            "file": "packages/foundation/src/Middleware/JobPipeline.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Middleware\\SecurityHeadersMiddleware",
-            "kind": "class",
-            "file": "packages/foundation/src/Middleware/SecurityHeadersMiddleware.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Middleware\\CompressionMiddleware",
-            "kind": "class",
-            "file": "packages/foundation/src/Middleware/CompressionMiddleware.php",
-            "line": 11,
             "internal": false,
             "api": false
         },
@@ -1220,194 +1001,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Foundation\\Middleware\\RequestLoggingMiddleware",
-            "kind": "class",
-            "file": "packages/foundation/src/Middleware/RequestLoggingMiddleware.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Middleware\\ETagMiddleware",
-            "kind": "class",
-            "file": "packages/foundation/src/Middleware/ETagMiddleware.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Middleware\\HttpPipeline",
-            "kind": "class",
-            "file": "packages/foundation/src/Middleware/HttpPipeline.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\SlugGenerator",
-            "kind": "class",
-            "file": "packages/foundation/src/SlugGenerator.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Ingestion\\Envelope",
-            "kind": "class",
-            "file": "packages/foundation/src/Ingestion/Envelope.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Ingestion\\IngestionLogger",
-            "kind": "class",
-            "file": "packages/foundation/src/Ingestion/IngestionLogger.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Ingestion\\PayloadValidator",
-            "kind": "class",
-            "file": "packages/foundation/src/Ingestion/PayloadValidator.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Ingestion\\IngestionErrorCode",
-            "kind": "enum",
-            "file": "packages/foundation/src/Ingestion/IngestionErrorCode.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Ingestion\\InvalidEnvelopeException",
-            "kind": "class",
-            "file": "packages/foundation/src/Ingestion/InvalidEnvelopeException.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Ingestion\\IngestionLogEntry",
-            "kind": "class",
-            "file": "packages/foundation/src/Ingestion/IngestionLogEntry.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Ingestion\\EnvelopeValidator",
-            "kind": "class",
-            "file": "packages/foundation/src/Ingestion/EnvelopeValidator.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Ingestion\\IngestionError",
-            "kind": "class",
-            "file": "packages/foundation/src/Ingestion/IngestionError.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Attribute\\AsFieldType",
-            "kind": "attribute_class",
-            "file": "packages/foundation/src/Attribute/AsFieldType.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Attribute\\AsMiddleware",
-            "kind": "attribute_class",
-            "file": "packages/foundation/src/Attribute/AsMiddleware.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Foundation\\Attribute\\AsEntityType",
-            "kind": "attribute_class",
-            "file": "packages/foundation/src/Attribute/AsEntityType.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Geo\\GeoDistance",
-            "kind": "class",
-            "file": "packages/geo/src/GeoDistance.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Geo\\GeoServiceProvider",
             "kind": "class",
             "file": "packages/geo/src/GeoServiceProvider.php",
             "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\HttpClient\\HttpRequestException",
-            "kind": "class",
-            "file": "packages/http-client/src/HttpRequestException.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\HttpClient\\StreamHttpClient",
-            "kind": "class",
-            "file": "packages/http-client/src/StreamHttpClient.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\HttpClient\\HttpResponse",
-            "kind": "class",
-            "file": "packages/http-client/src/HttpResponse.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\I18n\\Translator",
-            "kind": "class",
-            "file": "packages/i18n/src/Translator.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\I18n\\LanguageContext",
-            "kind": "class",
-            "file": "packages/i18n/src/LanguageContext.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\I18n\\Language",
-            "kind": "class",
-            "file": "packages/i18n/src/Language.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\I18n\\LanguageManager",
-            "kind": "class",
-            "file": "packages/i18n/src/LanguageManager.php",
-            "line": 13,
             "internal": false,
             "api": false
         },
@@ -1420,14 +1017,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\I18n\\Twig\\TranslationTwigExtension",
-            "kind": "class",
-            "file": "packages/i18n/src/Twig/TranslationTwigExtension.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\I18n\\TranslatorInterface",
             "kind": "interface",
             "file": "packages/i18n/src/TranslatorInterface.php",
@@ -1436,90 +1025,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\I18n\\FallbackChain",
-            "kind": "class",
-            "file": "packages/i18n/src/FallbackChain.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Ingestion\\ValidationResult",
-            "kind": "class",
-            "file": "packages/ingestion/src/ValidationResult.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mail\\Mailer",
-            "kind": "class",
-            "file": "packages/mail/src/Mailer.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mail\\Envelope",
-            "kind": "class",
-            "file": "packages/mail/src/Envelope.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mail\\MailServiceProvider",
-            "kind": "class",
-            "file": "packages/mail/src/MailServiceProvider.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mail\\Twig\\TwigMailRenderer",
-            "kind": "class",
-            "file": "packages/mail/src/Twig/TwigMailRenderer.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mail\\Transport\\SendGridTransport",
-            "kind": "class",
-            "file": "packages/mail/src/Transport/SendGridTransport.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mail\\Transport\\ArrayTransport",
-            "kind": "class",
-            "file": "packages/mail/src/Transport/ArrayTransport.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mail\\Transport\\LocalTransport",
-            "kind": "class",
-            "file": "packages/mail/src/Transport/LocalTransport.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Mercure\\MercureServiceProvider",
             "kind": "class",
             "file": "packages/mercure/src/MercureServiceProvider.php",
             "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mercure\\MercurePublisher",
-            "kind": "class",
-            "file": "packages/mercure/src/MercurePublisher.php",
-            "line": 7,
             "internal": false,
             "api": false
         },
@@ -1668,30 +1177,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Queue\\ChainedJobs",
-            "kind": "class",
-            "file": "packages/queue/src/ChainedJobs.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\Worker\\Worker",
-            "kind": "class",
-            "file": "packages/queue/src/Worker/Worker.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\Worker\\WorkerOptions",
-            "kind": "class",
-            "file": "packages/queue/src/Worker/WorkerOptions.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Queue\\MessageBusQueue",
             "kind": "class",
             "file": "packages/queue/src/MessageBusQueue.php",
@@ -1708,42 +1193,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Queue\\AttributeGuard",
-            "kind": "class",
-            "file": "packages/queue/src/AttributeGuard.php",
-            "line": 22,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\BatchedJobs",
-            "kind": "class",
-            "file": "packages/queue/src/BatchedJobs.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\Handler\\JobHandler",
-            "kind": "class",
-            "file": "packages/queue/src/Handler/JobHandler.php",
-            "line": 21,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Queue\\InMemoryQueue",
             "kind": "class",
             "file": "packages/queue/src/InMemoryQueue.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\FailedJobRepository",
-            "kind": "class",
-            "file": "packages/queue/src/FailedJobRepository.php",
-            "line": 12,
             "internal": false,
             "api": false
         },
@@ -1772,14 +1225,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Queue\\SyncQueue",
-            "kind": "class",
-            "file": "packages/queue/src/SyncQueue.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Queue\\Migration\\CreateQueueTables",
             "kind": "class",
             "file": "packages/queue/src/Migration/CreateQueueTables.php",
@@ -1788,81 +1233,9 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Queue\\Storage\\InMemoryFailedJobRepository",
-            "kind": "class",
-            "file": "packages/queue/src/Storage/InMemoryFailedJobRepository.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\Storage\\DatabaseFailedJobRepository",
-            "kind": "class",
-            "file": "packages/queue/src/Storage/DatabaseFailedJobRepository.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\Attribute\\UniqueJob",
-            "kind": "attribute_class",
-            "file": "packages/queue/src/Attribute/UniqueJob.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\Attribute\\RateLimited",
-            "kind": "attribute_class",
-            "file": "packages/queue/src/Attribute/RateLimited.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\Attribute\\OnQueue",
-            "kind": "attribute_class",
-            "file": "packages/queue/src/Attribute/OnQueue.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Queue\\QueueInterface",
             "kind": "interface",
             "file": "packages/queue/src/QueueInterface.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\DbalQueue",
-            "kind": "class",
-            "file": "packages/queue/src/DbalQueue.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\Transport\\DbalTransport",
-            "kind": "class",
-            "file": "packages/queue/src/Transport/DbalTransport.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Queue\\Transport\\InMemoryTransport",
-            "kind": "class",
-            "file": "packages/queue/src/Transport/InMemoryTransport.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Scheduler\\Schedule",
-            "kind": "class",
-            "file": "packages/scheduler/src/Schedule.php",
             "line": 7,
             "internal": false,
             "api": false
@@ -1876,42 +1249,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Scheduler\\ScheduledTask",
-            "kind": "class",
-            "file": "packages/scheduler/src/ScheduledTask.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Scheduler\\ScheduleRunner",
-            "kind": "class",
-            "file": "packages/scheduler/src/ScheduleRunner.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Scheduler\\ScheduleRunResult",
-            "kind": "class",
-            "file": "packages/scheduler/src/ScheduleRunResult.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Scheduler\\Migration\\CreateSchedulerTables",
             "kind": "class",
             "file": "packages/scheduler/src/Migration/CreateSchedulerTables.php",
             "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Scheduler\\Storage\\ScheduleStateRepository",
-            "kind": "class",
-            "file": "packages/scheduler/src/Storage/ScheduleStateRepository.php",
-            "line": 9,
             "internal": false,
             "api": false
         },
@@ -1928,14 +1269,6 @@
             "kind": "class",
             "file": "packages/scheduler/src/Lock/InMemoryLock.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Scheduler\\ScheduleBuilder",
-            "kind": "class",
-            "file": "packages/scheduler/src/ScheduleBuilder.php",
-            "line": 10,
             "internal": false,
             "api": false
         },
@@ -1964,54 +1297,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\TypedData\\Type\\StringData",
-            "kind": "class",
-            "file": "packages/typed-data/src/Type/StringData.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\TypedData\\Type\\FloatData",
-            "kind": "class",
-            "file": "packages/typed-data/src/Type/FloatData.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\TypedData\\Type\\ListData",
-            "kind": "class",
-            "file": "packages/typed-data/src/Type/ListData.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\TypedData\\Type\\IntegerData",
-            "kind": "class",
-            "file": "packages/typed-data/src/Type/IntegerData.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\TypedData\\Type\\BooleanData",
-            "kind": "class",
-            "file": "packages/typed-data/src/Type/BooleanData.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\TypedData\\Type\\MapData",
-            "kind": "class",
-            "file": "packages/typed-data/src/Type/MapData.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\TypedData\\Coercion\\CoercionException",
             "kind": "class",
             "file": "packages/typed-data/src/Coercion/CoercionException.php",
@@ -2028,14 +1313,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\TypedData\\DataDefinition",
-            "kind": "class",
-            "file": "packages/typed-data/src/DataDefinition.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\TypedData\\PrimitiveInterface",
             "kind": "interface",
             "file": "packages/typed-data/src/PrimitiveInterface.php",
@@ -2048,14 +1325,6 @@
             "kind": "interface",
             "file": "packages/typed-data/src/ComplexDataInterface.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\TypedData\\TypedDataManager",
-            "kind": "class",
-            "file": "packages/typed-data/src/TypedDataManager.php",
-            "line": 14,
             "internal": false,
             "api": false
         },
@@ -2164,5 +1433,5 @@
             "api": false
         }
     ],
-    "methodology": "Only @covers lines are indexed; no inference from test class new/use."
+    "methodology": "@covers PHPDoc and #[CoversClass(...)] attributes are both indexed (Convention C1, mission #1335). Short refs resolved via file-local use statements; same-namespace refs without an alias are skipped."
 }

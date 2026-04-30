@@ -1,10 +1,9 @@
 {
-    "generated_at": "2026-04-24T21:14:07+00:00",
+    "generated_at": "2026-04-30T17:02:32+00:00",
     "audit": "Layer 6 forensic audit (Interfaces)",
     "target_layer": 6,
     "layer_name": "Interfaces",
     "canonical_layer_packages": [
-        "admin",
         "admin-surface",
         "cli",
         "debug",
@@ -17,16 +16,9 @@
         "telescope"
     ],
     "inventory": {
-        "generated_at": "2026-04-24T21:14:07+00:00",
+        "generated_at": "2026-04-30T17:02:32+00:00",
         "layer": 6,
         "packages": {
-            "admin": {
-                "waaseyaa_require": [],
-                "waaseyaa_require_dev": [],
-                "src_php_count": 0,
-                "has_tests_unit_dir": false,
-                "has_tests_integration_dir": false
-            },
             "admin-surface": {
                 "waaseyaa_require": {
                     "waaseyaa/entity": "^0.1.0-alpha.150",
@@ -142,41 +134,22 @@
                     "waaseyaa/routing": "^0.1.0-alpha.150"
                 },
                 "waaseyaa_require_dev": [],
-                "src_php_count": 31,
+                "src_php_count": 43,
                 "has_tests_unit_dir": true,
                 "has_tests_integration_dir": false
             },
             "telescope": {
-                "waaseyaa_require": [],
+                "waaseyaa_require": {
+                    "waaseyaa/api": "^0.1.0-alpha.150"
+                },
                 "waaseyaa_require_dev": [],
-                "src_php_count": 36,
+                "src_php_count": 37,
                 "has_tests_unit_dir": true,
                 "has_tests_integration_dir": false
             }
         }
     },
     "priority_findings": [
-        {
-            "id": "L6-PHPSTAN-GAP-admin",
-            "priority": 2,
-            "category": "ci_alignment",
-            "severity": "medium",
-            "message": "Package 'admin' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
-        },
-        {
-            "id": "L6-PHPSTAN-GAP-admin-surface",
-            "priority": 2,
-            "category": "ci_alignment",
-            "severity": "medium",
-            "message": "Package 'admin-surface' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
-        },
-        {
-            "id": "L6-PHPSTAN-GAP-debug",
-            "priority": 2,
-            "category": "ci_alignment",
-            "severity": "medium",
-            "message": "Package 'debug' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
-        },
         {
             "id": "L6-PHPSTAN-GAP-deployer",
             "priority": 2,
@@ -185,47 +158,26 @@
             "message": "Package 'deployer' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
         },
         {
-            "id": "L6-PHPSTAN-GAP-genealogy",
-            "priority": 2,
-            "category": "ci_alignment",
-            "severity": "medium",
-            "message": "Package 'genealogy' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
-        },
-        {
-            "id": "L6-PHPSTAN-GAP-graphql",
-            "priority": 2,
-            "category": "ci_alignment",
-            "severity": "medium",
-            "message": "Package 'graphql' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
-        },
-        {
-            "id": "L6-PHPSTAN-GAP-inertia",
-            "priority": 2,
-            "category": "ci_alignment",
-            "severity": "medium",
-            "message": "Package 'inertia' (L6) not listed in phpstan.neon paths; default CI may not analyze it."
-        },
-        {
             "id": "L6-COV-AGG",
             "priority": 4,
             "category": "test_coverage",
             "severity": "low",
-            "message": "Public (non-@internal) L6 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer6.json",
+            "message": "Public (non-@internal) L6 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer6.json",
             "detail": {
-                "count": 226,
+                "count": 56,
                 "sample_fqcn": [
-                    "Waaseyaa\\AdminSurface\\Query\\SurfaceFilterOperator",
-                    "Waaseyaa\\AdminSurface\\Query\\SurfaceQueryParser",
-                    "Waaseyaa\\AdminSurface\\Query\\SurfaceQuery",
                     "Waaseyaa\\AdminSurface\\Action\\SurfaceActionHandlerInterface",
-                    "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceSessionData",
-                    "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceUiPayload",
-                    "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceResultData",
-                    "Waaseyaa\\AdminSurface\\Host\\GenericAdminSurfaceHost",
-                    "Waaseyaa\\AdminSurface\\Host\\AbstractAdminSurfaceHost",
-                    "Waaseyaa\\AdminSurface\\Catalog\\ActionDefinition",
-                    "Waaseyaa\\AdminSurface\\Catalog\\EntityDefinition",
-                    "Waaseyaa\\AdminSurface\\Catalog\\CatalogBuilder"
+                    "Waaseyaa\\CLI\\CliServiceProvider",
+                    "Waaseyaa\\CLI\\Provenance\\ProvenanceReport",
+                    "Waaseyaa\\CLI\\Provenance\\InstalledWaaseyaaPackage",
+                    "Waaseyaa\\CLI\\Command\\AdminBuildCommand",
+                    "Waaseyaa\\Cli\\Command\\SearchReindexCommand",
+                    "Waaseyaa\\CLI\\Command\\AdminDevCommand",
+                    "Waaseyaa\\CLI\\Command\\WaaseyaaVersionCommand",
+                    "Waaseyaa\\CLI\\Command\\SyncRulesCommand",
+                    "Waaseyaa\\CLI\\Ingestion\\SourceConnectorInterface",
+                    "Waaseyaa\\Debug\\DebugServiceProvider",
+                    "Waaseyaa\\Debug\\ErrorPreviewController"
                 ]
             }
         }

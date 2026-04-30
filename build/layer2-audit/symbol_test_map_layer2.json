@@ -1,7 +1,7 @@
 {
-    "generated_at": "2026-04-24T21:13:57+00:00",
+    "generated_at": "2026-04-30T17:02:21+00:00",
     "test_files_parsed": 62,
-    "at_covers_hits": 20,
+    "at_covers_hits": 54,
     "per_symbol": {
         "Waaseyaa\\Engagement\\EngagementServiceProvider": [
             "packages/engagement/tests/Unit/EngagementServiceProviderTest.php"
@@ -27,11 +27,20 @@
         "Waaseyaa\\Groups\\GroupType": [
             "packages/groups/tests/Unit/GroupsServiceProviderTest.php"
         ],
+        "Waaseyaa\\Media\\Http\\Router\\MediaRouter": [
+            "packages/media/tests/Unit/Http/Router/MediaRouterTest.php"
+        ],
+        "Waaseyaa\\Media\\MediaServiceProvider": [
+            "packages/media/tests/Unit/MediaServiceProviderTest.php"
+        ],
         "Waaseyaa\\Media\\Media": [
             "packages/media/tests/Unit/MediaTest.php"
         ],
         "Waaseyaa\\Media\\LocalFileRepository": [
             "packages/media/tests/Unit/LocalFileRepositoryTest.php"
+        ],
+        "Waaseyaa\\Media\\UploadHandler": [
+            "packages/media/tests/Unit/UploadHandlerTest.php"
         ],
         "Waaseyaa\\Media\\MediaType": [
             "packages/media/tests/Unit/MediaTypeTest.php"
@@ -42,11 +51,17 @@
         "Waaseyaa\\Media\\InMemoryFileRepository": [
             "packages/media/tests/Unit/InMemoryFileRepositoryTest.php"
         ],
+        "Waaseyaa\\Media\\MediaAccessPolicy": [
+            "packages/media/tests/Unit/MediaAccessPolicyTest.php"
+        ],
         "Waaseyaa\\Menu\\MenuLink": [
             "packages/menu/tests/Unit/MenuLinkTest.php"
         ],
         "Waaseyaa\\Menu\\MenuTreeBuilder": [
             "packages/menu/tests/Unit/MenuTreeBuilderTest.php"
+        ],
+        "Waaseyaa\\Menu\\MenuAccessPolicy": [
+            "packages/menu/tests/Unit/MenuAccessPolicyTest.php"
         ],
         "Waaseyaa\\Menu\\MenuTreeElement": [
             "packages/menu/tests/Unit/MenuTreeElementTest.php"
@@ -54,11 +69,99 @@
         "Waaseyaa\\Menu\\Menu": [
             "packages/menu/tests/Unit/MenuTest.php"
         ],
+        "Waaseyaa\\Menu\\MenuServiceProvider": [
+            "packages/menu/tests/Unit/MenuServiceProviderTest.php"
+        ],
+        "Waaseyaa\\Messaging\\MessageThread": [
+            "packages/messaging/tests/Unit/MessageThreadTest.php"
+        ],
+        "Waaseyaa\\Messaging\\ThreadMessage": [
+            "packages/messaging/tests/Unit/ThreadMessageTest.php"
+        ],
+        "Waaseyaa\\Messaging\\ThreadParticipant": [
+            "packages/messaging/tests/Unit/ThreadParticipantTest.php"
+        ],
+        "Waaseyaa\\Node\\Node": [
+            "packages/node/tests/Unit/NodeTest.php"
+        ],
+        "Waaseyaa\\Node\\NodeType": [
+            "packages/node/tests/Unit/NodeTypeTest.php"
+        ],
+        "Waaseyaa\\Node\\NodeAccessPolicy": [
+            "packages/node/tests/Unit/NodeAccessPolicyTest.php"
+        ],
+        "Waaseyaa\\Node\\NodeServiceProvider": [
+            "packages/node/tests/Unit/NodeServiceProviderTest.php"
+        ],
+        "Waaseyaa\\Note\\Note": [
+            "packages/note/tests/Unit/NoteTest.php",
+            "packages/note/tests/Unit/NoteSingleTenantTest.php"
+        ],
+        "Waaseyaa\\Note\\NoteAccessPolicy": [
+            "packages/note/tests/Unit/NoteAccessPolicyTest.php"
+        ],
+        "Waaseyaa\\Note\\Ingestion\\NoteIngester": [
+            "packages/note/tests/Unit/Ingestion/NoteIngesterTest.php"
+        ],
+        "Waaseyaa\\Note\\Ingestion\\IngestionEnvelope": [
+            "packages/note/tests/Unit/Ingestion/NoteIngesterTest.php"
+        ],
+        "Waaseyaa\\Note\\Ingestion\\IngestionEnvelopeValidator": [
+            "packages/note/tests/Unit/Ingestion/IngestionEnvelopeValidatorTest.php"
+        ],
+        "Waaseyaa\\Note\\Ingestion\\ValidationError": [
+            "packages/note/tests/Unit/Ingestion/IngestionEnvelopeValidatorTest.php"
+        ],
+        "Waaseyaa\\Path\\InMemoryPathAliasManager": [
+            "packages/path/tests/Unit/InMemoryPathAliasManagerTest.php"
+        ],
+        "Waaseyaa\\Path\\PathProcessor": [
+            "packages/path/tests/Unit/PathProcessorTest.php"
+        ],
+        "Waaseyaa\\Path\\PathAliasAccessPolicy": [
+            "packages/path/tests/Unit/PathAliasAccessPolicyTest.php"
+        ],
+        "Waaseyaa\\Path\\PathAliasResolver": [
+            "packages/path/tests/Unit/PathAliasResolverTest.php"
+        ],
+        "Waaseyaa\\Path\\PathServiceProvider": [
+            "packages/path/tests/Unit/PathServiceProviderTest.php"
+        ],
+        "Waaseyaa\\Path\\PathAlias": [
+            "packages/path/tests/Unit/PathAliasTest.php"
+        ],
+        "Waaseyaa\\Relationship\\Relationship": [
+            "packages/relationship/tests/Unit/RelationshipTest.php"
+        ],
+        "Waaseyaa\\Relationship\\RelationshipPreSaveListener": [
+            "packages/relationship/tests/Unit/RelationshipPreSaveListenerTest.php"
+        ],
+        "Waaseyaa\\Relationship\\RelationshipDeleteGuardListener": [
+            "packages/relationship/tests/Unit/RelationshipDeleteGuardListenerTest.php"
+        ],
+        "Waaseyaa\\Relationship\\RelationshipAccessPolicy": [
+            "packages/relationship/tests/Unit/RelationshipAccessPolicyTest.php"
+        ],
+        "Waaseyaa\\Relationship\\RelationshipDiscoveryService": [
+            "packages/relationship/tests/Unit/RelationshipDiscoveryServiceTest.php"
+        ],
+        "Waaseyaa\\Relationship\\RelationshipValidator": [
+            "packages/relationship/tests/Unit/RelationshipValidatorTest.php"
+        ],
+        "Waaseyaa\\Relationship\\RelationshipTraversalService": [
+            "packages/relationship/tests/Unit/RelationshipTraversalServiceTest.php"
+        ],
+        "Waaseyaa\\Relationship\\RelationshipSchemaManager": [
+            "packages/relationship/tests/Unit/RelationshipSchemaManagerTest.php"
+        ],
         "Waaseyaa\\Taxonomy\\TermAccessPolicy": [
             "packages/taxonomy/tests/Unit/TermAccessPolicyTest.php"
         ],
         "Waaseyaa\\Taxonomy\\Term": [
             "packages/taxonomy/tests/Unit/TermTest.php"
+        ],
+        "Waaseyaa\\Taxonomy\\TaxonomyServiceProvider": [
+            "packages/taxonomy/tests/Unit/TaxonomyServiceProviderTest.php"
         ],
         "Waaseyaa\\Taxonomy\\Vocabulary": [
             "packages/taxonomy/tests/Unit/VocabularyTest.php"
@@ -66,66 +169,10 @@
     },
     "public_non_internal_symbols_lacking_at_covers": [
         {
-            "fqcn": "Waaseyaa\\Media\\Http\\Router\\MediaRouter",
-            "kind": "class",
-            "file": "packages/media/src/Http/Router/MediaRouter.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Media\\MediaAccessPolicy",
-            "kind": "class",
-            "file": "packages/media/src/MediaAccessPolicy.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Media\\UploadHandler",
-            "kind": "class",
-            "file": "packages/media/src/UploadHandler.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Media\\FileRepositoryInterface",
             "kind": "interface",
             "file": "packages/media/src/FileRepositoryInterface.php",
             "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Media\\MediaServiceProvider",
-            "kind": "class",
-            "file": "packages/media/src/MediaServiceProvider.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Menu\\MenuServiceProvider",
-            "kind": "class",
-            "file": "packages/menu/src/MenuServiceProvider.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Menu\\MenuAccessPolicy",
-            "kind": "class",
-            "file": "packages/menu/src/MenuAccessPolicy.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Messaging\\ThreadMessage",
-            "kind": "class",
-            "file": "packages/messaging/src/ThreadMessage.php",
-            "line": 9,
             "internal": false,
             "api": false
         },
@@ -138,114 +185,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Messaging\\ThreadParticipant",
-            "kind": "class",
-            "file": "packages/messaging/src/ThreadParticipant.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Messaging\\MessageThread",
-            "kind": "class",
-            "file": "packages/messaging/src/MessageThread.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Node\\NodeType",
-            "kind": "class",
-            "file": "packages/node/src/NodeType.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Node\\NodeAccessPolicy",
-            "kind": "class",
-            "file": "packages/node/src/NodeAccessPolicy.php",
-            "line": 20,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Node\\NodeServiceProvider",
-            "kind": "class",
-            "file": "packages/node/src/NodeServiceProvider.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Node\\Node",
-            "kind": "class",
-            "file": "packages/node/src/Node.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Note\\NoteServiceProvider",
             "kind": "class",
             "file": "packages/note/src/NoteServiceProvider.php",
             "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Note\\NoteAccessPolicy",
-            "kind": "class",
-            "file": "packages/note/src/NoteAccessPolicy.php",
-            "line": 29,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Note\\Ingestion\\ValidationError",
-            "kind": "class",
-            "file": "packages/note/src/Ingestion/ValidationError.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Note\\Ingestion\\IngestionEnvelope",
-            "kind": "class",
-            "file": "packages/note/src/Ingestion/IngestionEnvelope.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Note\\Ingestion\\IngestionEnvelopeValidator",
-            "kind": "class",
-            "file": "packages/note/src/Ingestion/IngestionEnvelopeValidator.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Note\\Ingestion\\NoteIngester",
-            "kind": "class",
-            "file": "packages/note/src/Ingestion/NoteIngester.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Note\\Note",
-            "kind": "class",
-            "file": "packages/note/src/Note.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Path\\PathAlias",
-            "kind": "class",
-            "file": "packages/path/src/PathAlias.php",
-            "line": 16,
             "internal": false,
             "api": false
         },
@@ -266,98 +209,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Path\\PathAliasAccessPolicy",
-            "kind": "class",
-            "file": "packages/path/src/PathAliasAccessPolicy.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Path\\PathAliasResolver",
-            "kind": "class",
-            "file": "packages/path/src/PathAliasResolver.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Path\\PathServiceProvider",
-            "kind": "class",
-            "file": "packages/path/src/PathServiceProvider.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Path\\InMemoryPathAliasManager",
-            "kind": "class",
-            "file": "packages/path/src/InMemoryPathAliasManager.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Path\\PathProcessor",
-            "kind": "class",
-            "file": "packages/path/src/PathProcessor.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Relationship\\RelationshipDiscoveryService",
-            "kind": "class",
-            "file": "packages/relationship/src/RelationshipDiscoveryService.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Relationship\\Relationship",
-            "kind": "class",
-            "file": "packages/relationship/src/Relationship.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Relationship\\RelationshipTraversalService",
-            "kind": "class",
-            "file": "packages/relationship/src/RelationshipTraversalService.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Relationship\\RelationshipParameterValidator",
             "kind": "class",
             "file": "packages/relationship/src/RelationshipParameterValidator.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Relationship\\RelationshipPreSaveListener",
-            "kind": "class",
-            "file": "packages/relationship/src/RelationshipPreSaveListener.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Relationship\\RelationshipAccessPolicy",
-            "kind": "class",
-            "file": "packages/relationship/src/RelationshipAccessPolicy.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Relationship\\RelationshipSchemaManager",
-            "kind": "class",
-            "file": "packages/relationship/src/RelationshipSchemaManager.php",
-            "line": 9,
             "internal": false,
             "api": false
         },
@@ -370,37 +225,13 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Relationship\\RelationshipValidator",
-            "kind": "class",
-            "file": "packages/relationship/src/RelationshipValidator.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Relationship\\RelationshipServiceProvider",
             "kind": "class",
             "file": "packages/relationship/src/RelationshipServiceProvider.php",
             "line": 10,
             "internal": false,
             "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Relationship\\RelationshipDeleteGuardListener",
-            "kind": "class",
-            "file": "packages/relationship/src/RelationshipDeleteGuardListener.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Taxonomy\\TaxonomyServiceProvider",
-            "kind": "class",
-            "file": "packages/taxonomy/src/TaxonomyServiceProvider.php",
-            "line": 10,
-            "internal": false,
-            "api": false
         }
     ],
-    "methodology": "Only @covers lines are indexed; no inference from test class new/use."
+    "methodology": "@covers PHPDoc and #[CoversClass(...)] attributes are both indexed (Convention C1, mission #1335). Short refs resolved via file-local use statements; same-namespace refs without an alias are skipped."
 }

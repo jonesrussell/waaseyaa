@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:13:57+00:00",
+    "generated_at": "2026-04-30T17:02:21+00:00",
     "phpstan": {
         "command": "phpstan analyse (L1 package src/ trees only \u2014 not full CI set)",
         "paths": [

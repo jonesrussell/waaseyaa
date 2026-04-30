@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:13:54+00:00",
+    "generated_at": "2026-04-30T17:02:18+00:00",
     "source": "bin/check-package-layers LAYER_BY_SHORT",
     "layer": 1,
     "packages": {
@@ -523,7 +523,7 @@
             ]
         },
         "entity": {
-            "file_count": 54,
+            "file_count": 60,
             "symbols": [
                 {
                     "fqcn": "Waaseyaa\\Entity\\Audit\\EntityWriteAuditListener",
@@ -854,6 +854,14 @@
                     "api": false
                 },
                 {
+                    "fqcn": "Waaseyaa\\Entity\\Exception\\EntityMetadataException",
+                    "kind": "class",
+                    "file": "packages/entity/src/Exception/EntityMetadataException.php",
+                    "line": 10,
+                    "internal": false,
+                    "api": false
+                },
+                {
                     "fqcn": "Waaseyaa\\Entity\\Snapshot\\EntityValuesSnapshot",
                     "kind": "class",
                     "file": "packages/entity/src/Snapshot/EntityValuesSnapshot.php",
@@ -873,7 +881,15 @@
                     "fqcn": "Waaseyaa\\Entity\\ContentEntityBase",
                     "kind": "abstract_class",
                     "file": "packages/entity/src/ContentEntityBase.php",
-                    "line": 26,
+                    "line": 28,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Entity\\Attribute\\ContentEntityKeys",
+                    "kind": "attribute_class",
+                    "file": "packages/entity/src/Attribute/ContentEntityKeys.php",
+                    "line": 12,
                     "internal": false,
                     "api": false
                 },
@@ -882,6 +898,38 @@
                     "kind": "attribute_class",
                     "file": "packages/entity/src/Attribute/EntityTypeAttribute.php",
                     "line": 24,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Entity\\Attribute\\EntityMetadataReader",
+                    "kind": "class",
+                    "file": "packages/entity/src/Attribute/EntityMetadataReader.php",
+                    "line": 12,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Entity\\Attribute\\ContentEntityTypeReader",
+                    "kind": "class",
+                    "file": "packages/entity/src/Attribute/ContentEntityTypeReader.php",
+                    "line": 10,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Entity\\Attribute\\ContentEntityType",
+                    "kind": "attribute_class",
+                    "file": "packages/entity/src/Attribute/ContentEntityType.php",
+                    "line": 11,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Entity\\Attribute\\EntityClassMetadata",
+                    "kind": "class",
+                    "file": "packages/entity/src/Attribute/EntityClassMetadata.php",
+                    "line": 12,
                     "internal": false,
                     "api": false
                 },
@@ -937,7 +985,7 @@
                     "fqcn": "Waaseyaa\\Entity\\EntityTypeManager",
                     "kind": "class",
                     "file": "packages/entity/src/EntityTypeManager.php",
-                    "line": 20,
+                    "line": 21,
                     "internal": false,
                     "api": false
                 },
@@ -998,7 +1046,7 @@
                     "fqcn": "Waaseyaa\\EntityStorage\\SqlSchemaHandler",
                     "kind": "class",
                     "file": "packages/entity-storage/src/SqlSchemaHandler.php",
-                    "line": 22,
+                    "line": 24,
                     "internal": false,
                     "api": false
                 },
@@ -1528,7 +1576,7 @@
                     "fqcn": "Waaseyaa\\Oidc\\Entity\\OidcClient",
                     "kind": "class",
                     "file": "packages/oidc/src/Entity/OidcClient.php",
-                    "line": 19,
+                    "line": 21,
                     "internal": false,
                     "api": false
                 },
@@ -1552,7 +1600,7 @@
                     "fqcn": "Waaseyaa\\Oidc\\OidcServiceProvider",
                     "kind": "class",
                     "file": "packages/oidc/src/OidcServiceProvider.php",
-                    "line": 30,
+                    "line": 29,
                     "internal": false,
                     "api": false
                 }
@@ -1682,7 +1730,7 @@
                     "fqcn": "Waaseyaa\\User\\UserBlock",
                     "kind": "class",
                     "file": "packages/user/src/UserBlock.php",
-                    "line": 9,
+                    "line": 11,
                     "internal": false,
                     "api": false
                 },
@@ -1738,7 +1786,7 @@
                     "fqcn": "Waaseyaa\\User\\User",
                     "kind": "class",
                     "file": "packages/user/src/User.php",
-                    "line": 24,
+                    "line": 26,
                     "internal": false,
                     "api": false
                 },

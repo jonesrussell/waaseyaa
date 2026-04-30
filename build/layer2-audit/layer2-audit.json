@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:14:00+00:00",
+    "generated_at": "2026-04-30T17:02:24+00:00",
     "audit": "Layer 2 forensic audit (Content Types)",
     "target_layer": 2,
     "layer_name": "Content Types",
@@ -16,7 +16,7 @@
         "taxonomy"
     ],
     "inventory": {
-        "generated_at": "2026-04-24T21:13:57+00:00",
+        "generated_at": "2026-04-30T17:02:21+00:00",
         "layer": 2,
         "packages": {
             "engagement": {
@@ -133,22 +133,18 @@
             "priority": 4,
             "category": "test_coverage",
             "severity": "low",
-            "message": "Public (non-@internal) L2 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer2.json",
+            "message": "Public (non-@internal) L2 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer2.json",
             "detail": {
-                "count": 42,
+                "count": 8,
                 "sample_fqcn": [
-                    "Waaseyaa\\Media\\Http\\Router\\MediaRouter",
-                    "Waaseyaa\\Media\\MediaAccessPolicy",
-                    "Waaseyaa\\Media\\UploadHandler",
                     "Waaseyaa\\Media\\FileRepositoryInterface",
-                    "Waaseyaa\\Media\\MediaServiceProvider",
-                    "Waaseyaa\\Menu\\MenuServiceProvider",
-                    "Waaseyaa\\Menu\\MenuAccessPolicy",
-                    "Waaseyaa\\Messaging\\ThreadMessage",
                     "Waaseyaa\\Messaging\\MessagingServiceProvider",
-                    "Waaseyaa\\Messaging\\ThreadParticipant",
-                    "Waaseyaa\\Messaging\\MessageThread",
-                    "Waaseyaa\\Node\\NodeType"
+                    "Waaseyaa\\Note\\NoteServiceProvider",
+                    "Waaseyaa\\Path\\ResolvedPath",
+                    "Waaseyaa\\Path\\PathAliasManagerInterface",
+                    "Waaseyaa\\Relationship\\RelationshipParameterValidator",
+                    "Waaseyaa\\Relationship\\VisibilityFilterInterface",
+                    "Waaseyaa\\Relationship\\RelationshipServiceProvider"
                 ]
             }
         }

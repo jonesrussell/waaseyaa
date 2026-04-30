@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:45:59+00:00",
+    "generated_at": "2026-04-30T17:02:26+00:00",
     "source": "bin/check-package-layers LAYER_BY_SHORT",
     "layer": 4,
     "packages": {
@@ -130,7 +130,7 @@
                     "fqcn": "Waaseyaa\\Api\\Controller\\CodifiedContextController",
                     "kind": "class",
                     "file": "packages/api/src/Controller/CodifiedContextController.php",
-                    "line": 12,
+                    "line": 16,
                     "internal": false,
                     "api": false
                 },
@@ -462,8 +462,16 @@
             ]
         },
         "routing": {
-            "file_count": 11,
+            "file_count": 12,
             "symbols": [
+                {
+                    "fqcn": "Waaseyaa\\Routing\\RouteFingerprint",
+                    "kind": "class",
+                    "file": "packages/routing/src/RouteFingerprint.php",
+                    "line": 12,
+                    "internal": false,
+                    "api": false
+                },
                 {
                     "fqcn": "Waaseyaa\\Routing\\Language\\LanguageNegotiator",
                     "kind": "class",

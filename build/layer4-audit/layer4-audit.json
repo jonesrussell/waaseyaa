@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:46:01+00:00",
+    "generated_at": "2026-04-30T17:02:29+00:00",
     "audit": "Layer 4 forensic audit (API)",
     "target_layer": 4,
     "layer_name": "API",
@@ -9,7 +9,7 @@
         "routing"
     ],
     "inventory": {
-        "generated_at": "2026-04-24T21:45:59+00:00",
+        "generated_at": "2026-04-30T17:02:26+00:00",
         "layer": 4,
         "packages": {
             "api": {
@@ -46,7 +46,7 @@
                     "waaseyaa/oidc": "^0.1.0-alpha.150"
                 },
                 "waaseyaa_require_dev": [],
-                "src_php_count": 11,
+                "src_php_count": 12,
                 "has_tests_unit_dir": true,
                 "has_tests_integration_dir": false
             }
@@ -58,22 +58,18 @@
             "priority": 4,
             "category": "test_coverage",
             "severity": "low",
-            "message": "Public (non-@internal) L4 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer4.json",
+            "message": "Public (non-@internal) L4 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer4.json",
             "detail": {
-                "count": 63,
+                "count": 8,
                 "sample_fqcn": [
-                    "Waaseyaa\\Api\\Http\\DiscoveryApiHandler",
-                    "Waaseyaa\\Api\\Http\\Router\\DiscoveryRouter",
-                    "Waaseyaa\\Api\\ResourceSerializer",
-                    "Waaseyaa\\Api\\Query\\ParsedQuery",
-                    "Waaseyaa\\Api\\Query\\QueryFilter",
-                    "Waaseyaa\\Api\\Query\\QueryParser",
-                    "Waaseyaa\\Api\\Query\\QueryApplier",
-                    "Waaseyaa\\Api\\Query\\QuerySort",
-                    "Waaseyaa\\Api\\Query\\PaginationLinks",
-                    "Waaseyaa\\Api\\Schema\\SchemaPresenter",
-                    "Waaseyaa\\Api\\Controller\\BroadcastStorage",
-                    "Waaseyaa\\Api\\Controller\\TranslationController"
+                    "Waaseyaa\\Api\\MutableTranslatableInterface",
+                    "Waaseyaa\\Api\\Exception\\JsonApiDocumentException",
+                    "Waaseyaa\\Bimaaji\\Dsl\\TaskPipelineResult",
+                    "Waaseyaa\\Bimaaji\\Graph\\GraphSectionProviderInterface",
+                    "Waaseyaa\\Routing\\RouteFingerprint",
+                    "Waaseyaa\\Routing\\Language\\LanguageNegotiatorInterface",
+                    "Waaseyaa\\Routing\\WaaseyaaRouter",
+                    "Waaseyaa\\Routing\\AuthOidcRouteServiceProvider"
                 ]
             }
         }

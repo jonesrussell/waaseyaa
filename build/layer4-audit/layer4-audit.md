@@ -1,6 +1,6 @@
 # Layer 4 Forensic Audit (API)
 
-Generated: 2026-04-24T21:46:01+00:00 UTC
+Generated: 2026-04-30T17:02:29+00:00 UTC
 
 ## 1. Canonical scope
 
@@ -12,23 +12,19 @@ Layer 4 (API) packages from `bin/check-package-layers` **LAYER_BY_SHORT**: api, 
 
 ### L4-COV-AGG
 - **Priority:** P4 | **Category:** test_coverage | **Severity:** low
-- **Message:** Public (non-@internal) L4 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer4.json
+- **Message:** Public (non-@internal) L4 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer4.json
 ```json
 {
-    "count": 63,
+    "count": 8,
     "sample_fqcn": [
-        "Waaseyaa\\Api\\Http\\DiscoveryApiHandler",
-        "Waaseyaa\\Api\\Http\\Router\\DiscoveryRouter",
-        "Waaseyaa\\Api\\ResourceSerializer",
-        "Waaseyaa\\Api\\Query\\ParsedQuery",
-        "Waaseyaa\\Api\\Query\\QueryFilter",
-        "Waaseyaa\\Api\\Query\\QueryParser",
-        "Waaseyaa\\Api\\Query\\QueryApplier",
-        "Waaseyaa\\Api\\Query\\QuerySort",
-        "Waaseyaa\\Api\\Query\\PaginationLinks",
-        "Waaseyaa\\Api\\Schema\\SchemaPresenter",
-        "Waaseyaa\\Api\\Controller\\BroadcastStorage",
-        "Waaseyaa\\Api\\Controller\\TranslationController"
+        "Waaseyaa\\Api\\MutableTranslatableInterface",
+        "Waaseyaa\\Api\\Exception\\JsonApiDocumentException",
+        "Waaseyaa\\Bimaaji\\Dsl\\TaskPipelineResult",
+        "Waaseyaa\\Bimaaji\\Graph\\GraphSectionProviderInterface",
+        "Waaseyaa\\Routing\\RouteFingerprint",
+        "Waaseyaa\\Routing\\Language\\LanguageNegotiatorInterface",
+        "Waaseyaa\\Routing\\WaaseyaaRouter",
+        "Waaseyaa\\Routing\\AuthOidcRouteServiceProvider"
     ]
 }
 ```
@@ -47,10 +43,10 @@ Static: Waaseyaa `use` in L4 code targeting layer >4 — see P2-style findings. 
 
 Counts: service providers **2**, *Listener* classes **0**, *Attribute* classes (heuristic) **1**. See `layer4_metadata_consistency.json` for file paths.
 
-## 6. Test / @covers
+## 6. Test coverage (@covers + #[CoversClass])
 
-Unique FQCNs with at least one `@covers`: 3
-Public symbols with no @covers: 63 (see coverage finding and `symbol_test_map_layer4.json`).
+Unique FQCNs with at least one `@covers` or `#[CoversClass]`: 60
+Public symbols with no indexed coverage: 8 (see coverage finding and `symbol_test_map_layer4.json`).
 
 ## 7. Hygiene
 

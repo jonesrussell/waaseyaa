@@ -1,13 +1,8 @@
 {
-    "generated_at": "2026-04-24T21:14:07+00:00",
+    "generated_at": "2026-04-30T17:02:31+00:00",
     "source": "bin/check-package-layers LAYER_BY_SHORT",
     "layer": 6,
     "packages": {
-        "admin": {
-            "file_count": 0,
-            "symbols": [],
-            "error": "no src"
-        },
         "admin-surface": {
             "file_count": 16,
             "symbols": [
@@ -1019,7 +1014,7 @@
                     "fqcn": "Waaseyaa\\Genealogy\\Entity\\GenealogyPerson",
                     "kind": "class",
                     "file": "packages/genealogy/src/Entity/GenealogyPerson.php",
-                    "line": 9,
+                    "line": 11,
                     "internal": false,
                     "api": false
                 },
@@ -1027,7 +1022,7 @@
                     "fqcn": "Waaseyaa\\Genealogy\\Entity\\GenealogyTree",
                     "kind": "class",
                     "file": "packages/genealogy/src/Entity/GenealogyTree.php",
-                    "line": 9,
+                    "line": 11,
                     "internal": false,
                     "api": false
                 },
@@ -1035,7 +1030,7 @@
                     "fqcn": "Waaseyaa\\Genealogy\\Entity\\GenealogyFamily",
                     "kind": "class",
                     "file": "packages/genealogy/src/Entity/GenealogyFamily.php",
-                    "line": 9,
+                    "line": 11,
                     "internal": false,
                     "api": false
                 },
@@ -1043,7 +1038,7 @@
                     "fqcn": "Waaseyaa\\Genealogy\\Entity\\GenealogyEvent",
                     "kind": "class",
                     "file": "packages/genealogy/src/Entity/GenealogyEvent.php",
-                    "line": 9,
+                    "line": 11,
                     "internal": false,
                     "api": false
                 },
@@ -1128,7 +1123,7 @@
                     "fqcn": "Waaseyaa\\GraphQL\\Resolver\\EntityResolver",
                     "kind": "class",
                     "file": "packages/graphql/src/Resolver/EntityResolver.php",
-                    "line": 27,
+                    "line": 28,
                     "internal": false,
                     "api": false
                 },
@@ -1361,8 +1356,80 @@
             ]
         },
         "ssr": {
-            "file_count": 31,
+            "file_count": 43,
             "symbols": [
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppControllerArgumentResolver",
+                    "kind": "interface",
+                    "file": "packages/ssr/src/Http/AppController/AppControllerArgumentResolver.php",
+                    "line": 13,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppParameterKind",
+                    "kind": "enum",
+                    "file": "packages/ssr/src/Http/AppController/AppParameterKind.php",
+                    "line": 7,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppParameterBindingBuilder",
+                    "kind": "class",
+                    "file": "packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php",
+                    "line": 25,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppInvocationContext",
+                    "kind": "class",
+                    "file": "packages/ssr/src/Http/AppController/AppInvocationContext.php",
+                    "line": 13,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\Exception\\AppControllerTypeMismatchException",
+                    "kind": "class",
+                    "file": "packages/ssr/src/Http/AppController/Exception/AppControllerTypeMismatchException.php",
+                    "line": 7,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\Exception\\InvalidAppControllerArgumentException",
+                    "kind": "class",
+                    "file": "packages/ssr/src/Http/AppController/Exception/InvalidAppControllerArgumentException.php",
+                    "line": 7,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\Exception\\InvalidAppControllerBindingException",
+                    "kind": "class",
+                    "file": "packages/ssr/src/Http/AppController/Exception/InvalidAppControllerBindingException.php",
+                    "line": 7,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppParameterBindingSpec",
+                    "kind": "class",
+                    "file": "packages/ssr/src/Http/AppController/AppParameterBindingSpec.php",
+                    "line": 10,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppControllerMethodInvoker",
+                    "kind": "class",
+                    "file": "packages/ssr/src/Http/AppController/AppControllerMethodInvoker.php",
+                    "line": 14,
+                    "internal": false,
+                    "api": false
+                },
                 {
                     "fqcn": "Waaseyaa\\SSR\\Http\\Router\\SsrRouter",
                     "kind": "class",
@@ -1375,7 +1442,7 @@
                     "fqcn": "Waaseyaa\\SSR\\Http\\Router\\AppControllerRouter",
                     "kind": "class",
                     "file": "packages/ssr/src/Http/Router/AppControllerRouter.php",
-                    "line": 20,
+                    "line": 26,
                     "internal": false,
                     "api": false
                 },
@@ -1439,7 +1506,7 @@
                     "fqcn": "Waaseyaa\\SSR\\SsrPageHandler",
                     "kind": "class",
                     "file": "packages/ssr/src/SsrPageHandler.php",
-                    "line": 33,
+                    "line": 37,
                     "internal": false,
                     "api": false
                 },
@@ -1540,6 +1607,30 @@
                     "api": false
                 },
                 {
+                    "fqcn": "Waaseyaa\\SSR\\Attribute\\MapQuery",
+                    "kind": "attribute_class",
+                    "file": "packages/ssr/src/Attribute/MapQuery.php",
+                    "line": 10,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Attribute\\MapRoute",
+                    "kind": "attribute_class",
+                    "file": "packages/ssr/src/Attribute/MapRoute.php",
+                    "line": 10,
+                    "internal": false,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\SSR\\Attribute\\FromRoute",
+                    "kind": "attribute_class",
+                    "file": "packages/ssr/src/Attribute/FromRoute.php",
+                    "line": 7,
+                    "internal": false,
+                    "api": false
+                },
+                {
                     "fqcn": "Waaseyaa\\SSR\\Attribute\\Component",
                     "kind": "attribute_class",
                     "file": "packages/ssr/src/Attribute/Component.php",
@@ -1614,7 +1705,7 @@
             ]
         },
         "telescope": {
-            "file_count": 36,
+            "file_count": 37,
             "symbols": [
                 {
                     "fqcn": "Waaseyaa\\Telescope\\TelescopeEntry",
@@ -1886,6 +1977,14 @@
                     "file": "packages/telescope/src/CodifiedContext/Storage/CodifiedContextStoreInterface.php",
                     "line": 15,
                     "internal": true,
+                    "api": false
+                },
+                {
+                    "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\CodifiedContextSessionStoreAdapter",
+                    "kind": "class",
+                    "file": "packages/telescope/src/CodifiedContext/Storage/CodifiedContextSessionStoreAdapter.php",
+                    "line": 15,
+                    "internal": false,
                     "api": false
                 },
                 {

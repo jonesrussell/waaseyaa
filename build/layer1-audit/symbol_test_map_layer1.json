@@ -1,13 +1,40 @@
 {
-    "generated_at": "2026-04-24T21:13:55+00:00",
-    "test_files_parsed": 180,
-    "at_covers_hits": 23,
+    "generated_at": "2026-04-30T17:02:18+00:00",
+    "test_files_parsed": 182,
+    "at_covers_hits": 139,
     "per_symbol": {
         "Waaseyaa\\Access\\PermissionHandler": [
             "packages/access/tests/Unit/PermissionHandlerTest.php"
         ],
         "Waaseyaa\\Access\\EntityAccessHandler": [
-            "packages/access/tests/Unit/EntityAccessHandlerTest.php"
+            "packages/access/tests/Unit/EntityAccessHandlerBundleFilterTest.php",
+            "packages/access/tests/Unit/EntityAccessHandlerTest.php",
+            "packages/access/tests/Unit/EntityAccessHandlerFieldAccessTest.php"
+        ],
+        "Waaseyaa\\Access\\Gate\\Gate": [
+            "packages/access/tests/Unit/Gate/GateTest.php"
+        ],
+        "Waaseyaa\\Access\\Gate\\AccessDeniedException": [
+            "packages/access/tests/Unit/Gate/GateTest.php"
+        ],
+        "Waaseyaa\\Access\\Gate\\PolicyAttribute": [
+            "packages/access/tests/Unit/Gate/GateTest.php"
+        ],
+        "Waaseyaa\\Access\\Gate\\EntityAccessGate": [
+            "packages/access/tests/Unit/Gate/EntityAccessGateTest.php"
+        ],
+        "Waaseyaa\\Access\\ConfigEntityAccessPolicy": [
+            "packages/access/tests/Unit/ConfigEntityAccessPolicyTest.php"
+        ],
+        "Waaseyaa\\Access\\AccessPolicyInterface": [
+            "packages/access/tests/Unit/ConfigEntityAccessPolicyTest.php"
+        ],
+        "Waaseyaa\\Access\\RedirectValidator": [
+            "packages/access/tests/Unit/RedirectValidatorTest.php",
+            "packages/access/tests/Unit/Middleware/AuthorizationMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Access\\Middleware\\AuthorizationMiddleware": [
+            "packages/access/tests/Unit/Middleware/AuthorizationMiddlewareTest.php"
         ],
         "Waaseyaa\\Access\\AccessResult": [
             "packages/access/tests/Unit/AccessResultTest.php"
@@ -15,9 +42,121 @@
         "Waaseyaa\\Access\\AccessStatus": [
             "packages/access/tests/Unit/AccessResultTest.php"
         ],
+        "Waaseyaa\\Access\\Attribute\\AccessPolicy": [
+            "packages/access/tests/Unit/Attribute/AccessPolicyAttributeTest.php"
+        ],
+        "Waaseyaa\\Auth\\RateLimiter": [
+            "packages/auth/tests/Unit/RateLimiterTest.php"
+        ],
+        "Waaseyaa\\Auth\\Middleware\\AuthenticateMiddleware": [
+            "packages/auth/tests/Unit/AuthenticateMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Auth\\TwoFactorManager": [
+            "packages/auth/tests/Unit/TwoFactorManagerTest.php"
+        ],
+        "Waaseyaa\\Auth\\Controller\\RegisterController": [
+            "packages/auth/tests/Unit/Controller/RegisterControllerTest.php"
+        ],
+        "Waaseyaa\\Auth\\Controller\\VerifyEmailController": [
+            "packages/auth/tests/Unit/Controller/VerifyEmailControllerTest.php"
+        ],
+        "Waaseyaa\\Auth\\Controller\\ForgotPasswordController": [
+            "packages/auth/tests/Unit/Controller/ForgotPasswordControllerTest.php"
+        ],
+        "Waaseyaa\\Auth\\Controller\\ResetPasswordController": [
+            "packages/auth/tests/Unit/Controller/ResetPasswordControllerTest.php"
+        ],
+        "Waaseyaa\\Auth\\Controller\\ResendVerificationController": [
+            "packages/auth/tests/Unit/Controller/ResendVerificationControllerTest.php"
+        ],
+        "Waaseyaa\\Auth\\Controller\\LoginController": [
+            "packages/auth/tests/Unit/Controller/LoginControllerTest.php"
+        ],
+        "Waaseyaa\\Auth\\Controller\\LogoutController": [
+            "packages/auth/tests/Unit/Controller/LogoutControllerTest.php"
+        ],
+        "Waaseyaa\\Auth\\Controller\\MeController": [
+            "packages/auth/tests/Unit/Controller/MeControllerTest.php"
+        ],
+        "Waaseyaa\\Auth\\AuthManager": [
+            "packages/auth/tests/Unit/AuthManagerTest.php"
+        ],
+        "Waaseyaa\\Auth\\DatabaseRateLimiter": [
+            "packages/auth/tests/Unit/DatabaseRateLimiterTest.php"
+        ],
+        "Waaseyaa\\Auth\\Config\\AuthConfig": [
+            "packages/auth/tests/Unit/Config/AuthConfigTest.php"
+        ],
+        "Waaseyaa\\Config\\TranslatableConfigFactory": [
+            "packages/config/tests/Unit/TranslatableConfigFactoryTest.php"
+        ],
+        "Waaseyaa\\Config\\ConfigManager": [
+            "packages/config/tests/Unit/ConfigManagerTest.php"
+        ],
+        "Waaseyaa\\Config\\Schema\\ConfigSchemaValidator": [
+            "packages/config/tests/Unit/Schema/ConfigSchemaValidatorTest.php"
+        ],
+        "Waaseyaa\\Config\\Cache\\CachedConfigFactory": [
+            "packages/config/tests/Unit/Cache/CachedConfigFactoryTest.php"
+        ],
+        "Waaseyaa\\Config\\Cache\\ConfigCacheCompiler": [
+            "packages/config/tests/Unit/Cache/ConfigCacheCompilerTest.php"
+        ],
+        "Waaseyaa\\Config\\Config": [
+            "packages/config/tests/Unit/ConfigTest.php"
+        ],
+        "Waaseyaa\\Config\\Exception\\ImmutableConfigException": [
+            "packages/config/tests/Unit/ConfigTest.php"
+        ],
+        "Waaseyaa\\Config\\Listener\\ConfigCacheInvalidator": [
+            "packages/config/tests/Unit/Listener/ConfigCacheInvalidatorTest.php"
+        ],
+        "Waaseyaa\\Config\\Event\\ConfigEvent": [
+            "packages/config/tests/Unit/Event/ConfigEventTest.php"
+        ],
+        "Waaseyaa\\Config\\Event\\ConfigEvents": [
+            "packages/config/tests/Unit/Event/ConfigEventTest.php"
+        ],
+        "Waaseyaa\\Config\\EnvironmentConfigFactory": [
+            "packages/config/tests/Unit/EnvironmentConfigFactoryTest.php"
+        ],
+        "Waaseyaa\\Config\\ConfigManifest": [
+            "packages/config/tests/Unit/ConfigManifestTest.php"
+        ],
+        "Waaseyaa\\Config\\Storage\\FileStorage": [
+            "packages/config/tests/Unit/Storage/FileStorageTest.php"
+        ],
+        "Waaseyaa\\Config\\Storage\\MemoryStorage": [
+            "packages/config/tests/Unit/Storage/MemoryStorageTest.php"
+        ],
+        "Waaseyaa\\Config\\ConfigFactory": [
+            "packages/config/tests/Unit/ConfigFactoryTest.php"
+        ],
+        "Waaseyaa\\Config\\EventAwareStorage": [
+            "packages/config/tests/Unit/ConfigFactoryTest.php"
+        ],
+        "Waaseyaa\\Entity\\EntityTypeManager": [
+            "packages/entity/tests/Unit/EntityTypeManagerBundleFieldsTest.php",
+            "packages/entity/tests/Unit/EntityTypeManagerTest.php"
+        ],
+        "Waaseyaa\\Entity\\Audit\\EntityWriteAuditListener": [
+            "packages/entity/tests/Unit/Audit/EntityWriteAuditListenerTest.php"
+        ],
+        "Waaseyaa\\Entity\\Audit\\EntityAuditLogger": [
+            "packages/entity/tests/Unit/Audit/EntityAuditLoggerTest.php"
+        ],
+        "Waaseyaa\\Entity\\Audit\\EntityAuditEntry": [
+            "packages/entity/tests/Unit/Audit/EntityAuditLoggerTest.php"
+        ],
         "Waaseyaa\\Entity\\ContentEntityBase": [
             "packages/entity/tests/Unit/ContentEntityBaseTest.php",
             "packages/entity/tests/Unit/CastAwareEntityTest.php"
+        ],
+        "Waaseyaa\\Entity\\EntityTypeLifecycleManager": [
+            "packages/entity/tests/Unit/EntityTypeLifecycleManagerTest.php"
+        ],
+        "Waaseyaa\\Entity\\Snapshot\\EntityValuesSnapshot": [
+            "packages/entity/tests/Unit/EntityValuesSnapshotTest.php"
         ],
         "Waaseyaa\\Entity\\EntityType": [
             "packages/entity/tests/Unit/EntityTypeTest.php"
@@ -32,17 +171,94 @@
         "Waaseyaa\\Entity\\Cast\\ValueCaster": [
             "packages/entity/tests/Unit/Cast/ValueCasterTest.php"
         ],
+        "Waaseyaa\\Entity\\Validation\\FieldDefinitionConstraintBuilder": [
+            "packages/entity/tests/Unit/Validation/FieldDefinitionConstraintBuilderTest.php"
+        ],
+        "Waaseyaa\\Entity\\Validation\\EntityTypeValidationConstraints": [
+            "packages/entity/tests/Unit/Validation/EntityTypeValidationConstraintsTest.php"
+        ],
+        "Waaseyaa\\Entity\\Event\\EntitySaved": [
+            "packages/entity/tests/Unit/Event/EntitySavedTest.php"
+        ],
+        "Waaseyaa\\Entity\\Event\\EntityDeleted": [
+            "packages/entity/tests/Unit/Event/EntitySavedTest.php"
+        ],
         "Waaseyaa\\Entity\\Event\\EntityEvent": [
             "packages/entity/tests/Unit/Event/EntityEventTest.php"
         ],
         "Waaseyaa\\Entity\\Event\\EntityEvents": [
             "packages/entity/tests/Unit/Event/EntityEventTest.php"
         ],
-        "Waaseyaa\\Entity\\EntityTypeManager": [
-            "packages/entity/tests/Unit/EntityTypeManagerTest.php"
+        "Waaseyaa\\Entity\\Event\\DefaultEntityEventFactory": [
+            "packages/entity/tests/Unit/Event/DefaultEntityEventFactoryTest.php"
+        ],
+        "Waaseyaa\\Entity\\Attribute\\EntityMetadataReader": [
+            "packages/entity/tests/Unit/EntityMetadataReaderTest.php"
+        ],
+        "Waaseyaa\\Entity\\EntityTypeIdNormalizer": [
+            "packages/entity/tests/Unit/EntityTypeIdNormalizerTest.php"
+        ],
+        "Waaseyaa\\Entity\\EntityValues": [
+            "packages/entity/tests/Unit/EntityValuesTest.php"
         ],
         "Waaseyaa\\Entity\\DateTime\\TimestampFieldConvention": [
             "packages/entity/tests/Unit/DateTime/TimestampFieldConventionTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\SqlEntityStorage": [
+            "packages/entity-storage/tests/Unit/SqlEntityStorageBundleFieldsTest.php",
+            "packages/entity-storage/tests/Unit/CastPersistenceIntegrationTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\SqlEntityQuery": [
+            "packages/entity-storage/tests/Unit/SqlEntityQueryOperatorTest.php",
+            "packages/entity-storage/tests/Unit/SqlEntityQueryResultCacheTest.php",
+            "packages/entity-storage/tests/Unit/SqlEntityQueryBundleFieldsTest.php",
+            "packages/entity-storage/tests/Unit/SqlEntityQueryLikeTest.php",
+            "packages/entity-storage/tests/Unit/SqlEntityQueryDataFieldTest.php",
+            "packages/entity-storage/tests/Unit/SqlEntityQueryEdgeCaseTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\SqlEntityQueryResultCache": [
+            "packages/entity-storage/tests/Unit/SqlEntityQueryResultCacheTest.php"
+        ],
+        "Waaseyaa\\Entity\\RevisionableEntityTrait": [
+            "packages/entity-storage/tests/Unit/RevisionableEntityTraitTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\Hydration\\EntityInstantiator": [
+            "packages/entity-storage/tests/Unit/Hydration/EntityInstantiatorTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\EntitySchemaSync": [
+            "packages/entity-storage/tests/Unit/EntitySchemaSyncTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\EntityRepository": [
+            "packages/entity-storage/tests/Unit/EntityRepositoryTest.php",
+            "packages/entity-storage/tests/Unit/EntityRepositoryRevisionTest.php",
+            "packages/entity-storage/tests/Unit/CastPersistenceIntegrationTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\SqlSchemaHandler": [
+            "packages/entity-storage/tests/Unit/SqlSchemaHandlerRegistryFallbackTest.php",
+            "packages/entity-storage/tests/Unit/SqlSchemaHandlerBundleFieldsTest.php",
+            "packages/entity-storage/tests/Unit/TranslationStorageTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\UnitOfWork": [
+            "packages/entity-storage/tests/Unit/UnitOfWorkTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\Driver\\InMemoryStorageDriver": [
+            "packages/entity-storage/tests/Unit/Driver/InMemoryStorageDriverTest.php",
+            "packages/entity-storage/tests/Tenancy/CommunityScopeTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\Driver\\SqlStorageDriver": [
+            "packages/entity-storage/tests/Unit/Driver/SqlStorageDriverTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\Driver\\RevisionableStorageDriver": [
+            "packages/entity-storage/tests/Unit/Driver/RevisionableStorageDriverTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\Connection\\SingleConnectionResolver": [
+            "packages/entity-storage/tests/Unit/Connection/SingleConnectionResolverTest.php"
+        ],
+        "Waaseyaa\\EntityStorage\\Tenancy\\CommunityScope": [
+            "packages/entity-storage/tests/Tenancy/CommunityScopeTest.php"
+        ],
+        "Waaseyaa\\Field\\FieldDefinitionRegistry": [
+            "packages/field/tests/Unit/FieldDefinitionRegistryTest.php"
         ],
         "Waaseyaa\\Field\\FieldItemList": [
             "packages/field/tests/Unit/FieldItemListTest.php"
@@ -53,11 +269,26 @@
         "Waaseyaa\\Field\\FieldItemBase": [
             "packages/field/tests/Unit/FieldItemBaseTest.php"
         ],
+        "Waaseyaa\\Field\\Item\\JsonItem": [
+            "packages/field/tests/Unit/Item/JsonItemTest.php"
+        ],
+        "Waaseyaa\\Field\\Item\\ImageItem": [
+            "packages/field/tests/Unit/Item/ImageItemTest.php"
+        ],
         "Waaseyaa\\Field\\Item\\StringItem": [
             "packages/field/tests/Unit/Item/StringItemTest.php"
         ],
+        "Waaseyaa\\Field\\Item\\EmailItem": [
+            "packages/field/tests/Unit/Item/EmailItemTest.php"
+        ],
         "Waaseyaa\\Field\\Item\\TextItem": [
             "packages/field/tests/Unit/Item/TextItemTest.php"
+        ],
+        "Waaseyaa\\Field\\Item\\DateTimeItem": [
+            "packages/field/tests/Unit/Item/DateTimeItemTest.php"
+        ],
+        "Waaseyaa\\Field\\Item\\DecimalItem": [
+            "packages/field/tests/Unit/Item/DecimalItemTest.php"
         ],
         "Waaseyaa\\Field\\Item\\IntegerItem": [
             "packages/field/tests/Unit/Item/IntegerItemTest.php"
@@ -71,32 +302,150 @@
         "Waaseyaa\\Field\\Item\\BooleanItem": [
             "packages/field/tests/Unit/Item/BooleanItemTest.php"
         ],
+        "Waaseyaa\\Field\\Item\\ListItem": [
+            "packages/field/tests/Unit/Item/ListItemTest.php"
+        ],
+        "Waaseyaa\\Field\\Item\\FileItem": [
+            "packages/field/tests/Unit/Item/FileItemTest.php"
+        ],
+        "Waaseyaa\\Field\\Item\\ComputedItem": [
+            "packages/field/tests/Unit/Item/ComputedItemTest.php"
+        ],
+        "Waaseyaa\\Field\\Item\\LinkItem": [
+            "packages/field/tests/Unit/Item/LinkItemTest.php"
+        ],
+        "Waaseyaa\\Field\\Item\\DateItem": [
+            "packages/field/tests/Unit/Item/DateItemTest.php"
+        ],
         "Waaseyaa\\Field\\FieldDefinition": [
             "packages/field/tests/Unit/FieldDefinitionTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Http\\JwksController": [
+            "packages/oidc/tests/Unit/Http/JwksControllerTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Http\\DiscoveryController": [
+            "packages/oidc/tests/Unit/Http/DiscoveryControllerTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Access\\OidcClientAccessPolicy": [
+            "packages/oidc/tests/Unit/Access/OidcClientAccessPolicyTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Token\\PkceVerifier": [
+            "packages/oidc/tests/Unit/Token/PkceVerifierTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Token\\IdTokenMinter": [
+            "packages/oidc/tests/Unit/Token/IdTokenMinterTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Token\\TokenRequestValidator": [
+            "packages/oidc/tests/Unit/Token/TokenRequestValidatorTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Token\\TokenRequestException": [
+            "packages/oidc/tests/Unit/Token/TokenRequestValidatorTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Authorize\\AuthorizationRequestValidator": [
+            "packages/oidc/tests/Unit/Authorize/AuthorizationRequestValidatorTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Authorize\\AuthorizationRequestException": [
+            "packages/oidc/tests/Unit/Authorize/AuthorizationRequestValidatorTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Authorize\\ValidatedAuthorizationRequest": [
+            "packages/oidc/tests/Unit/Authorize/AuthorizationRequestValidatorTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Keys\\PemFileKeyLoader": [
+            "packages/oidc/tests/Unit/Keys/PemFileKeyLoaderTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Keys\\SigningKey": [
+            "packages/oidc/tests/Unit/Keys/PemFileKeyLoaderTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Repository\\AuthorizationCode": [
+            "packages/oidc/tests/Unit/Repository/AuthorizationCodeTest.php",
+            "packages/oidc/tests/Integration/Repository/DatabaseAuthorizationCodeRepositoryTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Entity\\OidcClient": [
+            "packages/oidc/tests/Unit/Entity/OidcClientTest.php",
+            "packages/oidc/tests/Integration/Entity/OidcClientStorageTest.php"
+        ],
+        "Waaseyaa\\Oidc\\OidcServiceProvider": [
+            "packages/oidc/tests/Unit/OidcServiceProviderTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Token\\TokenController": [
+            "packages/oidc/tests/Integration/Token/TokenControllerTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Authorize\\AuthorizeController": [
+            "packages/oidc/tests/Integration/Authorize/AuthorizeControllerTest.php"
+        ],
+        "Waaseyaa\\Oidc\\Repository\\DatabaseAuthorizationCodeRepository": [
+            "packages/oidc/tests/Integration/Repository/DatabaseAuthorizationCodeRepositoryTest.php"
+        ],
+        "Waaseyaa\\Oidc\\ClientRegistry\\OidcClientSeeder": [
+            "packages/oidc/tests/Integration/ClientRegistry/OidcClientSeederTest.php"
+        ],
+        "Waaseyaa\\Oidc\\ClientRegistry\\OidcClientLookup": [
+            "packages/oidc/tests/Integration/ClientRegistry/OidcClientLookupTest.php"
+        ],
+        "Waaseyaa\\Testing\\WaaseyaaTestCase": [
+            "packages/testing/tests/Unit/WaaseyaaTestCaseTest.php"
+        ],
+        "Waaseyaa\\Testing\\Factory\\EntityTypeFixtureValues": [
+            "packages/testing/tests/Unit/EntityTypeFixtureValuesTest.php"
+        ],
+        "Waaseyaa\\Testing\\Factory\\EntityFactory": [
+            "packages/testing/tests/Unit/EntityFactoryTest.php"
+        ],
+        "Waaseyaa\\User\\Http\\AuthController": [
+            "packages/user/tests/Unit/Http/AuthControllerTest.php"
+        ],
+        "Waaseyaa\\User\\UserSession": [
+            "packages/user/tests/Unit/UserSessionTest.php"
+        ],
+        "Waaseyaa\\User\\UserServiceProvider": [
+            "packages/user/tests/Unit/UserServiceProviderTest.php"
+        ],
+        "Waaseyaa\\User\\AnonymousUser": [
+            "packages/user/tests/Unit/AnonymousUserTest.php"
+        ],
+        "Waaseyaa\\User\\Role": [
+            "packages/user/tests/Unit/RoleTest.php"
+        ],
+        "Waaseyaa\\User\\UserBlock": [
+            "packages/user/tests/Unit/UserBlockTest.php"
+        ],
+        "Waaseyaa\\User\\Session\\NativeSession": [
+            "packages/user/tests/Unit/Session/NativeSessionTest.php"
+        ],
+        "Waaseyaa\\User\\UserAccessPolicy": [
+            "packages/user/tests/Unit/UserAccessPolicyTest.php"
+        ],
+        "Waaseyaa\\User\\AuthMailer": [
+            "packages/user/tests/Unit/AuthMailerTest.php"
+        ],
+        "Waaseyaa\\User\\UserBlockService": [
+            "packages/user/tests/Unit/UserBlockServiceTest.php"
+        ],
+        "Waaseyaa\\User\\Middleware\\SessionMiddleware": [
+            "packages/user/tests/Unit/Middleware/SessionMiddlewareTest.php"
+        ],
+        "Waaseyaa\\User\\Middleware\\CsrfMiddleware": [
+            "packages/user/tests/Unit/Middleware/CsrfMiddlewareTest.php"
+        ],
+        "Waaseyaa\\User\\Middleware\\BearerAuthMiddleware": [
+            "packages/user/tests/Unit/Middleware/BearerAuthMiddlewareTest.php"
+        ],
+        "Waaseyaa\\User\\DevAdminAccount": [
+            "packages/user/tests/Unit/DevAdminAccountTest.php"
+        ],
+        "Waaseyaa\\User\\UserBlockAccessPolicy": [
+            "packages/user/tests/Unit/UserBlockAccessPolicyTest.php"
+        ],
+        "Waaseyaa\\User\\User": [
+            "packages/user/tests/Unit/UserTest.php"
         ]
     },
     "public_non_internal_symbols_lacking_at_covers": [
-        {
-            "fqcn": "Waaseyaa\\Access\\ConfigEntityAccessPolicy",
-            "kind": "class",
-            "file": "packages/access/src/ConfigEntityAccessPolicy.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
         {
             "fqcn": "Waaseyaa\\Access\\AccountInterface",
             "kind": "interface",
             "file": "packages/access/src/AccountInterface.php",
             "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Access\\RedirectValidator",
-            "kind": "class",
-            "file": "packages/access/src/RedirectValidator.php",
-            "line": 12,
             "internal": false,
             "api": false
         },
@@ -109,58 +458,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Access\\AccessPolicyInterface",
-            "kind": "interface",
-            "file": "packages/access/src/AccessPolicyInterface.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Access\\Gate\\PolicyAttribute",
-            "kind": "attribute_class",
-            "file": "packages/access/src/Gate/PolicyAttribute.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Access\\Gate\\GateInterface",
             "kind": "interface",
             "file": "packages/access/src/Gate/GateInterface.php",
             "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Access\\Gate\\AccessDeniedException",
-            "kind": "class",
-            "file": "packages/access/src/Gate/AccessDeniedException.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Access\\Gate\\Gate",
-            "kind": "class",
-            "file": "packages/access/src/Gate/Gate.php",
-            "line": 20,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Access\\Gate\\EntityAccessGate",
-            "kind": "class",
-            "file": "packages/access/src/Gate/EntityAccessGate.php",
-            "line": 21,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Access\\Middleware\\AuthorizationMiddleware",
-            "kind": "class",
-            "file": "packages/access/src/Middleware/AuthorizationMiddleware.php",
-            "line": 22,
             "internal": false,
             "api": false
         },
@@ -173,14 +474,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Access\\Attribute\\AccessPolicy",
-            "kind": "attribute_class",
-            "file": "packages/access/src/Attribute/AccessPolicy.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Access\\AccessChecker",
             "kind": "class",
             "file": "packages/access/src/AccessChecker.php",
@@ -189,89 +482,9 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Auth\\RateLimiter",
-            "kind": "class",
-            "file": "packages/auth/src/RateLimiter.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Auth\\Token\\AuthTokenRepository",
             "kind": "class",
             "file": "packages/auth/src/Token/AuthTokenRepository.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Controller\\ResendVerificationController",
-            "kind": "class",
-            "file": "packages/auth/src/Controller/ResendVerificationController.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Controller\\LoginController",
-            "kind": "class",
-            "file": "packages/auth/src/Controller/LoginController.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Controller\\MeController",
-            "kind": "class",
-            "file": "packages/auth/src/Controller/MeController.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Controller\\ResetPasswordController",
-            "kind": "class",
-            "file": "packages/auth/src/Controller/ResetPasswordController.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Controller\\VerifyEmailController",
-            "kind": "class",
-            "file": "packages/auth/src/Controller/VerifyEmailController.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Controller\\LogoutController",
-            "kind": "class",
-            "file": "packages/auth/src/Controller/LogoutController.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Controller\\ForgotPasswordController",
-            "kind": "class",
-            "file": "packages/auth/src/Controller/ForgotPasswordController.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Controller\\RegisterController",
-            "kind": "class",
-            "file": "packages/auth/src/Controller/RegisterController.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\AuthManager",
-            "kind": "class",
-            "file": "packages/auth/src/AuthManager.php",
             "line": 9,
             "internal": false,
             "api": false
@@ -285,38 +498,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Auth\\TwoFactorManager",
-            "kind": "class",
-            "file": "packages/auth/src/TwoFactorManager.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\DatabaseRateLimiter",
-            "kind": "class",
-            "file": "packages/auth/src/DatabaseRateLimiter.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Middleware\\AuthenticateMiddleware",
-            "kind": "class",
-            "file": "packages/auth/src/Middleware/AuthenticateMiddleware.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Auth\\Config\\AuthConfig",
-            "kind": "class",
-            "file": "packages/auth/src/Config/AuthConfig.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Auth\\Config\\MailMissingPolicy",
             "kind": "enum",
             "file": "packages/auth/src/Config/MailMissingPolicy.php",
@@ -325,42 +506,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Config\\EnvironmentConfigFactory",
-            "kind": "class",
-            "file": "packages/config/src/EnvironmentConfigFactory.php",
-            "line": 27,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\ConfigManifest",
-            "kind": "class",
-            "file": "packages/config/src/ConfigManifest.php",
-            "line": 29,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\TranslatableConfigFactory",
-            "kind": "class",
-            "file": "packages/config/src/TranslatableConfigFactory.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Config\\StorageInterface",
             "kind": "interface",
             "file": "packages/config/src/StorageInterface.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\Schema\\ConfigSchemaValidator",
-            "kind": "class",
-            "file": "packages/config/src/Schema/ConfigSchemaValidator.php",
-            "line": 19,
             "internal": false,
             "api": false
         },
@@ -381,14 +530,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Config\\Config",
-            "kind": "class",
-            "file": "packages/config/src/Config.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Config\\ConfigImportResult",
             "kind": "class",
             "file": "packages/config/src/ConfigImportResult.php",
@@ -405,73 +546,9 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Config\\Cache\\CachedConfigFactory",
-            "kind": "class",
-            "file": "packages/config/src/Cache/CachedConfigFactory.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\Cache\\ConfigCacheCompiler",
-            "kind": "class",
-            "file": "packages/config/src/Cache/ConfigCacheCompiler.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\Listener\\ConfigCacheInvalidator",
-            "kind": "class",
-            "file": "packages/config/src/Listener/ConfigCacheInvalidator.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Config\\Ownership\\PackageOwnership",
             "kind": "class",
             "file": "packages/config/src/Ownership/PackageOwnership.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\Event\\ConfigEvent",
-            "kind": "class",
-            "file": "packages/config/src/Event/ConfigEvent.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\Event\\ConfigEvents",
-            "kind": "enum",
-            "file": "packages/config/src/Event/ConfigEvents.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\Storage\\MemoryStorage",
-            "kind": "class",
-            "file": "packages/config/src/Storage/MemoryStorage.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\Storage\\FileStorage",
-            "kind": "class",
-            "file": "packages/config/src/Storage/FileStorage.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\Exception\\ImmutableConfigException",
-            "kind": "class",
-            "file": "packages/config/src/Exception/ImmutableConfigException.php",
             "line": 7,
             "internal": false,
             "api": false
@@ -501,30 +578,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Config\\ConfigFactory",
-            "kind": "class",
-            "file": "packages/config/src/ConfigFactory.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Config\\ConfigManager",
-            "kind": "class",
-            "file": "packages/config/src/ConfigManager.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Entity\\Audit\\EntityWriteAuditListener",
-            "kind": "class",
-            "file": "packages/entity/src/Audit/EntityWriteAuditListener.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Entity\\Audit\\LifecycleAuditKey",
             "kind": "enum",
             "file": "packages/entity/src/Audit/LifecycleAuditKey.php",
@@ -541,34 +594,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Entity\\Audit\\EntityAuditEntry",
-            "kind": "class",
-            "file": "packages/entity/src/Audit/EntityAuditEntry.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Entity\\Audit\\EntityAuditLogger",
-            "kind": "class",
-            "file": "packages/entity/src/Audit/EntityAuditLogger.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Entity\\DefinesEntityType",
             "kind": "interface",
             "file": "packages/entity/src/DefinesEntityType.php",
             "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Entity\\EntityTypeIdNormalizer",
-            "kind": "class",
-            "file": "packages/entity/src/EntityTypeIdNormalizer.php",
-            "line": 11,
             "internal": false,
             "api": false
         },
@@ -597,26 +626,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Entity\\EntityValues",
-            "kind": "class",
-            "file": "packages/entity/src/EntityValues.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Entity\\Community\\HasCommunityInterface",
             "kind": "interface",
             "file": "packages/entity/src/Community/HasCommunityInterface.php",
             "line": 30,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Entity\\EntityTypeLifecycleManager",
-            "kind": "class",
-            "file": "packages/entity/src/EntityTypeLifecycleManager.php",
-            "line": 16,
             "internal": false,
             "api": false
         },
@@ -645,26 +658,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Entity\\Validation\\EntityTypeValidationConstraints",
-            "kind": "class",
-            "file": "packages/entity/src/Validation/EntityTypeValidationConstraints.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Entity\\Validation\\EntityValidator",
             "kind": "class",
             "file": "packages/entity/src/Validation/EntityValidator.php",
             "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Entity\\Validation\\FieldDefinitionConstraintBuilder",
-            "kind": "class",
-            "file": "packages/entity/src/Validation/FieldDefinitionConstraintBuilder.php",
-            "line": 24,
             "internal": false,
             "api": false
         },
@@ -705,30 +702,6 @@
             "kind": "interface",
             "file": "packages/entity/src/Repository/EntityRepositoryInterface.php",
             "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Entity\\Event\\EntityDeleted",
-            "kind": "class",
-            "file": "packages/entity/src/Event/EntityDeleted.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Entity\\Event\\DefaultEntityEventFactory",
-            "kind": "class",
-            "file": "packages/entity/src/Event/DefaultEntityEventFactory.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Entity\\Event\\EntitySaved",
-            "kind": "class",
-            "file": "packages/entity/src/Event/EntitySaved.php",
-            "line": 9,
             "internal": false,
             "api": false
         },
@@ -789,10 +762,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Entity\\Snapshot\\EntityValuesSnapshot",
+            "fqcn": "Waaseyaa\\Entity\\Exception\\EntityMetadataException",
             "kind": "class",
-            "file": "packages/entity/src/Snapshot/EntityValuesSnapshot.php",
-            "line": 20,
+            "file": "packages/entity/src/Exception/EntityMetadataException.php",
+            "line": 10,
             "internal": false,
             "api": false
         },
@@ -805,10 +778,42 @@
             "api": false
         },
         {
+            "fqcn": "Waaseyaa\\Entity\\Attribute\\ContentEntityKeys",
+            "kind": "attribute_class",
+            "file": "packages/entity/src/Attribute/ContentEntityKeys.php",
+            "line": 12,
+            "internal": false,
+            "api": false
+        },
+        {
             "fqcn": "Waaseyaa\\Entity\\Attribute\\EntityTypeAttribute",
             "kind": "attribute_class",
             "file": "packages/entity/src/Attribute/EntityTypeAttribute.php",
             "line": 24,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\Entity\\Attribute\\ContentEntityTypeReader",
+            "kind": "class",
+            "file": "packages/entity/src/Attribute/ContentEntityTypeReader.php",
+            "line": 10,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\Entity\\Attribute\\ContentEntityType",
+            "kind": "attribute_class",
+            "file": "packages/entity/src/Attribute/ContentEntityType.php",
+            "line": 11,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\Entity\\Attribute\\EntityClassMetadata",
+            "kind": "class",
+            "file": "packages/entity/src/Attribute/EntityClassMetadata.php",
+            "line": 12,
             "internal": false,
             "api": false
         },
@@ -861,54 +866,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\EntityStorage\\SqlEntityQueryResultCache",
-            "kind": "class",
-            "file": "packages/entity-storage/src/SqlEntityQueryResultCache.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\EntityRepository",
-            "kind": "class",
-            "file": "packages/entity-storage/src/EntityRepository.php",
-            "line": 31,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\Tenancy\\CommunityScope",
-            "kind": "class",
-            "file": "packages/entity-storage/src/Tenancy/CommunityScope.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\SqlSchemaHandler",
-            "kind": "class",
-            "file": "packages/entity-storage/src/SqlSchemaHandler.php",
-            "line": 22,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\UnitOfWork",
-            "kind": "class",
-            "file": "packages/entity-storage/src/UnitOfWork.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\EntitySchemaSync",
-            "kind": "class",
-            "file": "packages/entity-storage/src/EntitySchemaSync.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\EntityStorage\\Exception\\BundleAmbiguousFieldException",
             "kind": "class",
             "file": "packages/entity-storage/src/Exception/BundleAmbiguousFieldException.php",
@@ -933,30 +890,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\EntityStorage\\Driver\\RevisionableStorageDriver",
-            "kind": "class",
-            "file": "packages/entity-storage/src/Driver/RevisionableStorageDriver.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\Driver\\InMemoryStorageDriver",
-            "kind": "class",
-            "file": "packages/entity-storage/src/Driver/InMemoryStorageDriver.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\Driver\\SqlStorageDriver",
-            "kind": "class",
-            "file": "packages/entity-storage/src/Driver/SqlStorageDriver.php",
-            "line": 23,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\EntityStorage\\Driver\\EntityStorageDriverInterface",
             "kind": "interface",
             "file": "packages/entity-storage/src/Driver/EntityStorageDriverInterface.php",
@@ -969,30 +902,6 @@
             "kind": "interface",
             "file": "packages/entity-storage/src/Connection/ConnectionResolverInterface.php",
             "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\Connection\\SingleConnectionResolver",
-            "kind": "class",
-            "file": "packages/entity-storage/src/Connection/SingleConnectionResolver.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\SqlEntityQuery",
-            "kind": "class",
-            "file": "packages/entity-storage/src/SqlEntityQuery.php",
-            "line": 29,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\EntityStorage\\SqlEntityStorage",
-            "kind": "class",
-            "file": "packages/entity-storage/src/SqlEntityStorage.php",
-            "line": 36,
             "internal": false,
             "api": false
         },
@@ -1037,98 +946,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Field\\FieldDefinitionRegistry",
-            "kind": "class",
-            "file": "packages/field/src/FieldDefinitionRegistry.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Field\\PropertyValue",
             "kind": "class",
             "file": "packages/field/src/PropertyValue.php",
             "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\DateTimeItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/DateTimeItem.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\ComputedItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/ComputedItem.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\ImageItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/ImageItem.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\LinkItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/LinkItem.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\DateItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/DateItem.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\FileItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/FileItem.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\EmailItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/EmailItem.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\ListItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/ListItem.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\JsonItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/JsonItem.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Field\\Item\\DecimalItem",
-            "kind": "class",
-            "file": "packages/field/src/Item/DecimalItem.php",
-            "line": 10,
             "internal": false,
             "api": false
         },
@@ -1165,122 +986,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Oidc\\Http\\DiscoveryController",
-            "kind": "class",
-            "file": "packages/oidc/src/Http/DiscoveryController.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Http\\JwksController",
-            "kind": "class",
-            "file": "packages/oidc/src/Http/JwksController.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Access\\OidcClientAccessPolicy",
-            "kind": "class",
-            "file": "packages/oidc/src/Access/OidcClientAccessPolicy.php",
-            "line": 34,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Token\\PkceVerifier",
-            "kind": "class",
-            "file": "packages/oidc/src/Token/PkceVerifier.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Token\\TokenRequestValidator",
-            "kind": "class",
-            "file": "packages/oidc/src/Token/TokenRequestValidator.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Token\\IdTokenMinter",
-            "kind": "class",
-            "file": "packages/oidc/src/Token/IdTokenMinter.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Token\\TokenController",
-            "kind": "class",
-            "file": "packages/oidc/src/Token/TokenController.php",
-            "line": 27,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Oidc\\Token\\TokenRequest",
             "kind": "class",
             "file": "packages/oidc/src/Token/TokenRequest.php",
             "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Token\\TokenRequestException",
-            "kind": "class",
-            "file": "packages/oidc/src/Token/TokenRequestException.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Authorize\\AuthorizationRequestException",
-            "kind": "class",
-            "file": "packages/oidc/src/Authorize/AuthorizationRequestException.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Authorize\\AuthorizationRequestValidator",
-            "kind": "class",
-            "file": "packages/oidc/src/Authorize/AuthorizationRequestValidator.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Authorize\\ValidatedAuthorizationRequest",
-            "kind": "class",
-            "file": "packages/oidc/src/Authorize/ValidatedAuthorizationRequest.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Authorize\\AuthorizeController",
-            "kind": "class",
-            "file": "packages/oidc/src/Authorize/AuthorizeController.php",
-            "line": 31,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Keys\\SigningKey",
-            "kind": "class",
-            "file": "packages/oidc/src/Keys/SigningKey.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Keys\\PemFileKeyLoader",
-            "kind": "class",
-            "file": "packages/oidc/src/Keys/PemFileKeyLoader.php",
-            "line": 9,
             "internal": false,
             "api": false
         },
@@ -1299,199 +1008,7 @@
             "line": 19,
             "internal": false,
             "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Repository\\AuthorizationCode",
-            "kind": "class",
-            "file": "packages/oidc/src/Repository/AuthorizationCode.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Repository\\DatabaseAuthorizationCodeRepository",
-            "kind": "class",
-            "file": "packages/oidc/src/Repository/DatabaseAuthorizationCodeRepository.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\Entity\\OidcClient",
-            "kind": "class",
-            "file": "packages/oidc/src/Entity/OidcClient.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\ClientRegistry\\OidcClientSeeder",
-            "kind": "class",
-            "file": "packages/oidc/src/ClientRegistry/OidcClientSeeder.php",
-            "line": 33,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\ClientRegistry\\OidcClientLookup",
-            "kind": "class",
-            "file": "packages/oidc/src/ClientRegistry/OidcClientLookup.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Oidc\\OidcServiceProvider",
-            "kind": "class",
-            "file": "packages/oidc/src/OidcServiceProvider.php",
-            "line": 30,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Testing\\Factory\\EntityFactory",
-            "kind": "class",
-            "file": "packages/testing/src/Factory/EntityFactory.php",
-            "line": 29,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Testing\\Factory\\EntityTypeFixtureValues",
-            "kind": "class",
-            "file": "packages/testing/src/Factory/EntityTypeFixtureValues.php",
-            "line": 28,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\Http\\AuthController",
-            "kind": "class",
-            "file": "packages/user/src/Http/AuthController.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\AnonymousUser",
-            "kind": "class",
-            "file": "packages/user/src/AnonymousUser.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\UserSession",
-            "kind": "class",
-            "file": "packages/user/src/UserSession.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\AuthMailer",
-            "kind": "class",
-            "file": "packages/user/src/AuthMailer.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\Session\\NativeSession",
-            "kind": "class",
-            "file": "packages/user/src/Session/NativeSession.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\UserAccessPolicy",
-            "kind": "class",
-            "file": "packages/user/src/UserAccessPolicy.php",
-            "line": 21,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\UserBlock",
-            "kind": "class",
-            "file": "packages/user/src/UserBlock.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\Role",
-            "kind": "class",
-            "file": "packages/user/src/Role.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\UserServiceProvider",
-            "kind": "class",
-            "file": "packages/user/src/UserServiceProvider.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\Middleware\\BearerAuthMiddleware",
-            "kind": "class",
-            "file": "packages/user/src/Middleware/BearerAuthMiddleware.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\Middleware\\SessionMiddleware",
-            "kind": "class",
-            "file": "packages/user/src/Middleware/SessionMiddleware.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\Middleware\\CsrfMiddleware",
-            "kind": "class",
-            "file": "packages/user/src/Middleware/CsrfMiddleware.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\DevAdminAccount",
-            "kind": "class",
-            "file": "packages/user/src/DevAdminAccount.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\User",
-            "kind": "class",
-            "file": "packages/user/src/User.php",
-            "line": 24,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\UserBlockService",
-            "kind": "class",
-            "file": "packages/user/src/UserBlockService.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\User\\UserBlockAccessPolicy",
-            "kind": "class",
-            "file": "packages/user/src/UserBlockAccessPolicy.php",
-            "line": 13,
-            "internal": false,
-            "api": false
         }
     ],
-    "methodology": "Only @covers lines are indexed; no inference from test class new/use."
+    "methodology": "@covers PHPDoc and #[CoversClass(...)] attributes are both indexed (Convention C1, mission #1335). Short refs resolved via file-local use statements; same-namespace refs without an alias are skipped."
 }
