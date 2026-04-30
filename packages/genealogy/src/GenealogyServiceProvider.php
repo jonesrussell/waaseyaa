@@ -7,6 +7,7 @@ namespace Waaseyaa\Genealogy;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
+use Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Genealogy\Access\GenealogyRelationshipAccessPolicy;
 use Waaseyaa\Genealogy\Entity\GenealogyEvent;
@@ -19,7 +20,7 @@ use Waaseyaa\Genealogy\Ssr\GenealogySsrController;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
-final class GenealogyServiceProvider extends ServiceProvider
+final class GenealogyServiceProvider extends ServiceProvider implements ConfiguresHttpKernelInterface
 {
     public function register(): void
     {

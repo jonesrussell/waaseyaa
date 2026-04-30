@@ -38,6 +38,7 @@
 <!-- Spec reviewed 2026-04-30b - ServiceProvider capability split: graphqlMutationOverrides lifted from abstract base into HasGraphqlMutationOverridesInterface; GraphQlServiceProvider guards the call with instanceof; tier 2 down to 5 candidates, tier 3 up to 2 (mission #824 WP03 surface D) -->
 <!-- Spec reviewed 2026-04-30c - ServiceProvider capability split: commands lifted from abstract base into HasCommandsInterface; ConsoleKernel guards the call with instanceof; NorthCloudServiceProvider implements the new interface; tier 2 down to 4 candidates, tier 3 up to 3 (mission #824 WP03 surface E) -->
 <!-- Spec reviewed 2026-04-30d - ServiceProvider capability split: registerRenderCacheListeners lifted from abstract base into HasRenderCacheListenersInterface; HttpKernel finalizeBoot guards with instanceof; SsrServiceProvider implements the new interface; tier 2 down to 3 candidates, tier 3 up to 4 (mission #824 WP03 surface F) -->
+<!-- Spec reviewed 2026-04-30e - ServiceProvider capability split: configureHttpKernel lifted from abstract base into ConfiguresHttpKernelInterface (verb-led name because it mutates the kernel rather than contributing values); HttpKernel finalizeBoot guards with instanceof; GenealogyServiceProvider and SsrServiceProvider implement the new interface; tier 2 down to 2 candidates, tier 3 up to 5 (mission #824 WP03 surface G) -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -132,7 +133,6 @@ Every `Waaseyaa\Foundation\ServiceProvider\ServiceProvider` exposes a fixed set 
 |--------|--------|---------|
 | `middleware(EntityTypeManager): list<HttpMiddlewareInterface>` | `HttpKernel::buildMiddlewarePipeline()` | HTTP middleware instances. |
 | `httpDomainRouters(HttpKernel): iterable<DomainRouterInterface>` | `HttpKernel::buildDomainRouterChain()` | Domain routers merged after foundation built-ins through `McpRouter` and before `BroadcastRouter`. |
-| `configureHttpKernel(HttpKernel): void` | `HttpKernel::finalizeBoot()` | Late HTTP wiring after database caches exist (e.g. `SsrPageHandler` construction). |
 
 **Tier 3 — capability interfaces (`instanceof`-guarded).** A provider opts in by implementing the named interface; the call site (kernel for foundation-owned hooks, the owning subsystem's bootstrap for cross-package hooks) checks `instanceof` before calling. The contract test's `CAPABILITY_INTERFACES` allowlist names which method belongs to which interface.
 
@@ -142,6 +142,7 @@ Every `Waaseyaa\Foundation\ServiceProvider\ServiceProvider` exposes a fixed set 
 | `graphqlMutationOverrides(EntityTypeManager): array<string, array{args?, resolve?}>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface` | `Waaseyaa\GraphQL\GraphQlServiceProvider::httpDomainRouters()` |
 | `commands(EntityTypeManager, DatabaseInterface, EventDispatcherInterface): list<Command>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface` | `ConsoleKernel::handle()` |
 | `registerRenderCacheListeners(EventDispatcherInterface, ?CacheBackendInterface): void` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface` | `HttpKernel::finalizeBoot()` |
+| `configureHttpKernel(HttpKernel): void` | `Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface` | `HttpKernel::finalizeBoot()` |
 
 ### ServiceProvider kernel-services bus
 

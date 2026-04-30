@@ -58,11 +58,6 @@ abstract class ServiceProvider implements ServiceProviderInterface
         return [];
     }
 
-    /**
-     * Late HTTP wiring after database caches exist (e.g. SsrPageHandler construction).
-     */
-    public function configureHttpKernel(\Waaseyaa\Foundation\Kernel\HttpKernel $kernel): void {}
-
     public function provides(): array
     {
         return [];
