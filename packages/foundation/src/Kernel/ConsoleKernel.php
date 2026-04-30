@@ -23,6 +23,7 @@ use Waaseyaa\Foundation\Diagnostic\HealthChecker;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Foundation\Discovery\StaleManifestException;
 use Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 final class ConsoleKernel extends AbstractKernel
@@ -144,6 +145,9 @@ final class ConsoleKernel extends AbstractKernel
         $app->registerCommands($commandRegistry->migrationCommands($this->migrator, $migrationsProvider));
 
         foreach ($this->providers as $provider) {
+            if (!$provider instanceof HasCommandsInterface) {
+                continue;
+            }
             $pluginCommands = $provider->commands($this->entityTypeManager, $this->database, $this->dispatcher);
             if ($pluginCommands !== []) {
                 $app->registerCommands($pluginCommands);

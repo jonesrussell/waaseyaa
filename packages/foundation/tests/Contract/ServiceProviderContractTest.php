@@ -15,6 +15,7 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use SplFileInfo;
 use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProviderInterface;
@@ -57,7 +58,6 @@ final class ServiceProviderContractTest extends TestCase
      * @var list<string>
      */
     private const array ABSTRACT_BASE_ONLY = [
-        'commands',
         'middleware',
         'httpDomainRouters',
         'registerRenderCacheListeners',
@@ -75,6 +75,7 @@ final class ServiceProviderContractTest extends TestCase
     private const array CAPABILITY_INTERFACES = [
         'stripLanguagePrefixForRouting' => LanguagePathStripperInterface::class,
         'graphqlMutationOverrides' => HasGraphqlMutationOverridesInterface::class,
+        'commands' => HasCommandsInterface::class,
     ];
 
     #[Test]

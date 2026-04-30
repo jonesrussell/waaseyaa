@@ -36,6 +36,7 @@
 <!-- Spec reviewed 2026-04-20 - ServiceProvider now preserves entity-type registrant provenance and ProviderRegistry rethrows entity-type collision exceptions after logging so duplicate canonical registrations fail boot deterministically (#1313) -->
 <!-- Spec reviewed 2026-04-30 - ServiceProvider extension-hook enumeration: 10 interface methods, 6 abstract-base capability-split candidates, 1 capability interface (LanguagePathStripperInterface); lockstep enforced by ServiceProviderContractTest (mission #824 WP03 surface C) -->
 <!-- Spec reviewed 2026-04-30b - ServiceProvider capability split: graphqlMutationOverrides lifted from abstract base into HasGraphqlMutationOverridesInterface; GraphQlServiceProvider guards the call with instanceof; tier 2 down to 5 candidates, tier 3 up to 2 (mission #824 WP03 surface D) -->
+<!-- Spec reviewed 2026-04-30c - ServiceProvider capability split: commands lifted from abstract base into HasCommandsInterface; ConsoleKernel guards the call with instanceof; NorthCloudServiceProvider implements the new interface; tier 2 down to 4 candidates, tier 3 up to 3 (mission #824 WP03 surface E) -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -128,7 +129,6 @@ Every `Waaseyaa\Foundation\ServiceProvider\ServiceProvider` exposes a fixed set 
 
 | Method | Caller | Purpose |
 |--------|--------|---------|
-| `commands(EntityTypeManager, DatabaseInterface, EventDispatcherInterface): list<Command>` | `ConsoleKernel::handle()` | Plugin CLI commands. |
 | `middleware(EntityTypeManager): list<HttpMiddlewareInterface>` | `HttpKernel::buildMiddlewarePipeline()` | HTTP middleware instances. |
 | `httpDomainRouters(HttpKernel): iterable<DomainRouterInterface>` | `HttpKernel::buildDomainRouterChain()` | Domain routers merged after foundation built-ins through `McpRouter` and before `BroadcastRouter`. |
 | `registerRenderCacheListeners(EventDispatcherInterface, ?CacheBackendInterface): void` | `HttpKernel::finalizeBoot()` | Render-cache entity listeners. |
@@ -140,6 +140,7 @@ Every `Waaseyaa\Foundation\ServiceProvider\ServiceProvider` exposes a fixed set 
 |--------|---------------------|--------|
 | `stripLanguagePrefixForRouting(string): string` | `Waaseyaa\Foundation\Http\LanguagePathStripperInterface` | `HttpKernel::stripLanguagePrefixForHttpRouting()` |
 | `graphqlMutationOverrides(EntityTypeManager): array<string, array{args?, resolve?}>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface` | `Waaseyaa\GraphQL\GraphQlServiceProvider::httpDomainRouters()` |
+| `commands(EntityTypeManager, DatabaseInterface, EventDispatcherInterface): list<Command>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface` | `ConsoleKernel::handle()` |
 
 ### ServiceProvider kernel-services bus
 

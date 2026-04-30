@@ -39,19 +39,6 @@ abstract class ServiceProvider implements ServiceProviderInterface
     public function routes(\Waaseyaa\Routing\WaaseyaaRouter $router, \Waaseyaa\Entity\EntityTypeManager $entityTypeManager): void {}
 
     /**
-     * Return plugin CLI commands to register with the console application.
-     *
-     * @return list<\Symfony\Component\Console\Command\Command>
-     */
-    public function commands(
-        \Waaseyaa\Entity\EntityTypeManager $entityTypeManager,
-        \Waaseyaa\Database\DatabaseInterface $database,
-        EventDispatcherInterface $dispatcher,
-    ): array {
-        return [];
-    }
-
-    /**
      * Return HTTP middleware instances to register with the kernel pipeline.
      *
      * Use #[AsMiddleware] on each class to set pipeline and priority.

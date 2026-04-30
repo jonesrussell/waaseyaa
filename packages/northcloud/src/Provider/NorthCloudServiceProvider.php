@@ -8,6 +8,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\NorthCloud\Client\NorthCloudCache;
 use Waaseyaa\NorthCloud\Client\NorthCloudClient;
@@ -26,7 +27,7 @@ use Waaseyaa\NorthCloud\Sync\NcSyncService;
  * Config is read from the `northcloud` key. See config/northcloud.php for
  * shipped defaults.
  */
-final class NorthCloudServiceProvider extends ServiceProvider
+final class NorthCloudServiceProvider extends ServiceProvider implements HasCommandsInterface
 {
     public function register(): void
     {
