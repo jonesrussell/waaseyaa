@@ -439,7 +439,8 @@
     },
     "extra": {
         "waaseyaa": {
-            "admin_path": "packages/admin"
+            "admin_path": "packages/admin",
+            "providers": []
         }
     }
 }
