@@ -1,5 +1,7 @@
 # Workflow governance (Spec Kitty–first)
 
+<!-- Spec reviewed 2026-05-01 - Milestone table reconciliation: GitHub now has exactly 5 Track milestones (Track 1 Entity system & hydration, Track 2 Bimaaji & agentic, Track 3 Parity & performance, Track 4 Schema evolution, Track 5 Ecosystem identity) — the prior version-numbered milestones (v0.1, v0.2, v0.3, v0.5, Phase 1, M1) flagged in the audit were retired before this surface landed. The "Framework Milestones" table below is the semantic capability narrative (slices, not GitHub titles); the "GitHub milestone tracks" table is the live mirror that contributors assign issues to. Both tables are now in sync with the live GitHub state (mission #824 WP09 surface E, closes #852) -->
+
 **Planning and execution** for substantive work are driven by **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** — missions, work packages, `spec-kitty next`, the dashboard, and `.kittify/` artifacts — not by GitHub issues alone. **`docs/specs/`** remains the contract layer agents read from disk.
 
 **GitHub** stays the **integration and visibility surface**: pull requests, Actions, releases, security, fork/contributor discovery, and **optional** issues (including M11 governed-change filings). CI and merge reality still live on GitHub; Spec Kitty does not replace the PR or the pipeline.
