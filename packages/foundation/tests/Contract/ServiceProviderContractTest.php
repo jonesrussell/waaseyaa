@@ -18,6 +18,7 @@ use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
@@ -53,16 +54,16 @@ final class ServiceProviderContractTest extends TestCase
     ];
 
     /**
-     * Provider hooks the kernel calls that are intentionally NOT on the
-     * interface. They live on the abstract base today and are slated for a
-     * capability-interface split (see `ServiceProviderInterface` § Capability
-     * split). Removing one without a split plan is a breaking change.
+     * Provider hooks the kernel calls that live on the abstract base only.
+     *
+     * The capability-interface split (mission #824 WP03 surfaces D–I) lifted
+     * every former entry into `CAPABILITY_INTERFACES`. This list is now empty
+     * and SHOULD stay empty: new kernel-invoked hooks must enter as capability
+     * interfaces, never as no-op defaults on the abstract base.
      *
      * @var list<string>
      */
-    private const array ABSTRACT_BASE_ONLY = [
-        'httpDomainRouters',
-    ];
+    private const array ABSTRACT_BASE_ONLY = [];
 
     /**
      * Provider methods invoked only after an `instanceof` guard against a
@@ -79,6 +80,7 @@ final class ServiceProviderContractTest extends TestCase
         'registerRenderCacheListeners' => HasRenderCacheListenersInterface::class,
         'configureHttpKernel' => ConfiguresHttpKernelInterface::class,
         'middleware' => HasMiddlewareInterface::class,
+        'httpDomainRouters' => HasHttpDomainRoutersInterface::class,
     ];
 
     #[Test]

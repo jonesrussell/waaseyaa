@@ -40,6 +40,7 @@
 <!-- Spec reviewed 2026-04-30d - ServiceProvider capability split: registerRenderCacheListeners lifted from abstract base into HasRenderCacheListenersInterface; HttpKernel finalizeBoot guards with instanceof; SsrServiceProvider implements the new interface; tier 2 down to 3 candidates, tier 3 up to 4 (mission #824 WP03 surface F) -->
 <!-- Spec reviewed 2026-04-30e - ServiceProvider capability split: configureHttpKernel lifted from abstract base into ConfiguresHttpKernelInterface (verb-led name because it mutates the kernel rather than contributing values); HttpKernel finalizeBoot guards with instanceof; GenealogyServiceProvider and SsrServiceProvider implement the new interface; tier 2 down to 2 candidates, tier 3 up to 5 (mission #824 WP03 surface G) -->
 <!-- Spec reviewed 2026-04-30f - ServiceProvider capability split: middleware lifted from abstract base into HasMiddlewareInterface; HttpKernel buildMiddlewarePipeline guards with instanceof; AuthServiceProvider, DebugServiceProvider, and InertiaServiceProvider implement the new interface; tier 2 down to 1 candidate (httpDomainRouters), tier 3 up to 6 (mission #824 WP03 surface H) -->
+<!-- Spec reviewed 2026-04-30g - ServiceProvider capability split COMPLETE: httpDomainRouters lifted from abstract base into HasHttpDomainRoutersInterface; HttpKernel buildDomainRouterChain guards with instanceof; ApiServiceProvider, GraphQlServiceProvider, MediaServiceProvider, and SsrServiceProvider implement the new interface; tier 2 down to 0 candidates (now empty by design), tier 3 up to 7 (mission #824 WP03 surface I — the final capability split) -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -128,11 +129,7 @@ Every `Waaseyaa\Foundation\ServiceProvider\ServiceProvider` exposes a fixed set 
 | `setKernelServices(KernelServicesInterface): void` | `ProviderRegistry::discoverAndRegister()` | Inject the kernel-services bus before `register()`. |
 | `getEntityTypeRegistrations(): list<array{entityType, registrant}>` | `ProviderRegistry::discoverAndRegister()` | Entity-type registrations contributed during `register()`. |
 
-**Tier 2 — abstract `ServiceProvider` capability methods.** Live on the abstract base only; default to empty/no-op. Slated for capability-interface split (mission #824 WP03 surface D), so removing one without a split plan is a breaking change tracked by the contract test's `ABSTRACT_BASE_ONLY` allowlist.
-
-| Method | Caller | Purpose |
-|--------|--------|---------|
-| `httpDomainRouters(HttpKernel): iterable<DomainRouterInterface>` | `HttpKernel::buildDomainRouterChain()` | Domain routers merged after foundation built-ins through `McpRouter` and before `BroadcastRouter`. |
+**Tier 2 — abstract `ServiceProvider` capability methods.** Empty after mission #824 WP03 surfaces D–I lifted every kernel-invoked hook into a capability interface. New kernel-invoked hooks should enter as capability interfaces, never as no-op defaults on the abstract base. The contract test's `ABSTRACT_BASE_ONLY` allowlist enforces the empty invariant.
 
 **Tier 3 — capability interfaces (`instanceof`-guarded).** A provider opts in by implementing the named interface; the call site (kernel for foundation-owned hooks, the owning subsystem's bootstrap for cross-package hooks) checks `instanceof` before calling. The contract test's `CAPABILITY_INTERFACES` allowlist names which method belongs to which interface.
 
@@ -144,6 +141,7 @@ Every `Waaseyaa\Foundation\ServiceProvider\ServiceProvider` exposes a fixed set 
 | `registerRenderCacheListeners(EventDispatcherInterface, ?CacheBackendInterface): void` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface` | `HttpKernel::finalizeBoot()` |
 | `configureHttpKernel(HttpKernel): void` | `Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface` | `HttpKernel::finalizeBoot()` |
 | `middleware(EntityTypeManager): list<HttpMiddlewareInterface>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface` | `HttpKernel::buildMiddlewarePipeline()` |
+| `httpDomainRouters(HttpKernel): iterable<DomainRouterInterface>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface` | `HttpKernel::buildDomainRouterChain()` |
 
 ### ServiceProvider kernel-services bus
 

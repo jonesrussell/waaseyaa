@@ -34,6 +34,7 @@ use Waaseyaa\Foundation\Middleware\DebugHeaderMiddleware;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
 use Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
 use Waaseyaa\Routing\WaaseyaaRouter;
@@ -389,6 +390,9 @@ final class HttpKernel extends AbstractKernel
 
         $providerRouters = [];
         foreach ($this->providers as $provider) {
+            if (!$provider instanceof HasHttpDomainRoutersInterface) {
+                continue;
+            }
             foreach ($provider->httpDomainRouters($this) as $domainRouter) {
                 $providerRouters[] = $domainRouter;
             }

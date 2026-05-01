@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\ServiceProvider;
 
-use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
-
 abstract class ServiceProvider implements ServiceProviderInterface
 {
     protected string $projectRoot = '';
@@ -35,16 +33,6 @@ abstract class ServiceProvider implements ServiceProviderInterface
     public function boot(): void {}
 
     public function routes(\Waaseyaa\Routing\WaaseyaaRouter $router, \Waaseyaa\Entity\EntityTypeManager $entityTypeManager): void {}
-
-    /**
-     * Contribute domain routers after foundation built-ins up to MCP and before BroadcastRouter.
-     *
-     * @return iterable<DomainRouterInterface>
-     */
-    public function httpDomainRouters(\Waaseyaa\Foundation\Kernel\HttpKernel $httpKernel): iterable
-    {
-        return [];
-    }
 
     public function provides(): array
     {

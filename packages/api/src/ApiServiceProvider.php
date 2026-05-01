@@ -7,10 +7,11 @@ namespace Waaseyaa\Api;
 use Waaseyaa\Api\Http\Router\DiscoveryRouter;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
-final class ApiServiceProvider extends ServiceProvider
+final class ApiServiceProvider extends ServiceProvider implements HasHttpDomainRoutersInterface
 {
     public function register(): void {}
 
