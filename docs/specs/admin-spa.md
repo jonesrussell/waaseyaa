@@ -11,6 +11,7 @@
 <!-- Spec reviewed 2026-04-08 - Session UI TypeScript mirror: `packages/admin/app/contracts/surface-ui.ts` duplicates admin-surface `contract/types.ts` ui shapes for `npm run build:contracts` (rootDir app only); keep in sync with PHP/contract (#756) -->
 <!-- Spec reviewed 2026-04-09 - AdminSurfaceTransportAdapter: constructor takes normalizedAppBase; all CRUD/action URLs via adminSurfaceFetchUrl (parity with plugin bootstrap; #1161) -->
 <!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute contract: SPA consumes cast-aware payloads from ResourceSerializer (#1181) -->
+<!-- Spec reviewed 2026-04-30 - Host extension typing: GenericAdminSurfaceHost constructor and AdminSurfaceServiceProvider::routes() accept EntityTypeManagerInterface only; concrete EntityTypeManager bindings forbidden in packages/admin* (mission #824 WP04 surface C, closes #836) -->
 
 ## Optionality
 
@@ -226,6 +227,8 @@ The root Nuxt plugin is the authoritative bootstrap for `$admin`. On non-public 
 6. Returns `{ provide: { admin: runtime } }`, or `{ provide: { admin: null } }` for public auth pages and unauthenticated redirects.
 
 **Session UI customization (PHP → SPA):** Hosts extend `GenericAdminSurfaceHost` and override `buildAdminUi(AccountInterface): ?AdminSurfaceUiPayload` to attach non-empty `AdminSurfaceUiPayload` to `AdminSurfaceSessionData`. JSON includes a top-level `ui` object only when the payload has at least one valid header link or sidebar item. Sidebar `group` values that look like i18n keys (`nav_*`) are passed through `t()` in `NavBuilder`; an empty/missing `group` uses `nav_group_custom` (“Shortcuts”). External targets use `external: true` or absolute URLs (`http(s):`, `//`, `mailto:`, `tel:`) and render as `<a target="_blank" rel="noopener noreferrer">`.
+
+**Host extension typing (mission #824 WP04 surface C).** `GenericAdminSurfaceHost` and `AdminSurfaceServiceProvider::routes()` accept `Waaseyaa\Entity\EntityTypeManagerInterface`, never the concrete `EntityTypeManager`. Subclasses extending the host receive the interface and must not narrow that parameter. The acceptance gate is `grep -rn 'EntityTypeManager[^I]' packages/admin*` returning no results — re-run it whenever you touch admin-surface code or its tests.
 
 This plugin is the source of truth for `$admin` injection and for composables that call `useAdmin()`.
 
