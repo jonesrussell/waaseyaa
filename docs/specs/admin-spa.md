@@ -13,6 +13,7 @@
 <!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute contract: SPA consumes cast-aware payloads from ResourceSerializer (#1181) -->
 <!-- Spec reviewed 2026-04-30 - Host extension typing: GenericAdminSurfaceHost constructor and AdminSurfaceServiceProvider::routes() accept EntityTypeManagerInterface only; concrete EntityTypeManager bindings forbidden in packages/admin* (mission #824 WP04 surface C, closes #836) -->
 <!-- Spec reviewed 2026-05-01 - Admin-surface session contract: AdminSurfaceAccount.emailVerified?: boolean is now part of packages/admin-surface/contract/types.ts (camelCase, matching the PHP host payload at AdminSurfaceSessionData::toArray() and the SPA runtime read sites in auth.global and VerificationBanner). Spec language no longer uses snake_case email_verified (mission #824 WP07 surface A, closes #839) -->
+<!-- Spec reviewed 2026-05-01 - Admin-surface catalog contract: AdminSurfaceCatalogEntry.description?: string is preserved in packages/admin-surface/contract/types.ts and locked in by CatalogBuilderTest regression assertions (description emitted when set, omitted when unset, matching the optional contract field) (mission #824 WP07 surface B, closes #840) -->
 
 ## Optionality
 
