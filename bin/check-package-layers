@@ -150,6 +150,20 @@ KERNEL_EXEMPT_FILES = {
     "foundation/src/Kernel/EventListenerRegistrar.php":
         "kernel-boot listener wiring; pure dispatcher::addListener calls; single caller (HttpKernel)",
 
+    # foundation — kernel-adjacent service-provider capability interfaces consumed
+    # only by ConsoleKernel/HttpKernel. They type-hint EntityTypeManager (L1) for
+    # hook signatures so the kernel can wire commands, middleware, and graphql
+    # mutation overrides through a typed contract rather than reflection. They are
+    # not reusable library code — every consumer is a kernel call site. Mission
+    # #824 WP03 surfaces D-F introduced these capability hooks; surfacing
+    # `composer verify` (WP09 surface A) requires the layer gate to pass cleanly.
+    "foundation/src/ServiceProvider/Capability/HasCommandsInterface.php":
+        "kernel-adjacent capability interface consumed only by ConsoleKernel; #824 WP03 surface E",
+    "foundation/src/ServiceProvider/Capability/HasMiddlewareInterface.php":
+        "kernel-adjacent capability interface consumed only by HttpKernel middleware pipeline; #824 WP03 surface D",
+    "foundation/src/ServiceProvider/Capability/HasGraphqlMutationOverridesInterface.php":
+        "kernel-adjacent capability interface consumed only by GraphQL bootstrap from kernel context; #824 WP03 surface F",
+
     # cache — event listeners wired by ServiceProvider; subscribe to higher-layer events.
     "cache/src/Listener/ConfigCacheInvalidator.php":
         "event listener; subscribes to L1 config events for cache invalidation",

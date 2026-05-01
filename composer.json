@@ -423,13 +423,29 @@
     },
     "scripts": {
         "check-composer-policy": "bash bin/check-composer-policy",
+        "check-ingestion-defaults": "bash bin/check-ingestion-defaults",
+        "check-no-secrets": "bash bin/check-no-secrets",
+        "check-package-layers": "bash bin/check-package-layers",
         "cs-check": "php-cs-fixer fix --dry-run --diff",
         "cs-fix": "php-cs-fixer fix",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "PHP_CLI_SERVER_WORKERS=4 bin/waaseyaa serve & NUXT_BACKEND_URL=http://127.0.0.1:${APP_PORT:-8080} bin/waaseyaa admin:dev && kill $!"
         ],
-        "phpstan": "phpstan analyse --memory-limit=512M"
+        "phpstan": "phpstan analyse --memory-limit=512M",
+        "test": "phpunit --no-coverage",
+        "verify": [
+            "@cs-check",
+            "@phpstan",
+            "@check-composer-policy",
+            "@check-package-layers",
+            "@check-no-secrets",
+            "@check-ingestion-defaults",
+            "@test"
+        ]
+    },
+    "scripts-descriptions": {
+        "verify": "Run all repo-wide gates: cs-check, phpstan, composer-policy, package-layers, no-secrets, ingestion-defaults, and the test suite. Canonical CI entry point — see docs/specs/operations-playbooks.md."
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
