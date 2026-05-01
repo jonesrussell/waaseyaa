@@ -6,6 +6,7 @@ namespace Waaseyaa\Api;
 
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
+use Waaseyaa\Access\Exception\PartialAccessContextException;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\EntityValues;
@@ -40,6 +41,10 @@ final class ResourceSerializer
         ?EntityAccessHandler $accessHandler = null,
         ?AccountInterface $account = null,
     ): JsonApiResource {
+        if (($accessHandler === null) !== ($account === null)) {
+            throw PartialAccessContextException::forSerializer(__METHOD__);
+        }
+
         $entityTypeId = $entity->getEntityTypeId();
         $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
         $keys = $entityType->getKeys();
@@ -87,6 +92,10 @@ final class ResourceSerializer
         ?EntityAccessHandler $accessHandler = null,
         ?AccountInterface $account = null,
     ): array {
+        if (($accessHandler === null) !== ($account === null)) {
+            throw PartialAccessContextException::forSerializer(__METHOD__);
+        }
+
         return array_values(array_map(
             fn(EntityInterface $entity): JsonApiResource => $this->serialize($entity, $accessHandler, $account),
             $entities,
