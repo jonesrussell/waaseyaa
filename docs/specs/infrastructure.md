@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-05-01b - BootFailureMessageFormatter extracted as a public seam in packages/foundation/src/Kernel/: HttpKernel::bootFailureJsonResponse delegates clientSafeBootFailureDetail mapping to the formatter, eliminating 3× setAccessible() in HttpKernelBootFailureTest; behavior unchanged (mission #824 WP09 surface H) -->
 <!-- Spec reviewed 2026-05-01 - README skeletons added under packages/billing/, packages/deployer/, packages/github/, packages/http-client/, packages/inertia/ (purpose, layer, key classes only); StripeClientInterface, GitHubClient, HttpClientInterface, Inertia adapter, and Deployer recipe contracts unchanged from prior review (mission #824 WP09 surface F, closes #849) -->
 <!-- Spec reviewed 2026-04-26 - Package-declared migrations: extra.waaseyaa.migrations path, MigrationLoader glob order, OIDC exemplar migration (#1286) -->
 <!-- Spec reviewed 2026-04-26 - AbstractKernel bootEntityTypeManager: SqlSchemaHandler constructed with kernel LoggerInterface for deriveColumnSpec unknown-type warnings (#1305); see docs/specs/field/column-derivation.md -->
