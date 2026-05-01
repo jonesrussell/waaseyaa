@@ -1,5 +1,7 @@
 # Plugin Extension Points
 
+<!-- Spec reviewed 2026-05-01 - Audit (#849) flagged this spec as part of the M1-contracts cohort presenting stale public surfaces. Reviewed against current code: the L0 plugin contract (PluginManagerInterface, PluginDefinition, DefaultPluginManager) and the foundation HasCommands/HasMiddleware/HasGraphqlMutationOverrides capability hooks (added in mission #824 WP03 surfaces D-F and pinned by ServiceProviderContractTest) are the authoritative extension points. No drift detected against the runtime surface (mission #824 WP09 surface F, closes #849) -->
+
 ## Purpose
 
 This spec defines stable plugin extension points for workflow, traversal, and discovery tooling integrations.
