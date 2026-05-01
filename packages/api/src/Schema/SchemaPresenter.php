@@ -6,6 +6,7 @@ namespace Waaseyaa\Api\Schema;
 
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
+use Waaseyaa\Access\Exception\PartialAccessContextException;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Field\FieldDefinition;
@@ -115,6 +116,10 @@ final class SchemaPresenter
         ?EntityAccessHandler $accessHandler = null,
         ?AccountInterface $account = null,
     ): array {
+        if (($accessHandler === null) !== ($account === null)) {
+            throw PartialAccessContextException::forSerializer(__METHOD__);
+        }
+
         $schema = [
             '$schema' => 'https://json-schema.org/draft-07/schema#',
             'title' => $entityType->getLabel(),
