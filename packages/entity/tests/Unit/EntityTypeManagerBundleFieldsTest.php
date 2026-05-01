@@ -94,6 +94,38 @@ final class EntityTypeManagerBundleFieldsTest extends TestCase
         $manager->addBundleFields('user', 'business', []);
     }
 
+    /**
+     * WP03 #1257 (K1): Bundle identifiers containing the reserved "__" separator
+     * are rejected at registration time so that no downstream storage or query
+     * code paths can be reached with a malformed bundle id. The structural guard
+     * complements the formatting guard in
+     * {@see \Waaseyaa\EntityStorage\SqlSchemaHandler::resolveSubtableName()}.
+     */
+    #[Test]
+    public function addBundleFieldsThrowsForBundleIdContainingReservedSeparator(): void
+    {
+        $registry = new SpyRegistry();
+        $manager = new EntityTypeManager($this->dispatcher, null, null, $registry);
+        $manager->registerEntityType(new EntityType(
+            id: 'group',
+            label: 'Group',
+            class: TestEntity::class,
+            bundleEntityType: 'group_type',
+        ));
+
+        try {
+            $manager->addBundleFields('group', 'business__nested', []);
+            self::fail('Expected InvalidArgumentException not thrown');
+        } catch (\InvalidArgumentException $e) {
+            self::assertStringContainsString('reserved separator "__"', $e->getMessage());
+            self::assertStringContainsString('"business__nested"', $e->getMessage());
+            self::assertStringContainsString('"group"', $e->getMessage());
+        }
+
+        // Guard must fire before delegating to the registry.
+        self::assertSame([], $registry->bundleCalls);
+    }
+
     #[Test]
     public function registerEntityTypePushesCoreFieldsIntoRegistry(): void
     {
