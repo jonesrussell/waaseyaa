@@ -1,0 +1,240 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Tests\Integration\AdminSurface;
+
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Routing\RequestContext;
+use Waaseyaa\AdminSurface\AdminSurfaceRoutePaths;
+use Waaseyaa\AdminSurface\AdminSurfaceServiceProvider;
+use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Routing\WaaseyaaRouter;
+
+/**
+ * Cross-package wiring integration test for the admin-surface seam.
+ *
+ * The audit (#846) flagged that there were no root-level integration
+ * tests covering `AdminSurfaceServiceProvider`, `GenericAdminSurfaceHost`,
+ * `/admin/_surface/session`, or `/admin/_surface/catalog`. The
+ * package-local `AdminSurfaceServiceProviderTest` uses a fake host and
+ * exercises only `registerRoutes(router, host)` — it does not exercise
+ * the real production entry point `routes(router, entityTypeManager)`,
+ * which constructs `GenericAdminSurfaceHost` itself, registers the
+ * five admin-surface API routes, and adds the admin SPA catch-all.
+ *
+ * This test wires the real provider, real router, real entity type
+ * manager, and real generic host together — the same composition the
+ * kernel boots in production — and asserts:
+ *
+ * - All five `admin_surface.*` routes are registered with the canonical
+ *   paths from `AdminSurfaceRoutePaths::PATH_*`.
+ * - HTTP methods match the contract (GET for read endpoints, POST for
+ *   actions).
+ * - `WaaseyaaRouter::match()` resolves the canonical paths back to the
+ *   correct route names with extracted parameters.
+ * - `AdminSurfaceRoutePaths::generate()` is a round-trip inverse: every
+ *   path it generates resolves back to the same route name.
+ * - The admin SPA catch-all is registered with the `_surface`-excluding
+ *   path requirement so API routes win the match race.
+ *
+ * Closes #846.
+ */
+#[CoversNothing]
+final class AdminSurfaceRouteWiringIntegrationTest extends TestCase
+{
+    private EntityTypeManager $entityTypeManager;
+    private WaaseyaaRouter $router;
+
+    protected function setUp(): void
+    {
+        $this->entityTypeManager = new EntityTypeManager(new EventDispatcher());
+        $this->entityTypeManager->registerEntityType(new EntityType(
+            id: 'article',
+            label: 'Article',
+            class: \stdClass::class,
+            keys: ['id' => 'id'],
+        ));
+
+        $this->router = new WaaseyaaRouter(new RequestContext('', 'GET'));
+
+        $provider = new AdminSurfaceServiceProvider();
+        $provider->setKernelContext(
+            projectRoot: sys_get_temp_dir(),
+            config: [],
+            manifestFormatters: [],
+        );
+        $provider->routes($this->router, $this->entityTypeManager);
+    }
+
+    #[Test]
+    public function allFiveAdminSurfaceApiRoutesAreRegistered(): void
+    {
+        $routes = $this->router->getRouteCollection();
+
+        foreach (
+            [
+                'admin_surface.session',
+                'admin_surface.catalog',
+                'admin_surface.list',
+                'admin_surface.get',
+                'admin_surface.action',
+            ] as $name
+        ) {
+            self::assertNotNull(
+                $routes->get($name),
+                sprintf('AdminSurfaceServiceProvider::routes must register %s', $name),
+            );
+        }
+    }
+
+    #[Test]
+    public function routePathsMatchAdminSurfaceRoutePathsConstants(): void
+    {
+        $routes = $this->router->getRouteCollection();
+
+        self::assertSame(
+            AdminSurfaceRoutePaths::PATH_SESSION,
+            $routes->get('admin_surface.session')?->getPath(),
+        );
+        self::assertSame(
+            AdminSurfaceRoutePaths::PATH_CATALOG,
+            $routes->get('admin_surface.catalog')?->getPath(),
+        );
+        self::assertSame(
+            AdminSurfaceRoutePaths::PATH_LIST,
+            $routes->get('admin_surface.list')?->getPath(),
+        );
+        self::assertSame(
+            AdminSurfaceRoutePaths::PATH_GET,
+            $routes->get('admin_surface.get')?->getPath(),
+        );
+        self::assertSame(
+            AdminSurfaceRoutePaths::PATH_ACTION,
+            $routes->get('admin_surface.action')?->getPath(),
+        );
+    }
+
+    #[Test]
+    public function httpMethodsMatchContract(): void
+    {
+        $routes = $this->router->getRouteCollection();
+
+        self::assertSame(['GET'], $routes->get('admin_surface.session')?->getMethods());
+        self::assertSame(['GET'], $routes->get('admin_surface.catalog')?->getMethods());
+        self::assertSame(['GET'], $routes->get('admin_surface.list')?->getMethods());
+        self::assertSame(['GET'], $routes->get('admin_surface.get')?->getMethods());
+        self::assertSame(['POST'], $routes->get('admin_surface.action')?->getMethods());
+    }
+
+    #[Test]
+    public function sessionPathMatchesBackToSessionRoute(): void
+    {
+        $match = $this->router->match(AdminSurfaceRoutePaths::PATH_SESSION);
+
+        self::assertSame('admin_surface.session', $match['_route']);
+    }
+
+    #[Test]
+    public function catalogPathMatchesBackToCatalogRoute(): void
+    {
+        $match = $this->router->match(AdminSurfaceRoutePaths::PATH_CATALOG);
+
+        self::assertSame('admin_surface.catalog', $match['_route']);
+    }
+
+    #[Test]
+    public function listPathMatchesAndExtractsTypeParameter(): void
+    {
+        $match = $this->router->match('/admin/_surface/article');
+
+        self::assertSame('admin_surface.list', $match['_route']);
+        self::assertSame('article', $match['type']);
+    }
+
+    #[Test]
+    public function getPathMatchesAndExtractsTypeAndIdParameters(): void
+    {
+        $match = $this->router->match('/admin/_surface/article/42');
+
+        self::assertSame('admin_surface.get', $match['_route']);
+        self::assertSame('article', $match['type']);
+        self::assertSame('42', $match['id']);
+    }
+
+    #[Test]
+    public function actionPathMatchesAndExtractsTypeAndActionParameters(): void
+    {
+        $postRouter = new WaaseyaaRouter(new RequestContext('', 'POST'));
+        $provider = new AdminSurfaceServiceProvider();
+        $provider->setKernelContext(sys_get_temp_dir(), [], []);
+        $provider->routes($postRouter, $this->entityTypeManager);
+
+        $match = $postRouter->match('/admin/_surface/article/action/publish');
+
+        self::assertSame('admin_surface.action', $match['_route']);
+        self::assertSame('article', $match['type']);
+        self::assertSame('publish', $match['action']);
+    }
+
+    #[Test]
+    public function generatedPathsRoundTripThroughTheRouter(): void
+    {
+        // RoutePaths::generate must produce paths that match back to the
+        // same route name. This guards against drift where the generator
+        // and the registered path patterns disagree.
+        $cases = [
+            ['admin_surface.session', [], 'admin_surface.session'],
+            ['admin_surface.catalog', [], 'admin_surface.catalog'],
+            ['admin_surface.list', ['type' => 'article'], 'admin_surface.list'],
+            ['admin_surface.get', ['type' => 'article', 'id' => '42'], 'admin_surface.get'],
+        ];
+
+        foreach ($cases as [$generateName, $params, $expectedRoute]) {
+            $path = AdminSurfaceRoutePaths::generate($generateName, $params);
+            $match = $this->router->match($path);
+            self::assertSame(
+                $expectedRoute,
+                $match['_route'],
+                sprintf('generate(%s) must round-trip to %s', $generateName, $expectedRoute),
+            );
+        }
+    }
+
+    #[Test]
+    public function adminSpaCatchAllExcludesSurfaceApiPaths(): void
+    {
+        $routes = $this->router->getRouteCollection();
+        $spa = $routes->get('admin_spa');
+
+        self::assertNotNull($spa, 'admin_spa catch-all must be registered alongside surface API routes');
+        self::assertSame('/admin/{path}', $spa->getPath());
+
+        // The path requirement must exclude `_surface` so admin_surface.*
+        // routes win the match race against the SPA catch-all.
+        $requirement = $spa->getRequirement('path');
+        self::assertNotNull($requirement);
+        self::assertStringContainsString('_surface', $requirement);
+    }
+
+    #[Test]
+    public function surfacePathsBeatSpaCatchAllInMatchOrder(): void
+    {
+        // Ensures that even though the SPA catch-all matches `/admin/{path}`,
+        // the more specific surface routes win for `/admin/_surface/...`.
+        $sessionMatch = $this->router->match(AdminSurfaceRoutePaths::PATH_SESSION);
+        self::assertSame('admin_surface.session', $sessionMatch['_route']);
+
+        $catalogMatch = $this->router->match(AdminSurfaceRoutePaths::PATH_CATALOG);
+        self::assertSame('admin_surface.catalog', $catalogMatch['_route']);
+
+        // SPA catch-all matches non-_surface paths.
+        $spaMatch = $this->router->match('/admin/dashboard');
+        self::assertSame('admin_spa', $spaMatch['_route']);
+        self::assertSame('dashboard', $spaMatch['path']);
+    }
+}
