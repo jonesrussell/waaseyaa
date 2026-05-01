@@ -10,6 +10,7 @@ use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\EntityStorage\Exception\BundleAmbiguousFieldException;
 use Waaseyaa\EntityStorage\Exception\UnknownFieldException;
+use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\FieldStorage;
 
 /**
@@ -214,6 +215,79 @@ final class SqlEntityQuery implements EntityQueryInterface
         }
 
         return $this->dataStoredCoreFieldNames = $names;
+    }
+
+    /**
+     * Coerce a condition value to its declared FieldDefinition type so that
+     * comparisons against `_data` JSON storage commute regardless of how
+     * the caller typed the bound parameter (mission #1257 WP05, K3).
+     *
+     * SQLite's `json_extract()` returns the native JSON type (integer for
+     * `13`, string for `"13"`) and SQLite has no column affinity for
+     * expression results — so `WHERE json_extract(_data, '$.x') = '13'`
+     * matches no rows when the stored value is integer 13. Coercing the
+     * bound parameter to the registered field type closes the asymmetry
+     * and lets callers bind `int|string|null` interchangeably without
+     * needing to know the storage shape (#1257 anchor).
+     *
+     * Coercion is a no-op when the registry has no definition for the
+     * field, when the field's declared type is non-numeric, or when the
+     * value is not a numeric-looking string. Boolean coercion is
+     * intentionally left out: PHP/SQL boolean-string conventions vary
+     * (`'true'`, `'1'`, `'on'`) and forcing a single answer here would
+     * surprise callers.
+     */
+    private function coerceConditionValue(string $field, mixed $value, ?string $bundle): mixed
+    {
+        if ($this->fieldRegistry === null) {
+            return $value;
+        }
+
+        $definition = $this->lookupFieldDefinition($field, $bundle);
+        if ($definition === null) {
+            return $value;
+        }
+
+        if (!is_string($value) || !is_numeric($value)) {
+            return $value;
+        }
+
+        return match ($definition->getType()) {
+            'integer', 'int' => (int) $value,
+            'float', 'decimal', 'numeric' => (float) $value,
+            default => $value,
+        };
+    }
+
+    /**
+     * Returns true when the resolved field expression is a `json_extract(...)`
+     * call against `_data`. Used to decide when text-cast wrapping is needed
+     * to commute string-vs-int comparisons (mission #1257 WP05, K3).
+     */
+    private static function expressionResolvesViaJsonExtract(string $resolvedField): bool
+    {
+        return str_contains($resolvedField, 'json_extract(');
+    }
+
+    /**
+     * Look up the FieldDefinition for a referenced field, honoring the
+     * routing bundle when the field is bundle-scoped.
+     */
+    private function lookupFieldDefinition(string $field, ?string $bundle): ?FieldDefinitionInterface
+    {
+        if ($this->fieldRegistry === null) {
+            return null;
+        }
+
+        $entityTypeId = $this->entityType->id();
+
+        if ($bundle === null) {
+            $core = $this->fieldRegistry->coreFieldsFor($entityTypeId);
+            return $core[$field] ?? null;
+        }
+
+        $bundleFields = $this->fieldRegistry->bundleFieldsFor($entityTypeId, $bundle);
+        return $bundleFields[$field] ?? null;
     }
 
     /**
@@ -435,23 +509,43 @@ final class SqlEntityQuery implements EntityQueryInterface
         // Apply conditions.
         foreach ($this->conditions as $condition) {
             $operator = strtoupper($condition['operator']);
-            $field = $this->resolveField($condition['field'], $routing);
+            $fieldName = $condition['field'];
+            $bundle = $routing[$fieldName] ?? null;
+            $field = $this->resolveField($fieldName, $routing);
 
             if ($operator === 'IS NULL') {
                 $select->isNull($field);
             } elseif ($operator === 'IS NOT NULL') {
                 $select->isNotNull($field);
             } elseif ($operator === 'IN') {
-                $values = is_array($condition['value']) ? $condition['value'] : [$condition['value']];
+                $rawValues = is_array($condition['value']) ? $condition['value'] : [$condition['value']];
+                if (self::expressionResolvesViaJsonExtract($field)) {
+                    // K3 (mission #1257 WP05): SQLite's `json_extract()` returns
+                    // the native JSON type and the underlying DBAL helper
+                    // hardcodes ArrayParameterType::STRING for IN-set parameters.
+                    // Wrapping the resolved field in CAST(... AS TEXT) and
+                    // stringifying each value forces text-vs-text equality so
+                    // callers can pass int|string|null interchangeably without
+                    // knowing the storage shape.
+                    $field = 'CAST(' . $field . ' AS TEXT)';
+                    $values = array_map(static fn(mixed $v): string => (string) $v, $rawValues);
+                } else {
+                    $values = array_map(
+                        fn(mixed $v): mixed => $this->coerceConditionValue($fieldName, $v, $bundle),
+                        $rawValues,
+                    );
+                }
                 $select->condition($field, $values, 'IN');
             } elseif ($operator === 'CONTAINS') {
+                // String-pattern operator: do not coerce, callers want string semantics.
                 $escaped = str_replace(['%', '_'], ['\\%', '\\_'], (string) $condition['value']);
                 $select->condition($field, '%' . $escaped . '%', 'LIKE');
             } elseif ($operator === 'STARTS_WITH') {
                 $escaped = str_replace(['%', '_'], ['\\%', '\\_'], (string) $condition['value']);
                 $select->condition($field, $escaped . '%', 'LIKE');
             } else {
-                $select->condition($field, $condition['value'], $condition['operator']);
+                $value = $this->coerceConditionValue($fieldName, $condition['value'], $bundle);
+                $select->condition($field, $value, $condition['operator']);
             }
         }
 
