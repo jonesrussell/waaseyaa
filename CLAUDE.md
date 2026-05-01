@@ -39,18 +39,24 @@ When working on files matching these patterns, retrieve the spec for deep contex
 | `packages/note/*` | — | `docs/specs/ingestion-defaults.md` |
 | `packages/relationship/*` | — | `docs/specs/relationship-modeling.md`, `docs/specs/relationship-inference-contract.md` |
 | `packages/genealogy/*` | — | `docs/specs/genealogy.md`, `docs/specs/relationship-modeling.md` |
-| `packages/graphql/*` | — | — |
-| `packages/search/*` | — | — |
+| `packages/graphql/*` | — | `packages/graphql/README.md` |
+| `packages/search/*` | — | `packages/search/README.md` |
 | `packages/seo/*` | — | `docs/specs/seo.md` |
-| `packages/ssr/*` | — | — |
+| `packages/ssr/*` | — | `packages/ssr/README.md` |
 | `packages/error-handler/*` | — | `docs/specs/debugging-dx.md` |
 | `packages/debug/*` | — | `docs/specs/debugging-dx.md` |
 | `packages/telescope/*` (agent-context / codified-context telemetry, Prometheus) | — | `docs/specs/telescope-agent-context-telemetry.md`, `docs/specs/api-layer.md` |
-| `packages/workflows/*` | — | — |
-| `packages/billing/*` | — | — |
-| `packages/github/*` | — | — |
-| `packages/deployer/*` | — | — |
-| `packages/inertia/*` | — | — |
+| `packages/workflows/*` | — | `packages/workflows/README.md` |
+| `packages/billing/*` | — | `packages/billing/README.md` |
+| `packages/github/*` | — | `packages/github/README.md` |
+| `packages/deployer/*` | — | `packages/deployer/README.md` |
+| `packages/inertia/*` | — | `packages/inertia/README.md` |
+| `packages/engagement/*` | — | `packages/engagement/README.md` |
+| `packages/geo/*` | — | `packages/geo/README.md` |
+| `packages/mercure/*` | — | `packages/mercure/README.md` |
+| `packages/messaging/*` | — | `packages/messaging/README.md` |
+| `packages/oauth-provider/*` | — | `packages/oauth-provider/README.md` |
+| `packages/analytics/*` | — | `packages/analytics/README.md` |
 | `packages/mail/*` | `waaseyaa:infrastructure` | `docs/specs/infrastructure.md` |
 | `packages/scheduler/*` | `waaseyaa:infrastructure` | `docs/specs/infrastructure.md` |
 | `packages/notification/*` | `waaseyaa:infrastructure` | `docs/specs/infrastructure.md` |
