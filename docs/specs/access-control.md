@@ -8,6 +8,7 @@
 <!-- Spec reviewed 2026-04-03c - auth controller review fixes: JSON_THROW_ON_ERROR, session guard, AccountInterface null check (#571) -->
 <!-- Spec reviewed 2026-04-08 - composer manifest policy normalization for packages/access, packages/auth, packages/user; no runtime access-control behavior change -->
 <!-- Spec reviewed 2026-04-08b - restored packages/access symfony/routing floor from ^7.3 back to ^7.0 to avoid unnecessary downstream constraint tightening -->
+<!-- Spec reviewed 2026-05-01 - AccessChecker canonical placement: source lives at packages/access/src/AccessChecker.php with namespace Waaseyaa\Access; routing depends on access (downward); package tables, file/namespace headers, and dir-tree visualization corrected (mission #824 WP05 surface A, closes #832) -->
 
 Waaseyaa's access control system spans three packages: `packages/access/` (core primitives), `packages/routing/` (route-level checks), and `packages/user/` (session resolution, password reset). This document covers entity-level and route-level access. For field-level access, see `docs/specs/field-access.md`.
 
@@ -33,9 +34,9 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Path | Provides |
 |---------|------|----------|
-| access | `packages/access/src/` | AccessPolicyInterface, AccessResult, AccessStatus, EntityAccessHandler, AccountInterface, FieldAccessPolicyInterface, PermissionHandler, Gate, EntityAccessGate, AuthorizationMiddleware |
+| access | `packages/access/src/` | AccessPolicyInterface, AccessResult, AccessStatus, EntityAccessHandler, AccountInterface, FieldAccessPolicyInterface, PermissionHandler, Gate, EntityAccessGate, AuthorizationMiddleware, **AccessChecker** (route-level access) |
 | auth | `packages/auth/src/` | Controllers and services for login/register/reset/verify; **HTTP route registration** is in `packages/routing` (`AuthOidcRouteServiceProvider`), not in `AuthServiceProvider` |
-| routing | `packages/routing/src/` | AccessChecker (route-level access); `AuthOidcRouteServiceProvider` wires auth and OIDC HTTP routes |
+| routing | `packages/routing/src/` | `AuthOidcRouteServiceProvider` wires auth and OIDC HTTP routes (AccessChecker is owned by `waaseyaa/access`, not routing — mission #824 WP05 surface A) |
 | user | `packages/user/src/` | SessionMiddleware (account resolution), UserServiceProvider (user entity type registration) |
 
 ## Core Interfaces
@@ -343,8 +344,10 @@ final class AccessDeniedException extends \RuntimeException
 
 ## Route Access Control
 
-**File:** `packages/routing/src/AccessChecker.php`
-**Namespace:** `Waaseyaa\Routing`
+**File:** `packages/access/src/AccessChecker.php`
+**Namespace:** `Waaseyaa\Access`
+
+The class lives in the access package because route-level access checking is the routing-time consumer of the access subsystem (gates, policies, account context). The routing package depends on access, never the other way around.
 
 ```php
 final class AccessChecker
@@ -604,13 +607,11 @@ packages/access/src/
         EntityAccessGate.php         - Adapter bridging GateInterface to EntityAccessHandler
         PolicyAttribute.php          - Maps policy class to entity type
         AccessDeniedException.php    - Thrown by Gate::authorize()
+    AccessChecker.php                - Route option access checks (_public, _authenticated, _session, _permission, _role, _gate)
     RedirectValidator.php            - Open-redirect prevention (isSafe/sanitize)
     ErrorPageRendererInterface.php   - Error page rendering contract (render -> ?Response) [@internal — not a public consumer contract]
     Middleware/
         AuthorizationMiddleware.php  - Route-level access enforcement
-
-packages/routing/src/
-    AccessChecker.php                - Route option access checks (_public, _authenticated, _session, _permission, _role, _gate)
 
 packages/user/src/
     Middleware/

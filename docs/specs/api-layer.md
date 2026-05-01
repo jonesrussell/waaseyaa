@@ -16,6 +16,7 @@
 <!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute pipeline cross-linked to docs/specs/jsonapi.md; ResourceSerializer uses toCastAwareMap (#1181) -->
 <!-- Spec reviewed 2026-04-09 ST-10 - ResourceSerializer delegates JSON value normalization to EntityValues::normalizeValueForJson() (#1181) -->
 <!-- Spec reviewed 2026-04-09 - SchemaPresenter: admin JSON Schema from field definitions, not EntityBase::$casts; cross-link entity-system #1184 -->
+<!-- Spec reviewed 2026-05-01 - AccessChecker canonical placement: source lives at packages/access/src/AccessChecker.php with namespace Waaseyaa\Access; routing package table row corrected; routing dir-tree no longer lists AccessChecker.php (mission #824 WP05 surface A, closes #832) -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
 
@@ -75,7 +76,7 @@ Foundation still wires several shared HTTP surfaces that are not entity-package 
 | `src/RouteBuilder.php` | `Waaseyaa\Routing` | Fluent API for building Symfony Route objects; `entityParameter()` sets `options.parameters.*.type = entity:{id}`; `bind()` sets `options._waaseyaa_app_bindings` for SSR post-load class checks |
 | `src/RouteFingerprint.php` | `Waaseyaa\Routing` | Stable hash of path, methods, parameters, bindings, defaults for app-controller descriptor cache invalidation |
 | `src/RouteMatch.php` | `Waaseyaa\Routing` | Value object for matched route (name, route, parameters) |
-| `src/AccessChecker.php` | `Waaseyaa\Routing` | Route-level access checking via route options |
+| `src/AccessChecker.php` (in `waaseyaa/access`, not routing) | `Waaseyaa\Access` | Route-level access checking via route options. Owned by the access package; routing depends on access (mission #824 WP05 surface A). |
 | `src/AuthOidcRouteServiceProvider.php` | `Waaseyaa\Routing` | Registers `/api/auth/*`, `/api/user/me`, and OIDC discovery/authorize/token routes; depends on `waaseyaa/auth` and `waaseyaa/oidc` for controllers only |
 | `src/OidcHttpRoutes.php` | `Waaseyaa\Routing` | OIDC path table (discovery, jwks, optional authorize/token) used by `AuthOidcRouteServiceProvider` |
 | `src/Attribute/GateAttribute.php` | `Waaseyaa\Routing\Attribute` | PHP attribute for gate-based access control on controller methods |
@@ -615,7 +616,7 @@ Multiple requirements are combined with **AND** logic (all must pass). If no acc
 ### AccessChecker
 
 ```php
-// packages/routing/src/AccessChecker.php
+// packages/access/src/AccessChecker.php — Waaseyaa\Access\AccessChecker
 final class AccessChecker
 {
     public function __construct(
@@ -855,7 +856,6 @@ packages/routing/
       UrlPrefixNegotiator.php
     ParamConverter/
       EntityParamConverter.php
-    AccessChecker.php
     RouteBuilder.php
     RouteMatch.php
     WaaseyaaRouter.php
