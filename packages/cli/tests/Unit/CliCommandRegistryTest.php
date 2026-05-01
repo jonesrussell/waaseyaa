@@ -99,6 +99,10 @@ final class CliCommandRegistryTest extends TestCase
             $this->assertContains('waaseyaa:version', $names);
             $this->assertContains('admin:dev', $names);
             $this->assertContains('admin:build', $names);
+            // Regression: scaffold:auth was implemented in
+            // packages/cli/src/Command/ScaffoldAuthCommand.php but never
+            // surfaced through the registry until WP08 surface B (#858).
+            $this->assertContains('scaffold:auth', $names);
         } finally {
             $items = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($projectRoot, \RecursiveDirectoryIterator::SKIP_DOTS),

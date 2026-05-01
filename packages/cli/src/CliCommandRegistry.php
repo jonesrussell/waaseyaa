@@ -54,6 +54,7 @@ use Waaseyaa\CLI\Command\Perf\PerformanceCompareCommand;
 use Waaseyaa\CLI\Command\PermissionListCommand;
 use Waaseyaa\CLI\Command\RelationshipTypeScaffoldCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
+use Waaseyaa\CLI\Command\ScaffoldAuthCommand;
 use Waaseyaa\CLI\Command\SchemaCheckCommand;
 use Waaseyaa\CLI\Command\SchemaListCommand;
 use Waaseyaa\CLI\Command\SemanticRefreshCommand;
@@ -137,6 +138,7 @@ final class CliCommandRegistry
             new MakeProviderCommand(),
             new MakePublicCommand($projectRoot),
             new MakeTestCommand(),
+            new ScaffoldAuthCommand($projectRoot),
             new ServeCommand($projectRoot),
             new AdminDevCommand($projectRoot),
             new AdminBuildCommand($projectRoot),
