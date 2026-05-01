@@ -253,6 +253,73 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
             . 'never the lingering legacy column. Reading the column would return either no match (column = 99) or the wrong row.',
         );
     }
+
+    /**
+     * WP05 #1257 (K3 — `_data` value coercion in query builder).
+     *
+     * Reproduces the original #1257 anchor bug: `condition()` values bound
+     * against integer-typed fields stored in `_data` must coerce to int when
+     * passed as numeric strings. SQLite's `json_extract()` returns the
+     * native JSON type (integer for `13`), and SQLite has no column affinity
+     * for expression results — so `WHERE json_extract(_data, '$.user_id') = '13'`
+     * matches no rows when the stored value is integer 13.
+     *
+     * The Minoo `(int) $account->id()` workaround is verified removable once
+     * this lands.
+     */
+    #[Test]
+    public function conditionOnDataIntegerFieldMatchesWhenValueIsNumericString(): void
+    {
+        $entity = new TestRoutingWidget([
+            'name' => 'Numeric String Match',
+            'type' => 'gizmo',
+            'status' => 13,
+            'gizmo_code' => 'NS-1',
+        ]);
+        $this->storage->save($entity);
+
+        // Sanity: integer-bound query already works.
+        $idsInt = $this->storage->getQuery()
+            ->condition('status', 13)
+            ->execute();
+        self::assertSame([$entity->id()], $idsInt, 'integer binding (control)');
+
+        // The bug: numeric-string bound against integer-typed _data field
+        // returns no rows pre-WP05 because SQLite compares int 13 != string "13".
+        $idsString = $this->storage->getQuery()
+            ->condition('status', '13')
+            ->execute();
+
+        self::assertSame(
+            [$entity->id()],
+            $idsString,
+            'condition() must coerce numeric-string values to the declared FieldDefinition type so callers do not '
+            . 'need to know the storage shape. (Mirrors #1257 reproduction; verifies the (int) workaround is removable.)',
+        );
+    }
+
+    /**
+     * WP05 #1257 (K3): IN-set values are coerced element-wise.
+     */
+    #[Test]
+    public function conditionInOnDataIntegerFieldCoercesEachElement(): void
+    {
+        $a = new TestRoutingWidget(['name' => 'A', 'type' => 'gizmo', 'status' => 1, 'gizmo_code' => 'A-1']);
+        $b = new TestRoutingWidget(['name' => 'B', 'type' => 'gizmo', 'status' => 2, 'gizmo_code' => 'B-1']);
+        $c = new TestRoutingWidget(['name' => 'C', 'type' => 'gizmo', 'status' => 3, 'gizmo_code' => 'C-1']);
+        $this->storage->save($a);
+        $this->storage->save($b);
+        $this->storage->save($c);
+
+        // Mixed string/int IN-set against an integer-typed _data field must
+        // match by numeric value, not lexical bytes.
+        $ids = $this->storage->getQuery()
+            ->condition('status', ['1', 3], 'IN')
+            ->execute();
+
+        sort($ids);
+        self::assertSame([$a->id(), $c->id()], $ids);
+    }
 }
 
 /**
