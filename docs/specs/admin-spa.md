@@ -14,6 +14,13 @@
 <!-- Spec reviewed 2026-04-30 - Host extension typing: GenericAdminSurfaceHost constructor and AdminSurfaceServiceProvider::routes() accept EntityTypeManagerInterface only; concrete EntityTypeManager bindings forbidden in packages/admin* (mission #824 WP04 surface C, closes #836) -->
 <!-- Spec reviewed 2026-05-01 - Admin-surface session contract: AdminSurfaceAccount.emailVerified?: boolean is now part of packages/admin-surface/contract/types.ts (camelCase, matching the PHP host payload at AdminSurfaceSessionData::toArray() and the SPA runtime read sites in auth.global and VerificationBanner). Spec language no longer uses snake_case email_verified (mission #824 WP07 surface A, closes #839) -->
 <!-- Spec reviewed 2026-05-01 - Admin-surface catalog contract: AdminSurfaceCatalogEntry.description?: string is preserved in packages/admin-surface/contract/types.ts and locked in by CatalogBuilderTest regression assertions (description emitted when set, omitted when unset, matching the optional contract field) (mission #824 WP07 surface B, closes #840) -->
+<!-- Spec reviewed 2026-05-01 - Admin-surface authority: payload shape is defined exclusively in packages/admin-surface/contract/types.ts (see packages/admin-surface/contract/README.md). This spec describes SPA runtime behaviour and references contract type names but does not redefine them; cross-boundary tests at tests/Integration/AdminSurface/ enforce conformance (mission #824 WP07 surface E, closes #851) -->
+
+## Authority
+
+The host-to-SPA payload shape is defined in **`packages/admin-surface/contract/types.ts`** (see [`packages/admin-surface/contract/README.md`](../../packages/admin-surface/contract/README.md)). This document is the subsystem spec for the admin SPA runtime — components, composables, routes, schema-driven forms, auth flow — and references contract type names (`AdminSurfaceSession`, `AdminSurfaceCatalogEntry`, etc.) rather than redefining them. When this spec and the contract package disagree, the contract package wins; raise an issue against this spec to bring it back into alignment.
+
+Two cross-boundary tests under `tests/Integration/AdminSurface/` enforce structural conformance between the backend emit and the contract; the audit (#851) flagged the prior governance drift where snake_case variants in this spec contradicted the camelCase contract. Use camelCase everywhere (e.g. `emailVerified`, `requireVerifiedEmail`).
 
 ## Optionality
 
