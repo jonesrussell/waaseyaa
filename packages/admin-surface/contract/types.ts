@@ -39,6 +39,18 @@ export interface AdminSurfaceAccount {
   id: string
   name: string
   email?: string
+  /**
+   * Email-verification state.
+   *
+   * Emitted by the PHP host (`AdminSurfaceSessionData::toArray()` writes
+   * `account.emailVerified`) and consumed by the SPA runtime
+   * (`auth.global` middleware and `VerificationBanner.vue`).
+   *
+   * Optional: hosts that do not implement email verification may omit it,
+   * in which case the SPA treats the account as unverified for gating
+   * purposes (see `runtimeConfig.public.requireVerifiedEmail`).
+   */
+  emailVerified?: boolean
   roles: string[]
 }
 

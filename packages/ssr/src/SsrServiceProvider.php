@@ -16,6 +16,9 @@ use Waaseyaa\Entity\Event\EntityEvent;
 use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
+use Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\SSR\Flash\Flash;
 use Waaseyaa\SSR\Flash\FlashMessageService;
@@ -23,7 +26,7 @@ use Waaseyaa\SSR\Http\Router\AppControllerRouter;
 use Waaseyaa\SSR\Http\Router\SsrRouter;
 use Waaseyaa\SSR\Twig\FlashTwigExtension;
 
-final class SsrServiceProvider extends ServiceProvider implements LanguagePathStripperInterface
+final class SsrServiceProvider extends ServiceProvider implements ConfiguresHttpKernelInterface, HasHttpDomainRoutersInterface, HasRenderCacheListenersInterface, LanguagePathStripperInterface
 {
     private static ?Environment $twigEnvironment = null;
     private static ?FieldFormatterRegistry $formatterRegistry = null;
@@ -66,9 +69,9 @@ final class SsrServiceProvider extends ServiceProvider implements LanguagePathSt
         }
     }
 
-    public function registerRenderCacheListeners(EventDispatcherInterface $dispatcher, mixed $renderCacheBackend): void
+    public function registerRenderCacheListeners(EventDispatcherInterface $dispatcher, ?CacheBackendInterface $renderCacheBackend): void
     {
-        if (!$renderCacheBackend instanceof CacheBackendInterface) {
+        if ($renderCacheBackend === null) {
             return;
         }
 
@@ -134,7 +137,7 @@ final class SsrServiceProvider extends ServiceProvider implements LanguagePathSt
     /**
      * @return iterable<SsrRouter|AppControllerRouter>
      */
-    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
+    public function httpDomainRouters(HttpKernel $httpKernel): iterable
     {
         if ($this->ssrPageHandler === null) {
             return [];

@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\ServiceProvider;
 
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
-use Waaseyaa\Foundation\Http\Router\DomainRouterInterface;
-use Waaseyaa\Foundation\Kernel\HttpKernel;
-
 abstract class ServiceProvider implements ServiceProviderInterface
 {
     protected string $projectRoot = '';
@@ -21,7 +17,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
     /** @var array<string, array{concrete: string|callable, shared: bool}> */
     private array $bindings = [];
 
-    /** @var array<string, mixed> */
+    /** @var array<string, object> */
     private array $resolved = [];
 
     /** @var array<string, list<string>> */
@@ -30,76 +26,13 @@ abstract class ServiceProvider implements ServiceProviderInterface
     /** @var list<array{entityType: \Waaseyaa\Entity\EntityTypeInterface, registrant: class-string}> */
     private array $entityTypeRegistrations = [];
 
-    /** @var (\Closure(string): ?object)|null */
-    protected ?\Closure $kernelResolver = null;
+    protected ?KernelServicesInterface $kernelServices = null;
 
     abstract public function register(): void;
 
     public function boot(): void {}
 
-    public function routes(\Waaseyaa\Routing\WaaseyaaRouter $router, ?\Waaseyaa\Entity\EntityTypeManager $entityTypeManager = null): void {}
-
-    /**
-     * Return plugin CLI commands to register with the console application.
-     *
-     * @return list<\Symfony\Component\Console\Command\Command>
-     */
-    public function commands(
-        \Waaseyaa\Entity\EntityTypeManager $entityTypeManager,
-        \Waaseyaa\Database\DatabaseInterface $database,
-        \Symfony\Contracts\EventDispatcher\EventDispatcherInterface $dispatcher,
-    ): array {
-        return [];
-    }
-
-    /**
-     * Return GraphQL mutation overrides.
-     *
-     * Each key is a mutation name (e.g. 'updateScheduleEntry').
-     * Each value has optional 'args' (merged with defaults) and 'resolve' (replaces default).
-     *
-     * @return array<string, array{args?: array<string, mixed>, resolve?: callable}>
-     */
-    /**
-     * @return array<string, array{args?: array<string, mixed>, resolve?: callable}>
-     */
-    public function graphqlMutationOverrides(\Waaseyaa\Entity\EntityTypeManager $entityTypeManager): array
-    {
-        return [];
-    }
-
-    /**
-     * Return HTTP middleware instances to register with the kernel pipeline.
-     *
-     * Use #[AsMiddleware] on each class to set pipeline and priority.
-     *
-     * @return list<\Waaseyaa\Foundation\Middleware\HttpMiddlewareInterface>
-     */
-    public function middleware(\Waaseyaa\Entity\EntityTypeManager $entityTypeManager): array
-    {
-        return [];
-    }
-
-    /**
-     * Contribute domain routers after foundation built-ins up to MCP and before BroadcastRouter.
-     *
-     * @return iterable<DomainRouterInterface>
-     */
-    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
-    {
-        return [];
-    }
-
-    /**
-     * Register render-cache entity listeners. The second argument is the render bin backend
-     * from the kernel (CacheBackendInterface); SSR wraps it in RenderCache.
-     */
-    public function registerRenderCacheListeners(EventDispatcherInterface $dispatcher, mixed $renderCacheBackend): void {}
-
-    /**
-     * Late HTTP wiring after database caches exist (e.g. SsrPageHandler construction).
-     */
-    public function configureHttpKernel(HttpKernel $kernel): void {}
+    public function routes(\Waaseyaa\Routing\WaaseyaaRouter $router, \Waaseyaa\Entity\EntityTypeManager $entityTypeManager): void {}
 
     public function provides(): array
     {
@@ -117,7 +50,7 @@ abstract class ServiceProvider implements ServiceProviderInterface
      * @param array<string, mixed> $config
      * @param array<string, class-string> $manifestFormatters
      */
-    public function setKernelContext(string $projectRoot, array $config, array $manifestFormatters = []): void
+    public function setKernelContext(string $projectRoot, array $config, array $manifestFormatters): void
     {
         $this->projectRoot = $projectRoot;
         $this->config = $config;
@@ -125,13 +58,12 @@ abstract class ServiceProvider implements ServiceProviderInterface
     }
 
     /**
-     * Set a fallback resolver for kernel-level services (e.g. EntityTypeManager).
-     *
-     * @param \Closure(string): ?object $resolver
+     * Provide the typed kernel-services bus that backs {@see resolve()} fallbacks
+     * for abstracts the provider has not bound locally.
      */
-    public function setKernelResolver(\Closure $resolver): void
+    public function setKernelServices(KernelServicesInterface $services): void
     {
-        $this->kernelResolver = $resolver;
+        $this->kernelServices = $services;
     }
 
     /**
@@ -142,8 +74,8 @@ abstract class ServiceProvider implements ServiceProviderInterface
     final protected function mergeChildProvider(ServiceProvider $child): void
     {
         $child->setKernelContext($this->projectRoot, $this->config, $this->manifestFormatters);
-        if ($this->kernelResolver !== null) {
-            $child->setKernelResolver($this->kernelResolver);
+        if ($this->kernelServices !== null) {
+            $child->setKernelServices($this->kernelServices);
         }
         $child->register();
         foreach ($child->getBindings() as $abstract => $binding) {
@@ -175,18 +107,15 @@ abstract class ServiceProvider implements ServiceProviderInterface
         $this->tags[$tag][] = $abstract;
     }
 
-    /**
-     * Resolve a binding registered via singleton() or bind().
-     */
-    public function resolve(string $abstract): mixed
+    public function resolve(string $abstract): object
     {
         if (isset($this->resolved[$abstract])) {
             return $this->resolved[$abstract];
         }
 
         if (!isset($this->bindings[$abstract])) {
-            if ($this->kernelResolver !== null) {
-                $resolved = ($this->kernelResolver)($abstract);
+            if ($this->kernelServices !== null) {
+                $resolved = $this->kernelServices->get($abstract);
                 if ($resolved !== null) {
                     return $resolved;
                 }
@@ -198,6 +127,10 @@ abstract class ServiceProvider implements ServiceProviderInterface
         $concrete = $binding['concrete'];
 
         $instance = is_callable($concrete) ? $concrete() : new $concrete();
+
+        if (!is_object($instance)) {
+            throw new \RuntimeException("Concrete for {$abstract} did not produce an object.");
+        }
 
         if ($binding['shared']) {
             $this->resolved[$abstract] = $instance;

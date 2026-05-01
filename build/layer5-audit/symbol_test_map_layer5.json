@@ -1,8 +1,77 @@
 {
-    "generated_at": "2026-04-24T21:14:04+00:00",
-    "test_files_parsed": 53,
-    "at_covers_hits": 8,
+    "generated_at": "2026-04-30T17:02:29+00:00",
+    "test_files_parsed": 55,
+    "at_covers_hits": 48,
     "per_symbol": {
+        "Waaseyaa\\AI\\Agent\\AgentContext": [
+            "packages/ai-agent/tests/Unit/AgentContextTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\AgentAction": [
+            "packages/ai-agent/tests/Unit/AgentActionTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\AgentExecutor": [
+            "packages/ai-agent/tests/Unit/AgentExecutorTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\AgentResult": [
+            "packages/ai-agent/tests/Unit/AgentResultTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\McpServer": [
+            "packages/ai-agent/tests/Unit/McpServerTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\ToolRegistry": [
+            "packages/ai-agent/tests/Unit/ToolRegistryTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\Provider\\LlmConversationRequest": [
+            "packages/ai-agent/tests/Unit/Provider/LlmConversationRequestTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\Provider\\NullLlmProvider": [
+            "packages/ai-agent/tests/Unit/Provider/NullLlmProviderTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\Provider\\AnthropicProvider": [
+            "packages/ai-agent/tests/Unit/Provider/AnthropicProviderTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\Provider\\OpenAiCompatibleProvider": [
+            "packages/ai-agent/tests/Unit/Provider/OpenAiCompatibleProviderTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\Provider\\MessageRequest": [
+            "packages/ai-agent/tests/Unit/Provider/MessageRequestTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\Provider\\StreamChunk": [
+            "packages/ai-agent/tests/Unit/Provider/StreamChunkTest.php"
+        ],
+        "Waaseyaa\\AI\\Agent\\AgentAuditLog": [
+            "packages/ai-agent/tests/Unit/AgentAuditLogTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\Handle\\TraceHandle": [
+            "packages/ai-observability/tests/Unit/Handle/TraceHandleTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\Recorder\\NullTraceRecorder": [
+            "packages/ai-observability/tests/Unit/Recorder/NullTraceRecorderTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\ObservabilityServiceProvider": [
+            "packages/ai-observability/tests/Unit/ObservabilityServiceProviderTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\Analysis\\AnomalyDetector": [
+            "packages/ai-observability/tests/Unit/Analysis/AnomalyDetectorTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\TraceContext": [
+            "packages/ai-observability/tests/Unit/TraceContextTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\Cost\\BudgetManager": [
+            "packages/ai-observability/tests/Unit/Cost/BudgetManagerTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\Cost\\TokenAccountant": [
+            "packages/ai-observability/tests/Unit/Cost/TokenAccountantTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\Cost\\ModelPricing": [
+            "packages/ai-observability/tests/Unit/Cost/ModelPricingTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\Value\\DecisionTrace": [
+            "packages/ai-observability/tests/Unit/Value/DecisionTraceTest.php"
+        ],
+        "Waaseyaa\\AI\\Observability\\Value\\Outcome": [
+            "packages/ai-observability/tests/Unit/Value/OutcomeTest.php"
+        ],
         "Waaseyaa\\AI\\Pipeline\\PipelineContext": [
             "packages/ai-pipeline/tests/Unit/PipelineContextTest.php"
         ],
@@ -11,6 +80,9 @@
         ],
         "Waaseyaa\\AI\\Pipeline\\PipelineQueueMessage": [
             "packages/ai-pipeline/tests/Unit/PipelineQueueMessageTest.php"
+        ],
+        "Waaseyaa\\AI\\Pipeline\\AIPipelineServiceProvider": [
+            "packages/ai-pipeline/tests/Unit/AIPipelineServiceProviderTest.php"
         ],
         "Waaseyaa\\AI\\Pipeline\\PipelineStepConfig": [
             "packages/ai-pipeline/tests/Unit/PipelineStepConfigTest.php"
@@ -24,19 +96,59 @@
         "Waaseyaa\\AI\\Pipeline\\PipelineDispatcher": [
             "packages/ai-pipeline/tests/Unit/PipelineDispatcherTest.php"
         ],
+        "Waaseyaa\\AI\\Pipeline\\EmbeddingPipeline": [
+            "packages/ai-pipeline/tests/Unit/EmbeddingPipelineTest.php"
+        ],
         "Waaseyaa\\AI\\Pipeline\\StepResult": [
             "packages/ai-pipeline/tests/Unit/StepResultTest.php"
+        ],
+        "Waaseyaa\\AI\\Schema\\SchemaRegistry": [
+            "packages/ai-schema/tests/Unit/SchemaRegistryTest.php"
+        ],
+        "Waaseyaa\\AI\\Schema\\EntityJsonSchemaGenerator": [
+            "packages/ai-schema/tests/Unit/EntityJsonSchemaGeneratorTest.php"
+        ],
+        "Waaseyaa\\AI\\Schema\\Mcp\\TranslationToolGenerator": [
+            "packages/ai-schema/tests/Unit/Mcp/TranslationToolGeneratorTest.php"
+        ],
+        "Waaseyaa\\AI\\Schema\\Mcp\\McpToolExecutor": [
+            "packages/ai-schema/tests/Unit/Mcp/McpToolExecutorTest.php"
+        ],
+        "Waaseyaa\\AI\\Schema\\Mcp\\McpToolDefinition": [
+            "packages/ai-schema/tests/Unit/Mcp/McpToolDefinitionTest.php"
+        ],
+        "Waaseyaa\\AI\\Schema\\Mcp\\McpToolGenerator": [
+            "packages/ai-schema/tests/Unit/Mcp/McpToolGeneratorTest.php"
+        ],
+        "Waaseyaa\\AI\\Vector\\EntityEmbeddingCleanupListener": [
+            "packages/ai-vector/tests/Unit/EntityEmbeddingCleanupListenerTest.php"
+        ],
+        "Waaseyaa\\AI\\Vector\\SemanticIndexWarmer": [
+            "packages/ai-vector/tests/Unit/SemanticIndexWarmerTest.php"
+        ],
+        "Waaseyaa\\AI\\Vector\\SearchController": [
+            "packages/ai-vector/tests/Unit/SearchControllerTest.php"
+        ],
+        "Waaseyaa\\AI\\Vector\\SqliteEmbeddingStorage": [
+            "packages/ai-vector/tests/Unit/SqliteEmbeddingStorageTest.php"
+        ],
+        "Waaseyaa\\AI\\Vector\\EntityEmbedding": [
+            "packages/ai-vector/tests/Unit/LanguageAwareVectorTest.php"
+        ],
+        "Waaseyaa\\AI\\Vector\\InMemoryVectorStore": [
+            "packages/ai-vector/tests/Unit/LanguageAwareVectorTest.php"
+        ],
+        "Waaseyaa\\AI\\Vector\\EntityEmbeddingListener": [
+            "packages/ai-vector/tests/Unit/EntityEmbeddingListenerTest.php"
+        ],
+        "Waaseyaa\\AI\\Vector\\OllamaEmbeddingProvider": [
+            "packages/ai-vector/tests/Unit/EmbeddingProvidersTest.php"
+        ],
+        "Waaseyaa\\AI\\Vector\\OpenAiEmbeddingProvider": [
+            "packages/ai-vector/tests/Unit/EmbeddingProvidersTest.php"
         ]
     },
     "public_non_internal_symbols_lacking_at_covers": [
-        {
-            "fqcn": "Waaseyaa\\AI\\Agent\\AgentAuditLog",
-            "kind": "class",
-            "file": "packages/ai-agent/src/AgentAuditLog.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
         {
             "fqcn": "Waaseyaa\\AI\\Agent\\ToolRegistryInterface",
             "kind": "interface",
@@ -66,46 +178,6 @@
             "kind": "class",
             "file": "packages/ai-agent/src/Event/ToolCallCompleted.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Agent\\AgentAction",
-            "kind": "class",
-            "file": "packages/ai-agent/src/AgentAction.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Agent\\McpServer",
-            "kind": "class",
-            "file": "packages/ai-agent/src/McpServer.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Agent\\AgentResult",
-            "kind": "class",
-            "file": "packages/ai-agent/src/AgentResult.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Agent\\AgentExecutor",
-            "kind": "class",
-            "file": "packages/ai-agent/src/AgentExecutor.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Agent\\ToolRegistry",
-            "kind": "class",
-            "file": "packages/ai-agent/src/ToolRegistry.php",
-            "line": 12,
             "internal": false,
             "api": false
         },
@@ -150,34 +222,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\AI\\Agent\\Provider\\MessageRequest",
-            "kind": "class",
-            "file": "packages/ai-agent/src/Provider/MessageRequest.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Agent\\Provider\\NullLlmProvider",
-            "kind": "class",
-            "file": "packages/ai-agent/src/Provider/NullLlmProvider.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\AI\\Agent\\Provider\\ToolUseBlock",
             "kind": "class",
             "file": "packages/ai-agent/src/Provider/ToolUseBlock.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Agent\\Provider\\AnthropicProvider",
-            "kind": "class",
-            "file": "packages/ai-agent/src/Provider/AnthropicProvider.php",
-            "line": 10,
             "internal": false,
             "api": false
         },
@@ -198,30 +246,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\AI\\Agent\\Provider\\StreamChunk",
-            "kind": "class",
-            "file": "packages/ai-agent/src/Provider/StreamChunk.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Agent\\AgentContext",
-            "kind": "class",
-            "file": "packages/ai-agent/src/AgentContext.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Observability\\ObservabilityServiceProvider",
-            "kind": "class",
-            "file": "packages/ai-observability/src/ObservabilityServiceProvider.php",
-            "line": 24,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\AI\\Observability\\Trace",
             "kind": "class",
             "file": "packages/ai-observability/src/Trace.php",
@@ -238,14 +262,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\AI\\Observability\\Handle\\TraceHandle",
-            "kind": "class",
-            "file": "packages/ai-observability/src/Handle/TraceHandle.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\AI\\Observability\\Recorder\\TraceRecorder",
             "kind": "class",
             "file": "packages/ai-observability/src/Recorder/TraceRecorder.php",
@@ -254,34 +270,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\AI\\Observability\\Recorder\\NullTraceRecorder",
-            "kind": "class",
-            "file": "packages/ai-observability/src/Recorder/NullTraceRecorder.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\AI\\Observability\\Recorder\\TraceRecorderInterface",
             "kind": "interface",
             "file": "packages/ai-observability/src/Recorder/TraceRecorderInterface.php",
             "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Observability\\TraceContext",
-            "kind": "class",
-            "file": "packages/ai-observability/src/TraceContext.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Observability\\Analysis\\AnomalyDetector",
-            "kind": "class",
-            "file": "packages/ai-observability/src/Analysis/AnomalyDetector.php",
-            "line": 9,
             "internal": false,
             "api": false
         },
@@ -302,34 +294,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\AI\\Observability\\Cost\\BudgetManager",
-            "kind": "class",
-            "file": "packages/ai-observability/src/Cost/BudgetManager.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\AI\\Observability\\Cost\\CostTracker",
             "kind": "class",
             "file": "packages/ai-observability/src/Cost/CostTracker.php",
             "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Observability\\Cost\\ModelPricing",
-            "kind": "class",
-            "file": "packages/ai-observability/src/Cost/ModelPricing.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Observability\\Cost\\TokenAccountant",
-            "kind": "class",
-            "file": "packages/ai-observability/src/Cost/TokenAccountant.php",
-            "line": 11,
             "internal": false,
             "api": false
         },
@@ -358,30 +326,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\AI\\Observability\\Value\\Outcome",
-            "kind": "class",
-            "file": "packages/ai-observability/src/Value/Outcome.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Observability\\Value\\DecisionTrace",
-            "kind": "class",
-            "file": "packages/ai-observability/src/Value/DecisionTrace.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Pipeline\\EmbeddingPipeline",
-            "kind": "class",
-            "file": "packages/ai-pipeline/src/EmbeddingPipeline.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\AI\\Pipeline\\PipelineStepInterface",
             "kind": "interface",
             "file": "packages/ai-pipeline/src/PipelineStepInterface.php",
@@ -390,82 +334,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\AI\\Pipeline\\AIPipelineServiceProvider",
-            "kind": "class",
-            "file": "packages/ai-pipeline/src/AIPipelineServiceProvider.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Schema\\SchemaRegistry",
-            "kind": "class",
-            "file": "packages/ai-schema/src/SchemaRegistry.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Schema\\EntityJsonSchemaGenerator",
-            "kind": "class",
-            "file": "packages/ai-schema/src/EntityJsonSchemaGenerator.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Schema\\Mcp\\McpToolExecutor",
-            "kind": "class",
-            "file": "packages/ai-schema/src/Mcp/McpToolExecutor.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Schema\\Mcp\\TranslationToolGenerator",
-            "kind": "class",
-            "file": "packages/ai-schema/src/Mcp/TranslationToolGenerator.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Schema\\Mcp\\McpToolDefinition",
-            "kind": "class",
-            "file": "packages/ai-schema/src/Mcp/McpToolDefinition.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Schema\\Mcp\\McpToolGenerator",
-            "kind": "class",
-            "file": "packages/ai-schema/src/Mcp/McpToolGenerator.php",
-            "line": 22,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\AI\\Vector\\VectorStoreInterface",
             "kind": "interface",
             "file": "packages/ai-vector/src/VectorStoreInterface.php",
             "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Vector\\InMemoryVectorStore",
-            "kind": "class",
-            "file": "packages/ai-vector/src/InMemoryVectorStore.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Vector\\OllamaEmbeddingProvider",
-            "kind": "class",
-            "file": "packages/ai-vector/src/OllamaEmbeddingProvider.php",
-            "line": 7,
             "internal": false,
             "api": false
         },
@@ -482,30 +354,6 @@
             "kind": "enum",
             "file": "packages/ai-vector/src/DistanceMetric.php",
             "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Vector\\EntityEmbedding",
-            "kind": "class",
-            "file": "packages/ai-vector/src/EntityEmbedding.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Vector\\EntityEmbeddingListener",
-            "kind": "class",
-            "file": "packages/ai-vector/src/EntityEmbeddingListener.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Vector\\OpenAiEmbeddingProvider",
-            "kind": "class",
-            "file": "packages/ai-vector/src/OpenAiEmbeddingProvider.php",
-            "line": 7,
             "internal": false,
             "api": false
         },
@@ -550,45 +398,13 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\AI\\Vector\\SearchController",
-            "kind": "class",
-            "file": "packages/ai-vector/src/SearchController.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\AI\\Vector\\EntityEmbedder",
             "kind": "class",
             "file": "packages/ai-vector/src/EntityEmbedder.php",
             "line": 13,
             "internal": false,
             "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Vector\\SemanticIndexWarmer",
-            "kind": "class",
-            "file": "packages/ai-vector/src/SemanticIndexWarmer.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Vector\\SqliteEmbeddingStorage",
-            "kind": "class",
-            "file": "packages/ai-vector/src/SqliteEmbeddingStorage.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AI\\Vector\\EntityEmbeddingCleanupListener",
-            "kind": "class",
-            "file": "packages/ai-vector/src/EntityEmbeddingCleanupListener.php",
-            "line": 9,
-            "internal": false,
-            "api": false
         }
     ],
-    "methodology": "Only @covers lines are indexed; no inference from test class new/use."
+    "methodology": "@covers PHPDoc and #[CoversClass(...)] attributes are both indexed (Convention C1, mission #1335). Short refs resolved via file-local use statements; same-namespace refs without an alias are skipped."
 }

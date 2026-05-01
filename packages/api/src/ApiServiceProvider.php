@@ -7,19 +7,16 @@ namespace Waaseyaa\Api;
 use Waaseyaa\Api\Http\Router\DiscoveryRouter;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
-final class ApiServiceProvider extends ServiceProvider
+final class ApiServiceProvider extends ServiceProvider implements HasHttpDomainRoutersInterface
 {
     public function register(): void {}
 
-    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
+    public function httpDomainRouters(HttpKernel $httpKernel): iterable
     {
-        if ($httpKernel === null) {
-            return [];
-        }
-
         return [
             new DiscoveryRouter(
                 $httpKernel->getDiscoveryApiHandler(),
@@ -28,12 +25,8 @@ final class ApiServiceProvider extends ServiceProvider
         ];
     }
 
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
-        if ($entityTypeManager === null) {
-            return;
-        }
-
         (new JsonApiRouteProvider($entityTypeManager))->registerRoutes($router);
     }
 }

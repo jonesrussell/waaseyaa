@@ -9,7 +9,7 @@ use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\AdminSurface\Host\AbstractAdminSurfaceHost;
 use Waaseyaa\AdminSurface\Host\GenericAdminSurfaceHost;
 use Waaseyaa\Api\Schema\SchemaPresenter;
-use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Kernel\Bootstrap\AccessPolicyRegistry;
 use Waaseyaa\Foundation\Log\NullLogger;
@@ -33,7 +33,7 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
     public function register(): void
     {
         // No bindings needed — host is constructed in routes() where
-        // EntityTypeManager is available via injection.
+        // EntityTypeManagerInterface is available via injection.
     }
 
     /**
@@ -97,12 +97,8 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
      * If an app provides its own host via a higher-priority provider,
      * it should call registerRoutes() directly and skip this provider.
      */
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, EntityTypeManagerInterface $entityTypeManager): void
     {
-        if ($entityTypeManager === null) {
-            return;
-        }
-
         $host = new GenericAdminSurfaceHost(
             entityTypeManager: $entityTypeManager,
             accessHandler: $this->discoverAccessHandler(),

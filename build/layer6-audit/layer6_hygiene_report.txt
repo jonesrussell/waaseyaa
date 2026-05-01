@@ -1,7 +1,6 @@
 Layer 6 hygiene scan (this layer src/ trees only)
-generated_at: 2026-04-24T21:14:07+00:00
+generated_at: 2026-04-30T17:02:32+00:00
 
-rg: /home/jones/dev/waaseyaa/packages/admin/src: No such file or directory (os error 2)
 rg: /home/jones/dev/waaseyaa/packages/deployer/src: No such file or directory (os error 2)
 /home/jones/dev/waaseyaa/packages/cli/src/Command/SearchReindexCommand.php:47:            // TODO: paginated loading — loadMultiple() loads all entities into memory at once
 /home/jones/dev/waaseyaa/packages/cli/src/Command/QueueRetryCommand.php:48:        $message = @unserialize($record['payload']);

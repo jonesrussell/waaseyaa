@@ -29,7 +29,7 @@ final class NorthCloudServiceProviderTest extends TestCase
         putenv('NORTHCLOUD_API_TOKEN=env-token');
 
         $provider = new NorthCloudServiceProvider();
-        $provider->setKernelContext('/tmp/test', []);
+        $provider->setKernelContext('/tmp/test', [], []);
         $provider->register();
 
         $client = $provider->resolve(NorthCloudClient::class);
@@ -44,7 +44,7 @@ final class NorthCloudServiceProviderTest extends TestCase
         putenv('NORTHCLOUD_API_TOKEN');
 
         $provider = new NorthCloudServiceProvider();
-        $provider->setKernelContext('/tmp/test', []);
+        $provider->setKernelContext('/tmp/test', [], []);
         $provider->register();
 
         // Resolution should succeed (uses https://api.northcloud.one default).
@@ -60,7 +60,7 @@ final class NorthCloudServiceProviderTest extends TestCase
         $provider = new NorthCloudServiceProvider();
         $provider->setKernelContext('/tmp/test', [
             'northcloud' => ['base_url' => 'https://config-loses.example.com'],
-        ]);
+        ], []);
         $provider->register();
 
         // We can't read the private baseUrl directly, but resolution succeeding
@@ -75,7 +75,7 @@ final class NorthCloudServiceProviderTest extends TestCase
         putenv('NORTHCLOUD_BASE_URL=http://insecure.example.com');
 
         $provider = new NorthCloudServiceProvider();
-        $provider->setKernelContext('/tmp/test', []);
+        $provider->setKernelContext('/tmp/test', [], []);
         $provider->register();
 
         $this->expectException(\InvalidArgumentException::class);

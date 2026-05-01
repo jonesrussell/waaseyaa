@@ -1,6 +1,6 @@
 # Layer 2 Forensic Audit (Content Types)
 
-Generated: 2026-04-24T21:14:00+00:00 UTC
+Generated: 2026-04-30T17:02:24+00:00 UTC
 
 ## 1. Canonical scope
 
@@ -12,23 +12,19 @@ Layer 2 (Content Types) packages from `bin/check-package-layers` **LAYER_BY_SHOR
 
 ### L2-COV-AGG
 - **Priority:** P4 | **Category:** test_coverage | **Severity:** low
-- **Message:** Public (non-@internal) L2 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer2.json
+- **Message:** Public (non-@internal) L2 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer2.json
 ```json
 {
-    "count": 42,
+    "count": 8,
     "sample_fqcn": [
-        "Waaseyaa\\Media\\Http\\Router\\MediaRouter",
-        "Waaseyaa\\Media\\MediaAccessPolicy",
-        "Waaseyaa\\Media\\UploadHandler",
         "Waaseyaa\\Media\\FileRepositoryInterface",
-        "Waaseyaa\\Media\\MediaServiceProvider",
-        "Waaseyaa\\Menu\\MenuServiceProvider",
-        "Waaseyaa\\Menu\\MenuAccessPolicy",
-        "Waaseyaa\\Messaging\\ThreadMessage",
         "Waaseyaa\\Messaging\\MessagingServiceProvider",
-        "Waaseyaa\\Messaging\\ThreadParticipant",
-        "Waaseyaa\\Messaging\\MessageThread",
-        "Waaseyaa\\Node\\NodeType"
+        "Waaseyaa\\Note\\NoteServiceProvider",
+        "Waaseyaa\\Path\\ResolvedPath",
+        "Waaseyaa\\Path\\PathAliasManagerInterface",
+        "Waaseyaa\\Relationship\\RelationshipParameterValidator",
+        "Waaseyaa\\Relationship\\VisibilityFilterInterface",
+        "Waaseyaa\\Relationship\\RelationshipServiceProvider"
     ]
 }
 ```
@@ -47,10 +43,10 @@ Static: Waaseyaa `use` in L2 code targeting layer >2 — see P2-style findings. 
 
 Counts: service providers **10**, *Listener* classes **2**, *Attribute* classes (heuristic) **0**. See `layer2_metadata_consistency.json` for file paths.
 
-## 6. Test / @covers
+## 6. Test coverage (@covers + #[CoversClass])
 
-Unique FQCNs with at least one `@covers`: 20
-Public symbols with no @covers: 42 (see coverage finding and `symbol_test_map_layer2.json`).
+Unique FQCNs with at least one `@covers` or `#[CoversClass]`: 54
+Public symbols with no indexed coverage: 8 (see coverage finding and `symbol_test_map_layer2.json`).
 
 ## 7. Hygiene
 

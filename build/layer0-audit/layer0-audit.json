@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:45:59+00:00",
+    "generated_at": "2026-04-30T17:02:18+00:00",
     "audit": "Layer 0 forensic audit (Foundation)",
     "target_layer": 0,
     "layer_name": "Foundation",
@@ -24,7 +24,7 @@
         "validation"
     ],
     "inventory": {
-        "generated_at": "2026-04-24T21:45:56+00:00",
+        "generated_at": "2026-04-30T17:02:15+00:00",
         "layer": 0,
         "packages": {
             "analytics": {
@@ -66,7 +66,7 @@
                     "waaseyaa/error-handler": "^0.1.0-alpha.150",
                     "waaseyaa/routing": "^0.1.0-alpha.150"
                 },
-                "src_php_count": 134,
+                "src_php_count": 137,
                 "has_tests_unit_dir": true,
                 "has_tests_integration_dir": false
             },
@@ -323,22 +323,22 @@
             "priority": 4,
             "category": "test_coverage",
             "severity": "low",
-            "message": "Public (non-@internal) L0 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer0.json",
+            "message": "Public (non-@internal) L0 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer0.json",
             "detail": {
-                "count": 269,
+                "count": 113,
                 "sample_fqcn": [
                     "Waaseyaa\\Analytics\\UmamiClient",
-                    "Waaseyaa\\Cache\\CacheFactory",
                     "Waaseyaa\\Cache\\TagAwareCacheInterface",
                     "Waaseyaa\\Cache\\CacheItem",
                     "Waaseyaa\\Cache\\CacheTagsInvalidator",
-                    "Waaseyaa\\Cache\\Listener\\TranslationCacheInvalidator",
                     "Waaseyaa\\Cache\\Listener\\EntityCacheSubscriber",
-                    "Waaseyaa\\Cache\\Listener\\ConfigCacheInvalidator",
-                    "Waaseyaa\\Cache\\Listener\\EntityCacheInvalidator",
-                    "Waaseyaa\\Cache\\Backend\\DatabaseBackend",
                     "Waaseyaa\\Cache\\Backend\\MemoryBackend",
-                    "Waaseyaa\\Cache\\Backend\\NullBackend"
+                    "Waaseyaa\\Cache\\Backend\\NullBackend",
+                    "Waaseyaa\\Cache\\CacheTagsInvalidatorInterface",
+                    "Waaseyaa\\Cache\\CacheBackendInterface",
+                    "Waaseyaa\\Cache\\CacheFactoryInterface",
+                    "Waaseyaa\\Database\\DeleteInterface",
+                    "Waaseyaa\\Database\\DatabaseInterface"
                 ]
             }
         }

@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:14:07+00:00",
+    "generated_at": "2026-04-30T17:02:31+00:00",
     "audit": "Layer 5 forensic audit (AI)",
     "target_layer": 5,
     "layer_name": "AI",
@@ -11,7 +11,7 @@
         "ai-vector"
     ],
     "inventory": {
-        "generated_at": "2026-04-24T21:14:04+00:00",
+        "generated_at": "2026-04-30T17:02:29+00:00",
         "layer": 5,
         "packages": {
             "ai-agent": {
@@ -20,7 +20,7 @@
                     "waaseyaa/access": "^0.1.0-alpha.150"
                 },
                 "waaseyaa_require_dev": [],
-                "src_php_count": 23,
+                "src_php_count": 25,
                 "has_tests_unit_dir": true,
                 "has_tests_integration_dir": false
             },
@@ -74,53 +74,33 @@
     },
     "priority_findings": [
         {
-            "id": "L5-PHPSTAN-GAP-ai-observability",
-            "priority": 2,
-            "category": "ci_alignment",
-            "severity": "medium",
-            "message": "Package 'ai-observability' (L5) not listed in phpstan.neon paths; default CI may not analyze it."
-        },
-        {
             "id": "L5-COV-AGG",
             "priority": 4,
             "category": "test_coverage",
             "severity": "low",
-            "message": "Public (non-@internal) L5 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer5.json",
+            "message": "Public (non-@internal) L5 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer5.json",
             "detail": {
-                "count": 70,
+                "count": 32,
                 "sample_fqcn": [
-                    "Waaseyaa\\AI\\Agent\\AgentAuditLog",
                     "Waaseyaa\\AI\\Agent\\ToolRegistryInterface",
                     "Waaseyaa\\AI\\Agent\\Event\\ToolCallStarted",
                     "Waaseyaa\\AI\\Agent\\Event\\LlmCallCompleted",
                     "Waaseyaa\\AI\\Agent\\Event\\ToolCallCompleted",
-                    "Waaseyaa\\AI\\Agent\\AgentAction",
-                    "Waaseyaa\\AI\\Agent\\McpServer",
-                    "Waaseyaa\\AI\\Agent\\AgentResult",
-                    "Waaseyaa\\AI\\Agent\\AgentExecutor",
-                    "Waaseyaa\\AI\\Agent\\ToolRegistry",
                     "Waaseyaa\\AI\\Agent\\AgentInterface",
-                    "Waaseyaa\\AI\\Agent\\Provider\\RateLimitException"
+                    "Waaseyaa\\AI\\Agent\\Provider\\RateLimitException",
+                    "Waaseyaa\\AI\\Agent\\Provider\\ProviderInterface",
+                    "Waaseyaa\\AI\\Agent\\Provider\\ToolResultBlock",
+                    "Waaseyaa\\AI\\Agent\\Provider\\StreamingProviderInterface",
+                    "Waaseyaa\\AI\\Agent\\Provider\\ToolUseBlock",
+                    "Waaseyaa\\AI\\Agent\\Provider\\MessageResponse",
+                    "Waaseyaa\\AI\\Agent\\Provider\\MaxIterationsException"
                 ]
-            }
-        },
-        {
-            "id": "L5-DOC-CLAUDE",
-            "priority": 1,
-            "category": "public_api_documentation",
-            "severity": "low",
-            "message": "CLAUDE.md Layer 5 table and bin/check-package-layers disagree on package set.",
-            "detail": {
-                "in_script_not_in_claude": [
-                    "ai-observability"
-                ],
-                "in_claude_not_in_script": []
             }
         }
     ],
     "phpstan_totals": {
         "errors": 0,
-        "file_errors": 1
+        "file_errors": 0
     },
     "deliverables": [
         "layer5-audit.md",

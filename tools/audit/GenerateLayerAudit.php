@@ -371,15 +371,51 @@ function buildSymbolTestMap(string $root, array $packageShorts, array $publicApi
             $scanned++;
             $content = (string) file_get_contents($file->getPathname());
             $rel = str_replace($root . DIRECTORY_SEPARATOR, '', $file->getPathname());
+            $register = static function (string $fqcn) use (&$perSymbol, $rel): void {
+                if (!str_starts_with($fqcn, 'Waaseyaa\\')) {
+                    return;
+                }
+                if (!isset($perSymbol[$fqcn])) {
+                    $perSymbol[$fqcn] = [];
+                }
+                $perSymbol[$fqcn][] = $rel;
+            };
+
             if (preg_match_all('/@covers\s*\\\\?([A-Za-z0-9_\\\\]+)/u', $content, $m)) {
                 foreach ($m[1] as $raw) {
-                    if (!\is_string($raw) || !str_starts_with($raw, 'Waaseyaa\\')) {
+                    if (\is_string($raw) && $raw !== '') {
+                        $register(ltrim($raw, '\\'));
+                    }
+                }
+            }
+
+            // Convention C1 (mission #1335): #[CoversClass(\Foo\Bar::class)] attributes (PHPUnit 10.5+).
+            // Resolve short class refs via the file's use statements.
+            $useMap = [];
+            if (preg_match_all('/^\s*use\s+(?!function\s|const\s)(\\\\?[A-Za-z0-9_\\\\]+)(?:\s+as\s+([A-Za-z0-9_]+))?\s*;/m', $content, $um)) {
+                foreach ($um[1] as $i => $fqcn) {
+                    if (!\is_string($fqcn) || $fqcn === '') {
                         continue;
                     }
-                    if (!isset($perSymbol[$raw])) {
-                        $perSymbol[$raw] = [];
+                    $alias = (string) ($um[2][$i] ?? '');
+                    if ($alias === '') {
+                        $parts = explode('\\', ltrim($fqcn, '\\'));
+                        $alias = (string) end($parts);
                     }
-                    $perSymbol[$raw][] = $rel;
+                    $useMap[$alias] = ltrim($fqcn, '\\');
+                }
+            }
+            if (preg_match_all('/#\[CoversClass\(\s*\\\\?([A-Za-z0-9_\\\\]+)::class\s*\)\]/u', $content, $am)) {
+                foreach ($am[1] as $rawRef) {
+                    if (!\is_string($rawRef) || $rawRef === '') {
+                        continue;
+                    }
+                    $fqcn = str_contains($rawRef, '\\')
+                        ? ltrim($rawRef, '\\')
+                        : ($useMap[$rawRef] ?? null);
+                    if ($fqcn !== null) {
+                        $register($fqcn);
+                    }
                 }
             }
         }
@@ -414,7 +450,7 @@ function buildSymbolTestMap(string $root, array $packageShorts, array $publicApi
         'at_covers_hits' => \count($perSymbol),
         'per_symbol' => $perSymbol,
         'public_non_internal_symbols_lacking_at_covers' => $missing,
-        'methodology' => 'Only @covers lines are indexed; no inference from test class new/use.',
+        'methodology' => '@covers PHPDoc and #[CoversClass(...)] attributes are both indexed (Convention C1, mission #1335). Short refs resolved via file-local use statements; same-namespace refs without an alias are skipped.',
     ];
 }
 
@@ -772,7 +808,7 @@ function buildPriorityFindings(
             'priority' => 4,
             'category' => 'test_coverage',
             'severity' => 'low',
-            'message' => "Public (non-@internal) L{$targetLayer} symbols with no @covers in this layer's test tree (count). Full list: {$symbolMapFile}",
+            'message' => "Public (non-@internal) L{$targetLayer} symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: {$symbolMapFile}",
             'detail' => [
                 'count' => \count($missingCov),
                 'sample_fqcn' => array_map(
@@ -888,11 +924,11 @@ function buildMarkdownReport(
     $ac = \count((array) ($metadataFindings['policy_or_gate_attributes'] ?? []));
     $lines[] = "Counts: service providers **{$spc}**, *Listener* classes **{$lsc}**, *Attribute* classes (heuristic) **{$ac}**. See `layer{$targetLayer}_metadata_consistency.json` for file paths.";
     $lines[] = '';
-    $lines[] = '## 6. Test / @covers';
+    $lines[] = '## 6. Test coverage (@covers + #[CoversClass])';
     $lines[] = '';
     $c = (int) ($testMap['at_covers_hits'] ?? 0);
-    $lines[] = 'Unique FQCNs with at least one `@covers`: ' . (string) $c;
-    $lines[] = 'Public symbols with no @covers: ' . (string) \count((array) ($testMap['public_non_internal_symbols_lacking_at_covers'] ?? [])) . " (see coverage finding and `symbol_test_map_layer{$targetLayer}.json`).";
+    $lines[] = 'Unique FQCNs with at least one `@covers` or `#[CoversClass]`: ' . (string) $c;
+    $lines[] = 'Public symbols with no indexed coverage: ' . (string) \count((array) ($testMap['public_non_internal_symbols_lacking_at_covers'] ?? [])) . " (see coverage finding and `symbol_test_map_layer{$targetLayer}.json`).";
     $lines[] = '';
     $lines[] = '## 7. Hygiene';
     $lines[] = '';

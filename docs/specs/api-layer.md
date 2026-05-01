@@ -16,6 +16,8 @@
 <!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute pipeline cross-linked to docs/specs/jsonapi.md; ResourceSerializer uses toCastAwareMap (#1181) -->
 <!-- Spec reviewed 2026-04-09 ST-10 - ResourceSerializer delegates JSON value normalization to EntityValues::normalizeValueForJson() (#1181) -->
 <!-- Spec reviewed 2026-04-09 - SchemaPresenter: admin JSON Schema from field definitions, not EntityBase::$casts; cross-link entity-system #1184 -->
+<!-- Spec reviewed 2026-05-01 - AccessChecker canonical placement: source lives at packages/access/src/AccessChecker.php with namespace Waaseyaa\Access; routing package table row corrected; routing dir-tree no longer lists AccessChecker.php (mission #824 WP05 surface A, closes #832) -->
+<!-- Spec reviewed 2026-05-01 - JsonApiRouteProvider route table now enumerates the public `api.discovery` route alongside the five per-entity-type CRUD routes; ApiDiscoveryController response contract documented (meta {api, version} + links {self, <entity_type>: {href, meta.type}}) and exercised by an end-to-end integration test (mission #824 WP06 surface A, closes #841) -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
 
@@ -75,7 +77,7 @@ Foundation still wires several shared HTTP surfaces that are not entity-package 
 | `src/RouteBuilder.php` | `Waaseyaa\Routing` | Fluent API for building Symfony Route objects; `entityParameter()` sets `options.parameters.*.type = entity:{id}`; `bind()` sets `options._waaseyaa_app_bindings` for SSR post-load class checks |
 | `src/RouteFingerprint.php` | `Waaseyaa\Routing` | Stable hash of path, methods, parameters, bindings, defaults for app-controller descriptor cache invalidation |
 | `src/RouteMatch.php` | `Waaseyaa\Routing` | Value object for matched route (name, route, parameters) |
-| `src/AccessChecker.php` | `Waaseyaa\Routing` | Route-level access checking via route options |
+| `src/AccessChecker.php` (in `waaseyaa/access`, not routing) | `Waaseyaa\Access` | Route-level access checking via route options. Owned by the access package; routing depends on access (mission #824 WP05 surface A). |
 | `src/AuthOidcRouteServiceProvider.php` | `Waaseyaa\Routing` | Registers `/api/auth/*`, `/api/user/me`, and OIDC discovery/authorize/token routes; depends on `waaseyaa/auth` and `waaseyaa/oidc` for controllers only |
 | `src/OidcHttpRoutes.php` | `Waaseyaa\Routing` | OIDC path table (discovery, jwks, optional authorize/token) used by `AuthOidcRouteServiceProvider` |
 | `src/Attribute/GateAttribute.php` | `Waaseyaa\Routing\Attribute` | PHP attribute for gate-based access control on controller methods |
@@ -615,7 +617,7 @@ Multiple requirements are combined with **AND** logic (all must pass). If no acc
 ### AccessChecker
 
 ```php
-// packages/routing/src/AccessChecker.php
+// packages/access/src/AccessChecker.php — Waaseyaa\Access\AccessChecker
 final class AccessChecker
 {
     public function __construct(
@@ -674,17 +676,53 @@ final class JsonApiRouteProvider
 }
 ```
 
-Registers five routes per entity type:
+Registers a single public discovery route plus five CRUD routes per entity type. The discovery route is always registered, even when no entity types are present.
 
-| Route Name | Method | Path | Controller Method |
-|-----------|--------|------|-------------------|
-| `api.{type}.index` | GET | `/api/{type}` | `index` |
-| `api.{type}.show` | GET | `/api/{type}/{id}` | `show` |
-| `api.{type}.store` | POST | `/api/{type}` | `store` |
-| `api.{type}.update` | PATCH | `/api/{type}/{id}` | `update` |
-| `api.{type}.destroy` | DELETE | `/api/{type}/{id}` | `destroy` |
+| Route Name | Method | Path | Controller Method | Access |
+|-----------|--------|------|-------------------|--------|
+| `api.discovery` | GET | `/api` | `Waaseyaa\Api\ApiDiscoveryController::discover` | `_public` (allowAll) |
+| `api.{type}.index` | GET | `/api/{type}` | `JsonApiController::index` | route-default access |
+| `api.{type}.show` | GET | `/api/{type}/{id}` | `JsonApiController::show` | route-default access |
+| `api.{type}.store` | POST | `/api/{type}` | `JsonApiController::store` | `_authenticated` + `application/vnd.api+json` |
+| `api.{type}.update` | PATCH | `/api/{type}/{id}` | `JsonApiController::update` | `_authenticated` + `application/vnd.api+json` |
+| `api.{type}.destroy` | DELETE | `/api/{type}/{id}` | `JsonApiController::destroy` | `_authenticated` |
 
-Each route sets `_entity_type` as a default parameter.
+Per-entity-type CRUD routes set `_entity_type` as a default parameter. The discovery route does not — it iterates `EntityTypeManagerInterface::getDefinitions()` at request time.
+
+### ApiDiscoveryController
+
+```php
+// packages/api/src/ApiDiscoveryController.php
+final class ApiDiscoveryController
+{
+    public function __construct(
+        private readonly EntityTypeManagerInterface $entityTypeManager,
+        private readonly string $basePath = '/api',
+    ) {}
+
+    /**
+     * @return array{meta: array<string, string>, links: array<string, mixed>}
+     */
+    public function discover(): array;
+}
+```
+
+Returns a JSON:API-style discovery document listing every registered entity type's collection endpoint. The response contract is:
+
+| Key | Shape | Notes |
+|-----|-------|-------|
+| `meta.api` | `'waaseyaa'` (string) | Constant identifier for the API surface. |
+| `meta.version` | `'1.0'` (string) | Discovery contract version, not the framework version. |
+| `links.self` | `string` | The configured `$basePath` (defaults to `/api`). |
+| `links.{entity_type_id}` | `array{href: string, meta: array{type: string}}` | One entry per `EntityTypeManagerInterface::getDefinitions()` entry. `href` is `{basePath}/{entity_type_id}`; `meta.type` echoes the entity type id for client convenience. |
+
+Invariants enforced by the integration test:
+- `links.self` is always present.
+- `links.{type}.href` always equals the collection path served by `api.{type}.index`.
+- The entry set in `links` (excluding `self`) is exactly the set of registered entity type ids — no more, no less.
+- When zero entity types are registered, `links` collapses to `['self' => $basePath]`.
+
+The route is dispatched by `JsonApiRouteProvider`'s `api.discovery` registration. At runtime, `DiscoveryRouter` (the `HttpDomainRouter` registered through `ApiServiceProvider::httpDomainRouters()`) recognises the controller string `Waaseyaa\Api\ApiDiscoveryController::discover` via `str_contains($controller, 'ApiDiscoveryController')`, instantiates the controller with the booted `EntityTypeManager`, and wraps the discover payload in a `jsonapi.version` envelope before returning a JSON:API response.
 
 ## Translation Sub-Resource
 
@@ -855,7 +893,6 @@ packages/routing/
       UrlPrefixNegotiator.php
     ParamConverter/
       EntityParamConverter.php
-    AccessChecker.php
     RouteBuilder.php
     RouteMatch.php
     WaaseyaaRouter.php

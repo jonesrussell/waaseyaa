@@ -113,7 +113,10 @@ final class ServiceProviderTest extends TestCase
         };
 
         $router = new \Waaseyaa\Routing\WaaseyaaRouter();
-        $provider->routes($router);
+        $entityTypeManager = new \Waaseyaa\Entity\EntityTypeManager(
+            new \Symfony\Component\EventDispatcher\EventDispatcher(),
+        );
+        $provider->routes($router, $entityTypeManager);
 
         // Default no-op should not add any routes
         $this->assertSame(0, $router->getRouteCollection()->count());

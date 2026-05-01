@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:13:54+00:00",
+    "generated_at": "2026-04-30T17:02:18+00:00",
     "service_providers": [
         {
             "package": "auth",
@@ -39,8 +39,20 @@
         },
         {
             "package": "entity",
+            "file": "packages/entity/src/Attribute/ContentEntityKeys.php",
+            "class": "Waaseyaa\\Entity\\Attribute\\ContentEntityKeys",
+            "note": "review_if_contract"
+        },
+        {
+            "package": "entity",
             "file": "packages/entity/src/Attribute/EntityTypeAttribute.php",
             "class": "Waaseyaa\\Entity\\Attribute\\EntityTypeAttribute",
+            "note": "review_if_contract"
+        },
+        {
+            "package": "entity",
+            "file": "packages/entity/src/Attribute/ContentEntityType.php",
+            "class": "Waaseyaa\\Entity\\Attribute\\ContentEntityType",
             "note": "review_if_contract"
         },
         {

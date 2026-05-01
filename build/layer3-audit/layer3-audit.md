@@ -1,6 +1,6 @@
 # Layer 3 Forensic Audit (Services)
 
-Generated: 2026-04-24T21:14:02+00:00 UTC
+Generated: 2026-04-30T17:02:26+00:00 UTC
 
 ## 1. Canonical scope
 
@@ -12,7 +12,7 @@ Layer 3 (Services) packages from `bin/check-package-layers` **LAYER_BY_SHORT**: 
 
 ### L3-COV-AGG
 - **Priority:** P4 | **Category:** test_coverage | **Severity:** low
-- **Message:** Public (non-@internal) L3 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer3.json
+- **Message:** Public (non-@internal) L3 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer3.json
 ```json
 {
     "count": 21,
@@ -47,10 +47,10 @@ Static: Waaseyaa `use` in L3 code targeting layer >3 — see P2-style findings. 
 
 Counts: service providers **6**, *Listener* classes **1**, *Attribute* classes (heuristic) **0**. See `layer3_metadata_consistency.json` for file paths.
 
-## 6. Test / @covers
+## 6. Test coverage (@covers + #[CoversClass])
 
-Unique FQCNs with at least one `@covers`: 50
-Public symbols with no @covers: 21 (see coverage finding and `symbol_test_map_layer3.json`).
+Unique FQCNs with at least one `@covers` or `#[CoversClass]`: 50
+Public symbols with no indexed coverage: 21 (see coverage finding and `symbol_test_map_layer3.json`).
 
 ## 7. Hygiene
 

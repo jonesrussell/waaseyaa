@@ -1,6 +1,6 @@
 # Layer 1 Forensic Audit (Core Data)
 
-Generated: 2026-04-24T21:13:57+00:00 UTC
+Generated: 2026-04-30T17:02:21+00:00 UTC
 
 ## 1. Canonical scope
 
@@ -12,23 +12,23 @@ Layer 1 (Core Data) packages from `bin/check-package-layers` **LAYER_BY_SHORT**:
 
 ### L1-COV-AGG
 - **Priority:** P4 | **Category:** test_coverage | **Severity:** low
-- **Message:** Public (non-@internal) L1 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer1.json
+- **Message:** Public (non-@internal) L1 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer1.json
 ```json
 {
-    "count": 177,
+    "count": 71,
     "sample_fqcn": [
-        "Waaseyaa\\Access\\ConfigEntityAccessPolicy",
         "Waaseyaa\\Access\\AccountInterface",
-        "Waaseyaa\\Access\\RedirectValidator",
         "Waaseyaa\\Access\\PermissionHandlerInterface",
-        "Waaseyaa\\Access\\AccessPolicyInterface",
-        "Waaseyaa\\Access\\Gate\\PolicyAttribute",
         "Waaseyaa\\Access\\Gate\\GateInterface",
-        "Waaseyaa\\Access\\Gate\\AccessDeniedException",
-        "Waaseyaa\\Access\\Gate\\Gate",
-        "Waaseyaa\\Access\\Gate\\EntityAccessGate",
-        "Waaseyaa\\Access\\Middleware\\AuthorizationMiddleware",
-        "Waaseyaa\\Access\\FieldAccessPolicyInterface"
+        "Waaseyaa\\Access\\FieldAccessPolicyInterface",
+        "Waaseyaa\\Access\\AccessChecker",
+        "Waaseyaa\\Auth\\Token\\AuthTokenRepository",
+        "Waaseyaa\\Auth\\AuthServiceProvider",
+        "Waaseyaa\\Auth\\Config\\MailMissingPolicy",
+        "Waaseyaa\\Config\\StorageInterface",
+        "Waaseyaa\\Config\\Schema\\SchemaViolation",
+        "Waaseyaa\\Config\\ManifestVerificationResult",
+        "Waaseyaa\\Config\\ConfigImportResult"
     ]
 }
 ```
@@ -45,12 +45,12 @@ Static: Waaseyaa `use` in L1 code targeting layer >1 — see P2-style findings. 
 
 ## 5. Metadata and extension points
 
-Counts: service providers **3**, *Listener* classes **1**, *Attribute* classes (heuristic) **4**. See `layer1_metadata_consistency.json` for file paths.
+Counts: service providers **3**, *Listener* classes **1**, *Attribute* classes (heuristic) **6**. See `layer1_metadata_consistency.json` for file paths.
 
-## 6. Test / @covers
+## 6. Test coverage (@covers + #[CoversClass])
 
-Unique FQCNs with at least one `@covers`: 23
-Public symbols with no @covers: 177 (see coverage finding and `symbol_test_map_layer1.json`).
+Unique FQCNs with at least one `@covers` or `#[CoversClass]`: 139
+Public symbols with no indexed coverage: 71 (see coverage finding and `symbol_test_map_layer1.json`).
 
 ## 7. Hygiene
 

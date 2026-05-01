@@ -8,9 +8,10 @@ use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Asset\ViteAssetManager;
 use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
 use Waaseyaa\Foundation\Middleware\HttpMiddlewareInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
-final class InertiaServiceProvider extends ServiceProvider
+final class InertiaServiceProvider extends ServiceProvider implements HasMiddlewareInterface
 {
     public function register(): void
     {

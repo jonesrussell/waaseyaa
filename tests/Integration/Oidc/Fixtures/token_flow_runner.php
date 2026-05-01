@@ -38,7 +38,7 @@ $bootMethod = (new ReflectionClass(HttpKernel::class))->getMethod('boot');
 $bootMethod->invoke($kernel);
 
 $resolver = $kernel->getHttpServiceResolver();
-$codeRepository = $resolver(AuthorizationCodeRepositoryInterface::class);
+$codeRepository = $resolver->resolve(AuthorizationCodeRepositoryInterface::class);
 if (!$codeRepository instanceof AuthorizationCodeRepositoryInterface) {
     fwrite(STDERR, "Failed to resolve AuthorizationCodeRepositoryInterface\n");
     exit(1);

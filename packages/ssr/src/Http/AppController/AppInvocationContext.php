@@ -9,6 +9,7 @@ use Symfony\Component\Routing\Route;
 use Twig\Environment;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 
 final readonly class AppInvocationContext
 {
@@ -25,6 +26,6 @@ final readonly class AppInvocationContext
         public array $routeParams,
         public array $query,
         public ?\Waaseyaa\Access\Gate\GateInterface $gate,
-        public ?\Closure $serviceResolver,
+        public ?HttpServiceResolverInterface $serviceResolver,
     ) {}
 }

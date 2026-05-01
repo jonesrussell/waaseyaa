@@ -1,5 +1,7 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-05-01b - BootFailureMessageFormatter extracted as a public seam in packages/foundation/src/Kernel/: HttpKernel::bootFailureJsonResponse delegates clientSafeBootFailureDetail mapping to the formatter, eliminating 3× setAccessible() in HttpKernelBootFailureTest; behavior unchanged (mission #824 WP09 surface H) -->
+<!-- Spec reviewed 2026-05-01 - README skeletons added under packages/billing/, packages/deployer/, packages/github/, packages/http-client/, packages/inertia/ (purpose, layer, key classes only); StripeClientInterface, GitHubClient, HttpClientInterface, Inertia adapter, and Deployer recipe contracts unchanged from prior review (mission #824 WP09 surface F, closes #849) -->
 <!-- Spec reviewed 2026-04-26 - Package-declared migrations: extra.waaseyaa.migrations path, MigrationLoader glob order, OIDC exemplar migration (#1286) -->
 <!-- Spec reviewed 2026-04-26 - AbstractKernel bootEntityTypeManager: SqlSchemaHandler constructed with kernel LoggerInterface for deriveColumnSpec unknown-type warnings (#1305); see docs/specs/field/column-derivation.md -->
 <!-- Spec reviewed 2026-04-25 - packages/testing stub entities: constructor/metadata alignment for EntityTypeManager parity tests only; no kernel/bootstrap contract change -->
@@ -7,6 +9,7 @@
 <!-- Spec reviewed 2026-04-24 - packages/http-client StreamHttpClient; packages/inertia InertiaServiceProvider (PHPStan-only); packages/queue timestamped migrations + CreateQueueTables DDL (waaseyaa_queue_jobs / waaseyaa_failed_jobs) -->
 <!-- Spec reviewed 2026-04-24 - Layer 0 env variable contract subsection (APP_ENV, APP_DEBUG, WAASEYAA_DB, WAASEYAA_CONFIG_DIR, .env/EnvLoader) + assert/IO review note after boot guard -->
 <!-- Spec reviewed 2026-04-22 - PackageManifest: removed persisted commands/routes (ADR docs/adr/0001); legacy extra.waaseyaa.commands|routes log warning only; fromArray strips legacy cache keys; mergeRootWaaseyaa merges providers+permissions only; attributeEntityTypes; ProviderRegistry entity_auto_register; ServiceProvider::mergeChildProvider; BuiltinRouteRegistrar: MCP route owned by mcp package only, sortRoutesByPriority after provider routes; MigrationLoader InstalledVersions; queue/notification/scheduler extra.waaseyaa.migrations -->
+<!-- Spec reviewed 2026-04-30 - layer-graph file-level scan + named-file kernel exemption surface (mission #824 WP02 surface C) -->
 <!-- Spec reviewed 2026-04-22 - require-dev layer audit script + CI integration (warn-only), plus composer layer graph docs -->
 <!-- Spec reviewed 2026-04-21 - Composer layer graph (bin/check-package-layers), HTTP JSON-first error surface, database-legacy ADR 007 cross-link -->
 <!-- Spec reviewed 2026-04-05 - SovereigntyProfile/Config added to foundation, FoundationServiceProvider registers SovereigntyConfig singleton; CommunityContext/CommunityMiddleware added for community-scoped query isolation; SsrResponse removed, all controllers return Symfony Response/JsonResponse; ControllerDispatcher now delegates to DomainRouterInterface chain; both callable and router dispatch paths wrapped in try-catch returning 500 JSON:API errors; MediaRouter file move wrapped in try-catch; ViteAssetManager gained assetTags() method with devServerUrl constructor param for dev mode support; ControllerDispatcher uses Inertia::getRenderer() instead of hardcoded new RootTemplateRenderer(); RootTemplateRenderer accepts optional ViteAssetManager and injects Vite asset tags in default template; InertiaServiceProvider auto-configures renderer with ViteAssetManager for zero-config Inertia SPA support; AppControllerRouter added to dispatch Class::method controllers from ServiceProvider::routes() — delegates to SsrPageHandler::dispatchAppController, wired after SsrRouter in HttpKernel router chain (#1119); AppControllerRouter handle() relies on dispatchAppController's typed array shape contract (no runtime defensive casts); MediaRouter mkdir warning suppressed via @-prefix double-check idiom so a non-directory ancestor produces a clean 500 from the move catch block instead of a PHP warning under --fail-on-warning -->
@@ -33,6 +36,13 @@
 <!-- Spec reviewed 2026-04-09 - HttpKernel::serveHttpRequest: auth middleware short-circuit — return pipeline response whenever status !== 200 (302 login redirect, 401/403 JSON), not only when status >= 400, so unauthenticated SSR routes cannot fall through to controller dispatch -->
 
 <!-- Spec reviewed 2026-04-20 - ServiceProvider now preserves entity-type registrant provenance and ProviderRegistry rethrows entity-type collision exceptions after logging so duplicate canonical registrations fail boot deterministically (#1313) -->
+<!-- Spec reviewed 2026-04-30 - ServiceProvider extension-hook enumeration: 10 interface methods, 6 abstract-base capability-split candidates, 1 capability interface (LanguagePathStripperInterface); lockstep enforced by ServiceProviderContractTest (mission #824 WP03 surface C) -->
+<!-- Spec reviewed 2026-04-30b - ServiceProvider capability split: graphqlMutationOverrides lifted from abstract base into HasGraphqlMutationOverridesInterface; GraphQlServiceProvider guards the call with instanceof; tier 2 down to 5 candidates, tier 3 up to 2 (mission #824 WP03 surface D) -->
+<!-- Spec reviewed 2026-04-30c - ServiceProvider capability split: commands lifted from abstract base into HasCommandsInterface; ConsoleKernel guards the call with instanceof; NorthCloudServiceProvider implements the new interface; tier 2 down to 4 candidates, tier 3 up to 3 (mission #824 WP03 surface E) -->
+<!-- Spec reviewed 2026-04-30d - ServiceProvider capability split: registerRenderCacheListeners lifted from abstract base into HasRenderCacheListenersInterface; HttpKernel finalizeBoot guards with instanceof; SsrServiceProvider implements the new interface; tier 2 down to 3 candidates, tier 3 up to 4 (mission #824 WP03 surface F) -->
+<!-- Spec reviewed 2026-04-30e - ServiceProvider capability split: configureHttpKernel lifted from abstract base into ConfiguresHttpKernelInterface (verb-led name because it mutates the kernel rather than contributing values); HttpKernel finalizeBoot guards with instanceof; GenealogyServiceProvider and SsrServiceProvider implement the new interface; tier 2 down to 2 candidates, tier 3 up to 5 (mission #824 WP03 surface G) -->
+<!-- Spec reviewed 2026-04-30f - ServiceProvider capability split: middleware lifted from abstract base into HasMiddlewareInterface; HttpKernel buildMiddlewarePipeline guards with instanceof; AuthServiceProvider, DebugServiceProvider, and InertiaServiceProvider implement the new interface; tier 2 down to 1 candidate (httpDomainRouters), tier 3 up to 6 (mission #824 WP03 surface H) -->
+<!-- Spec reviewed 2026-04-30g - ServiceProvider capability split COMPLETE: httpDomainRouters lifted from abstract base into HasHttpDomainRoutersInterface; HttpKernel buildDomainRouterChain guards with instanceof; ApiServiceProvider, GraphQlServiceProvider, MediaServiceProvider, and SsrServiceProvider implement the new interface; tier 2 down to 0 candidates (now empty by design), tier 3 up to 7 (mission #824 WP03 surface I — the final capability split) -->
 
 Specification for the foundational infrastructure layer of Waaseyaa CMS: domain events, cache system, database abstraction, query builder, migration system, kernel bootstrapping (including environment resolution and debug mode), service provider discovery, and queue workers.
 
@@ -84,6 +94,89 @@ Infrastructure-layer split packages that ship as Packagist libraries are expecte
 ### Composer layer graph
 
 The monorepo enforces the seven-layer rule from `CLAUDE.md` on **runtime** Composer edges: `bin/check-package-layers` walks `packages/*/composer.json` and fails if any `require` entry `waaseyaa/*` targets a package **strictly above** the declaring package’s layer. Metapackages (`cms`, `core`, `full`) are skipped. `require-dev` remains non-fatal; use `bin/audit-require-dev-layers` for a warn-only report that surfaces upward dev-only edges without blocking merges. The canonical short-name → layer map lives in `bin/check-package-layers`; when you add a new first-party package, extend the map and the Layer Architecture table in `CLAUDE.md` together. This supersedes ad-hoc checks for historical issues such as foundation → path or validation → entity at the manifest level.
+
+The PHP layer graph covers the **62 PHP packages** under `packages/` plus the three metapackages (`cms`, `core`, `full`, all skipped). `packages/admin/` is a Nuxt SPA (no `composer.json`, zero PHP source) and is not part of the PHP layer hierarchy; its PHP host extension is `waaseyaa/admin-surface`, which is what L6 actually means here.
+
+The same script also scans every package's `src/**/*.php` for `use Waaseyaa\X\…` imports and fails on any import whose target package sits **above** the importing package's layer. This catches cross-layer leaks that don't show up in `composer.json` (e.g. a Foundation listener referencing an L1 entity event class without declaring an upward `require`). Diagnostics are emitted as `FAIL [PL005]` and name the offending file, the importing package's layer, and the imported package's layer.
+
+### Kernel exemption surface (named files)
+
+Some bootstrapper code intentionally sees across layers — kernels wire entity-type managers, route registrars register controllers from any layer, cache invalidators subscribe to events from higher layers. Two complementary exemption tiers in `bin/check-package-layers` codify this:
+
+| Tier | Mechanism | Use for |
+|------|-----------|---------|
+| Implicit | `KERNEL_EXEMPT_DIR_SUFFIXES` (currently `/src/Kernel/`) | Files inside `<pkg>/src/Kernel/` — the canonical kernel/bootstrapper boundary documented in `CLAUDE.md` "Layer Architecture > Exemption" |
+| Explicit | `KERNEL_EXEMPT_FILES` (path → rationale) | Kernel-adjacent files that must live outside `Kernel/` (route registrars wired only from `HttpKernel`, diagnostics wired only from `ConsoleKernel`, listeners wired only from a `ServiceProvider`) |
+
+Each `KERNEL_EXEMPT_FILES` entry carries a one-line rationale string so future readers can audit whether the exemption is still load-bearing. To land a new kernel-adjacent file, either move it under `<pkg>/src/Kernel/` (preferred — the Composer-graph picture stays clean) or add an explicit named entry; the gate refuses to merge an unjustified cross-layer leak.
+
+The named-file surface was added in mission #824 WP02 surface C and is the prerequisite for mission #1257 K6(c) (`HealthChecker` codified as kernel-adjacent rather than relocated).
+
+### ServiceProvider extension hooks
+
+Every `Waaseyaa\Foundation\ServiceProvider\ServiceProvider` exposes a fixed set of hooks the kernel calls during bootstrap. Three tiers exist; the contract test at `packages/foundation/tests/Contract/ServiceProviderContractTest.php` keeps all three in lockstep with the actual kernel call sites (mission #824 WP03 surface B). Adding a Tier 1 method, removing a Tier 2 method, or wiring a new `instanceof`-guarded call site without an allowlist entry fails the contract test — drift cannot land silently.
+
+**Tier 1 — `ServiceProviderInterface` (the public contract).** Every provider implements these; removing or signature-changing one breaks third-party providers.
+
+| Method | Caller | Purpose |
+|--------|--------|---------|
+| `register(): void` | `ProviderRegistry::discoverAndRegister()` | Bind services. Called once per registration pass after `setKernelContext` and `setKernelServices`. |
+| `boot(): void` | `ProviderRegistry::boot()` | Late wiring after every provider has registered. Subscribe to events, warm caches. |
+| `routes(WaaseyaaRouter, EntityTypeManager): void` | `BuiltinRouteRegistrar::register()` | Contribute HTTP routes. |
+| `provides(): list<string>` | `ProviderRegistry` (deferred check) | Service ids the provider intends to bind. |
+| `isDeferred(): bool` | `ProviderRegistry` (deferred check) | Whether `register()` may be deferred until a `provides()` service is requested. |
+| `getBindings(): array<string, array{concrete, shared}>` | `HttpKernel`, `HttpKernelServiceResolver`, `ProviderRegistryKernelServices` | Local bindings registered by this provider. |
+| `resolve(string): object` | `HttpKernel`, `HttpKernelServiceResolver`, `ProviderRegistryKernelServices` | Resolve a binding; throws when neither local bindings nor the kernel-services bus knows the abstract. |
+| `setKernelContext(string $projectRoot, array $config, array $manifestFormatters): void` | `ProviderRegistry::discoverAndRegister()` | Inject project root, config, and manifest formatters before `register()`. |
+| `setKernelServices(KernelServicesInterface): void` | `ProviderRegistry::discoverAndRegister()` | Inject the kernel-services bus before `register()`. |
+| `getEntityTypeRegistrations(): list<array{entityType, registrant}>` | `ProviderRegistry::discoverAndRegister()` | Entity-type registrations contributed during `register()`. |
+
+**Tier 2 — abstract `ServiceProvider` capability methods.** Empty after mission #824 WP03 surfaces D–I lifted every kernel-invoked hook into a capability interface. New kernel-invoked hooks should enter as capability interfaces, never as no-op defaults on the abstract base. The contract test's `ABSTRACT_BASE_ONLY` allowlist enforces the empty invariant.
+
+**Tier 3 — capability interfaces (`instanceof`-guarded).** A provider opts in by implementing the named interface; the call site (kernel for foundation-owned hooks, the owning subsystem's bootstrap for cross-package hooks) checks `instanceof` before calling. The contract test's `CAPABILITY_INTERFACES` allowlist names which method belongs to which interface.
+
+| Method | Capability interface | Caller |
+|--------|---------------------|--------|
+| `stripLanguagePrefixForRouting(string): string` | `Waaseyaa\Foundation\Http\LanguagePathStripperInterface` | `HttpKernel::stripLanguagePrefixForHttpRouting()` |
+| `graphqlMutationOverrides(EntityTypeManager): array<string, array{args?, resolve?}>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface` | `Waaseyaa\GraphQL\GraphQlServiceProvider::httpDomainRouters()` |
+| `commands(EntityTypeManager, DatabaseInterface, EventDispatcherInterface): list<Command>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface` | `ConsoleKernel::handle()` |
+| `registerRenderCacheListeners(EventDispatcherInterface, ?CacheBackendInterface): void` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface` | `HttpKernel::finalizeBoot()` |
+| `configureHttpKernel(HttpKernel): void` | `Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface` | `HttpKernel::finalizeBoot()` |
+| `middleware(EntityTypeManager): list<HttpMiddlewareInterface>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface` | `HttpKernel::buildMiddlewarePipeline()` |
+| `httpDomainRouters(HttpKernel): iterable<DomainRouterInterface>` | `Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface` | `HttpKernel::buildDomainRouterChain()` |
+
+### ServiceProvider kernel-services bus
+
+Service providers receive a typed bus of kernel-owned services through `Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface` (Contract A from mission #824 WP02). The interface declares a single method:
+
+```php
+public function get(string $abstract): ?object;
+```
+
+`KernelServicesInterface` replaces the legacy `\Closure(string): ?object` field that providers previously received via `setKernelResolver()`. The named contract makes the kernel surface explicit, restores PHPStan-visible types at the call boundary, and gives test doubles a stable seam.
+
+**Wiring.** `ProviderRegistry` constructs one `ProviderRegistryKernelServices` instance per registration pass and hands it to every discovered provider via `ServiceProvider::setKernelServices()`. The default implementation resolves these abstracts:
+
+| Abstract | Resolves to |
+|----------|-------------|
+| `Waaseyaa\Entity\EntityTypeManager` | The kernel’s entity-type manager |
+| `Waaseyaa\Database\DatabaseInterface` | The kernel’s `DBALDatabase` |
+| `Symfony\Contracts\EventDispatcher\EventDispatcherInterface` | The kernel’s event dispatcher |
+| `Waaseyaa\Foundation\Log\LoggerInterface` | The kernel’s logger |
+| `\PDO` | The native PDO connection beneath `DBALDatabase` |
+| anything else | The first sibling provider whose `getBindings()` declares the abstract, or `null` |
+
+The provider list is read through a closure accessor so resolution sees the live registration state — necessary when a provider’s `register()` resolves a binding declared by a sibling registered earlier in the same pass.
+
+**Resolution order in `ServiceProvider::resolve()`.** Local bindings (`singleton`/`bind`) win first; only when the abstract is unbound locally does the provider delegate to `KernelServicesInterface::get()`; if that returns `null`, the provider throws `RuntimeException("No binding registered for {$abstract}.")`.
+
+**Propagation through `mergeChildProvider()`.** When a stack provider merges a child via `mergeChildProvider()`, the child receives the same `KernelServicesInterface` instance so `resolve()` keeps working inside the child’s `register()`.
+
+### HTTP service resolver (SSR controller-method DI)
+
+`HttpKernel::getHttpServiceResolver()` returns `Waaseyaa\Foundation\Http\HttpServiceResolverInterface` (default impl `Waaseyaa\Foundation\Kernel\Http\HttpKernelServiceResolver`). SSR uses this seam to satisfy app-controller method dependencies — given a class name from a `\ReflectionNamedType` parameter, the resolver returns an instance or `null`. Replaces the legacy `\Closure(string): ?object` shape; mirrors the typed-resolver pattern introduced for `KernelServicesInterface` above.
+
+`HttpServiceResolverInterface` is intentionally separate from `KernelServicesInterface`: the latter is finite, kernel-internal, and provider-scoped, while this surface is open-ended and driven by user-authored controller signatures. Naming the seam allows future tightening (allowed-types enforcement, caching, tracing) without affecting the kernel-services bus.
 
 ### HTTP error surface (JSON-first)
 

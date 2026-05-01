@@ -45,7 +45,7 @@ final class OidcServiceProviderTest extends TestCase
         $provider = new OidcServiceProvider();
         $provider->setKernelContext('/tmp/oidc-test', [
             'oidc' => ['issuer' => 'https://id.example'],
-        ]);
+        ], []);
 
         $provider->register();
 
@@ -64,7 +64,7 @@ final class OidcServiceProviderTest extends TestCase
         putenv('OIDC_ISSUER=https://env.example');
 
         $provider = new OidcServiceProvider();
-        $provider->setKernelContext('/tmp/oidc-test', []);
+        $provider->setKernelContext('/tmp/oidc-test', [], []);
 
         $provider->register();
 
@@ -79,7 +79,7 @@ final class OidcServiceProviderTest extends TestCase
         $provider = new OidcServiceProvider();
         $provider->setKernelContext('/tmp/oidc-test', [
             'oidc' => ['issuer' => 'https://id.example'],
-        ]);
+        ], []);
 
         $provider->register();
 
@@ -102,7 +102,7 @@ final class OidcServiceProviderTest extends TestCase
                     'config-key' => ['algorithm' => 'RS256', 'public_key_path' => $publicPath],
                 ],
             ],
-        ]);
+        ], []);
 
         $provider->register();
 
@@ -127,7 +127,7 @@ final class OidcServiceProviderTest extends TestCase
         putenv('OIDC_SIGNING_KEY_DIR=' . $dir);
 
         $provider = new OidcServiceProvider();
-        $provider->setKernelContext('/tmp/oidc-test', []);
+        $provider->setKernelContext('/tmp/oidc-test', [], []);
 
         $provider->register();
 
@@ -142,7 +142,7 @@ final class OidcServiceProviderTest extends TestCase
     public function resolvingKeyLoaderThrowsWhenNoSigningKeysConfigured(): void
     {
         $provider = new OidcServiceProvider();
-        $provider->setKernelContext('/tmp/oidc-test', []);
+        $provider->setKernelContext('/tmp/oidc-test', [], []);
 
         $provider->register();
 
@@ -165,7 +165,7 @@ final class OidcServiceProviderTest extends TestCase
                     'jwks-key' => ['algorithm' => 'RS256', 'public_key_path' => $publicPath],
                 ],
             ],
-        ]);
+        ], []);
 
         $provider->register();
 
@@ -181,7 +181,7 @@ final class OidcServiceProviderTest extends TestCase
     public function registerRegistersOidcClientEntityType(): void
     {
         $provider = new OidcServiceProvider();
-        $provider->setKernelContext('/tmp/oidc-test', []);
+        $provider->setKernelContext('/tmp/oidc-test', [], []);
 
         $provider->register();
 
@@ -222,7 +222,7 @@ final class OidcServiceProviderTest extends TestCase
                     'singleton-key' => ['algorithm' => 'RS256', 'public_key_path' => $publicPath],
                 ],
             ],
-        ]);
+        ], []);
 
         $provider->register();
 

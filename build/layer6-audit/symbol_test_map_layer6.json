@@ -1,33 +1,580 @@
 {
-    "generated_at": "2026-04-24T21:14:07+00:00",
-    "test_files_parsed": 203,
-    "at_covers_hits": 0,
-    "per_symbol": [],
+    "generated_at": "2026-04-30T17:02:32+00:00",
+    "test_files_parsed": 204,
+    "at_covers_hits": 184,
+    "per_symbol": {
+        "Waaseyaa\\AdminSurface\\Query\\SurfaceFilterOperator": [
+            "packages/admin-surface/tests/Unit/Query/SurfaceFilterOperatorTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Query\\SurfaceQuery": [
+            "packages/admin-surface/tests/Unit/Query/SurfaceQueryTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Query\\SurfaceQueryParser": [
+            "packages/admin-surface/tests/Unit/Query/SurfaceQueryParserTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\AdminSurfaceServiceProvider": [
+            "packages/admin-surface/tests/Unit/AdminSurfaceServiceProviderTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\AdminSurfaceRoutePaths": [
+            "packages/admin-surface/tests/Unit/AdminSurfaceServiceProviderTest.php",
+            "packages/admin-surface/tests/Unit/AdminSurfaceRoutePathsTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Host\\AbstractAdminSurfaceHost": [
+            "packages/admin-surface/tests/Unit/AdminSurfaceServiceProviderTest.php",
+            "packages/admin-surface/tests/Unit/Host/AbstractAdminSurfaceHostTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\AdminSpaFallback": [
+            "packages/admin-surface/tests/Unit/AdminSpaFallbackTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceResultData": [
+            "packages/admin-surface/tests/Unit/Host/AdminSurfaceResultDataTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Host\\GenericAdminSurfaceHost": [
+            "packages/admin-surface/tests/Unit/Host/GenericAdminSurfaceHostTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceUiPayload": [
+            "packages/admin-surface/tests/Unit/Host/AdminSurfaceUiPayloadTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceSessionData": [
+            "packages/admin-surface/tests/Unit/Host/AdminSurfaceSessionDataTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Catalog\\CatalogBuilder": [
+            "packages/admin-surface/tests/Unit/Catalog/CatalogBuilderTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Catalog\\EntityDefinition": [
+            "packages/admin-surface/tests/Unit/Catalog/CatalogBuilderTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Catalog\\ActionDefinition": [
+            "packages/admin-surface/tests/Unit/Catalog/ActionDefinitionTest.php"
+        ],
+        "Waaseyaa\\AdminSurface\\Catalog\\FieldDefinition": [
+            "packages/admin-surface/tests/Unit/Catalog/FieldDefinitionTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\ScaffoldAuthCommand": [
+            "packages/cli/tests/Unit/ScaffoldAuthCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\CliCommandRegistry": [
+            "packages/cli/tests/Unit/CliCommandRegistryTest.php"
+        ],
+        "Waaseyaa\\CLI\\Provenance\\ComposerProvenanceReporter": [
+            "packages/cli/tests/Unit/Provenance/ComposerProvenanceReporterTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\IngestRunCommand": [
+            "packages/cli/tests/Unit/Command/IngestRunCommandTest.php",
+            "packages/cli/tests/Unit/Command/IngestionFixturePackRegressionTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\DebugContextCommand": [
+            "packages/cli/tests/Unit/Command/DebugContextCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\QueueFailedCommand": [
+            "packages/cli/tests/Unit/Command/QueueFailedCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\HealthReportCommand": [
+            "packages/cli/tests/Unit/Command/HealthReportCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\FixturePackRefreshCommand": [
+            "packages/cli/tests/Unit/Command/FixturePackRefreshCommandTest.php",
+            "packages/cli/tests/Unit/Command/IngestionFixturePackRegressionTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\InstallCommand": [
+            "packages/cli/tests/Unit/Command/InstallCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\QueueRetryCommand": [
+            "packages/cli/tests/Unit/Command/QueueRetryCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\QueueFlushCommand": [
+            "packages/cli/tests/Unit/Command/QueueFlushCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\EntityListCommand": [
+            "packages/cli/tests/Unit/Command/EntityListCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\MigrateDefaultsCommand": [
+            "packages/cli/tests/Unit/Command/MigrateDefaultsCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\MigrateRollbackCommand": [
+            "packages/cli/tests/Unit/Command/MigrateRollbackCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\HealthCheckCommand": [
+            "packages/cli/tests/Unit/Command/HealthCheckCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\SchemaListCommand": [
+            "packages/cli/tests/Unit/Command/SchemaListCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\RouteListCommand": [
+            "packages/cli/tests/Unit/Command/RouteListCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Telescope\\TelescopeListCommand": [
+            "packages/cli/tests/Unit/Command/Telescope/TelescopeListCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Telescope\\TelescopePruneCommand": [
+            "packages/cli/tests/Unit/Command/Telescope/TelescopePruneCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Telescope\\TelescopeClearCommand": [
+            "packages/cli/tests/Unit/Command/Telescope/TelescopeClearCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Telescope\\TelescopeValidateCommand": [
+            "packages/cli/tests/Unit/Command/Telescope/TelescopeValidateCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\ScheduleListCommand": [
+            "packages/cli/tests/Unit/Command/ScheduleListCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\FixtureGenerateCommand": [
+            "packages/cli/tests/Unit/Command/FixtureGenerateCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\SemanticRefreshCommand": [
+            "packages/cli/tests/Unit/Command/SemanticRefreshCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\TypeDisableCommand": [
+            "packages/cli/tests/Unit/Command/TypeLifecycleCommandTest.php",
+            "packages/cli/tests/Unit/Command/TypeDisableCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\TypeEnableCommand": [
+            "packages/cli/tests/Unit/Command/TypeLifecycleCommandTest.php",
+            "packages/cli/tests/Unit/Command/TypeEnableCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\AuditLogCommand": [
+            "packages/cli/tests/Unit/Command/TypeLifecycleCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\UserCreateCommand": [
+            "packages/cli/tests/Unit/Command/UserCreateCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\MigrateStatusCommand": [
+            "packages/cli/tests/Unit/Command/MigrateStatusCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\EntityTypeListCommand": [
+            "packages/cli/tests/Unit/Command/EntityTypeListCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\QueueWorkCommand": [
+            "packages/cli/tests/Unit/Command/QueueWorkCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\EntityCreateCommand": [
+            "packages/cli/tests/Unit/Command/EntityCreateCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Make\\MakePolicyCommand": [
+            "packages/cli/tests/Unit/Command/Make/MakePolicyCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Make\\MakeJobCommand": [
+            "packages/cli/tests/Unit/Command/Make/MakeJobCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Make\\MakeTestCommand": [
+            "packages/cli/tests/Unit/Command/Make/MakeTestCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Make\\MakeEntityCommand": [
+            "packages/cli/tests/Unit/Command/Make/MakeEntityCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Make\\MakeListenerCommand": [
+            "packages/cli/tests/Unit/Command/Make/MakeListenerCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Make\\MakeProviderCommand": [
+            "packages/cli/tests/Unit/Command/Make/MakeProviderCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Make\\MakeMigrationCommand": [
+            "packages/cli/tests/Unit/Command/Make/MakeMigrationCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\MigrateCommand": [
+            "packages/cli/tests/Unit/Command/MigrateCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\ConfigImportCommand": [
+            "packages/cli/tests/Unit/Command/ConfigImportCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\MakePluginCommand": [
+            "packages/cli/tests/Unit/Command/MakePluginCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\SemanticWarmCommand": [
+            "packages/cli/tests/Unit/Command/SemanticWarmCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\SchemaCheckCommand": [
+            "packages/cli/tests/Unit/Command/SchemaCheckCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\WorkflowScaffoldCommand": [
+            "packages/cli/tests/Unit/Command/WorkflowScaffoldCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\DbInitCommand": [
+            "packages/cli/tests/Unit/Command/DbInitCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\ExtensionScaffoldCommand": [
+            "packages/cli/tests/Unit/Command/ExtensionScaffoldCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\ScheduleRunCommand": [
+            "packages/cli/tests/Unit/Command/ScheduleRunCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\BundleScaffoldCommand": [
+            "packages/cli/tests/Unit/Command/BundleScaffoldCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\MakeEntityTypeCommand": [
+            "packages/cli/tests/Unit/Command/MakeEntityTypeCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\ConfigExportCommand": [
+            "packages/cli/tests/Unit/Command/ConfigExportCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Perf\\PerformanceBaselineCommand": [
+            "packages/cli/tests/Unit/Command/Perf/PerformanceBaselineCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Perf\\PerformanceCompareCommand": [
+            "packages/cli/tests/Unit/Command/Perf/PerformanceCompareCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Optimize\\OptimizeConfigCommand": [
+            "packages/cli/tests/Unit/Command/Optimize/OptimizeConfigCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Optimize\\OptimizeClearCommand": [
+            "packages/cli/tests/Unit/Command/Optimize/OptimizeClearCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Optimize\\OptimizeManifestCommand": [
+            "packages/cli/tests/Unit/Command/Optimize/OptimizeManifestCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Optimize\\OptimizeCommand": [
+            "packages/cli/tests/Unit/Command/Optimize/OptimizeCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\IngestDashboardCommand": [
+            "packages/cli/tests/Unit/Command/IngestDashboardCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\FixtureScaffoldCommand": [
+            "packages/cli/tests/Unit/Command/FixtureScaffoldCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\AboutCommand": [
+            "packages/cli/tests/Unit/Command/AboutCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\CacheClearCommand": [
+            "packages/cli/tests/Unit/Command/CacheClearCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\EventListCommand": [
+            "packages/cli/tests/Unit/Command/EventListCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\ServeCommand": [
+            "packages/cli/tests/Unit/Command/ServeCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\RelationshipTypeScaffoldCommand": [
+            "packages/cli/tests/Unit/Command/RelationshipTypeScaffoldCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\PermissionListCommand": [
+            "packages/cli/tests/Unit/Command/PermissionListCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\UserRoleCommand": [
+            "packages/cli/tests/Unit/Command/UserRoleCommandTest.php"
+        ],
+        "Waaseyaa\\CLI\\WaaseyaaApplication": [
+            "packages/cli/tests/Unit/WaaseyaaApplicationTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\ValidationGateValidator": [
+            "packages/cli/tests/Unit/Ingestion/ValidationGateValidatorTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\SemanticRefreshTriggerPlanner": [
+            "packages/cli/tests/Unit/Ingestion/SemanticRefreshTriggerPlannerTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\SchemaDiagnosticEmitter": [
+            "packages/cli/tests/Unit/Ingestion/SchemaDiagnosticEmitterTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\SchemaValidator": [
+            "packages/cli/tests/Unit/Ingestion/SchemaValidatorTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\ApiSourceConnector": [
+            "packages/cli/tests/Unit/Ingestion/ApiSourceConnectorTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\SourcePriorityMergeResolver": [
+            "packages/cli/tests/Unit/Ingestion/SourcePriorityMergeResolverTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\RelationshipInferenceEngine": [
+            "packages/cli/tests/Unit/Ingestion/RelationshipInferenceEngineTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\ValidationDiagnosticEmitter": [
+            "packages/cli/tests/Unit/Ingestion/ValidationDiagnosticEmitterTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\DatasetSourceConnector": [
+            "packages/cli/tests/Unit/Ingestion/DatasetSourceConnectorTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\SourceAdapterNormalizer": [
+            "packages/cli/tests/Unit/Ingestion/SourceAdapterNormalizerTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\CrossSourceIdentityResolver": [
+            "packages/cli/tests/Unit/Ingestion/CrossSourceIdentityResolverTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\FileSourceConnector": [
+            "packages/cli/tests/Unit/Ingestion/FileSourceConnectorTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\IngestionEnvelopeNormalizer": [
+            "packages/cli/tests/Unit/Ingestion/IngestionEnvelopeNormalizerTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\CrawlSourceConnector": [
+            "packages/cli/tests/Unit/Ingestion/CrawlSourceConnectorTest.php"
+        ],
+        "Waaseyaa\\CLI\\Ingestion\\AuthoringAssistBuilder": [
+            "packages/cli/tests/Unit/Ingestion/AuthoringAssistBuilderTest.php"
+        ],
+        "Waaseyaa\\CLI\\Support\\AdminPackagePathResolver": [
+            "packages/cli/tests/Unit/Support/AdminPackagePathResolverTest.php"
+        ],
+        "Waaseyaa\\CLI\\Command\\Make\\MakePublicCommand": [
+            "packages/cli/tests/Integration/Command/Make/MakePublicCommandTest.php"
+        ],
+        "Waaseyaa\\Debug\\DebugToolbarMiddleware": [
+            "packages/debug/tests/Unit/DebugToolbarMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Genealogy\\Service\\GenealogyPedigreeService": [
+            "packages/genealogy/tests/Unit/GenealogyPedigreeServiceTest.php"
+        ],
+        "Waaseyaa\\Genealogy\\Service\\GenealogyFamilyService": [
+            "packages/genealogy/tests/Unit/GenealogyFamilyServiceTest.php"
+        ],
+        "Waaseyaa\\GraphQL\\Http\\Router\\GraphQlRouter": [
+            "packages/graphql/tests/Unit/Http/Router/GraphQlRouterTest.php"
+        ],
+        "Waaseyaa\\GraphQL\\Access\\GraphQlAccessGuard": [
+            "packages/graphql/tests/Unit/Access/GraphQlAccessGuardTest.php"
+        ],
+        "Waaseyaa\\GraphQL\\Schema\\FieldTypeMapper": [
+            "packages/graphql/tests/Unit/Schema/FieldTypeMapperTest.php"
+        ],
+        "Waaseyaa\\GraphQL\\Schema\\SchemaFactory": [
+            "packages/graphql/tests/Unit/SchemaFactoryTest.php"
+        ],
+        "Waaseyaa\\GraphQL\\Resolver\\EntityResolver": [
+            "packages/graphql/tests/Unit/Resolver/EntityResolverTest.php"
+        ],
+        "Waaseyaa\\GraphQL\\Resolver\\ReferenceLoader": [
+            "packages/graphql/tests/Unit/Resolver/ReferenceLoaderTest.php"
+        ],
+        "Waaseyaa\\GraphQL\\GraphQlServiceProvider": [
+            "packages/graphql/tests/Unit/GraphQlServiceProviderTest.php"
+        ],
+        "Waaseyaa\\GraphQL\\GraphQlEndpoint": [
+            "packages/graphql/tests/Unit/GraphQlEndpointTest.php"
+        ],
+        "Waaseyaa\\Inertia\\InertiaServiceProvider": [
+            "packages/inertia/tests/Unit/InertiaServiceProviderTest.php"
+        ],
+        "Waaseyaa\\Inertia\\Inertia": [
+            "packages/inertia/tests/Unit/InertiaTest.php"
+        ],
+        "Waaseyaa\\Inertia\\InertiaMiddleware": [
+            "packages/inertia/tests/Unit/InertiaMiddlewareTest.php"
+        ],
+        "Waaseyaa\\Inertia\\RootTemplateRenderer": [
+            "packages/inertia/tests/Unit/RootTemplateRendererTest.php"
+        ],
+        "Waaseyaa\\Inertia\\InertiaResponse": [
+            "packages/inertia/tests/Unit/InertiaDispatcherTest.php",
+            "packages/inertia/tests/Unit/InertiaResponseTest.php"
+        ],
+        "Waaseyaa\\Inertia\\PropResolver": [
+            "packages/inertia/tests/Unit/PropResolverTest.php"
+        ],
+        "Waaseyaa\\Mcp\\Rpc\\ResponseFormatter": [
+            "packages/mcp/tests/Unit/Rpc/ResponseFormatterTest.php"
+        ],
+        "Waaseyaa\\Mcp\\Rpc\\ToolIntrospector": [
+            "packages/mcp/tests/Unit/Rpc/ToolIntrospectorTest.php"
+        ],
+        "Waaseyaa\\Mcp\\McpController": [
+            "packages/mcp/tests/Unit/McpControllerDiscoveryTest.php",
+            "packages/mcp/tests/Unit/McpControllerTraversalTest.php",
+            "packages/mcp/tests/Unit/McpControllerCacheTest.php",
+            "packages/mcp/tests/Unit/McpControllerManifestTest.php",
+            "packages/mcp/tests/Unit/McpControllerEditorialTest.php"
+        ],
+        "Waaseyaa\\Mcp\\McpEndpoint": [
+            "packages/mcp/tests/Unit/McpEndpointTest.php"
+        ],
+        "Waaseyaa\\Mcp\\McpResponse": [
+            "packages/mcp/tests/Unit/McpEndpointTest.php"
+        ],
+        "Waaseyaa\\Mcp\\Cache\\ReadCache": [
+            "packages/mcp/tests/Unit/Cache/ReadCacheTest.php"
+        ],
+        "Waaseyaa\\Mcp\\McpRouteProvider": [
+            "packages/mcp/tests/Unit/McpRouteProviderTest.php"
+        ],
+        "Waaseyaa\\Mcp\\Tools\\EditorialTools": [
+            "packages/mcp/tests/Unit/Tools/EditorialToolsTest.php"
+        ],
+        "Waaseyaa\\Mcp\\Tools\\McpTool": [
+            "packages/mcp/tests/Unit/Tools/EditorialToolsTest.php",
+            "packages/mcp/tests/Unit/Tools/DiscoveryToolsTest.php",
+            "packages/mcp/tests/Unit/Tools/EntityToolsTest.php",
+            "packages/mcp/tests/Unit/Tools/TraversalToolsTest.php"
+        ],
+        "Waaseyaa\\Mcp\\Tools\\DiscoveryTools": [
+            "packages/mcp/tests/Unit/Tools/DiscoveryToolsTest.php"
+        ],
+        "Waaseyaa\\Mcp\\Tools\\EntityTools": [
+            "packages/mcp/tests/Unit/Tools/EntityToolsTest.php"
+        ],
+        "Waaseyaa\\Mcp\\Tools\\TraversalTools": [
+            "packages/mcp/tests/Unit/Tools/TraversalToolsTest.php"
+        ],
+        "Waaseyaa\\Mcp\\McpServiceProvider": [
+            "packages/mcp/tests/Unit/McpServiceProviderTest.php"
+        ],
+        "Waaseyaa\\Mcp\\Auth\\BearerTokenAuth": [
+            "packages/mcp/tests/Unit/Auth/BearerTokenAuthTest.php"
+        ],
+        "Waaseyaa\\Mcp\\McpServerCard": [
+            "packages/mcp/tests/Unit/McpServerCardTest.php"
+        ],
+        "Waaseyaa\\SSR\\Http\\Router\\AppControllerRouter": [
+            "packages/ssr/tests/Unit/Http/Router/AppControllerRouterTest.php"
+        ],
+        "Waaseyaa\\SSR\\Http\\Router\\SsrRouter": [
+            "packages/ssr/tests/Unit/Http/Router/SsrRouterTest.php"
+        ],
+        "Waaseyaa\\SSR\\Flash\\FlashMessageService": [
+            "packages/ssr/tests/Unit/Flash/FlashMessageServiceTest.php"
+        ],
+        "Waaseyaa\\SSR\\Flash\\Flash": [
+            "packages/ssr/tests/Unit/Flash/FlashTest.php"
+        ],
+        "Waaseyaa\\SSR\\SsrPageHandler": [
+            "packages/ssr/tests/Unit/SsrPageHandlerResolverTest.php",
+            "packages/ssr/tests/Unit/SsrPageHandlerInertiaDispatchTest.php",
+            "packages/ssr/tests/Unit/SsrPageHandlerTest.php"
+        ],
+        "Waaseyaa\\SSR\\Theme": [
+            "packages/ssr/tests/Unit/ThemeServiceProviderTest.php"
+        ],
+        "Waaseyaa\\SSR\\ThemeServiceProvider": [
+            "packages/ssr/tests/Unit/ThemeServiceProviderTest.php"
+        ],
+        "Waaseyaa\\SSR\\SsrController": [
+            "packages/ssr/tests/Unit/SsrControllerTest.php"
+        ],
+        "Waaseyaa\\SSR\\EntityRenderer": [
+            "packages/ssr/tests/Unit/EntityRendererTest.php"
+        ],
+        "Waaseyaa\\SSR\\SsrServiceProvider": [
+            "packages/ssr/tests/Unit/SsrServiceProviderHttpRoutersTest.php",
+            "packages/ssr/tests/Unit/SsrServiceProviderTest.php"
+        ],
+        "Waaseyaa\\SSR\\FieldFormatterRegistry": [
+            "packages/ssr/tests/Unit/FieldFormatterRegistryTest.php"
+        ],
+        "Waaseyaa\\SSR\\TwigErrorPageRenderer": [
+            "packages/ssr/tests/Unit/TwigErrorPageRendererTest.php"
+        ],
+        "Waaseyaa\\SSR\\RenderCache": [
+            "packages/ssr/tests/Unit/RenderCacheTest.php"
+        ],
+        "Waaseyaa\\SSR\\ComponentMetadata": [
+            "packages/ssr/tests/Unit/ComponentMetadataTest.php"
+        ],
+        "Waaseyaa\\SSR\\RenderController": [
+            "packages/ssr/tests/Unit/RenderControllerTest.php",
+            "packages/ssr/tests/Unit/RenderControllerDefaultSiteNameTest.php"
+        ],
+        "Waaseyaa\\SSR\\ViewMode": [
+            "packages/ssr/tests/Unit/ViewModeTest.php"
+        ],
+        "Waaseyaa\\SSR\\Twig\\WaaseyaaExtension": [
+            "packages/ssr/tests/Unit/Twig/WaaseyaaExtensionTest.php"
+        ],
+        "Waaseyaa\\SSR\\ComponentRegistry": [
+            "packages/ssr/tests/Unit/ComponentRegistryTest.php"
+        ],
+        "Waaseyaa\\SSR\\LanguageResolver": [
+            "packages/ssr/tests/Unit/SsrPageHandlerTest.php"
+        ],
+        "Waaseyaa\\SSR\\Attribute\\Component": [
+            "packages/ssr/tests/Unit/Attribute/ComponentTest.php"
+        ],
+        "Waaseyaa\\SSR\\Formatter\\HtmlFormatter": [
+            "packages/ssr/tests/Unit/Formatter/HtmlFormatterTest.php"
+        ],
+        "Waaseyaa\\SSR\\ComponentRenderer": [
+            "packages/ssr/tests/Unit/ComponentRendererTest.php"
+        ],
+        "Waaseyaa\\Telescope\\Recorder\\QueryRecorder": [
+            "packages/telescope/tests/Unit/Recorder/QueryRecorderTest.php"
+        ],
+        "Waaseyaa\\Telescope\\Recorder\\CacheRecorder": [
+            "packages/telescope/tests/Unit/Recorder/CacheRecorderTest.php"
+        ],
+        "Waaseyaa\\Telescope\\Recorder\\EventRecorder": [
+            "packages/telescope/tests/Unit/Recorder/EventRecorderTest.php"
+        ],
+        "Waaseyaa\\Telescope\\Recorder\\RequestRecorder": [
+            "packages/telescope/tests/Unit/Recorder/RequestRecorderTest.php"
+        ],
+        "Waaseyaa\\Telescope\\TelescopeServiceProvider": [
+            "packages/telescope/tests/Unit/TelescopeServiceProviderTest.php"
+        ],
+        "Waaseyaa\\Telescope\\Storage\\SqliteTelescopeStore": [
+            "packages/telescope/tests/Unit/Storage/SqliteTelescopeStoreTest.php"
+        ],
+        "Waaseyaa\\Telescope\\TelescopeEntry": [
+            "packages/telescope/tests/Unit/TelescopeEntryTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\CodifiedContextObserver": [
+            "packages/telescope/tests/Unit/CodifiedContext/CodifiedContextObserverTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Schema\\SessionEventSchema": [
+            "packages/telescope/tests/Unit/CodifiedContext/Schema/SchemaValidatorsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Schema\\ValidationReportSchema": [
+            "packages/telescope/tests/Unit/CodifiedContext/Schema/SchemaValidatorsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\CodifiedContextEntry": [
+            "packages/telescope/tests/Unit/CodifiedContext/CodifiedContextEntryTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Validator\\ContradictionChecker": [
+            "packages/telescope/tests/Unit/CodifiedContext/Validator/ContradictionCheckerTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Validator\\ValidationReport": [
+            "packages/telescope/tests/Unit/CodifiedContext/Validator/ValidationReportTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Validator\\DriftScorer": [
+            "packages/telescope/tests/Unit/CodifiedContext/Validator/DriftScorerTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Validator\\StructuralChecker": [
+            "packages/telescope/tests/Unit/CodifiedContext/Validator/StructuralCheckerTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Recorder\\CodifiedContextEventRecorder": [
+            "packages/telescope/tests/Unit/CodifiedContext/Recorder/CodifiedContextEventRecorderTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Recorder\\CodifiedContextValidationRecorder": [
+            "packages/telescope/tests/Unit/CodifiedContext/Recorder/CodifiedContextValidationRecorderTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Recorder\\CodifiedContextSessionRecorder": [
+            "packages/telescope/tests/Unit/CodifiedContext/Recorder/CodifiedContextSessionRecorderTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Event\\SessionStarted": [
+            "packages/telescope/tests/Unit/CodifiedContext/Event/EventValueObjectsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Event\\SessionEnded": [
+            "packages/telescope/tests/Unit/CodifiedContext/Event/EventValueObjectsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ContextLoaded": [
+            "packages/telescope/tests/Unit/CodifiedContext/Event/EventValueObjectsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ContextHashComputed": [
+            "packages/telescope/tests/Unit/CodifiedContext/Event/EventValueObjectsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ContextLoadFailed": [
+            "packages/telescope/tests/Unit/CodifiedContext/Event/EventValueObjectsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ModelOutputRecorded": [
+            "packages/telescope/tests/Unit/CodifiedContext/Event/EventValueObjectsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Event\\DriftDetected": [
+            "packages/telescope/tests/Unit/CodifiedContext/Event/EventValueObjectsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Event\\DriftCorrected": [
+            "packages/telescope/tests/Unit/CodifiedContext/Event/EventValueObjectsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ValidationCompleted": [
+            "packages/telescope/tests/Unit/CodifiedContext/Event/EventValueObjectsTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\JsonlCodifiedContextStore": [
+            "packages/telescope/tests/Unit/CodifiedContext/Storage/JsonlCodifiedContextStoreTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\CodifiedContextSessionStoreAdapter": [
+            "packages/telescope/tests/Unit/CodifiedContext/Storage/CodifiedContextSessionStoreAdapterTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\PrometheusCodifiedContextStore": [
+            "packages/telescope/tests/Unit/CodifiedContext/Storage/PrometheusCodifiedContextStoreTest.php"
+        ],
+        "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\SqliteCodifiedContextStore": [
+            "packages/telescope/tests/Unit/CodifiedContext/Storage/SqliteCodifiedContextStoreTest.php"
+        ]
+    },
     "public_non_internal_symbols_lacking_at_covers": [
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Query\\SurfaceFilterOperator",
-            "kind": "enum",
-            "file": "packages/admin-surface/src/Query/SurfaceFilterOperator.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Query\\SurfaceQueryParser",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Query/SurfaceQueryParser.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Query\\SurfaceQuery",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Query/SurfaceQuery.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
         {
             "fqcn": "Waaseyaa\\AdminSurface\\Action\\SurfaceActionHandlerInterface",
             "kind": "interface",
@@ -37,122 +584,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceSessionData",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Host/AdminSurfaceSessionData.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceUiPayload",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Host/AdminSurfaceUiPayload.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Host\\AdminSurfaceResultData",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Host/AdminSurfaceResultData.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Host\\GenericAdminSurfaceHost",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Host/GenericAdminSurfaceHost.php",
-            "line": 33,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Host\\AbstractAdminSurfaceHost",
-            "kind": "abstract_class",
-            "file": "packages/admin-surface/src/Host/AbstractAdminSurfaceHost.php",
-            "line": 20,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Catalog\\ActionDefinition",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Catalog/ActionDefinition.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Catalog\\EntityDefinition",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Catalog/EntityDefinition.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Catalog\\CatalogBuilder",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Catalog/CatalogBuilder.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\Catalog\\FieldDefinition",
-            "kind": "class",
-            "file": "packages/admin-surface/src/Catalog/FieldDefinition.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\AdminSpaFallback",
-            "kind": "class",
-            "file": "packages/admin-surface/src/AdminSpaFallback.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\AdminSurfaceRoutePaths",
-            "kind": "class",
-            "file": "packages/admin-surface/src/AdminSurfaceRoutePaths.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\AdminSurface\\AdminSurfaceServiceProvider",
-            "kind": "class",
-            "file": "packages/admin-surface/src/AdminSurfaceServiceProvider.php",
-            "line": 31,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\CLI\\CliServiceProvider",
             "kind": "class",
             "file": "packages/cli/src/CliServiceProvider.php",
             "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\WaaseyaaApplication",
-            "kind": "class",
-            "file": "packages/cli/src/WaaseyaaApplication.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Provenance\\ComposerProvenanceReporter",
-            "kind": "class",
-            "file": "packages/cli/src/Provenance/ComposerProvenanceReporter.php",
-            "line": 13,
             "internal": false,
             "api": false
         },
@@ -173,345 +608,9 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\CLI\\Command\\FixturePackRefreshCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/FixturePackRefreshCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\SemanticRefreshCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/SemanticRefreshCommand.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\HealthReportCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/HealthReportCommand.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\EventListCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/EventListCommand.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\CacheClearCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/CacheClearCommand.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\QueueFlushCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/QueueFlushCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\UserCreateCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/UserCreateCommand.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\MakePluginCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/MakePluginCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\DbInitCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/DbInitCommand.php",
-            "line": 31,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\RouteListCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/RouteListCommand.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\MigrateDefaultsCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/MigrateDefaultsCommand.php",
-            "line": 20,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\IngestRunCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/IngestRunCommand.php",
-            "line": 21,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\ScheduleRunCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/ScheduleRunCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\IngestDashboardCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/IngestDashboardCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\ExtensionScaffoldCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/ExtensionScaffoldCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Telescope\\TelescopeListCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Telescope/TelescopeListCommand.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Telescope\\TelescopePruneCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Telescope/TelescopePruneCommand.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Telescope\\TelescopeClearCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Telescope/TelescopeClearCommand.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Telescope\\TelescopeValidateCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Telescope/TelescopeValidateCommand.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\TypeEnableCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/TypeEnableCommand.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\CLI\\Command\\AdminBuildCommand",
             "kind": "class",
             "file": "packages/cli/src/Command/AdminBuildCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\ConfigExportCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/ConfigExportCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\QueueWorkCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/QueueWorkCommand.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\BundleScaffoldCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/BundleScaffoldCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\EntityCreateCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/EntityCreateCommand.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\AboutCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/AboutCommand.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\WorkflowScaffoldCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/WorkflowScaffoldCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\ScheduleListCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/ScheduleListCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\MigrateRollbackCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/MigrateRollbackCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\ConfigImportCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/ConfigImportCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\HealthCheckCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/HealthCheckCommand.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\UserRoleCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/UserRoleCommand.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\InstallCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/InstallCommand.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\QueueRetryCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/QueueRetryCommand.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Make\\MakePublicCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Make/MakePublicCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Make\\MakePolicyCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Make/MakePolicyCommand.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Make\\MakeMigrationCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Make/MakeMigrationCommand.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Make\\MakeJobCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Make/MakeJobCommand.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Make\\MakeProviderCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Make/MakeProviderCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Make\\MakeTestCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Make/MakeTestCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Make\\MakeEntityCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Make/MakeEntityCommand.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Make\\MakeListenerCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Make/MakeListenerCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\ServeCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/ServeCommand.php",
             "line": 13,
             "internal": false,
             "api": false
@@ -525,98 +624,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\CLI\\Command\\FixtureScaffoldCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/FixtureScaffoldCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\SchemaListCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/SchemaListCommand.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\ScaffoldAuthCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/ScaffoldAuthCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\MigrateCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/MigrateCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\CLI\\Command\\AdminDevCommand",
             "kind": "class",
             "file": "packages/cli/src/Command/AdminDevCommand.php",
             "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\AuditLogCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/AuditLogCommand.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Perf\\PerformanceCompareCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Perf/PerformanceCompareCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Perf\\PerformanceBaselineCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Perf/PerformanceBaselineCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Optimize\\OptimizeCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Optimize/OptimizeCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Optimize\\OptimizeManifestCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Optimize/OptimizeManifestCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Optimize\\OptimizeConfigCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Optimize/OptimizeConfigCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\Optimize\\OptimizeClearCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/Optimize/OptimizeClearCommand.php",
-            "line": 12,
             "internal": false,
             "api": false
         },
@@ -629,54 +640,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\CLI\\Command\\EntityListCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/EntityListCommand.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\TypeDisableCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/TypeDisableCommand.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\EntityTypeListCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/EntityTypeListCommand.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\DebugContextCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/DebugContextCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\MakeEntityTypeCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/MakeEntityTypeCommand.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\FixtureGenerateCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/FixtureGenerateCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\CLI\\Command\\SyncRulesCommand",
             "kind": "class",
             "file": "packages/cli/src/Command/SyncRulesCommand.php",
@@ -685,194 +648,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\CLI\\Command\\RelationshipTypeScaffoldCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/RelationshipTypeScaffoldCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\SchemaCheckCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/SchemaCheckCommand.php",
-            "line": 16,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\MigrateStatusCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/MigrateStatusCommand.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\QueueFailedCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/QueueFailedCommand.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\SemanticWarmCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/SemanticWarmCommand.php",
-            "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Command\\PermissionListCommand",
-            "kind": "class",
-            "file": "packages/cli/src/Command/PermissionListCommand.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\CrawlSourceConnector",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/CrawlSourceConnector.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\CrossSourceIdentityResolver",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/CrossSourceIdentityResolver.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\AuthoringAssistBuilder",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/AuthoringAssistBuilder.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\SemanticRefreshTriggerPlanner",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/SemanticRefreshTriggerPlanner.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\SchemaValidator",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/SchemaValidator.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\CLI\\Ingestion\\SourceConnectorInterface",
             "kind": "interface",
             "file": "packages/cli/src/Ingestion/SourceConnectorInterface.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\SchemaDiagnosticEmitter",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/SchemaDiagnosticEmitter.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\SourceAdapterNormalizer",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/SourceAdapterNormalizer.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\ApiSourceConnector",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/ApiSourceConnector.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\ValidationDiagnosticEmitter",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/ValidationDiagnosticEmitter.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\FileSourceConnector",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/FileSourceConnector.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\IngestionEnvelopeNormalizer",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/IngestionEnvelopeNormalizer.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\DatasetSourceConnector",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/DatasetSourceConnector.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\RelationshipInferenceEngine",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/RelationshipInferenceEngine.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\SourcePriorityMergeResolver",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/SourcePriorityMergeResolver.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Ingestion\\ValidationGateValidator",
-            "kind": "class",
-            "file": "packages/cli/src/Ingestion/ValidationGateValidator.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\CliCommandRegistry",
-            "kind": "class",
-            "file": "packages/cli/src/CliCommandRegistry.php",
-            "line": 86,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\CLI\\Support\\AdminPackagePathResolver",
-            "kind": "class",
-            "file": "packages/cli/src/Support/AdminPackagePathResolver.php",
-            "line": 13,
             "internal": false,
             "api": false
         },
@@ -889,14 +668,6 @@
             "kind": "class",
             "file": "packages/debug/src/ErrorPreviewController.php",
             "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Debug\\DebugToolbarMiddleware",
-            "kind": "class",
-            "file": "packages/debug/src/DebugToolbarMiddleware.php",
-            "line": 16,
             "internal": false,
             "api": false
         },
@@ -957,22 +728,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Genealogy\\Service\\GenealogyFamilyService",
-            "kind": "class",
-            "file": "packages/genealogy/src/Service/GenealogyFamilyService.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Genealogy\\Service\\GenealogyPedigreeService",
-            "kind": "class",
-            "file": "packages/genealogy/src/Service/GenealogyPedigreeService.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Genealogy\\GenealogyFieldDefinitions",
             "kind": "class",
             "file": "packages/genealogy/src/GenealogyFieldDefinitions.php",
@@ -984,7 +739,7 @@
             "fqcn": "Waaseyaa\\Genealogy\\Entity\\GenealogyPerson",
             "kind": "class",
             "file": "packages/genealogy/src/Entity/GenealogyPerson.php",
-            "line": 9,
+            "line": 11,
             "internal": false,
             "api": false
         },
@@ -992,7 +747,7 @@
             "fqcn": "Waaseyaa\\Genealogy\\Entity\\GenealogyTree",
             "kind": "class",
             "file": "packages/genealogy/src/Entity/GenealogyTree.php",
-            "line": 9,
+            "line": 11,
             "internal": false,
             "api": false
         },
@@ -1000,7 +755,7 @@
             "fqcn": "Waaseyaa\\Genealogy\\Entity\\GenealogyFamily",
             "kind": "class",
             "file": "packages/genealogy/src/Entity/GenealogyFamily.php",
-            "line": 9,
+            "line": 11,
             "internal": false,
             "api": false
         },
@@ -1008,7 +763,7 @@
             "fqcn": "Waaseyaa\\Genealogy\\Entity\\GenealogyEvent",
             "kind": "class",
             "file": "packages/genealogy/src/Entity/GenealogyEvent.php",
-            "line": 9,
+            "line": 11,
             "internal": false,
             "api": false
         },
@@ -1017,22 +772,6 @@
             "kind": "class",
             "file": "packages/genealogy/src/GenealogyBootstrap.php",
             "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\GraphQL\\Http\\Router\\GraphQlRouter",
-            "kind": "class",
-            "file": "packages/graphql/src/Http/Router/GraphQlRouter.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\GraphQL\\Access\\GraphQlAccessGuard",
-            "kind": "class",
-            "file": "packages/graphql/src/Access/GraphQlAccessGuard.php",
-            "line": 18,
             "internal": false,
             "api": false
         },
@@ -1053,14 +792,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\GraphQL\\Schema\\SchemaFactory",
-            "kind": "class",
-            "file": "packages/graphql/src/Schema/SchemaFactory.php",
-            "line": 28,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\GraphQL\\Schema\\TypeRegistry",
             "kind": "class",
             "file": "packages/graphql/src/Schema/TypeRegistry.php",
@@ -1069,122 +800,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\GraphQL\\Schema\\FieldTypeMapper",
-            "kind": "class",
-            "file": "packages/graphql/src/Schema/FieldTypeMapper.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\GraphQL\\Resolver\\ReferenceLoader",
-            "kind": "class",
-            "file": "packages/graphql/src/Resolver/ReferenceLoader.php",
-            "line": 26,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\GraphQL\\Resolver\\EntityResolver",
-            "kind": "class",
-            "file": "packages/graphql/src/Resolver/EntityResolver.php",
-            "line": 27,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\GraphQL\\GraphQlEndpoint",
-            "kind": "class",
-            "file": "packages/graphql/src/GraphQlEndpoint.php",
-            "line": 27,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\GraphQL\\GraphQlServiceProvider",
-            "kind": "class",
-            "file": "packages/graphql/src/GraphQlServiceProvider.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Inertia\\OptionalProp",
             "kind": "class",
             "file": "packages/inertia/src/OptionalProp.php",
             "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Inertia\\RootTemplateRenderer",
-            "kind": "class",
-            "file": "packages/inertia/src/RootTemplateRenderer.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Inertia\\PropResolver",
-            "kind": "class",
-            "file": "packages/inertia/src/PropResolver.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Inertia\\InertiaResponse",
-            "kind": "class",
-            "file": "packages/inertia/src/InertiaResponse.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Inertia\\Inertia",
-            "kind": "class",
-            "file": "packages/inertia/src/Inertia.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Inertia\\InertiaServiceProvider",
-            "kind": "class",
-            "file": "packages/inertia/src/InertiaServiceProvider.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Inertia\\InertiaMiddleware",
-            "kind": "class",
-            "file": "packages/inertia/src/InertiaMiddleware.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\Rpc\\ResponseFormatter",
-            "kind": "class",
-            "file": "packages/mcp/src/Rpc/ResponseFormatter.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\Rpc\\ToolIntrospector",
-            "kind": "class",
-            "file": "packages/mcp/src/Rpc/ToolIntrospector.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\McpServiceProvider",
-            "kind": "class",
-            "file": "packages/mcp/src/McpServiceProvider.php",
-            "line": 11,
             "internal": false,
             "api": false
         },
@@ -1205,78 +824,6 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Mcp\\McpResponse",
-            "kind": "class",
-            "file": "packages/mcp/src/McpResponse.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\McpServerCard",
-            "kind": "class",
-            "file": "packages/mcp/src/McpServerCard.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\Cache\\ReadCache",
-            "kind": "class",
-            "file": "packages/mcp/src/Cache/ReadCache.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\McpRouteProvider",
-            "kind": "class",
-            "file": "packages/mcp/src/McpRouteProvider.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\Tools\\EditorialTools",
-            "kind": "class",
-            "file": "packages/mcp/src/Tools/EditorialTools.php",
-            "line": 18,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\Tools\\TraversalTools",
-            "kind": "class",
-            "file": "packages/mcp/src/Tools/TraversalTools.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\Tools\\EntityTools",
-            "kind": "class",
-            "file": "packages/mcp/src/Tools/EntityTools.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\Tools\\DiscoveryTools",
-            "kind": "class",
-            "file": "packages/mcp/src/Tools/DiscoveryTools.php",
-            "line": 17,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\Auth\\BearerTokenAuth",
-            "kind": "class",
-            "file": "packages/mcp/src/Auth/BearerTokenAuth.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Mcp\\Auth\\McpAuthInterface",
             "kind": "interface",
             "file": "packages/mcp/src/Auth/McpAuthInterface.php",
@@ -1285,154 +832,74 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Mcp\\McpController",
-            "kind": "class",
-            "file": "packages/mcp/src/McpController.php",
-            "line": 27,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Mcp\\McpEndpoint",
-            "kind": "class",
-            "file": "packages/mcp/src/McpEndpoint.php",
+            "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppControllerArgumentResolver",
+            "kind": "interface",
+            "file": "packages/ssr/src/Http/AppController/AppControllerArgumentResolver.php",
             "line": 13,
             "internal": false,
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\SSR\\Http\\Router\\SsrRouter",
+            "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppParameterKind",
+            "kind": "enum",
+            "file": "packages/ssr/src/Http/AppController/AppParameterKind.php",
+            "line": 7,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppParameterBindingBuilder",
             "kind": "class",
-            "file": "packages/ssr/src/Http/Router/SsrRouter.php",
+            "file": "packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php",
+            "line": 25,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppInvocationContext",
+            "kind": "class",
+            "file": "packages/ssr/src/Http/AppController/AppInvocationContext.php",
+            "line": 13,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\Exception\\AppControllerTypeMismatchException",
+            "kind": "class",
+            "file": "packages/ssr/src/Http/AppController/Exception/AppControllerTypeMismatchException.php",
+            "line": 7,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\Exception\\InvalidAppControllerArgumentException",
+            "kind": "class",
+            "file": "packages/ssr/src/Http/AppController/Exception/InvalidAppControllerArgumentException.php",
+            "line": 7,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\Exception\\InvalidAppControllerBindingException",
+            "kind": "class",
+            "file": "packages/ssr/src/Http/AppController/Exception/InvalidAppControllerBindingException.php",
+            "line": 7,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppParameterBindingSpec",
+            "kind": "class",
+            "file": "packages/ssr/src/Http/AppController/AppParameterBindingSpec.php",
+            "line": 10,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\SSR\\Http\\AppController\\AppControllerMethodInvoker",
+            "kind": "class",
+            "file": "packages/ssr/src/Http/AppController/AppControllerMethodInvoker.php",
             "line": 14,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\Http\\Router\\AppControllerRouter",
-            "kind": "class",
-            "file": "packages/ssr/src/Http/Router/AppControllerRouter.php",
-            "line": 20,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\Flash\\Flash",
-            "kind": "class",
-            "file": "packages/ssr/src/Flash/Flash.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\Flash\\FlashMessageService",
-            "kind": "class",
-            "file": "packages/ssr/src/Flash/FlashMessageService.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\SsrServiceProvider",
-            "kind": "class",
-            "file": "packages/ssr/src/SsrServiceProvider.php",
-            "line": 26,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\ViewMode",
-            "kind": "class",
-            "file": "packages/ssr/src/ViewMode.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\ComponentRenderer",
-            "kind": "class",
-            "file": "packages/ssr/src/ComponentRenderer.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\ThemeServiceProvider",
-            "kind": "class",
-            "file": "packages/ssr/src/ThemeServiceProvider.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\ComponentRegistry",
-            "kind": "class",
-            "file": "packages/ssr/src/ComponentRegistry.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\SsrPageHandler",
-            "kind": "class",
-            "file": "packages/ssr/src/SsrPageHandler.php",
-            "line": 33,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\FieldFormatterRegistry",
-            "kind": "class",
-            "file": "packages/ssr/src/FieldFormatterRegistry.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\SsrController",
-            "kind": "class",
-            "file": "packages/ssr/src/SsrController.php",
-            "line": 9,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\LanguageResolver",
-            "kind": "class",
-            "file": "packages/ssr/src/LanguageResolver.php",
-            "line": 19,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\RenderCache",
-            "kind": "class",
-            "file": "packages/ssr/src/RenderCache.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\RenderController",
-            "kind": "class",
-            "file": "packages/ssr/src/RenderController.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\ComponentMetadata",
-            "kind": "class",
-            "file": "packages/ssr/src/ComponentMetadata.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\Theme",
-            "kind": "class",
-            "file": "packages/ssr/src/Theme.php",
-            "line": 7,
             "internal": false,
             "api": false
         },
@@ -1441,22 +908,6 @@
             "kind": "class",
             "file": "packages/ssr/src/Twig/FlashTwigExtension.php",
             "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\Twig\\WaaseyaaExtension",
-            "kind": "class",
-            "file": "packages/ssr/src/Twig/WaaseyaaExtension.php",
-            "line": 11,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\SSR\\TwigErrorPageRenderer",
-            "kind": "class",
-            "file": "packages/ssr/src/TwigErrorPageRenderer.php",
-            "line": 14,
             "internal": false,
             "api": false
         },
@@ -1477,18 +928,26 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\SSR\\Attribute\\Component",
+            "fqcn": "Waaseyaa\\SSR\\Attribute\\MapQuery",
             "kind": "attribute_class",
-            "file": "packages/ssr/src/Attribute/Component.php",
-            "line": 9,
+            "file": "packages/ssr/src/Attribute/MapQuery.php",
+            "line": 10,
             "internal": false,
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\SSR\\Formatter\\HtmlFormatter",
-            "kind": "class",
-            "file": "packages/ssr/src/Formatter/HtmlFormatter.php",
-            "line": 12,
+            "fqcn": "Waaseyaa\\SSR\\Attribute\\MapRoute",
+            "kind": "attribute_class",
+            "file": "packages/ssr/src/Attribute/MapRoute.php",
+            "line": 10,
+            "internal": false,
+            "api": false
+        },
+        {
+            "fqcn": "Waaseyaa\\SSR\\Attribute\\FromRoute",
+            "kind": "attribute_class",
+            "file": "packages/ssr/src/Attribute/FromRoute.php",
+            "line": 7,
             "internal": false,
             "api": false
         },
@@ -1541,98 +1000,10 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\SSR\\EntityRenderer",
-            "kind": "class",
-            "file": "packages/ssr/src/EntityRenderer.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\TelescopeEntry",
-            "kind": "class",
-            "file": "packages/telescope/src/TelescopeEntry.php",
-            "line": 10,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\Recorder\\CacheRecorder",
-            "kind": "class",
-            "file": "packages/telescope/src/Recorder/CacheRecorder.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\Recorder\\QueryRecorder",
-            "kind": "class",
-            "file": "packages/telescope/src/Recorder/QueryRecorder.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\Recorder\\EventRecorder",
-            "kind": "class",
-            "file": "packages/telescope/src/Recorder/EventRecorder.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\Recorder\\RequestRecorder",
-            "kind": "class",
-            "file": "packages/telescope/src/Recorder/RequestRecorder.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\Storage\\SqliteTelescopeStore",
-            "kind": "class",
-            "file": "packages/telescope/src/Storage/SqliteTelescopeStore.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Telescope\\Middleware\\TelescopeRequestMiddleware",
             "kind": "class",
             "file": "packages/telescope/src/Middleware/TelescopeRequestMiddleware.php",
             "line": 20,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\TelescopeServiceProvider",
-            "kind": "class",
-            "file": "packages/telescope/src/TelescopeServiceProvider.php",
-            "line": 21,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Schema\\ValidationReportSchema",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Schema/ValidationReportSchema.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Schema\\SessionEventSchema",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Schema/SessionEventSchema.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\CodifiedContextEntry",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/CodifiedContextEntry.php",
-            "line": 10,
             "internal": false,
             "api": false
         },
@@ -1645,173 +1016,13 @@
             "api": false
         },
         {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Validator\\ValidationReport",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Validator/ValidationReport.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Validator\\DriftScorer",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Validator/DriftScorer.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Validator\\StructuralChecker",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Validator/StructuralChecker.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
             "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Validator\\MockEmbeddingProvider",
             "kind": "class",
             "file": "packages/telescope/src/CodifiedContext/Validator/MockEmbeddingProvider.php",
             "line": 7,
             "internal": false,
             "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Validator\\ContradictionChecker",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Validator/ContradictionChecker.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Recorder\\CodifiedContextEventRecorder",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Recorder/CodifiedContextEventRecorder.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Recorder\\CodifiedContextSessionRecorder",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Recorder/CodifiedContextSessionRecorder.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Recorder\\CodifiedContextValidationRecorder",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Recorder/CodifiedContextValidationRecorder.php",
-            "line": 12,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ContextLoaded",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Event/ContextLoaded.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Event\\SessionStarted",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Event/SessionStarted.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ValidationCompleted",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Event/ValidationCompleted.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ModelOutputRecorded",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Event/ModelOutputRecorded.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ContextLoadFailed",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Event/ContextLoadFailed.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Event\\SessionEnded",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Event/SessionEnded.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Event\\ContextHashComputed",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Event/ContextHashComputed.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Event\\DriftDetected",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Event/DriftDetected.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Event\\DriftCorrected",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Event/DriftCorrected.php",
-            "line": 7,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\JsonlCodifiedContextStore",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Storage/JsonlCodifiedContextStore.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\PrometheusCodifiedContextStore",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Storage/PrometheusCodifiedContextStore.php",
-            "line": 15,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\Storage\\SqliteCodifiedContextStore",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/Storage/SqliteCodifiedContextStore.php",
-            "line": 13,
-            "internal": false,
-            "api": false
-        },
-        {
-            "fqcn": "Waaseyaa\\Telescope\\CodifiedContext\\CodifiedContextObserver",
-            "kind": "class",
-            "file": "packages/telescope/src/CodifiedContext/CodifiedContextObserver.php",
-            "line": 17,
-            "internal": false,
-            "api": false
         }
     ],
-    "methodology": "Only @covers lines are indexed; no inference from test class new/use."
+    "methodology": "@covers PHPDoc and #[CoversClass(...)] attributes are both indexed (Convention C1, mission #1335). Short refs resolved via file-local use statements; same-namespace refs without an alias are skipped."
 }

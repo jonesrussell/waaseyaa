@@ -12,6 +12,7 @@ parameters:
     reportPossiblyNonexistentConstantArrayOffset: true
     paths:
         - packages/access/src
+        # admin: Nuxt SPA — excluded per Convention C3 (mission #1335 spec.md). PHP host is admin-surface (L6).
         - packages/admin-surface/src
         - packages/ai-agent/src
         - packages/ai-observability/src
@@ -28,6 +29,7 @@ parameters:
         - packages/config/src
         - packages/database-legacy/src
         - packages/debug/src
+        # deployer: recipe-only package (no PSR-4 src/) — single Deployer recipe file at recipe/waaseyaa.php depends on deployphp/deployer's globally-bound functions (run/task/desc/get/after) that PHPStan cannot resolve without project-specific stubs. Excluded per Convention C3 (mission #1335 spec.md).
         - packages/entity-storage/src
         - packages/entity/src
         - packages/engagement/src

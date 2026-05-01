@@ -1,6 +1,6 @@
 # Layer 0 Forensic Audit (Foundation)
 
-Generated: 2026-04-24T21:45:59+00:00 UTC
+Generated: 2026-04-30T17:02:18+00:00 UTC
 
 ## 1. Canonical scope
 
@@ -138,23 +138,23 @@ Layer 0 (Foundation) packages from `bin/check-package-layers` **LAYER_BY_SHORT**
 
 ### L0-COV-AGG
 - **Priority:** P4 | **Category:** test_coverage | **Severity:** low
-- **Message:** Public (non-@internal) L0 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer0.json
+- **Message:** Public (non-@internal) L0 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer0.json
 ```json
 {
-    "count": 269,
+    "count": 113,
     "sample_fqcn": [
         "Waaseyaa\\Analytics\\UmamiClient",
-        "Waaseyaa\\Cache\\CacheFactory",
         "Waaseyaa\\Cache\\TagAwareCacheInterface",
         "Waaseyaa\\Cache\\CacheItem",
         "Waaseyaa\\Cache\\CacheTagsInvalidator",
-        "Waaseyaa\\Cache\\Listener\\TranslationCacheInvalidator",
         "Waaseyaa\\Cache\\Listener\\EntityCacheSubscriber",
-        "Waaseyaa\\Cache\\Listener\\ConfigCacheInvalidator",
-        "Waaseyaa\\Cache\\Listener\\EntityCacheInvalidator",
-        "Waaseyaa\\Cache\\Backend\\DatabaseBackend",
         "Waaseyaa\\Cache\\Backend\\MemoryBackend",
-        "Waaseyaa\\Cache\\Backend\\NullBackend"
+        "Waaseyaa\\Cache\\Backend\\NullBackend",
+        "Waaseyaa\\Cache\\CacheTagsInvalidatorInterface",
+        "Waaseyaa\\Cache\\CacheBackendInterface",
+        "Waaseyaa\\Cache\\CacheFactoryInterface",
+        "Waaseyaa\\Database\\DeleteInterface",
+        "Waaseyaa\\Database\\DatabaseInterface"
     ]
 }
 ```
@@ -173,10 +173,10 @@ Static: Waaseyaa `use` in L0 code targeting layer >0 — see P2-style findings. 
 
 Counts: service providers **8**, *Listener* classes **0**, *Attribute* classes (heuristic) **12**. See `layer0_metadata_consistency.json` for file paths.
 
-## 6. Test / @covers
+## 6. Test coverage (@covers + #[CoversClass])
 
-Unique FQCNs with at least one `@covers`: 2
-Public symbols with no @covers: 269 (see coverage finding and `symbol_test_map_layer0.json`).
+Unique FQCNs with at least one `@covers` or `#[CoversClass]`: 168
+Public symbols with no indexed coverage: 113 (see coverage finding and `symbol_test_map_layer0.json`).
 
 ## 7. Hygiene
 

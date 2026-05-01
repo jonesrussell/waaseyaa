@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bcaa15c940aae8fbf286f75939e5aac0",
+    "content-hash": "48ab85959cc2726b5124c045c920279a",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -4066,19 +4066,19 @@
         },
         {
             "name": "waaseyaa/attachment",
-            "version": "dev-kitty/mission-single-entity-work-surface-01KQ7M1P-lane-a",
+            "version": "dev-mission/824-architectural-remediation",
             "dist": {
                 "type": "path",
                 "url": "packages/attachment",
-                "reference": "0c7f9203e8bec1b8295adae08bb82f6b389a04ee"
+                "reference": "ef788468422a3517a1e0b51999d87c3f29e63395"
             },
             "require": {
                 "php": "^8.4",
-                "waaseyaa/access": "@dev",
-                "waaseyaa/database-legacy": "@dev",
-                "waaseyaa/entity": "@dev",
-                "waaseyaa/entity-storage": "@dev",
-                "waaseyaa/foundation": "@dev"
+                "waaseyaa/access": "^0.1.0-alpha.150",
+                "waaseyaa/database-legacy": "^0.1.0-alpha.150",
+                "waaseyaa/entity": "^0.1.0-alpha.150",
+                "waaseyaa/entity-storage": "^0.1.0-alpha.150",
+                "waaseyaa/foundation": "^0.1.0-alpha.150"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -4296,7 +4296,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "dc9ee093f3cc01e4bcc60a4d7cab5f87d0057ed3"
+                "reference": "59a0463e65b8a6f64a93396542d99874492a9934"
             },
             "require": {
                 "php": ">=8.4",
@@ -4318,6 +4318,11 @@
                 "branch-alias": {
                     "dev-main": "0.1.x-dev",
                     "dev-develop/v1.1": "0.1.x-dev"
+                },
+                "waaseyaa": {
+                    "providers": [
+                        "Waaseyaa\\CLI\\CliServiceProvider"
+                    ]
                 }
             },
             "autoload": {
@@ -6215,16 +6220,16 @@
         },
         {
             "name": "waaseyaa/structured-import",
-            "version": "dev-kitty/mission-single-entity-work-surface-01KQ7M1P-lane-a",
+            "version": "dev-mission/824-architectural-remediation",
             "dist": {
                 "type": "path",
                 "url": "packages/structured-import",
-                "reference": "847732407b04afe9b97a0b621ced0512052ac7ce"
+                "reference": "50a132ec91c9a0b01a38eaae04f81afebdd2ac93"
             },
             "require": {
                 "php": "^8.4",
-                "waaseyaa/field": "@dev",
-                "waaseyaa/foundation": "@dev"
+                "waaseyaa/field": "^0.1.0-alpha.150",
+                "waaseyaa/foundation": "^0.1.0-alpha.150"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -6307,7 +6312,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/telescope",
-                "reference": "c2382c39505dc955b19caafbdbaa7103c342b30a"
+                "reference": "edd791349bd7dea7e139bef8bc6a5009e0937fee"
             },
             "require": {
                 "php": ">=8.4",
@@ -6321,6 +6326,11 @@
                 "branch-alias": {
                     "dev-main": "0.1.x-dev",
                     "dev-develop/v1.1": "0.1.x-dev"
+                },
+                "waaseyaa": {
+                    "providers": [
+                        "Waaseyaa\\Telescope\\TelescopeServiceProvider"
+                    ]
                 }
             },
             "autoload": {

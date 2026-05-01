@@ -11,6 +11,16 @@
 <!-- Spec reviewed 2026-04-08 - Session UI TypeScript mirror: `packages/admin/app/contracts/surface-ui.ts` duplicates admin-surface `contract/types.ts` ui shapes for `npm run build:contracts` (rootDir app only); keep in sync with PHP/contract (#756) -->
 <!-- Spec reviewed 2026-04-09 - AdminSurfaceTransportAdapter: constructor takes normalizedAppBase; all CRUD/action URLs via adminSurfaceFetchUrl (parity with plugin bootstrap; #1161) -->
 <!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute contract: SPA consumes cast-aware payloads from ResourceSerializer (#1181) -->
+<!-- Spec reviewed 2026-04-30 - Host extension typing: GenericAdminSurfaceHost constructor and AdminSurfaceServiceProvider::routes() accept EntityTypeManagerInterface only; concrete EntityTypeManager bindings forbidden in packages/admin* (mission #824 WP04 surface C, closes #836) -->
+<!-- Spec reviewed 2026-05-01 - Admin-surface session contract: AdminSurfaceAccount.emailVerified?: boolean is now part of packages/admin-surface/contract/types.ts (camelCase, matching the PHP host payload at AdminSurfaceSessionData::toArray() and the SPA runtime read sites in auth.global and VerificationBanner). Spec language no longer uses snake_case email_verified (mission #824 WP07 surface A, closes #839) -->
+<!-- Spec reviewed 2026-05-01 - Admin-surface catalog contract: AdminSurfaceCatalogEntry.description?: string is preserved in packages/admin-surface/contract/types.ts and locked in by CatalogBuilderTest regression assertions (description emitted when set, omitted when unset, matching the optional contract field) (mission #824 WP07 surface B, closes #840) -->
+<!-- Spec reviewed 2026-05-01 - Admin-surface authority: payload shape is defined exclusively in packages/admin-surface/contract/types.ts (see packages/admin-surface/contract/README.md). This spec describes SPA runtime behaviour and references contract type names but does not redefine them; cross-boundary tests at tests/Integration/AdminSurface/ enforce conformance (mission #824 WP07 surface E, closes #851) -->
+
+## Authority
+
+The host-to-SPA payload shape is defined in **`packages/admin-surface/contract/types.ts`** (see [`packages/admin-surface/contract/README.md`](../../packages/admin-surface/contract/README.md)). This document is the subsystem spec for the admin SPA runtime — components, composables, routes, schema-driven forms, auth flow — and references contract type names (`AdminSurfaceSession`, `AdminSurfaceCatalogEntry`, etc.) rather than redefining them. When this spec and the contract package disagree, the contract package wins; raise an issue against this spec to bring it back into alignment.
+
+Two cross-boundary tests under `tests/Integration/AdminSurface/` enforce structural conformance between the backend emit and the contract; the audit (#851) flagged the prior governance drift where snake_case variants in this spec contradicted the camelCase contract. Use camelCase everywhere (e.g. `emailVerified`, `requireVerifiedEmail`).
 
 ## Optionality
 
@@ -226,6 +236,8 @@ The root Nuxt plugin is the authoritative bootstrap for `$admin`. On non-public 
 6. Returns `{ provide: { admin: runtime } }`, or `{ provide: { admin: null } }` for public auth pages and unauthenticated redirects.
 
 **Session UI customization (PHP → SPA):** Hosts extend `GenericAdminSurfaceHost` and override `buildAdminUi(AccountInterface): ?AdminSurfaceUiPayload` to attach non-empty `AdminSurfaceUiPayload` to `AdminSurfaceSessionData`. JSON includes a top-level `ui` object only when the payload has at least one valid header link or sidebar item. Sidebar `group` values that look like i18n keys (`nav_*`) are passed through `t()` in `NavBuilder`; an empty/missing `group` uses `nav_group_custom` (“Shortcuts”). External targets use `external: true` or absolute URLs (`http(s):`, `//`, `mailto:`, `tel:`) and render as `<a target="_blank" rel="noopener noreferrer">`.
+
+**Host extension typing (mission #824 WP04 surface C).** `GenericAdminSurfaceHost` and `AdminSurfaceServiceProvider::routes()` accept `Waaseyaa\Entity\EntityTypeManagerInterface`, never the concrete `EntityTypeManager`. Subclasses extending the host receive the interface and must not narrow that parameter. The acceptance gate is `grep -rn 'EntityTypeManager[^I]' packages/admin*` returning no results — re-run it whenever you touch admin-surface code or its tests.
 
 This plugin is the source of truth for `$admin` injection and for composables that call `useAdmin()`.
 
@@ -576,7 +588,7 @@ This keeps client bootstrap, server bootstrap, and route middleware aligned on t
 
 When `runtimeConfig.public.requireVerifiedEmail` is true, the global auth middleware enforces email verification gating:
 
-- If `currentUser.email_verified` is false and the current path is not in the skip list, `navigateTo('/verify-email')`.
+- If `currentUser.emailVerified` is false and the current path is not in the skip list, `navigateTo('/verify-email')`.
 - Skipped paths: `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`.
 
 When `requireVerifiedEmail` is false (default), unverified users reach the AdminShell but see `VerificationBanner`.
@@ -585,11 +597,11 @@ When `requireVerifiedEmail` is false (default), unverified users reach the Admin
 
 **File:** `packages/admin/app/components/auth/VerificationBanner.vue`
 
-Rendered inside `AdminShell` when `auth.require_verified_email` is false and the current user's `email_verified` is false. Features:
+Rendered inside `AdminShell` when `auth.requireVerifiedEmail` is false and the current user's `emailVerified` is false. Features:
 
 - Persistent but dismissible. Dismissal stored in `localStorage` keyed by user ID to prevent cross-account leakage on shared machines.
 - Inline "Resend verification" button; reflects `Retry-After` header for cooldown display.
-- Disappears reactively when `useAuth().currentUser.email_verified` becomes true.
+- Disappears reactively when `useAuth().currentUser.emailVerified` becomes true.
 - User-facing banner text, resend state text, and dismiss `aria-label` route through `useLanguage()`.
 
 ### Runtime Config Additions

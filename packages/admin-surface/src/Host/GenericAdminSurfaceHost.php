@@ -18,12 +18,12 @@ use Waaseyaa\Api\JsonApiResource;
 use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Schema\SchemaPresenter;
 use Waaseyaa\Entity\ConfigEntityBase;
-use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\EntityTypeManagerInterface;
 
 /**
  * Generic admin surface host that works with any Waaseyaa application.
  *
- * Auto-discovers entity types from EntityTypeManager and provides full
+ * Auto-discovers entity types from EntityTypeManagerInterface and provides full
  * CRUD operations. Apps get a working admin SPA without writing a custom
  * host — just install the admin-surface package.
  *
@@ -41,7 +41,7 @@ class GenericAdminSurfaceHost extends AbstractAdminSurfaceHost
      * @param string[] $readOnlyTypes Entity type IDs that should be read-only in the admin
      */
     public function __construct(
-        private readonly EntityTypeManager $entityTypeManager,
+        private readonly EntityTypeManagerInterface $entityTypeManager,
         private readonly ?EntityAccessHandler $accessHandler = null,
         private readonly ?SchemaPresenter $schemaPresenter = null,
         private readonly string $tenantId = 'default',

@@ -13,6 +13,7 @@ use Waaseyaa\Cache\CacheConfigResolver;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Api\Http\DiscoveryApiHandler;
+use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\I18n\Language;
 use Waaseyaa\I18n\LanguageManager;
 use Waaseyaa\I18n\LanguageManagerInterface;
@@ -23,7 +24,7 @@ use Waaseyaa\SSR\SsrPageHandler;
 #[CoversClass(LanguageResolver::class)]
 final class SsrPageHandlerTest extends TestCase
 {
-    private function createHandler(array $config = [], ?\Closure $serviceResolver = null): SsrPageHandler
+    private function createHandler(array $config = [], ?HttpServiceResolverInterface $serviceResolver = null): SsrPageHandler
     {
         $entityTypeManager = new EntityTypeManager(new EventDispatcher());
         $database = DBALDatabase::createSqlite();
@@ -42,9 +43,25 @@ final class SsrPageHandlerTest extends TestCase
         );
     }
 
-    private function createLanguageResolver(?\Closure $serviceResolver = null): LanguageResolver
+    private function createLanguageResolver(?HttpServiceResolverInterface $serviceResolver = null): LanguageResolver
     {
         return new LanguageResolver(serviceResolver: $serviceResolver);
+    }
+
+    /**
+     * Wrap a closure as an {@see HttpServiceResolverInterface} for tests that
+     * need to inject a small lookup function.
+     */
+    private function makeServiceResolver(\Closure $resolver): HttpServiceResolverInterface
+    {
+        return new class ($resolver) implements HttpServiceResolverInterface {
+            public function __construct(private readonly \Closure $resolver) {}
+
+            public function resolve(string $className): ?object
+            {
+                return ($this->resolver)($className);
+            }
+        };
     }
 
     /**
@@ -65,12 +82,14 @@ final class SsrPageHandlerTest extends TestCase
 
         $manager = new LanguageManager($languages);
 
-        $serviceResolver = static function (string $className) use ($manager): ?object {
-            if ($className === LanguageManagerInterface::class) {
-                return $manager;
-            }
-            return null;
-        };
+        $serviceResolver = $this->makeServiceResolver(
+            static function (string $className) use ($manager): ?object {
+                if ($className === LanguageManagerInterface::class) {
+                    return $manager;
+                }
+                return null;
+            },
+        );
 
         return [$this->createLanguageResolver(serviceResolver: $serviceResolver), $manager];
     }
@@ -298,7 +317,9 @@ final class SsrPageHandlerTest extends TestCase
     {
         // serviceResolver is present but returns something that isn't a LanguageManagerInterface.
         // Falls back to default English langcode and unchanged path.
-        $resolver = $this->createLanguageResolver(serviceResolver: static fn(string $class): ?object => new \stdClass());
+        $resolver = $this->createLanguageResolver(
+            serviceResolver: $this->makeServiceResolver(static fn (string $class): ?object => new \stdClass()),
+        );
         $request = HttpRequest::create('/about');
 
         $result = $resolver->resolveRenderLanguageAndAliasPath('/about', $request);

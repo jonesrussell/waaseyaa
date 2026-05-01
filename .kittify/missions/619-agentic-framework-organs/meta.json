@@ -1,0 +1,16 @@
+{
+  "feature_number": "619",
+  "slug": "619-agentic-framework-organs",
+  "mission": "software-dev",
+  "target_branch": "main",
+  "github_issue": "https://github.com/waaseyaa/framework/issues/619",
+  "child_issues": [
+    "https://github.com/waaseyaa/framework/issues/619",
+    "https://github.com/waaseyaa/framework/issues/620",
+    "https://github.com/waaseyaa/framework/issues/621",
+    "https://github.com/waaseyaa/framework/issues/623"
+  ],
+  "track": "Track 2 \u2014 Bimaaji & agentic",
+  "created_at": "2026-04-30T00:00:00Z",
+  "vcs": "git"
+}

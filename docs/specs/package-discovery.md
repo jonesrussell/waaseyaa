@@ -1,5 +1,7 @@
 # Package Discovery
 
+<!-- Spec reviewed 2026-05-01 - extra.waaseyaa is the authoritative registration path for providers, commands, and routes. waaseyaa/cli, waaseyaa/api, waaseyaa/graphql, waaseyaa/mcp, waaseyaa/telescope all declare their service providers via extra.waaseyaa.providers; root composer.json reserves extra.waaseyaa.providers as an extension point for app-level providers. ConsoleKernel must not introduce new string-literal command lists; commands belong in the owning package's HasCommandsInterface implementation (mission #824 WP08 surface A, closes #854) -->
+
 Specification for how Waaseyaa packages are discovered, registered, booted, and compiled into optimized artifacts.
 
 ## Overview
@@ -122,6 +124,8 @@ Binding properties:
 
 ### Package composer.json format
 
+`extra.waaseyaa` is the **only authoritative registration path** for providers, commands, and routes. Hidden registration channels (kernel-internal hard-coded lists, side imports, manual `Application::add()` calls outside of `HasCommandsInterface`) are forbidden — every active framework package surfaces its providers and commands through this manifest entry, and `PackageManifestCompiler` is the single source the kernel reads. Active framework packages with this declaration include `waaseyaa/foundation`, `waaseyaa/api`, `waaseyaa/graphql`, `waaseyaa/mcp`, `waaseyaa/cli`, `waaseyaa/telescope`, `waaseyaa/admin-surface`, `waaseyaa/routing`, and the various entity-package providers.
+
 Each package declares its registration metadata in `extra.waaseyaa`:
 
 ```json
@@ -157,7 +161,7 @@ Supported keys:
 
 ### Root composer.json conventions
 
-The monorepo root uses `@dev` constraints for all `waaseyaa/*` packages and path repository references:
+The monorepo root uses `@dev` constraints for all `waaseyaa/*` packages and path repository references. It also carries its own `extra.waaseyaa` block — the framework root reserves `extra.waaseyaa.providers` as an extension point for repo-level service providers, alongside the `admin_path` configuration:
 
 ```json
 {
@@ -167,9 +171,17 @@ The monorepo root uses `@dev` constraints for all `waaseyaa/*` packages and path
     "require": {
         "waaseyaa/foundation": "@dev",
         "waaseyaa/entity": "@dev"
+    },
+    "extra": {
+        "waaseyaa": {
+            "admin_path": "packages/admin",
+            "providers": []
+        }
     }
 }
 ```
+
+Consumer applications populate `extra.waaseyaa.providers` with their own application-level service providers; the framework monorepo root keeps it empty because all framework providers live in their owning packages.
 
 ### ProviderDiscovery
 

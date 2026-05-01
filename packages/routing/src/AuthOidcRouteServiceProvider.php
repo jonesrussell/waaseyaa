@@ -29,19 +29,19 @@ final class AuthOidcRouteServiceProvider extends ServiceProvider
 {
     public function register(): void {}
 
-    public function routes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager = null): void
+    public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
         $this->registerAuthRoutes($router, $entityTypeManager);
         $this->registerOidcRoutes($router);
     }
 
-    private function registerAuthRoutes(WaaseyaaRouter $router, ?EntityTypeManager $entityTypeManager): void
+    private function registerAuthRoutes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
         $authConfig = $this->resolve(AuthConfig::class);
         $tokenRepo = $this->resolve(AuthTokenRepositoryInterface::class);
         $rateLimiter = $this->resolve(RateLimiterInterface::class);
         $authMailer = $this->resolve(AuthMailer::class);
-        $etm = $entityTypeManager ?? $this->resolve(EntityTypeManager::class);
+        $etm = $entityTypeManager;
 
         $router->addRoute(
             'api.auth.register',

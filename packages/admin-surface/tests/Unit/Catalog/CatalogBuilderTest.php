@@ -120,6 +120,38 @@ final class CatalogBuilderTest extends TestCase
     }
 
     #[Test]
+    public function descriptionIsEmittedInCatalogPayloadWhenSet(): void
+    {
+        // Regression anchor for the AdminSurfaceCatalogEntry.description
+        // contract field (packages/admin-surface/contract/types.ts).
+        // The PHP host emits this field; the SPA runtime consumes it.
+        $builder = new CatalogBuilder();
+        $builder->defineEntity('node', 'Content')
+            ->description('Long-form articles, blog posts, and pages.');
+
+        $result = $builder->build();
+
+        self::assertArrayHasKey('description', $result[0]);
+        self::assertSame(
+            'Long-form articles, blog posts, and pages.',
+            $result[0]['description'],
+        );
+    }
+
+    #[Test]
+    public function descriptionIsOmittedFromCatalogPayloadWhenUnset(): void
+    {
+        // Optional contract field: hosts that omit description must not
+        // appear in the payload at all (matches `description?: string`).
+        $builder = new CatalogBuilder();
+        $builder->defineEntity('node', 'Content');
+
+        $result = $builder->build();
+
+        self::assertArrayNotHasKey('description', $result[0]);
+    }
+
+    #[Test]
     public function invalidCapabilityThrows(): void
     {
         $entity = new EntityDefinition('test', 'Test');

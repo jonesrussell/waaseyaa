@@ -1,9 +1,8 @@
 {
-    "generated_at": "2026-04-24T21:14:07+00:00",
+    "generated_at": "2026-04-30T17:02:32+00:00",
     "phpstan": {
         "command": "phpstan analyse (L6 package src/ trees only \u2014 not full CI set)",
         "paths": [
-            "/home/jones/dev/waaseyaa/packages/admin/src",
             "/home/jones/dev/waaseyaa/packages/admin-surface/src",
             "/home/jones/dev/waaseyaa/packages/cli/src",
             "/home/jones/dev/waaseyaa/packages/debug/src",
@@ -22,22 +21,21 @@
         "note": "Per-package: path contains packages/<short>/src in phpstan.neon.",
         "packages_in_neon": {
             "included": [
+                "admin-surface",
                 "cli",
+                "debug",
+                "genealogy",
+                "graphql",
+                "inertia",
                 "mcp",
                 "ssr",
                 "telescope"
             ],
             "missing_from_phpstan_neon": [
-                "admin",
-                "admin-surface",
-                "debug",
-                "deployer",
-                "genealogy",
-                "graphql",
-                "inertia"
+                "deployer"
             ]
         }
     },
-    "raw_stdout": "Note: Using configuration file /home/jones/dev/waaseyaa/phpstan.neon.\nPath /home/jones/dev/waaseyaa/packages/admin/src does not exist\n",
+    "raw_stdout": "Note: Using configuration file /home/jones/dev/waaseyaa/phpstan.neon.\nPath /home/jones/dev/waaseyaa/packages/deployer/src does not exist\n",
     "phpstan_json_parsed": null
 }

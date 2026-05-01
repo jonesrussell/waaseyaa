@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:45:59+00:00",
+    "generated_at": "2026-04-30T17:02:26+00:00",
     "layer_4_packages": [
         "api",
         "bimaaji",
@@ -22,7 +22,7 @@
     },
     "bin_check_package_layers": {
         "exit_code": 0,
-        "output": "OK \u2014 package layer constraints (waaseyaa/* in require) satisfied."
+        "output": "OK \u2014 package layer constraints (composer.json + PHP file-level) satisfied."
     },
     "bin_audit_require_dev_layers": {
         "output": "require-dev layer audit warnings (non-fatal):\n  WARN [PLD001] packages/api/composer.json require-dev: api(L4) -> telescope(L6)\n  WARN [PLD001] packages/foundation/composer.json require-dev: foundation(L0) -> entity(L1)\n  WARN [PLD001] packages/foundation/composer.json require-dev: foundation(L0) -> routing(L4)\n  WARN [PLD001] packages/media/composer.json require-dev: media(L2) -> api(L4)\nTotal warnings: 4"

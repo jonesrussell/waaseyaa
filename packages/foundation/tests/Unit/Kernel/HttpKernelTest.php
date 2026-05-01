@@ -556,110 +556,6 @@ final class HttpKernelTest extends TestCase
         $this->assertContains('discovery:direction:both', $tags);
     }
 
-    #[Test]
-    public function service_resolver_returns_null_and_logs_when_provider_resolve_throws(): void
-    {
-        $kernel = new HttpKernel('/tmp/test-project');
-
-        // Create a provider that registers a binding but throws on resolve.
-        $provider = new class extends \Waaseyaa\Foundation\ServiceProvider\ServiceProvider {
-            public function register(): void
-            {
-                $this->singleton('SomeInterface', fn() => throw new \RuntimeException('Connection failed'));
-            }
-        };
-        $provider->register();
-
-        // Inject the provider into the kernel's providers array.
-        $providersProp = new \ReflectionProperty(AbstractKernel::class, 'providers');
-        $providersProp->setAccessible(true);
-        $providersProp->setValue($kernel, [$provider]);
-
-        // Build the serviceResolver closure the same way HttpKernel::serveHttpRequest() does.
-        $serviceResolver = \Closure::bind(function (string $className): ?object {
-            foreach ($this->providers as $provider) {
-                if (isset($provider->getBindings()[$className])) {
-                    try {
-                        return $provider->resolve($className);
-                    } catch (\Throwable $e) {
-                        error_log(sprintf('[Waaseyaa] Failed to resolve %s: %s', $className, $e->getMessage()));
-                        return null;
-                    }
-                }
-            }
-            return null;
-        }, $kernel, HttpKernel::class);
-
-        // Capture error_log output.
-        $logMessages = [];
-        set_error_handler(function () { return true; });
-        $result = $serviceResolver('SomeInterface');
-        restore_error_handler();
-
-        $this->assertNull($result, 'serviceResolver should return null when resolve() throws');
-    }
-
-    #[Test]
-    public function service_resolver_returns_resolved_instance_on_success(): void
-    {
-        $kernel = new HttpKernel('/tmp/test-project');
-
-        $provider = new class extends \Waaseyaa\Foundation\ServiceProvider\ServiceProvider {
-            public function register(): void
-            {
-                $this->singleton('SomeInterface', fn() => new \stdClass());
-            }
-        };
-        $provider->register();
-
-        $providersProp = new \ReflectionProperty(AbstractKernel::class, 'providers');
-        $providersProp->setAccessible(true);
-        $providersProp->setValue($kernel, [$provider]);
-
-        $serviceResolver = \Closure::bind(function (string $className): ?object {
-            foreach ($this->providers as $provider) {
-                if (isset($provider->getBindings()[$className])) {
-                    try {
-                        return $provider->resolve($className);
-                    } catch (\Throwable $e) {
-                        error_log(sprintf('[Waaseyaa] Failed to resolve %s: %s', $className, $e->getMessage()));
-                        return null;
-                    }
-                }
-            }
-            return null;
-        }, $kernel, HttpKernel::class);
-
-        $result = $serviceResolver('SomeInterface');
-        $this->assertInstanceOf(\stdClass::class, $result);
-    }
-
-    #[Test]
-    public function service_resolver_returns_null_for_unregistered_class(): void
-    {
-        $kernel = new HttpKernel('/tmp/test-project');
-
-        $providersProp = new \ReflectionProperty(AbstractKernel::class, 'providers');
-        $providersProp->setAccessible(true);
-        $providersProp->setValue($kernel, []);
-
-        $serviceResolver = \Closure::bind(function (string $className): ?object {
-            foreach ($this->providers as $provider) {
-                if (isset($provider->getBindings()[$className])) {
-                    try {
-                        return $provider->resolve($className);
-                    } catch (\Throwable $e) {
-                        error_log(sprintf('[Waaseyaa] Failed to resolve %s: %s', $className, $e->getMessage()));
-                        return null;
-                    }
-                }
-            }
-            return null;
-        }, $kernel, HttpKernel::class);
-
-        $result = $serviceResolver('NonExistentInterface');
-        $this->assertNull($result);
-    }
 
     #[Test]
     public function discovery_cache_listener_uses_tag_invalidation_when_available(): void
@@ -851,11 +747,13 @@ final class HttpKernelTest extends TestCase
         );
         $manager = new LanguageManager($languages);
 
-        $serviceResolver = static function (string $className) use ($manager): ?object {
-            if ($className === LanguageManagerInterface::class) {
-                return $manager;
+        $serviceResolver = new class ($manager) implements \Waaseyaa\Foundation\Http\HttpServiceResolverInterface {
+            public function __construct(private readonly LanguageManager $manager) {}
+
+            public function resolve(string $className): ?object
+            {
+                return $className === LanguageManagerInterface::class ? $this->manager : null;
             }
-            return null;
         };
 
         return new LanguageResolver(serviceResolver: $serviceResolver);
@@ -882,11 +780,13 @@ final class HttpKernelTest extends TestCase
         );
         $manager = new LanguageManager($languages);
 
-        $serviceResolver = static function (string $className) use ($manager): ?object {
-            if ($className === LanguageManagerInterface::class) {
-                return $manager;
+        $serviceResolver = new class ($manager) implements \Waaseyaa\Foundation\Http\HttpServiceResolverInterface {
+            public function __construct(private readonly LanguageManager $manager) {}
+
+            public function resolve(string $className): ?object
+            {
+                return $className === LanguageManagerInterface::class ? $this->manager : null;
             }
-            return null;
         };
 
         return new SsrPageHandler(

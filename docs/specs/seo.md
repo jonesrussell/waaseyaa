@@ -1,5 +1,7 @@
 # SEO package (`waaseyaa/seo`)
 
+<!-- Spec reviewed 2026-05-01 - README skeleton added under packages/seo/ (purpose, layer, key classes only); SitemapGenerator, MetaTagBuilder, JsonLdBuilder, RobotsTxtGenerator contracts unchanged from prior review (mission #824 WP09 surface F, closes #849) -->
+
 **Audience:** framework contributors and app authors wiring sitemaps, robots, and head metadata.
 
 ## Scope

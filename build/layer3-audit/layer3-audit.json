@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:14:02+00:00",
+    "generated_at": "2026-04-30T17:02:26+00:00",
     "audit": "Layer 3 forensic audit (Services)",
     "target_layer": 3,
     "layer_name": "Services",
@@ -13,7 +13,7 @@
         "workflows"
     ],
     "inventory": {
-        "generated_at": "2026-04-24T21:14:00+00:00",
+        "generated_at": "2026-04-30T17:02:24+00:00",
         "layer": 3,
         "packages": {
             "billing": {
@@ -97,7 +97,7 @@
             "priority": 4,
             "category": "test_coverage",
             "severity": "low",
-            "message": "Public (non-@internal) L3 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer3.json",
+            "message": "Public (non-@internal) L3 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer3.json",
             "detail": {
                 "count": 21,
                 "sample_fqcn": [

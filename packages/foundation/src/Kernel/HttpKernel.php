@@ -22,15 +22,21 @@ use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\Foundation\Attribute\AsMiddleware;
 use Waaseyaa\Foundation\Http\ControllerDispatcher;
 use Waaseyaa\Foundation\Http\CorsHandler;
+use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
 use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
 use Waaseyaa\Foundation\Http\Router as HttpRouter;
+use Waaseyaa\Foundation\Kernel\Http\HttpKernelServiceResolver;
 use Waaseyaa\Foundation\Log\LogManager;
 use Waaseyaa\Foundation\Log\Processor\RequestContextProcessor;
 use Waaseyaa\Foundation\Middleware\DebugHeaderMiddleware;
 use Waaseyaa\Foundation\Middleware\HttpHandlerInterface;
 use Waaseyaa\Foundation\Middleware\HttpPipeline;
+use Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
 use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\BearerAuthMiddleware;
@@ -115,6 +121,9 @@ final class HttpKernel extends AbstractKernel
 
         $listenerRegistrar = new EventListenerRegistrar($this->dispatcher, $this->logger);
         foreach ($this->providers as $provider) {
+            if (!$provider instanceof HasRenderCacheListenersInterface) {
+                continue;
+            }
             $provider->registerRenderCacheListeners($this->dispatcher, $this->renderCacheBackend);
         }
         $listenerRegistrar->registerDiscoveryCacheListeners($this->discoveryCache);
@@ -124,6 +133,9 @@ final class HttpKernel extends AbstractKernel
         }
 
         foreach ($this->providers as $provider) {
+            if (!$provider instanceof ConfiguresHttpKernelInterface) {
+                continue;
+            }
             $provider->configureHttpKernel($this);
         }
     }
@@ -155,30 +167,24 @@ final class HttpKernel extends AbstractKernel
         $this->codifiedContextSessionStore = $store;
     }
 
+    private ?HttpServiceResolverInterface $httpServiceResolver = null;
+
     /**
-     * @return \Closure(string): ?object
+     * Returns the SSR controller-method dependency resolver.
+     *
+     * Replaces the legacy `\Closure(string): ?object` shape with a typed
+     * interface; semantics unchanged (provider walk + narrow kernel-services
+     * fallback). Mirrors the typed-resolver pattern introduced for
+     * {@see \Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface} in
+     * mission #824 WP02 surface A.
      */
-    public function getHttpServiceResolver(): \Closure
+    public function getHttpServiceResolver(): HttpServiceResolverInterface
     {
-        return function (string $className): ?object {
-            foreach ($this->providers as $provider) {
-                if (isset($provider->getBindings()[$className])) {
-                    try {
-                        return $provider->resolve($className);
-                    } catch (\Throwable $e) {
-                        $this->logger->error(sprintf('Failed to resolve %s: %s', $className, $e->getMessage()));
-
-                        return null;
-                    }
-                }
-            }
-
-            $kernelServices = [
-                \Waaseyaa\Database\DatabaseInterface::class => $this->database,
-            ];
-
-            return $kernelServices[$className] ?? null;
-        };
+        return $this->httpServiceResolver ??= new HttpKernelServiceResolver(
+            providersAccessor: fn(): array => $this->providers,
+            database: $this->database,
+            logger: $this->logger,
+        );
     }
 
     private function resolveErrorPageRenderer(): ?ErrorPageRendererInterface
@@ -312,6 +318,9 @@ final class HttpKernel extends AbstractKernel
         }
 
         foreach ($this->providers as $provider) {
+            if (!$provider instanceof HasMiddlewareInterface) {
+                continue;
+            }
             foreach ($provider->middleware($this->entityTypeManager) as $mw) {
                 $middlewares[] = $mw;
             }
@@ -381,6 +390,9 @@ final class HttpKernel extends AbstractKernel
 
         $providerRouters = [];
         foreach ($this->providers as $provider) {
+            if (!$provider instanceof HasHttpDomainRoutersInterface) {
+                continue;
+            }
             foreach ($provider->httpDomainRouters($this) as $domainRouter) {
                 $providerRouters[] = $domainRouter;
             }
@@ -472,7 +484,7 @@ final class HttpKernel extends AbstractKernel
 
         $detail = $showDetail
             ? $e->getMessage()
-            : $this->clientSafeBootFailureDetail($e);
+            : (new BootFailureMessageFormatter())->format($e);
 
         try {
             $body = json_encode([
@@ -484,31 +496,6 @@ final class HttpKernel extends AbstractKernel
         }
 
         return new HttpResponse($body, 500, ['Content-Type' => 'application/vnd.api+json']);
-    }
-
-    /**
-     * Human-readable boot failure text for non-debug HTTP responses.
-     *
-     * Omits filesystem paths and stack details; those remain in the critical log line above.
-     */
-    private function clientSafeBootFailureDetail(\Throwable $e): string
-    {
-        $msg = $e->getMessage();
-
-        if ($e instanceof \RuntimeException) {
-            if (str_starts_with($msg, 'APP_DEBUG must not be enabled in production')) {
-                return $msg;
-            }
-            if (str_starts_with($msg, 'Database not found at ')) {
-                return 'SQLite database file is missing in production. Verify WAASEYAA_DB points to an existing file on the server, or run bin/waaseyaa db:init.';
-            }
-        }
-
-        if (str_contains($msg, 'PHPUnit\\Framework')) {
-            return 'A PHPUnit-only class was loaded during bootstrap (often a test base class on a production autoload path). Install with composer --no-dev and ensure test helpers are autoload-dev only.';
-        }
-
-        return 'Application failed to boot.';
     }
 
     private function handleCors(): ?HttpResponse

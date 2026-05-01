@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-04-24T21:13:57+00:00",
+    "generated_at": "2026-04-30T17:02:21+00:00",
     "audit": "Layer 1 forensic audit (Core Data)",
     "target_layer": 1,
     "layer_name": "Core Data",
@@ -15,7 +15,7 @@
         "user"
     ],
     "inventory": {
-        "generated_at": "2026-04-24T21:13:55+00:00",
+        "generated_at": "2026-04-30T17:02:18+00:00",
         "layer": 1,
         "packages": {
             "access": {
@@ -57,7 +57,7 @@
                     "waaseyaa/validation": "^0.1.0-alpha.150"
                 },
                 "waaseyaa_require_dev": [],
-                "src_php_count": 54,
+                "src_php_count": 60,
                 "has_tests_unit_dir": true,
                 "has_tests_integration_dir": false
             },
@@ -65,6 +65,7 @@
                 "waaseyaa_require": {
                     "waaseyaa/entity": "^0.1.0-alpha.150",
                     "waaseyaa/field": "^0.1.0-alpha.150",
+                    "waaseyaa/foundation": "^0.1.0-alpha.150",
                     "waaseyaa/cache": "^0.1.0-alpha.150",
                     "waaseyaa/database-legacy": "^0.1.0-alpha.150"
                 },
@@ -124,22 +125,22 @@
             "priority": 4,
             "category": "test_coverage",
             "severity": "low",
-            "message": "Public (non-@internal) L1 symbols with no @covers in this layer's test tree (count). Full list: symbol_test_map_layer1.json",
+            "message": "Public (non-@internal) L1 symbols with no @covers / #[CoversClass] in this layer's test tree (count). Full list: symbol_test_map_layer1.json",
             "detail": {
-                "count": 177,
+                "count": 71,
                 "sample_fqcn": [
-                    "Waaseyaa\\Access\\ConfigEntityAccessPolicy",
                     "Waaseyaa\\Access\\AccountInterface",
-                    "Waaseyaa\\Access\\RedirectValidator",
                     "Waaseyaa\\Access\\PermissionHandlerInterface",
-                    "Waaseyaa\\Access\\AccessPolicyInterface",
-                    "Waaseyaa\\Access\\Gate\\PolicyAttribute",
                     "Waaseyaa\\Access\\Gate\\GateInterface",
-                    "Waaseyaa\\Access\\Gate\\AccessDeniedException",
-                    "Waaseyaa\\Access\\Gate\\Gate",
-                    "Waaseyaa\\Access\\Gate\\EntityAccessGate",
-                    "Waaseyaa\\Access\\Middleware\\AuthorizationMiddleware",
-                    "Waaseyaa\\Access\\FieldAccessPolicyInterface"
+                    "Waaseyaa\\Access\\FieldAccessPolicyInterface",
+                    "Waaseyaa\\Access\\AccessChecker",
+                    "Waaseyaa\\Auth\\Token\\AuthTokenRepository",
+                    "Waaseyaa\\Auth\\AuthServiceProvider",
+                    "Waaseyaa\\Auth\\Config\\MailMissingPolicy",
+                    "Waaseyaa\\Config\\StorageInterface",
+                    "Waaseyaa\\Config\\Schema\\SchemaViolation",
+                    "Waaseyaa\\Config\\ManifestVerificationResult",
+                    "Waaseyaa\\Config\\ConfigImportResult"
                 ]
             }
         }

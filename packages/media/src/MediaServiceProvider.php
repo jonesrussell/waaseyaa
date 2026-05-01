@@ -6,17 +6,14 @@ namespace Waaseyaa\Media;
 
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
+use Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Media\Http\Router\MediaRouter;
 
-final class MediaServiceProvider extends ServiceProvider
+final class MediaServiceProvider extends ServiceProvider implements HasHttpDomainRoutersInterface
 {
-    public function httpDomainRouters(?HttpKernel $httpKernel = null): iterable
+    public function httpDomainRouters(HttpKernel $httpKernel): iterable
     {
-        if ($httpKernel === null) {
-            return [];
-        }
-
         return [
             new MediaRouter($httpKernel->getProjectRoot(), $httpKernel->getConfig()),
         ];

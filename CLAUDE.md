@@ -1,7 +1,7 @@
 # Waaseyaa
 
 ## Project Structure
-- Monorepo: 54 PHP packages in `packages/`, 3 meta-packages (core, cms, full), 1 JS admin SPA
+- Monorepo: 62 PHP packages in `packages/`, 3 meta-packages (core, cms, full), 1 JS admin SPA (`packages/admin/`, no composer.json)
 - 7-layer architecture (Foundation → Core Data → Content Types → Services → API → AI → Interfaces)
 - Each package has its own `composer.json` with path repository references
 - Root `composer.json` uses `@dev` constraints for all waaseyaa/* packages
@@ -39,18 +39,24 @@ When working on files matching these patterns, retrieve the spec for deep contex
 | `packages/note/*` | — | `docs/specs/ingestion-defaults.md` |
 | `packages/relationship/*` | — | `docs/specs/relationship-modeling.md`, `docs/specs/relationship-inference-contract.md` |
 | `packages/genealogy/*` | — | `docs/specs/genealogy.md`, `docs/specs/relationship-modeling.md` |
-| `packages/graphql/*` | — | — |
-| `packages/search/*` | — | — |
+| `packages/graphql/*` | — | `packages/graphql/README.md` |
+| `packages/search/*` | — | `packages/search/README.md` |
 | `packages/seo/*` | — | `docs/specs/seo.md` |
-| `packages/ssr/*` | — | — |
+| `packages/ssr/*` | — | `packages/ssr/README.md` |
 | `packages/error-handler/*` | — | `docs/specs/debugging-dx.md` |
 | `packages/debug/*` | — | `docs/specs/debugging-dx.md` |
 | `packages/telescope/*` (agent-context / codified-context telemetry, Prometheus) | — | `docs/specs/telescope-agent-context-telemetry.md`, `docs/specs/api-layer.md` |
-| `packages/workflows/*` | — | — |
-| `packages/billing/*` | — | — |
-| `packages/github/*` | — | — |
-| `packages/deployer/*` | — | — |
-| `packages/inertia/*` | — | — |
+| `packages/workflows/*` | — | `packages/workflows/README.md` |
+| `packages/billing/*` | — | `packages/billing/README.md` |
+| `packages/github/*` | — | `packages/github/README.md` |
+| `packages/deployer/*` | — | `packages/deployer/README.md` |
+| `packages/inertia/*` | — | `packages/inertia/README.md` |
+| `packages/engagement/*` | — | `packages/engagement/README.md` |
+| `packages/geo/*` | — | `packages/geo/README.md` |
+| `packages/mercure/*` | — | `packages/mercure/README.md` |
+| `packages/messaging/*` | — | `packages/messaging/README.md` |
+| `packages/oauth-provider/*` | — | `packages/oauth-provider/README.md` |
+| `packages/analytics/*` | — | `packages/analytics/README.md` |
 | `packages/mail/*` | `waaseyaa:infrastructure` | `docs/specs/infrastructure.md` |
 | `packages/scheduler/*` | `waaseyaa:infrastructure` | `docs/specs/infrastructure.md` |
 | `packages/notification/*` | `waaseyaa:infrastructure` | `docs/specs/infrastructure.md` |
@@ -74,7 +80,7 @@ When the mapping is not obvious, search under `docs/specs/` (e.g. `rg -n "TopicO
 | 3 | Services | workflows, search, seo, notification, billing, github, northcloud |
 | 4 | API | api, bimaaji, routing |
 | 5 | AI | ai-agent, ai-observability, ai-pipeline, ai-schema, ai-vector |
-| 6 | Interfaces | cli, admin, admin-surface, graphql, mcp, ssr, genealogy, telescope, deployer, inertia, debug |
+| 6 | Interfaces | cli, admin-surface, graphql, mcp, ssr, genealogy, telescope, deployer, inertia, debug |
 
 **Rule:** Packages can only import from their own layer or lower. Upward communication via DomainEvents.
 
