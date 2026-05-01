@@ -35,6 +35,7 @@
 <!-- Spec reviewed 2026-04-21 - FieldDefinitionRegistryInterface::mergeCoreFields for host-app core field overlays without forking package entity types -->
 <!-- Spec reviewed 2026-04-22 - SqlEntityStorage + EntityType field definitions: legacy array defs or FieldDefinitionInterface objects in create(), JSON typing, timestamp auto-populate -->
 <!-- Spec reviewed 2026-04-30 - EntityTypeManager reserved-namespace contract: registerEntityType rejects "core." with [NAMESPACE_RESERVED] DomainException; registerCoreEntityType is the privileged path for kernel + core providers; both share persistDefinition() (mission #824 WP04 surface A, closes #835) -->
+<!-- Spec reviewed 2026-04-30b - RevisionableStorageInterface spec ↔ source parity: every signature corrected to match PHP source (entityId is always the first arg, revisionId is int, getLatestRevisionId returns ?int); getRevisionIds added; lockstep enforced by RevisionableStorageInterfaceContractTest (mission #824 WP04 surface B, closes #837) -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
 
@@ -431,11 +432,20 @@ File: `packages/entity/src/Storage/RevisionableStorageInterface.php`
 Extends `EntityStorageInterface`. Adds:
 
 ```php
-public function loadRevision(int|string $revisionId): ?EntityInterface;
-public function loadMultipleRevisions(array $ids): array;
-public function deleteRevision(int|string $revisionId): void;
-public function getLatestRevisionId(int|string $entityId): int|string|null;
+public function loadRevision(int|string $entityId, int $revisionId): ?EntityInterface;
+
+/** @return array<int, EntityInterface> */
+public function loadMultipleRevisions(int|string $entityId, array $revisionIds): array;
+
+public function deleteRevision(int|string $entityId, int $revisionId): void;
+
+public function getLatestRevisionId(int|string $entityId): ?int;
+
+/** @return int[] Revision IDs in ascending order. */
+public function getRevisionIds(int|string $entityId): array;
 ```
+
+Every revision operation is scoped by `$entityId` first — revision IDs are unique only within a given entity. Revision IDs are typed `int` (auto-increment); the entity ID stays `int|string` to match the parent `EntityStorageInterface`. Spec ↔ source parity is enforced by `packages/entity/tests/Contract/RevisionableStorageInterfaceContractTest.php` (mission #824 WP04 surface B).
 
 ### EntityRepositoryInterface
 
