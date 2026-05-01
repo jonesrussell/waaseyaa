@@ -39,6 +39,18 @@ Use this as the default runbook for upgrades, baseline refreshes, and verificati
 - Drift detection is performed with `perf:compare`.
 - Regression snapshots are tracked under `tests/Baselines/`.
 
+### Local Development Process Model
+
+`composer dev`, `composer dev:php`, and `composer dev:admin` are separate, typed entry points — each runs exactly one long-lived process in the foreground. The legacy single-script `composer dev` couples the PHP server and the admin SPA via a backgrounded shell fork-and-kill one-liner; that pattern is brittle (orphaned PHP processes when the SPA dies, no clean shutdown, shell-expansion variability across `bash`/`zsh`) and has been replaced by the typed split:
+
+| Script | Process | Purpose |
+|--------|---------|---------|
+| `composer dev:php` | `bin/waaseyaa serve` | PHP built-in server with `PHP_CLI_SERVER_WORKERS=4`. Single foreground process, no shell forking. |
+| `composer dev:admin` | `bin/waaseyaa admin:dev` | Nuxt admin SPA dev server. Reads `NUXT_BACKEND_URL` (defaults to `http://127.0.0.1:${APP_PORT:-8080}`). |
+| `composer dev` | delegates to `dev:php` | Convenience alias for the most common case (PHP-only). |
+
+For full-stack local development, run `composer dev:php` in one terminal and `composer dev:admin` in another. Each process owns its own lifecycle; killing one does not orphan the other. CI and Docker compose files invoke the typed entries directly rather than the legacy shell pipeline.
+
 ### Verification Entry Point
 
 `composer verify` is the canonical repo-wide verification command. It chains every gate that protects merge: `cs-check`, `phpstan`, `check-composer-policy`, `check-package-layers`, `check-no-secrets`, `check-ingestion-defaults`, and `test` (the PHPUnit suite). Each gate is also exposed as its own composer script so contributors can run them in isolation during development:

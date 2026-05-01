@@ -430,7 +430,15 @@
         "cs-fix": "php-cs-fixer fix",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "PHP_CLI_SERVER_WORKERS=4 bin/waaseyaa serve & NUXT_BACKEND_URL=http://127.0.0.1:${APP_PORT:-8080} bin/waaseyaa admin:dev && kill $!"
+            "@dev:php"
+        ],
+        "dev:admin": [
+            "Composer\\Config::disableProcessTimeout",
+            "NUXT_BACKEND_URL=http://127.0.0.1:${APP_PORT:-8080} bin/waaseyaa admin:dev"
+        ],
+        "dev:php": [
+            "Composer\\Config::disableProcessTimeout",
+            "PHP_CLI_SERVER_WORKERS=4 bin/waaseyaa serve"
         ],
         "phpstan": "phpstan analyse --memory-limit=512M",
         "test": "phpunit --no-coverage",
@@ -445,6 +453,9 @@
         ]
     },
     "scripts-descriptions": {
+        "dev": "Start the PHP dev server (delegates to dev:php). For the admin SPA, run `composer dev:admin` in a second terminal — see docs/specs/operations-playbooks.md.",
+        "dev:admin": "Start the Nuxt admin SPA dev server. NUXT_BACKEND_URL points at the PHP server (default :8080); set APP_PORT to override.",
+        "dev:php": "Start the PHP built-in dev server via bin/waaseyaa serve. Single typed long-running process with no shell forking.",
         "verify": "Run all repo-wide gates: cs-check, phpstan, composer-policy, package-layers, no-secrets, ingestion-defaults, and the test suite. Canonical CI entry point — see docs/specs/operations-playbooks.md."
     },
     "minimum-stability": "dev",
