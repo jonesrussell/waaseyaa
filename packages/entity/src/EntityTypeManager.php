@@ -161,6 +161,15 @@ class EntityTypeManager implements EntityTypeManagerInterface
             ));
         }
 
+        if (str_contains($bundle, '__')) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Bundle identifier "%s" for entity type "%s" contains the reserved separator "__"; '
+                . 'it cannot be used in bundle-scoped field registration.',
+                $bundle,
+                $entityTypeId,
+            ));
+        }
+
         $this->fieldRegistry->registerBundleFields($entityTypeId, $bundle, $fields);
     }
 

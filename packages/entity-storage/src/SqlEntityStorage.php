@@ -669,7 +669,7 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     private function bundleSubtableName(string $bundle): string
     {
-        return $this->tableName . '__' . $bundle;
+        return SqlSchemaHandler::resolveSubtableName($this->tableName, $bundle, $this->entityType->id());
     }
 
     private function bundleSubtableExists(string $bundle): bool

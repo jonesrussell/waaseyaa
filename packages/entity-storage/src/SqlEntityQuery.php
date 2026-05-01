@@ -136,7 +136,9 @@ final class SqlEntityQuery implements EntityQueryInterface
     {
         if (\array_key_exists($field, $routing)) {
             $bundle = $routing[$field];
-            $targetTable = $bundle === null ? $this->tableName : ($this->tableName . '__' . $bundle);
+            $targetTable = $bundle === null
+                ? $this->tableName
+                : SqlSchemaHandler::resolveSubtableName($this->tableName, $bundle, $this->entityType->id());
             $quotedAlias = $this->database->quoteIdentifier($targetTable);
 
             $cacheKey = $targetTable . "\0" . $field;
@@ -367,7 +369,7 @@ final class SqlEntityQuery implements EntityQueryInterface
         }
 
         foreach ($requiredJoins as $bundle) {
-            $subtable = $this->tableName . '__' . $bundle;
+            $subtable = SqlSchemaHandler::resolveSubtableName($this->tableName, $bundle, $this->entityType->id());
             $baseQuoted = $this->database->quoteIdentifier($this->tableName);
             $subQuoted = $this->database->quoteIdentifier($subtable);
             $select->join(

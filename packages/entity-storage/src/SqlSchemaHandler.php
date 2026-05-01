@@ -122,20 +122,39 @@ final class SqlSchemaHandler
     /**
      * Returns the subtable name for the given bundle: `{base_table}__{bundle}`.
      *
+     * Thin wrapper around {@see self::resolveSubtableName()} that supplies the
+     * handler's own base table and entity type id.
+     *
      * @throws \InvalidArgumentException If $bundle contains '__'.
      */
     public function bundleSubtableName(string $bundle): string
     {
+        return self::resolveSubtableName($this->tableName, $bundle, $this->entityType->id());
+    }
+
+    /**
+     * Canonical formatter for bundle subtable names: `{baseTable}__{bundle}`.
+     *
+     * Single source of truth shared by SqlSchemaHandler, SqlEntityStorage, and
+     * SqlEntityQuery (mission #1257 WP03, K1). Rejects bundle identifiers that
+     * contain the reserved `__` separator. The structural guard at
+     * EntityTypeManager::addBundleFields() prevents bad input upstream; this
+     * helper enforces the same invariant at the formatting boundary.
+     *
+     * @throws \InvalidArgumentException When `$bundle` contains `__`.
+     */
+    public static function resolveSubtableName(string $baseTable, string $bundle, ?string $entityTypeId = null): string
+    {
         if (str_contains($bundle, '__')) {
             throw new \InvalidArgumentException(\sprintf(
                 'Bundle identifier "%s" contains the reserved separator "__"; '
-                . 'it cannot be used in bundle-scoped subtable names for entity type "%s".',
+                . 'it cannot be used in bundle-scoped subtable names%s.',
                 $bundle,
-                $this->entityType->id(),
+                $entityTypeId !== null ? ' for entity type "' . $entityTypeId . '"' : '',
             ));
         }
 
-        return $this->tableName . '__' . $bundle;
+        return $baseTable . '__' . $bundle;
     }
 
     /**
