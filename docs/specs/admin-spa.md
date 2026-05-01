@@ -12,6 +12,7 @@
 <!-- Spec reviewed 2026-04-09 - AdminSurfaceTransportAdapter: constructor takes normalizedAppBase; all CRUD/action URLs via adminSurfaceFetchUrl (parity with plugin bootstrap; #1161) -->
 <!-- Spec reviewed 2026-04-09 ST-9 - JSON:API attribute contract: SPA consumes cast-aware payloads from ResourceSerializer (#1181) -->
 <!-- Spec reviewed 2026-04-30 - Host extension typing: GenericAdminSurfaceHost constructor and AdminSurfaceServiceProvider::routes() accept EntityTypeManagerInterface only; concrete EntityTypeManager bindings forbidden in packages/admin* (mission #824 WP04 surface C, closes #836) -->
+<!-- Spec reviewed 2026-05-01 - Admin-surface session contract: AdminSurfaceAccount.emailVerified?: boolean is now part of packages/admin-surface/contract/types.ts (camelCase, matching the PHP host payload at AdminSurfaceSessionData::toArray() and the SPA runtime read sites in auth.global and VerificationBanner). Spec language no longer uses snake_case email_verified (mission #824 WP07 surface A, closes #839) -->
 
 ## Optionality
 
@@ -579,7 +580,7 @@ This keeps client bootstrap, server bootstrap, and route middleware aligned on t
 
 When `runtimeConfig.public.requireVerifiedEmail` is true, the global auth middleware enforces email verification gating:
 
-- If `currentUser.email_verified` is false and the current path is not in the skip list, `navigateTo('/verify-email')`.
+- If `currentUser.emailVerified` is false and the current path is not in the skip list, `navigateTo('/verify-email')`.
 - Skipped paths: `/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`.
 
 When `requireVerifiedEmail` is false (default), unverified users reach the AdminShell but see `VerificationBanner`.
@@ -588,11 +589,11 @@ When `requireVerifiedEmail` is false (default), unverified users reach the Admin
 
 **File:** `packages/admin/app/components/auth/VerificationBanner.vue`
 
-Rendered inside `AdminShell` when `auth.require_verified_email` is false and the current user's `email_verified` is false. Features:
+Rendered inside `AdminShell` when `auth.requireVerifiedEmail` is false and the current user's `emailVerified` is false. Features:
 
 - Persistent but dismissible. Dismissal stored in `localStorage` keyed by user ID to prevent cross-account leakage on shared machines.
 - Inline "Resend verification" button; reflects `Retry-After` header for cooldown display.
-- Disappears reactively when `useAuth().currentUser.email_verified` becomes true.
+- Disappears reactively when `useAuth().currentUser.emailVerified` becomes true.
 - User-facing banner text, resend state text, and dismiss `aria-label` route through `useLanguage()`.
 
 ### Runtime Config Additions
