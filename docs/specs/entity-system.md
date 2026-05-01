@@ -34,6 +34,7 @@
 <!-- Spec reviewed 2026-04-20 - EntityTypeManager collision guard now preserves registrant provenance, distinguishes duplicate vs shadow registration, and throws EntityTypeRegistrationCollisionException (#1313) -->
 <!-- Spec reviewed 2026-04-21 - FieldDefinitionRegistryInterface::mergeCoreFields for host-app core field overlays without forking package entity types -->
 <!-- Spec reviewed 2026-04-22 - SqlEntityStorage + EntityType field definitions: legacy array defs or FieldDefinitionInterface objects in create(), JSON typing, timestamp auto-populate -->
+<!-- Spec reviewed 2026-04-30 - EntityTypeManager reserved-namespace contract: registerEntityType rejects "core." with [NAMESPACE_RESERVED] DomainException; registerCoreEntityType is the privileged path for kernel + core providers; both share persistDefinition() (mission #824 WP04 surface A, closes #835) -->
 
 Subsystem specification for the Waaseyaa entity, entity-storage, field, and config packages. Covers entity interfaces, storage implementations, query building, field definitions, config entities, and lifecycle events.
 
@@ -369,6 +370,15 @@ interface EntityTypeManagerInterface
 `getRepository()` returns `EntityRepositoryInterface` (the driver-backed repository with hydration, validation hooks, and transactional batch APIs). The kernel registers a repository factory alongside the storage factory so consumers can wrap `EntityTypeManager::getRepository($entityTypeId)` in thin domain repositories without manually assembling `SqlStorageDriver`, `RevisionableStorageDriver`, and `EntityRepository` dependencies.
 
 `registerEntityType()` and `registerCoreEntityType()` accept an optional registrant class so the registry can emit provenance-aware collision errors. When an entity type id is registered twice with the same class, the manager throws `EntityTypeRegistrationCollisionException` with the duplicate-registration message contract. When the same id is registered with a different class, the manager throws the shadow-collision variant naming the canonical and conflicting classes.
+
+**Reserved-namespace contract (mission #824 WP04 surface A).** The `core.` prefix is reserved for built-in platform entity types. The two registration methods enforce this asymmetrically:
+
+| Method | `core.*` id | Caller |
+|--------|-------------|--------|
+| `registerEntityType()` | rejected — throws `\DomainException` with the `[NAMESPACE_RESERVED]` diagnostic prefix and a remediation hint to use a custom namespace prefix | extensions, tenants, third-party providers |
+| `registerCoreEntityType()` | accepted — bypasses the namespace guard | kernel boot code and core service providers only |
+
+Both methods share the same `persistDefinition()` path beyond the namespace check, so collision-provenance and bundle-subtable diagnostics below apply to both. The namespace check is the single behavioural difference between the two methods — there is no other privilege escalation. Calling `registerCoreEntityType()` from extension code is a layer-discipline violation (DIR-006) but is not enforced at runtime; the convention is enforced by code review and by the fact that core registrations live exclusively in `FoundationServiceProvider` and a small named set of layer-0 providers.
 
 **Duplicate registration (K7, mission #1257).** `EntityTypeRegistrationCollisionException::duplicate(...)` names **both** registrants — the existing one (FQCN of class + provenance) and the incoming one — so the operator can reach both call sites from one exception body. Convention only; no contract change.
 
