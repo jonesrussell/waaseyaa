@@ -185,6 +185,74 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
         $columnNames = array_column($columns, 'name');
         self::assertNotContains('status', $columnNames, 'status must not be materialized as a base column under FieldStorage::Data.');
     }
+
+    /**
+     * WP04 #1257 (K2 — read/write symmetry for FieldStorage::Data).
+     *
+     * Reproduces the asymmetric case from #1308: a legacy `status` column
+     * lingers in the schema after the field's storage hint was migrated to
+     * FieldStorage::Data. The write path (`SqlEntityStorage::splitForStorage()`)
+     * already consults the registry hint and routes new writes to `_data`.
+     * The read path (`SqlEntityQuery::resolveField()`) MUST consult the same
+     * registry hint and resolve via `json_extract(_data, ...)`, never the
+     * stale column. Otherwise reads silently return pre-migration column
+     * values while writes go elsewhere.
+     */
+    #[Test]
+    public function legacyColumnForDataStoredFieldDoesNotShadowJsonExtract(): void
+    {
+        // Simulate a legacy column lingering after the field migrated to
+        // FieldStorage::Data. ensureTable() correctly does not materialize
+        // `status` (verified by dataStoredCoreFieldLandsInDataBlobNotColumn);
+        // we ALTER it back in to model the pre-migration legacy state.
+        $this->database->getConnection()->executeStatement(
+            'ALTER TABLE "widget" ADD COLUMN status INTEGER',
+        );
+
+        $matchEntity = new TestRoutingWidget([
+            'name' => 'Match',
+            'type' => 'gizmo',
+            'status' => 1,
+            'gizmo_code' => 'X-1',
+        ]);
+        $other = new TestRoutingWidget([
+            'name' => 'Other',
+            'type' => 'gizmo',
+            'status' => 2,
+            'gizmo_code' => 'Y-2',
+        ]);
+
+        $this->storage->save($matchEntity);
+        $this->storage->save($other);
+
+        // Confirm the write side is already symmetric: both rows have NULL in
+        // the legacy column and their actual status in `_data`.
+        $rows = $this->database->getConnection()->fetchAllAssociative(
+            'SELECT wid, status, _data FROM "widget" ORDER BY wid',
+        );
+        self::assertCount(2, $rows);
+        foreach ($rows as $row) {
+            self::assertNull($row['status'], 'Write path must not populate the legacy column when FieldStorage::Data is set.');
+        }
+
+        // Now poison the legacy column with stale values that, if the read
+        // path consults the column, would either match the wrong row or no
+        // row at all.
+        $this->database->getConnection()->executeStatement(
+            'UPDATE "widget" SET status = 99',
+        );
+
+        $ids = $this->storage->getQuery()
+            ->condition('status', 1)
+            ->execute();
+
+        self::assertSame(
+            [$matchEntity->id()],
+            $ids,
+            'Read path must consult the FieldStorage::Data registry hint and resolve via json_extract on `_data`, '
+            . 'never the lingering legacy column. Reading the column would return either no match (column = 99) or the wrong row.',
+        );
+    }
 }
 
 /**

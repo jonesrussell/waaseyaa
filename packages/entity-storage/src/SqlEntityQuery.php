@@ -45,6 +45,16 @@ final class SqlEntityQuery implements EntityQueryInterface
     /** @var array<string, bool> */
     private array $columnCache = [];
 
+    /**
+     * Memoized set of core field names whose registered storage hint is
+     * FieldStorage::Data. Mirrors SqlEntityStorage::getDataStoredCoreFieldNames()
+     * so the read path consults the same registry hint as the write path
+     * (mission #1257 WP04, K2). Null = not yet computed.
+     *
+     * @var array<string, true>|null
+     */
+    private ?array $dataStoredCoreFieldNames = null;
+
     public function __construct(
         private readonly EntityTypeInterface $entityType,
         private readonly DatabaseInterface $database,
@@ -141,6 +151,17 @@ final class SqlEntityQuery implements EntityQueryInterface
                 : SqlSchemaHandler::resolveSubtableName($this->tableName, $bundle, $this->entityType->id());
             $quotedAlias = $this->database->quoteIdentifier($targetTable);
 
+            // K2 (mission #1257 WP04): registry hint wins over schema column
+            // lookup. A core field with FieldStorage::Data is always read from
+            // `_data` JSON, even when a legacy column lingers in the base
+            // schema. This matches SqlEntityStorage::splitForStorage() on the
+            // write side via getDataStoredCoreFieldNames(); both paths consult
+            // the same FieldDefinition->getStored() hint, so reads cannot
+            // shadow writes.
+            if ($bundle === null && isset($this->getDataStoredCoreFieldNames()[$field])) {
+                return 'json_extract(' . $quotedAlias . '._data, \'$.' . $field . '\')';
+            }
+
             $cacheKey = $targetTable . "\0" . $field;
             if (!isset($this->columnCache[$cacheKey])) {
                 $this->columnCache[$cacheKey] = $this->database->schema()->fieldExists($targetTable, $field);
@@ -161,6 +182,38 @@ final class SqlEntityQuery implements EntityQueryInterface
         }
 
         return "json_extract(_data, '\$." . $field . "')";
+    }
+
+    /**
+     * Returns the set of core field names whose registered storage hint is
+     * FieldStorage::Data. Mirrors SqlEntityStorage::getDataStoredCoreFieldNames()
+     * so the read path consults the same registry hint as the write path
+     * (mission #1257 WP04, K2 — read/write symmetry for FieldStorage::Data).
+     *
+     * Result is memoized for the lifetime of this query instance; the
+     * registry is invariant per request, and resolveField() may be called
+     * once per condition + sort + select column.
+     *
+     * @return array<string, true>
+     */
+    private function getDataStoredCoreFieldNames(): array
+    {
+        if ($this->dataStoredCoreFieldNames !== null) {
+            return $this->dataStoredCoreFieldNames;
+        }
+
+        if ($this->fieldRegistry === null) {
+            return $this->dataStoredCoreFieldNames = [];
+        }
+
+        $names = [];
+        foreach ($this->fieldRegistry->coreFieldsFor($this->entityType->id()) as $name => $definition) {
+            if ($definition->getStored() === FieldStorage::Data) {
+                $names[$name] = true;
+            }
+        }
+
+        return $this->dataStoredCoreFieldNames = $names;
     }
 
     /**
@@ -205,10 +258,10 @@ final class SqlEntityQuery implements EntityQueryInterface
             if ($name === $this->bundleKey || \array_key_exists($name, $coreFields)) {
                 $routing[$name] = null;
                 // A core field marked FieldStorage::Data lives in the base
-                // table's `_data` JSON blob, not in a column. Resolve it via
-                // json_extract on the base alias so query routing matches the
-                // splitForStorage write path. resolveField() already handles
-                // the column-vs-data branching when the column lookup misses.
+                // table's `_data` JSON blob, not in a column. resolveField()
+                // consults getDataStoredCoreFieldNames() before fieldExists()
+                // to honor the registry hint even when a legacy column
+                // lingers (mission #1257 WP04, K2 — read/write symmetry).
                 continue;
             }
 
