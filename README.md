@@ -13,7 +13,7 @@ Waaseyaa replaces Drupal's legacy runtime with a clean, modular architecture org
 - **Entity-first architecture** — Content types, users, config, and taxonomy are all entities with a unified persistence pipeline
 - **JSON:API + GraphQL** — Dual API layer auto-generated from entity type definitions
 - **AI-native** — Entity schemas automatically generate MCP tools, enabling AI agents to create, query, and manage content
-- **Modular monorepo** — 52 independent packages organized in 7 architectural layers
+- **Modular monorepo** — 62 active packages (plus 3 meta-packages: `core`, `cms`, `full`) organized in 7 architectural layers; see [CLAUDE.md](CLAUDE.md#layer-architecture) for the full layer table
 - **Nuxt 3 admin SPA** — Vue 3 + TypeScript admin interface with i18n support
 - **In-memory testable** — Every subsystem has in-memory implementations for fast, isolated testing
 - **Zero Drupal dependency** — Clean-room implementation inspired by Drupal's entity model, built on Symfony components

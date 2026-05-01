@@ -1,5 +1,7 @@
 # Per-site convergence audit (Waaseyaa ecosystem)
 
+<!-- Spec reviewed 2026-05-01 - Canonical architecture topology refresh: README.md and CLAUDE.md reflect current 62 active packages + 3 meta-packages (core, cms, full); layer table in CLAUDE.md is exhaustive across all L0-L6 packages including engagement, geo, mercure, messaging, oauth-provider; all 65 active packages now ship a README per the WP09 surface C skeleton (mission #824 WP09 surface D, closes #848) -->
+
 ## Purpose
 
 Provide a **repeatable, adversarial, invariant-driven** checklist for each Waaseyaa consumer app after ecosystem-level alignment (version provenance, skeleton normalization, GraphQL contract base). Use it so audits are **comparable** across sites and remediation is **categorized and sequenced**.
