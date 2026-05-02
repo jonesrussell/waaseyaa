@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Waaseyaa\Entity\Community\HasCommunityInterface;
 use Waaseyaa\Entity\Exception\EntityTypeRegistrationCollisionException;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
+use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\Log\NullLogger;
 
 /**
  * Registry-based entity type manager.
@@ -44,6 +47,16 @@ class EntityTypeManager implements EntityTypeManagerInterface
     private array $repositoryInstances = [];
 
     /**
+     * Entity-type ids that have already triggered the HasCommunityInterface
+     * deprecation warning. Memoizes one log line per type id.
+     *
+     * @var array<string, true>
+     */
+    private array $tenancyDeprecationFired = [];
+
+    private readonly LoggerInterface $logger;
+
+    /**
      * @param EventDispatcherInterface $eventDispatcher The event dispatcher for entity lifecycle events.
      * @param \Closure|null $storageFactory A factory callable: fn(EntityTypeInterface): EntityStorageInterface.
      *                                     If null, getStorage() will throw when no storage class is configured.
@@ -53,13 +66,19 @@ class EntityTypeManager implements EntityTypeManagerInterface
      *                                                             If null, addBundleFields() and getFieldRegistry() throw.
      *                                                             Core fields are registered into the registry at
      *                                                             registerEntityType() time when this is provided.
+     * @param LoggerInterface|null $logger Receives the once-per-type
+     *                                     `HasCommunityInterface` deprecation warning (mission #1257 §C1).
+     *                                     Defaults to `NullLogger` for callers that don't wire logging.
      */
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly ?\Closure $storageFactory = null,
         private readonly ?\Closure $repositoryFactory = null,
         private readonly ?FieldDefinitionRegistryInterface $fieldRegistry = null,
-    ) {}
+        ?LoggerInterface $logger = null,
+    ) {
+        $this->logger = $logger ?? new NullLogger();
+    }
 
     /**
      * Register an entity type definition.
@@ -126,6 +145,54 @@ class EntityTypeManager implements EntityTypeManagerInterface
         $this->definitionRegistrants[$type->id()] = $registrant;
 
         $this->fieldRegistry?->registerCoreFields($type->id(), $type->getFieldDefinitions());
+
+        $this->maybeWarnLegacyTenancyMarker($type);
+    }
+
+    /**
+     * Mission #1257 §C1: emit a one-time deprecation warning per entity-type id
+     * when the registered class still implements the legacy
+     * {@see HasCommunityInterface} marker but the type's declarative
+     * `tenancy` slot is null. Apps that already declare
+     * `tenancy: ['scope' => 'community']` are silent.
+     *
+     * Memoization is per type id (not per class), matching how the
+     * EntityTypeManager treats type-id collisions elsewhere — duplicate
+     * registrations under the same id are rejected upstream, so a type id
+     * gets registered exactly once and the warning fires exactly once.
+     */
+    private function maybeWarnLegacyTenancyMarker(EntityTypeInterface $type): void
+    {
+        if ($type->getTenancy() !== null) {
+            return;
+        }
+
+        $class = $type->getClass();
+        if (!is_a($class, HasCommunityInterface::class, true)) {
+            return;
+        }
+
+        if (isset($this->tenancyDeprecationFired[$type->id()])) {
+            return;
+        }
+        $this->tenancyDeprecationFired[$type->id()] = true;
+
+        $this->logger->warning(
+            \sprintf(
+                '[deprecated] HasCommunityInterface on entity-type "%s" (class %s) — '
+                . 'declare tenancy: [\'scope\' => \'community\'] on the EntityType registration. '
+                . 'Marker support will be removed in the next minor release. '
+                . 'See mission #1257 §C1 / packages/groups/CHANGELOG.md.',
+                $type->id(),
+                $class,
+            ),
+            [
+                'entity_type' => $type->id(),
+                'entity_class' => $class,
+                'mission' => '1257',
+                'contract' => 'C1',
+            ],
+        );
     }
 
     /**

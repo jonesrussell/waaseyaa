@@ -159,4 +159,65 @@ class EntityTypeTest extends TestCase
         $this->assertTrue($reflection->isReadOnly());
         $this->assertTrue($reflection->isFinal());
     }
+
+    public function testTenancyDefaultsToNull(): void
+    {
+        $type = new EntityType(
+            id: 'test',
+            label: 'Test',
+            class: 'Waaseyaa\\Entity\\Tests\\Unit\\TestEntity',
+        );
+
+        $this->assertNull($type->getTenancy());
+    }
+
+    public function testTenancyCommunityScope(): void
+    {
+        $type = new EntityType(
+            id: 'group',
+            label: 'Group',
+            class: 'Waaseyaa\\Entity\\Tests\\Unit\\TestEntity',
+            tenancy: ['scope' => 'community'],
+        );
+
+        $this->assertSame(['scope' => 'community'], $type->getTenancy());
+    }
+
+    public function testTenancyRejectsUnknownScope(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/scope.*region/i');
+
+        new EntityType(
+            id: 'test',
+            label: 'Test',
+            class: 'Waaseyaa\\Entity\\Tests\\Unit\\TestEntity',
+            tenancy: ['scope' => 'region'],
+        );
+    }
+
+    public function testTenancyRejectsMissingScopeKey(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/scope/i');
+
+        new EntityType(
+            id: 'test',
+            label: 'Test',
+            class: 'Waaseyaa\\Entity\\Tests\\Unit\\TestEntity',
+            tenancy: [],
+        );
+    }
+
+    public function testTenancyRejectsExtraKeys(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        new EntityType(
+            id: 'test',
+            label: 'Test',
+            class: 'Waaseyaa\\Entity\\Tests\\Unit\\TestEntity',
+            tenancy: ['scope' => 'community', 'extra' => 'nope'],
+        );
+    }
 }

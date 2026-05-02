@@ -44,6 +44,7 @@ class StubEntityTypeManager implements EntityTypeManagerInterface
             public function getFieldDefinitions(): array { return []; }
             public function getGroup(): ?string { return null; }
             public function getDescription(): ?string { return null; }
+            public function getTenancy(): ?array { return null; }
         };
     }
 
