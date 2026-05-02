@@ -7,6 +7,51 @@
 
 ---
 
+## Ratified Resolutions (Q1–Q9) — 2026-05-02
+
+**Status: RATIFIED.** The nine §14 open questions in [`docs/specs/schema-evolution-v2.md`](../../docs/specs/schema-evolution-v2.md) are **locked** as of 2026-05-02. Each resolution is the binding architectural decision for Phase 2+ implementation. Further changes require an ADR and an explicit overturn note in the subsystem spec; resolutions may not be relitigated implicitly during WP execution.
+
+| ID | Topic | Ratified resolution |
+|----|-------|---------------------|
+| **Q1** | `migration_id` vs current `migration` column | **B** — `migration` remains the sole canonical ledger key; `checksum` and `diff_hash` (nullable) extend the row. |
+| **Q2** | Checksum algorithm and canonical serialization | **A** — SHA-256 over canonical JSON (sorted keys, UTF-8) for both `checksum` and `diff_hash`. |
+| **Q3** | `MigrationPlan` vs `CompositeDiff` (empty plan) | **B** — single composite root; empty plan = `CompositeDiff([])`. |
+| **Q4** | Merge algorithm (legacy + v2 in one graph) | **B** — single DAG; topological sort; tie-break `(package ASC, migration ASC)`. |
+| **Q5** | SQLite `AlterColumn` support (v1 compiler) | **B** — reject `AlterColumn` at compile time on SQLite in v1 with a stable diagnostic code. |
+| **Q6** | Foreign keys on SQLite (v1 compiler) | **B** — reject `AddForeignKey` / `DropForeignKey` on SQLite in v1 (`FOREIGN_KEY_UNSUPPORTED_SQLITE_V1`). |
+| **Q7** | Where `EntityLevelDiff` is produced | **B** — atomic value types in `waaseyaa/foundation`; entity-scoped factories in `waaseyaa/entity-storage`. |
+| **Q8** | CLI surface (`--dry-run` / `--verify`) | **B** — extend `bin/waaseyaa migrate` with `--dry-run` and `--verify`; no new command family without ADR. |
+| **Q9** | Deprecation calendar for string `migrations` paths | **Hybrid (B)** — no hard removal; array form preferred from Phase 6; string path remains supported indefinitely. |
+
+Full rationale and option tables: [`docs/specs/schema-evolution-v2.md` §15](../../docs/specs/schema-evolution-v2.md#15-ratified-resolutions-q1q9).
+
+---
+
+## Functional Requirements (validator aliases)
+
+The mission's design surfaces (§A–§F) and ratified decisions (§15 Q1–Q9) are aliased
+below to the FR/NFR/C scheme spec-kitty's validator recognizes. Authoring intent stays
+in the existing sections; this block exists only so requirement_refs in WP frontmatter
+resolve.
+
+- FR-001 — see §A SchemaDiff data model
+- FR-002 — see §B MigrationInterface v2 authoring contract
+- FR-003 — see §C Composer manifest evolution
+- FR-004 — see §D Migration ledger extensions
+- FR-005 — see §E Execution model
+- NFR-001 — see §F Test strategy
+- C-001 — see §15 Ratified Resolutions Q1
+- C-002 — see §15 Ratified Resolutions Q2
+- C-003 — see §15 Ratified Resolutions Q3
+- C-004 — see §15 Ratified Resolutions Q4
+- C-005 — see §15 Ratified Resolutions Q5
+- C-006 — see §15 Ratified Resolutions Q6
+- C-007 — see §15 Ratified Resolutions Q7
+- C-008 — see §15 Ratified Resolutions Q8
+- C-009 — see §15 Ratified Resolutions Q9
+
+---
+
 ## Purpose
 
 Move Waaseyaa from a **migration runner** (imperative `Migration::up(SchemaBuilder)`, directory-loaded PHP files) toward a **structural evolution engine**: field-definition and storage intent produce **auditable, deterministic diffs**, with **safety gates**, **verify/replay**, and a path to **declarative Composer manifests** — without collapsing into Laravel/Symfony/Drupal “timestamp folders + hope” ergonomics.

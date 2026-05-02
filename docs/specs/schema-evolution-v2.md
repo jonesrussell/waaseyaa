@@ -307,13 +307,13 @@ From GitHub epic: child issues **#522** (this document + refinements), **#521** 
 8. **CLI UX:** Single `migrate --dry-run` for both legacy and v2 or separate subcommand — product preference.
 9. **Deprecation calendar** for directory-only `migrations` string paths — communicate in CHANGELOG and [workflow.md](./workflow.md).
 
-**Proposed resolutions** for each item are recorded in **§15** for human review; §14 remains the question list.
+**Resolutions for each item are ratified in §15 (locked 2026-05-02).** §14 remains the question list for traceability; binding decisions are §15.
 
 ---
 
-## 15. Proposed resolutions to open questions
+## 15. Ratified Resolutions (Q1–Q9)
 
-This section records **architecture-safe, review-ready** choices aligned with the mission (`kitty-specs/529-schema-evolution-v2/`), Phase 1 scope, PHP 8.4 idioms, deterministic behavior, and clean coexistence with the legacy engine. Each item states **options considered** and a **single proposed resolution** (the default path for Phase 2 unless explicitly overturned in review).
+**Status: RATIFIED — 2026-05-02.** This section locks the architectural decisions for Q1–Q9. Each entry below is a **finalized resolution** binding on Phase 2+ implementation. Changes to any ratified resolution require a new ADR and an explicit overturn note in this document; they may not be relitigated implicitly during WP execution.
 
 ### Q1 — `migration_id` vs current `migration` column
 
@@ -322,7 +322,7 @@ This section records **architecture-safe, review-ready** choices aligned with th
 | **A** | Add a parallel `migration_id` column; keep `migration` as display-only. |
 | **B** | Retain **`migration` as the sole canonical ledger key** (same uniqueness semantics as today); v2 entries use the same stable string pattern (`{package}:{logical_slug}`). |
 
-**Proposed resolution:** **B.** Avoid a second identifier column and a wide data migration on every install. v2 registrations MUST supply a **stable, unique** `migration` string (document format in ADR — e.g. `{package}:v2:{kebab_or_uuid}`). New columns **`checksum`** and **`diff_hash`** (nullable) extend the row; **`ran_at`** semantics unchanged (§6 may still call it `applied_at` in prose only).
+**Ratified resolution (2026-05-02):** **B.** Avoid a second identifier column and a wide data migration on every install. v2 registrations MUST supply a **stable, unique** `migration` string (document format in ADR — e.g. `{package}:v2:{kebab_or_uuid}`). New columns **`checksum`** and **`diff_hash`** (nullable) extend the row; **`ran_at`** semantics unchanged (§6 may still call it `applied_at` in prose only).
 
 ### Q2 — Checksum algorithm and canonical serialization
 
@@ -331,7 +331,7 @@ This section records **architecture-safe, review-ready** choices aligned with th
 | **A** | SHA-256 over UTF-8 bytes of canonical JSON. |
 | **B** | BLAKE3 or truncated hash for shorter rows. |
 
-**Proposed resolution:** **A for both `checksum` and `diff_hash`.** SHA-256 is ubiquitous in PHP (`hash('sha256', …)`), tooling, and CI. **Canonical JSON rules** (ADR): UTF-8; object keys **sorted lexicographically**; arrays preserve order; integers vs floats disallowed in ambiguous forms; `null` only where schema allows. `checksum` hashes the **canonical SchemaDiff / plan intent**; `diff_hash` hashes the **canonical serialized compiled plan** (DTO list) once Phase 3 exists.
+**Ratified resolution (2026-05-02):** **A for both `checksum` and `diff_hash`.** SHA-256 is ubiquitous in PHP (`hash('sha256', …)`), tooling, and CI. **Canonical JSON rules** (ADR): UTF-8; object keys **sorted lexicographically**; arrays preserve order; integers vs floats disallowed in ambiguous forms; `null` only where schema allows. `checksum` hashes the **canonical SchemaDiff / plan intent**; `diff_hash` hashes the **canonical serialized compiled plan** (DTO list) once Phase 3 exists.
 
 ### Q3 — `MigrationPlan` vs `CompositeDiff` (empty plan)
 
@@ -340,7 +340,7 @@ This section records **architecture-safe, review-ready** choices aligned with th
 | **A** | Tagged union: `Plan \| Empty`. |
 | **B** | **Single composite root:** `CompositeDiff` with **zero operations** is the canonical empty plan. |
 
-**Proposed resolution:** **B.** Avoid parallel “empty” types. **`MigrationPlan`** (readonly DTO) wraps **metadata** (`migration` ledger key, `package`, `dependencies`) plus a **root `CompositeDiff`** (possibly empty). No `up`/`down`; “no work” is `CompositeDiff([])` with deterministic JSON `{"ops":[]}`.
+**Ratified resolution (2026-05-02):** **B.** Avoid parallel “empty” types. **`MigrationPlan`** (readonly DTO) wraps **metadata** (`migration` ledger key, `package`, `dependencies`) plus a **root `CompositeDiff`** (possibly empty). No `up`/`down`; “no work” is `CompositeDiff([])` with deterministic JSON `{"ops":[]}`.
 
 ### Q4 — Merge algorithm (legacy `Migration` + v2 in one graph)
 
@@ -349,7 +349,7 @@ This section records **architecture-safe, review-ready** choices aligned with th
 | **A** | Always run all legacy migrations in a batch before any v2 plan. |
 | **B** | **Single directed acyclic graph:** nodes = all pending units (legacy + v2); edges = `$after` / `dependencies`; topological sort; **tie-break** `(package ASC, migration ASC)`. |
 
-**Proposed resolution:** **B.** Deterministic, declarative, and avoids hidden “legacy first” coupling. If a product needs ordering across kinds, authors declare **`$after` / `dependencies`** explicitly. Document that **cross-kind edges are allowed** when safe (e.g. v2 after a legacy table-creating migration).
+**Ratified resolution (2026-05-02):** **B.** Deterministic, declarative, and avoids hidden “legacy first” coupling. If a product needs ordering across kinds, authors declare **`$after` / `dependencies`** explicitly. Document that **cross-kind edges are allowed** when safe (e.g. v2 after a legacy table-creating migration).
 
 ### Q5 — SQLite `AlterColumn` support (v1 compiler)
 
@@ -358,7 +358,7 @@ This section records **architecture-safe, review-ready** choices aligned with th
 | **A** | Attempt full SQLite table rebuild for arbitrary alters. |
 | **B** | **v1: reject `AlterColumn` at compile time** for SQLite with a stable diagnostic code; additive-only path until rebuild strategy exists. |
 
-**Proposed resolution:** **B.** Keeps the compiler honest and predictable; aligns with “unsafe changes blocked or surfaced explicitly.” Broader `AlterColumn` support becomes a **later ADR** with table-rebuild semantics and tests.
+**Ratified resolution (2026-05-02):** **B.** Keeps the compiler honest and predictable; aligns with “unsafe changes blocked or surfaced explicitly.” Broader `AlterColumn` support becomes a **later ADR** with table-rebuild semantics and tests.
 
 ### Q6 — Foreign keys on SQLite (v1 compiler)
 
@@ -367,7 +367,7 @@ This section records **architecture-safe, review-ready** choices aligned with th
 | **A** | Emit `REFERENCES` clauses where SQLite accepts them; document limitations. |
 | **B** | **v1: reject `AddForeignKey` and `DropForeignKey`** at compile time for SQLite with `FOREIGN_KEY_UNSUPPORTED_SQLITE_V1`. |
 
-**Proposed resolution:** **B.** SQLite FK behavior and `ALTER TABLE` interactions are easy to get wrong; v1 focuses on **structural columns and indexes** Waaseyaa already models well. MySQL/PostgreSQL compilers (future) implement FK ops with a separate capability matrix ADR.
+**Ratified resolution (2026-05-02):** **B.** SQLite FK behavior and `ALTER TABLE` interactions are easy to get wrong; v1 focuses on **structural columns and indexes** Waaseyaa already models well. MySQL/PostgreSQL compilers (future) implement FK ops with a separate capability matrix ADR.
 
 ### Q7 — Where `EntityLevelDiff` is produced (package / layer)
 
@@ -376,7 +376,7 @@ This section records **architecture-safe, review-ready** choices aligned with th
 | **A** | New small package for diff types only. |
 | **B** | **Atomic `SchemaDiff` / `CompositeDiff` value types in `waaseyaa/foundation`** (no imports from entity layers); **factory/builder that constructs entity-scoped composites in `waaseyaa/entity-storage`** using `EntityTypeInterface` + `FieldDefinitionRegistryInterface`. |
 
-**Proposed resolution:** **B.** Respects the layer graph: foundation stays free of L1+ domain imports; entity-storage already owns `SqlSchemaHandler` / table naming and can emit **pure DTO graphs** upward. **`EntityLevelDiff`** in the spec remains a **semantic wrapper** (metadata + child `CompositeDiff`), implemented as a readonly type **living next to factories** in entity-storage or as a named pattern in docs without forcing a cycle.
+**Ratified resolution (2026-05-02):** **B.** Respects the layer graph: foundation stays free of L1+ domain imports; entity-storage already owns `SqlSchemaHandler` / table naming and can emit **pure DTO graphs** upward. **`EntityLevelDiff`** in the spec remains a **semantic wrapper** (metadata + child `CompositeDiff`), implemented as a readonly type **living next to factories** in entity-storage or as a named pattern in docs without forcing a cycle.
 
 ### Q8 — CLI surface (`--dry-run` / `--verify`)
 
@@ -385,7 +385,7 @@ This section records **architecture-safe, review-ready** choices aligned with th
 | **A** | New top-level commands only (`migrate:plan`, `schema:verify`). |
 | **B** | **Extend existing `migrate`** with `--dry-run`; add **`--verify`** on `migrate` (or document pairing with `schema:check` if verify belongs there — pick one surface). |
 
-**Proposed resolution:** **B with a single verify entry point:** **`bin/waaseyaa migrate --dry-run`** compiles and prints pending legacy + v2 work without writes; **`bin/waaseyaa migrate --verify`** runs the verify pass described in §7.3 (no apply). If `schema:check` already covers overlap, **implementation** must consolidate so operators see one story (ADR); design intent is **no new command family** without ADR.
+**Ratified resolution (2026-05-02):** **B with a single verify entry point:** **`bin/waaseyaa migrate --dry-run`** compiles and prints pending legacy + v2 work without writes; **`bin/waaseyaa migrate --verify`** runs the verify pass described in §7.3 (no apply). If `schema:check` already covers overlap, **implementation** must consolidate so operators see one story (ADR); design intent is **no new command family** without ADR.
 
 ### Q9 — Deprecation calendar for string `migrations` paths
 
@@ -394,7 +394,7 @@ This section records **architecture-safe, review-ready** choices aligned with th
 | **A** | Set a hard removal release for directory-based discovery. |
 | **B** | **Keep string path indefinitely** as an escape hatch; **prefer ordered array** for new packages; deprecate only **“ordering by filename alone”** as undocumented behavior. |
 
-**Proposed resolution:** **Hybrid (B + soft Phase 6 signal):** **No hard removal date** in this spec — [#1286](https://github.com/waaseyaa/framework/issues/1286) installs depend on string paths. Phase 6 adds **array** form as the **preferred** declarative manifest. **CHANGELOG + [workflow.md](./workflow.md)** announce: new work SHOULD use arrays when order matters; string path remains **supported**. A **hard removal** (if ever) requires a **future major** + ADR and is **out of scope** for Phase 1–2.
+**Ratified resolution (2026-05-02):** **Hybrid (B + soft Phase 6 signal):** **No hard removal date** in this spec — [#1286](https://github.com/waaseyaa/framework/issues/1286) installs depend on string paths. Phase 6 adds **array** form as the **preferred** declarative manifest. **CHANGELOG + [workflow.md](./workflow.md)** announce: new work SHOULD use arrays when order matters; string path remains **supported**. A **hard removal** (if ever) requires a **future major** + ADR and is **out of scope** for Phase 1–2.
 
 ---
 
@@ -404,3 +404,4 @@ This section records **architecture-safe, review-ready** choices aligned with th
 |------|--------|
 | 2026-04-26 | Initial design draft (Spec Kitty mission 529-schema-evolution-v2, Phase 1 / WP01). |
 | 2026-04-26 | §15: proposed resolutions for §14 open questions (review checkpoint). |
+| 2026-05-02 | §15: resolutions ratified (Q1–Q9 all accepted as proposed). Binding for Phase 2+ implementation; further changes require ADR. |
