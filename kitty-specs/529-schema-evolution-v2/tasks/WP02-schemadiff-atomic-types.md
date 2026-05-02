@@ -154,3 +154,7 @@ Read before starting:
 - **Canonical JSON edge cases:** Integer-vs-float serialization is a known footgun. Lock specific rules in `CanonicalJson` and document them with examples in the class docblock.
 - **`final readonly` on PHP 8.4:** Use constructor-promoted readonly properties. Don't accept overridable constructors — the immutability contract is load-bearing for `checksum()` correctness.
 - **`equals()` via checksum:** Tempting to write a property-walker; don't. `equals()` going through `checksum()` keeps a single source of truth for identity.
+
+## Activity Log
+
+- 2026-05-02T23:33:15Z – unknown – Moved to in_progress
