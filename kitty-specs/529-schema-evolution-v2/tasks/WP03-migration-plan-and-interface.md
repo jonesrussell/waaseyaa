@@ -139,3 +139,7 @@ Read before starting:
 - **`migration_id` format** is locked at this WP. If someone proposes a different shape later, it requires an ADR — not a quiet edit.
 - **Metadata vs identity:** `checksum()` covers structural intent only. `migration_id` is the ledger key. Conflating them silently will break Q4's tie-break (`(package ASC, migration ASC)`) when two distinct migrations happen to have identical diffs.
 - **Empty plans are real:** A migration that conditionally produces no ops (e.g. "ensure column exists" against a DB that already has it) returns `CompositeDiff::empty()`. The Migrator should treat this as a valid no-op apply and write the ledger row.
+
+## Activity Log
+
+- 2026-05-02T23:37:00Z – unknown – Moved to in_progress
