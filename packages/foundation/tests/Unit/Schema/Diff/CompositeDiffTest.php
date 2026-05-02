@@ -145,6 +145,14 @@ final class CompositeDiffTest extends TestCase
     }
 
     #[Test]
+    public function isEmptyDistinguishesEmptyFromNonEmpty(): void
+    {
+        self::assertTrue(CompositeDiff::empty()->isEmpty());
+        self::assertTrue((new CompositeDiff([]))->isEmpty());
+        self::assertFalse((new CompositeDiff([new DropColumn('users', 'x')]))->isEmpty());
+    }
+
+    #[Test]
     public function classAndPropertiesAreReadonly(): void
     {
         $reflection = new \ReflectionClass(CompositeDiff::class);

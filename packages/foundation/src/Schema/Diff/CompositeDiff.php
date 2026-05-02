@@ -44,6 +44,20 @@ final readonly class CompositeDiff
     }
 
     /**
+     * Whether this composite carries zero ops.
+     *
+     * Per §15 Q3, the empty plan is `CompositeDiff([])` — there is no
+     * separate `Empty` type. Callers (e.g. {@see \Waaseyaa\Foundation\Schema\Migration\MigrationPlan})
+     * use this predicate to distinguish a no-op apply from a structural
+     * change. The Migrator (WP06) treats an empty plan as a valid apply
+     * that still writes a ledger row.
+     */
+    public function isEmpty(): bool
+    {
+        return $this->ops === [];
+    }
+
+    /**
      * Canonical-JSON-ready representation.
      *
      * Shape: `['ops' => [op1.toCanonical(), op2.toCanonical(), ...]]`.
