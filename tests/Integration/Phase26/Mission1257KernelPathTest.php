@@ -11,18 +11,24 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
+use Waaseyaa\Entity\Community\HasCommunityInterface;
+use Waaseyaa\Entity\Community\HasCommunityTrait;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Exception\EntityTypeRegistrationCollisionException;
+use Waaseyaa\EntityStorage\Driver\SqlStorageDriver;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\EntityStorage\Tenancy\CommunityScope;
 use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldDefinitionRegistry;
 use Waaseyaa\Field\FieldStorage;
+use Waaseyaa\Foundation\Community\CommunityContext;
 use Waaseyaa\Foundation\Diagnostic\BootDiagnosticReport;
 use Waaseyaa\Foundation\Diagnostic\DiagnosticCode;
 use Waaseyaa\Foundation\Diagnostic\HealthChecker;
+use Waaseyaa\Foundation\Kernel\AbstractKernel;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\LogLevel;
 
@@ -51,15 +57,22 @@ use Waaseyaa\Foundation\Log\LogLevel;
  *     and `ORPHAN_BUNDLE_SUBTABLE` diagnostic codes from `checkSchemaDrift()`.
  *   - K7 (WP07-B): `EntityTypeRegistrationCollisionException::duplicate()`
  *     names both registrants and both classes in its message body.
- *
- * Tenancy via `EntityType` (C1, WP10) is intentionally out of scope here —
- * WP10 is unscheduled and ratifies the contract. A follow-on extension to
- * this file picks up the tenancy assertion once WP10 lands.
+ *   - C1 (WP10): `EntityType` carries a declarative `tenancy` slot;
+ *     `EntityTypeManager` emits a one-time `HasCommunityInterface`
+ *     deprecation warning when the slot is null but the class still
+ *     implements the legacy marker; `AbstractKernel`'s repository
+ *     factory consults `getTenancy()` and wires `CommunityScope` into
+ *     `SqlStorageDriver` when a `CommunityContextInterface` is bound,
+ *     while logging a once-per-type warning when tenancy is declared
+ *     but no context is bound.
  *
  * Components are wired in the same order `AbstractKernel` wires them. No
  * filesystem fixture or kernel boot is required — the integration is the
  * sequence (registry → schema → storage → query → health-check), not the
- * provider-discovery shell.
+ * provider-discovery shell. The C1 wiring assertions reach into
+ * `AbstractKernel` via a minimal test subclass that exposes only the
+ * `bootEntityTypeManager()` step, so the production wiring stays the
+ * subject under test.
  */
 #[CoversNothing]
 final class Mission1257KernelPathTest extends TestCase
@@ -442,8 +455,283 @@ final class Mission1257KernelPathTest extends TestCase
     }
 
     // ------------------------------------------------------------------
+    // C1 (WP10) — declarative tenancy via EntityType
+    // ------------------------------------------------------------------
+
+    #[Test]
+    public function c1_entityTypeCarriesTenancySlotEndToEnd(): void
+    {
+        $tenantType = new EntityType(
+            id: 'mission1257_tenant_widget',
+            label: 'Mission #1257 Tenant Widget',
+            class: Mission1257TenantWidget::class,
+            keys: ['id' => 'wid', 'uuid' => 'uuid', 'label' => 'name', 'langcode' => 'langcode'],
+            tenancy: ['scope' => 'community'],
+        );
+
+        self::assertSame(['scope' => 'community'], $tenantType->getTenancy());
+        self::assertNull(
+            $this->entityType->getTenancy(),
+            'Untenant types must report null tenancy — the slot is opt-in.',
+        );
+    }
+
+    #[Test]
+    public function c1_entityTypeManagerWarnsOnceWhenLegacyMarkerStillCarriedAndTenancyNull(): void
+    {
+        $tenantType = new EntityType(
+            id: 'mission1257_legacy_tenant',
+            label: 'Legacy tenant',
+            class: Mission1257LegacyMarkerEntity::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid'],
+        );
+
+        $this->entityTypeManager->registerEntityType($tenantType, registrant: self::class);
+
+        // EntityTypeManager logs through the logger passed to its constructor.
+        // The WP11 setUp() does not pass a logger, so we re-register with a
+        // logger-aware manager to lock the deprecation contract directly.
+        $loggerAware = new EntityTypeManager(
+            new EventDispatcher(),
+            null,
+            null,
+            null,
+            $this->logger,
+        );
+        $loggerAware->registerEntityType(new EntityType(
+            id: 'mission1257_legacy_tenant_again',
+            label: 'Legacy tenant (logger-aware)',
+            class: Mission1257LegacyMarkerEntity::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid'],
+        ));
+
+        $matches = $this->logger->messagesContaining('HasCommunityInterface');
+        self::assertCount(
+            1,
+            $matches,
+            'Mission #1257 §C1: registering a legacy-marker entity type without a tenancy slot must emit '
+            . 'exactly one [deprecated] HasCommunityInterface warning per type id.',
+        );
+        self::assertStringContainsString('mission1257_legacy_tenant_again', $matches[0]);
+        self::assertStringContainsString("tenancy: ['scope' => 'community']", $matches[0]);
+    }
+
+    #[Test]
+    public function c1_entityTypeManagerStaysSilentWhenTenancySlotDeclared(): void
+    {
+        $loggerAware = new EntityTypeManager(
+            new EventDispatcher(),
+            null,
+            null,
+            null,
+            $this->logger,
+        );
+
+        $loggerAware->registerEntityType(new EntityType(
+            id: 'mission1257_migrated_tenant',
+            label: 'Migrated tenant',
+            class: Mission1257LegacyMarkerEntity::class,
+            keys: ['id' => 'id', 'uuid' => 'uuid'],
+            tenancy: ['scope' => 'community'],
+        ));
+
+        self::assertSame(
+            [],
+            $this->logger->messagesContaining('HasCommunityInterface'),
+            'A migrated tenancy slot must silence the legacy-marker deprecation warning, '
+            . 'even when the class still carries the marker for the deprecation cycle.',
+        );
+    }
+
+    #[Test]
+    public function c1_kernelInjectsCommunityScopeWhenTenancyDeclaredAndContextBound(): void
+    {
+        $kernel = $this->newTenancyTestKernel();
+        $kernel->publicBootDatabase();
+
+        $context = new CommunityContext();
+        $context->set('community-alpha');
+        $kernel->setCommunityContext($context);
+
+        $kernel->publicBootEntityTypeManager();
+
+        $tenantType = new EntityType(
+            id: 'mission1257_kernel_tenant',
+            label: 'Kernel-wired tenant',
+            class: Mission1257TenantWidget::class,
+            keys: ['id' => 'wid', 'uuid' => 'uuid', 'label' => 'name', 'langcode' => 'langcode'],
+            tenancy: ['scope' => 'community'],
+        );
+        $kernel->publicEntityTypeManager()->registerEntityType($tenantType, registrant: self::class);
+
+        $repository = $kernel->publicEntityTypeManager()->getRepository('mission1257_kernel_tenant');
+
+        $driver = self::extractDriver($repository);
+        $scope = self::extractCommunityScope($driver);
+
+        self::assertInstanceOf(
+            CommunityScope::class,
+            $scope,
+            'Mission #1257 §C1: the kernel must inject CommunityScope into SqlStorageDriver '
+            . 'when EntityType declares tenancy [scope=>community] and a CommunityContextInterface is bound.',
+        );
+        self::assertTrue($scope->isActive());
+        self::assertSame('community-alpha', $scope->getCommunityId());
+    }
+
+    #[Test]
+    public function c1_kernelLogsOnceWhenTenancyDeclaredButContextMissingInDevelopment(): void
+    {
+        // In development environments the kernel must NOT crash on missing
+        // context — tests, CLI, and bare bootstrap routinely run without a
+        // bound CommunityContextInterface.
+        $kernel = $this->newTenancyTestKernel(environment: 'local');
+        $kernel->publicBootDatabase();
+        $kernel->publicBootEntityTypeManager();
+
+        $tenantType = new EntityType(
+            id: 'mission1257_unbound_tenant',
+            label: 'Unbound tenant',
+            class: Mission1257TenantWidget::class,
+            keys: ['id' => 'wid', 'uuid' => 'uuid', 'label' => 'name', 'langcode' => 'langcode'],
+            tenancy: ['scope' => 'community'],
+        );
+        $kernel->publicEntityTypeManager()->registerEntityType($tenantType, registrant: self::class);
+
+        // Trigger the factory twice to prove memoization (one warning, not two).
+        $repositoryA = $kernel->publicEntityTypeManager()->getRepository('mission1257_unbound_tenant');
+        $repositoryB = $kernel->publicEntityTypeManager()->getRepository('mission1257_unbound_tenant');
+
+        self::assertSame($repositoryA, $repositoryB);
+
+        $driver = self::extractDriver($repositoryA);
+        self::assertNull(
+            self::extractCommunityScope($driver),
+            'In development, missing CommunityContextInterface must fall back to a null scope '
+            . 'rather than crashing the boot path.',
+        );
+
+        $matches = $this->logger->messagesContaining('mission1257_unbound_tenant');
+        self::assertCount(
+            1,
+            $matches,
+            'Mission #1257 §C1: missing CommunityContextInterface in development must produce '
+            . 'exactly one kernel-side warning per entity-type id.',
+        );
+        self::assertStringContainsString('CommunityContextInterface', $matches[0]);
+        self::assertStringContainsString('setCommunityContext', $matches[0]);
+    }
+
+    #[Test]
+    public function c1_kernelThrowsInProductionWhenTenancyDeclaredButContextMissing(): void
+    {
+        // Mission #1257 §C1 / WP10 review feedback: in production, declaring
+        // tenancy without binding a CommunityContextInterface is a data-leak
+        // posture (every read goes through with no community filter), not a
+        // tolerable misconfiguration. Refuse to construct the repository —
+        // fail loud, not silent.
+        $kernel = $this->newTenancyTestKernel(environment: 'production');
+        $kernel->publicBootDatabase();
+        $kernel->publicBootEntityTypeManager();
+
+        $tenantType = new EntityType(
+            id: 'mission1257_prod_unbound_tenant',
+            label: 'Production tenant without context',
+            class: Mission1257TenantWidget::class,
+            keys: ['id' => 'wid', 'uuid' => 'uuid', 'label' => 'name', 'langcode' => 'langcode'],
+            tenancy: ['scope' => 'community'],
+        );
+        $kernel->publicEntityTypeManager()->registerEntityType($tenantType, registrant: self::class);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/TENANCY_MISCONFIGURED/');
+
+        $kernel->publicEntityTypeManager()->getRepository('mission1257_prod_unbound_tenant');
+    }
+
+    /**
+     * Reach into an EntityRepository to inspect the storage driver it wraps.
+     *
+     * The C1 wiring contract (mission #1257 §C1 / WP10) is internal: the
+     * kernel's repository factory builds an `EntityRepository` whose driver
+     * is a `SqlStorageDriver` carrying — or lacking — a `CommunityScope`.
+     * No public accessor exists, by design (the driver is an implementation
+     * detail). Reflection here is the cost of locking the wiring decision
+     * at the kernel boundary without leaking accessors into production.
+     */
+    private static function extractDriver(object $repository): SqlStorageDriver
+    {
+        $property = new \ReflectionProperty($repository, 'driver');
+        $driver = $property->getValue($repository);
+        self::assertInstanceOf(SqlStorageDriver::class, $driver);
+        return $driver;
+    }
+
+    private static function extractCommunityScope(SqlStorageDriver $driver): ?CommunityScope
+    {
+        $property = new \ReflectionProperty($driver, 'communityScope');
+        $value = $property->getValue($driver);
+
+        if ($value === null) {
+            return null;
+        }
+
+        self::assertInstanceOf(CommunityScope::class, $value);
+        return $value;
+    }
+
+    // ------------------------------------------------------------------
     // Helpers
     // ------------------------------------------------------------------
+
+    /**
+     * Build an anonymous {@see AbstractKernel} subclass that exposes only
+     * the boot steps WP10 wires (database + entity-type manager). Returning
+     * an anonymous class satisfies the architectural rule
+     * `NoKernelSubclassesInTestsTest` while still letting the C1 tests
+     * exercise the production wiring decision in `bootEntityTypeManager()`.
+     *
+     * The kernel-bootstrap exemption documented in the project CLAUDE.md
+     * (kernels intentionally import from all layers) applies here: this
+     * fixture mirrors the same wiring surface as `ConsoleKernel` /
+     * `HttpKernel`, just without the boot orchestration.
+     */
+    private function newTenancyTestKernel(string $environment = 'local'): object
+    {
+        return new class ($this->projectRoot, $this->logger, $environment) extends AbstractKernel {
+            public function __construct(string $projectRoot, LoggerInterface $logger, string $environment)
+            {
+                parent::__construct($projectRoot, $logger);
+                // DatabaseBootstrapper reads `config.database` as a path string.
+                // `environment` drives AbstractKernel::isDevelopmentMode(),
+                // which gates the production-strict tenancy guard.
+                $this->config = [
+                    'database' => ':memory:',
+                    'environment' => $environment,
+                ];
+                // boot() seeds the EventDispatcher before bootDatabase() and
+                // bootEntityTypeManager() consume it. Reproduce the bare
+                // minimum so the tests can drive the wiring steps without
+                // running provider discovery or manifest compilation.
+                $this->dispatcher = new EventDispatcher();
+            }
+
+            public function publicBootDatabase(): void
+            {
+                $this->bootDatabase();
+            }
+
+            public function publicBootEntityTypeManager(): void
+            {
+                $this->bootEntityTypeManager();
+            }
+
+            public function publicEntityTypeManager(): EntityTypeManager
+            {
+                return $this->entityTypeManager;
+            }
+        };
+    }
 
     private function newHealthChecker(): HealthChecker
     {
@@ -558,4 +846,34 @@ final class Mission1257SpyLogger implements LoggerInterface
     {
         $this->messages[] = (string) $message;
     }
+}
+
+/**
+ * Test fixture for C1 (WP10) tenancy assertions. Carries no
+ * `HasCommunityInterface` marker — tenancy is declared at the EntityType
+ * registration site.
+ */
+#[ContentEntityType(id: 'mission1257_tenant_widget')]
+#[ContentEntityKeys(id: 'wid', uuid: 'uuid', label: 'name', langcode: 'langcode')]
+final class Mission1257TenantWidget extends ContentEntityBase
+{
+    public function __construct(
+        array $values = [],
+        string $entityTypeId = '',
+        array $entityKeys = [],
+        array $fieldDefinitions = [],
+    ) {
+        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
+    }
+}
+
+/**
+ * Test fixture for C1 (WP10) deprecation-cycle assertions. Implements the
+ * legacy {@see HasCommunityInterface} marker so the EntityTypeManager can
+ * recognize the pre-mission shape and emit the once-per-type deprecation
+ * warning.
+ */
+final class Mission1257LegacyMarkerEntity extends ContentEntityBase implements HasCommunityInterface
+{
+    use HasCommunityTrait;
 }

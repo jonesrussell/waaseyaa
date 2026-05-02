@@ -52,6 +52,59 @@ final class EntityTypeFromClassTest extends TestCase
         self::assertSame([], $type->getFieldDefinitions());
     }
 
+    public function testTenancyOverrideIsForwardedOnFirstCall(): void
+    {
+        $type = EntityType::fromClass(
+            SimpleFixture::class,
+            tenancy: ['scope' => 'community'],
+        );
+
+        self::assertSame(['scope' => 'community'], $type->getTenancy());
+    }
+
+    public function testCacheReturnsSameInstanceWhenTenancyMatches(): void
+    {
+        $first = EntityType::fromClass(
+            SimpleFixture::class,
+            tenancy: ['scope' => 'community'],
+        );
+        $second = EntityType::fromClass(
+            SimpleFixture::class,
+            tenancy: ['scope' => 'community'],
+        );
+
+        self::assertSame($first, $second);
+    }
+
+    public function testCacheRejectsConflictingTenancyOverride(): void
+    {
+        // Mission #1257 §C1: tenancy is a security boundary, not a presentation
+        // override. Silently returning the cached non-tenant instance would
+        // disable community scoping for the second caller.
+        EntityType::fromClass(SimpleFixture::class);
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageMatches('/tenancy/i');
+
+        EntityType::fromClass(
+            SimpleFixture::class,
+            tenancy: ['scope' => 'community'],
+        );
+    }
+
+    public function testCacheRejectsRemovingTenancyAfterDeclaring(): void
+    {
+        EntityType::fromClass(
+            SimpleFixture::class,
+            tenancy: ['scope' => 'community'],
+        );
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessageMatches('/tenancy/i');
+
+        EntityType::fromClass(SimpleFixture::class);
+    }
+
     public function testLabelDefaultsToUcfirstOfTypeIdWhenAttributeOmitsLabel(): void
     {
         $type = EntityType::fromClass(NoLabelFixture::class);

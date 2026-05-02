@@ -31,6 +31,14 @@ final readonly class EntityType implements EntityTypeInterface
     private const string DEFAULT_STORAGE_CLASS = 'Waaseyaa\\EntityStorage\\SqlEntityStorage';
 
     /**
+     * Canonical scope identifier for community-scoped tenancy.
+     *
+     * The only scope value accepted by {@see self::__construct()} today.
+     * Future region/org scopes would extend this surface deliberately.
+     */
+    public const string TENANCY_SCOPE_COMMUNITY = 'community';
+
+    /**
      * @param string $id Machine name of the entity type (e.g. 'node', 'user').
      * @param string $label Human-readable label.
      * @param class-string<EntityInterface> $class The entity class.
@@ -41,10 +49,15 @@ final readonly class EntityType implements EntityTypeInterface
      * @param string|null $bundleEntityType The entity type ID that provides bundles (e.g. 'node_type' for 'node').
      * @param array<string, mixed> $constraints Validation constraints.
      * @param string|null $description Human-readable description of the entity type.
+     * @param array{scope: string}|null $tenancy Declarative tenancy slot. `null` = non-tenant.
+     *   Currently the only accepted shape is `['scope' => 'community']`. Replaces the
+     *   legacy `HasCommunityInterface` marker (mission #1257 §C1).
      * @param array<string, FieldDefinitionInterface|array<string, mixed>> $_fieldDefinitions
      *   @internal Field definitions keyed by field name. Populated only by
      *   {@see self::fromClass()} and {@see \Waaseyaa\Entity\Tests\Helper\TestEntityType::stub()}.
      *   Application code MUST NOT pass this argument; doing so is unsupported.
+     *
+     * @throws \InvalidArgumentException If `$tenancy` is provided and does not match `['scope' => 'community']`.
      */
     public function __construct(
         private string $id,
@@ -59,8 +72,58 @@ final readonly class EntityType implements EntityTypeInterface
         private array $constraints = [],
         private ?string $group = null,
         private ?string $description = null,
+        private ?array $tenancy = null,
         private array $_fieldDefinitions = [],
-    ) {}
+    ) {
+        if ($this->tenancy !== null) {
+            $this->validateTenancy($this->tenancy);
+        }
+    }
+
+    /**
+     * Validate the shape of the `$tenancy` ctor argument.
+     *
+     * Locked to `['scope' => 'community']` per mission #1257 §C1. Future
+     * scopes are an explicit design surface; silent acceptance of unknown
+     * scopes would erode the invariant the slot exists to enforce.
+     *
+     * @param array<string, mixed> $tenancy
+     */
+    private function validateTenancy(array $tenancy): void
+    {
+        if (!array_key_exists('scope', $tenancy)) {
+            throw new \InvalidArgumentException(
+                'EntityType $tenancy must contain a "scope" key (e.g. ["scope" => "community"]); none provided.',
+            );
+        }
+
+        $extra = array_diff(array_keys($tenancy), ['scope']);
+        if ($extra !== []) {
+            throw new \InvalidArgumentException(\sprintf(
+                'EntityType $tenancy accepts only the "scope" key; unrecognized keys: %s.',
+                implode(', ', $extra),
+            ));
+        }
+
+        if ($tenancy['scope'] !== self::TENANCY_SCOPE_COMMUNITY) {
+            throw new \InvalidArgumentException(\sprintf(
+                'EntityType $tenancy scope "%s" is not supported; only "%s" is recognized today.',
+                (string) $tenancy['scope'],
+                self::TENANCY_SCOPE_COMMUNITY,
+            ));
+        }
+    }
+
+    /**
+     * @param array{scope: string}|null $tenancy
+     */
+    private static function describeTenancy(?array $tenancy): string
+    {
+        if ($tenancy === null) {
+            return 'null';
+        }
+        return \sprintf("['scope' => '%s']", $tenancy['scope']);
+    }
 
     /**
      * Build an EntityType for a content entity class via attribute reflection.
@@ -83,6 +146,16 @@ final readonly class EntityType implements EntityTypeInterface
      * @param array<string, mixed> $constraints
      * @throws EntityMetadataException When the class does not declare #[ContentEntityType].
      */
+    /**
+     * @param array{scope: string}|null $tenancy Forwarded to the constructor; see __construct().
+     *
+     * @throws \LogicException When the class has already been resolved with a
+     *   different `$tenancy` slot. The cache treats most overrides as
+     *   presentation-grade ("framework norm: one canonical EntityType per
+     *   class"), but tenancy is a security boundary — silently returning a
+     *   cached non-tenant instance to a caller that asked for community
+     *   scoping (or vice versa) would disable isolation. Mismatch fails loud.
+     */
     public static function fromClass(
         string $class,
         string $storageClass = self::DEFAULT_STORAGE_CLASS,
@@ -92,10 +165,24 @@ final readonly class EntityType implements EntityTypeInterface
         ?string $bundleEntityType = null,
         array $constraints = [],
         ?string $group = null,
+        ?array $tenancy = null,
     ): self {
         $cache = &self::fromClassCacheRef();
         if (isset($cache[$class])) {
-            return $cache[$class];
+            $cached = $cache[$class];
+            if ($cached->getTenancy() !== $tenancy) {
+                throw new \LogicException(\sprintf(
+                    'EntityType::fromClass() received a tenancy override for "%s" that conflicts with the '
+                    . 'cached instance (cached: %s, requested: %s). Tenancy is a security boundary — '
+                    . 'declare it consistently across all fromClass() call sites for the same class, '
+                    . 'or call EntityType::clearFromClassCache() between scopes (tests only). '
+                    . 'See mission #1257 §C1.',
+                    $class,
+                    self::describeTenancy($cached->getTenancy()),
+                    self::describeTenancy($tenancy),
+                ));
+            }
+            return $cached;
         }
 
         $metadata = EntityMetadataReader::forClass($class);
@@ -123,6 +210,7 @@ final readonly class EntityType implements EntityTypeInterface
             constraints: $constraints,
             group: $group,
             description: $description,
+            tenancy: $tenancy,
             _fieldDefinitions: $metadata->fields,
         );
     }
@@ -264,5 +352,10 @@ final readonly class EntityType implements EntityTypeInterface
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function getTenancy(): ?array
+    {
+        return $this->tenancy;
     }
 }

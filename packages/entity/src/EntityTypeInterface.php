@@ -43,4 +43,20 @@ interface EntityTypeInterface
 
     /** @return string|null Human-readable description of the entity type. */
     public function getDescription(): ?string;
+
+    /**
+     * Declarative tenancy scope for this entity type.
+     *
+     * `null` (default) means non-tenant — storage drivers see no community
+     * isolation. `['scope' => 'community']` opts the entity type into
+     * community-scoped tenancy; the kernel wires a `CommunityScope` into
+     * the storage driver when a `CommunityContextInterface` is bound.
+     *
+     * Replaces the legacy `HasCommunityInterface` marker (deprecated;
+     * removal in next minor). See docs/specs/entity-system.md §Tenancy
+     * declaration and mission #1257 §C1.
+     *
+     * @return array{scope: string}|null
+     */
+    public function getTenancy(): ?array;
 }

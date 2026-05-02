@@ -22,6 +22,8 @@ use Waaseyaa\EntityStorage\Driver\SqlStorageDriver;
 use Waaseyaa\EntityStorage\EntityRepository;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\EntityStorage\Tenancy\CommunityScope;
+use Waaseyaa\Foundation\Community\CommunityContextInterface;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Kernel\Bootstrap\AccessPolicyRegistry;
 use Waaseyaa\Foundation\Kernel\Bootstrap\AppEntityTypeLoader;
@@ -65,6 +67,26 @@ abstract class AbstractKernel
     private ?KnowledgeToolingExtensionRunner $knowledgeExtensionRunner = null;
     private bool $booted = false;
     protected LoggerInterface $logger;
+
+    /**
+     * Optional community context for tenancy-scoped entity types
+     * (mission #1257 §C1). When bound, the kernel wires `CommunityScope`
+     * into the storage driver of every EntityType whose `getTenancy()`
+     * returns `['scope' => 'community']`. When `null`, declarative-tenant
+     * entity types resolve without scoping and the kernel logs a warning
+     * once per registration.
+     */
+    protected ?CommunityContextInterface $communityContext = null;
+
+    /**
+     * Type ids that have already triggered the
+     * "tenancy declared but no CommunityContextInterface bound" warning,
+     * memoized so the kernel logs it once per repository factory invocation
+     * site rather than once per request.
+     *
+     * @var array<string, true>
+     */
+    private array $missingCommunityContextWarned = [];
 
     public function __construct(
         protected readonly string $projectRoot,
@@ -172,7 +194,11 @@ abstract class AbstractKernel
                 $idKey = $keys['id'] ?? 'id';
 
                 $resolver = new SingleConnectionResolver($database);
-                $driver = new SqlStorageDriver($resolver, $idKey);
+                $driver = new SqlStorageDriver(
+                    $resolver,
+                    $idKey,
+                    $this->resolveCommunityScope($definition),
+                );
                 $revisionDriver = $definition->isRevisionable()
                     ? new RevisionableStorageDriver($resolver, $definition)
                     : null;
@@ -186,7 +212,95 @@ abstract class AbstractKernel
                 );
             },
             $fieldRegistry,
+            $this->logger,
         );
+    }
+
+    /**
+     * Bind a community context for tenancy-scoped entity types (mission #1257 §C1).
+     *
+     * Apps wire this from their bootstrap once a `CommunityContextInterface`
+     * binding exists (typically from the request middleware or a CLI
+     * configuration step). After this call, every entity type that declares
+     * `tenancy: ['scope' => 'community']` resolves with `CommunityScope`
+     * injected into its storage driver.
+     *
+     * Pass `null` to clear the binding (test-suite teardown, multi-tenant
+     * boundary changes).
+     */
+    public function setCommunityContext(?CommunityContextInterface $context): void
+    {
+        $this->communityContext = $context;
+    }
+
+    /**
+     * Build a `CommunityScope` for the storage driver of a tenant-scoped
+     * entity type, or return null when scoping is not requested.
+     *
+     * Tenancy is opt-in declarative metadata on the EntityType. When a type
+     * declares `tenancy: ['scope' => 'community']`:
+     *   - If a `CommunityContextInterface` is bound, wire it.
+     *   - If not bound and the kernel runs in development (`local`, `dev`,
+     *     `development`, `testing`), log a once-per-type warning and fall
+     *     back to a null scope so tests / CLI / bare bootstrap don't crash.
+     *   - If not bound and the kernel runs in production, throw. A null
+     *     scope in production silently disables community isolation —
+     *     every read passes through unfiltered. That is a data-leak
+     *     posture, not a tolerable misconfiguration. Fail loud at boot.
+     */
+    private function resolveCommunityScope(EntityTypeInterface $definition): ?CommunityScope
+    {
+        $tenancy = $definition->getTenancy();
+        if ($tenancy === null) {
+            return null;
+        }
+
+        // EntityType's constructor validates the slot shape; reaching this
+        // branch implies scope === 'community'. The future-scope guard
+        // remains so a follow-on (region, org, etc.) lands as a deliberate
+        // change rather than a silent fall-through.
+        if ($tenancy['scope'] !== 'community') {
+            return null;
+        }
+
+        if ($this->communityContext === null) {
+            $typeId = $definition->id();
+
+            if (!$this->isDevelopmentMode()) {
+                throw new \RuntimeException(\sprintf(
+                    '[TENANCY_MISCONFIGURED] Entity type "%s" declares tenancy [scope=>community] '
+                    . 'but no CommunityContextInterface is bound on the kernel. '
+                    . 'In production, this would silently disable community isolation on every read — '
+                    . 'a data-leak posture, not a tolerable misconfiguration. '
+                    . 'Wire $kernel->setCommunityContext() during app bootstrap. '
+                    . 'See docs/specs/entity-system.md §Community Scoping.',
+                    $typeId,
+                ));
+            }
+
+            if (!isset($this->missingCommunityContextWarned[$typeId])) {
+                $this->missingCommunityContextWarned[$typeId] = true;
+                $this->logger->warning(
+                    \sprintf(
+                        'Entity type "%s" declares tenancy [scope=>community] but no CommunityContextInterface '
+                        . 'is bound on the kernel; CommunityScope injection is skipped (development mode). '
+                        . 'Wire $kernel->setCommunityContext() during app bootstrap. '
+                        . 'In production this would throw. See docs/specs/entity-system.md §Community Scoping.',
+                        $typeId,
+                    ),
+                    [
+                        'entity_type' => $typeId,
+                        'mission' => '1257',
+                        'contract' => 'C1',
+                        'environment' => $this->resolveEnvironment(),
+                    ],
+                );
+            }
+
+            return null;
+        }
+
+        return new CommunityScope($this->communityContext);
     }
 
     protected function compileManifest(): void
