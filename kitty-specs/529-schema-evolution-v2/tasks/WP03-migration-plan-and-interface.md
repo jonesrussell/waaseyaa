@@ -145,3 +145,4 @@ Read before starting:
 - 2026-05-02T23:37:00Z – unknown – Moved to in_progress
 - 2026-05-02T23:42:26Z – unknown – Moved to for_review
 - 2026-05-02T23:42:27Z – unknown – Moved to approved
+- 2026-05-02T23:42:28Z – unknown – Done override: Self-approved per user authorization for the mission run; commit e8ea2d268 landed on main with all gates green.
