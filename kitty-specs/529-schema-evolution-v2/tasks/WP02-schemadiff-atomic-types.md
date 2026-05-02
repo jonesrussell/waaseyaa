@@ -163,3 +163,4 @@ Read before starting:
 - 2026-05-02T23:33:15Z – unknown – Moved to in_progress
 - 2026-05-02T23:33:18Z – unknown – Moved to for_review
 - 2026-05-02T23:36:23Z – unknown – Moved to approved
+- 2026-05-02T23:36:25Z – unknown – Done override: Self-approved per user authorization; commit 29203e7a6 landed on main with all gates green (phpunit Unit 6171/6171, phpstan, layers, composer policy, cs).
