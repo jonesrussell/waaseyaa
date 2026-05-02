@@ -91,7 +91,7 @@ node-compile-cache/
 .kittify/dossiers/
 .kittify/events/
 .kittify/merge-state.json
-.kittify/missions/__pycache__/
 .kittify/runtime/
 .kittify/workspaces/
 .claude/worktrees/
+phpstan-tests/

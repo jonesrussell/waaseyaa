@@ -57,6 +57,6 @@ Order matters: the `tenancy:` flip is wiring-local and reversible; the class col
 
 #### Reference
 
-- Architectural decision: `.kittify/missions/1257-entity-storage-hardening/spec.md` §C1.
+- Architectural decision: `kitty-specs/1257-entity-storage-hardening/spec.md` §C1.
 - Spec: `docs/specs/entity-system.md` §Community Scoping → §Tenancy declaration.
 - Implementation work package: WP10 (tenancy-opt-in-via-entitytype) of mission #1257.

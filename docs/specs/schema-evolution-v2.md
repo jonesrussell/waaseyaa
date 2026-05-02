@@ -2,7 +2,7 @@
 
 **Status:** Design draft (Phase 1 — WP01 / [#522](https://github.com/waaseyaa/framework/issues/522))  
 **Epic:** [#529](https://github.com/waaseyaa/framework/issues/529) Schema Evolution v2.0  
-**Mission (authoritative checkpoint):** `.kittify/missions/529-schema-evolution-v2/spec.md`  
+**Mission (authoritative checkpoint):** `kitty-specs/529-schema-evolution-v2/spec.md`  
 **Architecture rule:** Waaseyaa owns diffing rules, migration generation, and safety gates; **applications** own timing and operational rollout of generated schema changes.
 
 This document is the **canonical design contract** for the SchemaDiff pivot. It does not prescribe implementation filenames or package layout; those follow in [#521](https://github.com/waaseyaa/framework/issues/521). Until implementation lands, **no behavior change** is implied for production installs.
@@ -313,7 +313,7 @@ From GitHub epic: child issues **#522** (this document + refinements), **#521** 
 
 ## 15. Proposed resolutions to open questions
 
-This section records **architecture-safe, review-ready** choices aligned with the mission (`.kittify/missions/529-schema-evolution-v2/`), Phase 1 scope, PHP 8.4 idioms, deterministic behavior, and clean coexistence with the legacy engine. Each item states **options considered** and a **single proposed resolution** (the default path for Phase 2 unless explicitly overturned in review).
+This section records **architecture-safe, review-ready** choices aligned with the mission (`kitty-specs/529-schema-evolution-v2/`), Phase 1 scope, PHP 8.4 idioms, deterministic behavior, and clean coexistence with the legacy engine. Each item states **options considered** and a **single proposed resolution** (the default path for Phase 2 unless explicitly overturned in review).
 
 ### Q1 — `migration_id` vs current `migration` column
 

@@ -1,8 +1,4 @@
 {
-  "feature_number": "584",
-  "slug": "584-perf-n-plus-one",
-  "mission": "software-dev",
-  "target_branch": "main",
   "child_issues": [
     "https://github.com/waaseyaa/framework/issues/584",
     "https://github.com/waaseyaa/framework/issues/585",
@@ -10,7 +6,12 @@
     "https://github.com/waaseyaa/framework/issues/587",
     "https://github.com/waaseyaa/framework/issues/588"
   ],
-  "track": "Track 3 \u2014 Parity & performance",
   "created_at": "2026-04-30T00:00:00Z",
+  "feature_number": "584",
+  "mission": "software-dev",
+  "mission_id": "01KQN41MQD3Y6PG0PES8XX166G",
+  "slug": "584-perf-n-plus-one",
+  "target_branch": "main",
+  "track": "Track 3 — Parity & performance",
   "vcs": "git"
 }

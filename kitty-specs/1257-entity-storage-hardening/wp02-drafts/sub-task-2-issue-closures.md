@@ -18,7 +18,7 @@ Closing per **mission #1257 entity-storage-hardening** WP02 (Path X) — ratifie
 
 Subsumed by **WP{NN} — {wp-title}**.
 
-Convention/contract: **{K-grade}** — see `.kittify/missions/1257-entity-storage-hardening/spec.md` §{K-grade-section}.
+Convention/contract: **{K-grade}** — see `kitty-specs/1257-entity-storage-hardening/spec.md` §{K-grade-section}.
 
 {ONE-LINE-CONVENTION-SUMMARY}
 
@@ -36,7 +36,7 @@ Closing per **mission #1257 entity-storage-hardening** WP02 (Path X) — ratifie
 
 Subsumed by **WP03 — bundle-naming-centralization**.
 
-Convention: **K1** — `.kittify/missions/1257-entity-storage-hardening/spec.md` §K1.
+Convention: **K1** — `kitty-specs/1257-entity-storage-hardening/spec.md` §K1.
 
 `{base}__{bundle}` and the `__`-in-bundle-id structural guard belong to a single shared helper consumed by `SqlEntityStorage`, `SqlEntityQuery`, and `SqlSchemaHandler`. The structural guard also fires at registration time in `EntityTypeManager::addBundleFields()` (belt and suspenders). Implementation lands via WP03; specs ratified in `docs/specs/bundle-scoped-storage.md` §Naming and `docs/specs/entity-system.md` §EntityTypeManagerInterface.
 
@@ -50,7 +50,7 @@ Closing per **mission #1257 entity-storage-hardening** WP02 (Path X) — ratifie
 
 Subsumed by **WP06 — bundle-load-drift-logging**.
 
-Convention: **K4** — `.kittify/missions/1257-entity-storage-hardening/spec.md` §K4.
+Convention: **K4** — `kitty-specs/1257-entity-storage-hardening/spec.md` §K4.
 
 `SqlEntityStorage::mergeBundleSubtableRow()` and `mergeBundleSubtableRowsBatch()` log once per `(entity_type, bundle)` per process — memoized on `bundleSubtableCache` — when the subtable is absent. Diagnostic-loop tightening, not throwing: preserves the open-by-default model from `docs/specs/operator-diagnostics.md`. Implementation lands via WP06; spec ratified in `docs/specs/bundle-scoped-storage.md` §Lifecycle.
 
@@ -64,7 +64,7 @@ Closing per **mission #1257 entity-storage-hardening** WP02 (Path X) — ratifie
 
 Subsumed by **WP08 — healthchecker-layer-placement**.
 
-Convention: **K6 option (c)** — `.kittify/missions/1257-entity-storage-hardening/spec.md` §K6.
+Convention: **K6 option (c)** — `kitty-specs/1257-entity-storage-hardening/spec.md` §K6.
 
 **Decision: option (c) — codified kernel-adjacent exemption.** `HealthChecker` stays in `packages/foundation/src/Diagnostic/` and imports from L1; the cross-layer privilege is granted explicitly via `KERNEL_EXEMPT_FILES` in `bin/check-package-layers`.
 
@@ -87,7 +87,7 @@ Closing per **mission #1257 entity-storage-hardening** WP02 (Path X) — ratifie
 
 Subsumed by **WP09 — portable-orphan-detection**.
 
-Convention: **K5** — `.kittify/missions/1257-entity-storage-hardening/spec.md` §K5.
+Convention: **K5** — `kitty-specs/1257-entity-storage-hardening/spec.md` §K5.
 
 `HealthChecker::findOrphanSubtables()` enumerates tables via DBAL `AbstractSchemaManager::listTableNames()` filtered against `{base}__%`; SQLite's `sqlite_master` is retained as a fast-path. Test matrix gates a non-SQLite run behind a docker-compose env var so MySQL/PostgreSQL coverage is mechanical. Implementation lands via WP09; spec ratified in `docs/specs/bundle-scoped-storage.md` §Drift diagnostic.
 
@@ -101,7 +101,7 @@ Closing per **mission #1257 entity-storage-hardening** WP02 (Path X) — ratifie
 
 Subsumed by **WP10 — tenancy-opt-in-via-entitytype**.
 
-Contract: **C1 (option 1)** — `.kittify/missions/1257-entity-storage-hardening/spec.md` §C1.
+Contract: **C1 (option 1)** — `kitty-specs/1257-entity-storage-hardening/spec.md` §C1.
 
 **Decision: declarative `tenancy:` key on `EntityType`.** `EntityType` gains a named constructor parameter `tenancy: ['scope' => 'community']` (or `null` for non-tenant types). `SqlStorageDriver` / `MemoryStorageDriver` wire `CommunityScope` from this declaration; the entity class needs no marker interface. `HasCommunityInterface` enters a deprecation cycle (one-time `LoggerInterface::warning()` per `(entity-type id, process)` on first wiring); removal in the next minor release. Migration recipe in `packages/groups/CHANGELOG.md`.
 
@@ -119,7 +119,7 @@ Closing per **mission #1257 entity-storage-hardening** WP02 (Path X) — ratifie
 
 Subsumed by **WP04 — read-write-symmetry-fieldstorage-data**.
 
-Convention: **K2** — `.kittify/missions/1257-entity-storage-hardening/spec.md` §K2.
+Convention: **K2** — `kitty-specs/1257-entity-storage-hardening/spec.md` §K2.
 
 `SqlEntityQuery::routeFields()` consults `FieldDefinitionRegistry::isDataStored()` — the same source `SqlEntityStorage::splitForStorage()` uses on write via `getDataStoredCoreFieldNames()`. The registry hint wins over `SchemaInterface::fieldExists()` on the query side too; no silent dual-source. Closes the asymmetry that produced silently stale reads when a legacy column lingered after a field gained the storage hint. Implementation lands via WP04; spec ratified in `docs/specs/entity-system.md` §SqlEntityQuery substrate.
 

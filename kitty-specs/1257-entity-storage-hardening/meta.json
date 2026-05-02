@@ -1,9 +1,4 @@
 {
-  "feature_number": "1257",
-  "slug": "1257-entity-storage-hardening",
-  "mission": "software-dev",
-  "target_branch": "main",
-  "github_issue": "https://github.com/waaseyaa/framework/issues/1257",
   "child_issues": [
     "https://github.com/waaseyaa/framework/issues/1257",
     "https://github.com/waaseyaa/framework/issues/1298",
@@ -14,7 +9,13 @@
     "https://github.com/waaseyaa/framework/issues/1308",
     "https://github.com/waaseyaa/framework/issues/1313"
   ],
-  "track": "Track 1 \u2014 Entity system & hydration",
   "created_at": "2026-04-30T00:00:00Z",
+  "feature_number": "1257",
+  "github_issue": "https://github.com/waaseyaa/framework/issues/1257",
+  "mission": "software-dev",
+  "mission_id": "01KQN41MQC85XBEQAT31QQ78D0",
+  "slug": "1257-entity-storage-hardening",
+  "target_branch": "main",
+  "track": "Track 1 — Entity system & hydration",
   "vcs": "git"
 }

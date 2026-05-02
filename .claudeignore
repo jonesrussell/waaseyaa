@@ -3,7 +3,6 @@
 
 # Template directories (not working code)
 .kittify/templates/
-.kittify/missions/
 .kittify/scripts/
 
 # Agent command directories (generated from templates, not source)
