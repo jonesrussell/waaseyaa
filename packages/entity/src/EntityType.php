@@ -115,6 +115,17 @@ final readonly class EntityType implements EntityTypeInterface
     }
 
     /**
+     * @param array{scope: string}|null $tenancy
+     */
+    private static function describeTenancy(?array $tenancy): string
+    {
+        if ($tenancy === null) {
+            return 'null';
+        }
+        return \sprintf("['scope' => '%s']", $tenancy['scope']);
+    }
+
+    /**
      * Build an EntityType for a content entity class via attribute reflection.
      *
      * Reads:
@@ -137,6 +148,13 @@ final readonly class EntityType implements EntityTypeInterface
      */
     /**
      * @param array{scope: string}|null $tenancy Forwarded to the constructor; see __construct().
+     *
+     * @throws \LogicException When the class has already been resolved with a
+     *   different `$tenancy` slot. The cache treats most overrides as
+     *   presentation-grade ("framework norm: one canonical EntityType per
+     *   class"), but tenancy is a security boundary — silently returning a
+     *   cached non-tenant instance to a caller that asked for community
+     *   scoping (or vice versa) would disable isolation. Mismatch fails loud.
      */
     public static function fromClass(
         string $class,
@@ -151,7 +169,20 @@ final readonly class EntityType implements EntityTypeInterface
     ): self {
         $cache = &self::fromClassCacheRef();
         if (isset($cache[$class])) {
-            return $cache[$class];
+            $cached = $cache[$class];
+            if ($cached->getTenancy() !== $tenancy) {
+                throw new \LogicException(\sprintf(
+                    'EntityType::fromClass() received a tenancy override for "%s" that conflicts with the '
+                    . 'cached instance (cached: %s, requested: %s). Tenancy is a security boundary — '
+                    . 'declare it consistently across all fromClass() call sites for the same class, '
+                    . 'or call EntityType::clearFromClassCache() between scopes (tests only). '
+                    . 'See mission #1257 §C1.',
+                    $class,
+                    self::describeTenancy($cached->getTenancy()),
+                    self::describeTenancy($tenancy),
+                ));
+            }
+            return $cached;
         }
 
         $metadata = EntityMetadataReader::forClass($class);

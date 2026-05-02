@@ -238,10 +238,15 @@ abstract class AbstractKernel
      * entity type, or return null when scoping is not requested.
      *
      * Tenancy is opt-in declarative metadata on the EntityType. When a type
-     * declares `tenancy: ['scope' => 'community']` but no
-     * `CommunityContextInterface` is bound, the kernel falls back to a null
-     * scope and emits a once-per-type warning so apps notice the
-     * misconfiguration without crashing the request.
+     * declares `tenancy: ['scope' => 'community']`:
+     *   - If a `CommunityContextInterface` is bound, wire it.
+     *   - If not bound and the kernel runs in development (`local`, `dev`,
+     *     `development`, `testing`), log a once-per-type warning and fall
+     *     back to a null scope so tests / CLI / bare bootstrap don't crash.
+     *   - If not bound and the kernel runs in production, throw. A null
+     *     scope in production silently disables community isolation —
+     *     every read passes through unfiltered. That is a data-leak
+     *     posture, not a tolerable misconfiguration. Fail loud at boot.
      */
     private function resolveCommunityScope(EntityTypeInterface $definition): ?CommunityScope
     {
@@ -260,20 +265,34 @@ abstract class AbstractKernel
 
         if ($this->communityContext === null) {
             $typeId = $definition->id();
+
+            if (!$this->isDevelopmentMode()) {
+                throw new \RuntimeException(\sprintf(
+                    '[TENANCY_MISCONFIGURED] Entity type "%s" declares tenancy [scope=>community] '
+                    . 'but no CommunityContextInterface is bound on the kernel. '
+                    . 'In production, this would silently disable community isolation on every read — '
+                    . 'a data-leak posture, not a tolerable misconfiguration. '
+                    . 'Wire $kernel->setCommunityContext() during app bootstrap. '
+                    . 'See docs/specs/entity-system.md §Community Scoping.',
+                    $typeId,
+                ));
+            }
+
             if (!isset($this->missingCommunityContextWarned[$typeId])) {
                 $this->missingCommunityContextWarned[$typeId] = true;
                 $this->logger->warning(
                     \sprintf(
                         'Entity type "%s" declares tenancy [scope=>community] but no CommunityContextInterface '
-                        . 'is bound on the kernel; CommunityScope injection is skipped. '
+                        . 'is bound on the kernel; CommunityScope injection is skipped (development mode). '
                         . 'Wire $kernel->setCommunityContext() during app bootstrap. '
-                        . 'See docs/specs/entity-system.md §Community Scoping.',
+                        . 'In production this would throw. See docs/specs/entity-system.md §Community Scoping.',
                         $typeId,
                     ),
                     [
                         'entity_type' => $typeId,
                         'mission' => '1257',
                         'contract' => 'C1',
+                        'environment' => $this->resolveEnvironment(),
                     ],
                 );
             }

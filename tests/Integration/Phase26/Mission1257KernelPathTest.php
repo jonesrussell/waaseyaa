@@ -580,11 +580,13 @@ final class Mission1257KernelPathTest extends TestCase
     }
 
     #[Test]
-    public function c1_kernelLogsOnceWhenTenancyDeclaredButContextMissing(): void
+    public function c1_kernelLogsOnceWhenTenancyDeclaredButContextMissingInDevelopment(): void
     {
-        $kernel = $this->newTenancyTestKernel();
+        // In development environments the kernel must NOT crash on missing
+        // context — tests, CLI, and bare bootstrap routinely run without a
+        // bound CommunityContextInterface.
+        $kernel = $this->newTenancyTestKernel(environment: 'local');
         $kernel->publicBootDatabase();
-        // Intentionally do NOT bind a CommunityContextInterface.
         $kernel->publicBootEntityTypeManager();
 
         $tenantType = new EntityType(
@@ -600,26 +602,51 @@ final class Mission1257KernelPathTest extends TestCase
         $repositoryA = $kernel->publicEntityTypeManager()->getRepository('mission1257_unbound_tenant');
         $repositoryB = $kernel->publicEntityTypeManager()->getRepository('mission1257_unbound_tenant');
 
-        // The same repository instance is cached; double-call still proves the
-        // factory ran only once for the type.
         self::assertSame($repositoryA, $repositoryB);
 
         $driver = self::extractDriver($repositoryA);
         self::assertNull(
             self::extractCommunityScope($driver),
-            'Without a CommunityContextInterface bound, the kernel must fall back to a null '
-            . 'CommunityScope rather than crashing the boot path.',
+            'In development, missing CommunityContextInterface must fall back to a null scope '
+            . 'rather than crashing the boot path.',
         );
 
         $matches = $this->logger->messagesContaining('mission1257_unbound_tenant');
         self::assertCount(
             1,
             $matches,
-            'Mission #1257 §C1: missing CommunityContextInterface must produce exactly one '
-            . 'kernel-side warning per entity-type id.',
+            'Mission #1257 §C1: missing CommunityContextInterface in development must produce '
+            . 'exactly one kernel-side warning per entity-type id.',
         );
         self::assertStringContainsString('CommunityContextInterface', $matches[0]);
         self::assertStringContainsString('setCommunityContext', $matches[0]);
+    }
+
+    #[Test]
+    public function c1_kernelThrowsInProductionWhenTenancyDeclaredButContextMissing(): void
+    {
+        // Mission #1257 §C1 / WP10 review feedback: in production, declaring
+        // tenancy without binding a CommunityContextInterface is a data-leak
+        // posture (every read goes through with no community filter), not a
+        // tolerable misconfiguration. Refuse to construct the repository —
+        // fail loud, not silent.
+        $kernel = $this->newTenancyTestKernel(environment: 'production');
+        $kernel->publicBootDatabase();
+        $kernel->publicBootEntityTypeManager();
+
+        $tenantType = new EntityType(
+            id: 'mission1257_prod_unbound_tenant',
+            label: 'Production tenant without context',
+            class: Mission1257TenantWidget::class,
+            keys: ['id' => 'wid', 'uuid' => 'uuid', 'label' => 'name', 'langcode' => 'langcode'],
+            tenancy: ['scope' => 'community'],
+        );
+        $kernel->publicEntityTypeManager()->registerEntityType($tenantType, registrant: self::class);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessageMatches('/TENANCY_MISCONFIGURED/');
+
+        $kernel->publicEntityTypeManager()->getRepository('mission1257_prod_unbound_tenant');
     }
 
     /**
@@ -669,14 +696,19 @@ final class Mission1257KernelPathTest extends TestCase
      * fixture mirrors the same wiring surface as `ConsoleKernel` /
      * `HttpKernel`, just without the boot orchestration.
      */
-    private function newTenancyTestKernel(): object
+    private function newTenancyTestKernel(string $environment = 'local'): object
     {
-        return new class ($this->projectRoot, $this->logger) extends AbstractKernel {
-            public function __construct(string $projectRoot, LoggerInterface $logger)
+        return new class ($this->projectRoot, $this->logger, $environment) extends AbstractKernel {
+            public function __construct(string $projectRoot, LoggerInterface $logger, string $environment)
             {
                 parent::__construct($projectRoot, $logger);
                 // DatabaseBootstrapper reads `config.database` as a path string.
-                $this->config = ['database' => ':memory:'];
+                // `environment` drives AbstractKernel::isDevelopmentMode(),
+                // which gates the production-strict tenancy guard.
+                $this->config = [
+                    'database' => ':memory:',
+                    'environment' => $environment,
+                ];
                 // boot() seeds the EventDispatcher before bootDatabase() and
                 // bootEntityTypeManager() consume it. Reproduce the bare
                 // minimum so the tests can drive the wiring steps without
