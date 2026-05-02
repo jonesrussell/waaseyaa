@@ -48,6 +48,16 @@ final class SqlEntityStorage implements EntityStorageInterface
     /** @var array<string, bool> Bundle subtable existence cache (subtable name => exists). */
     private array $bundleSubtableCache = [];
 
+    /**
+     * Bundles for which a load-side `[MISSING_BUNDLE_SUBTABLE]` notice has
+     * already been emitted in this storage instance. Keyed by bundle id.
+     * Independent of the save-time notice cadence — the two surfaces have
+     * different operator audiences (mission #1257 WP06, K4).
+     *
+     * @var array<string, true>
+     */
+    private array $missingBundleSubtableLoadLogged = [];
+
     private readonly LoggerInterface $logger;
 
     private readonly EntityEventFactoryInterface $eventFactory;
@@ -682,6 +692,34 @@ final class SqlEntityStorage implements EntityStorageInterface
     }
 
     /**
+     * Emits a single `[MISSING_BUNDLE_SUBTABLE]` notice for the given bundle
+     * on the load path, memoized per bundle for the lifetime of this storage
+     * instance (mission #1257 WP06, K4 — bundle-load drift logging). The
+     * memo is independent of the save-time notice: load and save surfaces
+     * are different code paths with different operator audiences, so each
+     * gets its own once-per-(entity_type, bundle) cadence.
+     *
+     * The save-time notice already exists at the splitForStorage seam; this
+     * companion closes the symmetric gap on read so operators get a signal
+     * the bundle is in a half-migrated state regardless of which surface
+     * they touch first.
+     */
+    private function logMissingBundleSubtableLoadOnce(string $bundle): void
+    {
+        if (isset($this->missingBundleSubtableLoadLogged[$bundle])) {
+            return;
+        }
+        $this->missingBundleSubtableLoadLogged[$bundle] = true;
+
+        $this->logger->notice(\sprintf(
+            '[MISSING_BUNDLE_SUBTABLE] Bundle-scoped fields are registered for entity type "%s" bundle "%s", but subtable "%s" does not exist at load time. Bundle-field values will be omitted from loaded entities for this bundle. Run the schema migration or sync that materializes the subtable.',
+            $this->entityType->id(),
+            $bundle,
+            $this->bundleSubtableName($bundle),
+        ));
+    }
+
+    /**
      * UPSERT a bundle subtable row by primary key.
      *
      * Portable across SQLite/MySQL/Postgres: probes for an existing row, then
@@ -751,6 +789,7 @@ final class SqlEntityStorage implements EntityStorageInterface
         }
 
         if (!$this->bundleSubtableExists($bundle)) {
+            $this->logMissingBundleSubtableLoadOnce($bundle);
             return;
         }
 
@@ -802,6 +841,7 @@ final class SqlEntityStorage implements EntityStorageInterface
 
         foreach ($idsByBundle as $bundle => $ids) {
             if (!$this->bundleSubtableExists($bundle)) {
+                $this->logMissingBundleSubtableLoadOnce($bundle);
                 continue;
             }
             $subtable = $this->bundleSubtableName($bundle);
