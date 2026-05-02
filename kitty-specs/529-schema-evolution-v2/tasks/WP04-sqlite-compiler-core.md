@@ -147,3 +147,7 @@ Read before starting:
 - **Identifier quoting:** SQLite accepts both backtick and double-quote, but double-quote is SQL-standard and what we'll need for cross-DB later. Use double quotes consistently.
 - **Determinism > terseness:** Don't shortcut the canonical-JSON path. Two compiler runs producing different `diff_hash` for the same input would silently break verify mode in WP09 / WP10.
 - **No DB connection in this WP.** Compiler is a pure function: in = `CompositeDiff`, out = `CompiledMigrationPlan`. Any test that opens a SQLite handle here is a smell — that belongs to WP08 / WP06.
+
+## Activity Log
+
+- 2026-05-02T23:49:39Z – unknown – Moved to in_progress
