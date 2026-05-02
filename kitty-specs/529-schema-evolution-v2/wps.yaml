@@ -1,0 +1,255 @@
+# Mission #529 — Schema Evolution v2.0
+# Work Package Manifest
+#
+# Source spec:        kitty-specs/529-schema-evolution-v2/spec.md
+# Subsystem spec:     docs/specs/schema-evolution-v2.md
+# Ratified decisions: §15 Q1–Q9 (locked 2026-05-02)
+#
+# requirement_refs use the mission's native ID scheme:
+#   A–F  -> mission spec §A through §F (atomic design surfaces)
+#   Q1–Q9 -> ratified resolutions in subsystem spec §15
+
+work_packages:
+  - id: WP01
+    title: "Design ratification (#522)"
+    dependencies: []
+    owned_files:
+      - "docs/specs/schema-evolution-v2.md"
+      - "kitty-specs/529-schema-evolution-v2/spec.md"
+    requirement_refs:
+      - FR-001
+      - FR-002
+      - FR-003
+      - FR-004
+      - FR-005
+      - NFR-001
+      - C-001
+      - C-002
+      - C-003
+      - C-004
+      - C-005
+      - C-006
+      - C-007
+      - C-008
+      - C-009
+    subtasks:
+      - T001
+      - T002
+      - T003
+    prompt_file: tasks/WP01-design-ratification.md
+
+  - id: WP02
+    title: "SchemaDiff atomic types + CompositeDiff (foundation)"
+    dependencies:
+      - WP01
+    owned_files:
+      - "packages/foundation/src/Schema/Diff/**"
+      - "packages/foundation/tests/Unit/Schema/Diff/**"
+    requirement_refs:
+      - FR-001
+      - C-002
+      - C-003
+      - C-007
+    subtasks:
+      - T004
+      - T005
+      - T006
+      - T007
+      - T008
+      - T009
+      - T010
+    prompt_file: tasks/WP02-schemadiff-atomic-types.md
+
+  - id: WP03
+    title: "MigrationPlan + MigrationInterfaceV2 (foundation)"
+    dependencies:
+      - WP02
+    owned_files:
+      - "packages/foundation/src/Schema/Migration/**"
+      - "packages/foundation/tests/Unit/Schema/Migration/**"
+    requirement_refs:
+      - FR-002
+      - C-001
+      - C-003
+    subtasks:
+      - T011
+      - T012
+      - T013
+      - T014
+      - T015
+      - T016
+    prompt_file: tasks/WP03-migration-plan-and-interface.md
+
+  - id: WP04
+    title: "SQLite compiler core (additive ops only)"
+    dependencies:
+      - WP02
+    owned_files:
+      - "packages/foundation/src/Schema/Compiler/Sqlite/**"
+      - "packages/foundation/tests/Unit/Schema/Compiler/Sqlite/**"
+    requirement_refs:
+      - FR-001
+      - C-005
+    subtasks:
+      - T017
+      - T018
+      - T019
+      - T020
+      - T021
+      - T022
+      - T023
+    prompt_file: tasks/WP04-sqlite-compiler-core.md
+
+  - id: WP05
+    title: "Compiler validation gates + capability matrix"
+    dependencies:
+      - WP04
+    owned_files:
+      - "packages/foundation/src/Schema/Compiler/Validation/**"
+      - "packages/foundation/tests/Unit/Schema/Compiler/Validation/**"
+    requirement_refs:
+      - C-005
+      - C-006
+    subtasks:
+      - T024
+      - T025
+      - T026
+      - T027
+      - T028
+      - T029
+      - T030
+    prompt_file: tasks/WP05-compiler-validation-gates.md
+
+  - id: WP06
+    title: "Migrator integration (legacy + v2 unified graph)"
+    dependencies:
+      - WP03
+      - WP04
+      - WP05
+    owned_files:
+      - "packages/foundation/src/Migration/Migrator.php"
+      - "packages/foundation/src/Migration/Dag/**"
+      - "packages/foundation/tests/Unit/Migration/Dag/**"
+      - "packages/foundation/tests/Integration/Migration/UnifiedGraph/**"
+    requirement_refs:
+      - FR-005
+      - C-004
+    subtasks:
+      - T031
+      - T032
+      - T033
+      - T034
+      - T035
+      - T036
+      - T037
+    prompt_file: tasks/WP06-migrator-unified-graph.md
+
+  - id: WP07
+    title: "EntityLevelDiff factory in entity-storage"
+    dependencies:
+      - WP02
+      - WP03
+    owned_files:
+      - "packages/entity-storage/src/Schema/**"
+      - "packages/entity-storage/tests/Unit/Schema/**"
+    requirement_refs:
+      - FR-001
+      - C-007
+    subtasks:
+      - T038
+      - T039
+      - T040
+      - T041
+      - T042
+      - T043
+    prompt_file: tasks/WP07-entity-level-diff-factory.md
+
+  - id: WP08
+    title: "Regression test fixtures (#518)"
+    dependencies:
+      - WP02
+      - WP03
+      - WP04
+      - WP05
+      - WP06
+      - WP07
+    owned_files:
+      - "tests/Integration/Schema/Diff/**"
+      - "tests/Integration/Schema/Compiler/**"
+      - "tests/Integration/Schema/Migration/**"
+    requirement_refs:
+      - NFR-001
+    subtasks:
+      - T044
+      - T045
+      - T046
+      - T047
+      - T048
+      - T049
+    prompt_file: tasks/WP08-regression-test-fixtures.md
+
+  - id: WP09
+    title: "Ledger checksum + diff_hash extensions"
+    dependencies:
+      - WP03
+      - WP06
+    owned_files:
+      - "packages/foundation/src/Migration/MigrationRepository.php"
+      - "packages/foundation/src/Migration/LedgerSchema/**"
+      - "packages/foundation/tests/Unit/Migration/Ledger/**"
+    requirement_refs:
+      - FR-004
+      - C-001
+      - C-002
+    subtasks:
+      - T050
+      - T051
+      - T052
+      - T053
+      - T054
+      - T055
+    prompt_file: tasks/WP09-ledger-checksum.md
+
+  - id: WP10
+    title: "dry-run + verify CLI surface"
+    dependencies:
+      - WP04
+      - WP06
+      - WP09
+    owned_files:
+      - "packages/cli/src/Command/MigrateCommand.php"
+      - "packages/cli/src/Command/Migrate/**"
+      - "packages/cli/tests/Unit/Command/Migrate/**"
+    requirement_refs:
+      - FR-005
+      - C-008
+    subtasks:
+      - T056
+      - T057
+      - T058
+      - T059
+      - T060
+      - T061
+    prompt_file: tasks/WP10-dry-run-verify-cli.md
+
+  - id: WP11
+    title: "Composer manifest array form (Phase 6)"
+    dependencies:
+      - WP03
+    owned_files:
+      - "packages/foundation/src/Discovery/PackageManifestCompiler.php"
+      - "packages/foundation/src/Migration/MigrationLoader.php"
+      - "packages/foundation/tests/Unit/Discovery/PackageManifestCompilerArrayMigrationsTest.php"
+      - "packages/foundation/tests/Unit/Migration/MigrationLoaderArrayFormTest.php"
+    requirement_refs:
+      - FR-003
+      - C-009
+    subtasks:
+      - T062
+      - T063
+      - T064
+      - T065
+      - T066
+      - T067
+      - T068
+    prompt_file: tasks/WP11-composer-manifest-array-form.md
