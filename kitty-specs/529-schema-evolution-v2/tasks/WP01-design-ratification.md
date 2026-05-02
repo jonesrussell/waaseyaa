@@ -93,3 +93,7 @@ Per the ratification, all WP02–WP11 work proceeds on these binding decisions:
 
 - Any future change to a ratified resolution requires an ADR and an explicit overturn note in the subsystem spec — not a silent edit.
 - Implementation WPs (WP02–WP11) must reference Q-IDs in their subtask guidance to keep the chain auditable.
+
+## Activity Log
+
+- 2026-05-02T22:02:48Z – unknown – Moved to done
