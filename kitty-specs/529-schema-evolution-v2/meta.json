@@ -1,0 +1,16 @@
+{
+  "child_issues": [
+    "https://github.com/waaseyaa/framework/issues/522",
+    "https://github.com/waaseyaa/framework/issues/521",
+    "https://github.com/waaseyaa/framework/issues/518"
+  ],
+  "created_at": "2026-04-26T00:00:00Z",
+  "feature_number": "529",
+  "github_issue": "https://github.com/waaseyaa/framework/issues/529",
+  "mission": "software-dev",
+  "mission_id": "01KQN41MQD3Y6PG0PES8XX166F",
+  "slug": "529-schema-evolution-v2",
+  "target_branch": "main",
+  "track": "Track 4 — Schema evolution",
+  "vcs": "git"
+}

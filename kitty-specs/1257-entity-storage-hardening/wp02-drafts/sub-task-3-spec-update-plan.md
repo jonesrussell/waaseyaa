@@ -148,7 +148,7 @@ Add two cross-references:
 
 ```
 - Tenancy declaration on `EntityType`: [`entity-system.md` §Community Scoping](./entity-system.md).
-- Mission ratification: `.kittify/missions/1257-entity-storage-hardening/spec.md`.
+- Mission ratification: `kitty-specs/1257-entity-storage-hardening/spec.md`.
 ```
 
 ---

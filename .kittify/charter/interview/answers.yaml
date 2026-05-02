@@ -161,7 +161,7 @@ answers:
         orchestration table, gotchas. Authoritative for agents and humans.
       - **Specs** (`docs/specs/*.md`): durable subsystem contracts. Updated
         in the same PR that changes the subsystem's behavior.
-      - **Missions** (`kitty-specs/<mission>/` and `.kittify/missions/`):
+      - **Missions** (`kitty-specs/<mission>/` and `kitty-specs/`):
         in-flight feature work. Lifecycle: planned → done → merged →
         archived.
     User-facing documentation in `README.md` and `UPGRADING.md` is updated

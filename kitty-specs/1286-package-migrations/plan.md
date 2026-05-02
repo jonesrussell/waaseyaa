@@ -3,7 +3,7 @@
 ## Phase 0 — Design lock (this mission)
 
 - [x] Mission + `spec.md` approved as architectural guardrail (Russell / Russell+agent).
-- [ ] Optional: short comment on GitHub #1286 linking to `.kittify/missions/1286-package-migrations/spec.md` for contributors.
+- [ ] Optional: short comment on GitHub #1286 linking to `kitty-specs/1286-package-migrations/spec.md` for contributors.
 
 ## Phase 1 — Ship the convention (meets GitHub acceptance)
 

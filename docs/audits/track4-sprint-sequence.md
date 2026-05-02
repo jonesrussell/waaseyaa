@@ -2,9 +2,9 @@
 
 **Done:** [#1305](https://github.com/waaseyaa/framework/issues/1305) — explicit `deriveColumnSpec()` mappings for `text_long` / `uri` / `entity_reference`, tests, optional logging on unknown types, spec table, vendor/FK nuance and `FieldStorage` context (folded from closed duplicate [#1314](https://github.com/waaseyaa/framework/issues/1314)).
 
-**Done:** [#1286](https://github.com/waaseyaa/framework/issues/1286) — package-level migrations exemplar (`waaseyaa/oidc` + `docs/specs/infrastructure.md` § package-declared migrations). **Design mission:** `.kittify/missions/1286-package-migrations/spec.md` (north-star / follow-on phases).
+**Done:** [#1286](https://github.com/waaseyaa/framework/issues/1286) — package-level migrations exemplar (`waaseyaa/oidc` + `docs/specs/infrastructure.md` § package-declared migrations). **Design mission:** `kitty-specs/1286-package-migrations/spec.md` (north-star / follow-on phases).
 
-**Active anchor:** [#529](https://github.com/waaseyaa/framework/issues/529) — schema evolution v2 / diffing baseline. **Design mission:** `.kittify/missions/529-schema-evolution-v2/spec.md` (SchemaDiff, ledger, manifest, execution model).
+**Active anchor:** [#529](https://github.com/waaseyaa/framework/issues/529) — schema evolution v2 / diffing baseline. **Design mission:** `kitty-specs/529-schema-evolution-v2/spec.md` (SchemaDiff, ledger, manifest, execution model).
 
 ## Dependency order (execute in this order)
 
