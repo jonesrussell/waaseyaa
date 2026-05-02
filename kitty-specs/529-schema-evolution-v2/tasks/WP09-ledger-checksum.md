@@ -10,7 +10,7 @@ requirement_refs:
 - C-002
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T050
 - T051
@@ -29,7 +29,11 @@ owned_files:
 - packages/foundation/src/Migration/MigrationRepository.php
 - packages/foundation/src/Migration/LedgerSchema/**
 - packages/foundation/tests/Unit/Migration/Ledger/**
-tags: [foundation, ledger, checksum, sha-256]
+tags:
+- foundation
+- ledger
+- checksum
+- sha-256
 ---
 
 # WP09 — Ledger checksum + diff_hash extensions

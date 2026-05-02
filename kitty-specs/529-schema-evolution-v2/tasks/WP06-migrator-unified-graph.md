@@ -10,7 +10,7 @@ requirement_refs:
 - C-004
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T031
 - T032
@@ -31,7 +31,11 @@ owned_files:
 - packages/foundation/src/Migration/Dag/**
 - packages/foundation/tests/Unit/Migration/Dag/**
 - packages/foundation/tests/Integration/Migration/UnifiedGraph/**
-tags: [foundation, migrator, dag, integration]
+tags:
+- foundation
+- migrator
+- dag
+- integration
 ---
 
 # WP06 — Migrator integration (legacy + v2 unified graph)

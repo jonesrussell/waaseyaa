@@ -10,7 +10,7 @@ requirement_refs:
 - C-008
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T056
 - T057
@@ -29,7 +29,11 @@ owned_files:
 - packages/cli/src/Command/MigrateCommand.php
 - packages/cli/src/Command/Migrate/**
 - packages/cli/tests/Unit/Command/Migrate/**
-tags: [cli, dry-run, verify, operator-diagnostics]
+tags:
+- cli
+- dry-run
+- verify
+- operator-diagnostics
 ---
 
 # WP10 — dry-run + verify CLI surface

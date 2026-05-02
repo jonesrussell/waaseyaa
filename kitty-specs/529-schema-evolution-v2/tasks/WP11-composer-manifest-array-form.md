@@ -8,7 +8,7 @@ requirement_refs:
 - C-009
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T062
 - T063
@@ -29,7 +29,11 @@ owned_files:
 - packages/foundation/src/Migration/MigrationLoader.php
 - packages/foundation/tests/Unit/Discovery/PackageManifestCompilerArrayMigrationsTest.php
 - packages/foundation/tests/Unit/Migration/MigrationLoaderArrayFormTest.php
-tags: [foundation, manifest, composer, phase-6]
+tags:
+- foundation
+- manifest
+- composer
+- phase-6
 ---
 
 # WP11 — Composer manifest array form (Phase 6)

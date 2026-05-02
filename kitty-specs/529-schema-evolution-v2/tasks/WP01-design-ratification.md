@@ -20,7 +20,7 @@ requirement_refs:
 - C-009
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Planning artifacts only. Ratification edits land directly on main; no implementation branch required.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T001
 - T002
@@ -39,7 +39,9 @@ mission_slug: 529-schema-evolution-v2
 owned_files:
 - docs/specs/schema-evolution-v2.md
 - kitty-specs/529-schema-evolution-v2/spec.md
-tags: [design, ratification]
+tags:
+- design
+- ratification
 ---
 
 # WP01 — Design ratification (#522)

@@ -10,7 +10,7 @@ requirement_refs:
 - C-007
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T004
 - T005
@@ -29,7 +29,10 @@ mission_slug: 529-schema-evolution-v2
 owned_files:
 - packages/foundation/src/Schema/Diff/**
 - packages/foundation/tests/Unit/Schema/Diff/**
-tags: [foundation, schema-diff, data-model]
+tags:
+- foundation
+- schema-diff
+- data-model
 ---
 
 # WP02 — SchemaDiff atomic types + CompositeDiff (foundation)
