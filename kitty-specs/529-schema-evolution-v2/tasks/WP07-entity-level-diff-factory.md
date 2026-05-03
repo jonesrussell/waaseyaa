@@ -152,3 +152,4 @@ Read before starting:
 - 2026-05-03T01:07:03Z – unknown – Moved to in_progress
 - 2026-05-03T01:17:26Z – unknown – Moved to for_review
 - 2026-05-03T01:17:28Z – unknown – Moved to approved
+- 2026-05-03T01:17:29Z – unknown – Done override: Self-approved per user authorization; commit 12d2432050b8b7e7a5ee535fc0aef82a1e46a1a9 on main, all gates green (6369 unit + 764 integration tests, PHPStan src-clean, layer + composer policy clean).
