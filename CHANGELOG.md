@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Packagist crawl unblocked** — root `composer.json` carried `"version": "1.1.0"` (added in PR #385 to source AboutCommand from a canonical place). Packagist refused every release tag from v0.1.0-alpha.145 onward with `Skipped tag v0.1.0-alpha.169, tag (0.1.0.0-alpha169) does not match version (1.1.0.0) in composer.json`, leaving the package frozen at alpha.144 since 2026-04-15. ~3 weeks of silent release outage. Removing the field; Composer now derives the version from the git tag (or `dev-main` for development checkouts) and AboutCommand reads the same source automatically. ConsoleKernelVersionTest still passes.
+- **Dead-code check in `GenealogyContentAccessPolicy::viewAccess`** — second `isEntityPublic($entity)` call was provably true at the call site (line 95 already AND'd it into the `$published` gate). Replaced the redundant `if`/return with the unconditional return; `return AccessResult::neutral()` was unreachable and removed. phpstan now clean (the error was masked by result-cache reuse on prior pre-push runs).
+
+### Changed
+
+- **`Publish to Packagist` workflow** (replaces the manual `Trigger Packagist Update`) — now auto-fires on every `v*` tag push, dynamically discovers all `waaseyaa/*` packages from `packages/*/composer.json` (no hardcoded matrix to drift), runs the Packagist update API in a 6-wide matrix, and a verify job polls the p2 endpoint until the just-cut tag is visible. Stays red as a clear signal whenever Packagist crawls stall; goes green automatically once Packagist is healthy.
+
 ## [0.1.0-alpha.169] - 2026-05-03
 
 ### Changed
