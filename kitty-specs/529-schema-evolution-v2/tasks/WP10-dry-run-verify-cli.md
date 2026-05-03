@@ -152,3 +152,7 @@ Read before starting:
 - **Don't make `--verify` write to the ledger.** Even tempting "update last-verified-at" timestamps re-open the question of whether verify is read-only. It is. Lock it.
 - **Mutually-exclusive flags:** `--dry-run --verify` together is operator confusion. Fail fast with `INCOMPATIBLE_FLAGS`.
 - **Production sanitization is a security/UX concern, not a stylistic one.** Operator dashboards leak paths into Slack / Sentry. Test it explicitly.
+
+## Activity Log
+
+- 2026-05-03T00:53:29Z – unknown – Moved to in_progress
