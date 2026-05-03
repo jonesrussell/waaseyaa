@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Kernel boot crashed in Packagist installs that lack PHPStan**: `packages/entity/src/PhpStan/FieldAttributeRule.php` extended `PHPStan\Rules\Rule` (a dev-only dependency) but lived under the package's production PSR-4 autoload path. `PackageManifestCompiler::scanClasses()` reflectively loaded it during kernel boot and crashed with `Interface "PHPStan\Rules\Rule" not found`. Moved to `packages/entity/testing/PhpStan/` and registered under `autoload-dev` only — same fix as the alpha.106 → alpha.107 graphql incident on minoo. Surfaced by skeleton-smoke (#1315) immediately after the #1375 fix landed.
+
 ## [0.1.0-alpha.167] - 2026-05-03
 
 ### Fixed
