@@ -118,3 +118,4 @@ references. File the deferred follow-up issue per ratified C-005 (b).
 
 - (To be appended by the implementer.)
 - 2026-05-03T16:01:53Z – claude – shell_pid=650851 – Started review via action command
+- 2026-05-03T16:02:11Z – claude – shell_pid=650851 – Self-review passed. T012: 5 spec docs updated (api-layer, jsonapi, http-entry-point, middleware-pipeline, infrastructure) — drift D4 closed in infrastructure.md. T013: SymfonyImportBoundaryTest 2/2 green (6 assertions); fixture controller imports zero Symfony namespaces. T014: anchor #1107 annotated (comment 4366576551); follow-up issue #1374 filed (enforce Symfony-import boundary). Unit suite 6390/6390. All gates clean.
