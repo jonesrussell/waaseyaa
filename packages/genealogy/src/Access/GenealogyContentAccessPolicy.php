@@ -109,11 +109,11 @@ final class GenealogyContentAccessPolicy implements AccessPolicyInterface, Field
             return AccessResult::allowed('Tree owner may view genealogy workspace content.');
         }
 
-        if ($this->workflowVisibility->isEntityPublic($entity->getEntityTypeId(), EntityValues::toCastAwareMap($entity))) {
-            return AccessResult::allowed('Published genealogy resource is viewable under tree policy.');
-        }
-
-        return AccessResult::neutral('Genealogy view not granted.');
+        // Reaching this point implies the entity AND tree both passed the
+        // `$published` gate at the top of this method, so the visibility
+        // check is provably true here. The earlier guards have already
+        // filtered out private content and living persons under non-owners.
+        return AccessResult::allowed('Published genealogy resource is viewable under tree policy.');
     }
 
     /**
