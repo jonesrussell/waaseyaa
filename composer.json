@@ -3,7 +3,6 @@
     "description": "Waaseyaa monorepo \u2014 a modern, entity-first, AI-native CMS",
     "type": "project",
     "license": "GPL-2.0-or-later",
-    "version": "1.1.0",
     "repositories": [
         {
             "type": "path",
