@@ -146,3 +146,7 @@ Read before starting:
 - **`FieldStorage::Data` discipline:** From #1257 WP09, `_data`-stored fields are NOT materialized as columns. The factory must respect this. A regression here re-opens the K2 invariant.
 - **Snapshot source is out of scope:** This WP defines `SchemaSnapshot` as a DTO. Producing a snapshot from a live DB is a verify-mode concern (WP10). Tests pass snapshots constructed by hand.
 - **Don't over-engineer rename detection:** Per §3.3, rename is never inferred. The factory does NOT try to detect "looks like a rename" patterns. Drop + add. Operators who want a rename author it explicitly with `RenameColumn`.
+
+## Activity Log
+
+- 2026-05-03T01:07:03Z – unknown – Moved to in_progress
