@@ -6,10 +6,14 @@ name: Skeleton Smoke (Packaged-form CI)
 # class of failure where source-tree co-resolution masks consumer-install
 # state.
 #
-# Manual trigger only for v1: alert-only, does not gate the release tag.
-# Run after a release tag has propagated to Packagist.
+# Triggers automatically after sync-skeleton.yml succeeds (which itself
+# fires on v* tags). Retries composer create-project to absorb Packagist
+# crawl lag. Alert-only — does not gate the release tag.
 
 on:
+  workflow_run:
+    workflows: ['Sync Application Skeleton']
+    types: [completed]
   workflow_dispatch:
     inputs:
       framework_constraint:
@@ -19,8 +23,10 @@ on:
 
 jobs:
   smoke:
+    # workflow_run fires on every completion; only proceed when upstream succeeded.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout framework (smoke script only)
         uses: actions/checkout@v6
@@ -35,12 +41,23 @@ jobs:
           coverage: none
           tools: composer:v2
 
-      - name: composer create-project waaseyaa/waaseyaa
+      - name: composer create-project waaseyaa/waaseyaa (with Packagist crawl retry)
         run: |
-          composer create-project waaseyaa/waaseyaa smoke-app \
-            --stability=alpha \
-            --no-interaction \
-            --prefer-dist
+          # Packagist may not have crawled the just-tagged release yet.
+          # Retry up to 8 times with 60s gaps (8 minutes total).
+          attempt=1
+          max_attempts=8
+          until composer create-project waaseyaa/waaseyaa smoke-app \
+              --stability=alpha --no-interaction --prefer-dist; do
+            if [[ $attempt -ge $max_attempts ]]; then
+              echo "create-project failed after ${max_attempts} attempts" >&2
+              exit 1
+            fi
+            echo "create-project attempt ${attempt} failed; sleeping 60s and retrying"
+            rm -rf smoke-app
+            attempt=$((attempt + 1))
+            sleep 60
+          done
 
       - name: Override framework constraint (if requested)
         if: ${{ inputs.framework_constraint != '' }}
