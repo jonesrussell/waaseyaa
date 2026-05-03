@@ -152,3 +152,7 @@ Read before starting:
 - **`DropColumn` on old SQLite:** Don't try to make the destructive-allowed path silently emit a table-rebuild. v1's contract is "destructive is blocked OR explicitly accepted with a warning that you're on your own for SQLite-version compatibility." A rebuild story is a future ADR.
 - **Don't introspect the DB here.** OrderingValidator walks only the composite's ops. Database introspection is a verify-mode concern (WP10), not a compile-time concern.
 - **Capability matrix lives close to the compiler**, not in `docs/specs/schema-evolution-v2.md`. The spec ratification window is closed; this is implementation-adjacent reference material.
+
+## Activity Log
+
+- 2026-05-03T00:01:40Z – unknown – Moved to in_progress
