@@ -9,7 +9,22 @@ final class PackageManifest
     public function __construct(
         /** @var string[] */
         public readonly array $providers = [],
-        /** @var array<string, string> */
+        /**
+         * Per-package `extra.waaseyaa.migrations` declaration (per spec §15 Q9 / WP11).
+         *
+         * Each value is EITHER a single legacy directory path string OR
+         * an ordered list of mixed FQCN namespace roots and path strings:
+         *
+         * - string `"migrations"` — single legacy directory path.
+         * - `["Vendor\\Pkg\\Migrations\\v2", "../patches/v2"]` — ordered list.
+         *
+         * `MigrationLoader` walks the list in order and concatenates the
+         * results; `MigrationGraph` (WP06) handles cross-entry dependency
+         * edges. Per Q9, the string form is supported indefinitely — no
+         * `@deprecated` notice without an ADR.
+         *
+         * @var array<string, string|list<string>>
+         */
         public readonly array $migrations = [],
         /** @var array<string, string> */
         public readonly array $fieldTypes = [],

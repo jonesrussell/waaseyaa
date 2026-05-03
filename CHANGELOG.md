@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Schema evolution v2 (mission #529)** — closes the v1 surface. End-to-end pipeline for declarative schema diffs:
+  - **SchemaDiff algebra** (`Waaseyaa\Foundation\Schema\Diff\*`): atomic ops, `CompositeDiff`, canonical-JSON serialization, SHA-256 checksums.
+  - **SQLite compiler** (`Waaseyaa\Foundation\Schema\Compiler\Sqlite\*`): pure `compile(CompositeDiff): CompiledMigrationPlan`. Stable diagnostic codes `RENAME_COLUMN_UNSUPPORTED_SQLITE_LT_3_25`, `ALTER_COLUMN_UNSUPPORTED_SQLITE_V1`, `FOREIGN_KEY_UNSUPPORTED_SQLITE_V1`.
+  - **Validation gates** (`Waaseyaa\Foundation\Schema\Compiler\Validation\*`): platform-neutral `ValidationDiagnosticCode` (`UNKNOWN_OP_KIND`, `DESTRUCTIVE_OP_BLOCKED`, `ILLEGAL_OP_ORDER`), `PlanPolicy` value type, `OrderingValidator`.
+  - **Unified Migrator** (`Waaseyaa\Foundation\Migration\*`): one DAG over legacy `Migration` + new `MigrationInterfaceV2` instances. Q4 tie-break (`package ASC, id ASC`). Stable codes `MIGRATION_CYCLE`, `UNKNOWN_DEPENDENCY`.
+  - **Ledger checksum + diff_hash** (WP09): `waaseyaa_migrations` gains nullable `checksum` + `diff_hash` columns. Production `CHECKSUM_MISMATCH` guard refuses silent re-apply with drifted source. Backfill ADR: `docs/adr/008-ledger-checksum-backfill.md` (null-tolerate).
+  - **dry-run + verify CLI** (WP10): `bin/waaseyaa migrate --dry-run` previews compiled plans; `--verify` audits ledger checksums. Both support `--json`. Mutually exclusive (`INCOMPATIBLE_FLAGS`). Production output sanitisation strips filesystem paths.
+  - **Composer manifest array form** (WP11): `extra.waaseyaa.migrations` now accepts an ordered array of namespace and/or path entries. Recommended for new packages where ordering matters. String path form remains supported indefinitely (Q9). New code `INVALID_MIGRATION_ENTRY`. Discovery rules: `docs/adr/009-migration-manifest-discovery.md`.
+  - **Entity-storage diff factory** (WP07): `EntityDiffFactory` produces `EntityLevelDiff` + `BundleLevelDiff` from registered field definitions vs `SchemaSnapshot`. `SqlSchemaHandler::deriveDiffColumnSpec()` is the single source of truth for field-type → column mapping.
+  - **SQLite capability matrix**: `docs/specs/sqlite-capability-matrix.md` documents per-version op support.
+  - **Regression test pack** (WP08, GitHub #518): six end-to-end integration test files under `tests/Integration/Schema/` lock additive ops, rename semantics, destructive gates, bundle subtables, the K2 invariant, and idempotency including the WP09 checksum guard.
+
 ## [0.1.0-alpha.164] - 2026-04-28
 
 ### Fixed

@@ -70,7 +70,7 @@ final class PackageManifestCompiler
                 }
                 if (isset($extra['migrations'])) {
                     $packageName = $package['name'] ?? 'unknown';
-                    $migrations[$packageName] = $extra['migrations'];
+                    $migrations[$packageName] = self::validateMigrationsEntry($packageName, $extra['migrations']);
                 }
                 if (isset($extra['permissions']) && is_array($extra['permissions'])) {
                     foreach ($extra['permissions'] as $permId => $permDef) {
@@ -762,5 +762,50 @@ final class PackageManifestCompiler
         }
 
         return $classes;
+    }
+
+    /**
+     * Validate the `extra.waaseyaa.migrations` entry shape per spec
+     * §15 Q9 (mission #529 / WP11). Accepts a single string OR an
+     * ordered list of strings (FQCN namespace roots and/or path
+     * strings). Anything else throws {@see InvalidMigrationEntryException}
+     * with diagnostic code `INVALID_MIGRATION_ENTRY`.
+     *
+     * Public so tests can lock the contract independently of the
+     * compile() pipeline (which requires a composer install).
+     *
+     * @return string|list<string>
+     */
+    public static function validateMigrationsEntry(string $packageName, mixed $entry): string|array
+    {
+        if (is_string($entry)) {
+            return $entry;
+        }
+
+        if (is_array($entry)) {
+            if ($entry !== [] && ! array_is_list($entry)) {
+                throw new InvalidMigrationEntryException(
+                    $packageName,
+                    'array entries must form an ordered list (sequential integer keys); associative arrays are not supported',
+                );
+            }
+            foreach ($entry as $i => $item) {
+                if (! is_string($item)) {
+                    throw new InvalidMigrationEntryException(
+                        $packageName,
+                        sprintf('entry at index %d is %s, expected string', $i, get_debug_type($item)),
+                    );
+                }
+            }
+            // The array_is_list() guard above proves the keys are
+            // sequential integers 0..N-1, so $entry is already a list.
+            /** @var list<string> $entry */
+            return $entry;
+        }
+
+        throw new InvalidMigrationEntryException(
+            $packageName,
+            sprintf('top-level value is %s, expected string or list of strings', get_debug_type($entry)),
+        );
     }
 }

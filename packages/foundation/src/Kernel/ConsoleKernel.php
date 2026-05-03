@@ -142,7 +142,7 @@ final class ConsoleKernel extends AbstractKernel
         ));
 
         $migrationsProvider = fn() => $this->migrationLoader->loadAll();
-        $v2MigrationsProvider = static fn(): array => [];
+        $v2MigrationsProvider = fn(): array => $this->migrationLoader->loadAllV2();
         $compiler = \Waaseyaa\Foundation\Schema\Compiler\Sqlite\SqliteCompiler::forVersion('3.40.0');
         $app->registerCommands($commandRegistry->migrationCommands(
             $this->migrator,
