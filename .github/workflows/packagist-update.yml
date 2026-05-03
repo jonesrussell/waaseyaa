@@ -1,42 +1,156 @@
-name: Trigger Packagist Update
+name: Publish to Packagist
+
+# Auto-fires on every release tag and triggers a Packagist crawl for every
+# `waaseyaa/*` package (monorepo + 67 split packages, discovered dynamically
+# from `packages/*/composer.json` so the matrix can't drift like
+# split.yml did historically).
+#
+# Two jobs:
+#   - update: hits Packagist's update-package API per package
+#   - verify: polls the p2 endpoint until the just-cut tag is visible
+#
+# `verify` will stay red until the Packagist-side outage that surfaced
+# 2026-04-15 is resolved (Packagist accepts 202 jobs but does not crawl).
+# That's the intended signal — when Packagist is healthy, this workflow
+# turns green automatically and the whole release pipeline self-reports.
 
 on:
+  push:
+    tags: ['v*']
   workflow_dispatch:
     inputs:
-      packagist_username:
-        description: 'Packagist account username (owner of the API token)'
-        required: true
-        default: 'jonesrussell'
-      package:
-        description: 'Packagist package name (e.g. waaseyaa/waaseyaa)'
-        required: true
-        default: 'waaseyaa/waaseyaa'
-      repo_url:
-        description: 'GitHub repo URL for the package'
-        required: true
-        default: 'https://github.com/waaseyaa/waaseyaa'
+      tag:
+        description: 'Tag to verify (e.g. v0.1.0-alpha.169). Defaults to current ref.'
+        required: false
+        default: ''
+      package_filter:
+        description: 'Only update packages whose name CONTAINS this substring. Empty = all.'
+        required: false
+        default: ''
 
 jobs:
-  update:
+  discover:
     runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.scan.outputs.packages }}
+      tag: ${{ steps.target.outputs.tag }}
     steps:
-      - name: Trigger Packagist crawl
+      - uses: actions/checkout@v6
+
+      - name: Resolve target tag
+        id: target
         env:
-          PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
-          PACKAGIST_USERNAME: ${{ github.event.inputs.packagist_username }}
-          PACKAGE: ${{ github.event.inputs.package }}
-          REPO_URL: ${{ github.event.inputs.repo_url }}
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
         run: |
-          USERNAME="${PACKAGIST_USERNAME}"
-          RESPONSE=$(curl -s -o /tmp/packagist-response.json -w "%{http_code}" \
-            -X POST \
-            -H "Content-Type: application/json" \
-            -d "{\"repository\":{\"url\":\"${REPO_URL}\"}}" \
-            "https://packagist.org/api/update-package?username=${USERNAME}&apiToken=${PACKAGIST_TOKEN}")
-          echo "HTTP status: $RESPONSE"
-          cat /tmp/packagist-response.json
-          if [ "$RESPONSE" != "202" ]; then
-            echo "::error::Packagist update failed with status $RESPONSE"
+          if [[ -n "$INPUT_TAG" ]]; then
+            tag="$INPUT_TAG"
+          else
+            tag="$REF_NAME"
+          fi
+          if [[ ! "$tag" =~ ^v[0-9]+\. ]]; then
+            echo "::error::Resolved tag '$tag' does not look like a release tag (expected vX.Y.Z[-...])"
             exit 1
           fi
-          echo "Packagist update triggered successfully."
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Target tag: $tag"
+
+      - name: Discover waaseyaa/* packages
+        id: scan
+        env:
+          FILTER: ${{ inputs.package_filter }}
+        run: |
+          # Collect package names from every packages/*/composer.json plus
+          # the monorepo composer.json. Filter to waaseyaa/* and de-dup.
+          {
+            for f in packages/*/composer.json; do
+              jq -r '.name // empty' "$f"
+            done
+            jq -r '.name // empty' composer.json
+          } | grep '^waaseyaa/' | sort -u > /tmp/all-pkgs.txt
+
+          if [[ -n "$FILTER" ]]; then
+            grep -F "$FILTER" /tmp/all-pkgs.txt > /tmp/pkgs.txt || true
+          else
+            cp /tmp/all-pkgs.txt /tmp/pkgs.txt
+          fi
+
+          count=$(wc -l < /tmp/pkgs.txt)
+          if [[ "$count" -eq 0 ]]; then
+            echo "::error::No packages matched filter '$FILTER'"
+            exit 1
+          fi
+          echo "Will publish $count package(s):"
+          cat /tmp/pkgs.txt
+
+          json=$(jq -R -s -c 'split("\n") | map(select(length > 0))' /tmp/pkgs.txt)
+          echo "packages=$json" >> "$GITHUB_OUTPUT"
+
+  update:
+    needs: discover
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.packages) }}
+    steps:
+      - name: Trigger Packagist crawl for ${{ matrix.package }}
+        env:
+          PACKAGIST_TOKEN: ${{ secrets.PACKAGIST_TOKEN }}
+          PACKAGIST_USERNAME: jonesrussell
+          PACKAGE: ${{ matrix.package }}
+        run: |
+          if [[ -z "$PACKAGIST_TOKEN" ]]; then
+            echo "::error::PACKAGIST_TOKEN secret is not set"
+            exit 1
+          fi
+          repo_url="https://github.com/${PACKAGE}"
+          response=$(curl -s -o /tmp/body.json -w "%{http_code}" -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"repository\":{\"url\":\"${repo_url}\"}}" \
+            "https://packagist.org/api/update-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_TOKEN}")
+          echo "HTTP $response for $PACKAGE"
+          cat /tmp/body.json
+          echo
+          if [[ "$response" != "202" ]]; then
+            echo "::error::Packagist refused update for $PACKAGE (HTTP $response)"
+            exit 1
+          fi
+          status=$(jq -r '.status // "unknown"' /tmp/body.json 2>/dev/null || echo "unparseable")
+          if [[ "$status" != "success" ]]; then
+            echo "::error::Packagist update for $PACKAGE returned status: $status"
+            exit 1
+          fi
+
+  verify:
+    needs: [discover, update]
+    if: always() && needs.discover.result == 'success'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        package: ${{ fromJSON(needs.discover.outputs.packages) }}
+    steps:
+      - name: Wait for ${{ needs.discover.outputs.tag }} on ${{ matrix.package }}
+        env:
+          PACKAGE: ${{ matrix.package }}
+          TAG: ${{ needs.discover.outputs.tag }}
+        run: |
+          # Poll p2 (composer's metadata endpoint) for up to 24 * 30s = 12 min.
+          attempt=1
+          max_attempts=24
+          while [[ $attempt -le $max_attempts ]]; do
+            body=$(curl -sS --max-time 15 "https://repo.packagist.org/p2/${PACKAGE}.json" || echo '{}')
+            versions=$(echo "$body" | jq -r --arg pkg "$PACKAGE" '.packages[$pkg][]?.version // empty' 2>/dev/null || true)
+            if echo "$versions" | grep -qFx "$TAG"; then
+              echo "::notice::$PACKAGE $TAG visible on Packagist (attempt $attempt)"
+              exit 0
+            fi
+            echo "attempt $attempt: $TAG not yet listed for $PACKAGE"
+            attempt=$((attempt + 1))
+            sleep 30
+          done
+          echo "::error::$PACKAGE $TAG not visible on Packagist after $((max_attempts * 30))s — Packagist crawl may be stalled"
+          exit 1
