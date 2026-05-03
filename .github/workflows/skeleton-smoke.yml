@@ -6,9 +6,13 @@ name: Skeleton Smoke (Packaged-form CI)
 # class of failure where source-tree co-resolution masks consumer-install
 # state.
 #
-# Triggers automatically after sync-skeleton.yml succeeds (which itself
-# fires on v* tags). Retries composer create-project to absorb Packagist
-# crawl lag. Alert-only — does not gate the release tag.
+# Always pins the framework to the EXACT tag that triggered the run (or the
+# version supplied via workflow_dispatch). The retry loop on the pin step
+# absorbs Packagist crawl latency — composer require fails loudly when the
+# version isn't yet listed, unlike create-project which would silently
+# install whatever the previous "latest" was.
+#
+# Alert-only — does not gate the release tag.
 
 on:
   workflow_run:
@@ -17,17 +21,41 @@ on:
   workflow_dispatch:
     inputs:
       framework_constraint:
-        description: 'composer constraint for waaseyaa/framework (empty = use skeleton default)'
-        required: false
-        default: ''
+        description: 'composer constraint for waaseyaa/framework (e.g. 0.1.0-alpha.168). Required.'
+        required: true
 
 jobs:
   smoke:
-    # workflow_run fires on every completion; only proceed when upstream succeeded.
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    # workflow_run fires on every completion; only proceed when upstream
+    # succeeded AND its head_branch is a release tag we can pin to.
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       startsWith(github.event.workflow_run.head_branch, 'v'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - name: Resolve target framework version
+        id: target
+        env:
+          DISPATCH_INPUT: ${{ inputs.framework_constraint }}
+          UPSTREAM_TAG: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          if [[ "$DISPATCH_INPUT" != "" ]]; then
+            constraint="$DISPATCH_INPUT"
+            source="workflow_dispatch input"
+          else
+            # Tag like "v0.1.0-alpha.168" -> exact composer constraint "0.1.0-alpha.168"
+            constraint="${UPSTREAM_TAG#v}"
+            source="upstream sync-skeleton tag"
+          fi
+          if [[ -z "$constraint" ]]; then
+            echo "no framework constraint resolved" >&2
+            exit 1
+          fi
+          echo "Using constraint: $constraint (from $source)"
+          echo "constraint=$constraint" >> "$GITHUB_OUTPUT"
+
       - name: Checkout framework (smoke script only)
         uses: actions/checkout@v6
         with:
@@ -41,30 +69,40 @@ jobs:
           coverage: none
           tools: composer:v2
 
-      - name: composer create-project waaseyaa/waaseyaa (with Packagist crawl retry)
+      - name: composer create-project waaseyaa/waaseyaa
         run: |
-          # Packagist may not have crawled the just-tagged release yet.
-          # Retry up to 8 times with 60s gaps (8 minutes total).
+          composer create-project waaseyaa/waaseyaa smoke-app \
+            --stability=alpha --no-interaction --prefer-dist
+
+      - name: Pin framework to ${{ steps.target.outputs.constraint }} (with Packagist crawl retry)
+        working-directory: smoke-app
+        env:
+          CONSTRAINT: ${{ steps.target.outputs.constraint }}
+        run: |
+          # composer require fails loudly when the requested version isn't
+          # listed on Packagist yet — that's our signal to retry through
+          # the crawl window. 12 attempts * 60s = 12 minutes.
           attempt=1
-          max_attempts=8
-          until composer create-project waaseyaa/waaseyaa smoke-app \
-              --stability=alpha --no-interaction --prefer-dist; do
+          max_attempts=12
+          until composer require "waaseyaa/framework:${CONSTRAINT}" \
+              --no-interaction --no-scripts --update-with-all-dependencies; do
             if [[ $attempt -ge $max_attempts ]]; then
-              echo "create-project failed after ${max_attempts} attempts" >&2
+              echo "pin failed after ${max_attempts} attempts (Packagist may not have indexed ${CONSTRAINT})" >&2
               exit 1
             fi
-            echo "create-project attempt ${attempt} failed; sleeping 60s and retrying"
-            rm -rf smoke-app
+            echo "pin attempt ${attempt} failed; sleeping 60s and retrying"
             attempt=$((attempt + 1))
             sleep 60
           done
 
-      - name: Override framework constraint (if requested)
-        if: ${{ inputs.framework_constraint != '' }}
+      - name: Verify pinned version
         working-directory: smoke-app
+        env:
+          CONSTRAINT: ${{ steps.target.outputs.constraint }}
         run: |
-          composer require "waaseyaa/framework:${{ inputs.framework_constraint }}" \
-            --no-interaction --no-scripts --update-with-all-dependencies
+          installed=$(composer show waaseyaa/framework | grep '^versions' | awk '{print $4}')
+          echo "Installed: ${installed} (expected ${CONSTRAINT})"
+          [[ "$installed" == "$CONSTRAINT" ]] || { echo "version mismatch" >&2; exit 1; }
 
       - name: Run migrations
         working-directory: smoke-app
