@@ -13,26 +13,38 @@ namespace Waaseyaa\Foundation\Schema\Compiler\Sqlite;
  * and CI scripts may grep for it. Add new codes for new conditions; do
  * not repurpose existing ones.
  *
- * **Cases (WP04 — additive ops):**
+ * **Cases:**
  *
  * - `RENAME_COLUMN_UNSUPPORTED_SQLITE_LT_3_25` — runtime SQLite version
  *   is older than 3.25, which introduced `ALTER TABLE … RENAME COLUMN`.
  *   Operators on older builds must drop+add (with explicit data
- *   migration) instead. Per §15 Q5 / Q6 family of capability gates.
- * - `OPERATION_NOT_IMPLEMENTED` — provisional code emitted when WP04
- *   encounters an op kind whose translator does not yet exist (e.g.
- *   `AlterColumn`, `DropColumn`, `DropIndex`, `AddForeignKey`,
- *   `DropForeignKey`). WP05 replaces these with proper validation-gate
- *   codes (`ALTER_COLUMN_UNSUPPORTED_SQLITE_V1`,
- *   `FOREIGN_KEY_UNSUPPORTED_SQLITE_V1`, etc.). Until WP05 lands,
- *   callers see this single placeholder code and the op kind in the
- *   exception message.
+ *   migration) instead.
+ * - `ALTER_COLUMN_UNSUPPORTED_SQLITE_V1` — per §15 Q5, the v1 SQLite
+ *   compiler refuses `AlterColumn`. SQLite cannot change a column's
+ *   type or nullability in place; the only safe path is a table
+ *   rebuild, which is destructive and intricate. Future ADRs may
+ *   introduce a rebuild strategy; until then operators must split as
+ *   drop+add with explicit data migration.
+ * - `FOREIGN_KEY_UNSUPPORTED_SQLITE_V1` — per §15 Q6, the v1 SQLite
+ *   compiler refuses `AddForeignKey` and `DropForeignKey`. SQLite
+ *   cannot add or drop FK constraints on existing tables without a
+ *   full rebuild; cross-dialect FK ops will land with the future
+ *   MySQL / Postgres compilers.
+ * - `OPERATION_NOT_IMPLEMENTED` — legacy WP04 placeholder retained for
+ *   compatibility with any downstream tools that already grep for it.
+ *   No code path in the post-WP05 compiler emits this; new conditions
+ *   must use the specific validation codes above (or
+ *   {@see \Waaseyaa\Foundation\Schema\Compiler\Validation\ValidationDiagnosticCode}
+ *   for platform-neutral cases). Removal would be an API break — the
+ *   case stays.
  *
- * Future WPs (WP05 in particular) will append cases to this enum but
- * MUST NOT remove or rename existing ones without an ADR.
+ * Future WPs may append cases to this enum but MUST NOT remove or
+ * rename existing ones without an ADR.
  */
 enum SqliteDiagnosticCode: string
 {
     case RenameColumnUnsupportedSqliteLt325 = 'RENAME_COLUMN_UNSUPPORTED_SQLITE_LT_3_25';
+    case AlterColumnUnsupportedSqliteV1 = 'ALTER_COLUMN_UNSUPPORTED_SQLITE_V1';
+    case ForeignKeyUnsupportedSqliteV1 = 'FOREIGN_KEY_UNSUPPORTED_SQLITE_V1';
     case OperationNotImplemented = 'OPERATION_NOT_IMPLEMENTED';
 }

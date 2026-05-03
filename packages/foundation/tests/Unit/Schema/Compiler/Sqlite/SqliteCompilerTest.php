@@ -15,12 +15,21 @@ use Waaseyaa\Foundation\Schema\Compiler\Sqlite\SqliteDiagnosticCode;
 use Waaseyaa\Foundation\Schema\Compiler\Step\AlterTableAddColumn;
 use Waaseyaa\Foundation\Schema\Compiler\Step\CreateIndex;
 use Waaseyaa\Foundation\Schema\Compiler\Step\ExecuteStatement;
+use Waaseyaa\Foundation\Schema\Compiler\Validation\AlterColumnUnsupportedException;
+use Waaseyaa\Foundation\Schema\Compiler\Validation\DestructiveOpBlockedException;
+use Waaseyaa\Foundation\Schema\Compiler\Validation\ForeignKeyUnsupportedException;
+use Waaseyaa\Foundation\Schema\Compiler\Validation\IllegalOpOrderException;
+use Waaseyaa\Foundation\Schema\Compiler\Validation\PlanPolicy;
+use Waaseyaa\Foundation\Schema\Compiler\Validation\ValidationDiagnosticCode;
 use Waaseyaa\Foundation\Schema\Diff\AddColumn;
+use Waaseyaa\Foundation\Schema\Diff\AddForeignKey;
 use Waaseyaa\Foundation\Schema\Diff\AddIndex;
 use Waaseyaa\Foundation\Schema\Diff\AlterColumn;
 use Waaseyaa\Foundation\Schema\Diff\ColumnSpec;
 use Waaseyaa\Foundation\Schema\Diff\CompositeDiff;
 use Waaseyaa\Foundation\Schema\Diff\DropColumn;
+use Waaseyaa\Foundation\Schema\Diff\DropIndex;
+use Waaseyaa\Foundation\Schema\Diff\ForeignKeySpec;
 use Waaseyaa\Foundation\Schema\Diff\RenameColumn;
 use Waaseyaa\Foundation\Schema\Diff\RenameTable;
 
@@ -201,24 +210,100 @@ final class SqliteCompilerTest extends TestCase
     }
 
     #[Test]
-    public function unimplementedOpsThrowOperationNotImplemented(): void
+    public function compilerRejectsAlterColumnViaIntegratedGate(): void
     {
-        $unimplemented = [
-            new AlterColumn('widgets', 'name', new ColumnSpec(type: 'text', nullable: true)),
-            new DropColumn('widgets', 'archived'),
-        ];
+        try {
+            SqliteCompiler::forVersion('3.40.0')->compile(new CompositeDiff([
+                new AlterColumn('widgets', 'name', new ColumnSpec(type: 'text', nullable: true)),
+            ]));
+            self::fail('Expected AlterColumnUnsupportedException.');
+        } catch (AlterColumnUnsupportedException $e) {
+            self::assertSame(
+                SqliteDiagnosticCode::AlterColumnUnsupportedSqliteV1->value,
+                $e->diagnosticCode,
+            );
+        }
+    }
 
-        foreach ($unimplemented as $op) {
-            try {
-                SqliteCompiler::forVersion('3.40.0')->compile(new CompositeDiff([$op]));
-                self::fail('Expected SqliteCompilerException for unimplemented op kind ' . $op->kind()->value);
-            } catch (SqliteCompilerException $e) {
-                self::assertSame(
-                    SqliteDiagnosticCode::OperationNotImplemented,
-                    $e->diagnosticCode(),
-                );
-                self::assertStringContainsString($op->kind()->value, $e->getMessage());
-            }
+    #[Test]
+    public function compilerBlocksDropColumnUnderDefaultPolicy(): void
+    {
+        try {
+            SqliteCompiler::forVersion('3.40.0')->compile(new CompositeDiff([
+                new DropColumn('widgets', 'archived'),
+            ]));
+            self::fail('Expected DestructiveOpBlockedException under default PlanPolicy.');
+        } catch (DestructiveOpBlockedException $e) {
+            self::assertSame(ValidationDiagnosticCode::DestructiveOpBlocked->value, $e->diagnosticCode);
+            self::assertSame('drop_column', $e->opKind);
+        }
+    }
+
+    #[Test]
+    public function compilerEmitsDropColumnUnderDestructivePolicy(): void
+    {
+        $plan = SqliteCompiler::forVersion('3.40.0')->compile(
+            new CompositeDiff([new DropColumn('widgets', 'archived')]),
+            new PlanPolicy(allowDestructive: true),
+        );
+
+        self::assertCount(1, $plan->steps);
+        self::assertInstanceOf(ExecuteStatement::class, $plan->steps[0]);
+        self::assertSame(
+            'ALTER TABLE "widgets" DROP COLUMN "archived"',
+            $plan->steps[0]->sql(),
+        );
+    }
+
+    #[Test]
+    public function compilerBlocksDropIndexUnderDefaultPolicy(): void
+    {
+        try {
+            SqliteCompiler::forVersion('3.40.0')->compile(new CompositeDiff([
+                new DropIndex('widgets', 'idx_widgets_legacy'),
+            ]));
+            self::fail('Expected DestructiveOpBlockedException for DropIndex.');
+        } catch (DestructiveOpBlockedException $e) {
+            self::assertSame('drop_index', $e->opKind);
+        }
+    }
+
+    #[Test]
+    public function compilerRejectsAddForeignKeyViaIntegratedGate(): void
+    {
+        $op = new AddForeignKey('orders', new ForeignKeySpec(
+            referencedTable: 'users',
+            localColumns: ['user_id'],
+            referencedColumns: ['id'],
+            name: 'fk_orders_user',
+        ));
+
+        try {
+            SqliteCompiler::forVersion('3.40.0')->compile(new CompositeDiff([$op]));
+            self::fail('Expected ForeignKeyUnsupportedException.');
+        } catch (ForeignKeyUnsupportedException $e) {
+            self::assertSame(
+                SqliteDiagnosticCode::ForeignKeyUnsupportedSqliteV1->value,
+                $e->diagnosticCode,
+            );
+        }
+    }
+
+    #[Test]
+    public function compilerRunsOrderingValidatorBeforeTranslation(): void
+    {
+        // AddIndex(c1) before AddColumn(c1) — validator should fail this
+        // before any translator dispatch. If translation ran first the
+        // first op (AddIndex) would succeed and produce a CREATE INDEX
+        // step, hiding the bug.
+        try {
+            SqliteCompiler::forVersion('3.40.0')->compile(new CompositeDiff([
+                new AddIndex('users', ['email']),
+                new AddColumn('users', 'email', new ColumnSpec(type: 'varchar', nullable: false, length: 255)),
+            ]));
+            self::fail('Expected IllegalOpOrderException from OrderingValidator.');
+        } catch (IllegalOpOrderException $e) {
+            self::assertSame(ValidationDiagnosticCode::IllegalOpOrder->value, $e->diagnosticCode);
         }
     }
 

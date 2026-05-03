@@ -17,13 +17,22 @@ namespace Waaseyaa\Foundation\Schema\Compiler\Sqlite;
  * - `supportsRenameColumn` — true on SQLite ≥ 3.25 (added 2018-09-15).
  *   Older runtimes must use the drop+add escape hatch with explicit
  *   data migration (out of scope for v1).
+ * - `supportsDropColumn` — true on SQLite ≥ 3.35 (added 2021-03-12).
+ *   Informational in v1: the destructive-allowed path emits the naive
+ *   `ALTER TABLE … DROP COLUMN` SQL regardless and lets older runtimes
+ *   raise their own error at apply time (per WP05 risk note: "you're on
+ *   your own for SQLite-version compatibility once you opt in to
+ *   destruction"). Verify mode (WP10) and future ADRs may consult this
+ *   flag to gate at compile time.
  * - `foreignKeysEnabled` — informational. v1 of the SQLite compiler
- *   does NOT emit FK ops (WP05 gates `AddForeignKey` /
- *   `DropForeignKey` with `FOREIGN_KEY_UNSUPPORTED_SQLITE_V1`). The
- *   flag exists so future WPs can branch on it without an API change.
+ *   rejects every FK op via {@see \Waaseyaa\Foundation\Schema\Compiler\Validation\ForeignKeyUnsupportedException}
+ *   (Q6). The flag exists so future WPs can branch on it without an
+ *   API change.
  *
  * Use {@see forVersion()} for the common "I have a version string"
  * case; the constructor is provided for tests and explicit overrides.
+ * For pre-tabulated checkpoints (`sqlite325()`, `sqlite340()`, …) see
+ * {@see SqliteCapabilityMatrix}.
  */
 final readonly class SqliteCapabilities
 {
@@ -31,6 +40,7 @@ final readonly class SqliteCapabilities
         public string $version,
         public bool $supportsRenameColumn,
         public bool $foreignKeysEnabled = false,
+        public bool $supportsDropColumn = false,
     ) {}
 
     /**
@@ -45,6 +55,8 @@ final readonly class SqliteCapabilities
         return new self(
             version: $version,
             supportsRenameColumn: version_compare($version, '3.25.0', '>='),
+            foreignKeysEnabled: false,
+            supportsDropColumn: version_compare($version, '3.35.0', '>='),
         );
     }
 }

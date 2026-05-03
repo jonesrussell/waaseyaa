@@ -27,8 +27,28 @@ final class SqliteDiagnosticCodeTest extends TestCase
     }
 
     #[Test]
+    public function alterColumnUnsupportedCodeIsLocked(): void
+    {
+        self::assertSame(
+            'ALTER_COLUMN_UNSUPPORTED_SQLITE_V1',
+            SqliteDiagnosticCode::AlterColumnUnsupportedSqliteV1->value,
+        );
+    }
+
+    #[Test]
+    public function foreignKeyUnsupportedCodeIsLocked(): void
+    {
+        self::assertSame(
+            'FOREIGN_KEY_UNSUPPORTED_SQLITE_V1',
+            SqliteDiagnosticCode::ForeignKeyUnsupportedSqliteV1->value,
+        );
+    }
+
+    #[Test]
     public function operationNotImplementedCodeIsLocked(): void
     {
+        // Legacy WP04 placeholder retained for compatibility per the
+        // SqliteDiagnosticCode docblock — no current code path emits it.
         self::assertSame(
             'OPERATION_NOT_IMPLEMENTED',
             SqliteDiagnosticCode::OperationNotImplemented->value,
@@ -48,6 +68,8 @@ final class SqliteDiagnosticCodeTest extends TestCase
         self::assertSame(
             [
                 'RENAME_COLUMN_UNSUPPORTED_SQLITE_LT_3_25',
+                'ALTER_COLUMN_UNSUPPORTED_SQLITE_V1',
+                'FOREIGN_KEY_UNSUPPORTED_SQLITE_V1',
                 'OPERATION_NOT_IMPLEMENTED',
             ],
             $values,
