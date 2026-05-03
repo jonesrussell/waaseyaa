@@ -54,6 +54,8 @@ return [
     'Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface' => 'public',
     'Waaseyaa\Foundation\Http\Inertia\InertiaPageResultInterface' => 'public',
     'Waaseyaa\Foundation\Migration\Migration' => 'public',
+    // Schema-evolution v2 ledger verify surface (mission #529 / WP09).
+    'Waaseyaa\Foundation\Migration\VerifyResult' => 'public',
     'Waaseyaa\Foundation\Community\CommunityContextInterface' => 'public',
     'Waaseyaa\Foundation\Sovereignty\SovereigntyConfigInterface' => 'public',
     'Waaseyaa\Foundation\Sovereignty\SovereigntyProfile' => 'public',

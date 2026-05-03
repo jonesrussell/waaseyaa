@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\Foundation\Migration;
 
 use Doctrine\DBAL\Connection;
+use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Migration\Dag\MigrationGraph;
 use Waaseyaa\Foundation\Migration\Dag\MigrationKind;
 use Waaseyaa\Foundation\Migration\Dag\MigrationNode;
@@ -20,11 +21,26 @@ use Waaseyaa\Foundation\Schema\Migration\MigrationInterfaceV2;
  * per node, deterministic order via Q4's `(package ASC, id ASC)`
  * tie-break. Empty v2 plans write a ledger row and execute zero SQL.
  *
+ * **Post-WP09 ledger discipline.** Every successful v2 apply writes the
+ * SHA-256 of the canonical SchemaDiff (`checksum`) and the SHA-256 of
+ * the canonical compiled-plan (`diff_hash`) to the ledger. Re-runs
+ * compare the computed checksum against the stored one:
+ *
+ * - **Match:** node already applied, skip silently.
+ * - **Mismatch + `isProduction: true`:** throw {@see ChecksumMismatchException}
+ *   (`CHECKSUM_MISMATCH`). The same migration_id cannot mean two
+ *   different structural intents.
+ * - **Mismatch + `isProduction: false`:** log a warning via the
+ *   optional {@see LoggerInterface} and skip the apply.
+ * - **Stored checksum is null** (pre-WP09 row, or legacy migration):
+ *   treated as a match — verify mode (WP10) is the place to surface
+ *   "I cannot verify this row" via {@see VerifyResult::Unknown}.
+ *
  * **Failure semantics (intentional, locked by tests):** a SQL or compile
  * failure inside a node aborts that node's transaction (rollback of both
  * SQL and ledger row for the failing node). Prior nodes in the same
- * batch retain their ledger rows. This matches pre-WP06 legacy
- * behaviour — there is no "atomic batch" guarantee across nodes.
+ * batch retain their ledger rows. There is no "atomic batch" guarantee
+ * across nodes — matches pre-WP06 legacy behaviour.
  *
  * **Backward compatibility:** the legacy `run(array $migrations)` shape
  * still works. v2 callers pass a list of {@see MigrationInterfaceV2}
@@ -37,6 +53,8 @@ final class Migrator
         private readonly Connection $connection,
         private readonly MigrationRepository $repository,
         private readonly ?V2PlanExecutor $v2Executor = null,
+        private readonly bool $isProduction = true,
+        private readonly ?LoggerInterface $logger = null,
     ) {}
 
     /**
@@ -63,6 +81,9 @@ final class Migrator
 
         foreach ($ordered as $node) {
             if ($this->repository->hasRun($node->id)) {
+                if ($node->kind === MigrationKind::V2) {
+                    $this->guardV2Replay($node);
+                }
                 continue;
             }
 
@@ -175,10 +196,48 @@ final class Migrator
             throw new \LogicException(sprintf('V2 node "%s" cannot apply: missing source or executor.', $node->id));
         }
 
-        $this->connection->transactional(function () use ($executor, $migration, $node, $batch, $policy): void {
-            $executor->execute($migration->plan(), $policy);
-            $this->repository->record($node->id, $node->package, $batch);
+        $plan = $migration->plan();
+        $checksum = $plan->checksum();
+
+        $this->connection->transactional(function () use ($executor, $plan, $policy, $node, $batch, $checksum): void {
+            $compiled = $executor->execute($plan, $policy);
+            $this->repository->record($node->id, $node->package, $batch, $checksum, $compiled->diffHash());
         });
+    }
+
+    /**
+     * Drift check for an already-applied v2 node: if the stored
+     * checksum exists and differs from the computed one, throw in
+     * production / warn in dev.
+     */
+    private function guardV2Replay(MigrationNode $node): void
+    {
+        $migration = $node->v2;
+        if ($migration === null) {
+            return;
+        }
+
+        $stored = $this->repository->getStoredChecksum($node->id);
+        if ($stored === null) {
+            // Pre-WP09 row or legacy migration — nothing to verify.
+            return;
+        }
+
+        $computed = $migration->plan()->checksum();
+        if ($stored === $computed) {
+            return;
+        }
+
+        if ($this->isProduction) {
+            throw new ChecksumMismatchException($node->id, $stored, $computed);
+        }
+
+        $this->logger?->warning(sprintf(
+            'Migration "%s" stored checksum %s differs from computed %s. Skipping re-apply (dev mode). Set isProduction=true for strict refusal.',
+            $node->id,
+            $stored,
+            $computed,
+        ));
     }
 
     /**
