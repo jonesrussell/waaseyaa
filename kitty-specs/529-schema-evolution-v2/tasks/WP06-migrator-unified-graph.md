@@ -166,3 +166,7 @@ Read before starting:
 - **Q4 tie-break is the determinism contract.** Any deviation (random sort, hash-order, etc.) breaks reproducibility. Reviewer should confirm the sort key is exactly `(package, id)`, ASCII compare.
 - **Single-transaction boundary on SQLite:** SQLite supports DDL inside a transaction for additive ops, which is what v2 emits in this WP. The future destructive/AlterColumn paths will need different transaction handling — out of scope here.
 - **Don't write the ledger schema migration in this WP.** That's WP09. Here we just use the existing `MigrationRepository` to write rows.
+
+## Activity Log
+
+- 2026-05-03T00:19:48Z – unknown – Moved to in_progress
