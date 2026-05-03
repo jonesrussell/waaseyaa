@@ -40,10 +40,21 @@ if (is_file($projectRoot . '/.env')) {
 }
 
 echo "skeleton-smoke: booting HttpKernel against {$projectRoot}\n";
-$kernel = new HttpKernel($projectRoot);
 
-// Touching getEntityTypeManager() triggers manifest compile + provider discovery
-// + entity-type registration. This is the path that caught the alpha.149/.150 bugs.
+// AbstractKernel::boot() is protected; HttpKernel boots only via handle().
+// Expose boot() directly so the smoke does not have to fabricate an HTTP
+// request. This mirrors the Mission1257KernelPathTest harness pattern.
+$kernel = new class($projectRoot) extends HttpKernel {
+    public function bootForSmoke(): void
+    {
+        $this->boot();
+    }
+};
+
+$kernel->bootForSmoke();
+
+// Manifest compile + provider discovery + entity-type registration runs
+// during boot(). This is the path that caught the alpha.149/.150 bugs.
 $etm = $kernel->getEntityTypeManager();
 
 if (!$etm->hasDefinition('user')) {
