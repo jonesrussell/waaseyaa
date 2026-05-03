@@ -125,3 +125,4 @@ WP04 must NOT modify `Waaseyaa\Foundation\Http\JsonApiResponseTrait` itself — 
 
 - (To be appended by the implementer.)
 - 2026-05-03T15:48:24Z – claude – shell_pid=647960 – Started review via action command
+- 2026-05-03T15:48:27Z – claude – shell_pid=647960 – Self-review passed. JsonApiResponseTest 5/5 green (8 assertions). Foundation 947/947, API 383/383, Unit 6388/6388, Integration 782/782. amended C-004 implemented: api JsonResponseTrait deleted (only its own test referenced it; the original spec framing of 'duplicate JSON:API trait' was inaccurate — api's trait was a plain JSON helper); foundation's canonical JsonApiResponseTrait left untouched. FieldAutoSaveController migrated (only api controller constructing Symfony JsonResponse directly). Layer/policy/CS gates clean.
