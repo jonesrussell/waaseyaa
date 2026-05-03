@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.167] - 2026-05-03
+
 ### Fixed
 
 - **Entity round-trip via repository → driver path** (#1375): `SqlStorageDriver::write()` now splits entity values into existing columns vs the `_data` JSON blob, and `read()` / `readMultiple()` (plus translation variants) re-merge `_data` keys back onto the row before returning. Previously, `EntityRepository::doSave()` passed raw entity values straight to `DBALInsert::execute()`, which crashed for any entity whose declarative `#[Field]` attributes lacked dedicated columns — `User` save fails with `table user has no column named mail` was the canonical reproducer. The legacy `SqlEntityStorage::save()` path already did this routing internally; this commit ports the same convention to the modern repository path. New regression test `tests/Integration/EntityStorage/RepositoryUserRoundTripTest.php`. First caught by the skeleton-smoke CI (#1315) against alpha.166.
