@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\ServiceProvider\Capability;
 
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Cache\CacheBackendInterface;
+use Waaseyaa\Foundation\Event\EventDispatcherInterface;
 
 /**
  * Capability marker for service providers that subscribe render-cache entity

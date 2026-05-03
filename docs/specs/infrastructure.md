@@ -1836,3 +1836,33 @@ Attribute/
 Migration/
     CreateQueueTables.php        -- creates queue_jobs + failed_jobs tables
 ```
+
+## Symfony decoupling (mission 1107)
+
+Mission 1107-api-symfony-decoupling introduces three Waaseyaa-owned framework surfaces wrapping Symfony primitives. Per the ratified Path R-narrow charter, the mission scope is **HTTP request/response and event-dispatch only** — routing internals stay Symfony-coupled.
+
+### Public types (app code)
+
+| Waaseyaa surface | Wraps | Ratified contract |
+|---|---|---|
+| `Waaseyaa\Foundation\Http\Request` | `Symfony\Component\HttpFoundation\Request` (class alias) | C-002 (a) |
+| `Waaseyaa\Api\Http\JsonApiResponse` | `Symfony\Component\HttpFoundation\JsonResponse` (subclass) | C-001 (a) |
+| `Waaseyaa\Foundation\Event\EventDispatcherInterface` | PSR-14 + Symfony-style listener / subscriber methods | C-003 (a) |
+
+The default binding for `EventDispatcherInterface` is `Waaseyaa\Foundation\Event\SymfonyEventDispatcherAdapter`, instantiated by `AbstractKernel::boot()` and exposed via `getEventDispatcher(): EventDispatcherInterface`. The adapter implements both Waaseyaa's interface and Symfony's component `EventDispatcherInterface`, so framework-internal call sites that still type-hint Symfony continue to accept the same instance — the abstraction added without forcing a foundation-wide type-hint sweep.
+
+### Framework-internal contract (C-003)
+
+`Waaseyaa\Foundation\Event\DomainEvent` continues to `extends \Symfony\Contracts\EventDispatcher\Event`. Only the dispatcher gains a Waaseyaa-owned interface; event subclasses still inherit Symfony's `Event` via `DomainEvent`. This is an **explicit framework-internal contract**: the Symfony parent class is part of foundation's stable surface and changing it is a major-version concern. Subscriber-discovery semantics also stay Symfony-typed (`Symfony\Component\EventDispatcher\EventSubscriberInterface`) — the mission's surface-area calculus deliberately keeps these standard so existing subscriber idioms work unchanged.
+
+This closes drift flag **D4** ("DomainEvent extends Symfony Event is an undocumented public surface") raised in the mission decomposition.
+
+### Trait ownership (amended C-004)
+
+The canonical JSON:API response trait is `Waaseyaa\Foundation\Http\JsonApiResponseTrait`. Its 9 in-package consumers (HttpKernel, ControllerDispatcher, 7 routers) plus 4 cross-layer consumers (graphql, ssr×2, media) make it the natural canonical home. The previous duplicate `Waaseyaa\Api\JsonResponseTrait` (a plain JSON helper, not a JSON:API helper) was deleted as orphan; api consumers that need typed responses now construct `Waaseyaa\Api\Http\JsonApiResponse` directly. L4 → L0 imports of foundation's trait are allowed by the layer rule.
+
+### Out of scope (Path R-narrow)
+
+- **Routing decoupling.** `Symfony\Component\Routing\Route` continues to leak through `RouteBuilder` public signatures. App code that registers routes via service providers will still import Symfony's Route after this mission lands. Filed as a follow-up mission `routing-symfony-decoupling` (referenced from `#1107` at acceptance).
+- **Bimaaji decoupling.** Independent surface; out of scope for this mission.
+- **Symfony-import boundary linter.** Per ratified C-005 (b), the `bin/check-symfony-imports` script is deferred to a follow-up issue — the soft-rot tradeoff is documented there. Until that linter ships, the mission's executable contract is `packages/api/tests/Contract/SymfonyImportBoundaryTest`, which asserts a sample app-controller fixture produces a JSON:API response without `use Symfony\` imports.

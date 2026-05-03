@@ -4066,7 +4066,7 @@
         },
         {
             "name": "waaseyaa/attachment",
-            "version": "dev-mission/824-architectural-remediation",
+            "version": "dev-kitty/mission-1107-api-symfony-decoupling-lane-a",
             "dist": {
                 "type": "path",
                 "url": "packages/attachment",
@@ -4736,11 +4736,12 @@
             "dist": {
                 "type": "path",
                 "url": "packages/foundation",
-                "reference": "f896fce33c8b33ca5a304b3f7538b8ec5ae69942"
+                "reference": "e85af22d6b8bf6d44ae25ccc47f99f1626a2e524"
             },
             "require": {
                 "doctrine/dbal": "^4.0",
                 "php": ">=8.4",
+                "psr/event-dispatcher": "^1.0",
                 "symfony/dependency-injection": "^7.0",
                 "symfony/event-dispatcher": "^7.0",
                 "symfony/http-foundation": "^7.0",
@@ -4767,6 +4768,9 @@
                 }
             },
             "autoload": {
+                "files": [
+                    "src/Http/Request.php"
+                ],
                 "psr-4": {
                     "Waaseyaa\\Foundation\\": "src/"
                 }
@@ -6220,7 +6224,7 @@
         },
         {
             "name": "waaseyaa/structured-import",
-            "version": "dev-mission/824-architectural-remediation",
+            "version": "dev-kitty/mission-1107-api-symfony-decoupling-lane-a",
             "dist": {
                 "type": "path",
                 "url": "packages/structured-import",

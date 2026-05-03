@@ -897,3 +897,15 @@ packages/routing/
     RouteMatch.php
     WaaseyaaRouter.php
 ```
+
+## Symfony decoupling (mission 1107)
+
+Per mission 1107-api-symfony-decoupling, the api package gains:
+
+- **`Waaseyaa\Api\Http\JsonApiResponse`** — subclass of Symfony's `JsonResponse` enforcing `application/vnd.api+json` and the canonical encoding flags (`JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR`). App-level controllers should construct `JsonApiResponse` directly when a typed JSON:API response is wanted; foundation routers continue to use `Waaseyaa\Foundation\Http\JsonApiResponseTrait::jsonApiResponse()` (canonical helper, returns base `JsonResponse`).
+
+The mission's charter is **Path R-narrow**: HTTP request/response and event-dispatch only. **Routing internals stay Symfony-coupled** — `RouteBuilder` and friends continue to expose `Symfony\Component\Routing\Route` types in their public method signatures. App code that registers routes via service providers continues to import `Symfony\Component\Routing\Route` after this mission lands; a separate `routing-symfony-decoupling` follow-up mission is filed at mission close.
+
+The duplicate `Waaseyaa\Api\JsonResponseTrait` (a plain JSON helper, not a JSON:API helper) was deleted as orphan; only its own unit test referenced it. Per amended C-004, the canonical JSON:API trait remains in foundation (`Waaseyaa\Foundation\Http\JsonApiResponseTrait`); api consumers may import it directly — L4 → L0 imports are permitted by the layer rule.
+
+The `packages/api/tests/Contract/SymfonyImportBoundaryTest` asserts that a sample app controller fixture produces a JSON:API response without importing any `Symfony\` class — it is the executable contract that backs this Path R-narrow promise for app-side controllers.

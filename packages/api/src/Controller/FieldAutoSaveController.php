@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Controller;
 
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Access\EntityAccessHandler;
+use Waaseyaa\Api\Http\JsonApiResponse;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 
@@ -131,7 +131,7 @@ final class FieldAutoSaveController
         $storage->save($entity);
 
         // 10. 200 response per contracts/README.md F3.
-        return new JsonResponse([
+        return new JsonApiResponse([
             'data' => [
                 'id' => (string) $entity->id(),
                 'type' => $entityType,
@@ -147,9 +147,9 @@ final class FieldAutoSaveController
         return str_starts_with($type, 'application/json');
     }
 
-    private function error(int $status, string $code, string $title): JsonResponse
+    private function error(int $status, string $code, string $title): JsonApiResponse
     {
-        return new JsonResponse(
+        return new JsonApiResponse(
             ['errors' => [['status' => (string) $status, 'code' => $code, 'title' => $title]]],
             $status,
         );

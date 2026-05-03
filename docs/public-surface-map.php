@@ -44,6 +44,7 @@ return [
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface' => 'public',
     'Waaseyaa\Foundation\Event\DomainEvent' => 'public',
+    'Waaseyaa\Foundation\Event\EventDispatcherInterface' => 'public',
     'Waaseyaa\Foundation\Ingestion\IngestionErrorCode' => 'public',
     'Waaseyaa\Foundation\Exception\WaaseyaaException' => 'public',
     'Waaseyaa\Foundation\Http\HttpServiceResolverInterface' => 'public',
@@ -204,7 +205,6 @@ return [
 
     // Layer 4: API — public
     'Waaseyaa\Api\CodifiedContext\CodifiedContextSessionStoreInterface' => 'public',
-    'Waaseyaa\Api\JsonResponseTrait' => 'public',
     'Waaseyaa\Api\MutableTranslatableInterface' => 'public',
     'Waaseyaa\Routing\Language\LanguageNegotiatorInterface' => 'public',
 

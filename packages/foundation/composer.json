@@ -16,6 +16,7 @@
     "require": {
         "php": ">=8.4",
         "doctrine/dbal": "^4.0",
+        "psr/event-dispatcher": "^1.0",
         "symfony/dependency-injection": "^7.0",
         "symfony/event-dispatcher": "^7.0",
         "symfony/http-foundation": "^7.0",
@@ -30,6 +31,9 @@
         "waaseyaa/routing": "^0.1.0-alpha.150"
     },
     "autoload": {
+        "files": [
+            "src/Http/Request.php"
+        ],
         "psr-4": {
             "Waaseyaa\\Foundation\\": "src/"
         }

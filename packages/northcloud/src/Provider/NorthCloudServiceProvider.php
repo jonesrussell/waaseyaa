@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Waaseyaa\NorthCloud\Provider;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Foundation\Event\EventDispatcherInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\NorthCloud\Client\NorthCloudCache;

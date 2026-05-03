@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\SSR;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface as ComponentEventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Waaseyaa\Foundation\Event\EventDispatcherInterface;
 use Twig\Environment;
 use Waaseyaa\Access\ErrorPageRendererInterface;
 use Waaseyaa\Access\Gate\EntityAccessGate;
@@ -104,10 +103,6 @@ final class SsrServiceProvider extends ServiceProvider implements ConfiguresHttp
                 }
             }
         };
-
-        if (!$dispatcher instanceof ComponentEventDispatcherInterface) {
-            return;
-        }
 
         $dispatcher->addListener(EntityEvents::POST_SAVE->value, $invalidate);
         $dispatcher->addListener(EntityEvents::POST_DELETE->value, $invalidate);

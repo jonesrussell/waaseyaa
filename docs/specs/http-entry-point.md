@@ -31,3 +31,9 @@ Per-site session cookie options (e.g. `httponly`, `secure`, `samesite`) belong i
 ## Exceptions
 
 Apps with a **documented** non-standard entry (legacy bespoke front controllers) may set `WAASEYAA_AUDIT_SKIP_PUBLIC_INDEX=1` when running `./bin/waaseyaa-audit-site` until migrated. Record remediation in the site’s convergence audit (Section 8 of [`per-site-convergence-audit.md`](./per-site-convergence-audit.md)).
+
+## Symfony decoupling (mission 1107)
+
+Per ratified contract C-002 of mission 1107-api-symfony-decoupling, app code can type-hint `Waaseyaa\Foundation\Http\Request` instead of `\Symfony\Component\HttpFoundation\Request`. The Waaseyaa name is a `class_alias` of Symfony's class, registered via `autoload.files` in `packages/foundation/composer.json`, so all Symfony methods remain callable; the alias is loaded at composer bootstrap regardless of optimization mode.
+
+The mission's charter is **request/response/event-dispatch only** (Path R-narrow). Routing internals stay Symfony-coupled — `RouteBuilder` consumers continue to import `Symfony\Component\Routing\Route` directly. A future routing-decoupling mission is filed as a separate follow-up.

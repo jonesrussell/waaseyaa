@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Waaseyaa\Foundation\ServiceProvider\Capability;
 
 use Symfony\Component\Console\Command\Command;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Foundation\Event\EventDispatcherInterface;
 
 /**
  * Capability marker for service providers that contribute Symfony Console

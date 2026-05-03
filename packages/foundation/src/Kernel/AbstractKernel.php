@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Kernel;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as SymfonyContractEventDispatcherInterface;
+use Waaseyaa\Foundation\Event\EventDispatcherInterface;
+use Waaseyaa\Foundation\Event\SymfonyEventDispatcherAdapter;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Database\DBALDatabase;
@@ -47,7 +48,7 @@ use Waaseyaa\Plugin\Extension\KnowledgeToolingExtensionRunner;
  */
 abstract class AbstractKernel
 {
-    protected EventDispatcherInterface $dispatcher;
+    protected EventDispatcherInterface&SymfonyContractEventDispatcherInterface $dispatcher;
     protected DatabaseInterface $database;
     protected EntityTypeManager $entityTypeManager;
     protected ?\Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface $fieldRegistry = null;
@@ -132,7 +133,7 @@ abstract class AbstractKernel
             );
         }
 
-        $this->dispatcher         = new EventDispatcher();
+        $this->dispatcher         = new SymfonyEventDispatcherAdapter();
         $this->lifecycleManager   = new EntityTypeLifecycleManager($this->projectRoot);
         $this->entityAuditLogger  = new EntityAuditLogger($this->projectRoot);
 

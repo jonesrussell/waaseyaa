@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Waaseyaa\Foundation\Event\SymfonyEventDispatcherAdapter;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\Attribute\ContentEntityKeys;
 use Waaseyaa\Entity\Attribute\ContentEntityType;
@@ -713,7 +714,7 @@ final class Mission1257KernelPathTest extends TestCase
                 // bootEntityTypeManager() consume it. Reproduce the bare
                 // minimum so the tests can drive the wiring steps without
                 // running provider discovery or manifest compilation.
-                $this->dispatcher = new EventDispatcher();
+                $this->dispatcher = new SymfonyEventDispatcherAdapter();
             }
 
             public function publicBootDatabase(): void
