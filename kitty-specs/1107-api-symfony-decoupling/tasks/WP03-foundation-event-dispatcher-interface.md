@@ -11,7 +11,7 @@ merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks: []
 assignee: claude
-agent: claude
+agent: "claude"
 history: []
 authoritative_surface: packages/foundation/src/Event/
 execution_mode: code_change
@@ -20,6 +20,7 @@ owned_files:
 - packages/foundation/src/Event/SymfonyEventDispatcherAdapter.php
 - packages/foundation/tests/Contract/EventDispatcherContractTest.php
 tags: []
+shell_pid: "645614"
 ---
 
 # WP03 — Foundation EventDispatcherInterface + Symfony adapter
@@ -106,3 +107,4 @@ Waaseyaa-owned interface.
 ## Activity Log
 
 - (To be appended by the implementer.)
+- 2026-05-03T15:40:31Z – claude – shell_pid=645614 – Started review via action command
