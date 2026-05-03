@@ -1,7 +1,7 @@
 {
-  "event_count": 47,
-  "last_event_id": "01KQNKYJJDS3MEAFE5B0K5W9Z6",
-  "materialized_at": "2026-05-03T00:31:26.797590+00:00",
+  "event_count": 49,
+  "last_event_id": "01KQNM0Y1QZY19RETH414FH0T0",
+  "materialized_at": "2026-05-03T00:32:44.087875+00:00",
   "mission_number": "529",
   "mission_slug": "529-schema-evolution-v2",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 6,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 5
+    "planned": 4
   },
   "work_packages": {
     "WP01": {
@@ -74,11 +74,11 @@
       "last_transition_at": "2026-05-02T21:40:02.450470+00:00"
     },
     "WP09": {
-      "actor": "finalize-tasks",
+      "actor": "user",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQNA4QAEJYQC991E1P785KYQ",
-      "last_transition_at": "2026-05-02T21:40:02.510978+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KQNM0Y1QZY19RETH414FH0T0",
+      "last_transition_at": "2026-05-03T00:32:44.087875+00:00"
     },
     "WP10": {
       "actor": "finalize-tasks",

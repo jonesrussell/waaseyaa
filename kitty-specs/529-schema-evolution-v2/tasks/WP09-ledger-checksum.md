@@ -148,3 +148,7 @@ Read before starting:
 - **Production gate must be loud.** `CHECKSUM_MISMATCH` is the loudest possible failure mode. Don't hide it behind a config flag — it should always throw in production.
 - **Backfill is opt-in.** Most installs should NOT run the backfill script; null checksums for pre-WP09 rows are the default and verify mode tolerates them. Document this clearly so operators don't run the script "to be safe."
 - **Self-application caveat:** the ledger schema migration applies itself before its own ledger row can be written. The bootstrapper must handle this special case — usually by checking if the columns exist before writing the row, similar to how `ensureTable()` works for entity tables.
+
+## Activity Log
+
+- 2026-05-03T00:32:44Z – unknown – Moved to in_progress
