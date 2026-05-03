@@ -157,3 +157,7 @@ Read before starting:
 - **No opaque class-string registries.** Every FQCN entry is validated at discovery time against composer's autoload map. Untrusted JSON containing arbitrary `::class` strings would let someone register a class that doesn't exist as a "migration" — silent skip. Reject loud.
 - **Heuristic fragility:** the FQCN-vs-path detector in T065 has edge cases (Windows paths with `\\`?). The ADR should call this out and propose explicit override syntax (`{"type": "namespace", "value": "..."}`) for a future iteration if real-world ambiguity emerges.
 - **Don't reorder arrays.** Some JSON parsers / type widenings can silently key-rewrite. Test it explicitly with a fixture that would reorder under associative-array assumptions.
+
+## Activity Log
+
+- 2026-05-03T01:23:25Z – unknown – Moved to in_progress
