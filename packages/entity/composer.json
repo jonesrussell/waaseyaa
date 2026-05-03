@@ -55,6 +55,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Waaseyaa\\Entity\\PhpStan\\": "testing/PhpStan/",
             "Waaseyaa\\Entity\\Tests\\": "tests/"
         }
     },
