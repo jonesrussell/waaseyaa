@@ -1,8 +1,0 @@
-id,kind,reference,note
-S001,source-file,packages/entity/src/Attribute/FieldTypeInferrer.php,Inferrer to extend
-S002,source-file,packages/entity/tests/Unit/Attribute/FieldTypeInferrerTest.php,Unit-test home
-S003,source-file,packages/entity/tests/Fixtures/AttributeFirstEntities/InferrerTestFixtures.php,Reflection fixtures
-S004,source-file,packages/node/src/Node.php,Refactor site #1 (uid)
-S005,source-file,packages/taxonomy/src/Term.php,Refactor site #2 (parent_id)
-S006,spec,docs/specs/entity-system.md,Section "Known Transitional Gaps" item 3
-S007,commit,ce123bfe,M1 attribute-first entity definition merge
