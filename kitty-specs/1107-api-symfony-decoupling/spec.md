@@ -60,9 +60,21 @@ All five choice points decided. Pragmatic, reversible v1 shape across the board.
 
 `DomainEvent` continues to `extends \Symfony\Contracts\EventDispatcher\Event`. Only the dispatcher gets a Waaseyaa-owned interface (S3, WP03). App code uses `Waaseyaa\Foundation\Event\EventDispatcherInterface` to dispatch; event subclasses still inherit Symfony's `Event` via `DomainEvent`. Leak contained to Foundation; consumers don't see it directly. WP05 documents this as an explicit framework-internal contract in `docs/specs/infrastructure.md` (closes drift D4).
 
-### C4 — Trait ownership: move-and-deprecate — RATIFIED option (a)
+### C4 — Trait ownership: foundation-canonical (inverted) — RATIFIED option (a-inverted) on 2026-05-03
 
-Canonical JSON:API response trait moves to `packages/api`. Foundation keeps a deprecation shim that proxies to the api one. **Layer-rule prerequisite (WP02 verifies):** foundation L0 cannot import api L4 directly. The shim must be implementable without an upward edge — likely via `class_alias` to a deprecated location, or a foundation-side trait that internally constructs the api response by class name (string) without importing it. WP02 confirms the cleanest path and records it in `tasks.md`. If neither path works, surface to user before WP04 implements; do not silently downgrade to option (b).
+**Original ratification (2026-04-30):** option (a) move-and-deprecate; canonical trait moves to `packages/api`; foundation keeps a deprecation shim. **Amended on 2026-05-03 after WP02 prerequisite audit.**
+
+WP02's T004 layer-rule audit found that none of the three shim paths in the original plan are implementable:
+
+1. `class_alias` shim — PHP only aliases classes, not traits.
+2. Hard-delete the foundation trait — would break 9 in-package consumers (`HttpKernel`, `ControllerDispatcher`, and 7 routers: `JsonApiRouter`, `SchemaRouter`, `SearchRouter`, `McpRouter`, `BroadcastRouter`, `EntityTypeLifecycleRouter`, `CodifiedContextApiRouter`).
+3. Foundation trait re-implements the payload internally — keeps two divergent copies, defeats consolidation goal.
+
+**Amended decision (a-inverted):** **Canonical trait stays in `packages/foundation` as `Waaseyaa\Foundation\Http\JsonApiResponseTrait`** (where it already lives and where 9 in-package consumers + 4 cross-layer consumers — `graphql/GraphQlRouter`, `ssr/SsrRouter`, `ssr/AppControllerRouter`, `media/MediaRouter` — already import it). The duplicate `Waaseyaa\Api\JsonResponseTrait` is **deleted**. Api consumers (`JsonApiController`, `SchemaController`, etc.) `use Waaseyaa\Foundation\Http\JsonApiResponseTrait` directly. L4 → L0 imports are allowed by the layer rule, so no shim is needed.
+
+This still consolidates to one trait, still removes the duplicate, still resolves drift D3 — just from foundation's side rather than api's. WP04's surface is unchanged: ship `Waaseyaa\Api\Http\JsonApiResponse` (the new response *class*) and remove the duplicate trait. WP05 still documents the canonical pattern in `docs/specs/jsonapi.md` and `docs/specs/api-layer.md`.
+
+Audit evidence and recommendation are in `tasks/WP02-foundation-http-request-type.md` activity log.
 
 ### C5 — Symfony-import boundary linter: out-of-scope — RATIFIED option (b)
 
@@ -91,7 +103,7 @@ Canonical JSON:API response trait moves to `packages/api`. Foundation keeps a de
 | FR-001 | `Waaseyaa\Api\Http\JsonApiResponse` MUST exist per ratified C-001 (subclass of `\Symfony\Component\HttpFoundation\JsonResponse`). | ratified |
 | FR-002 | `Waaseyaa\Foundation\Http\Request` MUST exist per ratified C-002 (`class_alias` of `\Symfony\Component\HttpFoundation\Request`). | ratified |
 | FR-003 | `Waaseyaa\Foundation\Event\EventDispatcherInterface` MUST exist (PSR-14 compatible) with a `SymfonyEventDispatcherAdapter` default binding. | ratified |
-| FR-004 | The canonical JSON:API response trait MUST live in `packages/api`; `Waaseyaa\Api\JsonResponseTrait` MUST be removed; foundation's previous trait MUST be replaced via the C-004 shim path WP02 records in `tasks.md`. | ratified |
+| FR-004 | **Amended 2026-05-03:** The canonical JSON:API response trait MUST live in `packages/foundation` as `Waaseyaa\Foundation\Http\JsonApiResponseTrait` (its existing location). The duplicate `Waaseyaa\Api\JsonResponseTrait` MUST be removed. Api consumers MUST import foundation's trait directly (L4 → L0). | ratified |
 | FR-005 | The five spec docs `api-layer.md`, `jsonapi.md`, `http-entry-point.md`, `middleware-pipeline.md`, `infrastructure.md` MUST reference the new types and tighten charter language to Path R-narrow. | ratified |
 | FR-006 | A contract test in `packages/api/tests/Contract/` MUST assert that a sample app controller produces a JSON:API response without importing any `Symfony\` class. | ratified |
 
@@ -102,7 +114,7 @@ Canonical JSON:API response trait moves to `packages/api`. Foundation keeps a de
 | C-001 | `Waaseyaa\Api\Http\JsonApiResponse` shape: subclass vs standalone wrapper. | (a) subclass — `JsonApiResponse extends \Symfony\Component\HttpFoundation\JsonResponse`. |
 | C-002 | `Waaseyaa\Foundation\Http\Request` shape: class alias vs real wrapper. | (a) class alias — `class_alias(Symfony Request, Waaseyaa Request)`. |
 | C-003 | `Waaseyaa\Foundation\Event\DomainEvent` parent: keep Symfony Event vs flip to PSR-14 only. | (a) keep Symfony parent; only the dispatcher gets a Waaseyaa interface. Documented in `infrastructure.md`. |
-| C-004 | `JsonApiResponseTrait` ownership: keep both / move-and-deprecate / hard delete. | (a) move-and-deprecate; canonical trait in `packages/api`; foundation gets the shim path WP02 records — must NOT add a foundation→api Composer require edge. |
+| C-004 | `JsonApiResponseTrait` ownership: keep both / move-and-deprecate / hard delete. | **Amended 2026-05-03:** (a-inverted) foundation-canonical. Canonical `Waaseyaa\Foundation\Http\JsonApiResponseTrait` stays in foundation; the duplicate `Waaseyaa\Api\JsonResponseTrait` is deleted; api consumers import foundation's trait (L4 → L0, allowed). Original (a) was unimplementable — WP02 audit confirmed PHP traits cannot be class_aliased and 9 foundation files use the trait. |
 | C-005 | `bin/check-symfony-imports` boundary linter: in-scope vs follow-up issue. | (b) follow-up issue. WP06 dropped from this mission; WP05 files the follow-up at acceptance. |
 
 ## Acceptance
@@ -112,7 +124,7 @@ The mission accepts when ALL of:
 1. C1-C5 ratified by user; chosen options recorded in `spec.md`.
 2. `Waaseyaa\Foundation\Http\Request` exists per C2 (alias or wrapper).
 3. `Waaseyaa\Foundation\Event\EventDispatcherInterface` exists with `SymfonyEventDispatcherAdapter` default binding.
-4. `Waaseyaa\Api\Http\JsonApiResponse` exists per C1; canonical trait lives in api package per C4; `Waaseyaa\Api\JsonResponseTrait` removed.
+4. `Waaseyaa\Api\Http\JsonApiResponse` exists per C1; canonical trait stays in foundation as `Waaseyaa\Foundation\Http\JsonApiResponseTrait` per amended C4; the duplicate `Waaseyaa\Api\JsonResponseTrait` is removed; api consumers import foundation's trait directly.
 5. `JsonApiController` and `SchemaController` migrated to the new response type.
 6. Five spec docs updated: `api-layer.md`, `jsonapi.md`, `http-entry-point.md`, `middleware-pipeline.md`, `infrastructure.md`.
 7. Contract test in `packages/api/tests/Contract/` asserts a sample app controller produces a JSON:API response without importing any `Symfony\` class.

@@ -123,6 +123,16 @@ record the chosen shim path in `tasks.md`.
 
 ## Activity Log
 
-- (To be appended by the implementer.)
-- 2026-05-03T15:20:03Z – claude – shell_pid=640329 – Started review via action command
-- 2026-05-03T15:22:01Z – claude – shell_pid=640329 – Self-review passed. RequestAliasTest 2/2 green; Foundation Http regression 50/50 green; layer/policy/CS gates all clean. C-004 prerequisite (T004) audited and surfaced; user-ratified amendment patch saved at /tmp/kitty-specs-amendment.patch and will land on main as a separate spec-update commit.
+- 2026-05-03 – claude – T002 + T003 done. `packages/foundation/src/Http/Request.php` aliases Symfony's `HttpFoundation\Request` (string-literal `class_alias` with `class_exists` guard). `packages/foundation/composer.json` registers `src/Http/Request.php` under `autoload.files`. After `composer update waaseyaa/foundation`, `vendor/composer/autoload_files.php` carries the entry. `RequestAliasTest` (2 tests, 3 assertions) green. `bin/check-package-layers` clean. `composer check-composer-policy` clean. PHP-CS-Fixer clean on both new files. Foundation `tests/Unit/Http/` regression run: 50/50 green.
+- 2026-05-03 – claude – **T004 — C-004 layer-rule prerequisite: BLOCKED, surfacing to user.** The ratified plan ("canonical `JsonApiResponseTrait` moves to `packages/api`; foundation keeps a deprecation shim") is not cleanly implementable. Audit findings:
+  - `Waaseyaa\Foundation\Http\JsonApiResponseTrait` is consumed by 9 foundation-internal files: `HttpKernel`, `ControllerDispatcher`, and 7 routers (`JsonApiRouter`, `SchemaRouter`, `SearchRouter`, `McpRouter`, `BroadcastRouter`, `EntityTypeLifecycleRouter`, `CodifiedContextApiRouter`).
+  - It is also used by 4 higher-layer files: `graphql/GraphQlRouter` (L4), `ssr/SsrRouter` + `ssr/AppControllerRouter` (L6), `media/MediaRouter` (L2). These downward imports are fine — they just confirm the trait is broadly relied on.
+  - None of the three WP02-spec shim paths works:
+    1. `class_alias` shim — PHP traits cannot be aliased; only classes can.
+    2. Hard-delete the foundation trait — would break 9 in-package consumers including the kernel.
+    3. Foundation trait re-implements the payload internally — that's just keeping two implementations, defeating the consolidation goal.
+  - **Recommended alternative (inverts C-004's directional assumption):** keep the canonical trait in **foundation** (where 9 consumers already live). Delete the duplicate `Waaseyaa\Api\JsonResponseTrait`. Have api consumers `use Waaseyaa\Foundation\Http\JsonApiResponseTrait` — a downward import (L4 → L0), allowed by the layer rule.
+  - **Per the WP02 acceptance criteria, decision needed from user before WP04 enters implement. Do not silently downgrade.**
+- 2026-05-03 – claude – User adopted the inversion. C-004 amended in `spec.md` (Ratified contracts §C4, Constraints table, FR-004, Acceptance item 4). WP04 prompt rewritten to delete `packages/api/src/JsonResponseTrait.php` and migrate api consumers to import foundation's canonical trait directly. WP02 acceptance criteria for T004 satisfied: shim path decided as "no shim needed; foundation-canonical with downward L4 → L0 import for api consumers."
+- 2026-05-03T15:20:03Z – claude – shell_pid=640329 – Started review via action command.
+- 2026-05-03T15:22:01Z – claude – shell_pid=640329 – Self-review passed. RequestAliasTest 2/2 green; Foundation Http regression 50/50 green; layer/policy/CS gates all clean. C-004 amendment landing on main as a separate spec-update commit.
