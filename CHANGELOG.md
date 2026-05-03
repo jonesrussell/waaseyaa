@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.169] - 2026-05-03
+
 ### Changed
 
 - **`skeleton-smoke` CI now pins to the exact upstream tag**: previously `composer create-project --stability=alpha` resolved to whatever Packagist had indexed, which lagged the just-cut tag by minutes — every auto-triggered run ran against the *previous* release. The workflow now resolves a target version (workflow_dispatch input or upstream sync-skeleton tag), runs `composer require waaseyaa/framework:<version>` with a 12×60s retry loop that bridges the Packagist crawl window, and verifies the installed version matches before running migrations and the entity round-trip. Verifies the smoke is actually exercising the release it claims to.
