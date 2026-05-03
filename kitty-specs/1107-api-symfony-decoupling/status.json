@@ -1,16 +1,16 @@
 {
-  "event_count": 26,
-  "last_event_id": "01KQQ96SWZT31R5EC3GGPK3XS0",
-  "materialized_at": "2026-05-03T16:02:10.975025+00:00",
-  "mission_number": "1107",
+  "event_count": 30,
+  "last_event_id": "01KQQ9BFPMP49AT4130JDAZVFF",
+  "materialized_at": "2026-05-03T16:04:44.372171+00:00",
+  "mission_number": "8",
   "mission_slug": "1107-api-symfony-decoupling",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 4,
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 1,
+    "done": 5,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
@@ -25,32 +25,32 @@
       "last_transition_at": "2026-05-03T15:02:26.686329+00:00"
     },
     "WP02": {
-      "actor": "user",
+      "actor": "claude",
       "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KQQ6X7TN7C3GW3A75HMQ2P45",
-      "last_transition_at": "2026-05-03T15:22:00.405973+00:00"
+      "lane": "done",
+      "last_event_id": "01KQQ9BC8G9PGFJ5C5NYVKCQPM",
+      "last_transition_at": "2026-05-03T16:04:40.848368+00:00"
     },
     "WP03": {
-      "actor": "user",
+      "actor": "claude",
       "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KQQ7ZZAJ8N0N50V65TS706AF",
-      "last_transition_at": "2026-05-03T15:40:58.578767+00:00"
+      "lane": "done",
+      "last_event_id": "01KQQ9BDAQ64JWW99PSN6YHQQT",
+      "last_transition_at": "2026-05-03T16:04:41.944004+00:00"
     },
     "WP04": {
-      "actor": "user",
+      "actor": "claude",
       "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KQQ8DMWY484HT682DH691M1K",
-      "last_transition_at": "2026-05-03T15:48:26.654550+00:00"
+      "lane": "done",
+      "last_event_id": "01KQQ9BEEVZ0QXJ7GZNTY34ZC8",
+      "last_transition_at": "2026-05-03T16:04:43.099653+00:00"
     },
     "WP05": {
-      "actor": "user",
+      "actor": "claude",
       "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KQQ96SWZT31R5EC3GGPK3XS0",
-      "last_transition_at": "2026-05-03T16:02:10.975025+00:00"
+      "lane": "done",
+      "last_event_id": "01KQQ9BFPMP49AT4130JDAZVFF",
+      "last_transition_at": "2026-05-03T16:04:44.372171+00:00"
     }
   }
 }
