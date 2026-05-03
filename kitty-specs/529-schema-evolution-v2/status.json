@@ -1,17 +1,17 @@
 {
-  "event_count": 74,
-  "last_event_id": "01KQNQJ7R4ZRVFB6P6Q4KJN521",
-  "materialized_at": "2026-05-03T01:34:36.804727+00:00",
+  "event_count": 76,
+  "last_event_id": "01KQNQJ9ENJH3W4008FSTQPQAJ",
+  "materialized_at": "2026-05-03T01:34:38.549091+00:00",
   "mission_number": "529",
   "mission_slug": "529-schema-evolution-v2",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 0,
+    "approved": 1,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
     "done": 10,
-    "for_review": 1,
+    "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
     "planned": 0
@@ -90,9 +90,9 @@
     "WP11": {
       "actor": "user",
       "force_count": 2,
-      "lane": "for_review",
-      "last_event_id": "01KQNQJ7R4ZRVFB6P6Q4KJN521",
-      "last_transition_at": "2026-05-03T01:34:36.804727+00:00"
+      "lane": "approved",
+      "last_event_id": "01KQNQJ9ENJH3W4008FSTQPQAJ",
+      "last_transition_at": "2026-05-03T01:34:38.549091+00:00"
     }
   }
 }
