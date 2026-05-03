@@ -1,0 +1,67 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\CLI\Tests\Unit\Command\Migrate;
+
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Waaseyaa\CLI\Command\Migrate\OutputSanitizer;
+
+#[CoversClass(OutputSanitizer::class)]
+final class OutputSanitizerTest extends TestCase
+{
+    #[Test]
+    public function developmentModePassesThrough(): void
+    {
+        $s = new OutputSanitizer(isProduction: false);
+
+        self::assertSame(
+            'In /home/jones/dev/waaseyaa/packages/foo.php on line 42',
+            $s->sanitize('In /home/jones/dev/waaseyaa/packages/foo.php on line 42'),
+        );
+    }
+
+    #[Test]
+    public function productionStripsAbsolutePhpPaths(): void
+    {
+        $s = new OutputSanitizer(isProduction: true);
+
+        self::assertSame(
+            'In <path> on line 42',
+            $s->sanitize('In /home/jones/dev/waaseyaa/packages/foo.php on line 42'),
+        );
+    }
+
+    #[Test]
+    public function productionPreservesMigrationIds(): void
+    {
+        // Migration ids look like "package/name:v2:slug" — colons set
+        // them apart from filesystem paths. Sanitizer must not touch.
+        $s = new OutputSanitizer(isProduction: true);
+
+        $message = 'Migration "waaseyaa/foundation:v2:ledger-add-checksum-columns" mismatch.';
+        self::assertSame($message, $s->sanitize($message));
+    }
+
+    #[Test]
+    public function productionPreservesPackageNames(): void
+    {
+        $s = new OutputSanitizer(isProduction: true);
+
+        self::assertSame(
+            'Package waaseyaa/cli is missing.',
+            $s->sanitize('Package waaseyaa/cli is missing.'),
+        );
+    }
+
+    #[Test]
+    public function productionStripsMultiplePathsInOneMessage(): void
+    {
+        $s = new OutputSanitizer(isProduction: true);
+
+        $input = 'See /a/b/foo.php and /c/d/bar.json for details.';
+        self::assertSame('See <path> and <path> for details.', $s->sanitize($input));
+    }
+}

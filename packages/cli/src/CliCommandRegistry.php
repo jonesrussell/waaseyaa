@@ -197,12 +197,26 @@ final class CliCommandRegistry
 
     /**
      * @param \Closure(): array<string, array<string, \Waaseyaa\Foundation\Migration\Migration>> $migrationsProvider
+     * @param \Closure(): list<\Waaseyaa\Foundation\Schema\Migration\MigrationInterfaceV2>|null  $v2MigrationsProvider
      * @return list<\Symfony\Component\Console\Command\Command>
      */
-    public function migrationCommands(Migrator $migrator, \Closure $migrationsProvider): array
-    {
+    public function migrationCommands(
+        Migrator $migrator,
+        \Closure $migrationsProvider,
+        ?\Closure $v2MigrationsProvider = null,
+        ?\Waaseyaa\Foundation\Migration\MigrationRepository $migrationRepository = null,
+        ?\Waaseyaa\Foundation\Schema\Compiler\Sqlite\SqliteCompiler $compiler = null,
+        bool $isProduction = true,
+    ): array {
         return [
-            new MigrateCommand($migrator, $migrationsProvider),
+            new MigrateCommand(
+                $migrator,
+                $migrationsProvider,
+                $v2MigrationsProvider,
+                $migrationRepository,
+                $compiler,
+                $isProduction,
+            ),
             new MigrateRollbackCommand($migrator, $migrationsProvider),
             new MigrateStatusCommand($migrator, $migrationsProvider),
         ];

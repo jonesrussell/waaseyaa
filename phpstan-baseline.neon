@@ -1237,6 +1237,12 @@ parameters:
 			path: packages/foundation/src/Kernel/AbstractKernel.php
 
 		-
+			message: '#^Class Waaseyaa\\Foundation\\Kernel\\AbstractKernel has an uninitialized property \$migrationRepository\. Give it default value or assign it in the constructor\.$#'
+			identifier: property.uninitialized
+			count: 1
+			path: packages/foundation/src/Kernel/AbstractKernel.php
+
+		-
 			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
 			identifier: ternary.shortNotAllowed
 			count: 1

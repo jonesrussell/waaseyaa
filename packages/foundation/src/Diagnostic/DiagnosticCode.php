@@ -32,6 +32,13 @@ enum DiagnosticCode: string
     case INGESTION_LOG_OVERSIZED     = 'INGESTION_LOG_OVERSIZED';
     case INGESTION_RECENT_FAILURES   = 'INGESTION_RECENT_FAILURES';
 
+    // --- Schema-evolution v2 codes (mission #529) ---
+    case CHECKSUM_MISMATCH           = 'CHECKSUM_MISMATCH';
+    case LEDGER_ORPHAN               = 'LEDGER_ORPHAN';
+    case MIGRATION_CYCLE             = 'MIGRATION_CYCLE';
+    case UNKNOWN_DEPENDENCY          = 'UNKNOWN_DEPENDENCY';
+    case INCOMPATIBLE_FLAGS          = 'INCOMPATIBLE_FLAGS';
+
     public function defaultMessage(): string
     {
         return match ($this) {
@@ -65,6 +72,16 @@ enum DiagnosticCode: string
                 'The ingestion log file exceeds the expected size for the retention window. Run pruning.',
             self::INGESTION_RECENT_FAILURES =>
                 'A high proportion of recent ingestion attempts have failed.',
+            self::CHECKSUM_MISMATCH =>
+                'A v2 migration was re-applied with a different source checksum than the one recorded in the ledger. Production refuses silent re-apply; the same migration_id cannot mean two different structural intents.',
+            self::LEDGER_ORPHAN =>
+                'A ledger row references a migration_id whose source could no longer be located in the loaded migration set. Verify mode treats orphans as drift.',
+            self::MIGRATION_CYCLE =>
+                'The unified migration dependency graph contains a cycle. The Migrator cannot produce a deterministic apply order until the cycle is broken.',
+            self::UNKNOWN_DEPENDENCY =>
+                'A v2 migration declared a dependency string that resolves to no known migration_id and no known package in the current run.',
+            self::INCOMPATIBLE_FLAGS =>
+                'The CLI invocation combined flags that cannot be used together (for example, `migrate --dry-run --verify`).',
         };
     }
 
@@ -101,6 +118,16 @@ enum DiagnosticCode: string
                 'Run `waaseyaa health:check` to review log size, then prune old entries or increase the retention window.',
             self::INGESTION_RECENT_FAILURES =>
                 'Review recent ingestion errors in storage/framework/ingestion.jsonl. Check envelope format and payload schemas.',
+            self::CHECKSUM_MISMATCH =>
+                'Either revert the source change so the canonical SchemaDiff matches the stored checksum, or author a new migration_id (Q1 — migration_id is the canonical key).',
+            self::LEDGER_ORPHAN =>
+                'Investigate whether the migration was deliberately removed (uninstalled package, deleted local file). If so, document the orphan; do not silently delete the ledger row.',
+            self::MIGRATION_CYCLE =>
+                'Inspect the cycle path in the exception message and remove one of the dependency edges. v2 dependencies and legacy `$after` are both candidates.',
+            self::UNKNOWN_DEPENDENCY =>
+                'Check the spelling of the dependency string and ensure the dependency package is installed in this composer install.',
+            self::INCOMPATIBLE_FLAGS =>
+                'Pass only one mode flag at a time: `migrate` (apply), `migrate --dry-run` (preview), or `migrate --verify` (audit).',
         };
     }
 
@@ -127,6 +154,13 @@ enum DiagnosticCode: string
             self::NAMESPACE_RESERVED,
             self::STORAGE_DIRECTORY_MISSING,
             self::INGESTION_LOG_OVERSIZED => 'warning',
+
+            self::CHECKSUM_MISMATCH,
+            self::MIGRATION_CYCLE,
+            self::UNKNOWN_DEPENDENCY,
+            self::INCOMPATIBLE_FLAGS => 'error',
+
+            self::LEDGER_ORPHAN => 'warning',
         };
     }
 }

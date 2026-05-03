@@ -57,6 +57,7 @@ abstract class AbstractKernel
     protected EntityAuditLogger $entityAuditLogger;
     protected Migrator $migrator;
     protected MigrationLoader $migrationLoader;
+    protected MigrationRepository $migrationRepository;
 
     /** @var array<string, mixed> */
     protected array $config = [];
@@ -314,11 +315,11 @@ abstract class AbstractKernel
         assert($this->database instanceof DBALDatabase);
         $connection = $this->database->getConnection();
 
-        $repository = new MigrationRepository($connection);
-        $repository->createTable();
+        $this->migrationRepository = new MigrationRepository($connection);
+        $this->migrationRepository->createTable();
 
         $this->migrationLoader = new MigrationLoader($this->projectRoot, $this->manifest);
-        $this->migrator = new Migrator($connection, $repository);
+        $this->migrator = new Migrator($connection, $this->migrationRepository);
     }
 
     protected function discoverAndRegisterProviders(): void
