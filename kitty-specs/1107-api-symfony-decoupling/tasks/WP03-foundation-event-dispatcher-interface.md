@@ -108,3 +108,4 @@ Waaseyaa-owned interface.
 
 - (To be appended by the implementer.)
 - 2026-05-03T15:40:31Z – claude – shell_pid=645614 – Started review via action command
+- 2026-05-03T15:40:59Z – claude – shell_pid=645614 – Self-review passed. EventDispatcherContractTest 6/6 green (8 assertions). Foundation 947/947, Unit suite 6388/6388, Integration 782/782 — all green. Public APIs (HasCommandsInterface, HasRenderCacheListenersInterface) migrated to Waaseyaa interface; implementers (NorthCloud, SSR) updated. Adapter implements both Waaseyaa and Symfony component interfaces so internal kernel pipes need no migration. Surface map records new interface as 'public'. bin/check-package-layers, composer check-composer-policy, php-cs-fixer all clean.
