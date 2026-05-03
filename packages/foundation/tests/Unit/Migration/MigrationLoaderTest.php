@@ -8,8 +8,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
-use Waaseyaa\Foundation\Migration\MigrationLoader;
 use Waaseyaa\Foundation\Migration\Migration;
+use Waaseyaa\Foundation\Migration\MigrationLoader;
 
 #[CoversClass(MigrationLoader::class)]
 final class MigrationLoaderTest extends TestCase

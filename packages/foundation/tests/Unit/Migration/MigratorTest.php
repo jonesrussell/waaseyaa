@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Tests\Unit\Migration;
 
+use Doctrine\DBAL\DriverManager;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 use Waaseyaa\Foundation\Migration\Migration;
 use Waaseyaa\Foundation\Migration\MigrationRepository;
 use Waaseyaa\Foundation\Migration\MigrationResult;
 use Waaseyaa\Foundation\Migration\Migrator;
 use Waaseyaa\Foundation\Migration\SchemaBuilder;
 use Waaseyaa\Foundation\Migration\TableBuilder;
-use Doctrine\DBAL\DriverManager;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Migrator::class)]
 #[CoversClass(MigrationRepository::class)]
@@ -110,15 +110,21 @@ final class MigratorTest extends TestCase
     {
         $order = [];
 
-        $migrationA = new class($order) extends Migration {
+        $migrationA = new class ($order) extends Migration {
             public array $after = ['waaseyaa/base'];
             public function __construct(private array &$order) {}
-            public function up(SchemaBuilder $schema): void { $this->order[] = 'A'; }
+            public function up(SchemaBuilder $schema): void
+            {
+                $this->order[] = 'A';
+            }
         };
 
-        $migrationB = new class($order) extends Migration {
+        $migrationB = new class ($order) extends Migration {
             public function __construct(private array &$order) {}
-            public function up(SchemaBuilder $schema): void { $this->order[] = 'B'; }
+            public function up(SchemaBuilder $schema): void
+            {
+                $this->order[] = 'B';
+            }
         };
 
         // B is in waaseyaa/base, A depends on waaseyaa/base — B must run first

@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Tests\Unit\Migration;
 
-use Waaseyaa\Foundation\Migration\Migration;
-use Waaseyaa\Foundation\Migration\SchemaBuilder;
-use Waaseyaa\Foundation\Migration\TableBuilder;
 use Doctrine\DBAL\DriverManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Waaseyaa\Foundation\Migration\Migration;
+use Waaseyaa\Foundation\Migration\SchemaBuilder;
+use Waaseyaa\Foundation\Migration\TableBuilder;
 
 #[CoversClass(SchemaBuilder::class)]
 #[CoversClass(TableBuilder::class)]
