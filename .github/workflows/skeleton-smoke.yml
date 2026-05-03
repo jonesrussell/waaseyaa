@@ -101,8 +101,12 @@ jobs:
           CONSTRAINT: ${{ steps.target.outputs.constraint }}
         run: |
           installed=$(composer show waaseyaa/framework | grep '^versions' | awk '{print $4}')
+          # `composer show` returns the version with the `v` prefix; CONSTRAINT
+          # has already had it stripped. Normalize both sides before comparing.
+          installed_normalized="${installed#v}"
+          expected_normalized="${CONSTRAINT#v}"
           echo "Installed: ${installed} (expected ${CONSTRAINT})"
-          [[ "$installed" == "$CONSTRAINT" ]] || { echo "version mismatch" >&2; exit 1; }
+          [[ "$installed_normalized" == "$expected_normalized" ]] || { echo "version mismatch" >&2; exit 1; }
 
       - name: Run migrations
         working-directory: smoke-app
