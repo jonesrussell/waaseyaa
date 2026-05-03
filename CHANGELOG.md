@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.170] - 2026-05-03
+
 ### Fixed
 
 - **Packagist crawl unblocked** — root `composer.json` carried `"version": "1.1.0"` (added in PR #385 to source AboutCommand from a canonical place). Packagist refused every release tag from v0.1.0-alpha.145 onward with `Skipped tag v0.1.0-alpha.169, tag (0.1.0.0-alpha169) does not match version (1.1.0.0) in composer.json`, leaving the package frozen at alpha.144 since 2026-04-15. ~3 weeks of silent release outage. Removing the field; Composer now derives the version from the git tag (or `dev-main` for development checkouts) and AboutCommand reads the same source automatically. ConsoleKernelVersionTest still passes.
