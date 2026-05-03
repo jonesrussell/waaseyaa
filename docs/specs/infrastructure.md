@@ -858,6 +858,27 @@ Packages ship SQL DDL migrations under a **single directory** registered in `com
 
 **Ordering:** Prefer numeric or ISO-date prefixes in filenames so `glob` + `sort` order matches intended apply order. Use `Migration::$after` with **Composer package names** when one package’s migrations must run after another’s (see `Migrator::topologicalSort()`).
 
+#### v2 array form (mission #529 / WP11)
+
+Per spec §15 Q9, `extra.waaseyaa.migrations` also accepts an **ordered list** of mixed FQCN namespace prefixes and path strings, enabling packages that ship v2 migrations (`MigrationInterfaceV2`) alongside (or instead of) legacy directory-based ones:
+
+```json
+"extra": {
+    "waaseyaa": {
+        "migrations": [
+            "Vendor\\Pkg\\Migrations\\v2",
+            "../patches/v2"
+        ]
+    }
+}
+```
+
+`PackageManifestCompiler::validateMigrationsEntry()` rejects malformed entries (associative arrays, non-string elements, non-string-or-array top-level values) with stable code `INVALID_MIGRATION_ENTRY` (`InvalidMigrationEntryException`). `MigrationLoader` exposes two methods that walk the same manifest in order: `loadAll()` resolves path entries to legacy `Migration` instances; `loadAllV2()` resolves FQCN entries via Composer's classmap to `MigrationInterfaceV2` instances. The string form (`"migrations": "migrations"`) is preserved indefinitely (Q9 — no removal date) and is internally normalised to a single-element list.
+
+**Entry classification heuristic (v1):** entries containing a backslash are FQCN namespace prefixes; everything else is a path string. Full discovery rules — including the no-match warning, classmap optimization requirement, and Windows-path caveat — live in `docs/adr/009-migration-manifest-discovery.md`.
+
+**v2 ordering:** within a package, list entries traverse left-to-right. Across packages, the unified migration DAG (mission #529 / WP06) reorders nodes by their declared `dependencies()`; raw discovery order is only the input. Within an FQCN entry, classmap iteration order is implementation-defined — v2 plans should not depend on it. Use explicit `MigrationInterfaceV2::dependencies()` for cross-migration ordering.
+
 **Entity tables:** Kernel `SqlSchemaHandler::ensureTable()` creates base columns (`id`, `uuid`, `bundle`, label/langcode keys, `_data`, …) when storage is first resolved. **Additive** columns (field-backed lookups, indexes) belong in package migrations so they run on **`db:init`** / `migrate` paths that do not eagerly touch every entity type. Do **not** add recurring `SqlSchemaHandler::addFieldColumns()` calls in `ServiceProvider::boot()` for the same DDL — that duplicates schema truth and runs every request.
 
 **SQLite / `down()`:** Additive column migrations may use a no-op `down()` when portable `DROP COLUMN` is not guaranteed; prefer compensating migrations for breaking changes.
