@@ -14,7 +14,7 @@ merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks: []
 assignee: claude
-agent: claude
+agent: "claude"
 history: []
 authoritative_surface: docs/specs/
 execution_mode: code_change
@@ -26,6 +26,7 @@ owned_files:
 - docs/specs/infrastructure.md
 - packages/api/tests/Contract/SymfonyImportBoundaryTest.php
 tags: []
+shell_pid: "650851"
 ---
 
 # WP05 — Spec docs and contract test
@@ -116,3 +117,4 @@ references. File the deferred follow-up issue per ratified C-005 (b).
 ## Activity Log
 
 - (To be appended by the implementer.)
+- 2026-05-03T16:01:53Z – claude – shell_pid=650851 – Started review via action command
