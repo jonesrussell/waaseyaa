@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Packaged-form smoke CI** (#1315 Criterion B): new `.github/workflows/skeleton-smoke.yml` auto-fires after `Sync Application Skeleton` succeeds on each release tag. Runs `composer create-project waaseyaa/waaseyaa` against Packagist (with crawl-lag retry), executes migrations, then a User entity save/reload round-trip via `tools/skeleton-smoke/smoke.php`. Catches the alpha.148 → alpha.151 class of consumer-install regressions where the framework's source-tree test harness diverges from a real Packagist install.
+
 ## [0.1.0-alpha.165] - 2026-05-02
 
 ### Added
