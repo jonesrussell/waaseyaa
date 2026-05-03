@@ -1,0 +1,62 @@
+name: Skeleton Smoke (Packaged-form CI)
+
+# Resolves Criterion B of #1315: composer-install the published alpha from
+# Packagist into a minimal skeleton app and run a smoke suite on migrations
+# plus one entity save/read round-trip. Catches the alpha.148 -> alpha.151
+# class of failure where source-tree co-resolution masks consumer-install
+# state.
+#
+# Manual trigger only for v1: alert-only, does not gate the release tag.
+# Run after a release tag has propagated to Packagist.
+
+on:
+  workflow_dispatch:
+    inputs:
+      framework_constraint:
+        description: 'composer constraint for waaseyaa/framework (empty = use skeleton default)'
+        required: false
+        default: ''
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout framework (smoke script only)
+        uses: actions/checkout@v6
+        with:
+          path: framework
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_sqlite, json, mbstring
+          coverage: none
+          tools: composer:v2
+
+      - name: composer create-project waaseyaa/waaseyaa
+        run: |
+          composer create-project waaseyaa/waaseyaa smoke-app \
+            --stability=alpha \
+            --no-interaction \
+            --prefer-dist
+
+      - name: Override framework constraint (if requested)
+        if: ${{ inputs.framework_constraint != '' }}
+        working-directory: smoke-app
+        run: |
+          composer require "waaseyaa/framework:${{ inputs.framework_constraint }}" \
+            --no-interaction --no-scripts --update-with-all-dependencies
+
+      - name: Run migrations
+        working-directory: smoke-app
+        env:
+          APP_ENV: local
+        run: ./vendor/bin/waaseyaa migrate --no-interaction
+
+      - name: Entity round-trip smoke
+        working-directory: smoke-app
+        env:
+          APP_ENV: local
+        run: php "$GITHUB_WORKSPACE/framework/tools/skeleton-smoke/smoke.php" "$PWD"
