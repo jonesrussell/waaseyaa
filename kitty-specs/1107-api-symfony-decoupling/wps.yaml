@@ -1,0 +1,96 @@
+work_packages:
+  - id: WP01
+    title: "Mission decomposition (Pass 2)"
+    dependencies: []
+    owned_files:
+      - "kitty-specs/1107-api-symfony-decoupling/decomposition.md"
+      - "kitty-specs/1107-api-symfony-decoupling/spec.md"
+    requirement_refs:
+      - C-001
+      - C-002
+      - C-003
+      - C-004
+      - C-005
+    subtasks:
+      - T001
+    prompt_file: tasks/WP01-mission-decomposition.md
+
+  - id: WP02
+    title: "Foundation HTTP Request type (class_alias per C2)"
+    dependencies:
+      - WP01
+    owned_files:
+      - "packages/foundation/src/Http/Request.php"
+      - "packages/foundation/composer.json"
+      - "kitty-specs/1107-api-symfony-decoupling/tasks.md"
+    requirement_refs:
+      - C-002
+      - C-004
+      - FR-002
+    subtasks:
+      - T002
+      - T003
+      - T004
+    prompt_file: tasks/WP02-foundation-http-request-type.md
+
+  - id: WP03
+    title: "Foundation EventDispatcherInterface + Symfony adapter"
+    dependencies:
+      - WP01
+    owned_files:
+      - "packages/foundation/src/Event/EventDispatcherInterface.php"
+      - "packages/foundation/src/Event/SymfonyEventDispatcherAdapter.php"
+      - "packages/foundation/tests/Contract/EventDispatcherContractTest.php"
+    requirement_refs:
+      - C-003
+      - FR-003
+    subtasks:
+      - T005
+      - T006
+      - T007
+    prompt_file: tasks/WP03-foundation-event-dispatcher-interface.md
+
+  - id: WP04
+    title: "JsonApiResponse + trait consolidation in api package"
+    dependencies:
+      - WP02
+    owned_files:
+      - "packages/api/src/Http/JsonApiResponse.php"
+      - "packages/api/src/JsonApiResponseTrait.php"
+      - "packages/api/src/Controller/JsonApiController.php"
+      - "packages/api/src/Controller/SchemaController.php"
+      - "packages/foundation/src/Http/JsonApiResponseTrait.php"
+    requirement_refs:
+      - C-001
+      - C-004
+      - FR-001
+      - FR-004
+    subtasks:
+      - T008
+      - T009
+      - T010
+      - T011
+    prompt_file: tasks/WP04-api-jsonapiresponse-and-trait-consolidation.md
+
+  - id: WP05
+    title: "Spec docs and Symfony-import contract test"
+    dependencies:
+      - WP02
+      - WP03
+      - WP04
+    owned_files:
+      - "docs/specs/api-layer.md"
+      - "docs/specs/jsonapi.md"
+      - "docs/specs/http-entry-point.md"
+      - "docs/specs/middleware-pipeline.md"
+      - "docs/specs/infrastructure.md"
+      - "packages/api/tests/Contract/SymfonyImportBoundaryTest.php"
+    requirement_refs:
+      - FR-005
+      - FR-006
+      - C-005
+    subtasks:
+      - T012
+      - T013
+      - T014
+    prompt_file: tasks/WP05-spec-docs-and-contract-test.md

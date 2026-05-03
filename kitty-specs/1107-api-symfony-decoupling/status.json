@@ -1,7 +1,7 @@
 {
-  "event_count": 5,
-  "last_event_id": "01KQQ5K9XMFGVE967XAZA2KQE3",
-  "materialized_at": "2026-05-03T14:59:06.292558+00:00",
+  "event_count": 8,
+  "last_event_id": "01KQQ5SKY3XBTSNT5BB0ESD6B5",
+  "materialized_at": "2026-05-03T15:02:33.155510+00:00",
   "mission_number": "1107",
   "mission_slug": "1107-api-symfony-decoupling",
   "mission_type": "software-dev",
@@ -10,26 +10,26 @@
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 0,
+    "done": 1,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 5
+    "planned": 3
   },
   "work_packages": {
     "WP01": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQQ5K97BB7G897PVGJV6W84G",
-      "last_transition_at": "2026-05-03T14:59:05.579197+00:00"
+      "actor": "claude",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KQQ5SDKYGDXSVB7W23HQXMQV",
+      "last_transition_at": "2026-05-03T15:02:26.686329+00:00"
     },
     "WP02": {
-      "actor": "finalize-tasks",
+      "actor": "claude",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQQ5K9T3DHPPJ6TQNRBMGBT9",
-      "last_transition_at": "2026-05-03T14:59:06.179272+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KQQ5SKY3XBTSNT5BB0ESD6B5",
+      "last_transition_at": "2026-05-03T15:02:33.155510+00:00"
     },
     "WP03": {
       "actor": "finalize-tasks",

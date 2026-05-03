@@ -84,6 +84,27 @@ Canonical JSON:API response trait moves to `packages/api`. Foundation keeps a de
 
 ---
 
+## Functional Requirements
+
+| ID | Requirement | Status |
+|---|---|---|
+| FR-001 | `Waaseyaa\Api\Http\JsonApiResponse` MUST exist per ratified C-001 (subclass of `\Symfony\Component\HttpFoundation\JsonResponse`). | ratified |
+| FR-002 | `Waaseyaa\Foundation\Http\Request` MUST exist per ratified C-002 (`class_alias` of `\Symfony\Component\HttpFoundation\Request`). | ratified |
+| FR-003 | `Waaseyaa\Foundation\Event\EventDispatcherInterface` MUST exist (PSR-14 compatible) with a `SymfonyEventDispatcherAdapter` default binding. | ratified |
+| FR-004 | The canonical JSON:API response trait MUST live in `packages/api`; `Waaseyaa\Api\JsonResponseTrait` MUST be removed; foundation's previous trait MUST be replaced via the C-004 shim path WP02 records in `tasks.md`. | ratified |
+| FR-005 | The five spec docs `api-layer.md`, `jsonapi.md`, `http-entry-point.md`, `middleware-pipeline.md`, `infrastructure.md` MUST reference the new types and tighten charter language to Path R-narrow. | ratified |
+| FR-006 | A contract test in `packages/api/tests/Contract/` MUST assert that a sample app controller produces a JSON:API response without importing any `Symfony\` class. | ratified |
+
+## Constraints
+
+| ID | Constraint | Decision |
+|---|---|---|
+| C-001 | `Waaseyaa\Api\Http\JsonApiResponse` shape: subclass vs standalone wrapper. | (a) subclass — `JsonApiResponse extends \Symfony\Component\HttpFoundation\JsonResponse`. |
+| C-002 | `Waaseyaa\Foundation\Http\Request` shape: class alias vs real wrapper. | (a) class alias — `class_alias(Symfony Request, Waaseyaa Request)`. |
+| C-003 | `Waaseyaa\Foundation\Event\DomainEvent` parent: keep Symfony Event vs flip to PSR-14 only. | (a) keep Symfony parent; only the dispatcher gets a Waaseyaa interface. Documented in `infrastructure.md`. |
+| C-004 | `JsonApiResponseTrait` ownership: keep both / move-and-deprecate / hard delete. | (a) move-and-deprecate; canonical trait in `packages/api`; foundation gets the shim path WP02 records — must NOT add a foundation→api Composer require edge. |
+| C-005 | `bin/check-symfony-imports` boundary linter: in-scope vs follow-up issue. | (b) follow-up issue. WP06 dropped from this mission; WP05 files the follow-up at acceptance. |
+
 ## Acceptance
 
 The mission accepts when ALL of:
