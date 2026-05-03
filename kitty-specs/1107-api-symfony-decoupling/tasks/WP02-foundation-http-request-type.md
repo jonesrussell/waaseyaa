@@ -10,9 +10,12 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-1107-api-symfony-decoupling
+base_commit: 93ceddcae2585935992419d2edc295df435f8b2f
+created_at: '2026-05-03T15:02:53.543840+00:00'
 subtasks: []
 assignee: claude
-agent: claude
+agent: "claude"
 history: []
 authoritative_surface: packages/foundation/src/Http/
 execution_mode: code_change
@@ -21,6 +24,7 @@ owned_files:
 - packages/foundation/composer.json
 - kitty-specs/1107-api-symfony-decoupling/tasks.md
 tags: []
+shell_pid: "640329"
 ---
 
 # WP02 — Foundation HTTP Request type (class_alias per C2)
@@ -120,3 +124,4 @@ record the chosen shim path in `tasks.md`.
 ## Activity Log
 
 - (To be appended by the implementer.)
+- 2026-05-03T15:20:03Z – claude – shell_pid=640329 – Started review via action command
