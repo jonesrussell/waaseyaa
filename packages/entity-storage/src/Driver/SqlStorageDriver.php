@@ -59,7 +59,7 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
                 }
             }
 
-            return $row;
+            return $this->mergeFromRead($row);
         }
 
         return null;
@@ -108,7 +108,7 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
                 && isset($row['langcode']) && $row['langcode'] !== $langcode) {
                 continue;
             }
-            $byId[$key] = $row;
+            $byId[$key] = $this->mergeFromRead($row);
         }
 
         return $byId;
@@ -117,6 +117,11 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
     public function write(string $entityType, string $id, array $values): string
     {
         $db = $this->getDatabase();
+
+        // Route values whose column does not exist into the `_data` JSON blob
+        // (per SqlSchemaHandler::buildTableSpec the base table only materialises
+        // system keys + `_data`; user-defined fields live inside `_data`).
+        $values = $this->splitForWrite($db, $entityType, $values);
 
         // Use a scope-unaware existence check: a row with this ID must trigger
         // UPDATE regardless of which community it belongs to, preventing a
@@ -260,7 +265,7 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
         $rows = [];
 
         foreach ($result as $row) {
-            $rows[] = (array) $row;
+            $rows[] = $this->mergeFromRead((array) $row);
         }
 
         return $rows;
@@ -290,7 +295,7 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
 
         $base = null;
         foreach ($baseResult as $row) {
-            $base = (array) $row;
+            $base = $this->mergeFromRead((array) $row);
             break;
         }
 
@@ -344,7 +349,7 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
 
         $bases = [];
         foreach ($baseQuery->execute() as $row) {
-            $row = (array) $row;
+            $row = $this->mergeFromRead((array) $row);
             $pk = $row[$this->idKey] ?? null;
             if ($pk !== null) {
                 $bases[(string) $pk] = $row;
@@ -421,5 +426,99 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
     private function getDatabase(): DatabaseInterface
     {
         return $this->connectionResolver->connection();
+    }
+
+    /**
+     * Route entity values into existing columns vs the `_data` JSON blob.
+     *
+     * SqlSchemaHandler::buildTableSpec() materialises only system keys
+     * (id/uuid/bundle/label/langcode + revision pointer) and a `_data` text
+     * column. Any other value the entity carries (declarative `#[Field]`
+     * attributes that don't have a dedicated column, ad-hoc set() calls)
+     * lives inside `_data` as JSON. The legacy SqlEntityStorage path does
+     * this split internally; the repository → driver path goes through here
+     * so the same convention holds for both.
+     *
+     * @param array<string, mixed> $values
+     * @return array<string, mixed>
+     */
+    private function splitForWrite(DatabaseInterface $db, string $entityType, array $values): array
+    {
+        $schema = $db->schema();
+        $hasDataColumn = $schema->fieldExists($entityType, '_data');
+
+        $dbValues = [];
+        $extraData = [];
+
+        foreach ($values as $key => $value) {
+            if ($key === '_data') {
+                // Caller supplied a pre-built `_data` payload — fold it into
+                // our extras bucket so any column-routed values still land in
+                // their own columns.
+                if (is_string($value) && $value !== '') {
+                    try {
+                        $decoded = json_decode($value, associative: true, flags: \JSON_THROW_ON_ERROR);
+                        if (is_array($decoded)) {
+                            $extraData = $decoded + $extraData;
+                        }
+                    } catch (\JsonException) {
+                        // Ignore malformed pre-built blobs; rebuild from scratch.
+                    }
+                } elseif (is_array($value)) {
+                    $extraData = $value + $extraData;
+                }
+                continue;
+            }
+
+            if ($schema->fieldExists($entityType, $key)) {
+                $dbValues[$key] = $value;
+            } else {
+                $extraData[$key] = $value;
+            }
+        }
+
+        if ($hasDataColumn) {
+            $dbValues['_data'] = json_encode($extraData, \JSON_THROW_ON_ERROR);
+        }
+
+        return $dbValues;
+    }
+
+    /**
+     * Decode the `_data` JSON blob and merge its keys back onto the row.
+     *
+     * Inverse of {@see self::splitForWrite()}. Applied at every read boundary
+     * so consumers (EntityRepository hydration, findBy result iteration) see
+     * a flat value map without having to know about the `_data` convention.
+     *
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function mergeFromRead(array $row): array
+    {
+        if (!array_key_exists('_data', $row)) {
+            return $row;
+        }
+
+        $raw = $row['_data'];
+        unset($row['_data']);
+
+        if (!is_string($raw) || $raw === '') {
+            return $row;
+        }
+
+        try {
+            $extra = json_decode($raw, associative: true, flags: \JSON_THROW_ON_ERROR);
+        } catch (\JsonException) {
+            return $row;
+        }
+
+        if (!is_array($extra)) {
+            return $row;
+        }
+
+        // Column values win over `_data` to handle legacy rows where the
+        // same key appears in both (transient migration state).
+        return $row + $extra;
     }
 }
