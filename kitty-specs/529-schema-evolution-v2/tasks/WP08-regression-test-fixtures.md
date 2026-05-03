@@ -142,3 +142,7 @@ Read before starting:
 - **Idempotency depends on ledger state.** If WP09 hasn't landed when this WP starts, T049's checksum-mismatch case is skipped (gate via env or PHPUnit `markTestSkipped`).
 - **Cross-WP regression discipline:** This is the "don't break #1257" gate. Run the full `tests/Integration/Phase26/Mission1257KernelPathTest.php` suite before merging — if any K1/K2/K3 test breaks, the diff factory or compiler regressed an invariant.
 - **No new `final` classes that consumers would need to extend.** Same rule as mission #1257 acceptance #6.
+
+## Activity Log
+
+- 2026-05-03T01:18:34Z – unknown – Moved to in_progress
