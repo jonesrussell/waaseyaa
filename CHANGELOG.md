@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Published artifact resolves cleanly on Packagist** — root `composer.json` (published as `waaseyaa/framework`) had been shipping with 63 `"waaseyaa/*": "@dev"` constraints that consumers cannot resolve. alpha.170 broke skeleton-smoke when Packagist's transitive resolution failed to find a matching sibling; the failure is non-deterministic from the consumer's perspective. Replaced all 63 `waaseyaa/*` requires plus the one `require-dev` (`waaseyaa/testing`) with `self.version`. Composer resolves `self.version` to `dev-main` against local path repos and to the exact tag version when Packagist crawls the tag, giving consumers exact-matching siblings without a release-time rewrite step. Same pattern Symfony, Doctrine, and Sylius use for their root metapackages. (#1382, #1383)
+
+### Changed
+
+- **Composer policy expanded** — `bin/check-composer-policy` now codifies CP002 (`@dev` forbidden in root and `packages/*`), CP005 (skips `self.version` since exact match is strictly tighter than any range), and CP006 (`self.version` allowed only in root). Includes incidental fix for a worktree-filter bug that silently scanned zero files when the policy ran from inside a `.worktrees/` directory. (#1382, #1383)
+
 ## [0.1.0-alpha.170] - 2026-05-03
 
 ### Fixed
