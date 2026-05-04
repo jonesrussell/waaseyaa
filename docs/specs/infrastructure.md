@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-05-04b - issue #1309: added `COLUMN_DATA_STORAGE_DRIFT` to the DiagnosticCode table. HealthChecker gained `checkColumnDataStorageDrift()` (called from `checkRuntime()`), which warns when a field registered with `FieldStorage::Data` still has a backing column on the base table or a registered bundle subtable. Severity: warning. -->
 <!-- Spec reviewed 2026-05-04 - cs-fixer sweep applied to AbstractKernel.php (alphabetical import sort only, no behavior change). Spec contents verified accurate; no infrastructure-spec contract changed. -->
 <!-- Spec reviewed 2026-05-02b - mission #1257 WP10 review hardening (PR #1367): `AbstractKernel::resolveCommunityScope()` no longer falls back to a null scope unconditionally when tenancy is declared but no `CommunityContextInterface` is bound. In production (any environment NOT in {local, dev, development, testing}), missing context throws `[TENANCY_MISCONFIGURED] RuntimeException` — silent disablement of community isolation in production is a data-leak posture, not a tolerable misconfiguration. In development the prior log-once + null-scope path stays so tests / CLI / bare bootstrap don't crash. -->
 <!-- Spec reviewed 2026-05-02 - mission #1257 WP10: AbstractKernel gained `setCommunityContext(?CommunityContextInterface)` plus a private `resolveCommunityScope(EntityTypeInterface)` helper that the EntityRepository factory uses to inject CommunityScope into SqlStorageDriver when the EntityType declares `tenancy: ['scope' => 'community']`. When tenancy is declared but no context is bound, the kernel logs a once-per-type warning and falls back to a null scope (no boot crash; superseded by the 2026-05-02b production-throw guard above). EntityTypeManager now also receives the kernel logger so it can emit the C1 deprecation warning. Wiring contract details live in docs/specs/entity-system.md §C1 / §Community Scoping; no infrastructure-spec contract changed. -->
@@ -1323,8 +1324,9 @@ String-backed enum of operator-facing error codes:
 | `CACHE_DIRECTORY_UNWRITABLE` | Cache directory not writable |
 | `INGESTION_LOG_OVERSIZED` | Ingestion log exceeds retention threshold |
 | `INGESTION_RECENT_FAILURES` | High ingestion failure rate |
+| `COLUMN_DATA_STORAGE_DRIFT` | A field registered with `FieldStorage::Data` still has a backing column on the base table or a bundle subtable (new writes go to `_data`; the column holds stale values) |
 
-Each code has a `defaultMessage()` method for human-readable descriptions. Severity: `MISSING_BUNDLE_SUBTABLE` and `FK_ENFORCEMENT_DISABLED` are errors; `ORPHAN_BUNDLE_SUBTABLE` is a warning (the base row is still reachable, the subtable is merely stale).
+Each code has a `defaultMessage()` method for human-readable descriptions. Severity: `MISSING_BUNDLE_SUBTABLE` and `FK_ENFORCEMENT_DISABLED` are errors; `ORPHAN_BUNDLE_SUBTABLE` and `COLUMN_DATA_STORAGE_DRIFT` are warnings (the base row is still reachable, the lingering surface is merely stale).
 
 ### DiagnosticEmitter
 

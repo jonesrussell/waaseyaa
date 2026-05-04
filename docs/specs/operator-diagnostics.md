@@ -54,6 +54,7 @@ BootDiagnosticReport ─→ HealthChecker ─→ HealthCheckResult[] ─→ CLI 
 | `STORAGE_DIRECTORY_MISSING` | warning | `storage/framework/` does not exist |
 | `INGESTION_LOG_OVERSIZED` | warning | Ingestion log exceeds 10,000 entries |
 | `INGESTION_RECENT_FAILURES` | warning | >25% of ingestion attempts rejected |
+| `COLUMN_DATA_STORAGE_DRIFT` | warning | A field registered with `FieldStorage::Data` still has a backing column on the base table or a registered bundle subtable. New writes go to `_data`; the column holds stale values. Author a migration to drop the column or revert the storage hint. |
 
 ### Code Structure
 
@@ -75,6 +76,7 @@ Each `DiagnosticCode` case provides:
 
 - **Database** — `SELECT 1` connectivity test via `DBALDatabase::query()`
 - **Schema drift** — compares `PRAGMA table_info()` against `SqlSchemaHandler.buildTableSpec()` expected columns for each registered entity type. Multi-bundle types additionally enumerate their `{base_table}__{bundle}` subtables (see below).
+- **Column-vs-data storage drift** — for each entity type with a registered `FieldStorage::Data` field, probes `PRAGMA table_info()` for a column whose name matches the field on the base table (core fields) or the matching `{base_table}__{bundle}` subtable (bundle fields). Emits `COLUMN_DATA_STORAGE_DRIFT` per occurrence. Skipped silently when no `FieldDefinitionRegistry` is injected. SQLite-only at present (mirrors the orphan-detection path in #1301).
 - **Foreign key enforcement** — SQLite only: checks `PRAGMA foreign_keys`; emits `FK_ENFORCEMENT_DISABLED` when off. Skipped for dialects with default-on enforcement.
 - **Storage directory** — `storage/framework/` existence check
 - **Cache directory** — `storage/framework/` writability check

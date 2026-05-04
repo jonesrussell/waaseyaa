@@ -31,6 +31,7 @@ enum DiagnosticCode: string
     case STORAGE_DIRECTORY_MISSING   = 'STORAGE_DIRECTORY_MISSING';
     case INGESTION_LOG_OVERSIZED     = 'INGESTION_LOG_OVERSIZED';
     case INGESTION_RECENT_FAILURES   = 'INGESTION_RECENT_FAILURES';
+    case COLUMN_DATA_STORAGE_DRIFT   = 'COLUMN_DATA_STORAGE_DRIFT';
 
     // --- Schema-evolution v2 codes (mission #529) ---
     case CHECKSUM_MISMATCH           = 'CHECKSUM_MISMATCH';
@@ -72,6 +73,8 @@ enum DiagnosticCode: string
                 'The ingestion log file exceeds the expected size for the retention window. Run pruning.',
             self::INGESTION_RECENT_FAILURES =>
                 'A high proportion of recent ingestion attempts have failed.',
+            self::COLUMN_DATA_STORAGE_DRIFT =>
+                'A field is registered with FieldStorage::Data but a column for the field still exists in storage. New writes go to the _data JSON blob; the column holds stale values that reads will silently skip once query routing is symmetric.',
             self::CHECKSUM_MISMATCH =>
                 'A v2 migration was re-applied with a different source checksum than the one recorded in the ledger. Production refuses silent re-apply; the same migration_id cannot mean two different structural intents.',
             self::LEDGER_ORPHAN =>
@@ -118,6 +121,8 @@ enum DiagnosticCode: string
                 'Run `waaseyaa health:check` to review log size, then prune old entries or increase the retention window.',
             self::INGESTION_RECENT_FAILURES =>
                 'Review recent ingestion errors in storage/framework/ingestion.jsonl. Check envelope format and payload schemas.',
+            self::COLUMN_DATA_STORAGE_DRIFT =>
+                'Author a migration to drop the lingering column once any data has been backfilled into _data, or revert the FieldStorage::Data hint if the column should remain canonical. Auto-drop is never performed.',
             self::CHECKSUM_MISMATCH =>
                 'Either revert the source change so the canonical SchemaDiff matches the stored checksum, or author a new migration_id (Q1 — migration_id is the canonical key).',
             self::LEDGER_ORPHAN =>
@@ -148,7 +153,8 @@ enum DiagnosticCode: string
             self::TAG_QUARANTINE_DETECTED,
             self::INGESTION_RECENT_FAILURES,
             self::CACHE_DIRECTORY_UNWRITABLE,
-            self::ORPHAN_BUNDLE_SUBTABLE => 'warning',
+            self::ORPHAN_BUNDLE_SUBTABLE,
+            self::COLUMN_DATA_STORAGE_DRIFT => 'warning',
 
             self::MANIFEST_VERSIONING_MISSING,
             self::NAMESPACE_RESERVED,
