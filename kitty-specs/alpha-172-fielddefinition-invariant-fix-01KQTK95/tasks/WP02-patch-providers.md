@@ -15,6 +15,8 @@ subtasks:
 - T007
 - T008
 - T009
+agent: "claude"
+shell_pid: "34132"
 history:
 - timestamp: '2026-05-04T23:04:19Z'
   event: drafted
@@ -167,3 +169,7 @@ Set `targetEntityTypeId` on the three defective `FieldDefinition` constructions 
 - `packages/field/src/FieldDefinitionRegistry.php` — invariant being satisfied.
 - `packages/genealogy/src/GenealogyFieldDefinitions.php` — canonical pattern.
 - WP01 prompt: [`WP01-reproduce-and-lock-invariant.md`](./WP01-reproduce-and-lock-invariant.md) — acceptance signal for this WP.
+
+## Activity Log
+
+- 2026-05-04T23:46:18Z – claude – shell_pid=34132 – Started implementation via action command
