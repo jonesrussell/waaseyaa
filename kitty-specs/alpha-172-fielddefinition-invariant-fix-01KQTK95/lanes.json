@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "mission_slug": "alpha-172-fielddefinition-invariant-fix-01KQTK95",
+  "mission_id": "01KQTK95TKYCKCFA1C07XE0CFM",
+  "mission_branch": "kitty/mission-alpha-172-fielddefinition-invariant-fix-01KQTK95",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "docs/specs/entity-system.md",
+        "packages/field/tests/Unit/FieldDefinitionRegistryInvariantTest.php",
+        "packages/groups/src/GroupsServiceProvider.php",
+        "packages/groups/tests/Unit/GroupsServiceProviderTest.php",
+        "packages/taxonomy/src/TaxonomyServiceProvider.php",
+        "packages/taxonomy/tests/Unit/TaxonomyServiceProviderTest.php",
+        "tests/Integration/PhaseN/FieldDefinitionInvariantTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests",
+        "workspace"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-04T23:09:00.660161+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP02"
+      }
+    ],
+    "total_merges": 3,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 3
+    }
+  }
+}

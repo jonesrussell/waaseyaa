@@ -1,0 +1,49 @@
+{
+  "event_count": 4,
+  "last_event_id": "01KQTM12B2KNRCDAJBV4VK4JT2",
+  "materialized_at": "2026-05-04T23:09:00.642373+00:00",
+  "mission_number": "",
+  "mission_slug": "alpha-172-fielddefinition-invariant-fix-01KQTK95",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 4
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KQTM11Z3GJQ9BSB7006ZMRD4",
+      "last_transition_at": "2026-05-04T23:09:00.259453+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KQTM12A199E74H9KHY44NTWK",
+      "last_transition_at": "2026-05-04T23:09:00.609297+00:00"
+    },
+    "WP03": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KQTM12AJACPZ1FJNWTBWHJT2",
+      "last_transition_at": "2026-05-04T23:09:00.626143+00:00"
+    },
+    "WP04": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KQTM12B2KNRCDAJBV4VK4JT2",
+      "last_transition_at": "2026-05-04T23:09:00.642373+00:00"
+    }
+  }
+}
