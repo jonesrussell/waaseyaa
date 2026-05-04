@@ -18,6 +18,8 @@ subtasks:
 - T013
 - T014
 - T015
+agent: "claude"
+shell_pid: "36150"
 history:
 - timestamp: '2026-05-04T23:04:19Z'
   event: drafted
@@ -158,3 +160,7 @@ If any gate fails:
 - `bin/check-package-layers`, `bin/check-composer-policy`, `tools/drift-detector.sh` — gate scripts.
 - WP02 prompt: [`WP02-patch-providers.md`](./WP02-patch-providers.md).
 - WP03 prompt: [`WP03-sweep-and-spec-hygiene.md`](./WP03-sweep-and-spec-hygiene.md).
+
+## Activity Log
+
+- 2026-05-04T23:57:25Z – claude – shell_pid=36150 – Started implementation via action command
