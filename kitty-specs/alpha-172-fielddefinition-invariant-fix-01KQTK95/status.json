@@ -1,7 +1,7 @@
 {
-  "event_count": 10,
-  "last_event_id": "01KQTP7C4Q00VRTA5W39NAC5RR",
-  "materialized_at": "2026-05-04T23:47:24.439610+00:00",
+  "event_count": 12,
+  "last_event_id": "01KQTPD36TGJE7A8RZVFMB9AD9",
+  "materialized_at": "2026-05-04T23:50:31.898293+00:00",
   "mission_number": "",
   "mission_slug": "alpha-172-fielddefinition-invariant-fix-01KQTK95",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 2,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 2
+    "planned": 1
   },
   "work_packages": {
     "WP01": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-05-04T23:47:24.439610+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
+      "actor": "claude",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQTM12AJACPZ1FJNWTBWHJT2",
-      "last_transition_at": "2026-05-04T23:09:00.626143+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KQTPD36TGJE7A8RZVFMB9AD9",
+      "last_transition_at": "2026-05-04T23:50:31.898293+00:00"
     },
     "WP04": {
       "actor": "finalize-tasks",

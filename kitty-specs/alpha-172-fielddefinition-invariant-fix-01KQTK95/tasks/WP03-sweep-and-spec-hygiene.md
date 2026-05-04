@@ -13,6 +13,8 @@ subtasks:
 - T010
 - T011
 - T012
+agent: "claude"
+shell_pid: "35045"
 history:
 - timestamp: '2026-05-04T23:04:19Z'
   event: drafted
@@ -128,3 +130,7 @@ Confirm no other framework provider has the same `targetEntityTypeId` defect, an
 - `tools/drift-detector.sh` — spec-freshness gate.
 - `docs/specs/entity-system.md` — target spec.
 - WP02 prompt: [`WP02-patch-providers.md`](./WP02-patch-providers.md) — the patches whose surface this WP audits.
+
+## Activity Log
+
+- 2026-05-04T23:50:31Z – claude – shell_pid=35045 – Started implementation via action command
