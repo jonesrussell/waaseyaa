@@ -134,3 +134,4 @@ Confirm no other framework provider has the same `targetEntityTypeId` defect, an
 ## Activity Log
 
 - 2026-05-04T23:50:31Z – claude – shell_pid=35045 – Started implementation via action command
+- 2026-05-04T23:52:53Z – claude – shell_pid=35045 – WP03 complete in commit e0ab0c531. Sweep confirmed every framework bind-path FieldDefinition declares targetEntityTypeId post-WP02 (Groups, Taxonomy, Genealogy, registry synthesizers, EntityType normalizer, EntityMetadataReader, SchemaPresenter). docs/specs/entity-system.md gained a single paragraph documenting the bind invariant. tools/drift-detector.sh exits 0. WP01 tests still 14/14 green.
