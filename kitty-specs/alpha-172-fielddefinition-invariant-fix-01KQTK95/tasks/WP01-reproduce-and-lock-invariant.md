@@ -196,3 +196,4 @@ This is the foundation WP. It encodes the bug as a test, encodes the invariant c
 ## Activity Log
 
 - 2026-05-04T23:09:46Z – claude – shell_pid=31004 – Assigned agent via action command
+- 2026-05-04T23:39:28Z – claude – shell_pid=31004 – WP01 complete: four PHPUnit tests added in commit 314edf8e7. Three reproduce #1388 (T001 group_type/description, T002 taxonomy_vocabulary/description+weight, T004 manifest sweep). One pins the registry exception contract (T003, 5 tests pass). composer cs-check + composer phpstan green. Ready for review and WP02 (the three-line provider patch).
