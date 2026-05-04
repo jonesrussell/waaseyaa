@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Waaseyaa\Foundation\Kernel;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as SymfonyContractEventDispatcherInterface;
-use Waaseyaa\Foundation\Event\EventDispatcherInterface;
-use Waaseyaa\Foundation\Event\SymfonyEventDispatcherAdapter;
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Database\DBALDatabase;
@@ -26,6 +24,8 @@ use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\EntityStorage\Tenancy\CommunityScope;
 use Waaseyaa\Foundation\Community\CommunityContextInterface;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
+use Waaseyaa\Foundation\Event\EventDispatcherInterface;
+use Waaseyaa\Foundation\Event\SymfonyEventDispatcherAdapter;
 use Waaseyaa\Foundation\Kernel\Bootstrap\AccessPolicyRegistry;
 use Waaseyaa\Foundation\Kernel\Bootstrap\AppEntityTypeLoader;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ContentTypeValidator;

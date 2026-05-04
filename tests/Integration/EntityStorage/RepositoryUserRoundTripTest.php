@@ -14,8 +14,8 @@ use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\EntityStorage\Connection\SingleConnectionResolver;
 use Waaseyaa\EntityStorage\Driver\SqlStorageDriver;
 use Waaseyaa\EntityStorage\EntityRepository;
-use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
+use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\Field\FieldDefinitionRegistry;
 use Waaseyaa\User\User;
 
@@ -54,7 +54,7 @@ final class RepositoryUserRoundTripTest extends TestCase
 
         $entityTypeManager = new EntityTypeManager(
             $dispatcher,
-            fn (EntityType $def): SqlEntityStorage => new SqlEntityStorage($def, $database, $dispatcher, $fieldRegistry),
+            fn(EntityType $def): SqlEntityStorage => new SqlEntityStorage($def, $database, $dispatcher, $fieldRegistry),
         );
         $entityTypeManager->registerEntityType($entityType);
 
