@@ -54,6 +54,15 @@ class EntityTypeManager implements EntityTypeManagerInterface
      */
     private array $tenancyDeprecationFired = [];
 
+    /**
+     * (entityTypeId, bundle) pairs that have already triggered the
+     * `[BUNDLE_SUBTABLE_MISSING]` notice via addBundleFields(). One log line
+     * per pair; subsequent registrations stay silent.
+     *
+     * @var array<string, true>
+     */
+    private array $missingSubtableNoticeFired = [];
+
     private readonly LoggerInterface $logger;
 
     /**
@@ -69,6 +78,15 @@ class EntityTypeManager implements EntityTypeManagerInterface
      * @param LoggerInterface|null $logger Receives the once-per-type
      *                                     `HasCommunityInterface` deprecation warning (mission #1257 §C1).
      *                                     Defaults to `NullLogger` for callers that don't wire logging.
+     * @param \Closure|null $bundleSubtableExistsProbe Optional probe used by
+     *                                     {@see addBundleFields()} to detect whether the per-bundle
+     *                                     subtable already exists on disk. Signature:
+     *                                     `fn(string $entityTypeId, string $bundle): bool`.
+     *                                     When provided and the probe returns false, a
+     *                                     `[BUNDLE_SUBTABLE_MISSING]` notice is emitted once per
+     *                                     (entity_type_id, bundle) pair (issue #1376). Defaults to
+     *                                     null — the notice is silent for callers without a schema
+     *                                     accessor (tests, bare bootstraps).
      */
     public function __construct(
         private readonly EventDispatcherInterface $eventDispatcher,
@@ -76,6 +94,7 @@ class EntityTypeManager implements EntityTypeManagerInterface
         private readonly ?\Closure $repositoryFactory = null,
         private readonly ?FieldDefinitionRegistryInterface $fieldRegistry = null,
         ?LoggerInterface $logger = null,
+        private readonly ?\Closure $bundleSubtableExistsProbe = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
     }
@@ -238,6 +257,59 @@ class EntityTypeManager implements EntityTypeManagerInterface
         }
 
         $this->fieldRegistry->registerBundleFields($entityTypeId, $bundle, $fields);
+
+        $this->maybeEmitMissingSubtableNotice($entityTypeId, $bundle);
+    }
+
+    /**
+     * Emit a once-per-(entity_type_id, bundle) `[BUNDLE_SUBTABLE_MISSING]`
+     * notice when a probe is configured and the per-bundle subtable does not
+     * yet exist on disk. Issue #1376 (deferred WP07-A from mission #1257).
+     *
+     * The notice is informational. Save-time and load-time paths in
+     * `SqlEntityStorage` already handle the missing-subtable case (the values
+     * are skipped silently); this notice surfaces the registration-time
+     * signal so operators see the gap before any save attempts.
+     *
+     * Probe failures are swallowed — we never fail registration over an
+     * advisory check.
+     */
+    private function maybeEmitMissingSubtableNotice(string $entityTypeId, string $bundle): void
+    {
+        if ($this->bundleSubtableExistsProbe === null) {
+            return;
+        }
+
+        $cacheKey = $entityTypeId . '.' . $bundle;
+        if (isset($this->missingSubtableNoticeFired[$cacheKey])) {
+            return;
+        }
+
+        try {
+            $exists = (bool) ($this->bundleSubtableExistsProbe)($entityTypeId, $bundle);
+        } catch (\Throwable $e) {
+            $this->logger->info(\sprintf(
+                'Bundle-subtable existence probe failed for entity type "%s" bundle "%s": %s',
+                $entityTypeId,
+                $bundle,
+                $e->getMessage(),
+            ));
+            return;
+        }
+
+        if ($exists) {
+            return;
+        }
+
+        $this->missingSubtableNoticeFired[$cacheKey] = true;
+
+        $this->logger->notice(\sprintf(
+            '[BUNDLE_SUBTABLE_MISSING] Bundle-scoped fields registered for entity type "%s" bundle "%s", but subtable "%s__%s" does not exist on disk. Bundle-field saves and loads will skip the missing subtable until a schema migration materializes it.',
+            $entityTypeId,
+            $bundle,
+            $entityTypeId,
+            $bundle,
+        ));
     }
 
     /**

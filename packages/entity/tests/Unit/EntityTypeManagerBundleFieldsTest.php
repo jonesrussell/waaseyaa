@@ -13,6 +13,8 @@ use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\GroupBundleFixture;
 use Waaseyaa\Field\FieldDefinitionInterface;
+use Waaseyaa\Foundation\Log\LogLevel;
+use Waaseyaa\Foundation\Log\LoggerInterface;
 
 require_once __DIR__ . '/../Fixtures/AttributeFirstEntities/BundleFieldsFixtures.php';
 
@@ -150,6 +152,147 @@ final class EntityTypeManagerBundleFieldsTest extends TestCase
     }
 
     #[Test]
+    public function addBundleFieldsEmitsMissingSubtableNoticeWhenProbeReportsAbsent(): void
+    {
+        $registry = new SpyRegistry();
+        $logger = new SpyLogger();
+        $manager = new EntityTypeManager(
+            $this->dispatcher,
+            null,
+            null,
+            $registry,
+            $logger,
+            // Probe reports the subtable is absent.
+            static fn(string $_id, string $_bundle): bool => false,
+        );
+        $manager->registerEntityType(new EntityType(
+            id: 'group',
+            label: 'Group',
+            class: TestEntity::class,
+            bundleEntityType: 'group_type',
+        ));
+
+        $manager->addBundleFields('group', 'business', ['email' => new \stdClass()]);
+
+        self::assertCount(1, $logger->notices);
+        self::assertStringContainsString('[BUNDLE_SUBTABLE_MISSING]', $logger->notices[0]);
+        self::assertStringContainsString('"group"', $logger->notices[0]);
+        self::assertStringContainsString('"business"', $logger->notices[0]);
+        self::assertStringContainsString('group__business', $logger->notices[0]);
+    }
+
+    #[Test]
+    public function addBundleFieldsSuppressesNoticeWhenProbeReportsSubtablePresent(): void
+    {
+        $registry = new SpyRegistry();
+        $logger = new SpyLogger();
+        $manager = new EntityTypeManager(
+            $this->dispatcher,
+            null,
+            null,
+            $registry,
+            $logger,
+            static fn(string $_id, string $_bundle): bool => true,
+        );
+        $manager->registerEntityType(new EntityType(
+            id: 'group',
+            label: 'Group',
+            class: TestEntity::class,
+            bundleEntityType: 'group_type',
+        ));
+
+        $manager->addBundleFields('group', 'business', ['email' => new \stdClass()]);
+
+        self::assertSame([], $logger->notices);
+    }
+
+    #[Test]
+    public function missingSubtableNoticeFiresOncePerEntityTypeBundlePair(): void
+    {
+        $registry = new SpyRegistry();
+        $logger = new SpyLogger();
+        $manager = new EntityTypeManager(
+            $this->dispatcher,
+            null,
+            null,
+            $registry,
+            $logger,
+            static fn(string $_id, string $_bundle): bool => false,
+        );
+        $manager->registerEntityType(new EntityType(
+            id: 'group',
+            label: 'Group',
+            class: TestEntity::class,
+            bundleEntityType: 'group_type',
+        ));
+
+        // Two registrations for the same (entity_type, bundle) — second is silent.
+        $manager->addBundleFields('group', 'business', ['email' => new \stdClass()]);
+        $manager->addBundleFields('group', 'business', ['phone' => new \stdClass()]);
+        // A different bundle on the same entity type — fires its own notice.
+        $manager->addBundleFields('group', 'organization', ['vat' => new \stdClass()]);
+
+        self::assertCount(2, $logger->notices);
+        self::assertStringContainsString('"business"', $logger->notices[0]);
+        self::assertStringContainsString('"organization"', $logger->notices[1]);
+    }
+
+    #[Test]
+    public function missingSubtableNoticeIsSilentWhenNoProbeConfigured(): void
+    {
+        $registry = new SpyRegistry();
+        $logger = new SpyLogger();
+        $manager = new EntityTypeManager(
+            $this->dispatcher,
+            null,
+            null,
+            $registry,
+            $logger,
+            // No probe — defaults to null; behavior matches pre-#1376 callers.
+        );
+        $manager->registerEntityType(new EntityType(
+            id: 'group',
+            label: 'Group',
+            class: TestEntity::class,
+            bundleEntityType: 'group_type',
+        ));
+
+        $manager->addBundleFields('group', 'business', ['email' => new \stdClass()]);
+
+        self::assertSame([], $logger->notices);
+    }
+
+    #[Test]
+    public function missingSubtableProbeFailureIsSwallowedAndLoggedAtInfo(): void
+    {
+        $registry = new SpyRegistry();
+        $logger = new SpyLogger();
+        $manager = new EntityTypeManager(
+            $this->dispatcher,
+            null,
+            null,
+            $registry,
+            $logger,
+            static function (string $_id, string $_bundle): bool {
+                throw new \RuntimeException('schema unreachable');
+            },
+        );
+        $manager->registerEntityType(new EntityType(
+            id: 'group',
+            label: 'Group',
+            class: TestEntity::class,
+            bundleEntityType: 'group_type',
+        ));
+
+        // Probe failure must not fail registration.
+        $manager->addBundleFields('group', 'business', ['email' => new \stdClass()]);
+
+        self::assertSame([], $logger->notices, 'Notice must not fire when probe throws.');
+        self::assertCount(1, $logger->infos, 'Probe failure must be logged at info.');
+        self::assertStringContainsString('schema unreachable', $logger->infos[0]);
+    }
+
+    #[Test]
     public function getFieldRegistryReturnsRegistryOrThrows(): void
     {
         $registry = new SpyRegistry();
@@ -236,5 +379,46 @@ final class SpyRegistry implements FieldDefinitionRegistryInterface
             }
         }
         return \array_keys($bundles);
+    }
+}
+
+/**
+ * In-memory spy logger that records `notice` and `info` calls. The other
+ * severity methods are no-ops because the bundle-subtable-missing path only
+ * uses these two levels.
+ */
+final class SpyLogger implements LoggerInterface
+{
+    /** @var list<string> */
+    public array $notices = [];
+
+    /** @var list<string> */
+    public array $infos = [];
+
+    public function emergency(string|\Stringable $message, array $context = []): void {}
+    public function alert(string|\Stringable $message, array $context = []): void {}
+    public function critical(string|\Stringable $message, array $context = []): void {}
+    public function error(string|\Stringable $message, array $context = []): void {}
+    public function warning(string|\Stringable $message, array $context = []): void {}
+
+    public function notice(string|\Stringable $message, array $context = []): void
+    {
+        $this->notices[] = (string) $message;
+    }
+
+    public function info(string|\Stringable $message, array $context = []): void
+    {
+        $this->infos[] = (string) $message;
+    }
+
+    public function debug(string|\Stringable $message, array $context = []): void {}
+
+    public function log(LogLevel $level, string|\Stringable $message, array $context = []): void
+    {
+        match ($level) {
+            LogLevel::Notice => $this->notices[] = (string) $message,
+            LogLevel::Info => $this->infos[] = (string) $message,
+            default => null,
+        };
     }
 }
