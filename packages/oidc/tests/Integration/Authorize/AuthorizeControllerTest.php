@@ -85,6 +85,29 @@ final class AuthorizeControllerTest extends TestCase
         $this->assertStringContainsString(rawurlencode('client_id=minoo-web'), $location);
     }
 
+    public function testAnonymousRedirectPreservesPreExistingLoginPathQueryString(): void
+    {
+        // Regression for #1290 — login_path with a pre-existing query string
+        // produced `/login?foo=bar?return_to=...` (malformed). The controller
+        // must use `&` as the separator when the path already contains `?`.
+        $controller = new AuthorizeController(
+            clientLookup: new OidcClientLookup($this->storage),
+            validator: new AuthorizationRequestValidator(),
+            codeRepository: $this->codeRepository,
+            loginPath: '/login?foo=bar',
+        );
+
+        $request = $this->makeRequest($this->validQuery(), authenticated: false);
+
+        $response = $controller($request);
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $location = $response->headers->get('Location');
+        $this->assertNotNull($location);
+        $this->assertStringStartsWith('/login?foo=bar&return_to=', $location);
+        $this->assertStringNotContainsString('?return_to=', substr($location, strlen('/login?foo=bar')));
+    }
+
     public function testMissingAccountAttributeReturns500(): void
     {
         $request = Request::create('/authorize', 'GET', $this->validQuery());
