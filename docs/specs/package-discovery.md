@@ -161,7 +161,7 @@ Supported keys:
 
 ### Root composer.json conventions
 
-The monorepo root uses `@dev` constraints for all `waaseyaa/*` packages and path repository references. It also carries its own `extra.waaseyaa` block — the framework root reserves `extra.waaseyaa.providers` as an extension point for repo-level service providers, alongside the `admin_path` configuration:
+The monorepo root uses `self.version` constraints for all `waaseyaa/*` packages and path repository references. The root manifest is published to Packagist as `waaseyaa/framework`; `self.version` resolves to `dev-main` against local path repos and to the exact tag version when consumers install from Packagist (see #1382). It also carries its own `extra.waaseyaa` block — the framework root reserves `extra.waaseyaa.providers` as an extension point for repo-level service providers, alongside the `admin_path` configuration:
 
 ```json
 {
@@ -169,8 +169,8 @@ The monorepo root uses `@dev` constraints for all `waaseyaa/*` packages and path
         { "type": "path", "url": "packages/*" }
     ],
     "require": {
-        "waaseyaa/foundation": "@dev",
-        "waaseyaa/entity": "@dev"
+        "waaseyaa/foundation": "self.version",
+        "waaseyaa/entity": "self.version"
     },
     "extra": {
         "waaseyaa": {

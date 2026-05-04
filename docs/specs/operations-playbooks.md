@@ -59,7 +59,7 @@ For full-stack local development, run `composer dev:php` in one terminal and `co
 |------|---------|
 | `composer cs-check` | PHP-CS-Fixer dry-run — reports style violations |
 | `composer phpstan` | PHPStan max-level static analysis (1053 files, zero baseline tolerance) |
-| `composer check-composer-policy` | Composer manifest invariants — sort-packages, internal `@dev` constraints, no wildcard internal versions |
+| `composer check-composer-policy` | Composer manifest invariants — sort-packages, `@dev` forbidden in published manifests, `self.version` scoped to root metapackage, no wildcard internal versions, tight pre-release floor in non-root manifests |
 | `composer check-package-layers` | Seven-layer architecture enforcement at composer.json edges and PHP file imports; kernel-adjacent exemptions are in `KERNEL_EXEMPT_FILES` in the script itself |
 | `composer check-no-secrets` | Repo-wide secret scan for committed credentials |
 | `composer check-ingestion-defaults` | Ingestion default fixtures match contract |

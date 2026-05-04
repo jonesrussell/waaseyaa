@@ -4,11 +4,12 @@
 - Monorepo: 62 PHP packages in `packages/`, 3 meta-packages (core, cms, full), 1 JS admin SPA (`packages/admin/`, no composer.json)
 - 7-layer architecture (Foundation → Core Data → Content Types → Services → API → AI → Interfaces)
 - Each package has its own `composer.json` with path repository references
-- Root `composer.json` uses `@dev` constraints for all waaseyaa/* packages
+- Root `composer.json` uses `self.version` for all waaseyaa/* siblings — it is published to Packagist as `waaseyaa/framework`, so consumers receive the manifest verbatim. `self.version` resolves to `dev-main` locally (path repos) and to the exact tag version when crawled by Packagist (e.g. `0.1.0-alpha.170`), giving consumers exact-matching siblings without a release-time rewrite step. (#1382)
 - Composer policy is codified and gated via `bin/check-composer-policy`:
   - `config.sort-packages` must be `true` in all first-party `composer.json` files
-  - `@dev` is allowed only in root `composer.json` (local monorepo aggregator)
-  - wildcard internal constraints for `waaseyaa/*` are forbidden
+  - `@dev` is forbidden everywhere (CP002) — published artifacts cannot resolve it
+  - `self.version` is allowed only in root `composer.json` (CP006) — sibling metapackage shape
+  - wildcard internal constraints for `waaseyaa/*` are forbidden (CP003)
 - Authorization pipeline in `public/index.php`: SessionMiddleware → AuthorizationMiddleware. Session always sets `_account` on request; authorization reads it.
 - Route access control via route options: `_public`, `_authenticated`, `_session`, `_permission`, `_role`, `_gate` — checked by `AccessChecker`
 - Field-level access: `FieldAccessPolicyInterface` (companion to `AccessPolicyInterface`). Classes must implement both — `EntityAccessHandler` finds field policies via `instanceof` check. Open-by-default: Neutral = accessible, only Forbidden restricts.

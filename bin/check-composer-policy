@@ -19,6 +19,7 @@ policy_id = {
     "no_wildcard_internal": "CP003",
     "core_runtime_surface": "CP004",
     "tight_internal_floor": "CP005",
+    "self_version_scope": "CP006",
 }
 
 # Cross-package constraints in publishable manifests must include an explicit
@@ -35,12 +36,15 @@ def fail(rule_key: str, rel_path: str, current: str, expected: str) -> None:
     print(f"  current: {current}")
     print(f"  expected: {expected}")
 
+def _excluded(rel: str) -> bool:
+    parts = set(rel.split("/"))
+    return "vendor" in parts or "node_modules" in parts or rel.startswith(".worktrees/")
+
+
 manifest_paths = sorted(
     [
         p for p in root.rglob("composer.json")
-        if "vendor/" not in p.as_posix()
-        and "node_modules/" not in p.as_posix()
-        and "/.worktrees/" not in p.as_posix()
+        if not _excluded(p.relative_to(root).as_posix())
     ]
 )
 
@@ -85,14 +89,39 @@ for path in in_scope:
                 continue
 
             if pkg.startswith("waaseyaa/"):
-                # @dev policy: forbidden in publishable package manifests.
-                if version == "@dev" and rel.startswith("packages/"):
+                # @dev policy: forbidden in published artifacts.
+                # Root composer.json ships to Packagist as
+                # `waaseyaa/framework` and consumers cannot resolve `@dev`.
+                # Packages/* are split-published per package. Use
+                # `self.version` in root for sibling metapackage
+                # constraints; explicit semver ranges in packages/*.
+                # examples/ and docs/examples/ are consumer demos that
+                # track local path repos at dev-main — `@dev` is allowed.
+                if version == "@dev" and (
+                    rel == "composer.json" or rel.startswith("packages/")
+                ):
                     errors += 1
                     fail(
                         "dev_scope",
                         rel,
                         f'{pkg}={version}',
-                        '@dev forbidden in packages/*; use an explicit semver range',
+                        '@dev forbidden — root must use self.version, '
+                        'packages/* must use an explicit semver range',
+                    )
+
+                # self.version policy: only valid in root composer.json,
+                # where it acts as a sibling-metapackage constraint that
+                # resolves to the published tag. Outside root it has no
+                # parent version to bind against in publishable artifacts.
+                if version == "self.version" and rel != "composer.json":
+                    errors += 1
+                    fail(
+                        "self_version_scope",
+                        rel,
+                        f'{pkg}={version}',
+                        'self.version is only valid in the root '
+                        'composer.json (waaseyaa/framework metapackage); '
+                        'use an explicit semver range here',
                     )
 
                 # Wildcard internal constraints forbidden everywhere.
@@ -109,11 +138,13 @@ for path in in_scope:
                 # Tight-floor policy: publishable manifests must anchor
                 # cross-package constraints to a pre-release tag so Composer
                 # cannot silently resolve a stale sibling. Root composer.json
-                # is exempt (uses @dev). require-dev in skeleton/packages
-                # is also enforced — test deps shipped to consumers.
+                # uses self.version (exact match — strictly tighter than any
+                # range). require-dev in skeleton/packages is also enforced —
+                # test deps shipped to consumers.
                 if (
                     rel != "composer.json"
                     and version != "@dev"
+                    and version != "self.version"
                     and "*" not in version
                     and not TIGHT_FLOOR_PATTERN.search(version)
                 ):
