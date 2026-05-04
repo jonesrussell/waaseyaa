@@ -426,6 +426,7 @@
         "check-ingestion-defaults": "bash bin/check-ingestion-defaults",
         "check-no-secrets": "bash bin/check-no-secrets",
         "check-package-layers": "bash bin/check-package-layers",
+        "check-symfony-imports": "bash bin/check-symfony-imports",
         "cs-check": "php-cs-fixer fix --dry-run --diff",
         "cs-fix": "php-cs-fixer fix",
         "dev": [
@@ -449,14 +450,16 @@
             "@check-package-layers",
             "@check-no-secrets",
             "@check-ingestion-defaults",
+            "@check-symfony-imports",
             "@test"
         ]
     },
     "scripts-descriptions": {
+        "check-symfony-imports": "Enforce the Path R-narrow Symfony-import boundary (mission #1107 C-005 (b)). Fails when `use Symfony\\…` appears outside the framework allowlist. Allowlist lives in .symfony-import-allowlist.json — see docs/specs/api-layer.md §Symfony Import Boundary.",
         "dev": "Start the PHP dev server (delegates to dev:php). For the admin SPA, run `composer dev:admin` in a second terminal — see docs/specs/operations-playbooks.md.",
         "dev:admin": "Start the Nuxt admin SPA dev server. NUXT_BACKEND_URL points at the PHP server (default :8080); set APP_PORT to override.",
         "dev:php": "Start the PHP built-in dev server via bin/waaseyaa serve. Single typed long-running process with no shell forking.",
-        "verify": "Run all repo-wide gates: cs-check, phpstan, composer-policy, package-layers, no-secrets, ingestion-defaults, and the test suite. Canonical CI entry point — see docs/specs/operations-playbooks.md."
+        "verify": "Run all repo-wide gates: cs-check, phpstan, composer-policy, package-layers, no-secrets, ingestion-defaults, symfony-imports, and the test suite. Canonical CI entry point — see docs/specs/operations-playbooks.md."
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
