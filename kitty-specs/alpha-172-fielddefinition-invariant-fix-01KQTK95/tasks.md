@@ -12,11 +12,11 @@
 
 | ID | Description | WP | Parallel |
 |----|-------------|----|----------|
-| T001 | Add provider unit test for `GroupsServiceProvider` (registers `group_type`, per-field invariant assertions) | WP01 |   |
-| T002 | Add provider unit test for `TaxonomyServiceProvider` (registers `taxonomy_vocabulary`, per-field invariant assertions) | WP01 | [P] |
-| T003 | Add registry-level negative test (`FieldDefinitionRegistryInvariantTest`) pinning the `\InvalidArgumentException` contract | WP01 | [P] |
-| T004 | Add manifest-level integration test (`FieldDefinitionInvariantTest`) walking every registered entity type and asserting the invariant | WP01 |   |
-| T005 | Run targeted PHPUnit suites; confirm WP01 tests reproduce issue #1388 failures with the documented exception message | WP01 |   |
+| T001 | Add provider unit test for `GroupsServiceProvider` (registers `group_type`, per-field invariant assertions) | WP01 |   | [D] |
+| T002 | Add provider unit test for `TaxonomyServiceProvider` (registers `taxonomy_vocabulary`, per-field invariant assertions) | WP01 | [D] |
+| T003 | Add registry-level negative test (`FieldDefinitionRegistryInvariantTest`) pinning the `\InvalidArgumentException` contract | WP01 | [D] |
+| T004 | Add manifest-level integration test (`FieldDefinitionInvariantTest`) walking every registered entity type and asserting the invariant | WP01 |   | [D] |
+| T005 | Run targeted PHPUnit suites; confirm WP01 tests reproduce issue #1388 failures with the documented exception message | WP01 |   | [D] |
 | T006 | Patch `packages/groups/src/GroupsServiceProvider.php:43` — set `targetEntityTypeId: 'group_type'` on `description` | WP02 |   |
 | T007 | Patch `packages/taxonomy/src/TaxonomyServiceProvider.php:32` — set `targetEntityTypeId: 'taxonomy_vocabulary'` on `description` | WP02 | [P] |
 | T008 | Patch `packages/taxonomy/src/TaxonomyServiceProvider.php:39` — set `targetEntityTypeId: 'taxonomy_vocabulary'` on `weight` | WP02 | [P] |
@@ -46,11 +46,11 @@ Total: 15 subtasks across 4 work packages. Single mechanical lane.
 
 **Included subtasks**:
 
-- [ ] T001 Add provider unit test for `GroupsServiceProvider` (WP01)
-- [ ] T002 Add provider unit test for `TaxonomyServiceProvider` (WP01)
-- [ ] T003 Add registry-level negative test pinning `\InvalidArgumentException` contract (WP01)
-- [ ] T004 Add manifest-level integration test walking all entity types (WP01)
-- [ ] T005 Run targeted suites and document the reproduced failures (WP01)
+- [x] T001 Add provider unit test for `GroupsServiceProvider` (WP01)
+- [x] T002 Add provider unit test for `TaxonomyServiceProvider` (WP01)
+- [x] T003 Add registry-level negative test pinning `\InvalidArgumentException` contract (WP01)
+- [x] T004 Add manifest-level integration test walking all entity types (WP01)
+- [x] T005 Run targeted suites and document the reproduced failures (WP01)
 
 **Implementation sketch**: write tests against the in-memory kernel boot path used elsewhere in `tests/Integration/`; reuse `DBALDatabase::createSqlite()` if storage is required by the manifest test; assert exact exception message from `FieldDefinitionRegistry`.
 
