@@ -17,10 +17,10 @@
 | T003 | Add registry-level negative test (`FieldDefinitionRegistryInvariantTest`) pinning the `\InvalidArgumentException` contract | WP01 | [D] |
 | T004 | Add manifest-level integration test (`FieldDefinitionInvariantTest`) walking every registered entity type and asserting the invariant | WP01 |   | [D] |
 | T005 | Run targeted PHPUnit suites; confirm WP01 tests reproduce issue #1388 failures with the documented exception message | WP01 |   | [D] |
-| T006 | Patch `packages/groups/src/GroupsServiceProvider.php:43` — set `targetEntityTypeId: 'group_type'` on `description` | WP02 |   |
-| T007 | Patch `packages/taxonomy/src/TaxonomyServiceProvider.php:32` — set `targetEntityTypeId: 'taxonomy_vocabulary'` on `description` | WP02 | [P] |
-| T008 | Patch `packages/taxonomy/src/TaxonomyServiceProvider.php:39` — set `targetEntityTypeId: 'taxonomy_vocabulary'` on `weight` | WP02 | [P] |
-| T009 | Re-run WP01 tests; confirm all four are now green | WP02 |   |
+| T006 | Patch `packages/groups/src/GroupsServiceProvider.php:43` — set `targetEntityTypeId: 'group_type'` on `description` | WP02 |   | [D] |
+| T007 | Patch `packages/taxonomy/src/TaxonomyServiceProvider.php:32` — set `targetEntityTypeId: 'taxonomy_vocabulary'` on `description` | WP02 | [D] |
+| T008 | Patch `packages/taxonomy/src/TaxonomyServiceProvider.php:39` — set `targetEntityTypeId: 'taxonomy_vocabulary'` on `weight` | WP02 | [D] |
+| T009 | Re-run WP01 tests; confirm all four are now green | WP02 |   | [D] |
 | T010 | Re-run sweep over `packages/*/src/**` for every `new FieldDefinition(...)` call; confirm zero remaining defective bound sites and capture the search command in the WP report | WP03 |   |
 | T011 | Audit `docs/specs/entity-system.md` binding-invariant section; patch the field-binding paragraph if it does not state the `targetEntityTypeId === EntityType::id` rule | WP03 |   |
 | T012 | Run `tools/drift-detector.sh`; address any flagged specs | WP03 |   |
@@ -70,10 +70,10 @@ Total: 15 subtasks across 4 work packages. Single mechanical lane.
 
 **Included subtasks**:
 
-- [ ] T006 Patch `GroupsServiceProvider.php:43` description (WP02)
-- [ ] T007 Patch `TaxonomyServiceProvider.php:32` description (WP02)
-- [ ] T008 Patch `TaxonomyServiceProvider.php:39` weight (WP02)
-- [ ] T009 Re-run WP01 tests; confirm all four green (WP02)
+- [x] T006 Patch `GroupsServiceProvider.php:43` description (WP02)
+- [x] T007 Patch `TaxonomyServiceProvider.php:32` description (WP02)
+- [x] T008 Patch `TaxonomyServiceProvider.php:39` weight (WP02)
+- [x] T009 Re-run WP01 tests; confirm all four green (WP02)
 
 **Implementation sketch**: each patch is a one-line addition of a named-parameter argument inside an existing constructor call. Match the canonical pattern used in `packages/genealogy/src/GenealogyFieldDefinitions.php`.
 
