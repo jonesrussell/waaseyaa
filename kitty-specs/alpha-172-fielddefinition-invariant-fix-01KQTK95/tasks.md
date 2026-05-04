@@ -21,9 +21,9 @@
 | T007 | Patch `packages/taxonomy/src/TaxonomyServiceProvider.php:32` — set `targetEntityTypeId: 'taxonomy_vocabulary'` on `description` | WP02 | [D] |
 | T008 | Patch `packages/taxonomy/src/TaxonomyServiceProvider.php:39` — set `targetEntityTypeId: 'taxonomy_vocabulary'` on `weight` | WP02 | [D] |
 | T009 | Re-run WP01 tests; confirm all four are now green | WP02 |   | [D] |
-| T010 | Re-run sweep over `packages/*/src/**` for every `new FieldDefinition(...)` call; confirm zero remaining defective bound sites and capture the search command in the WP report | WP03 |   |
-| T011 | Audit `docs/specs/entity-system.md` binding-invariant section; patch the field-binding paragraph if it does not state the `targetEntityTypeId === EntityType::id` rule | WP03 |   |
-| T012 | Run `tools/drift-detector.sh`; address any flagged specs | WP03 |   |
+| T010 | Re-run sweep over `packages/*/src/**` for every `new FieldDefinition(...)` call; confirm zero remaining defective bound sites and capture the search command in the WP report | WP03 |   | [D] |
+| T011 | Audit `docs/specs/entity-system.md` binding-invariant section; patch the field-binding paragraph if it does not state the `targetEntityTypeId === EntityType::id` rule | WP03 |   | [D] |
+| T012 | Run `tools/drift-detector.sh`; address any flagged specs | WP03 |   | [D] |
 | T013 | Add `CHANGELOG.md` entry for `[0.1.0-alpha.172]` with `### Fixed` bullet (#1388) and the migration-aid `### Notes` block | WP04 |   |
 | T014 | Run all gates: `composer cs-fix`, `composer cs-check`, `composer phpstan`, `vendor/bin/phpunit`, `bin/check-package-layers`, `bin/check-composer-policy` | WP04 |   |
 | T015 | Final review pass — confirm PR description references `#1388` and the Minoo discovery mission per `docs/specs/workflow.md` traceability rules | WP04 |   |
@@ -93,9 +93,9 @@ Total: 15 subtasks across 4 work packages. Single mechanical lane.
 
 **Included subtasks**:
 
-- [ ] T010 Re-run sweep over `packages/*/src/**` for `new FieldDefinition` (WP03)
-- [ ] T011 Audit & patch `docs/specs/entity-system.md` binding-invariant section if stale (WP03)
-- [ ] T012 Run `tools/drift-detector.sh` (WP03)
+- [x] T010 Re-run sweep over `packages/*/src/**` for `new FieldDefinition` (WP03)
+- [x] T011 Audit & patch `docs/specs/entity-system.md` binding-invariant section if stale (WP03)
+- [x] T012 Run `tools/drift-detector.sh` (WP03)
 
 **Implementation sketch**: `rg -n "new FieldDefinition" packages/*/src/` to enumerate call sites; cross-check each against `targetEntityTypeId`; only edit the spec if the existing language fails to capture the post-alpha.171 invariant.
 
