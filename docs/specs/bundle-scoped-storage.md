@@ -105,7 +105,7 @@ The empty→non-empty transition is a first-class case, triggered whenever a rel
 
 See [`operator-diagnostics.md`](./operator-diagnostics.md) for the algorithm and diagnostic-code registry.
 
-**Dialect portability (K5, mission #1257).** `HealthChecker::findOrphanSubtables()` enumerates tables via DBAL `AbstractSchemaManager::listTableNames()` filtered against `{base}__%`, with SQLite's `sqlite_master` retained as a fast-path. Test matrix gates a non-SQLite run behind a docker-compose env var so MySQL/PostgreSQL coverage is mechanical.
+**Dialect portability (K5, mission #1257; landed via #1301).** `HealthChecker::findOrphanSubtables()` enumerates tables via `SchemaInterface::listTableNames()` (delegating to Doctrine's `AbstractSchemaManager::listTableNames()`) and filters by `{base}__` prefix in PHP using `str_starts_with`. Portable across SQLite, MySQL, PostgreSQL, and any other DBAL-supported driver — no `sqlite_master` fast-path remains. The production code path itself is dialect-portable as of #1301; non-SQLite test matrix coverage (docker-compose env-gated) is tracked separately as a CI extension.
 
 **Layer placement (K6, mission #1257).** `HealthChecker` lives in `packages/foundation/src/Diagnostic/` and imports from L1 (`Waaseyaa\Entity\*`, `Waaseyaa\EntityStorage\SqlSchemaHandler`, etc.) — kernel-adjacent because it is wired only from `ConsoleKernel`. The cross-layer privilege is codified in `bin/check-package-layers` `KERNEL_EXEMPT_FILES` per mission #824 WP02 surface C; entry rationale cites K6(c). See [`infrastructure.md` §Kernel exemption surface](./infrastructure.md).
 

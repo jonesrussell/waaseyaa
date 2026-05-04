@@ -446,35 +446,32 @@ final class HealthChecker implements HealthCheckerInterface
     }
 
     /**
+     * Enumerate `{baseTable}__*` tables that the registry does not expect.
+     *
+     * Issue #1301 (deferred mission #1257 WP09): replaced the SQLite-only
+     * `sqlite_master` query with `SchemaInterface::listTableNames()`, which
+     * Doctrine implements portably across SQLite, MySQL, PostgreSQL, etc.
+     * Filtering by `{baseTable}__` prefix happens in PHP — `str_starts_with`
+     * has no LIKE-pattern escaping concerns. The `__` between base and
+     * bundle is reserved (see bundle-scoped-storage.md §Naming) so prefix
+     * match is unambiguous.
+     *
      * @param array<string, true> $expectedSubtables
      * @return list<string>
      */
     private function findOrphanSubtables(string $baseTable, array $expectedSubtables): array
     {
-        // LIKE pattern escapes `_` and `%` so base-table names containing those
-        // characters don't match extra tables. The `__` between base and bundle
-        // is reserved (see bundle-scoped-storage.md §Naming).
-        $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $baseTable);
-        $like = $escaped . '\\_\\_%';
+        $prefix = $baseTable . '__';
         $orphans = [];
 
-        try {
-            foreach ($this->database->query(
-                "SELECT name FROM sqlite_master WHERE type = 'table' AND name LIKE ? ESCAPE '\\'",
-                [$like],
-            ) as $row) {
-                $name = $row['name'];
-                if (!isset($expectedSubtables[$name])) {
-                    $orphans[] = $name;
-                }
+        foreach ($this->database->schema()->listTableNames() as $name) {
+            if (!str_starts_with($name, $prefix)) {
+                continue;
             }
-        } catch (\Throwable $e) {
-            // Non-SQLite dialect — skip orphan detection silently.
-            $this->logger->info(sprintf(
-                'Orphan subtable detection skipped for %s: %s',
-                $baseTable,
-                $e->getMessage(),
-            ));
+            if (isset($expectedSubtables[$name])) {
+                continue;
+            }
+            $orphans[] = $name;
         }
 
         return $orphans;
