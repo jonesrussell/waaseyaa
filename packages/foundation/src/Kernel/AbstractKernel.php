@@ -215,6 +215,16 @@ abstract class AbstractKernel
             },
             $fieldRegistry,
             $this->logger,
+            // Issue #1376: probe used by EntityTypeManager::addBundleFields()
+            // to surface a `[BUNDLE_SUBTABLE_MISSING]` notice once per
+            // (entity_type_id, bundle) when the per-bundle subtable is not
+            // yet materialized on disk. Resolved name format mirrors
+            // SqlSchemaHandler::resolveSubtableName().
+            static function (string $entityTypeId, string $bundle) use ($database): bool {
+                return $database->schema()->tableExists(
+                    SqlSchemaHandler::resolveSubtableName($entityTypeId, $bundle),
+                );
+            },
         );
     }
 
