@@ -173,3 +173,4 @@ Set `targetEntityTypeId` on the three defective `FieldDefinition` constructions 
 ## Activity Log
 
 - 2026-05-04T23:46:18Z – claude – shell_pid=34132 – Started implementation via action command
+- 2026-05-04T23:47:24Z – claude – shell_pid=34132 – WP02 complete: three-line patch in commit 4e9e2f451 sets targetEntityTypeId on description (group_type), description (taxonomy_vocabulary), and weight (taxonomy_vocabulary). All four WP01 regression tests now pass (14/14, 72 assertions). Full Groups/Taxonomy/Field package suites green (479 tests, 824 assertions). composer cs-check + composer phpstan clean (1143 files, 0 errors). Ready for review and WP03 (sweep + spec hygiene).
