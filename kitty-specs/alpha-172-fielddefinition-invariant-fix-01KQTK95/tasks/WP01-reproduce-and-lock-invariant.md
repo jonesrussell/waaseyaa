@@ -10,12 +10,16 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-alpha-172-fielddefinition-invariant-fix-01KQTK95
+base_commit: b6856776a0cdcbb3363ae28073f7ec9466e5fe0a
+created_at: '2026-05-04T23:09:45.474018+00:00'
 subtasks:
 - T001
 - T002
 - T003
 - T004
 - T005
+shell_pid: '31004'
 history:
 - timestamp: '2026-05-04T23:04:19Z'
   event: drafted
