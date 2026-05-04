@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-04T22:55:58.579217+00:00",
+  "friendly_name": "alpha 172 fielddefinition invariant fix",
+  "mission_id": "01KQTK95TKYCKCFA1C07XE0CFM",
+  "mission_number": null,
+  "mission_slug": "alpha-172-fielddefinition-invariant-fix-01KQTK95",
+  "mission_type": "software-dev",
+  "slug": "alpha-172-fielddefinition-invariant-fix-01KQTK95",
+  "target_branch": "main"
+}
