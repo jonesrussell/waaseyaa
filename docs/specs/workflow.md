@@ -124,6 +124,31 @@ Policy rules:
 
 > CP006 was filed as #1382 after alpha.170 shipped to Packagist with unresolvable `@dev` constraints in the root artifact.
 
+## Cutting Releases
+
+The canonical release path is the `Cut Release` workflow (`.github/workflows/release-cut.yml`, `workflow_dispatch` trigger). It mirrors what `scripts/release.sh` did locally — validate semver, verify `[Unreleased]` has content, mutate CHANGELOG, commit, tag, push — but runs in CI with no interactive prompts and no operator-on-laptop dependency.
+
+```sh
+gh workflow run release-cut.yml -f version=v0.1.0-alpha.172
+```
+
+Or use the GitHub Actions UI ("Run workflow" → enter version).
+
+The workflow:
+
+1. Validates semver shape (same regex as the legacy script).
+2. Guards `v1.0*` tags against missing `release-approvals/v1.0.approved` (same gate `split.yml` runs after the fact — fails earlier).
+3. Verifies the tag does not already exist (locally or on origin).
+4. Verifies `CHANGELOG.md` has a `[Unreleased]` section with content.
+5. Mutates the changelog: renames `[Unreleased]` → `[X.Y.Z] - YYYY-MM-DD`, inserts fresh `[Unreleased]`.
+6. Commits as `github-actions[bot]`, tags annotated, pushes commit + tag using `SPLIT_GITHUB_TOKEN`.
+
+The push must use the `SPLIT_GITHUB_TOKEN` PAT, not the default `GITHUB_TOKEN`, because tag pushes by `GITHUB_TOKEN` do **not** trigger downstream workflows — and `split.yml` + `packagist-update.yml` are exactly what we need to fire.
+
+`scripts/release.sh` is preserved as a fallback for emergency local releases (offline, broken Actions runners) but is no longer the canonical path. The interactive `Create GitHub release? [y/N]` prompt in the script is redundant — `split.yml`'s `publish-github-release` job creates the GitHub Release on every tag.
+
+Filed as #1385 after the alpha.171 cut for #1382 surfaced the manual-release friction.
+
 ## Release Tag Parity
 
 Release tags must split to every package repo that is represented under `packages/*/composer.json`.
