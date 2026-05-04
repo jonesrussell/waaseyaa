@@ -46,7 +46,7 @@ final readonly class AuthorizeController
 
         if (!$account->isAuthenticated()) {
             return new RedirectResponse(
-                $this->loginPath . '?return_to=' . rawurlencode($request->getRequestUri()),
+                $this->appendQuery($this->loginPath, ['return_to' => $request->getRequestUri()]),
                 302,
             );
         }
