@@ -19,7 +19,8 @@ subtasks:
 - T003
 - T004
 - T005
-shell_pid: '31004'
+shell_pid: "31004"
+agent: "claude"
 history:
 - timestamp: '2026-05-04T23:04:19Z'
   event: drafted
@@ -191,3 +192,7 @@ This is the foundation WP. It encodes the bug as a test, encodes the invariant c
 - `packages/genealogy/src/GenealogyFieldDefinitions.php` — clean canonical pattern to mirror.
 - `packages/groups/src/GroupsServiceProvider.php:43` — defect site (DO NOT EDIT in WP01).
 - `packages/taxonomy/src/TaxonomyServiceProvider.php:32, :39` — defect sites (DO NOT EDIT in WP01).
+
+## Activity Log
+
+- 2026-05-04T23:09:46Z – claude – shell_pid=31004 – Assigned agent via action command
