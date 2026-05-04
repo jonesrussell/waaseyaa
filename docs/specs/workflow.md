@@ -115,10 +115,12 @@ The script exits 0 always. Output is a warning surface, not a CI gate. It does *
 
 Policy rules:
 
-1. `config.sort-packages` is required and must be `true` in all first-party `composer.json` manifests.
-2. `@dev` constraints for `waaseyaa/*` are allowed only in root `composer.json` (monorepo local development aggregator with path repositories).
-3. Wildcard constraints for internal `waaseyaa/*` packages are forbidden (for example `*`).
-4. `waaseyaa/core` must keep optional observability/dev packages (`waaseyaa/debug`, `waaseyaa/telescope`, `waaseyaa/testing`) out of `require`; they belong in `suggest`.
+1. `config.sort-packages` is required and must be `true` in all first-party `composer.json` manifests (CP001).
+2. `@dev` constraints for `waaseyaa/*` are forbidden in root `composer.json` and in `packages/*/composer.json` (CP002). The root manifest is published to Packagist as `waaseyaa/framework` and consumers cannot resolve `@dev`. `examples/` and `docs/examples/` are consumer demos that track local path repos at dev-main and may use `@dev`.
+3. Wildcard constraints for internal `waaseyaa/*` packages are forbidden everywhere (CP003).
+4. `waaseyaa/core` must keep optional observability/dev packages (`waaseyaa/debug`, `waaseyaa/telescope`, `waaseyaa/testing`) out of `require`; they belong in `suggest` (CP004).
+5. Cross-package constraints in `packages/*` and `skeleton/composer.json` must include an explicit pre-release floor (alpha/beta/rc/dev), e.g. `^0.1.0-alpha.150`, so Composer cannot resolve a stale sibling missing required methods (CP005).
+6. The root `composer.json` (published as `waaseyaa/framework`) uses `self.version` for all `waaseyaa/*` siblings (CP006). `self.version` resolves to `dev-main` against local path repos and to the exact tag version (e.g. `0.1.0-alpha.170`) when crawled by Packagist, giving consumers exact-matching siblings without a release-time rewrite step. `self.version` is forbidden outside root since non-root manifests have no parent metapackage version to bind against. Filed as #1382 after alpha.170 shipped to Packagist with unresolvable `@dev` constraints in the root artifact.
 
 ## Release Tag Parity
 
