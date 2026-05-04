@@ -9,6 +9,7 @@ use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
+use Waaseyaa\Field\FieldStorage;
 use Waaseyaa\Foundation\Ingestion\IngestionLogger;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
@@ -93,6 +94,11 @@ final class HealthChecker implements HealthCheckerInterface
         // Schema drift.
         $driftResults = $this->checkSchemaDrift();
         array_push($results, ...$driftResults);
+
+        // Column-vs-data storage drift (FieldStorage::Data fields with a
+        // lingering column on disk).
+        $columnDataDrift = $this->checkColumnDataStorageDrift();
+        array_push($results, ...$columnDataDrift);
 
         // Storage directory.
         $results[] = $this->checkStorageDirectory();
@@ -227,6 +233,120 @@ final class HealthChecker implements HealthCheckerInterface
         }
 
         return $results;
+    }
+
+    /**
+     * Detect column-vs-_data storage drift: fields registered with
+     * `FieldStorage::Data` whose name still has a backing column on the base
+     * table or a registered bundle subtable. Such columns hold stale data
+     * (new writes go to the `_data` JSON blob) and reads silently skip them
+     * once query routing is symmetric.
+     *
+     * Skipped silently when no FieldDefinitionRegistry was injected — the
+     * registry is the source of truth for the storage hint.
+     *
+     * @return list<HealthCheckResult>
+     */
+    public function checkColumnDataStorageDrift(): array
+    {
+        if ($this->fieldRegistry === null) {
+            return [];
+        }
+
+        $results = [];
+        $schema = $this->database->schema();
+
+        foreach (array_keys($this->entityTypeManager->getDefinitions()) as $entityId) {
+            $baseTable = $entityId;
+
+            // Core fields land on the base table.
+            if ($schema->tableExists($baseTable)) {
+                foreach ($this->fieldRegistry->coreFieldsFor($entityId) as $field) {
+                    if (!$this->fieldIsDataStored($field)) {
+                        continue;
+                    }
+                    $fieldName = $field->getName();
+                    if ($this->columnExists($baseTable, $fieldName)) {
+                        $results[] = $this->columnDataDriftResult($entityId, $baseTable, $fieldName, bundle: null);
+                    }
+                }
+            }
+
+            // Bundle fields land on the per-bundle subtable.
+            foreach ($this->fieldRegistry->bundleNamesFor($entityId) as $bundle) {
+                $subtable = $baseTable . '__' . $bundle;
+                if (!$schema->tableExists($subtable)) {
+                    continue;
+                }
+
+                foreach ($this->fieldRegistry->bundleFieldsFor($entityId, $bundle) as $field) {
+                    if (!$this->fieldIsDataStored($field)) {
+                        continue;
+                    }
+                    $fieldName = $field->getName();
+                    if ($this->columnExists($subtable, $fieldName)) {
+                        $results[] = $this->columnDataDriftResult($entityId, $subtable, $fieldName, bundle: $bundle);
+                    }
+                }
+            }
+        }
+
+        return $results;
+    }
+
+    private function fieldIsDataStored(object $field): bool
+    {
+        return method_exists($field, 'getStored') && $field->getStored() === FieldStorage::Data;
+    }
+
+    /**
+     * SQLite-only PRAGMA column existence probe. On non-SQLite drivers the
+     * query throws; treat that as "no drift" and skip silently — portable
+     * column enumeration is tracked separately under #1301.
+     */
+    private function columnExists(string $tableName, string $columnName): bool
+    {
+        try {
+            foreach ($this->database->query("PRAGMA table_info(\"{$tableName}\")", []) as $row) {
+                if (($row['name'] ?? null) === $columnName) {
+                    return true;
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->logger->info(sprintf(
+                'Column-data drift detection skipped for %s.%s: %s',
+                $tableName,
+                $columnName,
+                $e->getMessage(),
+            ));
+        }
+        return false;
+    }
+
+    private function columnDataDriftResult(string $entityId, string $tableName, string $columnName, ?string $bundle): HealthCheckResult
+    {
+        $context = [
+            'entity_type' => $entityId,
+            'table' => $tableName,
+            'column' => $columnName,
+            'field' => $columnName,
+        ];
+        if ($bundle !== null) {
+            $context['bundle'] = $bundle;
+        }
+
+        return HealthCheckResult::warn(
+            "Storage drift: {$tableName}.{$columnName}",
+            DiagnosticCode::COLUMN_DATA_STORAGE_DRIFT,
+            sprintf(
+                'Field "%s" on entity type "%s" is registered with FieldStorage::Data but column "%s" still exists on table "%s". New writes go to _data; the column holds stale data.',
+                $columnName,
+                $entityId,
+                $columnName,
+                $tableName,
+            ),
+            context: $context,
+        );
     }
 
     /**
