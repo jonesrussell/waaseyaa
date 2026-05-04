@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 # Release script: validates, updates CHANGELOG.md, tags, pushes, and optionally creates GitHub release.
 # Usage: scripts/release.sh <version>  (e.g., scripts/release.sh v1.0.0 or v0.1.0-alpha.5)
+#
+# DEPRECATED AS THE CANONICAL PATH (#1385).
+# Prefer the `Cut Release` workflow:
+#
+#     gh workflow run release-cut.yml -f version=v0.1.0-alpha.NNN
+#
+# This script is kept as a fallback for offline emergencies (broken
+# Actions runners, network partitions). The interactive
+# `Create GitHub release? [y/N]` prompt below is redundant — split.yml's
+# `publish-github-release` job creates the GitHub Release on every tag.
+# See docs/specs/workflow.md → "Cutting Releases".
 set -euo pipefail
 
 VERSION="${1:?Usage: scripts/release.sh <version>}"

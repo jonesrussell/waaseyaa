@@ -1,0 +1,175 @@
+name: Cut Release
+
+# Canonical release path (#1385). Replaces the manual scripts/release.sh
+# ritual: validate, mutate CHANGELOG, commit, tag, push — all in CI.
+#
+# Trigger via the GitHub Actions UI ("Run workflow") or `gh workflow run`:
+#
+#   gh workflow run release-cut.yml -f version=v0.1.0-alpha.172
+#
+# Mirrors scripts/release.sh checks (semver regex, [Unreleased] non-empty,
+# tag must not exist, monorepo shape) but eliminates the interactive
+# `gh release create` prompt — `.github/workflows/split.yml` already
+# creates the GitHub Release in its `publish-github-release` job.
+#
+# Push uses SPLIT_GITHUB_TOKEN (the existing PAT used by split.yml to fan
+# out to per-package repos). This is required because tags pushed by the
+# default `GITHUB_TOKEN` do NOT trigger downstream workflows
+# (split.yml + packagist-update.yml), and the whole point of automating
+# this is to keep the existing pipeline firing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (e.g. v0.1.0-alpha.172)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-cut
+  cancel-in-progress: false
+
+jobs:
+  cut:
+    name: Cut release tag ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify SPLIT_GITHUB_TOKEN secret
+        env:
+          SPLIT_GH_TOKEN: ${{ secrets.SPLIT_GITHUB_TOKEN }}
+        run: |
+          if [ -z "${SPLIT_GH_TOKEN}" ]; then
+            echo "::error::SPLIT_GITHUB_TOKEN secret is not configured."
+            echo "::error::Without a PAT, downstream workflows (split.yml,"
+            echo "::error::packagist-update.yml) will NOT fire on the tag push."
+            exit 1
+          fi
+
+      - name: Validate version shape
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-.+)?$ ]]; then
+            echo "::error::version must match vX.Y.Z or vX.Y.Z-prerelease.N (got: $VERSION)"
+            exit 1
+          fi
+          echo "::notice::Version $VERSION accepted."
+
+      - name: Guard against unauthorized v1.0 tag
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ "$VERSION" == v1.0* ]]; then
+            # Same guard as split.yml runs after the fact — fail HERE so the
+            # tag never gets created without owner approval.
+            if [ ! -f "release-approvals/v1.0.approved" ]; then
+              # We haven't checked out yet, but the path is in the repo at HEAD.
+              echo "::error::UNAUTHORIZED_V1_TAG: cannot cut $VERSION without release-approvals/v1.0.approved on main."
+              echo "::error::See VERSIONING.md for the v1.0 approval process."
+              exit 1
+            fi
+          fi
+
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          ref: main
+          # Use PAT so subsequent push triggers downstream workflows
+          # (split.yml, packagist-update.yml).
+          token: ${{ secrets.SPLIT_GITHUB_TOKEN }}
+
+      - name: Re-check v1.0 approval against checked-out tree
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [[ "$VERSION" == v1.0* ]] && [ ! -f "release-approvals/v1.0.approved" ]; then
+            echo "::error::UNAUTHORIZED_V1_TAG: release-approvals/v1.0.approved missing on main."
+            exit 1
+          fi
+
+      - name: Verify monorepo release shape
+        run: bash bin/check-monorepo-release-shape HEAD
+
+      - name: Verify tag does not exist
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "::error::tag $VERSION already exists locally"
+            exit 1
+          fi
+          if git ls-remote --tags origin "refs/tags/$VERSION" | grep -q .; then
+            echo "::error::tag $VERSION already exists on origin"
+            exit 1
+          fi
+          echo "::notice::Tag $VERSION is available."
+
+      - name: Verify CHANGELOG [Unreleased] has content
+        run: |
+          if [ ! -f CHANGELOG.md ]; then
+            echo "::error::CHANGELOG.md not found"
+            exit 1
+          fi
+          if ! grep -q '^## \[Unreleased\]' CHANGELOG.md; then
+            echo "::error::no [Unreleased] section in CHANGELOG.md"
+            exit 1
+          fi
+          unreleased=$(sed -n '/^## \[Unreleased\]/,/^## \[/{/^## \[/d;/^$/d;/^### /d;p;}' CHANGELOG.md)
+          if [ -z "$unreleased" ]; then
+            echo "::error::[Unreleased] section has no entries — add bullets before cutting a release"
+            exit 1
+          fi
+          echo "::notice::[Unreleased] has content."
+
+      - name: Mutate CHANGELOG and capture tag message
+        id: changelog
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          semver="${VERSION#v}"
+          today=$(date -u +%Y-%m-%d)
+          # Capture content for the tag message before mutation.
+          tag_msg=$(sed -n '/^## \[Unreleased\]/,/^## \[/{/^## \[Unreleased\]/d;/^## \[/d;p;}' CHANGELOG.md)
+          # Rename [Unreleased] → [X.Y.Z] - DATE, insert fresh [Unreleased].
+          sed -i "s/^## \[Unreleased\]/## [${semver}] - ${today}/" CHANGELOG.md
+          sed -i "/^## \[${semver}\] - ${today}/i\\## [Unreleased]\\n" CHANGELOG.md
+          # Stash tag_msg via heredoc-safe delimiter for downstream step.
+          {
+            echo "tag_msg<<RELEASE_TAG_MSG_EOF"
+            echo "$tag_msg"
+            echo "RELEASE_TAG_MSG_EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Commit, tag, and push
+        env:
+          VERSION: ${{ inputs.version }}
+          TAG_MSG: ${{ steps.changelog.outputs.tag_msg }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add CHANGELOG.md
+          git commit -m "chore: release ${VERSION}"
+          git tag -a "$VERSION" -m "Release ${VERSION}
+
+          ${TAG_MSG}"
+          git push origin main "$VERSION"
+          echo "::notice::Pushed main + tag $VERSION to origin."
+
+      - name: Summarize next steps
+        env:
+          VERSION: ${{ inputs.version }}
+          REPO: ${{ github.repository }}
+        run: |
+          {
+            echo "## Released $VERSION"
+            echo
+            echo "- Tag: https://github.com/${REPO}/releases/tag/${VERSION}"
+            echo "- Split runs: https://github.com/${REPO}/actions/workflows/split.yml"
+            echo "- Packagist publish: https://github.com/${REPO}/actions/workflows/packagist-update.yml"
+            echo
+            echo "Downstream workflows fire automatically on the tag push."
+          } >> "$GITHUB_STEP_SUMMARY"
