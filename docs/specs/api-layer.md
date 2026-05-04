@@ -909,3 +909,33 @@ The mission's charter is **Path R-narrow**: HTTP request/response and event-disp
 The duplicate `Waaseyaa\Api\JsonResponseTrait` (a plain JSON helper, not a JSON:API helper) was deleted as orphan; only its own unit test referenced it. Per amended C-004, the canonical JSON:API trait remains in foundation (`Waaseyaa\Foundation\Http\JsonApiResponseTrait`); api consumers may import it directly — L4 → L0 imports are permitted by the layer rule.
 
 The `packages/api/tests/Contract/SymfonyImportBoundaryTest` asserts that a sample app controller fixture produces a JSON:API response without importing any `Symfony\` class — it is the executable contract that backs this Path R-narrow promise for app-side controllers.
+
+### Symfony Import Boundary (linter — #1374)
+
+Per ratified C-005 (b), `bin/check-symfony-imports` is the codebase-wide gate that supplements the per-fixture contract test. It scans every `packages/*/src/**/*.php` file and fails when a `use Symfony\…` import (including `use function Symfony\…` and `use const Symfony\…`) appears outside the allowlist.
+
+**Allowlist** lives in `.symfony-import-allowlist.json` at the repo root (deliberately not hardcoded in the script):
+
+| Field | Purpose |
+|---|---|
+| `allowed_directories` | Path prefixes whose internal infrastructure is intentionally Symfony-coupled. Currently: `packages/foundation/`, `packages/routing/`, `packages/api/`, `packages/validation/`, `packages/cli/`. Tests are implicitly excluded — the gate only walks `packages/*/src/`, never `packages/*/tests/`. |
+| `legacy_files` | Explicit list of source files that pre-date the boundary and still import Symfony. The gate locks the historical surface; new violations in any package fail CI. Refactor a file to use Waaseyaa surfaces, then remove its entry. |
+
+**Wiring.** Runs as part of `composer verify` (between `check-ingestion-defaults` and `test`). Standalone invocations:
+
+```bash
+composer check-symfony-imports        # gate run; exits 0 if clean
+bin/check-symfony-imports --list-stale # also reports legacy_files entries
+                                       # whose file no longer has Symfony
+                                       # imports — remove them from the list
+```
+
+**Adding a new violation.** If a new file genuinely needs a Symfony import (e.g. a new directory acting as framework infrastructure), do one of:
+
+1. Replace the import with the equivalent Waaseyaa surface (`Waaseyaa\Foundation\Http\Request`, `Waaseyaa\Foundation\Event\EventDispatcherInterface`, `Waaseyaa\Api\Http\JsonApiResponse`).
+2. Add the file path to `legacy_files` in the JSON, with the rationale captured in the PR description.
+3. If a whole new directory should be allowed, add it to `allowed_directories` — but this should be rare and warrants discussion (every entry weakens the gate).
+
+**Refactoring legacy entries.** Replace the import with the Waaseyaa surface, run `bin/check-symfony-imports --list-stale` to confirm the file is reported as stale, and remove the entry from `legacy_files` in the same commit.
+
+**Soft-rot tradeoff.** The historical 90-file `legacy_files` list captures the implicit Symfony coupling that accumulated before mission #1107. The gate's job is to prevent further drift, not to clean up history — that's a slow incremental refactor. Each refactored file is one less entry; the list shrinks over time.
