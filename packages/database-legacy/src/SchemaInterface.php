@@ -25,4 +25,17 @@ interface SchemaInterface
     public function addUniqueKey(string $table, string $name, array $fields): void;
 
     public function addPrimaryKey(string $table, array $fields): void;
+
+    /**
+     * Enumerate every table visible to the current connection.
+     *
+     * Portable across SQLite, MySQL, PostgreSQL and any other dialect the
+     * underlying driver supports — callers must not assume a specific
+     * backend. Used by diagnostics that scan the live schema (e.g. orphan
+     * bundle-subtable detection in `HealthChecker`).
+     *
+     * @return list<string> Unordered list of table names. Empty when the
+     *                      connection has no tables.
+     */
+    public function listTableNames(): array;
 }

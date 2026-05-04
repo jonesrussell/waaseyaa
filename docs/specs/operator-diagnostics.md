@@ -76,7 +76,7 @@ Each `DiagnosticCode` case provides:
 
 - **Database** — `SELECT 1` connectivity test via `DBALDatabase::query()`
 - **Schema drift** — compares `PRAGMA table_info()` against `SqlSchemaHandler.buildTableSpec()` expected columns for each registered entity type. Multi-bundle types additionally enumerate their `{base_table}__{bundle}` subtables (see below).
-- **Column-vs-data storage drift** — for each entity type with a registered `FieldStorage::Data` field, probes `PRAGMA table_info()` for a column whose name matches the field on the base table (core fields) or the matching `{base_table}__{bundle}` subtable (bundle fields). Emits `COLUMN_DATA_STORAGE_DRIFT` per occurrence. Skipped silently when no `FieldDefinitionRegistry` is injected. SQLite-only at present (mirrors the orphan-detection path in #1301).
+- **Column-vs-data storage drift** — for each entity type with a registered `FieldStorage::Data` field, probes `PRAGMA table_info()` for a column whose name matches the field on the base table (core fields) or the matching `{base_table}__{bundle}` subtable (bundle fields). Emits `COLUMN_DATA_STORAGE_DRIFT` per occurrence. Skipped silently when no `FieldDefinitionRegistry` is injected. SQLite-only at present — orphan detection went portable in #1301; column-data drift's PRAGMA path is tracked separately for dialect parity.
 - **Foreign key enforcement** — SQLite only: checks `PRAGMA foreign_keys`; emits `FK_ENFORCEMENT_DISABLED` when off. Skipped for dialects with default-on enforcement.
 - **Storage directory** — `storage/framework/` existence check
 - **Cache directory** — `storage/framework/` writability check
@@ -119,7 +119,7 @@ When `HealthChecker` is constructed with a `FieldDefinitionRegistryInterface`, m
 1. For each bundle returned by `bundleNamesFor($entityTypeId)` with non-empty `bundleFieldsFor()`, the expected subtable is `{base_table}__{bundle}`.
 2. If the subtable is missing, emit `MISSING_BUNDLE_SUBTABLE` under the name `Schema: {base_table}__{bundle}`. `context.table` carries the subtable name.
 3. If the subtable exists, compare its columns against the bundle's registered field names. Missing columns are reported as `DATABASE_SCHEMA_DRIFT` under the subtable name, again with `context.table` set.
-4. Orphan detection queries `sqlite_master` for tables matching `{base_table}__%` (LIKE pattern with `_` and `%` escaped). Any subtable not accounted for by a registered non-empty bundle is reported as `ORPHAN_BUNDLE_SUBTABLE` (warn, informational — auto-drop is never performed; author a cleanup migration).
+4. Orphan detection enumerates every table via `SchemaInterface::listTableNames()` (Doctrine's `AbstractSchemaManager::listTableNames()` under the hood — portable across SQLite, MySQL, PostgreSQL, and any other DBAL-supported driver) and filters in PHP for entries starting with `{base_table}__`. Any subtable not accounted for by a registered non-empty bundle is reported as `ORPHAN_BUNDLE_SUBTABLE` (warn, informational — auto-drop is never performed; author a cleanup migration). Issue #1301 (deferred mission #1257 WP09) replaced the SQLite-only `sqlite_master` LIKE query with this portable path.
 
 Single-bundle entity types (no `bundleEntityType`) are unchanged — subtable enumeration is skipped entirely.
 

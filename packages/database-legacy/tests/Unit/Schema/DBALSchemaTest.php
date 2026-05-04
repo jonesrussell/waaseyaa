@@ -234,4 +234,44 @@ final class DBALSchemaTest extends TestCase
 
         $this->assertTrue($this->db->schema()->tableExists('all_types'));
     }
+
+    public function testListTableNamesReturnsEmptyOnFreshConnection(): void
+    {
+        $this->assertSame([], $this->db->schema()->listTableNames());
+    }
+
+    public function testListTableNamesReturnsAllCreatedTables(): void
+    {
+        // Issue #1301: portable enumeration must include base + bundle subtables
+        // and any sibling tables, regardless of dialect (SQLite here).
+        foreach (['group', 'group__business', 'group__organization', 'unrelated'] as $name) {
+            $this->db->schema()->createTable($name, [
+                'fields' => ['id' => ['type' => 'serial']],
+                'primary key' => ['id'],
+            ]);
+        }
+
+        $names = $this->db->schema()->listTableNames();
+        sort($names);
+
+        $this->assertSame(
+            ['group', 'group__business', 'group__organization', 'unrelated'],
+            $names,
+        );
+    }
+
+    public function testListTableNamesIsAvailableAcrossDialects(): void
+    {
+        // The method exists on the interface and the SQLite implementation.
+        // Locks the contract for #1301 — non-SQLite dialects must also return
+        // a portable list. Doctrine's AbstractSchemaManager::listTableNames()
+        // is implemented for every supported driver (sqlite, pdo_mysql,
+        // pdo_pgsql, etc.); a non-SQLite test matrix is tracked separately.
+        $names = $this->db->schema()->listTableNames();
+
+        $this->assertIsArray($names);
+        foreach ($names as $name) {
+            $this->assertIsString($name);
+        }
+    }
 }

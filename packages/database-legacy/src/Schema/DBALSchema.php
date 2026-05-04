@@ -39,6 +39,15 @@ final class DBALSchema implements SchemaInterface
         return isset($columns[$field]);
     }
 
+    public function listTableNames(): array
+    {
+        // Doctrine's `AbstractSchemaManager::listTableNames()` is portable
+        // across SQLite, MySQL, PostgreSQL, and other supported drivers.
+        // No raw `sqlite_master`-style queries here — issue #1301 (deferred
+        // mission #1257 WP09) replaced the SQLite-only path with this call.
+        return $this->sm->listTableNames();
+    }
+
     public function createTable(string $name, array $spec): void
     {
         if ($this->tableExists($name)) {
