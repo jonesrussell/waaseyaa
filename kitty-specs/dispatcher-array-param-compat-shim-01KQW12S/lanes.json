@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "mission_slug": "dispatcher-array-param-compat-shim-01KQW12S",
+  "mission_id": "01KQW12S3R4TY0563R4ZSQ2QBC",
+  "mission_branch": "kitty/mission-dispatcher-array-param-compat-shim-01KQW12S",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "packages/ssr/src/Http/AppController/AppControllerMethodInvoker.php",
+        "packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php",
+        "packages/ssr/src/SsrPageHandler.php",
+        "packages/ssr/tests/Integration/AppControllerImplicitArrayDispatchTest.php",
+        "packages/ssr/tests/Unit/Http/AppController/AppParameterBindingBuilderTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-05T13:08:44.875873+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": []
+}
