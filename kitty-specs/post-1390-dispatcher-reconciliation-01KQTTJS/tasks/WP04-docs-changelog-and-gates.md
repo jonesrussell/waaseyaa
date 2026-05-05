@@ -15,8 +15,8 @@ subtasks:
 - T014
 - T015
 - T016
-agent: "claude:opus-4-7:reviewer:reviewer"
-shell_pid: "92328"
+agent: "claude:opus-4-7:implementer:implementer"
+shell_pid: "93383"
 history:
 - '2026-05-05: created'
 authoritative_surface: docs/specs/
@@ -206,3 +206,4 @@ spec-kitty agent action implement WP04 --agent <your-agent-name> --mission post-
 - 2026-05-05T16:10:48Z – claude:opus-4-7:implementer:implementer – shell_pid=91087 – Ready for review: T013 spec cross-link landed (docs/specs/api-layer.md), T014 skipped (packages/ssr/* row in CLAUDE.md orchestration table already covers AppController/*), T015 skipped (existing [Unreleased] #1390 bullet from 454d00f77 already accurately describes the post-reconciliation deprecation-shim contract — controller/parameter/recommended_attribute/per-request dedup all present), T016 gates: cs-check/phpstan/check-composer-policy/check-package-layers all clean (exit 0), drift-detector clean, full PHPUnit green except 2 verified-pre-existing QueueIntegrationTest state-pollution failures (workerRunProcessesMultipleJobsThroughDbalTransport, workerRunMixesSuccessAndFailure) orthogonal to mission. Commit 683e47b27.
 - 2026-05-05T16:11:37Z – claude:opus-4-7:reviewer:reviewer – shell_pid=92328 – Started review via action command
 - 2026-05-05T16:16:26Z – claude:opus-4-7:reviewer:reviewer – shell_pid=92328 – Moved to planned
+- 2026-05-05T16:17:21Z – claude:opus-4-7:implementer:implementer – shell_pid=93383 – Started implementation via action command
