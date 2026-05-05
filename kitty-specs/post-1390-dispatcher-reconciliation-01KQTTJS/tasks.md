@@ -26,9 +26,9 @@
 | T004  | Produce `artifacts/controller-shape-audit.md`                                                        | WP01 | [D] |
 | T005  | Produce `artifacts/minoo-resume-verification.md`                                                     | WP01 | [D] |
 | T006  | File follow-up issues for any adjacent invariants surfaced (per spec C-005)                          | WP01 | [D] |
-| T007  | Inject `LoggerInterface` into the dispatcher binding pipeline                                        | WP02 |          |
-| T008  | Implement deprecation emission with `(class::method::param)` dedup                                   | WP02 |          |
-| T009  | Wire DI through `SsrServiceProvider` so production gets a real logger                                | WP02 |          |
+| T007  | Inject `LoggerInterface` into the dispatcher binding pipeline                                        | WP02 |          | [D] |
+| T008  | Implement deprecation emission with `(class::method::param)` dedup                                   | WP02 |          | [D] |
+| T009  | Wire DI through `SsrServiceProvider` so production gets a real logger                                | WP02 |          | [D] |
 | T010  | Add fixture controllers under `packages/ssr/tests/fixtures/`                                         | WP03 |          |
 | T011  | Add unit tests for `AppParameterBindingBuilder` deprecation path                                     | WP03 | [P]      |
 | T012  | Add the seven contract tests defined in `contracts/dispatcher-deprecation-contract.md`               | WP03 |          |
@@ -79,9 +79,9 @@ Prompt: [tasks/WP01-analysis-and-artifacts.md](./tasks/WP01-analysis-and-artifac
 
 Tracking:
 
-- [ ] T007 Inject `LoggerInterface` into the dispatcher binding pipeline (WP02)
-- [ ] T008 Implement deprecation emission with `(class::method::param)` dedup (WP02)
-- [ ] T009 Wire DI through `SsrServiceProvider` (WP02)
+- [x] T007 Inject `LoggerInterface` into the dispatcher binding pipeline (WP02)
+- [x] T008 Implement deprecation emission with `(class::method::param)` dedup (WP02)
+- [x] T009 Wire DI through `SsrServiceProvider` (WP02)
 
 Implementation sketch: identify the right collaborator (likely `AppParameterBindingBuilder`) → constructor-inject `?LoggerInterface $logger = null` → dedup map keyed on `(class::method::param)` → emit `notice` per spec → wire in `SsrServiceProvider`.
 
