@@ -1,13 +1,25 @@
 {
+  "acceptance_history": [
+    {
+      "acceptance_mode": "pr",
+      "accepted_at": "2026-05-05T13:23:23.285261+00:00",
+      "accepted_by": "jones",
+      "accepted_from_commit": "0957890ee962af07124f4d74a5f956835c2daafa"
+    }
+  ],
+  "acceptance_mode": "pr",
+  "accepted_at": "2026-05-05T13:23:23.285261+00:00",
+  "accepted_by": "jones",
+  "accepted_from_commit": "0957890ee962af07124f4d74a5f956835c2daafa",
   "created_at": "2026-05-05T12:16:23.550824+00:00",
   "friendly_name": "Dispatcher Array-Param Compatibility Shim (#1390)",
-  "source_description": "Fix framework issue #1390: AppParameterBindingBuilder rejects unannotated `array $params` / `array $query` controller parameters with no compatibility shim, breaking every consumer using the legacy implicit-array signature (184 methods across 37 files in Minoo alone). Restore implicit-array binding via deprecation-emitting shim — unannotated `array $params` defaults to #[MapRoute], unannotated `array $query` defaults to #[MapQuery] — keep the strict invariant for any other unannotated array parameter, and add regression tests so the shim cannot silently regress. Mirrors the alpha.165 `tenancy:` migration ergonomics. Unblocks Minoo's re-frozen alpha.171→172 upgrade mission and clears the gate on the post-1390-dispatcher-reconciliation mission's WP02–WP04.",
-  "vcs": "git",
   "mission_id": "01KQW12S3R4TY0563R4ZSQ2QBC",
-  "mission_number": null,
+  "mission_number": 2,
   "mission_slug": "dispatcher-array-param-compat-shim-01KQW12S",
   "mission_type": "software-dev",
   "slug": "dispatcher-array-param-compat-shim-01KQW12S",
+  "source_description": "Fix framework issue #1390: AppParameterBindingBuilder rejects unannotated `array $params` / `array $query` controller parameters with no compatibility shim, breaking every consumer using the legacy implicit-array signature (184 methods across 37 files in Minoo alone). Restore implicit-array binding via deprecation-emitting shim — unannotated `array $params` defaults to #[MapRoute], unannotated `array $query` defaults to #[MapQuery] — keep the strict invariant for any other unannotated array parameter, and add regression tests so the shim cannot silently regress. Mirrors the alpha.165 `tenancy:` migration ergonomics. Unblocks Minoo's re-frozen alpha.171→172 upgrade mission and clears the gate on the post-1390-dispatcher-reconciliation mission's WP02–WP04.",
   "target_branch": "main",
-  "tracking_issue": "https://github.com/waaseyaa/framework/issues/1390"
+  "tracking_issue": "https://github.com/waaseyaa/framework/issues/1390",
+  "vcs": "git"
 }

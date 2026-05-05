@@ -7,6 +7,8 @@ namespace Waaseyaa\SSR\Http\AppController;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Route;
 use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
+use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\Log\NullLogger;
 use Waaseyaa\Routing\RouteFingerprint;
 use Waaseyaa\SSR\Http\AppController\Exception\AppControllerTypeMismatchException;
 use Waaseyaa\SSR\Http\AppController\Exception\InvalidAppControllerArgumentException;
@@ -17,9 +19,14 @@ final class AppControllerMethodInvoker
     /** @var array<string, list<AppParameterBindingSpec>> */
     private static array $specCache = [];
 
+    private readonly AppParameterBindingBuilder $bindingBuilder;
+
     public function __construct(
-        private readonly AppParameterBindingBuilder $bindingBuilder = new AppParameterBindingBuilder(),
-    ) {}
+        ?AppParameterBindingBuilder $bindingBuilder = null,
+        ?LoggerInterface $logger = null,
+    ) {
+        $this->bindingBuilder = $bindingBuilder ?? new AppParameterBindingBuilder($logger ?? new NullLogger());
+    }
 
     /**
      * @param list<AppControllerArgumentResolver> $customResolvers

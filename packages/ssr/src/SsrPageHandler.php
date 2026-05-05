@@ -67,7 +67,7 @@ final class SsrPageHandler
     ) {
         $this->logger = $logger ?? new NullLogger();
         $this->languageResolver = $languageResolver ?? new LanguageResolver(serviceResolver: $this->serviceResolver);
-        $this->appControllerMethodInvoker = $appControllerMethodInvoker ?? new AppControllerMethodInvoker();
+        $this->appControllerMethodInvoker = $appControllerMethodInvoker ?? new AppControllerMethodInvoker(logger: $this->logger);
     }
 
     /**

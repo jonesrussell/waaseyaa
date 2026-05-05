@@ -13,6 +13,8 @@ use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
+use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\Log\NullLogger;
 use Waaseyaa\Routing\RouteFingerprint;
 use Waaseyaa\SSR\Attribute\FromRoute;
 use Waaseyaa\SSR\Attribute\MapQuery;
@@ -34,6 +36,13 @@ final class AppParameterBindingBuilder
         Environment::class,
         \Waaseyaa\Access\Gate\GateInterface::class,
     ];
+
+    private readonly LoggerInterface $logger;
+
+    public function __construct(?LoggerInterface $logger = null)
+    {
+        $this->logger = $logger ?? new NullLogger();
+    }
 
     /**
      * @param list<AppControllerArgumentResolver> $customResolvers
@@ -145,6 +154,23 @@ final class AppParameterBindingBuilder
 
         if ($named->isBuiltin()) {
             if ($typeName === 'array') {
+                if ($name === 'params') {
+                    $this->emitImplicitArrayDeprecation($method, $parameter, '#[MapRoute]');
+
+                    return new AppParameterBindingSpec(
+                        index: $index,
+                        kind: AppParameterKind::MapRoute,
+                    );
+                }
+                if ($name === 'query') {
+                    $this->emitImplicitArrayDeprecation($method, $parameter, '#[MapQuery]');
+
+                    return new AppParameterBindingSpec(
+                        index: $index,
+                        kind: AppParameterKind::MapQuery,
+                    );
+                }
+
                 throw new InvalidAppControllerBindingException(sprintf(
                     'Parameter $%s: array parameters require #[MapRoute] or #[MapQuery].',
                     $name,
@@ -413,6 +439,37 @@ final class AppParameterBindingBuilder
         }
 
         return null;
+    }
+
+    /**
+     * Emit a structured deprecation signal when the implicit-array shim fires.
+     *
+     * Payload contract (parsed by consumer tooling):
+     * - `controller_class` (string, FQCN) — declaring class of the action
+     * - `method_name` (string) — action method name
+     * - `parameter_name` ('params'|'query') — which implicit parameter triggered the shim
+     * - `recommended_attribute` ('#[MapRoute]'|'#[MapQuery]') — attribute the author should add
+     *
+     * Dedup is achieved by the static spec cache in {@see AppControllerMethodInvoker}
+     * (key: `class::method\0routeName\0fingerprint`). Emission therefore occurs at
+     * most once per (controller, method, route) per request lifetime under FPM/CLI
+     * SAPIs, and at most once per registration under long-lived workers (PHP-PM,
+     * RoadRunner, FrankenPHP, Swoole) — the desired behaviour.
+     */
+    private function emitImplicitArrayDeprecation(
+        \ReflectionMethod $method,
+        \ReflectionParameter $parameter,
+        string $recommendedAttribute,
+    ): void {
+        $this->logger->notice(
+            'Controller method uses implicit array parameter — add #[MapRoute] or #[MapQuery]',
+            [
+                'controller_class' => $method->getDeclaringClass()->getName(),
+                'method_name' => $method->getName(),
+                'parameter_name' => $parameter->getName(),
+                'recommended_attribute' => $recommendedAttribute,
+            ],
+        );
     }
 
     private function assertArrayParameter(\ReflectionParameter $parameter, string $attribute): void
