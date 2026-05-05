@@ -24,9 +24,9 @@
 | T010 | Re-run sweep over `packages/*/src/**` for every `new FieldDefinition(...)` call; confirm zero remaining defective bound sites and capture the search command in the WP report | WP03 |   | [D] |
 | T011 | Audit `docs/specs/entity-system.md` binding-invariant section; patch the field-binding paragraph if it does not state the `targetEntityTypeId === EntityType::id` rule | WP03 |   | [D] |
 | T012 | Run `tools/drift-detector.sh`; address any flagged specs | WP03 |   | [D] |
-| T013 | Add `CHANGELOG.md` entry for `[0.1.0-alpha.172]` with `### Fixed` bullet (#1388) and the migration-aid `### Notes` block | WP04 |   |
-| T014 | Run all gates: `composer cs-fix`, `composer cs-check`, `composer phpstan`, `vendor/bin/phpunit`, `bin/check-package-layers`, `bin/check-composer-policy` | WP04 |   |
-| T015 | Final review pass — confirm PR description references `#1388` and the Minoo discovery mission per `docs/specs/workflow.md` traceability rules | WP04 |   |
+| T013 | Add `CHANGELOG.md` entry for `[0.1.0-alpha.172]` with `### Fixed` bullet (#1388) and the migration-aid `### Notes` block | WP04 |   | [D] |
+| T014 | Run all gates: `composer cs-fix`, `composer cs-check`, `composer phpstan`, `vendor/bin/phpunit`, `bin/check-package-layers`, `bin/check-composer-policy` | WP04 |   | [D] |
+| T015 | Final review pass — confirm PR description references `#1388` and the Minoo discovery mission per `docs/specs/workflow.md` traceability rules | WP04 |   | [D] |
 
 Total: 15 subtasks across 4 work packages. Single mechanical lane.
 
@@ -115,9 +115,9 @@ Total: 15 subtasks across 4 work packages. Single mechanical lane.
 
 **Included subtasks**:
 
-- [ ] T013 Add `CHANGELOG.md` `[0.1.0-alpha.172]` entry (WP04)
-- [ ] T014 Run cs-fix / cs-check / phpstan / phpunit / layer + policy gates (WP04)
-- [ ] T015 Final review pass + PR-description traceability (WP04)
+- [x] T013 Add `CHANGELOG.md` `[0.1.0-alpha.172]` entry (WP04)
+- [x] T014 Run cs-fix / cs-check / phpstan / phpunit / layer + policy gates (WP04)
+- [x] T015 Final review pass + PR-description traceability (WP04)
 
 **Implementation sketch**: edit `CHANGELOG.md` in place per the format documented in `plan.md` § "Release notes design"; run gates from repo root; do not run `git commit` (the implement loop owns that).
 
