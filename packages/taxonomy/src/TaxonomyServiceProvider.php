@@ -32,6 +32,7 @@ final class TaxonomyServiceProvider extends ServiceProvider
                 'description' => new FieldDefinition(
                     name: 'description',
                     type: 'text',
+                    targetEntityTypeId: 'taxonomy_vocabulary',
                     label: 'Description',
                     description: 'A description of the vocabulary.',
                     settings: ['weight' => 5],
@@ -39,6 +40,7 @@ final class TaxonomyServiceProvider extends ServiceProvider
                 'weight' => new FieldDefinition(
                     name: 'weight',
                     type: 'integer',
+                    targetEntityTypeId: 'taxonomy_vocabulary',
                     label: 'Weight',
                     description: 'Sort order for this vocabulary.',
                     settings: ['weight' => 10],

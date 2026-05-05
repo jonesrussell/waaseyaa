@@ -43,6 +43,7 @@ final class GroupsServiceProvider extends ServiceProvider
                 'description' => new FieldDefinition(
                     name: 'description',
                     type: 'text',
+                    targetEntityTypeId: 'group_type',
                     label: 'Description',
                     description: 'Human-readable description of this group type.',
                     settings: ['weight' => 5],

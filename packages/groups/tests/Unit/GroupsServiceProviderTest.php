@@ -7,6 +7,7 @@ namespace Waaseyaa\Groups\Tests\Unit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Groups\Group;
 use Waaseyaa\Groups\GroupsServiceProvider;
 use Waaseyaa\Groups\GroupType;
@@ -90,6 +91,50 @@ final class GroupsServiceProviderTest extends TestCase
         self::assertSame(['status', 'created_at', 'updated_at'], array_keys($fieldDefs));
         foreach ($fieldDefs as $def) {
             self::assertSame(\Waaseyaa\Field\FieldStorage::Data, $def['stored']);
+        }
+    }
+
+    /**
+     * Regression for #1388: every core FieldDefinition shipped by GroupsServiceProvider
+     * MUST declare `targetEntityTypeId` matching its owning EntityType id, otherwise
+     * `FieldDefinitionRegistry::registerCoreFields()` rejects the bundle at registration
+     * time and the kernel cannot register `group_type`.
+     */
+    #[Test]
+    public function group_type_field_definitions_declare_target_entity_type_id(): void
+    {
+        $provider = new GroupsServiceProvider();
+        $provider->register();
+
+        $groupType = null;
+        foreach ($provider->getEntityTypes() as $t) {
+            if ($t->id() === 'group_type') {
+                $groupType = $t;
+                break;
+            }
+        }
+        self::assertNotNull($groupType, 'GroupsServiceProvider must register the group_type entity type.');
+
+        $fieldDefs = $groupType->getFieldDefinitions();
+        self::assertNotSame([], $fieldDefs, 'group_type must ship at least the description core field.');
+        self::assertArrayHasKey('description', $fieldDefs, '#1388: description must be a core field on group_type.');
+
+        foreach ($fieldDefs as $name => $def) {
+            self::assertInstanceOf(
+                FieldDefinitionInterface::class,
+                $def,
+                sprintf('group_type field "%s" must be a FieldDefinitionInterface instance.', $name),
+            );
+            self::assertSame(
+                'group_type',
+                $def->getTargetEntityTypeId(),
+                sprintf(
+                    '#1388: group_type core field "%s" must declare targetEntityTypeId "group_type"; '
+                    . 'got "%s". An empty value will be rejected by FieldDefinitionRegistry.',
+                    $name,
+                    $def->getTargetEntityTypeId(),
+                ),
+            );
         }
     }
 }

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.172] - 2026-05-04
+
+### Fixed
+
+- **Kernel boot for `groups` and `taxonomy` consumers (#1388)** — `GroupsServiceProvider` and `TaxonomyServiceProvider` constructed core `FieldDefinition` instances on their config bundle entity types (`group_type`, `taxonomy_vocabulary`) without declaring `targetEntityTypeId`. The alpha.171 binding invariant — `FieldDefinitionRegistry::registerCoreFields()` requires `FieldDefinition::getTargetEntityTypeId() === $entityTypeId` — correctly rejected the bind, which prevented kernel boot in any consumer registering groups or taxonomy. Three call sites patched (`GroupsServiceProvider.php` description for `group_type`; `TaxonomyServiceProvider.php` description and weight for `taxonomy_vocabulary`). Discovered while upgrading Minoo to alpha.171 (mission `upgrade-waaseyaa-alpha-171-01KQTDC2` WP03). Locked by four new regression tests in `packages/groups/tests/Unit/`, `packages/taxonomy/tests/Unit/`, `packages/field/tests/Unit/FieldDefinitionRegistryInvariantTest.php`, and `tests/Integration/Phase27/FieldDefinitionInvariantTest.php` — the integration sweep walks every framework provider's entity types through a real `FieldDefinitionRegistry` to catch any future regression of this class.
+
+### Changed
+
+- **Spec hygiene** — `docs/specs/entity-system.md` now documents the alpha.171+ field-binding invariant explicitly: every `FieldDefinition` passed to `FieldDefinitionRegistry::registerCoreFields()` or `registerBundleFields()` must declare `targetEntityTypeId === $entityTypeId` (and `targetBundle === $bundle` for the bundle path), with the `\InvalidArgumentException` message format named for both code paths. Points readers at `packages/genealogy/src/GenealogyFieldDefinitions.php` as the canonical clean pattern.
+
+### Notes
+
+- **Migration aid for consumers upgrading from alpha.165 → alpha.171 → alpha.172.** Three reconciliations already shipped in alpha.171 may still bite consumers crossing that gap (restated for posterity; not regressions of alpha.172):
+  - `EntityType` constructor named param renamed: `fieldDefinitions:` → `_fieldDefinitions:`.
+  - `ServiceProvider::setKernelResolver()` removed; replaced by `setKernelServices(KernelServicesInterface)` plus `mergeChildProvider()`.
+  - `Waaseyaa\Api\JsonResponseTrait` redesigned (single `jsonApiResponse()` returning `application/vnd.api+json`); previous `json()` / `jsonBody()` surface dropped.
+
 ## [0.1.0-alpha.171] - 2026-05-04
 
 ### Fixed
