@@ -40,3 +40,4 @@ work_packages:
       - T004
       - T005
       - T006
+    prompt_file: "tasks/WP01-array-param-compat-shim.md"
