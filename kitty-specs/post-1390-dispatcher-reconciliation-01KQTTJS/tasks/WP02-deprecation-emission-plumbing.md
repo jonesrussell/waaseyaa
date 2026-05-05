@@ -19,7 +19,8 @@ subtasks:
 - T007
 - T008
 - T009
-shell_pid: '79727'
+shell_pid: "79727"
+agent: "claude:opus-4-7:implementer:implementer"
 history:
 - '2026-05-05: created'
 authoritative_surface: packages/ssr/src/Http/AppController/
@@ -197,3 +198,7 @@ This WP focuses on production code; tests land in WP03. However, before requesti
 ```bash
 spec-kitty agent action implement WP02 --agent <your-agent-name> --mission post-1390-dispatcher-reconciliation-01KQTTJS
 ```
+
+## Activity Log
+
+- 2026-05-05T14:13:07Z – claude:opus-4-7:implementer:implementer – shell_pid=79727 – Assigned agent via action command
