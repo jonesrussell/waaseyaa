@@ -19,6 +19,7 @@
         "packages/ssr/src/Http/AppController/**",
         "packages/ssr/src/SsrServiceProvider.php",
         "packages/ssr/tests/Contract/**",
+        "packages/ssr/tests/Integration/**",
         "packages/ssr/tests/Unit/Http/AppController/**",
         "packages/ssr/tests/fixtures/**"
       ],
