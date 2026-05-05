@@ -471,8 +471,11 @@ final class AppParameterBindingBuilder
      * - `parameter_name` (`'params'`|`'query'`) — which implicit parameter fired the shim
      * - `recommended_attribute` (`'MapRoute'`|`'MapQuery'`) — bare attribute name to add
      *
-     * Dedup key is `controllerClass::method::parameterName` for the lifetime of
-     * this binding-builder instance (per-request scope per contract §7).
+     * Dedup key is `controllerClass::method::parameterName` for the lifetime
+     * of this binding-builder instance. Effective scope under FPM is once per
+     * triple per worker lifetime, because `AppControllerMethodInvoker::$specCache`
+     * (private static) caches the built spec and bypasses this method on
+     * subsequent requests for the same route. See contract §7 erratum (#1392).
      */
     private function emitDeprecation(
         string $controllerClass,
