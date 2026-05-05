@@ -101,10 +101,20 @@ Look for log lines with `channel: dispatcher.deprecation`. The schema is documen
 To extract Minoo's migration backlog from the logs:
 
 ```bash
+# Preferred: works when Minoo's logger formatter writes structured JSON.
 grep '"channel":"dispatcher.deprecation"' storage/logs/laravel.log \
   | jq -r '.context | "\(.controller_class)::\(.method) ($\(.parameter_name) → #[\(.recommended_attribute)])"' \
   | sort -u
 ```
+
+```bash
+# Fallback: works regardless of log format (text or JSON). Many Laravel
+# installations write text-formatted lines by default; the jq recipe above
+# silently produces no output on text logs, which is misleading.
+grep -F 'dispatcher.deprecation' storage/logs/laravel.log | sort -u | head -50
+```
+
+If the fallback grep returns hits but the jq recipe returns nothing, your logger is writing text-format lines and you cannot parse the structured fields cleanly. To get the parsed-context view, switch the channel's formatter to JSON for one boot — Laravel's `config/logging.php` typically lets you set `'formatter' => \Monolog\Formatter\JsonFormatter::class` on the relevant channel. Then re-run the preferred recipe.
 
 This list IS Minoo's migration backlog. Each entry corresponds to one method that should add an explicit attribute to suppress the notice.
 

@@ -2,6 +2,7 @@
 
 **Mission**: `post-1390-dispatcher-reconciliation-01KQTTJS`
 **Status**: 🟡 **Draft pending #1390 merge** — written 2026-05-05 against `main` at alpha.172, where #1390 is **OPEN**. Each section flags assumptions that need re-confirmation when the upstream PR lands.
+**Revision**: cycle-1 review fixes landed (B1: `#[FromRoute]` no longer listed as shim-suppressing; B2a: dedup scope clarified as **per-request** matching the `SsrPageHandler`-instantiated invoker lifecycle; M1: `MapRoute`+`MapQuery` resolution stated concretely; M2: §12 cross-reference attributed correctly). See `../tasks/WP01-analysis-and-artifacts/review-cycle-1.md` for the verdict trail.
 **Authoritative for**: WP02 (deprecation emission plumbing), WP03 (test coverage), WP04 (docs/CHANGELOG).
 
 This artifact supersedes the draft contract at `../contracts/dispatcher-deprecation-contract.md` for any subsequent decision. Where the two diverge, this document wins.
@@ -42,10 +43,10 @@ When #1390 merges, WP01 may be re-opened with a single subtask "Reconcile A1..A6
 
 ## 3. Trigger conditions (post-shim)
 
-The dispatcher emits **exactly one** deprecation event per `(controller_class, method_name, parameter_name)` registration when **any** of the following holds:
+The dispatcher emits **at most one** deprecation event per `(controller_class, method_name, parameter_name)` dedup key **per request** (see §7 for scope rationale) when **any** of the following holds:
 
-1. Method has an unannotated `array $params` parameter (no `#[MapRoute]`, `#[MapQuery]`, or `#[FromRoute]`). Event kind: `implicit_array_shim`. `recommended_attribute = "MapRoute"`.
-2. Method has an unannotated `array $query` parameter. Event kind: `implicit_array_shim`. `recommended_attribute = "MapQuery"`.
+1. Method has an unannotated `array $params` parameter (no `#[MapRoute]` and no `#[MapQuery]`). `#[FromRoute]` is a route-key remapper that does NOT suppress the shim — see §6 edge case. Event kind: `implicit_array_shim`. `recommended_attribute = "MapRoute"`.
+2. Method has an unannotated `array $query` parameter (no `#[MapRoute]` and no `#[MapQuery]`). `#[FromRoute]` does NOT suppress the shim. Event kind: `implicit_array_shim`. `recommended_attribute = "MapQuery"`.
 3. Method has an unannotated `array $X` parameter where `$X` is **neither** `params` nor `query`. Event kind: `implicit_array_unbound`. `recommended_attribute = ""` (empty). The dispatcher injects `[]` for this parameter (chosen here over hard-error to preserve existing semantics; see §6 edge cases).
 
 A method with two unannotated implicit-array params (e.g., `array $params, array $query`) emits **two** events — one per parameter — each with its own dedup key.
@@ -56,13 +57,13 @@ A method with no `array` parameters emits **zero** events and **zero** hash-tabl
 
 ## 4. Attribute equivalence rules
 
-| `parameter_name` | declared `parameter_type` | mapped attribute  | applies when                                                                              |
-|------------------|---------------------------|-------------------|-------------------------------------------------------------------------------------------|
-| `params`         | `array`                   | `MapRoute`        | no `#[MapRoute]`, `#[MapQuery]`, or `#[FromRoute]` attribute on the parameter             |
-| `query`          | `array`                   | `MapQuery`        | no `#[MapRoute]`, `#[MapQuery]`, or `#[FromRoute]` attribute on the parameter             |
-| any other        | `array`                   | (none — `unbound`) | no binding attribute on the parameter; injected as `[]`                                  |
+| `parameter_name` | declared `parameter_type` | mapped attribute  | applies when                                                                                                          |
+|------------------|---------------------------|-------------------|-----------------------------------------------------------------------------------------------------------------------|
+| `params`         | `array`                   | `MapRoute`        | no `#[MapRoute]` and no `#[MapQuery]` on the parameter. (`#[FromRoute]` is allowed; it does NOT suppress the shim.)   |
+| `query`          | `array`                   | `MapQuery`        | no `#[MapRoute]` and no `#[MapQuery]` on the parameter. (`#[FromRoute]` is allowed; it does NOT suppress the shim.)   |
+| any other        | `array`                   | (none — `unbound`) | no `#[MapRoute]` and no `#[MapQuery]` on the parameter; injected as `[]`.                                            |
 
-Rules are evaluated in parameter declaration order. The match is on parameter name (case-sensitive) and declared type only.
+Only `#[MapRoute]` and `#[MapQuery]` short-circuit binding-kind classification (per `AppParameterBindingBuilder.php:112-126`, where each is checked-and-returned-early before any other classification). `#[FromRoute]` is processed at lines 128-132 *after* the binding-kind decision and only sets a route-key override; it does NOT suppress the shim. Rules are evaluated in parameter declaration order. The match is on parameter name (case-sensitive) and declared type only.
 
 ## 5. Log emission contract (locked)
 
@@ -105,15 +106,24 @@ The seven required fields above constitute v1 of the schema. They MUST be stable
 | Method with `array $params` declared **nullable** (`?array $params`)                        | Treated as `array $params` for shim purposes (the `?` is resolved by `primaryNamedType()`'s null-stripping, already in the binding builder). Event fires.        |
 | Method with union type `array\|string $params`                                              | The existing `primaryNamedType()` rejects unions with >1 non-null member as `InvalidAppControllerBindingException`. The shim does not engage; behavior unchanged.  |
 | Method with `array $params` carrying `#[FromRoute('id')]` only (no `#[MapRoute]`)          | `FromRoute` does not satisfy the shim's "binding attribute present" check — the shim still engages because `FromRoute` is a route-key remapper, not a binding-kind attribute. Event fires; `recommended_attribute: MapRoute`. |
-| Method with `#[MapRoute] array $params` AND `#[MapQuery] array $params` on the same param  | Existing behavior (presumably one wins or the second is rejected); shim does not engage; no event. |
+| Method with `#[MapRoute] array $params` AND `#[MapQuery] array $params` on the same param  | `MapRoute` wins by source-iteration order: `AppParameterBindingBuilder::buildForParameter` checks `MapRoute` first (line 112) and returns immediately on match before the `MapQuery` loop runs (line 120). Shim does not engage; no event. |
 
 ## 7. Dedup invariant (NFR-002)
 
 - Dedup key: `sprintf('%s::%s::%s', $controllerClass, $method, $parameterName)`.
 - Storage: `private array $emittedKeys = []` on the binding-builder instance.
-- Scope: per-process. The cache lives for the lifetime of the binding-builder object. In production this is bounded by the `AppControllerMethodInvoker`'s lifetime, which today is per-request (the invoker is instantiated by `SsrPageHandler`); this is acceptable because each request boots a fresh dedup table and the noise budget per request is bounded by the number of distinct params on the matched route's controller method.
+- **Scope: per-request.** The dedup map lives on the binding-builder, which is owned by `AppControllerMethodInvoker`, which `SsrPageHandler` instantiates per HTTP request. Each request gets a fresh dedup table; within one request, a given `(class, method, parameter)` triple can only emit one notice no matter how many times the binding pipeline classifies it.
+- **NFR-002 interpretation**: spec.md NFR-002 reads "Deduplicated by `(class::method)` key for the lifetime of the dispatcher". For this contract, "lifetime of the dispatcher" is interpreted as "lifetime of the binding-builder instance" — which equals the request lifecycle given the current `SsrPageHandler` wiring. WP02 satisfies NFR-002 as written without needing a longer-lived collaborator.
 
-> **Open consideration**: if a future build moves the invoker to a long-lived singleton, the dedup table will accumulate. That is a feature (one notice per registration per process), not a bug — but it should be revisited in a follow-up if memory pressure becomes a concern.
+### Why per-request (and not per-process) is the right scope
+
+Per-request dedup is the lower-risk choice and matches the existing wiring without any container surgery:
+
+- The noise budget per request is bounded by the number of distinct `array` parameters on the matched route's controller method (typically 1–2 for the genealogy pattern, see `controller-shape-audit.md`).
+- Across requests, the same notice may fire repeatedly — once per request that hits the same controller. Consumers reading a steady-state log over a session will still see ~one event per controller-method-param triple per request that exercises it; cumulative log volume is `O(requests × distinct shimmed params)`, not `O(unique triples)`.
+- Per-process dedup would require either (a) making the binding-builder a singleton (changes invoker lifecycle), or (b) introducing a separate `DispatcherDeprecationCollector` collaborator with its own DI binding. Both are heavier than the noise reduction warrants, and consumers can cap log retention via standard logger configuration.
+
+If, in the future, log volume becomes a real concern under sustained load, the recommended evolution is to introduce a separate `DispatcherDeprecationCollector` resolved from the container as a singleton, keeping the binding-builder's per-request lifecycle intact. That is a follow-up, not part of this mission.
 
 ## 8. Performance invariant (NFR-001)
 
@@ -167,7 +177,7 @@ These do not require new framework-level deprecation paths; they are documented 
 
 ## 12. Cross-references
 
-- Mission spec: [`../spec.md`](../spec.md) (FR-001, FR-002, FR-010, NFR-001, NFR-002 anchor here)
+- Mission spec: [`../spec.md`](../spec.md). FR-001, FR-006, FR-008, FR-009, FR-010 anchor here (mapped to WP01). FR-002, NFR-001, NFR-002 are mapped to WP02 and are *implemented against* this contract — this artifact describes them; WP02 satisfies them.
 - Plan: [`../plan.md`](../plan.md)
 - Data model: [`../data-model.md`](../data-model.md)
 - Draft contract (superseded for any conflict): [`../contracts/dispatcher-deprecation-contract.md`](../contracts/dispatcher-deprecation-contract.md)

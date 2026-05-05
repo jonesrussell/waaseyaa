@@ -27,6 +27,8 @@ This means the framework's *own* exposure to the post-#1390 deprecation contract
 
 Verification: `rg -l AppControllerMethodInvoker packages/` returns only `packages/ssr/src/SsrPageHandler.php` and the invoker file itself.
 
+> **Verification limit (disclosure)**: This audit identifies dispatcher-subject controllers by grepping for *direct callers/imports* of `AppControllerMethodInvoker` and `AppParameterBindingBuilder`. That proves no other package *invokes* the dispatcher class itself, but does not exhaustively trace which routes the framework's existing `SsrPageHandler.handle()` accepts as targets. In practice the auth/JSON:API/MCP pipelines self-contain their dispatch (per inspection of their respective controller files: none import the AppController dispatcher), so the inferred exclusion is sound for the alpha cycle. If a consumer later reports a deprecation notice for a controller this audit lists as "not subject", the next step is a full route trace through `SsrPageHandler.handle()` to identify how the route reached the dispatcher.
+
 ## Dispatcher-subject controllers (full audit)
 
 Only the SSR-routed controller surface participates in the shim. Listed top-down:
