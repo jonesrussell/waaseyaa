@@ -1,0 +1,10 @@
+id,kind,locator,title,access_method,collected_at
+S-001,source-file,packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php,AppParameterBindingBuilder — dispatcher rejection site,direct read,2026-05-05
+S-002,source-file,packages/ssr/src/Http/AppController/AppControllerMethodInvoker.php,AppControllerMethodInvoker — sole caller; owns spec cache,direct read,2026-05-05
+S-003,source-file,packages/ssr/src/SsrPageHandler.php,SsrPageHandler — top-level dispatch entry point with LoggerInterface,direct read,2026-05-05
+S-004,source-file,packages/ssr/src/Http/Twig/TwigErrorPageRenderer.php,TwigErrorPageRenderer — second example of optional-logger ctor pattern,direct read,2026-05-05
+S-005,source-file,packages/ssr/tests/Unit/Http/Router/AppControllerRouterTest.php,Existing router test — no dedicated builder coverage,direct read,2026-05-05
+S-006,issue,https://github.com/waaseyaa/framework/issues/1390,Framework issue #1390 — controller dispatcher array-param hard break,gh issue view,2026-05-05
+S-007,source-file,packages/ssr/src/Http/AppController/AppParameterKind.php,AppParameterKind enum — confirms target cases,direct read,2026-05-05
+S-008,source-file,packages/ssr/src/Attribute/MapRoute.php,MapRoute attribute class — confirms marker shape,direct read,2026-05-05
+S-009,project-doc,/home/jones/dev/waaseyaa/CLAUDE.md,Project constitution — logging convention and architecture gotchas,direct read,2026-05-05

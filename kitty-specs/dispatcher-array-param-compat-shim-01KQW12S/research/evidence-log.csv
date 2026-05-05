@@ -1,0 +1,15 @@
+id,decision_id,source_id,file_or_url,line_or_section,finding,collected_at
+E-001,R-001,S-001,packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php,L26-L86,Builder is final class with implicit no-arg constructor; build() iterates ReflectionMethod parameters and dispatches to buildForParameter().,2026-05-05
+E-002,R-006,S-001,packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php,L147-L152,Sole rejection site: throws InvalidAppControllerBindingException for $typeName === 'array' with no MapRoute/MapQuery attribute.,2026-05-05
+E-003,R-004,S-002,packages/ssr/src/Http/AppController/AppControllerMethodInvoker.php,L12,Static $specCache property — process-scoped under long-lived workers; request-scoped under FPM.,2026-05-05
+E-004,R-004,S-002,packages/ssr/src/Http/AppController/AppControllerMethodInvoker.php,L20-L21,Cache key composed as $class::$method\0$routeName\0$fingerprint — prevents rebuild within request.,2026-05-05
+E-005,R-001,S-002,packages/ssr/src/Http/AppController/AppControllerMethodInvoker.php,L21,Builder instantiated inline as `new AppParameterBindingBuilder()` — no logger threaded.,2026-05-05
+E-006,R-001,S-003,packages/ssr/src/SsrPageHandler.php,L18-L35,SsrPageHandler accepts ?LoggerInterface $logger = null and falls back to NullLogger — confirms the project pattern to mirror.,2026-05-05
+E-007,R-001,S-004,packages/ssr/src/Http/Twig/TwigErrorPageRenderer.php,L25-L28,TwigErrorPageRenderer uses identical optional-logger ctor pattern — second confirmation.,2026-05-05
+E-008,R-002,S-005,packages/ssr/tests/Unit/Http/Router/AppControllerRouterTest.php,whole file,Router-level test exists; no dedicated AppParameterBindingBuilder unit test — new test class needed.,2026-05-05
+E-009,R-003,S-006,https://github.com/waaseyaa/framework/issues/1390,issue body,"Issue prescribes: ""default to #[MapRoute] for $params and #[MapQuery] for $query (the historical implicit behavior).""",2026-05-05
+E-010,R-006,S-001,packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php,L112-L126,Existing MapRoute/MapQuery attribute branch returns AppParameterBindingSpec with kind = MapRoute / MapQuery — shim short-circuits to identical shape.,2026-05-05
+E-011,R-001,S-007,packages/ssr/src/Http/AppController/AppParameterKind.php,L7-L14,Enum cases: FrameworkService RouteEntity RouteScalar RouteEnum MapRoute MapQuery Custom — MapRoute and MapQuery already present.,2026-05-05
+E-012,R-001,S-008,packages/ssr/src/Attribute/MapRoute.php,whole file,Marker attribute — no constructor params; target Attribute::TARGET_PARAMETER. Same for MapQuery.,2026-05-05
+E-013,R-005,S-009,/home/jones/dev/waaseyaa/CLAUDE.md,Architecture Gotchas / No psr/log,"Project mandates Waaseyaa\Foundation\Log\LoggerInterface for structured logging; error_log forbidden in framework code.",2026-05-05
+E-014,R-006,S-006,https://github.com/waaseyaa/framework/issues/1390,reproduction section,"Canonical implicit signature: public function show(array $params, array $query, AccountInterface $account, HttpRequest $request) — confirms the two parameter names to shim.",2026-05-05

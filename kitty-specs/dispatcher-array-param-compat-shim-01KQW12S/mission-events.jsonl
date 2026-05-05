@@ -1,0 +1,3 @@
+{"mission": "software-dev", "payload": {"action": "research", "agent": "claude", "decision_kind": "step", "mission_state": "discovery", "result_input": "success", "wp_id": null}, "timestamp": "2026-05-05T12:26:39.446660+00:00", "type": "MissionNextInvoked"}
+{"mission": "software-dev", "payload": {"action": "specify", "agent": "claude", "decision_kind": "step", "mission_state": "specify", "result_input": "success", "wp_id": null}, "timestamp": "2026-05-05T13:00:26.966022+00:00", "type": "MissionNextInvoked"}
+{"mission": "software-dev", "payload": {"action": "plan", "agent": "claude", "decision_kind": "step", "mission_state": "plan", "result_input": "success", "wp_id": null}, "timestamp": "2026-05-05T13:00:39.731636+00:00", "type": "MissionNextInvoked"}
