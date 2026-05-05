@@ -6,6 +6,7 @@ requirement_refs:
 - FR-001
 - FR-006
 - FR-008
+- FR-009
 - FR-010
 planning_base_branch: main
 merge_target_branch: main
