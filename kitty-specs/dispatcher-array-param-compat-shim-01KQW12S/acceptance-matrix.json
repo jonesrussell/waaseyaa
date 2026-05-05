@@ -1,0 +1,153 @@
+{
+  "mission_slug": "dispatcher-array-param-compat-shim-01KQW12S",
+  "mission_number": null,
+  "mission_type": "software-dev",
+  "criteria": [
+    {
+      "criterion_id": "SC-001",
+      "description": "Controller method with historical implicit signature dispatches successfully (no 500, no exception).",
+      "proof_type": "automated_test",
+      "evidence": "packages/ssr/tests/Integration/AppControllerImplicitArrayDispatchTest.php::implicitSignatureDispatchesAndEmitsTwoDeprecationLines",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": "Asserts ok-foo response from fixture controller registered with implicit signature."
+    },
+    {
+      "criterion_id": "SC-002",
+      "description": "Each shim hit emits exactly one structured deprecation log entry with the four required context keys.",
+      "proof_type": "automated_test",
+      "evidence": "packages/ssr/tests/Unit/Http/AppController/AppParameterBindingBuilderTest.php::implicitArrayParamsShimsToMapRouteAndLogsOnce",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": "Verifies controller_class, method_name, parameter_name, recommended_attribute keys; level=notice."
+    },
+    {
+      "criterion_id": "SC-003",
+      "description": "Method using explicit #[MapRoute] / #[MapQuery] produces zero deprecation log entries.",
+      "proof_type": "automated_test",
+      "evidence": "packages/ssr/tests/Unit/Http/AppController/AppParameterBindingBuilderTest.php::explicitMapRouteAttributeProducesNoDeprecation, ::explicitMapQueryAttributeProducesNoDeprecation",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": "Two tests cover the explicit-attribute path."
+    },
+    {
+      "criterion_id": "SC-004",
+      "description": "Unannotated array $headers (or any non-shimmed name) still raises InvalidAppControllerBindingException.",
+      "proof_type": "automated_test",
+      "evidence": "packages/ssr/tests/Unit/Http/AppController/AppParameterBindingBuilderTest.php::unannotatedArrayWithUnshimmedNameStillThrows",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": "Asserts the strict-mode exception is preserved for any name other than 'params'/'query'."
+    },
+    {
+      "criterion_id": "SC-005",
+      "description": "Shim applies per-parameter when only one of $params or $query is present.",
+      "proof_type": "automated_test",
+      "evidence": "packages/ssr/tests/Unit/Http/AppController/AppParameterBindingBuilderTest.php::shimAppliesPerParameterWhenOnlyParamsPresent, ::shimAppliesPerParameterWhenOnlyQueryPresent",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": "Two tests cover the per-parameter scoping."
+    },
+    {
+      "criterion_id": "SC-006",
+      "description": "CHANGELOG [Unreleased] carries a Fixed-section bullet referencing #1390 and naming the deprecated implicit-array shape, ready for release-cut.yml promotion.",
+      "proof_type": "code_review",
+      "evidence": "CHANGELOG.md (Unreleased > Fixed: \"Implicit-array controller signature compatibility (#1390) ...\")",
+      "pass_fail": "pass",
+      "verified_by": "independent-reviewer",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": "Bullet is the first item under [Unreleased] > ### Fixed and references #1390 explicitly."
+    },
+    {
+      "criterion_id": "FR-005-no-logger",
+      "description": "Builder constructed without a logger does not crash; emission falls through silently via NullLogger.",
+      "proof_type": "automated_test",
+      "evidence": "packages/ssr/tests/Unit/Http/AppController/AppParameterBindingBuilderTest.php::builderConstructedWithoutLoggerDoesNotCrash",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": "Validates the optional-logger fallback contract."
+    },
+    {
+      "criterion_id": "QG-cs-check",
+      "description": "Quality gate: composer cs-check (PHP-CS-Fixer dry-run) clean.",
+      "proof_type": "automated_test",
+      "evidence": "composer cs-check — files array empty, time 1.738s.",
+      "pass_fail": "pass",
+      "verified_by": "php-cs-fixer",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "QG-phpstan",
+      "description": "Quality gate: composer phpstan (level 5, 1143 files) clean.",
+      "proof_type": "automated_test",
+      "evidence": "composer phpstan — [OK] No errors.",
+      "pass_fail": "pass",
+      "verified_by": "phpstan",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "QG-package-layers",
+      "description": "Quality gate: bin/check-package-layers clean.",
+      "proof_type": "automated_test",
+      "evidence": "bin/check-package-layers — package layer constraints (composer.json + PHP file-level) satisfied.",
+      "pass_fail": "pass",
+      "verified_by": "check-package-layers",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "QG-composer-policy",
+      "description": "Quality gate: bin/check-composer-policy clean.",
+      "proof_type": "automated_test",
+      "evidence": "bin/check-composer-policy — Composer policy checks passed.",
+      "pass_fail": "pass",
+      "verified_by": "check-composer-policy",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": "No composer.json changes in this mission; gate is a no-op."
+    },
+    {
+      "criterion_id": "QG-ssr-tests",
+      "description": "Quality gate: full packages/ssr/tests/ suite passes.",
+      "proof_type": "automated_test",
+      "evidence": "./vendor/bin/phpunit packages/ssr/tests/ — 231 tests, 444 assertions, 0 failures.",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-05T13:30:00Z",
+      "notes": "Includes the 10 new tests added by this mission."
+    }
+  ],
+  "negative_invariants": [
+    {
+      "invariant_id": "NI-001",
+      "description": "Shim is name-keyed only — no broadening to type-keyed or other parameter names. Searching the builder for any string match other than 'params' or 'query' in the array branch must return zero hits beyond the two intended branches.",
+      "verification_method": "grep_absence",
+      "verification_command": "rg -n \"^\\s+if \\(\\\\\\$name === '[^pq]\" packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php",
+      "result": "confirmed_absent",
+      "evidence": "Only `$name === 'params'` and `$name === 'query'` branches exist in the array-builtin block."
+    },
+    {
+      "invariant_id": "NI-002",
+      "description": "No second dedup memo is introduced in the builder. The static spec cache in AppControllerMethodInvoker is the single source of dedup.",
+      "verification_method": "grep_absence",
+      "verification_command": "rg -n 'static\\s+array\\s+\\\\\\$' packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php",
+      "result": "confirmed_absent",
+      "evidence": "Builder has no static state — only instance-level $logger property added."
+    },
+    {
+      "invariant_id": "NI-003",
+      "description": "No psr/log usage; no error_log; no trigger_error in framework code.",
+      "verification_method": "grep_absence",
+      "verification_command": "rg -n 'error_log|trigger_error|use Psr\\\\\\\\Log' packages/ssr/src/Http/AppController/",
+      "result": "confirmed_absent",
+      "evidence": "Only Waaseyaa\\Foundation\\Log\\LoggerInterface and NullLogger are imported; no banned channels."
+    }
+  ]
+}
