@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "mission_slug": "post-1390-dispatcher-reconciliation-01KQTTJS",
+  "mission_id": "01KQTTJS73GVXHFPY5W8E8K3DX",
+  "mission_branch": "kitty/mission-post-1390-dispatcher-reconciliation-01KQTTJS",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP02",
+        "WP03",
+        "WP04"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "docs/specs/api-layer.md",
+        "packages/ssr/src/Http/AppController/**",
+        "packages/ssr/src/SsrServiceProvider.php",
+        "packages/ssr/tests/Contract/**",
+        "packages/ssr/tests/Unit/Http/AppController/**",
+        "packages/ssr/tests/fixtures/**"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "app-shell",
+        "artifact-rendering",
+        "legacy-cleanup"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP01"
+      ],
+      "write_scope": [
+        "kitty-specs/post-1390-dispatcher-reconciliation-01KQTTJS/artifacts/**"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-05T01:18:29.775941+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP01"
+  ],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP02"
+      }
+    ],
+    "total_merges": 2,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 2
+    }
+  }
+}
