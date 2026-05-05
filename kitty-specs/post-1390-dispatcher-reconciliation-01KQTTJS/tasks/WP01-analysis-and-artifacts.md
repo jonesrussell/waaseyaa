@@ -116,7 +116,7 @@ Read first:
    - **Trigger conditions** — exactly when the shim engages and exactly when the deprecation event fires.
    - **Attribute equivalence rules** — table per `data-model.md` §4.
    - **Log emission contract** — channel name, level, schema fields per `contracts/dispatcher-deprecation-contract.md` §"Schema". Lock the channel name (default proposal: `dispatcher.deprecation`).
-   - **Dedup invariant** — `(controller_class, method, parameter_name)` per process.
+   - **Dedup invariant** — `(controller_class, method, parameter_name)` per request (per contract §7; the cycle-1 B2a fix locked this scope).
    - **Edge case decisions** — finalize the four edge cases in spec §3 (mixed signature, query-only, non-route arrays, divergent #1390 shape).
    - **Reconciliation against landed #1390** — output of T002.
    - **Open items** — anything still TBD; should be empty before WP02 starts.

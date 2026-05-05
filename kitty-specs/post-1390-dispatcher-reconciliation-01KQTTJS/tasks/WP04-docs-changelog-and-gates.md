@@ -152,7 +152,7 @@ Read first:
      ```
 
 4. Post-merge follow-ups (per `feedback_pr_traceability_signals.md`):
-   - Close the mission's GitHub tracking issue: `gh issue close <issue#> --repo waaseyaa/framework`.
+   - Close the mission's GitHub tracking issue: `gh issue close 1391 --repo waaseyaa/framework`.
    - Edit the GitHub Release notes for the alpha that ships this WP to surface the dispatcher reconciliation entry — neither happens automatically.
 
 **Files touched**: none beyond the prior subtasks. This subtask is verification + orchestration only.
@@ -174,10 +174,10 @@ This WP is gates-driven. The tests already live in WP03; this WP runs them and t
 - [ ] T015 `[Unreleased]` CHANGELOG bullet present.
 - [ ] All five gates green.
 - [ ] Mission status reports all WPs `done`.
-- [ ] Tracking issue closed; release notes edited (manual, per `feedback_pr_traceability_signals.md`).
+- [ ] Tracking issue **#1391** closed; release notes edited (manual, per `feedback_pr_traceability_signals.md`).
 - [ ] No edits outside `owned_files`.
 - [ ] `tasks.md` rows T013..T016 marked complete.
-- [ ] WP04 PR references mission slug and #1390 per `docs/specs/workflow.md`.
+- [ ] WP04 PR references mission slug, tracking issue **#1391**, and upstream **#1390** per `docs/specs/workflow.md`.
 
 ## Risks
 

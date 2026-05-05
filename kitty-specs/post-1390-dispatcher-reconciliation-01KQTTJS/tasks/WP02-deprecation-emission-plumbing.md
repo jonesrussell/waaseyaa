@@ -32,7 +32,7 @@ tags: []
 
 ## Objective
 
-Wire `Waaseyaa\Foundation\Log\LoggerInterface` into the dispatcher binding pipeline so each controller-method registration that relies on the implicit-array shim emits exactly one structured deprecation event, deduplicated by `(class::method::parameter)` per process.
+Wire `Waaseyaa\Foundation\Log\LoggerInterface` into the dispatcher binding pipeline so each controller-method registration that relies on the implicit-array shim emits exactly one structured deprecation event, deduplicated by `(class::method::parameter)` **per request** (the dedup map lives on the `AppParameterBindingBuilder` instance, which `AppControllerMethodInvoker` instantiates per request via `SsrPageHandler` — see contract §7 for full rationale).
 
 ## ⚠️ Hard precondition: framework#1390 must be merged on `main`
 
@@ -172,7 +172,7 @@ This WP focuses on production code; tests land in WP03. However, before requesti
 - [ ] PHPStan, cs-check, check-package-layers, check-composer-policy all green.
 - [ ] No edits outside `owned_files`.
 - [ ] All `tasks.md` checkbox rows for T007..T009 marked complete.
-- [ ] WP02 PR references mission slug and #1390 per `docs/specs/workflow.md`.
+- [ ] WP02 PR references mission slug, tracking issue **#1391**, and upstream **#1390** per `docs/specs/workflow.md`.
 
 ## Risks
 
@@ -185,7 +185,7 @@ This WP focuses on production code; tests land in WP03. However, before requesti
 
 - Diff scope is `packages/ssr/src/Http/AppController/**` plus `SsrServiceProvider.php`. Any change outside this scope is a violation of `owned_files`.
 - Verify NFR-001: no per-request work for non-shim controllers.
-- Verify NFR-002: dedup is per-process (not per-request, not per-call).
+- Verify NFR-002: dedup is **per-request** (one notice per `(class, method, parameter)` triple per request, then re-emitted on the next request that exercises the same triple). See contract §7 for rationale; WP01's cycle-1 B2a fix made this explicit.
 - Verify the log schema matches WP01's contract artifact exactly. The schema is **stable across the next alpha** (FR-010); incorrect fields are blocking.
 
 ## Implementation command

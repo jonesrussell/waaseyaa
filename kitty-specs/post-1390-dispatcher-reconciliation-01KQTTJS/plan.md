@@ -2,6 +2,7 @@
 
 **Branch**: `main` | **Date**: 2026-05-05 | **Spec**: [spec.md](./spec.md)
 **Input**: [spec.md](./spec.md), [framework#1390](https://github.com/waaseyaa/framework/issues/1390), [framework#1388](https://github.com/waaseyaa/framework/issues/1388)
+**Tracking issue**: [framework#1391](https://github.com/waaseyaa/framework/issues/1391) (Track 3 — Parity & performance)
 **Mission**: `post-1390-dispatcher-reconciliation-01KQTTJS`
 **Mission ID**: `01KQTTJS73GVXHFPY5W8E8K3DX`
 

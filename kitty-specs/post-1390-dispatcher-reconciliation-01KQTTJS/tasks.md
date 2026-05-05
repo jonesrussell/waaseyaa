@@ -3,6 +3,7 @@
 **Mission**: `post-1390-dispatcher-reconciliation-01KQTTJS`
 **Date**: 2026-05-05
 **Spec**: [spec.md](./spec.md) · **Plan**: [plan.md](./plan.md) · **Contract**: [contracts/dispatcher-deprecation-contract.md](./contracts/dispatcher-deprecation-contract.md)
+**Tracking issue**: [framework#1391](https://github.com/waaseyaa/framework/issues/1391) · **Upstream dep**: [framework#1390](https://github.com/waaseyaa/framework/issues/1390)
 
 ## Branch contract
 
@@ -85,7 +86,7 @@ Tracking:
 Implementation sketch: identify the right collaborator (likely `AppParameterBindingBuilder`) → constructor-inject `?LoggerInterface $logger = null` → dedup map keyed on `(class::method::param)` → emit `notice` per spec → wire in `SsrServiceProvider`.
 
 Dependencies: WP01 (consumes the contract from WP01's artifact). Hard precondition: framework#1390 merged on `main`.
-Risks: dedup state crossing process boundaries (NFR-002); test the in-process path only.
+Risks: dedup scope locked at per-request per contract §7 (NFR-002 reinterpreted accordingly); WP02 must not introduce a longer-lived collaborator without an explicit contract revision.
 Prompt: [tasks/WP02-deprecation-emission-plumbing.md](./tasks/WP02-deprecation-emission-plumbing.md)
 
 ### WP03 — Test coverage (Phase B, gated)

@@ -5,6 +5,8 @@
 **Mission Type**: software-dev
 **Created**: 2026-05-05
 **Target branch**: `main`
+**Tracking issue**: [waaseyaa/framework#1391](https://github.com/waaseyaa/framework/issues/1391) (Track 3 — Parity & performance)
+**Upstream dependency**: [waaseyaa/framework#1390](https://github.com/waaseyaa/framework/issues/1390)
 
 ---
 
@@ -116,6 +118,7 @@ A consumer operator runs the framework's CLI (or tail-reads logs after a smoke t
 ### Hard dependencies
 
 - **framework#1390** — the dispatcher compatibility shim itself. WP02+ are gated until this lands on `main`. WP01 may proceed against the current `main` (alpha.172) state, but its final analysis must reference the merged shape of #1390.
+- **framework#1391** — this mission's GitHub tracking issue (Track 3 — Parity & performance). All Phase B PRs reference both #1390 and #1391 in their PR description. #1391 is closed manually after WP04 merges and the next alpha tag ships, per `feedback_pr_traceability_signals.md`.
 
 ### Adjacent / informational
 

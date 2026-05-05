@@ -74,12 +74,12 @@ Read first:
 1. Create five small fixture controllers under `packages/ssr/tests/fixtures/AppController/` (mirror existing fixture directory layout if there is one):
 
    ```php
-   namespace Waaseyaa\Ssr\Tests\Fixtures\AppController;
+   namespace Waaseyaa\SSR\Tests\Fixtures\AppController;
 
-   use Waaseyaa\Access\Account\AccountInterface;
-   use Waaseyaa\Foundation\Http\HttpRequest;
-   use Waaseyaa\Ssr\Attribute\MapQuery;
-   use Waaseyaa\Ssr\Attribute\MapRoute;
+   use Symfony\Component\HttpFoundation\Request as HttpRequest;
+   use Waaseyaa\Access\AccountInterface;
+   use Waaseyaa\SSR\Attribute\MapQuery;
+   use Waaseyaa\SSR\Attribute\MapRoute;
 
    final class LegacyArrayParamsFixture
    {
@@ -209,11 +209,11 @@ The whole WP is the test strategy. Before requesting review:
 - [ ] All static gates green.
 - [ ] No edits outside `owned_files`.
 - [ ] `tasks.md` rows T010..T012 marked complete.
-- [ ] WP03 PR references mission slug and #1390 per `docs/specs/workflow.md`.
+- [ ] WP03 PR references mission slug, tracking issue **#1391**, and upstream **#1390** per `docs/specs/workflow.md`.
 
 ## Risks
 
-- **Fixture namespace collisions** — `Waaseyaa\Ssr\Tests\Fixtures\AppController\*Fixture` may collide with existing fixtures. Grep first.
+- **Fixture namespace collisions** — `Waaseyaa\SSR\Tests\Fixtures\AppController\*Fixture` may collide with existing fixtures. Grep first.
 - **`createMock()` on final classes** — CLAUDE.md gotcha. Use real fixtures and a `RecordingLogger` test double.
 - **`-v` flag** — PHPUnit 10.5 rejects it. Don't pass it.
 - **The argument resolver requires container infrastructure** — for the contract tests, you may need a minimal kernel boot or a hand-rolled resolver harness. If kernel-boot is required, prefer the existing test pattern in `packages/ssr/tests/Contract/`. If no precedent exists, build a small harness in `packages/ssr/tests/Support/`.

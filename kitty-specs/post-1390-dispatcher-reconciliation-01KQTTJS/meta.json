@@ -8,5 +8,7 @@
   "mission_slug": "post-1390-dispatcher-reconciliation-01KQTTJS",
   "mission_type": "software-dev",
   "slug": "post-1390-dispatcher-reconciliation-01KQTTJS",
-  "target_branch": "main"
+  "target_branch": "main",
+  "tracking_issue": "https://github.com/waaseyaa/framework/issues/1391",
+  "upstream_dependency_issue": "https://github.com/waaseyaa/framework/issues/1390"
 }
