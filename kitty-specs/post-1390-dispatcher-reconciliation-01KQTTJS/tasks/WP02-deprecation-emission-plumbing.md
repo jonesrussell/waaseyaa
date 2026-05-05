@@ -19,7 +19,7 @@ subtasks:
 - T007
 - T008
 - T009
-shell_pid: "79727"
+shell_pid: "83924"
 agent: "claude:opus-4-7:implementer:implementer"
 history:
 - '2026-05-05: created'
@@ -204,3 +204,4 @@ spec-kitty agent action implement WP02 --agent <your-agent-name> --mission post-
 - 2026-05-05T14:13:07Z – claude:opus-4-7:implementer:implementer – shell_pid=79727 – Assigned agent via action command
 - 2026-05-05T14:20:59Z – claude:opus-4-7:implementer:implementer – shell_pid=79727 – Ready for review: LoggerInterface injected; per-request emittedKeys dedup map landed on AppParameterBindingBuilder; emitDeprecation/emitUnboundDeprecation match WP01 contract §5 schema (channel, event, method, bare MapRoute/MapQuery, locked message templates); new AppParameterKind::ImplicitEmptyArray injects [] for unbound array params per contract §3 trigger #3 (replaces previous throw); SsrServiceProvider wires real LoggerInterface from kernel services into SsrPageHandler. NFR-001 fast-path preserved (dedup map only touched after binding-kind classification fires). Gates green: cs-check, phpstan, check-package-layers, check-composer-policy, packages/ssr/tests/Contract/. KNOWN: 3 pre-contract unit tests in packages/ssr/tests/Unit/Http/AppController/AppParameterBindingBuilderTest.php (implicitArrayParamsShimsToMapRouteAndLogsOnce, implicitArrayQueryShimsToMapQueryAndLogsOnce, unannotatedArrayWithUnshimmedNameStillThrows) assert the #1390-era schema (#[MapRoute] brackets, method_name key, throw on unbound) which the WP01 contract supersedes. WP03 will reconcile these tests with the locked contract.
 - 2026-05-05T15:36:15Z – claude:opus-4-7:implementer:implementer – shell_pid=79727 – Moved to planned
+- 2026-05-05T15:36:23Z – claude:opus-4-7:implementer:implementer – shell_pid=83924 – Started implementation via action command
