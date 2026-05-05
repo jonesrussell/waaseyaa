@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.172] - 2026-05-05
+
 ### Fixed
 
 - **Kernel boot for `groups` and `taxonomy` consumers (#1388)** — `GroupsServiceProvider` and `TaxonomyServiceProvider` constructed core `FieldDefinition` instances on their config bundle entity types (`group_type`, `taxonomy_vocabulary`) without declaring `targetEntityTypeId`. The alpha.171 binding invariant — `FieldDefinitionRegistry::registerCoreFields()` requires `FieldDefinition::getTargetEntityTypeId() === $entityTypeId` — correctly rejected the bind, which prevented kernel boot in any consumer registering groups or taxonomy. Three call sites patched (`GroupsServiceProvider.php` description for `group_type`; `TaxonomyServiceProvider.php` description and weight for `taxonomy_vocabulary`). Discovered while upgrading Minoo to alpha.171 (mission `upgrade-waaseyaa-alpha-171-01KQTDC2` WP03). Locked by four new regression tests in `packages/groups/tests/Unit/`, `packages/taxonomy/tests/Unit/`, `packages/field/tests/Unit/FieldDefinitionRegistryInvariantTest.php`, and `tests/Integration/Phase27/FieldDefinitionInvariantTest.php` — the integration sweep walks every framework provider's entity types through a real `FieldDefinitionRegistry` to catch any future regression of this class.
