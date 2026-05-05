@@ -18,6 +18,8 @@ subtasks:
 - T004
 - T005
 - T006
+agent: "claude"
+shell_pid: "48047"
 history:
 - '2026-05-05: created'
 authoritative_surface: kitty-specs/post-1390-dispatcher-reconciliation-01KQTTJS/artifacts/
@@ -235,3 +237,7 @@ WP01 is markdown-only. There are no automated tests. Reviewer pass criteria:
 ```bash
 spec-kitty agent action implement WP01 --agent <your-agent-name> --mission post-1390-dispatcher-reconciliation-01KQTTJS
 ```
+
+## Activity Log
+
+- 2026-05-05T01:18:51Z – claude – shell_pid=48047 – Started implementation via action command
