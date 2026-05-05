@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-05T12:16:23.550824+00:00",
+  "friendly_name": "dispatcher array param compat shim",
+  "mission_id": "01KQW12S3R4TY0563R4ZSQ2QBC",
+  "mission_number": null,
+  "mission_slug": "dispatcher-array-param-compat-shim-01KQW12S",
+  "mission_type": "software-dev",
+  "slug": "dispatcher-array-param-compat-shim-01KQW12S",
+  "target_branch": "main"
+}
