@@ -15,6 +15,8 @@ subtasks:
 - T014
 - T015
 - T016
+agent: "claude:opus-4-7:implementer:implementer"
+shell_pid: "91087"
 history:
 - '2026-05-05: created'
 authoritative_surface: docs/specs/
@@ -197,3 +199,7 @@ This WP is gates-driven. The tests already live in WP03; this WP runs them and t
 ```bash
 spec-kitty agent action implement WP04 --agent <your-agent-name> --mission post-1390-dispatcher-reconciliation-01KQTTJS
 ```
+
+## Activity Log
+
+- 2026-05-05T16:06:45Z – claude:opus-4-7:implementer:implementer – shell_pid=91087 – Started implementation via action command
