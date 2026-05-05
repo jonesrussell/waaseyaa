@@ -207,3 +207,4 @@ spec-kitty agent action implement WP04 --agent <your-agent-name> --mission post-
 - 2026-05-05T16:11:37Z – claude:opus-4-7:reviewer:reviewer – shell_pid=92328 – Started review via action command
 - 2026-05-05T16:16:26Z – claude:opus-4-7:reviewer:reviewer – shell_pid=92328 – Moved to planned
 - 2026-05-05T16:17:21Z – claude:opus-4-7:implementer:implementer – shell_pid=93383 – Started implementation via action command
+- 2026-05-05T16:21:45Z – claude:opus-4-7:implementer:implementer – shell_pid=93383 – Cycle 2 ready: 3 stale-schema fixes in CHANGELOG bullet (method_name->method + channel/event added; unbound throw->[]+notice; dedup description corrected to per-request AppParameterBindingBuilder), plus matching method_name->method fix in api-layer.md HTML comment. Cycle-1 cross-link section unchanged. Gates green except 2 verified-pre-existing QueueIntegrationTest state-pollution failures.
