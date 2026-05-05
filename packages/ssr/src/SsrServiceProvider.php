@@ -15,6 +15,7 @@ use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Foundation\Event\EventDispatcherInterface;
 use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
 use Waaseyaa\Foundation\Kernel\HttpKernel;
+use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
@@ -124,6 +125,7 @@ final class SsrServiceProvider extends ServiceProvider implements ConfiguresHttp
             config: $kernel->getConfig(),
             manifest: $kernel->getManifest(),
             serviceResolver: $kernel->getHttpServiceResolver(),
+            logger: $this->resolve(LoggerInterface::class),
             gate: new EntityAccessGate($kernel->getAccessHandler()),
             inertiaFullPageRenderer: $kernel->getInertiaFullPageRenderer(),
         );

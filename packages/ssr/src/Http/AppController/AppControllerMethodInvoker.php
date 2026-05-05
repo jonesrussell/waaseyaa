@@ -87,6 +87,7 @@ final class AppControllerMethodInvoker
             AppParameterKind::FrameworkService => $this->resolveService($spec->serviceClass, $ctx),
             AppParameterKind::MapRoute => $ctx->routeParams,
             AppParameterKind::MapQuery => $ctx->query,
+            AppParameterKind::ImplicitEmptyArray => [],
             AppParameterKind::RouteScalar => $this->resolveScalar($reflectionParameter, $spec, $ctx),
             AppParameterKind::RouteEnum => $this->resolveEnum($reflectionParameter, $spec, $ctx),
             AppParameterKind::RouteEntity => $this->resolveEntity($reflectionParameter, $spec, $ctx),

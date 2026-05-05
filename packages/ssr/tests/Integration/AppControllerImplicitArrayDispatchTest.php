@@ -69,7 +69,7 @@ final class AppControllerImplicitArrayDispatchTest extends TestCase
         $deprecations = array_values(array_filter(
             $logger->entries,
             static fn (array $entry): bool => $entry['level'] === 'notice'
-                && str_contains($entry['message'], 'implicit array parameter'),
+                && str_contains($entry['message'], 'relies on the implicit-array shim'),
         ));
 
         self::assertCount(2, $deprecations);
@@ -81,10 +81,40 @@ final class AppControllerImplicitArrayDispatchTest extends TestCase
 
         self::assertArrayHasKey('params', $byParam);
         self::assertArrayHasKey('query', $byParam);
-        self::assertSame(ImplicitSignatureFixtureController::class, $byParam['params']['context']['controller_class']);
-        self::assertSame('show', $byParam['params']['context']['method_name']);
-        self::assertSame('#[MapRoute]', $byParam['params']['context']['recommended_attribute']);
-        self::assertSame('#[MapQuery]', $byParam['query']['context']['recommended_attribute']);
+
+        // Contract §5: locked log emission schema for both params and query entries.
+        foreach (['params', 'query'] as $name) {
+            self::assertSame('dispatcher.deprecation', $byParam[$name]['context']['channel']);
+            self::assertSame('implicit_array_shim', $byParam[$name]['context']['event']);
+            self::assertSame(ImplicitSignatureFixtureController::class, $byParam[$name]['context']['controller_class']);
+            self::assertSame('show', $byParam[$name]['context']['method']);
+            self::assertSame($name, $byParam[$name]['context']['parameter_name']);
+        }
+
+        self::assertSame('MapRoute', $byParam['params']['context']['recommended_attribute']);
+        self::assertSame('MapQuery', $byParam['query']['context']['recommended_attribute']);
+
+        // Contract §5: message template for implicit_array_shim.
+        self::assertSame(
+            sprintf(
+                'Controller %s::%s parameter $%s relies on the implicit-array shim; add #[%s] to suppress this notice.',
+                ImplicitSignatureFixtureController::class,
+                'show',
+                'params',
+                'MapRoute',
+            ),
+            $byParam['params']['message'],
+        );
+        self::assertSame(
+            sprintf(
+                'Controller %s::%s parameter $%s relies on the implicit-array shim; add #[%s] to suppress this notice.',
+                ImplicitSignatureFixtureController::class,
+                'show',
+                'query',
+                'MapQuery',
+            ),
+            $byParam['query']['message'],
+        );
     }
 }
 

@@ -12,5 +12,6 @@ enum AppParameterKind: string
     case RouteEnum = 'enum';
     case MapRoute = 'map_route';
     case MapQuery = 'map_query';
+    case ImplicitEmptyArray = 'implicit_empty_array';
     case Custom = 'custom';
 }

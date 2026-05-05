@@ -1,14 +1,14 @@
 {
   "created_at": "2026-05-05T01:03:33.399355+00:00",
   "friendly_name": "Post-#1390 Dispatcher Reconciliation",
-  "source_description": "Plan and execute framework-side reconciliation work that becomes possible after framework#1390 (controller-dispatcher implicit-array compatibility shim) merges. WP01 runs immediately to ratify the post-#1390 contract and produce the verification plan Minoo needs to resume its frozen alpha.171→172 upgrade. WP02+ are gated behind #1390 landing on main.",
-  "vcs": "git",
   "mission_id": "01KQTTJS73GVXHFPY5W8E8K3DX",
-  "mission_number": null,
+  "mission_number": 3,
   "mission_slug": "post-1390-dispatcher-reconciliation-01KQTTJS",
   "mission_type": "software-dev",
   "slug": "post-1390-dispatcher-reconciliation-01KQTTJS",
+  "source_description": "Plan and execute framework-side reconciliation work that becomes possible after framework#1390 (controller-dispatcher implicit-array compatibility shim) merges. WP01 runs immediately to ratify the post-#1390 contract and produce the verification plan Minoo needs to resume its frozen alpha.171→172 upgrade. WP02+ are gated behind #1390 landing on main.",
   "target_branch": "main",
   "tracking_issue": "https://github.com/waaseyaa/framework/issues/1391",
-  "upstream_dependency_issue": "https://github.com/waaseyaa/framework/issues/1390"
+  "upstream_dependency_issue": "https://github.com/waaseyaa/framework/issues/1390",
+  "vcs": "git"
 }

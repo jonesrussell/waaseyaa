@@ -18,6 +18,7 @@
 <!-- Spec reviewed 2026-04-09 - SchemaPresenter: admin JSON Schema from field definitions, not EntityBase::$casts; cross-link entity-system #1184 -->
 <!-- Spec reviewed 2026-05-01 - AccessChecker canonical placement: source lives at packages/access/src/AccessChecker.php with namespace Waaseyaa\Access; routing package table row corrected; routing dir-tree no longer lists AccessChecker.php (mission #824 WP05 surface A, closes #832) -->
 <!-- Spec reviewed 2026-05-01 - JsonApiRouteProvider route table now enumerates the public `api.discovery` route alongside the five per-entity-type CRUD routes; ApiDiscoveryController response contract documented (meta {api, version} + links {self, <entity_type>: {href, meta.type}}) and exercised by an end-to-end integration test (mission #824 WP06 surface A, closes #841) -->
+<!-- Spec reviewed 2026-05-05 - Controller parameter binding section added: SSR `AppParameterBindingBuilder` implicit-array shim (post-#1390) — unannotated `array $params` → `#[MapRoute]`, `array $query` → `#[MapQuery]`, other unannotated `array $X` → `[]` with `implicit_array_unbound` notice; structured `dispatcher.deprecation` log payload (keys `channel`, `event`, `controller_class`, `method`, `parameter_name`, `recommended_attribute`) deduplicated per `(controller_class, method, parameter_name)` per request. Cross-links the canonical contract artifact (mission `post-1390-dispatcher-reconciliation-01KQTTJS`). -->
 
 Technical specification for the Waaseyaa JSON:API layer and routing system. This document covers the `packages/api/` and `packages/routing/` packages, which together provide RESTful CRUD endpoints, resource serialization, query parsing, JSON Schema presentation, route building, and access checking. The current post-M10 baseline uses package-owned service providers for API route registration: `packages/api/composer.json` declares `Waaseyaa\Api\ApiServiceProvider`, and that provider delegates CRUD route registration to `JsonApiRouteProvider` while foundation keeps only shared infrastructure endpoints.
 
@@ -897,6 +898,25 @@ packages/routing/
     RouteMatch.php
     WaaseyaaRouter.php
 ```
+
+## Controller parameter binding (SSR app dispatcher)
+
+*Last updated: 2026-05-05 (post-#1390 dispatcher reconciliation, mission `post-1390-dispatcher-reconciliation-01KQTTJS`).*
+
+App-controller parameter binding for SSR-routed controllers lives in `packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php` (namespace `Waaseyaa\SSR\Http\AppController`). Only controllers wired through `SsrPageHandler` go through this dispatcher; JSON:API, auth, MCP, and the routers above use independent pipelines and are not subject to this contract.
+
+After the #1390 reconciliation, the binding builder uses a name-keyed compatibility shim instead of hard-rejecting unannotated `array` parameters:
+
+| Parameter signature                                        | Bound as                | Deprecation event             | `recommended_attribute` |
+|------------------------------------------------------------|-------------------------|-------------------------------|-------------------------|
+| `array $params` (no `#[MapRoute]` and no `#[MapQuery]`)    | `#[MapRoute]` (implicit) | `implicit_array_shim`         | `MapRoute`              |
+| `array $query` (no `#[MapRoute]` and no `#[MapQuery]`)     | `#[MapQuery]` (implicit) | `implicit_array_shim`         | `MapQuery`              |
+| `array $X` (any other name, no binding attribute)          | `[]` (injected default) | `implicit_array_unbound`      | `''` (empty)            |
+| `#[MapRoute] array $params` or `#[MapQuery] array $query`  | Per attribute           | none                          | n/a                     |
+
+`#[FromRoute]` is a route-key remapper and does NOT suppress the shim. Each shim hit emits one structured `dispatcher.deprecation` notice via `Waaseyaa\Foundation\Log\LoggerInterface` carrying `channel`, `event`, `controller_class`, `method`, `parameter_name`, and `recommended_attribute` keys, deduplicated per `(controller_class, method, parameter_name)` per request (NFR-002). Methods with no `array` parameters incur zero hash-table lookups (NFR-001 fast-path).
+
+The canonical contract, full edge-case table, log-emission templates, and rationale are owned by the mission artifact: [`kitty-specs/post-1390-dispatcher-reconciliation-01KQTTJS/artifacts/post-1390-dispatcher-contract.md`](../../kitty-specs/post-1390-dispatcher-reconciliation-01KQTTJS/artifacts/post-1390-dispatcher-contract.md). See §3 (trigger conditions), §4 (attribute equivalence), §5 (log emission contract), and §7 (per-request dedup invariant) of that artifact for the full contract.
 
 ## Symfony decoupling (mission 1107)
 

@@ -39,6 +39,9 @@ final class AppParameterBindingBuilder
 
     private readonly LoggerInterface $logger;
 
+    /** @var array<string, true> */
+    private array $emittedKeys = [];
+
     public function __construct(?LoggerInterface $logger = null)
     {
         $this->logger = $logger ?? new NullLogger();
@@ -155,7 +158,12 @@ final class AppParameterBindingBuilder
         if ($named->isBuiltin()) {
             if ($typeName === 'array') {
                 if ($name === 'params') {
-                    $this->emitImplicitArrayDeprecation($method, $parameter, '#[MapRoute]');
+                    $this->emitDeprecation(
+                        $method->getDeclaringClass()->getName(),
+                        $method->getName(),
+                        $name,
+                        'MapRoute',
+                    );
 
                     return new AppParameterBindingSpec(
                         index: $index,
@@ -163,7 +171,12 @@ final class AppParameterBindingBuilder
                     );
                 }
                 if ($name === 'query') {
-                    $this->emitImplicitArrayDeprecation($method, $parameter, '#[MapQuery]');
+                    $this->emitDeprecation(
+                        $method->getDeclaringClass()->getName(),
+                        $method->getName(),
+                        $name,
+                        'MapQuery',
+                    );
 
                     return new AppParameterBindingSpec(
                         index: $index,
@@ -171,10 +184,16 @@ final class AppParameterBindingBuilder
                     );
                 }
 
-                throw new InvalidAppControllerBindingException(sprintf(
-                    'Parameter $%s: array parameters require #[MapRoute] or #[MapQuery].',
+                $this->emitUnboundDeprecation(
+                    $method->getDeclaringClass()->getName(),
+                    $method->getName(),
                     $name,
-                ));
+                );
+
+                return new AppParameterBindingSpec(
+                    index: $index,
+                    kind: AppParameterKind::ImplicitEmptyArray,
+                );
             }
 
             return $this->buildScalarSpec(
@@ -442,32 +461,84 @@ final class AppParameterBindingBuilder
     }
 
     /**
-     * Emit a structured deprecation signal when the implicit-array shim fires.
+     * Emit the structured `implicit_array_shim` deprecation signal.
      *
-     * Payload contract (parsed by consumer tooling):
-     * - `controller_class` (string, FQCN) — declaring class of the action
-     * - `method_name` (string) — action method name
-     * - `parameter_name` ('params'|'query') — which implicit parameter triggered the shim
-     * - `recommended_attribute` ('#[MapRoute]'|'#[MapQuery]') — attribute the author should add
+     * Schema (locked by post-#1390 dispatcher contract §5):
+     * - `channel` — `'dispatcher.deprecation'`
+     * - `event` — `'implicit_array_shim'`
+     * - `controller_class` (FQCN) — declaring class of the action
+     * - `method` — action method name
+     * - `parameter_name` (`'params'`|`'query'`) — which implicit parameter fired the shim
+     * - `recommended_attribute` (`'MapRoute'`|`'MapQuery'`) — bare attribute name to add
      *
-     * Dedup is achieved by the static spec cache in {@see AppControllerMethodInvoker}
-     * (key: `class::method\0routeName\0fingerprint`). Emission therefore occurs at
-     * most once per (controller, method, route) per request lifetime under FPM/CLI
-     * SAPIs, and at most once per registration under long-lived workers (PHP-PM,
-     * RoadRunner, FrankenPHP, Swoole) — the desired behaviour.
+     * Dedup key is `controllerClass::method::parameterName` for the lifetime of
+     * this binding-builder instance (per-request scope per contract §7).
      */
-    private function emitImplicitArrayDeprecation(
-        \ReflectionMethod $method,
-        \ReflectionParameter $parameter,
+    private function emitDeprecation(
+        string $controllerClass,
+        string $method,
+        string $parameterName,
         string $recommendedAttribute,
     ): void {
+        $key = $controllerClass . '::' . $method . '::' . $parameterName;
+        if (isset($this->emittedKeys[$key])) {
+            return;
+        }
+        $this->emittedKeys[$key] = true;
+
         $this->logger->notice(
-            'Controller method uses implicit array parameter — add #[MapRoute] or #[MapQuery]',
+            sprintf(
+                'Controller %s::%s parameter $%s relies on the implicit-array shim; add #[%s] to suppress this notice.',
+                $controllerClass,
+                $method,
+                $parameterName,
+                $recommendedAttribute,
+            ),
             [
-                'controller_class' => $method->getDeclaringClass()->getName(),
-                'method_name' => $method->getName(),
-                'parameter_name' => $parameter->getName(),
+                'channel' => 'dispatcher.deprecation',
+                'event' => 'implicit_array_shim',
+                'controller_class' => $controllerClass,
+                'method' => $method,
+                'parameter_name' => $parameterName,
                 'recommended_attribute' => $recommendedAttribute,
+            ],
+        );
+    }
+
+    /**
+     * Emit the structured `implicit_array_unbound` deprecation signal.
+     *
+     * Fired when an unannotated `array $X` parameter is neither named `params`
+     * nor `query`. The dispatcher injects `[]` for this parameter (see
+     * {@see AppParameterKind::ImplicitEmptyArray}). `recommended_attribute`
+     * is the empty string; the operator must choose `MapRoute`, `MapQuery`,
+     * or remove the parameter.
+     */
+    private function emitUnboundDeprecation(
+        string $controllerClass,
+        string $method,
+        string $parameterName,
+    ): void {
+        $key = $controllerClass . '::' . $method . '::' . $parameterName;
+        if (isset($this->emittedKeys[$key])) {
+            return;
+        }
+        $this->emittedKeys[$key] = true;
+
+        $this->logger->notice(
+            sprintf(
+                'Controller %s::%s parameter $%s declares array without a binding attribute; the dispatcher injects []. Add an explicit binding or remove the parameter.',
+                $controllerClass,
+                $method,
+                $parameterName,
+            ),
+            [
+                'channel' => 'dispatcher.deprecation',
+                'event' => 'implicit_array_unbound',
+                'controller_class' => $controllerClass,
+                'method' => $method,
+                'parameter_name' => $parameterName,
+                'recommended_attribute' => '',
             ],
         );
     }
