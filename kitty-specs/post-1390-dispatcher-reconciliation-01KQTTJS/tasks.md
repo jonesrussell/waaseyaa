@@ -19,12 +19,12 @@
 
 | ID    | Description                                                                                          | WP   | Parallel |
 |-------|------------------------------------------------------------------------------------------------------|------|----------|
-| T001  | Audit current dispatcher source at `packages/ssr/src/Http/AppController/`                            | WP01 |          |
-| T002  | Reconcile spec assumptions against the merged shape of framework#1390 (or current main if not yet merged) | WP01 | [P]      |
-| T003  | Produce `artifacts/post-1390-dispatcher-contract.md`                                                 | WP01 |          |
-| T004  | Produce `artifacts/controller-shape-audit.md`                                                        | WP01 | [P]      |
-| T005  | Produce `artifacts/minoo-resume-verification.md`                                                     | WP01 | [P]      |
-| T006  | File follow-up issues for any adjacent invariants surfaced (per spec C-005)                          | WP01 | [P]      |
+| T001  | Audit current dispatcher source at `packages/ssr/src/Http/AppController/`                            | WP01 |          | [D] |
+| T002  | Reconcile spec assumptions against the merged shape of framework#1390 (or current main if not yet merged) | WP01 | [D] |
+| T003  | Produce `artifacts/post-1390-dispatcher-contract.md`                                                 | WP01 |          | [D] |
+| T004  | Produce `artifacts/controller-shape-audit.md`                                                        | WP01 | [D] |
+| T005  | Produce `artifacts/minoo-resume-verification.md`                                                     | WP01 | [D] |
+| T006  | File follow-up issues for any adjacent invariants surfaced (per spec C-005)                          | WP01 | [D] |
 | T007  | Inject `LoggerInterface` into the dispatcher binding pipeline                                        | WP02 |          |
 | T008  | Implement deprecation emission with `(class::method::param)` dedup                                   | WP02 |          |
 | T009  | Wire DI through `SsrServiceProvider` so production gets a real logger                                | WP02 |          |
@@ -52,12 +52,12 @@ The `[P]` marker in this index is reference-only. Per-WP tracking checkboxes app
 
 Tracking:
 
-- [ ] T001 Audit current dispatcher source at `packages/ssr/src/Http/AppController/` (WP01)
-- [ ] T002 Reconcile spec assumptions against the merged shape of framework#1390 (WP01)
-- [ ] T003 Produce `artifacts/post-1390-dispatcher-contract.md` (WP01)
-- [ ] T004 Produce `artifacts/controller-shape-audit.md` (WP01)
-- [ ] T005 Produce `artifacts/minoo-resume-verification.md` (WP01)
-- [ ] T006 File follow-up issues for adjacent invariants surfaced (WP01)
+- [x] T001 Audit current dispatcher source at `packages/ssr/src/Http/AppController/` (WP01)
+- [x] T002 Reconcile spec assumptions against the merged shape of framework#1390 (WP01)
+- [x] T003 Produce `artifacts/post-1390-dispatcher-contract.md` (WP01)
+- [x] T004 Produce `artifacts/controller-shape-audit.md` (WP01)
+- [x] T005 Produce `artifacts/minoo-resume-verification.md` (WP01)
+- [x] T006 File follow-up issues for adjacent invariants surfaced (WP01)
 
 Implementation sketch: read dispatcher source → check #1390 status → write contract → write audit → write resume plan → file follow-ups → commit.
 
