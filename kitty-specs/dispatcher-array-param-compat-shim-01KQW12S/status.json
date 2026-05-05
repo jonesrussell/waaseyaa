@@ -1,7 +1,7 @@
 {
-  "event_count": 3,
-  "last_event_id": "01KQW441E7SQH3V9RQ2AR7VPGC",
-  "materialized_at": "2026-05-05T13:09:29.671349+00:00",
+  "event_count": 4,
+  "last_event_id": "01KQW4K72NAYFHXCNNFJKVYT8H",
+  "materialized_at": "2026-05-05T13:17:46.965453+00:00",
   "mission_number": "",
   "mission_slug": "dispatcher-array-param-compat-shim-01KQW12S",
   "mission_type": "software-dev",
@@ -11,18 +11,18 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 0
   },
   "work_packages": {
     "WP01": {
-      "actor": "implement-command",
+      "actor": "user",
       "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KQW441E7SQH3V9RQ2AR7VPGC",
-      "last_transition_at": "2026-05-05T13:09:29.671349+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KQW4K72NAYFHXCNNFJKVYT8H",
+      "last_transition_at": "2026-05-05T13:17:46.965453+00:00"
     }
   }
 }

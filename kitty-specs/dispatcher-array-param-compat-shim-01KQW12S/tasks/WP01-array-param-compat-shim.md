@@ -304,3 +304,7 @@ Per `feedback_pr_traceability_signals.md`:
 - Close `#1390` manually with `gh issue close 1390 -c "Resolved by <PR-URL>; deprecation shim restores implicit-array signature."`
 - If a release tag has already been cut, edit the GitHub Release notes to include the bullet. Otherwise let `release-cut.yml` promote `[Unreleased]` at the next tag.
 - Confirm the `post-1390-dispatcher-reconciliation` mission's WP02–WP04 dependency gate is now clear.
+
+## Activity Log
+
+- 2026-05-05T13:17:47Z – claude – shell_pid=72450 – WP01 implementation complete: shim landed, 10 tests green, all gates clean
