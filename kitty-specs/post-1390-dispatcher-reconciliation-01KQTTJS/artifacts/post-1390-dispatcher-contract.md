@@ -125,6 +125,14 @@ Per-request dedup is the lower-risk choice and matches the existing wiring witho
 
 If, in the future, log volume becomes a real concern under sustained load, the recommended evolution is to introduce a separate `DispatcherDeprecationCollector` resolved from the container as a singleton, keeping the binding-builder's per-request lifecycle intact. That is a follow-up, not part of this mission.
 
+### Erratum (2026-05-05, post-merge mission review, #1392)
+
+The "per-request" scope above describes the contract's design intent and the binding-builder's intrinsic dedup envelope, but it does not account for the upstream optimization in `AppControllerMethodInvoker::$specCache` (`private static`, see `packages/ssr/src/Http/AppController/AppControllerMethodInvoker.php`). On a cache hit, the invoker returns the previously-built `AppParameterBindingSpec` list and never calls `AppParameterBindingBuilder::build()` for that route again, so `emitDeprecation` / `emitUnboundDeprecation` never fire. The effective dedup scope is therefore **once per (controller_class, method, parameter_name) per FPM worker lifetime**, not once per request.
+
+This is over-deduplication relative to the per-request promise: consumers receive *fewer* notices than the documented contract implies, not more. Cumulative log volume is `O(workers × distinct shimmed triples)`, not the `O(requests × distinct shimmed params)` estimated above. NFR-002 ("dedup by `(class::method)` for the lifetime of the dispatcher") remains satisfied — `$emittedKeys` still enforces it within any single binding-builder lifetime, and the upstream cache only tightens the envelope further.
+
+The decision in #1392 is to leave the code path as-is and treat the docs as the source of drift; option B (bypass `$specCache` for shim/unbound classifications) was rejected as out of scope. See `kitty-specs/post-1390-dispatcher-reconciliation-01KQTTJS/artifacts/mission-review.md` (RISK-001) for the full analysis.
+
 ## 8. Performance invariant (NFR-001)
 
 The fast-path check is the binding-kind classification: only when classification produces `implicit_array_shim` or `implicit_array_unbound` does the deprecation collaborator touch the dedup map. For controllers whose every parameter is annotated or non-array, the deprecation path is zero work after the existing classification.
