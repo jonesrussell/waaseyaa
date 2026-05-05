@@ -2,7 +2,7 @@
 
 **Mission**: `post-1390-dispatcher-reconciliation-01KQTTJS`
 **Status**: 🟡 **Draft pending #1390 merge** — written 2026-05-05 against `main` at alpha.172, where #1390 is **OPEN**. Each section flags assumptions that need re-confirmation when the upstream PR lands.
-**Revision**: cycle-1 review fixes landed (B1: `#[FromRoute]` no longer listed as shim-suppressing; B2a: dedup scope clarified as **per-request** matching the `SsrPageHandler`-instantiated invoker lifecycle; M1: `MapRoute`+`MapQuery` resolution stated concretely; M2: §12 cross-reference attributed correctly). See `../tasks/WP01-analysis-and-artifacts/review-cycle-1.md` for the verdict trail.
+**Revision**: cycle-1 fixes landed (B1: `#[FromRoute]` no longer listed as shim-suppressing; B2a: dedup scope clarified as **per-request** matching the `SsrPageHandler`-instantiated invoker lifecycle; M1: `MapRoute`+`MapQuery` resolution stated concretely; M2: §12 cross-reference attributed correctly). Cycle-2 fix landed in the audit only (B3: audit headline rewritten to use unique-triple count plus per-request volume model, matching this contract's §7 — no contract changes). See `../tasks/WP01-analysis-and-artifacts/review-cycle-1.md` and `review-cycle-2.md` for the verdict trail.
 **Authoritative for**: WP02 (deprecation emission plumbing), WP03 (test coverage), WP04 (docs/CHANGELOG).
 
 This artifact supersedes the draft contract at `../contracts/dispatcher-deprecation-contract.md` for any subsequent decision. Where the two diverge, this document wins.

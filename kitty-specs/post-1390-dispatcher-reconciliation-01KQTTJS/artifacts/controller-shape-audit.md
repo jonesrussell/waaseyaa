@@ -17,7 +17,9 @@
 | Methods classified `attribute_annotated`                                                        | 0     |
 | Methods classified `no_array_params` (in dispatcher-subject controllers)                        | 0     |
 
-**Headline**: when #1390's shim + WP02's deprecation emission ship, the framework itself emits **8 deprecation events per process** (4 methods × 2 implicit-array params each = 8), all from `Waaseyaa\Genealogy\Ssr\GenealogySsrController`. Every other framework-shipped "controller" uses a different invocation pipeline and is not subject to this dispatcher.
+> **Read this table with §7 of the contract in mind**: the deprecation event count above is *unique-triple* count, not per-process or per-request emission count. Per the per-request dedup scope, the same triple re-emits on every request that exercises it — see the headline below for the cumulative-volume model.
+
+**Headline**: the framework contains **4 dispatcher-subject methods × 2 implicit-array params = 8 unique `(class, method, parameter)` triples** that will trigger the shim, all from `Waaseyaa\Genealogy\Ssr\GenealogySsrController`. Per the per-request dedup scope (see `post-1390-dispatcher-contract.md` §7), a single HTTP request hitting one of these routes emits up to **2 notices per request** (one per implicit-array parameter); cumulative log volume scales with traffic as `O(requests × shimmed-params-on-matched-route)`, not with the triple count. Every other framework-shipped "controller" uses a different invocation pipeline and is not subject to this dispatcher.
 
 ## Why the dispatcher-subject set is so small
 
@@ -44,7 +46,7 @@ File: `packages/genealogy/src/Ssr/GenealogySsrController.php`
 | `Waaseyaa\Genealogy\Ssr\GenealogySsrController`          | `family`       | relies_on_shim  | Same signature shape. Two events.                                                                                            |
 | `Waaseyaa\Genealogy\Ssr\GenealogySsrController`          | `ancestorChart`| relies_on_shim  | Same signature shape. Two events.                                                                                            |
 
-Total events emitted per process by this controller: **8** (4 methods × 2 implicit-array params). All can be silenced post-shim by adding `#[MapRoute]` / `#[MapQuery]` to the `params` / `query` parameters respectively.
+Unique `(class, method, parameter)` triples on this controller: **8** (4 methods × 2 implicit-array params). Under the per-request dedup scope (contract §7), each request hitting one of these four routes emits up to 2 notices (one for `params`, one for `query`). All can be silenced post-shim by adding `#[MapRoute]` / `#[MapQuery]` to the `params` / `query` parameters respectively.
 
 ## Non-dispatcher-subject matches (informational, NOT subject to the shim)
 
@@ -75,7 +77,7 @@ These files contain `array $params` / `array $query` but are NOT subject to the 
 
 ## Implications for the next alpha
 
-1. **Framework's deprecation-noise floor is 8 lines per process** (one per `(GenealogySsrController, method, parameter_name)` triple, consolidated by dedup). Acceptable.
+1. **Framework's deprecation-noise floor is 2 lines per request hitting any genealogy SSR route** (one for `params`, one for `query`); the unique-triple count across all 4 genealogy methods is 8. Steady-state cumulative volume scales with traffic per the per-request dedup model in contract §7. Acceptable.
 2. **Genealogy controller is the canonical "good migration" example** — once the next alpha ships, an immediate follow-up issue can convert these four methods to `#[MapRoute] array $params, #[MapQuery] array $query` and shrink the floor to zero. This is voluntary, not blocking; filed as a separate issue if desired.
 3. **Audit is brittle to controller-discovery method**. The grep used here found controller-shaped files by `extends.*Controller` and `^final class.*Controller`. If future controllers adopt different conventions, re-run the audit by also tracing `RouteBuilder` registrations. For this alpha cycle, the inventory above is complete.
 
