@@ -244,3 +244,4 @@ spec-kitty agent action implement WP01 --agent <your-agent-name> --mission post-
 - 2026-05-05T01:25:19Z – claude – shell_pid=48047 – WP01 analysis complete: 3 artifacts produced, all 6 subtasks done, committed at 8d6c02c2c on main. #1390 still OPEN — WP02-WP04 remain gated until merge.
 - 2026-05-05T01:28:20Z – claude – shell_pid=49274 – Started review via action command
 - 2026-05-05T01:39:24Z – claude – shell_pid=51157 – Started implementation via action command
+- 2026-05-05T01:42:26Z – claude – shell_pid=51157 – Cycle-1 corrections applied: B1 (FromRoute), B2a (per-request dedup), M1-M4. See review-cycle-1.md for issues addressed; commit d2fc55e51 lands the fixes.
