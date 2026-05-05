@@ -1,0 +1,42 @@
+work_packages:
+  - id: WP01
+    title: "Implement name-keyed array-param compatibility shim with deprecation logging"
+    dependencies: []
+    owned_files:
+      - "packages/ssr/src/Http/AppController/AppParameterBindingBuilder.php"
+      - "packages/ssr/src/Http/AppController/AppControllerMethodInvoker.php"
+      - "packages/ssr/src/SsrPageHandler.php"
+      - "packages/ssr/tests/Unit/Http/AppController/AppParameterBindingBuilderTest.php"
+      - "packages/ssr/tests/Integration/AppControllerImplicitArrayDispatchTest.php"
+      - "CHANGELOG.md"
+    requirement_refs:
+      - FR-001
+      - FR-002
+      - FR-003
+      - FR-004
+      - FR-005
+      - FR-006
+      - FR-007
+      - FR-008
+      - FR-009
+      - FR-010
+      - NFR-001
+      - NFR-002
+      - NFR-003
+      - NFR-004
+      - NFR-005
+      - C-001
+      - C-002
+      - C-003
+      - C-004
+      - C-005
+      - C-006
+      - C-007
+      - C-008
+    subtasks:
+      - T001
+      - T002
+      - T003
+      - T004
+      - T005
+      - T006
