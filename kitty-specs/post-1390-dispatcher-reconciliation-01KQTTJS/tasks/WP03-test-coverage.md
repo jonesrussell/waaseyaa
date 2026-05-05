@@ -15,6 +15,8 @@ subtasks:
 - T010
 - T011
 - T012
+agent: "claude:opus-4-7:implementer:implementer"
+shell_pid: "86067"
 history:
 - '2026-05-05: created'
 authoritative_surface: packages/ssr/tests/
@@ -231,3 +233,7 @@ The whole WP is the test strategy. Before requesting review:
 ```bash
 spec-kitty agent action implement WP03 --agent <your-agent-name> --mission post-1390-dispatcher-reconciliation-01KQTTJS
 ```
+
+## Activity Log
+
+- 2026-05-05T15:46:46Z – claude:opus-4-7:implementer:implementer – shell_pid=86067 – Started implementation via action command

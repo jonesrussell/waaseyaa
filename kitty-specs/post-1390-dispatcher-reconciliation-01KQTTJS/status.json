@@ -1,7 +1,7 @@
 {
-  "event_count": 29,
-  "last_event_id": "01KQWCXG24SN942NEFZAB7D85E",
-  "materialized_at": "2026-05-05T15:43:12.452948+00:00",
+  "event_count": 31,
+  "last_event_id": "01KQWD40TSDDQQH6CBG80QHP37",
+  "materialized_at": "2026-05-05T15:46:46.233754+00:00",
   "mission_number": "",
   "mission_slug": "post-1390-dispatcher-reconciliation-01KQTTJS",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 1,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 2
+    "planned": 1
   },
   "work_packages": {
     "WP01": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-05-05T15:43:12.452948+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
+      "actor": "claude:opus-4-7:implementer:implementer",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQTVE5BMKNXEJKB3ZRQ6G2T8",
-      "last_transition_at": "2026-05-05T01:18:29.748460+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KQWD40TSDDQQH6CBG80QHP37",
+      "last_transition_at": "2026-05-05T15:46:46.233754+00:00"
     },
     "WP04": {
       "actor": "finalize-tasks",
