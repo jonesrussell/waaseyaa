@@ -29,9 +29,9 @@
 | T007  | Inject `LoggerInterface` into the dispatcher binding pipeline                                        | WP02 |          | [D] |
 | T008  | Implement deprecation emission with `(class::method::param)` dedup                                   | WP02 |          | [D] |
 | T009  | Wire DI through `SsrServiceProvider` so production gets a real logger                                | WP02 |          | [D] |
-| T010  | Add fixture controllers under `packages/ssr/tests/fixtures/`                                         | WP03 |          |
-| T011  | Add unit tests for `AppParameterBindingBuilder` deprecation path                                     | WP03 | [P]      |
-| T012  | Add the seven contract tests defined in `contracts/dispatcher-deprecation-contract.md`               | WP03 |          |
+| T010  | Add fixture controllers under `packages/ssr/tests/fixtures/`                                         | WP03 |          | [D] |
+| T011  | Add unit tests for `AppParameterBindingBuilder` deprecation path                                     | WP03 | [D] |
+| T012  | Add the seven contract tests defined in `contracts/dispatcher-deprecation-contract.md`               | WP03 |          | [D] |
 | T013  | Update `docs/specs/api-layer.md` with cross-link to dispatcher-deprecation contract                  | WP04 | [P]      |
 | T014  | (Optional) Update CLAUDE.md orchestration table — note that the dispatcher implementation lives in `packages/ssr/` | WP04 | [P]      |
 | T015  | Add `[Unreleased]` CHANGELOG bullet referencing #1390 (and #1388)                                    | WP04 | [P]      |
@@ -102,9 +102,9 @@ Prompt: [tasks/WP02-deprecation-emission-plumbing.md](./tasks/WP02-deprecation-e
 
 Tracking:
 
-- [ ] T010 Add fixture controllers under `packages/ssr/tests/fixtures/` (WP03)
-- [ ] T011 Add unit tests for `AppParameterBindingBuilder` deprecation path (WP03)
-- [ ] T012 Add the seven contract tests defined in the contract document (WP03)
+- [x] T010 Add fixture controllers under `packages/ssr/tests/fixtures/` (WP03)
+- [x] T011 Add unit tests for `AppParameterBindingBuilder` deprecation path (WP03)
+- [x] T012 Add the seven contract tests defined in the contract document (WP03)
 
 Implementation sketch: create five fixture controllers (LegacyArrayParams, Annotated, Mixed, OnlyQuery, UnboundArray) → unit test the binding builder's classification logic → contract tests cover the seven scenarios in §"Test contract".
 
