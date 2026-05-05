@@ -32,10 +32,10 @@
 | T010  | Add fixture controllers under `packages/ssr/tests/fixtures/`                                         | WP03 |          | [D] |
 | T011  | Add unit tests for `AppParameterBindingBuilder` deprecation path                                     | WP03 | [D] |
 | T012  | Add the seven contract tests defined in `contracts/dispatcher-deprecation-contract.md`               | WP03 |          | [D] |
-| T013  | Update `docs/specs/api-layer.md` with cross-link to dispatcher-deprecation contract                  | WP04 | [P]      |
-| T014  | (Optional) Update CLAUDE.md orchestration table — note that the dispatcher implementation lives in `packages/ssr/` | WP04 | [P]      |
-| T015  | Add `[Unreleased]` CHANGELOG bullet referencing #1390 (and #1388)                                    | WP04 | [P]      |
-| T016  | Run all gates (cs-check, phpstan, check-composer-policy, check-package-layers, full PHPUnit) and fix blockers | WP04 |          |
+| T013  | Update `docs/specs/api-layer.md` with cross-link to dispatcher-deprecation contract                  | WP04 | [D] |
+| T014  | (Optional) Update CLAUDE.md orchestration table — note that the dispatcher implementation lives in `packages/ssr/` | WP04 | [D] |
+| T015  | Add `[Unreleased]` CHANGELOG bullet referencing #1390 (and #1388)                                    | WP04 | [D] |
+| T016  | Run all gates (cs-check, phpstan, check-composer-policy, check-package-layers, full PHPUnit) and fix blockers | WP04 |          | [D] |
 
 The `[P]` marker in this index is reference-only. Per-WP tracking checkboxes appear under each WP heading below.
 
@@ -125,10 +125,10 @@ Prompt: [tasks/WP03-test-coverage.md](./tasks/WP03-test-coverage.md)
 
 Tracking:
 
-- [ ] T013 Update `docs/specs/api-layer.md` with cross-link to dispatcher-deprecation contract (WP04)
-- [ ] T014 (Optional) Note that dispatcher implementation lives in `packages/ssr/` in CLAUDE.md orchestration table (WP04)
-- [ ] T015 Add `[Unreleased]` CHANGELOG bullet referencing #1390 (and #1388) (WP04)
-- [ ] T016 Run all gates and fix blockers (WP04)
+- [x] T013 Update `docs/specs/api-layer.md` with cross-link to dispatcher-deprecation contract (WP04)
+- [x] T014 (Optional) Note that dispatcher implementation lives in `packages/ssr/` in CLAUDE.md orchestration table (WP04)
+- [x] T015 Add `[Unreleased]` CHANGELOG bullet referencing #1390 (and #1388) (WP04)
+- [x] T016 Run all gates and fix blockers (WP04)
 
 Implementation sketch: edit `docs/specs/api-layer.md` → optionally edit CLAUDE.md → edit CHANGELOG → run gates → land PR → close tracking issue → edit GitHub Release notes per `feedback_pr_traceability_signals.md`.
 
