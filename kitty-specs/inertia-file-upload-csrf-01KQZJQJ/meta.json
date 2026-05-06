@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-06T21:22:34.486700+00:00",
+  "friendly_name": "inertia file upload csrf",
+  "mission_id": "01KQZJQJV8XMG9C1PF7TVMKKHE",
+  "mission_number": null,
+  "mission_slug": "inertia-file-upload-csrf-01KQZJQJ",
+  "mission_type": "software-dev",
+  "slug": "inertia-file-upload-csrf-01KQZJQJ",
+  "target_branch": "main"
+}
