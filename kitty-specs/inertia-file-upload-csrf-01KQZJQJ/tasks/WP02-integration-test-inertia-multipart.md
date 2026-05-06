@@ -196,3 +196,4 @@ This WP closes NFR-003 (integration coverage).
 ## Activity Log
 
 - 2026-05-06T22:16:15Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223277 – Assigned agent via action command
+- 2026-05-06T22:30:54Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223277 – Integration test passes all 4 cases (T009-T012); full integration suite green (667/667). Also fixed architectural gap: CsrfMiddleware.attachXsrfCookie ran against auth pipeline empty 200, not controller response; added static attachCookieIfHtml() called from HttpKernel after controller dispatch.
