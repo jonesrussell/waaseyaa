@@ -239,3 +239,4 @@ If any item fails, document the failure in the summary file, fix, and re-run the
 ## Activity Log
 
 - 2026-05-06T22:35:59Z – claude:sonnet-4-6:implementer:implementer – shell_pid=241861 – Started implementation via action command
+- 2026-05-06T22:53:27Z – claude:sonnet-4-6:implementer:implementer – shell_pid=241861 – Smoke evidence in artifacts/: 4 files (screenshot, network, server log, summary). CSRF gate passed; controller invoked; lane-b code paths in stack trace; XSRF-TOKEN cookie JS-readable in browser. knowledge_item creation blocked by missing MarkItDown binary (dev-env tooling, orthogonal). Giiken composer.local.json is a gitignored dev override; no pre-existing user state was modified beyond what was reverted.
