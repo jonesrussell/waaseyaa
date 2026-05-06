@@ -15,7 +15,8 @@ subtasks:
 - T014
 - T015
 - T016
-shell_pid: '223898'
+shell_pid: "223898"
+agent: "claude:sonnet-4-6:implementer:implementer"
 history:
 - timestamp: '2026-05-06T21:45:49Z'
   event: created
@@ -144,3 +145,7 @@ This WP can run in parallel with WP02 once WP01 has landed (the docs reflect the
 - Verify the accepted-sources table matches `contracts/csrf-token-cookie.md` §2 exactly.
 - Verify the page doesn't leak implementation details that would rot fast (no internal class names, no test paths, no SHA references).
 - Verify the security-defaults pointer is inline with the existing CSRF discussion, not a stray new section.
+
+## Activity Log
+
+- 2026-05-06T22:16:22Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223898 – Assigned agent via action command
