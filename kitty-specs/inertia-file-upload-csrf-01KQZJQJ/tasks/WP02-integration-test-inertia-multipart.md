@@ -21,8 +21,8 @@ subtasks:
 - T011
 - T012
 - T013
-shell_pid: "223277"
-agent: "claude:sonnet-4-6:implementer:implementer"
+shell_pid: "238646"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - timestamp: '2026-05-06T21:45:49Z'
   event: created
@@ -197,3 +197,4 @@ This WP closes NFR-003 (integration coverage).
 
 - 2026-05-06T22:16:15Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223277 – Assigned agent via action command
 - 2026-05-06T22:30:54Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223277 – Integration test passes all 4 cases (T009-T012); full integration suite green (667/667). Also fixed architectural gap: CsrfMiddleware.attachXsrfCookie ran against auth pipeline empty 200, not controller response; added static attachCookieIfHtml() called from HttpKernel after controller dispatch.
+- 2026-05-06T22:31:22Z – claude:opus-4-7:reviewer:reviewer – shell_pid=238646 – Started review via action command
