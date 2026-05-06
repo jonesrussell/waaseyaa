@@ -149,3 +149,4 @@ This WP can run in parallel with WP02 once WP01 has landed (the docs reflect the
 ## Activity Log
 
 - 2026-05-06T22:16:22Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223898 – Assigned agent via action command
+- 2026-05-06T22:20:04Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223898 – Convention docs landed; security-defaults.md updated with inline pointer
