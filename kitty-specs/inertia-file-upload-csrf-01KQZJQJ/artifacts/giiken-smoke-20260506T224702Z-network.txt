@@ -1,0 +1,67 @@
+# Giiken Ingestion Smoke — Network Trace
+
+**Captured**: 2026-05-06T22:47:02Z
+**Browser**: Chrome via Playwright MCP, authenticated as `giiken_staff` / `staff` (dev creds, ./vendor/bin/waaseyaa serve session)
+**Framework under test**: lane-b worktree (`/home/jones/dev/waaseyaa/.worktrees/inertia-file-upload-csrf-01KQZJQJ-lane-b/packages/*`) — includes WP01 (CsrfMiddleware cookie writer + X-XSRF-TOKEN acceptance) and WP02 (HttpKernel attachCookieIfHtml fix).
+
+---
+
+## Cookie surface (browser-side, JS-readable)
+
+```
+document.cookie = "PHPSESSID=b61dc2dfa9bd2d274158ff3226e994e6; XSRF-TOKEN=ab9699fee87c274ceb33c01d5e4bc68131eeab21102567fe817b852b19b3c3ad"
+```
+
+- `XSRF-TOKEN` cookie is present in `document.cookie` (`HttpOnly=false` confirmed — JS could read it).
+- Token value (64 hex chars) decodes to itself via `decodeURIComponent` (URL-encoded hex is a no-op; matches `rawurlencode(bin2hex(random_bytes(32)))` from `CsrfMiddleware::token()`).
+- Cookie was set by the framework's response-side cookie writer on the GET that delivered the page.
+
+This satisfies **FR-001** (token reachable to JS) and the cookie attributes from contract §1.
+
+## Multipart POST observed
+
+```
+[POST] http://127.0.0.1:8080/sagamok-anishnawbek/manage/ingestion
+       Content-Type: multipart/form-data
+       (Inertia axios auto-forwarded XSRF-TOKEN cookie value as X-XSRF-TOKEN header)
+=> [500] Internal Server Error
+   Body (JSON): MarkItDown binary not found at /home/jones/dev/giiken/config/../storage/markitdown-venv/bin/markitdown
+   Trace: see giiken-smoke-20260506T224702Z-server.log
+
+  Performance entry:
+    transferSize: 2903 bytes
+    duration: 31 ms
+    responseStatus: 500
+```
+
+### Why 500 is positive evidence (not negative)
+
+The 500 originated in the **application layer** (`MarkItDownConverter::toMarkdown()`, called from `IngestionHandlerRegistry::handle()` after the controller method `ManagementController->ingestUpload()` ran).
+
+For the request to reach `ingestUpload()`, it MUST have:
+
+1. **Passed `CsrfMiddleware`** — without the WP01+WP02 fix, this would have returned 403 "Invalid Security Token" with the multipart/form-data Content-Type.
+2. **Inertia's axios** auto-forwarded the `XSRF-TOKEN` cookie as the `X-XSRF-TOKEN` request header (Inertia + axios convention; no giiken JS code was modified).
+3. **The framework code on the lane-b worktree** loaded — the server-log stack trace explicitly references `/home/jones/dev/waaseyaa/.worktrees/inertia-file-upload-csrf-01KQZJQJ-lane-b/packages/...` paths.
+
+The MarkItDown 500 is an unrelated dev-environment issue (`bin/setup-markitdown.sh` not run on this host). It is downstream of the CSRF gate this mission is fixing.
+
+## Comparison: pre-fix behavior
+
+Before this mission's framework changes, the same multipart upload from the same Inertia client would have returned **403 Invalid Security Token** at the CSRF middleware layer. Captured by the user during smoke-testing on 2026-05-06 against `waaseyaa/* ^0.1.0-alpha.173` (the bug that motivated this mission).
+
+## Comparison: post-fix behavior
+
+After this mission's WP01+WP02 changes, the same upload reaches the application layer (200 from CSRF middleware on its way to the controller; final response shape depends on application logic). The CSRF gate is no longer in the way. The fix reaches the consumer surface with **zero giiken-side code changes**.
+
+---
+
+## Files uploaded during this smoke
+
+| Sequence | File | MIME inferred | App-layer outcome |
+|---|---|---|---|
+| 1 | `/home/jones/dev/giiken/.playwright-mcp/wp04-smoke-test.md` | text/plain (Symfony detection) | 422 "No handler supports MIME type: text/plain" — **CSRF passed**, no `text/plain` handler registered |
+| 2 | `/home/jones/dev/giiken/.playwright-mcp/wp04-smoke-test.csv` | text/csv | 500 from MarkItDown — **CSRF passed**, `CsvIngestionHandler->handle()` called, MarkItDown binary missing |
+| 3 | `/home/jones/dev/giiken/.playwright-mcp/wp04-smoke-test.html` | text/html | 500 from MarkItDown — **CSRF passed**, `HtmlIngestionHandler->handle()` called, MarkItDown binary missing |
+
+All three uploads got past the CSRF middleware. None returned 403. That is the mission outcome.
