@@ -1,7 +1,7 @@
 {
-  "event_count": 11,
-  "last_event_id": "01KQZNSWRBQZQMKS443Q5TY96X",
-  "materialized_at": "2026-05-06T22:16:14.859579+00:00",
+  "event_count": 13,
+  "last_event_id": "01KQZNT3GHSY8BBE6TNQN9XCA4",
+  "materialized_at": "2026-05-06T22:16:21.777857+00:00",
   "mission_number": "",
   "mission_slug": "inertia-file-upload-csrf-01KQZJQJ",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 1,
+    "in_progress": 2,
     "in_review": 0,
-    "planned": 2
+    "planned": 1
   },
   "work_packages": {
     "WP01": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-05-06T22:16:14.859579+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
+      "actor": "implement-command",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KQZN7DWF6TP3R0JKFGQ7AXKY",
-      "last_transition_at": "2026-05-06T22:06:09.807285+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KQZNT3GHSY8BBE6TNQN9XCA4",
+      "last_transition_at": "2026-05-06T22:16:21.777857+00:00"
     },
     "WP04": {
       "actor": "finalize-tasks",
