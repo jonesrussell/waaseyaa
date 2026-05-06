@@ -21,7 +21,8 @@ subtasks:
 - T011
 - T012
 - T013
-shell_pid: '223277'
+shell_pid: "223277"
+agent: "claude:sonnet-4-6:implementer:implementer"
 history:
 - timestamp: '2026-05-06T21:45:49Z'
   event: created
@@ -191,3 +192,7 @@ This WP closes NFR-003 (integration coverage).
 - Verify the negative case (T011) asserts status 403 specifically, not just `>= 400`.
 - Verify the regression case (T012) actually exercises the JSON exemption and would fail if FR-004 were broken.
 - Verify the test does not depend on internal state of `CsrfMiddleware` (use only public surface — request/response).
+
+## Activity Log
+
+- 2026-05-06T22:16:15Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223277 – Assigned agent via action command
