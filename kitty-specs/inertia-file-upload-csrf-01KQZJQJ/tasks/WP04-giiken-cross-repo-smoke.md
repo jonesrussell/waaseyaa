@@ -19,6 +19,8 @@ subtasks:
 - T021
 - T022
 - T023
+agent: "claude:sonnet-4-6:implementer:implementer"
+shell_pid: "241861"
 history:
 - timestamp: '2026-05-06T21:45:49Z'
   event: created
@@ -233,3 +235,7 @@ If any item fails, document the failure in the summary file, fix, and re-run the
 - Open the summary file and verify the framework SHA includes WP01 and WP02 commits (run `git log <SHA> --oneline` and look for the WP titles).
 - Verify giiken's `git status` is clean and `composer.json.smoke-backup` is absent.
 - Confirm no giiken-side code was touched at any point (only `composer.json` was temporarily modified, and it's reverted).
+
+## Activity Log
+
+- 2026-05-06T22:35:59Z – claude:sonnet-4-6:implementer:implementer – shell_pid=241861 – Started implementation via action command
