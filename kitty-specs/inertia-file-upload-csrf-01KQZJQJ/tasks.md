@@ -38,12 +38,12 @@ The `[P]` marker indicates the subtask is parallel-safe across files/concerns wi
 | T005 | Unit tests in `CsrfMiddlewareTest.php` covering full Content-Type × token-source matrix from contract §2 (json exempt, `_csrf_token` field, `X-CSRF-Token` header, `X-XSRF-TOKEN` header URL-decoded, multipart variants, regression cases) | WP01 | [P] with T006 | [D] |
 | T006 | Unit tests for cookie writer (new `XsrfCookieMiddlewareTest.php` if separate middleware, else folded into `CsrfMiddlewareTest.php`) pinning every attribute from contract §1; cookie absent on JSON responses; idempotency | WP01 | [P] with T005 | [D] |
 | T007 | `composer test` + `composer analyse` green; zero new warnings (NFR-004) | WP01 | | [D] |
-| T008 | Create `tests/Integration/Phase13/InertiaMultipartCsrfIntegrationTest.php` following the `SsrHttpKernelIntegrationTest` pattern (boot full `HttpKernel`, dispatch through full middleware stack) | WP02 | |
-| T009 | Integration case 1 — GET to a CSRF-protected route, assert response carries `Set-Cookie: XSRF-TOKEN=...` with the contract's attributes | WP02 | |
-| T010 | Integration case 2 — extract cookie from GET, POST `multipart/form-data` with `X-XSRF-TOKEN: <urldecode(cookie)>`, assert 200/302 | WP02 | |
-| T011 | Integration case 3 (negative) — same multipart POST without `X-XSRF-TOKEN`, assert 403 | WP02 | [P] with T010 |
-| T012 | Integration case 4 (regression) — `application/json` POST with no token, assert exempt path still works | WP02 | [P] with T010, T011 |
-| T013 | Run `vendor/bin/phpunit tests/Integration/Phase13/InertiaMultipartCsrfIntegrationTest.php` green | WP02 | |
+| T008 | Create `tests/Integration/Phase13/InertiaMultipartCsrfIntegrationTest.php` following the `SsrHttpKernelIntegrationTest` pattern (boot full `HttpKernel`, dispatch through full middleware stack) | WP02 | | [D] |
+| T009 | Integration case 1 — GET to a CSRF-protected route, assert response carries `Set-Cookie: XSRF-TOKEN=...` with the contract's attributes | WP02 | | [D] |
+| T010 | Integration case 2 — extract cookie from GET, POST `multipart/form-data` with `X-XSRF-TOKEN: <urldecode(cookie)>`, assert 200/302 | WP02 | | [D] |
+| T011 | Integration case 3 (negative) — same multipart POST without `X-XSRF-TOKEN`, assert 403 | WP02 | [P] with T010 | [D] |
+| T012 | Integration case 4 (regression) — `application/json` POST with no token, assert exempt path still works | WP02 | [P] with T010, T011 | [D] |
+| T013 | Run `vendor/bin/phpunit tests/Integration/Phase13/InertiaMultipartCsrfIntegrationTest.php` green | WP02 | | [D] |
 | T014 | Create `docs/conventions/csrf-token-cookie.md` with three audiences (Inertia zero-code, vanilla `fetch` with `document.cookie`, server-rendered Twig with `csrf_token()` helper); include contract summary tables | WP03 | | [D] |
 | T015 | Update `docs/specs/security-defaults.md` with a one-line pointer to the new convention page | WP03 | [P] with T014 | [D] |
 | T016 | Verify docs build / lint (if applicable per Taskfile); zero new warnings | WP03 | | [D] |
@@ -127,12 +127,12 @@ Document the decision in the WP commit message body. Either shape is acceptable;
 
 **Included subtasks**:
 
-- [ ] T008 Create InertiaMultipartCsrfIntegrationTest.php scaffolded from SsrHttpKernelIntegrationTest pattern (WP02)
-- [ ] T009 Integration case 1 — GET asserts Set-Cookie: XSRF-TOKEN=... (WP02)
-- [ ] T010 Integration case 2 — multipart POST with X-XSRF-TOKEN asserts 200/302 (WP02)
-- [ ] T011 Integration case 3 (negative) — multipart POST without header asserts 403 (WP02)
-- [ ] T012 Integration case 4 (regression) — application/json POST without token asserts exempt path still works (WP02)
-- [ ] T013 Run integration suite green (WP02)
+- [x] T008 Create InertiaMultipartCsrfIntegrationTest.php scaffolded from SsrHttpKernelIntegrationTest pattern (WP02)
+- [x] T009 Integration case 1 — GET asserts Set-Cookie: XSRF-TOKEN=... (WP02)
+- [x] T010 Integration case 2 — multipart POST with X-XSRF-TOKEN asserts 200/302 (WP02)
+- [x] T011 Integration case 3 (negative) — multipart POST without header asserts 403 (WP02)
+- [x] T012 Integration case 4 (regression) — application/json POST without token asserts exempt path still works (WP02)
+- [x] T013 Run integration suite green (WP02)
 
 **Implementation sketch**:
 
