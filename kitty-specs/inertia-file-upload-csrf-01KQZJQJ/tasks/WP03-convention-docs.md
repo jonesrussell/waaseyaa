@@ -15,8 +15,8 @@ subtasks:
 - T014
 - T015
 - T016
-shell_pid: "223898"
-agent: "claude:sonnet-4-6:implementer:implementer"
+shell_pid: "228874"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - timestamp: '2026-05-06T21:45:49Z'
   event: created
@@ -150,3 +150,4 @@ This WP can run in parallel with WP02 once WP01 has landed (the docs reflect the
 
 - 2026-05-06T22:16:22Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223898 – Assigned agent via action command
 - 2026-05-06T22:20:04Z – claude:sonnet-4-6:implementer:implementer – shell_pid=223898 – Convention docs landed; security-defaults.md updated with inline pointer
+- 2026-05-06T22:20:27Z – claude:opus-4-7:reviewer:reviewer – shell_pid=228874 – Started review via action command
