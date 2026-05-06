@@ -44,9 +44,9 @@ The `[P]` marker indicates the subtask is parallel-safe across files/concerns wi
 | T011 | Integration case 3 (negative) — same multipart POST without `X-XSRF-TOKEN`, assert 403 | WP02 | [P] with T010 |
 | T012 | Integration case 4 (regression) — `application/json` POST with no token, assert exempt path still works | WP02 | [P] with T010, T011 |
 | T013 | Run `vendor/bin/phpunit tests/Integration/Phase13/InertiaMultipartCsrfIntegrationTest.php` green | WP02 | |
-| T014 | Create `docs/conventions/csrf-token-cookie.md` with three audiences (Inertia zero-code, vanilla `fetch` with `document.cookie`, server-rendered Twig with `csrf_token()` helper); include contract summary tables | WP03 | |
-| T015 | Update `docs/specs/security-defaults.md` with a one-line pointer to the new convention page | WP03 | [P] with T014 |
-| T016 | Verify docs build / lint (if applicable per Taskfile); zero new warnings | WP03 | |
+| T014 | Create `docs/conventions/csrf-token-cookie.md` with three audiences (Inertia zero-code, vanilla `fetch` with `document.cookie`, server-rendered Twig with `csrf_token()` helper); include contract summary tables | WP03 | | [D] |
+| T015 | Update `docs/specs/security-defaults.md` with a one-line pointer to the new convention page | WP03 | [P] with T014 | [D] |
+| T016 | Verify docs build / lint (if applicable per Taskfile); zero new warnings | WP03 | | [D] |
 | T017 | In `/home/jones/dev/giiken`: `cp composer.json composer.json.smoke-backup`; add path repository for `/home/jones/dev/waaseyaa/packages/*` (symlink); `composer update 'waaseyaa/*'` | WP04 | |
 | T018 | Verify symlink resolution (`vendor/waaseyaa/user` points to local source); confirm framework SHA in use | WP04 | |
 | T019 | `./vendor/bin/waaseyaa migrate` (idempotent); `./vendor/bin/waaseyaa serve`; log in as seeded admin/staff; navigate to Sagamok Anishnawbek community Ingestion page | WP04 | |
@@ -170,9 +170,9 @@ Document the decision in the WP commit message body. Either shape is acceptable;
 
 **Included subtasks**:
 
-- [ ] T014 Create docs/conventions/csrf-token-cookie.md (Inertia, fetch, Twig examples) (WP03)
-- [ ] T015 Add one-line pointer to convention page from docs/specs/security-defaults.md (WP03)
-- [ ] T016 Verify docs build / lint (if applicable) (WP03)
+- [x] T014 Create docs/conventions/csrf-token-cookie.md (Inertia, fetch, Twig examples) (WP03)
+- [x] T015 Add one-line pointer to convention page from docs/specs/security-defaults.md (WP03)
+- [x] T016 Verify docs build / lint (if applicable) (WP03)
 
 **Implementation sketch**:
 
