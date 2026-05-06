@@ -31,7 +31,8 @@ subtasks:
 - T005
 - T006
 - T007
-shell_pid: '215526'
+shell_pid: "215526"
+agent: "claude:sonnet-4-6:implementer:implementer"
 history:
 - timestamp: '2026-05-06T21:45:49Z'
   event: created
@@ -266,3 +267,7 @@ Use `#[DataProvider]` if it keeps the matrix readable; otherwise discrete test m
 - Verify zero new composer dependencies in `composer.json` and zero new entries in `phpstan-baseline.neon` (or that any new entry is justified in the commit body).
 - Verify the trusted-proxy honor for `$request->isSecure()` is preserved.
 - Confirm the WP commit body explains the middleware-shape decision.
+
+## Activity Log
+
+- 2026-05-06T22:07:36Z – claude:sonnet-4-6:implementer:implementer – shell_pid=215526 – Assigned agent via action command
