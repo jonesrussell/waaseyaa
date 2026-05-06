@@ -31,13 +31,13 @@ The `[P]` marker indicates the subtask is parallel-safe across files/concerns wi
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
-| T001 | Read `HttpKernel.php` + existing `CsrfMiddleware` response path; pick "extend `CsrfMiddleware`" vs. "new `XsrfCookieMiddleware`" shape; document chosen shape | WP01 | |
-| T002 | Implement the cookie writer per `contracts/csrf-token-cookie.md` §1 (XSRF-TOKEN, urlencoded value, HttpOnly=false, Secure=scheme-tracking, SameSite=Lax, Path=/, no Domain, session lifetime) | WP01 | |
-| T003 | Restrict cookie write to `text/html` primary Content-Type; skip JSON/non-HTML; ensure idempotency | WP01 | [P] with T002 if separate middleware |
-| T004 | Extend `CsrfMiddleware` request-side to accept `X-XSRF-TOKEN` header (URL-decoded before `hash_equals`) alongside existing `_csrf_token` field and `X-CSRF-Token` header | WP01 | [P] with T002–T003 if separate middleware |
-| T005 | Unit tests in `CsrfMiddlewareTest.php` covering full Content-Type × token-source matrix from contract §2 (json exempt, `_csrf_token` field, `X-CSRF-Token` header, `X-XSRF-TOKEN` header URL-decoded, multipart variants, regression cases) | WP01 | [P] with T006 |
-| T006 | Unit tests for cookie writer (new `XsrfCookieMiddlewareTest.php` if separate middleware, else folded into `CsrfMiddlewareTest.php`) pinning every attribute from contract §1; cookie absent on JSON responses; idempotency | WP01 | [P] with T005 |
-| T007 | `composer test` + `composer analyse` green; zero new warnings (NFR-004) | WP01 | |
+| T001 | Read `HttpKernel.php` + existing `CsrfMiddleware` response path; pick "extend `CsrfMiddleware`" vs. "new `XsrfCookieMiddleware`" shape; document chosen shape | WP01 | | [D] |
+| T002 | Implement the cookie writer per `contracts/csrf-token-cookie.md` §1 (XSRF-TOKEN, urlencoded value, HttpOnly=false, Secure=scheme-tracking, SameSite=Lax, Path=/, no Domain, session lifetime) | WP01 | | [D] |
+| T003 | Restrict cookie write to `text/html` primary Content-Type; skip JSON/non-HTML; ensure idempotency | WP01 | [P] with T002 if separate middleware | [D] |
+| T004 | Extend `CsrfMiddleware` request-side to accept `X-XSRF-TOKEN` header (URL-decoded before `hash_equals`) alongside existing `_csrf_token` field and `X-CSRF-Token` header | WP01 | [P] with T002–T003 if separate middleware | [D] |
+| T005 | Unit tests in `CsrfMiddlewareTest.php` covering full Content-Type × token-source matrix from contract §2 (json exempt, `_csrf_token` field, `X-CSRF-Token` header, `X-XSRF-TOKEN` header URL-decoded, multipart variants, regression cases) | WP01 | [P] with T006 | [D] |
+| T006 | Unit tests for cookie writer (new `XsrfCookieMiddlewareTest.php` if separate middleware, else folded into `CsrfMiddlewareTest.php`) pinning every attribute from contract §1; cookie absent on JSON responses; idempotency | WP01 | [P] with T005 | [D] |
+| T007 | `composer test` + `composer analyse` green; zero new warnings (NFR-004) | WP01 | | [D] |
 | T008 | Create `tests/Integration/Phase13/InertiaMultipartCsrfIntegrationTest.php` following the `SsrHttpKernelIntegrationTest` pattern (boot full `HttpKernel`, dispatch through full middleware stack) | WP02 | |
 | T009 | Integration case 1 — GET to a CSRF-protected route, assert response carries `Set-Cookie: XSRF-TOKEN=...` with the contract's attributes | WP02 | |
 | T010 | Integration case 2 — extract cookie from GET, POST `multipart/form-data` with `X-XSRF-TOKEN: <urldecode(cookie)>`, assert 200/302 | WP02 | |
@@ -75,13 +75,13 @@ Document the decision in the WP commit message body. Either shape is acceptable;
 
 **Included subtasks**:
 
-- [ ] T001 Read HttpKernel.php + existing CsrfMiddleware response path; decide middleware shape; document choice (WP01)
-- [ ] T002 Implement cookie writer per contract §1 attributes (WP01)
-- [ ] T003 Restrict cookie write to text/html responses; idempotency (WP01)
-- [ ] T004 Extend CsrfMiddleware request-side to accept X-XSRF-TOKEN header (URL-decoded) (WP01)
-- [ ] T005 Unit tests for full Content-Type × token-source matrix (WP01)
-- [ ] T006 Unit tests for cookie writer pinning every contract §1 attribute (WP01)
-- [ ] T007 composer test + composer analyse green; NFR-004 zero new warnings (WP01)
+- [x] T001 Read HttpKernel.php + existing CsrfMiddleware response path; decide middleware shape; document choice (WP01)
+- [x] T002 Implement cookie writer per contract §1 attributes (WP01)
+- [x] T003 Restrict cookie write to text/html responses; idempotency (WP01)
+- [x] T004 Extend CsrfMiddleware request-side to accept X-XSRF-TOKEN header (URL-decoded) (WP01)
+- [x] T005 Unit tests for full Content-Type × token-source matrix (WP01)
+- [x] T006 Unit tests for cookie writer pinning every contract §1 attribute (WP01)
+- [x] T007 composer test + composer analyse green; NFR-004 zero new warnings (WP01)
 
 **Implementation sketch**:
 
