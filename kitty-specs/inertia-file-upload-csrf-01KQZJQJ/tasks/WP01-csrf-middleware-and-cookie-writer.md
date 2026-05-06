@@ -31,8 +31,8 @@ subtasks:
 - T005
 - T006
 - T007
-shell_pid: "215526"
-agent: "claude:sonnet-4-6:implementer:implementer"
+shell_pid: "221814"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - timestamp: '2026-05-06T21:45:49Z'
   event: created
@@ -272,3 +272,4 @@ Use `#[DataProvider]` if it keeps the matrix readable; otherwise discrete test m
 
 - 2026-05-06T22:07:36Z – claude:sonnet-4-6:implementer:implementer – shell_pid=215526 – Assigned agent via action command
 - 2026-05-06T22:12:25Z – claude:sonnet-4-6:implementer:implementer – shell_pid=215526 – Ready for review: middleware-shape choice (a) documented in commit body; 41 tests passing (10 matrix cases + 13 cookie attribute cases); composer test 6449/6449 green; phpstan clean
+- 2026-05-06T22:12:55Z – claude:opus-4-7:reviewer:reviewer – shell_pid=221814 – Started review via action command
