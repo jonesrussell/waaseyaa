@@ -271,3 +271,4 @@ Use `#[DataProvider]` if it keeps the matrix readable; otherwise discrete test m
 ## Activity Log
 
 - 2026-05-06T22:07:36Z – claude:sonnet-4-6:implementer:implementer – shell_pid=215526 – Assigned agent via action command
+- 2026-05-06T22:12:25Z – claude:sonnet-4-6:implementer:implementer – shell_pid=215526 – Ready for review: middleware-shape choice (a) documented in commit body; 41 tests passing (10 matrix cases + 13 cookie attribute cases); composer test 6449/6449 green; phpstan clean
