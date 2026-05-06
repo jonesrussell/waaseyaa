@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "mission_slug": "inertia-file-upload-csrf-01KQZJQJ",
+  "mission_id": "01KQZJQJV8XMG9C1PF7TVMKKHE",
+  "mission_branch": "kitty/mission-inertia-file-upload-csrf-01KQZJQJ",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01"
+      ],
+      "write_scope": [
+        "packages/user/src/Middleware/CsrfMiddleware.php",
+        "packages/user/src/Middleware/XsrfCookieMiddleware.php",
+        "packages/user/tests/Unit/Middleware/CsrfMiddlewareTest.php",
+        "packages/user/tests/Unit/Middleware/XsrfCookieMiddlewareTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "workspace"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-b",
+      "wp_ids": [
+        "WP02"
+      ],
+      "write_scope": [
+        "tests/Integration/Phase13/InertiaMultipartCsrfIntegrationTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-c",
+      "wp_ids": [
+        "WP03"
+      ],
+      "write_scope": [
+        "docs/conventions/csrf-token-cookie.md",
+        "docs/specs/security-defaults.md"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP04"
+      ],
+      "write_scope": [
+        "kitty-specs/inertia-file-upload-csrf-01KQZJQJ/artifacts/**"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-06T22:06:09.885476+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP04"
+  ]
+}
