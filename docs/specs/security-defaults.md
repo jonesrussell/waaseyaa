@@ -79,6 +79,10 @@ Access enforcement happens at the resolver level via `GraphQlAccessGuard`. Mutat
 
 `BodySizeLimitMiddleware` (priority 70) rejects payloads exceeding 1 MB with HTTP 413.
 
+### CSRF token cookie
+
+State-changing routes (`POST`, `PUT`, `PATCH`, `DELETE`) require a valid CSRF token accepted from a form field, the `X-CSRF-Token` header, or the `X-XSRF-TOKEN` header (URL-decoded); every `text/html` response sets the `XSRF-TOKEN` cookie so Inertia + Vue consumers get protection automatically with no consumer-side code. See [docs/conventions/csrf-token-cookie.md](../conventions/csrf-token-cookie.md) for runnable examples and the full cookie-attribute table.
+
 ## Encryption Policy
 
 ### Current (pre-v1)

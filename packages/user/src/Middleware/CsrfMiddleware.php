@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\User\Middleware;
 
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,8 @@ final class CsrfMiddleware implements HttpMiddlewareInterface
     private const TOKEN_SESSION_KEY = '_csrf_token';
     private const TOKEN_FIELD_NAME = '_csrf_token';
     private const TOKEN_HEADER_NAME = 'X-CSRF-Token';
+    private const XSRF_HEADER_NAME = 'X-XSRF-TOKEN';
+    private const XSRF_COOKIE_NAME = 'XSRF-TOKEN';
     private const STATE_CHANGING_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
     private const CSRF_EXEMPT_CONTENT_TYPES = ['application/vnd.api+json', 'application/json'];
 
@@ -26,13 +29,13 @@ final class CsrfMiddleware implements HttpMiddlewareInterface
         $this->ensureToken();
 
         if (!$this->requiresValidation($request)) {
-            return $next->handle($request);
+            $response = $next->handle($request);
+            $this->attachXsrfCookie($request, $response);
+
+            return $response;
         }
 
-        $submittedToken = $request->request->get(self::TOKEN_FIELD_NAME)
-            ?? $request->headers->get(self::TOKEN_HEADER_NAME);
-
-        if (!is_string($submittedToken) || !hash_equals($this->getToken(), $submittedToken)) {
+        if (!$this->hasValidToken($request)) {
             $route = $request->attributes->get('_route_object');
             $isRenderRoute = $route instanceof Route && $route->getOption('_render') === true;
 
@@ -54,7 +57,54 @@ final class CsrfMiddleware implements HttpMiddlewareInterface
             ], 403, ['Content-Type' => 'application/vnd.api+json']);
         }
 
-        return $next->handle($request);
+        $response = $next->handle($request);
+        $this->attachXsrfCookie($request, $response);
+
+        return $response;
+    }
+
+    /**
+     * Attach the XSRF-TOKEN cookie to a response if it is a text/html response.
+     *
+     * Exposed as a public static helper so the HttpKernel can call it on the
+     * final controller response (which has the real Content-Type) after the
+     * auth pipeline has already run. The middleware itself attaches the cookie
+     * within its pipeline pass, but that runs against the auth-pipeline's empty
+     * 200 pass-through, not the controller response. The kernel calls this
+     * method on the controller response to satisfy contract §1.
+     */
+    public static function attachCookieIfHtml(Request $request, Response $response): void
+    {
+        if (session_status() !== \PHP_SESSION_ACTIVE) {
+            return;
+        }
+
+        $contentType = $response->headers->get('Content-Type', '');
+        $primaryType = strtolower(trim(explode(';', $contentType)[0]));
+        if ($primaryType !== 'text/html') {
+            return;
+        }
+
+        // Idempotency: skip if cookie already present.
+        foreach ($response->headers->getCookies() as $cookie) {
+            if ($cookie->getName() === self::XSRF_COOKIE_NAME) {
+                return;
+            }
+        }
+
+        $token = $_SESSION[self::TOKEN_SESSION_KEY] ?? '';
+        if ($token === '') {
+            return;
+        }
+
+        $cookie = Cookie::create(self::XSRF_COOKIE_NAME)
+            ->withValue(rawurlencode($token))
+            ->withPath('/')
+            ->withSecure($request->isSecure())
+            ->withHttpOnly(false)
+            ->withSameSite(Cookie::SAMESITE_LAX);
+
+        $response->headers->setCookie($cookie);
     }
 
     /**
@@ -83,6 +133,57 @@ final class CsrfMiddleware implements HttpMiddlewareInterface
         }
 
         $_SESSION[self::TOKEN_SESSION_KEY] = bin2hex(random_bytes(32));
+    }
+
+    private function hasValidToken(Request $request): bool
+    {
+        $sessionToken = $this->getToken();
+
+        // Source 1: _csrf_token POST field (no transform)
+        $fieldToken = $request->request->get(self::TOKEN_FIELD_NAME);
+        if (is_string($fieldToken) && hash_equals($sessionToken, $fieldToken)) {
+            return true;
+        }
+
+        // Source 2: X-CSRF-Token header (no transform)
+        $headerToken = $request->headers->get(self::TOKEN_HEADER_NAME);
+        if (is_string($headerToken) && hash_equals($sessionToken, $headerToken)) {
+            return true;
+        }
+
+        // Source 3: X-XSRF-TOKEN header (URL-decode before comparison)
+        $xsrfToken = $request->headers->get(self::XSRF_HEADER_NAME);
+        if (is_string($xsrfToken) && hash_equals($sessionToken, rawurldecode($xsrfToken))) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function attachXsrfCookie(Request $request, Response $response): void
+    {
+        // Only set cookie on text/html responses.
+        $contentType = $response->headers->get('Content-Type', '');
+        $primaryType = strtolower(trim(explode(';', $contentType)[0]));
+        if ($primaryType !== 'text/html') {
+            return;
+        }
+
+        // Idempotency: don't double-set if already present.
+        foreach ($response->headers->getCookies() as $cookie) {
+            if ($cookie->getName() === self::XSRF_COOKIE_NAME) {
+                return;
+            }
+        }
+
+        $cookie = Cookie::create(self::XSRF_COOKIE_NAME)
+            ->withValue(rawurlencode($this->getToken()))
+            ->withPath('/')
+            ->withSecure($request->isSecure())
+            ->withHttpOnly(false)
+            ->withSameSite(Cookie::SAMESITE_LAX);
+
+        $response->headers->setCookie($cookie);
     }
 
     private function ensureToken(): void

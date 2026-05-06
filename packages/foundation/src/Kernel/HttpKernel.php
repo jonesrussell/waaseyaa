@@ -409,7 +409,17 @@ final class HttpKernel extends AbstractKernel
             $this->resolveInertiaFullPageRenderer(),
         );
 
-        return $dispatcher->dispatch($httpRequest);
+        $finalResponse = $dispatcher->dispatch($httpRequest);
+
+        // Attach the XSRF-TOKEN cookie to HTML responses after controller
+        // dispatch. CsrfMiddleware runs in the auth pipeline (before the
+        // controller), so it only sees the empty 200 pass-through response,
+        // not the real controller response. We call the middleware's static
+        // helper here to satisfy contract §1 (cookie on every text/html
+        // response) once the actual Content-Type is known.
+        CsrfMiddleware::attachCookieIfHtml($httpRequest, $finalResponse);
+
+        return $finalResponse;
     }
 
     /**

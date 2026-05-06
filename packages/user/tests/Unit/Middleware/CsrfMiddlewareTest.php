@@ -262,4 +262,368 @@ final class CsrfMiddlewareTest extends TestCase
 
         $this->assertSame(200, $response->getStatusCode());
     }
+
+    // -------------------------------------------------------------------------
+    // T005 — Content-Type × token-source matrix (10 required cases)
+    // -------------------------------------------------------------------------
+
+    #[Test]
+    public function matrixCase1ApplicationJsonExempt(): void
+    {
+        // Case 1: application/json, no token → 200 (exempt)
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/api', 'POST', [], [], [], [], '{}');
+        $request->headers->set('Content-Type', 'application/json');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function matrixCase2ApplicationVndApiJsonExempt(): void
+    {
+        // Case 2: application/vnd.api+json, no token → 200 (exempt)
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/api/nodes', 'POST', [], [], [], [], '{"data":{}}');
+        $request->headers->set('Content-Type', 'application/vnd.api+json');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function matrixCase3FormUrlencodedCorrectFieldToken(): void
+    {
+        // Case 3: application/x-www-form-urlencoded, _csrf_token field correct → 200
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['_csrf_token'] = $token;
+
+        $request = Request::create('/submit', 'POST', ['_csrf_token' => $token]);
+        $request->headers->set('Content-Type', 'application/x-www-form-urlencoded');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function matrixCase4FormUrlencodedWrongFieldToken(): void
+    {
+        // Case 4: application/x-www-form-urlencoded, _csrf_token field wrong → 403
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/submit', 'POST', ['_csrf_token' => 'wrong-value']);
+        $request->headers->set('Content-Type', 'application/x-www-form-urlencoded');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(403, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function matrixCase5MultipartCorrectFieldToken(): void
+    {
+        // Case 5: multipart/form-data, _csrf_token field correct → 200
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['_csrf_token'] = $token;
+
+        $request = Request::create('/upload', 'POST', ['_csrf_token' => $token]);
+        $request->headers->set('Content-Type', 'multipart/form-data; boundary=----WebKitFormBoundary');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function matrixCase6MultipartCorrectXCsrfTokenHeader(): void
+    {
+        // Case 6: multipart/form-data, X-CSRF-Token correct → 200
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['_csrf_token'] = $token;
+
+        $request = Request::create('/upload', 'POST');
+        $request->headers->set('Content-Type', 'multipart/form-data; boundary=----WebKitFormBoundary');
+        $request->headers->set('X-CSRF-Token', $token);
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function matrixCase7MultipartCorrectXsrfTokenHeaderUrlEncoded(): void
+    {
+        // Case 7: multipart/form-data, X-XSRF-TOKEN correct (URL-encoded) → 200
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['_csrf_token'] = $token;
+
+        $request = Request::create('/upload', 'POST');
+        $request->headers->set('Content-Type', 'multipart/form-data; boundary=----WebKitFormBoundary');
+        $request->headers->set('X-XSRF-TOKEN', rawurlencode($token));
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function matrixCase8MultipartWrongXsrfTokenHeader(): void
+    {
+        // Case 8: multipart/form-data, X-XSRF-TOKEN wrong → 403
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/upload', 'POST');
+        $request->headers->set('Content-Type', 'multipart/form-data; boundary=----WebKitFormBoundary');
+        $request->headers->set('X-XSRF-TOKEN', rawurlencode('wrong-value'));
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(403, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function matrixCase9MultipartNoToken(): void
+    {
+        // Case 9: multipart/form-data, no token → 403
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/upload', 'POST');
+        $request->headers->set('Content-Type', 'multipart/form-data; boundary=----WebKitFormBoundary');
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(403, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function matrixCase10MultipartCorrectFieldAndWrongXsrfHeader(): void
+    {
+        // Case 10: multipart/form-data, _csrf_token correct AND X-XSRF-TOKEN wrong → 200 (any-of)
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['_csrf_token'] = $token;
+
+        $request = Request::create('/upload', 'POST', ['_csrf_token' => $token]);
+        $request->headers->set('Content-Type', 'multipart/form-data; boundary=----WebKitFormBoundary');
+        $request->headers->set('X-XSRF-TOKEN', rawurlencode('wrong-value'));
+        $response = $this->middleware->process($request, $this->passthrough);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    // -------------------------------------------------------------------------
+    // T006 — Cookie writer: every contract §1 attribute pinned
+    // -------------------------------------------------------------------------
+
+    private function makePassthroughWithHtmlResponse(): HttpHandlerInterface
+    {
+        return new class implements HttpHandlerInterface {
+            public function handle(Request $request): Response
+            {
+                return new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+            }
+        };
+    }
+
+    private function makePassthroughWithJsonResponse(): HttpHandlerInterface
+    {
+        return new class implements HttpHandlerInterface {
+            public function handle(Request $request): Response
+            {
+                return new Response('{}', 200, ['Content-Type' => 'application/json']);
+            }
+        };
+    }
+
+    private function makePassthroughWithOctetStreamResponse(): HttpHandlerInterface
+    {
+        return new class implements HttpHandlerInterface {
+            public function handle(Request $request): Response
+            {
+                return new Response('binary', 200, ['Content-Type' => 'application/octet-stream']);
+            }
+        };
+    }
+
+    #[Test]
+    public function cookieName(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $this->assertSame('XSRF-TOKEN', $cookies[0]->getName());
+    }
+
+    #[Test]
+    public function cookieValueIsRawUrlEncodedToken(): void
+    {
+        $token = bin2hex(random_bytes(32));
+        $_SESSION['_csrf_token'] = $token;
+
+        $request = Request::create('/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $this->assertSame(rawurlencode($token), $cookies[0]->getValue());
+    }
+
+    #[Test]
+    public function cookieHttpOnlyIsFalse(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $this->assertFalse($cookies[0]->isHttpOnly());
+    }
+
+    #[Test]
+    public function cookieSecureIsTrueOnHttps(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('https://example.com/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $this->assertTrue($cookies[0]->isSecure());
+    }
+
+    #[Test]
+    public function cookieSecureIsFalseOnHttp(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('http://example.com/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $this->assertFalse($cookies[0]->isSecure());
+    }
+
+    #[Test]
+    public function cookieSameSiteIsLax(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $this->assertSame('lax', $cookies[0]->getSameSite());
+    }
+
+    #[Test]
+    public function cookiePathIsSlash(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        $this->assertSame('/', $cookies[0]->getPath());
+    }
+
+    #[Test]
+    public function cookieDomainIsNotSet(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        // Domain unset: Symfony Cookie returns null when no domain is configured.
+        $this->assertNull($cookies[0]->getDomain());
+    }
+
+    #[Test]
+    public function cookieIsSessionCookieNoExpiry(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $cookies = $response->headers->getCookies();
+        $this->assertCount(1, $cookies);
+        // Session cookie: expires at 0 (no explicit expiry)
+        $this->assertSame(0, $cookies[0]->getExpiresTime());
+    }
+
+    #[Test]
+    public function noCookieOnJsonResponse(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/api', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithJsonResponse());
+
+        $this->assertCount(0, $response->headers->getCookies());
+    }
+
+    #[Test]
+    public function noCookieOnOctetStreamResponse(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/download', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithOctetStreamResponse());
+
+        $this->assertCount(0, $response->headers->getCookies());
+    }
+
+    #[Test]
+    public function exactlyOneCookieOnHtmlResponse(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/page', 'GET');
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        $xsrfCookies = array_filter(
+            $response->headers->getCookies(),
+            fn($c) => $c->getName() === 'XSRF-TOKEN',
+        );
+        $this->assertCount(1, $xsrfCookies);
+    }
+
+    #[Test]
+    public function idempotentSecondMiddlewarePassDoesNotDuplicateCookie(): void
+    {
+        $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
+
+        $request = Request::create('/page', 'GET');
+
+        // First pass
+        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+
+        // Second pass: simulate re-running the middleware on the already-cookie-set response
+        $responseWithCookie = $response;
+        $nextWithPresetCookie = new class ($responseWithCookie) implements HttpHandlerInterface {
+            public function __construct(private readonly Response $inner) {}
+
+            public function handle(Request $request): Response
+            {
+                return $this->inner;
+            }
+        };
+
+        $finalResponse = $this->middleware->process($request, $nextWithPresetCookie);
+
+        $xsrfCookies = array_filter(
+            $finalResponse->headers->getCookies(),
+            fn($c) => $c->getName() === 'XSRF-TOKEN',
+        );
+        $this->assertCount(1, $xsrfCookies);
+    }
 }
