@@ -47,13 +47,13 @@ The `[P]` marker indicates the subtask is parallel-safe across files/concerns wi
 | T014 | Create `docs/conventions/csrf-token-cookie.md` with three audiences (Inertia zero-code, vanilla `fetch` with `document.cookie`, server-rendered Twig with `csrf_token()` helper); include contract summary tables | WP03 | | [D] |
 | T015 | Update `docs/specs/security-defaults.md` with a one-line pointer to the new convention page | WP03 | [P] with T014 | [D] |
 | T016 | Verify docs build / lint (if applicable per Taskfile); zero new warnings | WP03 | | [D] |
-| T017 | In `/home/jones/dev/giiken`: `cp composer.json composer.json.smoke-backup`; add path repository for `/home/jones/dev/waaseyaa/packages/*` (symlink); `composer update 'waaseyaa/*'` | WP04 | |
-| T018 | Verify symlink resolution (`vendor/waaseyaa/user` points to local source); confirm framework SHA in use | WP04 | |
-| T019 | `./vendor/bin/waaseyaa migrate` (idempotent); `./vendor/bin/waaseyaa serve`; log in as seeded admin/staff; navigate to Sagamok Anishnawbek community Ingestion page | WP04 | |
-| T020 | Upload real test file (.md or .csv); capture (a) browser screenshot → `artifacts/giiken-smoke-<utc>.png`, (b) network capture (DevTools "copy as cURL" or `curl -v`) showing `X-XSRF-TOKEN` header and 200/302 → `artifacts/giiken-smoke-<utc>-network.txt`, (c) server log excerpt showing `knowledge_item` creation → `artifacts/giiken-smoke-<utc>-server.log` | WP04 | |
-| T021 | Write `artifacts/giiken-smoke-<utc>.md` summary (framework SHA, giiken SHA, test file used, outcome, links to evidence) | WP04 | |
-| T022 | Revert giiken `composer.json` (`mv composer.json.smoke-backup composer.json && composer update 'waaseyaa/*'`); verify giiken `git status` clean | WP04 | |
-| T023 | Final acceptance check — all four evidence files present; `knowledge_item` row created; `X-XSRF-TOKEN` was forwarded automatically (no giiken JS code touched); giiken tree clean | WP04 | |
+| T017 | In `/home/jones/dev/giiken`: `cp composer.json composer.json.smoke-backup`; add path repository for `/home/jones/dev/waaseyaa/packages/*` (symlink); `composer update 'waaseyaa/*'` | WP04 | | [D] |
+| T018 | Verify symlink resolution (`vendor/waaseyaa/user` points to local source); confirm framework SHA in use | WP04 | | [D] |
+| T019 | `./vendor/bin/waaseyaa migrate` (idempotent); `./vendor/bin/waaseyaa serve`; log in as seeded admin/staff; navigate to Sagamok Anishnawbek community Ingestion page | WP04 | | [D] |
+| T020 | Upload real test file (.md or .csv); capture (a) browser screenshot → `artifacts/giiken-smoke-<utc>.png`, (b) network capture (DevTools "copy as cURL" or `curl -v`) showing `X-XSRF-TOKEN` header and 200/302 → `artifacts/giiken-smoke-<utc>-network.txt`, (c) server log excerpt showing `knowledge_item` creation → `artifacts/giiken-smoke-<utc>-server.log` | WP04 | | [D] |
+| T021 | Write `artifacts/giiken-smoke-<utc>.md` summary (framework SHA, giiken SHA, test file used, outcome, links to evidence) | WP04 | | [D] |
+| T022 | Revert giiken `composer.json` (`mv composer.json.smoke-backup composer.json && composer update 'waaseyaa/*'`); verify giiken `git status` clean | WP04 | | [D] |
+| T023 | Final acceptance check — all four evidence files present; `knowledge_item` row created; `X-XSRF-TOKEN` was forwarded automatically (no giiken JS code touched); giiken tree clean | WP04 | | [D] |
 
 Total: **23 subtasks across 4 WPs.** All within the 3–10 subtasks/WP target.
 
@@ -210,13 +210,13 @@ Document the decision in the WP commit message body. Either shape is acceptable;
 
 **Included subtasks**:
 
-- [ ] T017 Backup giiken composer.json; add path repository for waaseyaa monorepo (symlink); composer update waaseyaa/* (WP04)
-- [ ] T018 Verify symlink resolution; confirm framework SHA in use (WP04)
-- [ ] T019 waaseyaa migrate + serve giiken; log in; navigate to Ingestion page (WP04)
-- [ ] T020 Upload real test file; capture screenshot + network trace + server log (WP04)
-- [ ] T021 Write artifacts/giiken-smoke-<utc>.md summary (WP04)
-- [ ] T022 Revert giiken composer.json; verify clean tree (WP04)
-- [ ] T023 Final acceptance check (WP04)
+- [x] T017 Backup giiken composer.json; add path repository for waaseyaa monorepo (symlink); composer update waaseyaa/* (WP04)
+- [x] T018 Verify symlink resolution; confirm framework SHA in use (WP04)
+- [x] T019 waaseyaa migrate + serve giiken; log in; navigate to Ingestion page (WP04)
+- [x] T020 Upload real test file; capture screenshot + network trace + server log (WP04)
+- [x] T021 Write artifacts/giiken-smoke-<utc>.md summary (WP04)
+- [x] T022 Revert giiken composer.json; verify clean tree (WP04)
+- [x] T023 Final acceptance check (WP04)
 
 **Implementation sketch**: See `quickstart.md §5` for the full procedure. Implementer follows it step-by-step. Evidence file naming is `<utc>` formatted as `YYYYMMDDTHHMMSSZ` for sortability.
 
