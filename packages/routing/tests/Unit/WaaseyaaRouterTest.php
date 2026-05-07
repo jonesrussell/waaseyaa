@@ -7,6 +7,7 @@ namespace Waaseyaa\Routing\Tests\Unit;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\RequestContext;
+use Waaseyaa\Routing\Exception\RouteNotFoundException;
 use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
@@ -32,5 +33,15 @@ final class WaaseyaaRouterTest extends TestCase
         $router->sortRoutesByPriority();
         $params = $router->match('/conflict');
         $this->assertSame('high', $params['_route']);
+    }
+
+    #[Test]
+    public function match_throws_route_not_found_for_unknown_path(): void
+    {
+        $router = new WaaseyaaRouter(new RequestContext('', 'GET'));
+        $router->addRoute('a', RouteBuilder::create('/known')->controller('X::a')->methods('GET')->build());
+
+        $this->expectException(RouteNotFoundException::class);
+        $router->match('/unknown');
     }
 }

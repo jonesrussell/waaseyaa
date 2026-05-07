@@ -15,7 +15,9 @@ namespace Waaseyaa\Foundation\Http;
  * supply an instance.
  *
  * Implementations walk the registered providers' bindings and may apply a
- * narrow fallback for kernel-owned services (e.g. {@see \Waaseyaa\Database\DatabaseInterface}).
+ * narrow kernel-owned fallback (e.g. {@see \Waaseyaa\Database\DatabaseInterface})
+ * via {@see \Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface} — not a
+ * parallel resolution map.
  *
  * Returning `null` is part of the contract: callers decide whether the missing
  * dependency is a hard error or a tolerated injection point.

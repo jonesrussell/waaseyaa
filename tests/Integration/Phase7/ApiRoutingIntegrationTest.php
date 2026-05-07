@@ -8,7 +8,6 @@ use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\RequestContext;
 use Waaseyaa\Api\ApiServiceProvider;
 use Waaseyaa\Api\JsonApiController;
@@ -16,6 +15,7 @@ use Waaseyaa\Api\ResourceSerializer;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Routing\Exception\RouteNotFoundException;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 /**
@@ -144,11 +144,11 @@ final class ApiRoutingIntegrationTest extends TestCase
     }
 
     #[Test]
-    public function unmatchedPathThrowsResourceNotFound(): void
+    public function unmatchedPathThrowsRouteNotFound(): void
     {
         $router = $this->createApiRouter('GET');
 
-        $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(RouteNotFoundException::class);
         $router->match('/api/unknown_type');
     }
 

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Routing;
 
+use Symfony\Component\Routing\Exception\MethodNotAllowedException as SymfonyMethodNotAllowedException;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException as SymfonyResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Waaseyaa\Routing\Exception\RouteMethodNotAllowedException;
+use Waaseyaa\Routing\Exception\RouteNotFoundException;
 
 /**
  * Waaseyaa router wrapping Symfony's routing components.
@@ -96,8 +100,8 @@ final class WaaseyaaRouter
      * @param string $pathinfo The path to match (e.g. "/node/42").
      * @return array<string, mixed> The matched parameters.
      *
-     * @throws \Symfony\Component\Routing\Exception\ResourceNotFoundException
-     * @throws \Symfony\Component\Routing\Exception\MethodNotAllowedException
+     * @throws RouteNotFoundException
+     * @throws RouteMethodNotAllowedException
      */
     public function match(string $pathinfo): array
     {
@@ -105,7 +109,18 @@ final class WaaseyaaRouter
             $this->matcher = new UrlMatcher($this->routes, $this->context);
         }
 
-        return $this->matcher->match($pathinfo);
+        try {
+            return $this->matcher->match($pathinfo);
+        } catch (SymfonyResourceNotFoundException $e) {
+            throw new RouteNotFoundException($pathinfo, $e);
+        } catch (SymfonyMethodNotAllowedException $e) {
+            throw new RouteMethodNotAllowedException(
+                $e->getAllowedMethods(),
+                $e->getMessage(),
+                $e->getCode(),
+                $e,
+            );
+        }
     }
 
     /**

@@ -7,11 +7,13 @@ namespace Waaseyaa\Foundation\Kernel\Http;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
 /**
  * Default {@see HttpServiceResolverInterface} backed by the kernel's
- * registered providers plus a narrow kernel-services fallback map.
+ * registered providers plus {@see KernelServicesInterface} for the narrow
+ * kernel-owned fallback (currently {@see DatabaseInterface} only).
  *
  * The provider list is read through a closure accessor so each resolution
  * sees the live registration state — important when SSR resolves a class
@@ -33,7 +35,7 @@ final class HttpKernelServiceResolver implements HttpServiceResolverInterface
      */
     public function __construct(
         \Closure $providersAccessor,
-        private readonly DatabaseInterface $database,
+        private readonly KernelServicesInterface $kernelServices,
         private readonly LoggerInterface $logger,
     ) {
         $this->providersAccessor = $providersAccessor;
@@ -57,7 +59,9 @@ final class HttpKernelServiceResolver implements HttpServiceResolverInterface
         }
 
         if ($className === DatabaseInterface::class) {
-            return $this->database;
+            $resolved = $this->kernelServices->get(DatabaseInterface::class);
+
+            return $resolved instanceof DatabaseInterface ? $resolved : null;
         }
 
         return null;

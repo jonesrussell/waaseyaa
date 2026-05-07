@@ -13,6 +13,7 @@ use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 use Waaseyaa\Foundation\Kernel\Http\HttpKernelServiceResolver;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
+use Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
 /**
@@ -38,7 +39,7 @@ final class HttpKernelServiceResolverTest extends TestCase
 
         $resolver = new HttpKernelServiceResolver(
             providersAccessor: static fn (): array => [$provider],
-            database: $database,
+            kernelServices: $this->makeKernelServices($database),
             logger: new NullLogger(),
         );
 
@@ -52,7 +53,7 @@ final class HttpKernelServiceResolverTest extends TestCase
 
         $resolver = new HttpKernelServiceResolver(
             providersAccessor: static fn (): array => [],
-            database: $database,
+            kernelServices: $this->makeKernelServices($database),
             logger: new NullLogger(),
         );
 
@@ -64,7 +65,7 @@ final class HttpKernelServiceResolverTest extends TestCase
     {
         $resolver = new HttpKernelServiceResolver(
             providersAccessor: static fn (): array => [],
-            database: $this->makeDatabaseStub(),
+            kernelServices: $this->makeKernelServices($this->makeDatabaseStub()),
             logger: new NullLogger(),
         );
 
@@ -100,7 +101,7 @@ final class HttpKernelServiceResolverTest extends TestCase
 
         $resolver = new HttpKernelServiceResolver(
             providersAccessor: static fn (): array => [$provider],
-            database: $this->makeDatabaseStub(),
+            kernelServices: $this->makeKernelServices($this->makeDatabaseStub()),
             logger: $logger,
         );
 
@@ -115,11 +116,23 @@ final class HttpKernelServiceResolverTest extends TestCase
     {
         $resolver = new HttpKernelServiceResolver(
             providersAccessor: static fn (): array => [],
-            database: $this->makeDatabaseStub(),
+            kernelServices: $this->makeKernelServices($this->makeDatabaseStub()),
             logger: new NullLogger(),
         );
 
         self::assertInstanceOf(HttpServiceResolverInterface::class, $resolver);
+    }
+
+    private function makeKernelServices(DatabaseInterface $database): KernelServicesInterface
+    {
+        return new class ($database) implements KernelServicesInterface {
+            public function __construct(private readonly DatabaseInterface $database) {}
+
+            public function get(string $abstract): ?object
+            {
+                return $abstract === DatabaseInterface::class ? $this->database : null;
+            }
+        };
     }
 
     /**

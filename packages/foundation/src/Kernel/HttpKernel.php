@@ -27,6 +27,7 @@ use Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
 use Waaseyaa\Foundation\Http\LanguagePathStripperInterface;
 use Waaseyaa\Foundation\Http\Router as HttpRouter;
+use Waaseyaa\Foundation\Kernel\Bootstrap\ProviderRegistryKernelServices;
 use Waaseyaa\Foundation\Kernel\Http\HttpKernelServiceResolver;
 use Waaseyaa\Foundation\Log\LogManager;
 use Waaseyaa\Foundation\Log\Processor\RequestContextProcessor;
@@ -37,6 +38,8 @@ use Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
+use Waaseyaa\Routing\Exception\RouteMethodNotAllowedException;
+use Waaseyaa\Routing\Exception\RouteNotFoundException;
 use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\BearerAuthMiddleware;
@@ -174,15 +177,21 @@ final class HttpKernel extends AbstractKernel
      *
      * Replaces the legacy `\Closure(string): ?object` shape with a typed
      * interface; semantics unchanged (provider walk + narrow kernel-services
-     * fallback). Mirrors the typed-resolver pattern introduced for
-     * {@see \Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface} in
-     * mission #824 WP02 surface A.
+     * fallback via {@see ProviderRegistryKernelServices}). Mirrors the typed-resolver
+     * pattern introduced for {@see \Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface}
+     * in mission #824 WP02 surface A.
      */
     public function getHttpServiceResolver(): HttpServiceResolverInterface
     {
         return $this->httpServiceResolver ??= new HttpKernelServiceResolver(
             providersAccessor: fn(): array => $this->providers,
-            database: $this->database,
+            kernelServices: new ProviderRegistryKernelServices(
+                entityTypeManager: $this->entityTypeManager,
+                database: $this->database,
+                dispatcher: $this->dispatcher,
+                logger: $this->logger,
+                providersAccessor: fn(): array => $this->providers,
+            ),
             logger: $this->logger,
         );
     }
@@ -269,9 +278,9 @@ final class HttpKernel extends AbstractKernel
 
         try {
             $params = $router->match($path);
-        } catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException) {
+        } catch (RouteNotFoundException) {
             return $this->jsonApiResponse(404, ['jsonapi' => ['version' => '1.1'], 'errors' => [['status' => '404', 'title' => 'Not Found', 'detail' => 'No route matches the requested path.']]]);
-        } catch (\Symfony\Component\Routing\Exception\MethodNotAllowedException) {
+        } catch (RouteMethodNotAllowedException) {
             return $this->jsonApiResponse(405, ['jsonapi' => ['version' => '1.1'], 'errors' => [['status' => '405', 'title' => 'Method Not Allowed', 'detail' => "Method {$method} is not allowed for this route."]]]);
         } catch (\Throwable $e) {
             $this->logger->critical(sprintf("Routing error: %s in %s:%d\n%s", $e->getMessage(), $e->getFile(), $e->getLine(), $e->getTraceAsString()));

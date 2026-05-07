@@ -7,7 +7,7 @@ namespace Waaseyaa\Routing\Tests\Integration;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Waaseyaa\Routing\Exception\RouteNotFoundException;
 use Waaseyaa\Routing\EntityDeepLinkRouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
@@ -89,7 +89,7 @@ final class EntityDeepLinkResolutionTest extends TestCase
     }
 
     #[Test]
-    public function nonMatchingPathThrowsResourceNotFoundException(): void
+    public function nonMatchingPathThrowsRouteNotFoundException(): void
     {
         $route = EntityDeepLinkRouteBuilder::for('/edit', 'node')
             ->controller('App\Controller\NodeController::edit')
@@ -97,7 +97,7 @@ final class EntityDeepLinkResolutionTest extends TestCase
 
         $this->router->addRoute('node.edit', $route);
 
-        $this->expectException(ResourceNotFoundException::class);
+        $this->expectException(RouteNotFoundException::class);
         $this->router->match('/view/node/1');
     }
 
