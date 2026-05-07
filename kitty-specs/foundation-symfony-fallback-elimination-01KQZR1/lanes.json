@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "mission_slug": "foundation-symfony-fallback-elimination-01KQZR1",
+  "mission_id": "01KQZR1ELIMSYMFALLBACKPATH01",
+  "mission_branch": "kitty/mission-foundation-symfony-fallback-elimination-01KQZR1",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP03",
+        "WP04",
+        "WP05"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "docs/specs/infrastructure.md",
+        "packages/foundation/src/Http/ControllerDispatcher.php",
+        "packages/foundation/src/Kernel/Http/HttpKernelServiceResolver.php",
+        "packages/foundation/src/Kernel/HttpKernel.php",
+        "packages/foundation/tests/Unit/Http/ControllerDispatcherTest.php",
+        "packages/foundation/tests/Unit/Kernel/Http/HttpKernelServiceResolverTest.php",
+        "packages/foundation/tests/Unit/Kernel/HttpKernelTest.php",
+        "packages/routing/src/RouteBuilder.php",
+        "packages/routing/src/WaaseyaaRouter.php",
+        "packages/routing/tests/Unit/RouteBuilderTest.php",
+        "packages/routing/tests/Unit/WaaseyaaRouterTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP01",
+        "WP02"
+      ],
+      "write_scope": [
+        "kitty-specs/foundation-symfony-fallback-elimination-01KQZR1/artifacts/**",
+        "kitty-specs/foundation-symfony-fallback-elimination-01KQZR1/contracts/**"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-07T23:52:30.834382+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP01",
+    "WP02"
+  ],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP03"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP04"
+      }
+    ],
+    "total_merges": 2,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 2
+    }
+  }
+}

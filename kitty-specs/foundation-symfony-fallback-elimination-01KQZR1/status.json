@@ -1,0 +1,56 @@
+{
+  "event_count": 5,
+  "last_event_id": "01KR2DPHPFX6NTFYK46AJEBWRK",
+  "materialized_at": "2026-05-07T23:52:19.919267+00:00",
+  "mission_number": "5",
+  "mission_slug": "foundation-symfony-fallback-elimination-01KQZR1",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 5
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR2DPGZJ37F1GSPYHD019429",
+      "last_transition_at": "2026-05-07T23:52:19.186858+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR2DPHH071EEXZDW8ZZB7Q1Z",
+      "last_transition_at": "2026-05-07T23:52:19.744884+00:00"
+    },
+    "WP03": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR2DPHJ9HB6BQEQ08N5DM5PQ",
+      "last_transition_at": "2026-05-07T23:52:19.785104+00:00"
+    },
+    "WP04": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR2DPHN317YTFW1CWRSQYQYQ",
+      "last_transition_at": "2026-05-07T23:52:19.875488+00:00"
+    },
+    "WP05": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR2DPHPFX6NTFYK46AJEBWRK",
+      "last_transition_at": "2026-05-07T23:52:19.919267+00:00"
+    }
+  }
+}
