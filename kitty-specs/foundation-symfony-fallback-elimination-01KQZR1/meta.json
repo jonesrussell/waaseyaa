@@ -1,0 +1,12 @@
+{
+  "created_at": "2026-05-07T12:00:00.000000+00:00",
+  "friendly_name": "Foundation: Eliminate Symfony Fallback Wiring",
+  "mission_id": "01KQZR1ELIMSYMFALLBACKPATH01",
+  "mission_number": 5,
+  "mission_slug": "foundation-symfony-fallback-elimination-01KQZR1",
+  "mission_type": "software-dev",
+  "slug": "foundation-symfony-fallback-elimination-01KQZR1",
+  "source_description": "Foundation still carries parallel compatibility paths around Symfony Routing and HttpFoundation shapes (e.g. HttpKernel catches Symfony routing exceptions; ControllerDispatcher normalizes [Class, method] array controllers; HttpKernelServiceResolver duplicates DatabaseInterface resolution already exposed via KernelServicesInterface). Mission #824 typed KernelServices and HttpServiceResolver seams explicitly to shrink implicit fallbacks — this mission completes that trajectory by inventorying remaining fallbacks, choosing elimination vs documented retention per item, and wiring everything through explicit contracts so no duplicate or Symfony-shaped shadow paths remain in foundation HTTP/bootstrap.",
+  "target_branch": "main",
+  "vcs": "git"
+}
