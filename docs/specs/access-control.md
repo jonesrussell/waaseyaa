@@ -503,6 +503,48 @@ Requires SessionMiddleware to run first. Enforced by middleware priority orderin
 
 Content-Type: `application/vnd.api+json`.
 
+## CSRF Protection
+
+**File:** `packages/user/src/Middleware/CsrfMiddleware.php`
+**Namespace:** `Waaseyaa\User\Middleware`
+
+`CsrfMiddleware` runs in the HTTP authorization pipeline (priority 20) and enforces session-based CSRF protection for all state-changing requests (`POST`, `PUT`, `PATCH`, `DELETE`).
+
+### XSRF-TOKEN cookie
+
+After passing a non-validating request through the pipeline, the middleware writes an `XSRF-TOKEN` cookie to `text/html` responses so JavaScript clients can read the current session token. Cookie attributes:
+
+| Attribute | Value |
+|-----------|-------|
+| Name | `XSRF-TOKEN` |
+| Value | `rawurlencode($_SESSION['_csrf_token'])` |
+| `Path` | `/` |
+| `HttpOnly` | `false` (required — JS must be able to read it) |
+| `SameSite` | `Lax` |
+| `Domain` | not set |
+| `Secure` | mirrors `$request->isSecure()` |
+| Lifetime | session (no explicit `Expires`/`Max-Age`) |
+
+Inertia consumers benefit automatically: axios reads the cookie and forwards its value as `X-XSRF-TOKEN` on subsequent mutation requests.
+
+**Known gap:** `$request->isSecure()` reads raw `$_SERVER['HTTPS']` without trusted-proxy awareness. Behind a TLS terminator the `Secure` flag will not be set unless a trusted proxy is configured. Tracked at waaseyaa/framework#1394. See also: `SessionMiddleware` trusted-proxy contract above.
+
+Cross-reference: `docs/conventions/csrf-token-cookie.md` for runnable integration examples.
+
+### Token validation (any-of, state-changing requests only)
+
+For state-changing requests the middleware accepts the session token from any of these sources, compared via `hash_equals`:
+
+1. `_csrf_token` POST field — read as-is, no transform.
+2. `X-CSRF-Token` request header — read as-is, no transform.
+3. `X-XSRF-TOKEN` request header — URL-decoded once via `rawurldecode` before comparison (matches the URL-encoded value written to the cookie).
+
+The first matching source short-circuits; all comparisons are constant-time.
+
+### CSRF-exempt requests
+
+Requests with a `Content-Type` of `application/json` or `application/vnd.api+json` are not validated (browsers cannot forge those content types from HTML forms). Routes may also opt out via `_csrf: false` in their route options.
+
 ## Discovery
 
 Policies and permissions are discovered at build time via `PackageManifestCompiler`:

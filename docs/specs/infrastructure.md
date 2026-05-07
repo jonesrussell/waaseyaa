@@ -1298,6 +1298,20 @@ After routing matches, `HttpKernel` builds an `HttpPipeline` of HTTP middleware 
 
 If any middleware short-circuits — for example `AuthorizationMiddleware` returning **302** to `/login` for unauthenticated `_authenticated` render routes, or **401** JSON:API for API routes — that response **must** be returned to the client immediately. The kernel treats any pipeline response whose status is **not 200** as final and does not continue to `ControllerDispatcher`. Only **200** from the pipeline means proceed to dispatch.
 
+### XSRF-TOKEN cookie hook (`HttpKernel::serveHttpRequest`)
+
+After `ControllerDispatcher` returns the final controller response, `serveHttpRequest` calls `CsrfMiddleware::attachCookieIfHtml($httpRequest, $finalResponse)` (around line 419). This pairs with the request-side CSRF middleware step earlier in the auth pipeline.
+
+The separation exists because the auth pipeline inner-handler stub returns a bare 200 with no Content-Type; `CsrfMiddleware::attachXsrfCookie` therefore sees no `text/html` response and cannot write the cookie. The kernel post-dispatch hook runs against the real controller response, which carries the correct Content-Type and headers.
+
+Behaviour of the hook:
+
+- **Restricted to `text/html`** — skips JSON, octet-stream, and any other primary Content-Type.
+- **Idempotent** — no-ops if an `XSRF-TOKEN` cookie is already present on the response (the middleware may have set it for non-validating GET requests that pass through without the 200-stub issue).
+- **Session guard** — returns immediately if no PHP session is active or the session token key is absent.
+
+This hook is the only post-dispatch mutation `serveHttpRequest` applies to the controller response; everything else (CORS, debug headers) is handled earlier in the pipeline.
+
 ### Dev fallback account
 
 `HttpKernel::shouldUseDevFallbackAccount()` controls whether `DevAdminAccount` is injected as the session fallback. All three conditions must be true:
