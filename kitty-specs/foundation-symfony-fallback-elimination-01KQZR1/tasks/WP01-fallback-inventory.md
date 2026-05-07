@@ -66,5 +66,5 @@ Run or read `bin/check-package-layers` output relevant to `foundation` ↔ `rout
 
 ## Validation
 
-- [ ] `artifacts/fallback-inventory.md` committed with this WP.
+- [ ] `artifacts/fallback-inventory.md` committed with this WP (use `git add -f …/artifacts/fallback-inventory.md` — root `.gitignore` ignores `artifacts/`).
 - [ ] Every spec §1 bullet mapped to at least one inventory row or explicitly “out of scope” with rationale.
