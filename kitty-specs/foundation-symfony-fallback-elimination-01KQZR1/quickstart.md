@@ -10,7 +10,8 @@
 1. Read `spec.md` and `checklists/requirements.md`.
 2. Run `/spec-kitty.plan` (or `spec-kitty plan`) to expand `plan.md` from the spec.
 3. Run `/spec-kitty.tasks` / finalize-tasks to materialize `tasks/WP*.md` and `lanes.json`.
-4. Execute WPs in lane order; after WP01, treat `artifacts/fallback-inventory.md` as authoritative scope control.
+4. Execute WPs in lane order; after WP01, treat `artifacts/fallback-inventory.md` as authoritative scope control.  
+   **Note:** repo root `.gitignore` ignores `artifacts/` — commit inventory with `git add -f kitty-specs/foundation-symfony-fallback-elimination-01KQZR1/artifacts/fallback-inventory.md`.
 
 ## Verification (after implementation)
 

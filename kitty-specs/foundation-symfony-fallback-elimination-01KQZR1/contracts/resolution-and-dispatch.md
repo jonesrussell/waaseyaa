@@ -1,23 +1,32 @@
-# Contract: Resolution and dispatch boundary (draft)
+# Contract: Resolution and dispatch boundary
 
 **Mission**: `foundation-symfony-fallback-elimination-01KQZR1`  
-**Status**: Draft — WP02 ratifies after WP01 inventory.
+**Status**: **Approved** (ratified against `artifacts/fallback-inventory.md`, WP01, 2026-05-07)
 
 ## 1. Kernel-owned service resolution
 
+**Approved** — unchanged from draft.
+
 - **Single semantic source**: Services listed in `docs/specs/infrastructure.md` under `ProviderRegistryKernelServices` SHALL NOT be re-resolved via parallel if-chains in `HttpKernelServiceResolver`.
-- **HTTP resolver role**: `HttpServiceResolverInterface` resolves **user-declared** controller constructor parameters by class name via provider bindings first; kernel-owned types SHALL flow through the same `KernelServicesInterface::get()` semantics (or a delegated helper with one implementation).
+- **HTTP resolver role**: `HttpServiceResolverInterface` resolves **user-declared** controller constructor parameters by class name via provider bindings first; kernel-owned types SHALL flow through the same `KernelServicesInterface::get()` semantics (or a delegated helper with **one** implementation shared with / delegating to `ProviderRegistryKernelServices`).
 
 ## 2. Routing match failures
 
-- **Foundation HTTP** SHALL NOT branch on `\Symfony\Component\Routing\Exception\ResourceNotFoundException` or `MethodNotAllowedException` for expected routing outcomes once WP04 completes.
-- **Acceptable**: A routing-layer adapter in `waaseyaa/routing` (or matcher wrapper) that translates Symfony matcher behavior into Waaseyaa-owned types or return values consumed by `HttpKernel`.
+**Revised** — WP numbering corrected: target is **WP03** (merged resolver + routing WP).
+
+- **Foundation HTTP** (`packages/foundation/src/Kernel/HttpKernel.php`) SHALL NOT use `catch (\Symfony\Component\Routing\Exception\ResourceNotFoundException)` or `MethodNotAllowedException` for expected routing outcomes after WP03.
+- **Normative approach**: `packages/routing/src/WaaseyaaRouter.php` (or a dedicated private helper in `waaseyaa/routing`) catches Symfony matcher failures and maps them to a Waaseyaa-owned outcome consumed by `HttpKernel` — e.g. a small result value object, discriminated union array shape, or domain-specific exception type **defined under `Waaseyaa\Routing`** — such that foundation imports **no** `Symfony\Component\Routing\Exception\*` classes for this control path.
+- **Observable**: HTTP 404 / 405 JSON:API bodies remain materially the same as pre-mission behavior unless CHANGELOG documents a deprecation.
 
 ## 3. `_controller` attribute
 
+**Approved** — disposition: **relocate or single-point normalize** (inventory row #3).
+
 - **Default contract** entering `ControllerDispatcher`: string `FQCN::method`, or `Closure` / invokable object.
-- **Array `[FQCN, method]`**: either eliminated at route registration time or explicitly deprecated with a removal milestone; not silently normalized in multiple places.
+- **Array `[FQCN, method]`**: normalize when routes are registered (`RouteBuilder` and any Symfony-native import path), **or** emit a structured deprecation from the single chosen locus with a removal milestone. `ControllerDispatcher` MUST NOT remain the long-term owner of array normalization once WP04 completes.
 
 ## 4. Consumer-visible errors
+
+**Approved** — unchanged from draft.
 
 - JSON:API-shaped **404** and **405** responses for unmatched routes remain valid unless a documented deprecation changes content-type or body shape.
