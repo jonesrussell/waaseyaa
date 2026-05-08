@@ -113,3 +113,4 @@ spec-kitty agent action implement WP07 --agent <name>
 - 2026-05-08T12:03:14Z – claude:sonnet:implementer:implementer – shell_pid=925564 – Cycle 2 fix: declaration-order options, fixtures restored
 - 2026-05-08T12:03:43Z – claude:opus-4-7:reviewer:reviewer – shell_pid=927307 – Started review via action command
 - 2026-05-08T12:05:51Z – claude:opus-4-7:reviewer:reviewer – shell_pid=927307 – Review passed cycle 2: declaration-order options, WP01 fixtures restored, byte-parity 8/8
+- 2026-05-08T18:06:18Z – claude:opus-4-7:reviewer:reviewer – shell_pid=927307 – Done override: Mission merged to main (cc36dfcd2)
