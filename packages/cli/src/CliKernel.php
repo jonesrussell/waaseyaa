@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Cli;
+namespace Waaseyaa\CLI;
 
 use Psr\Container\ContainerInterface;
 use Waaseyaa\CLI\Exception\ParseException;
