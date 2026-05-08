@@ -76,9 +76,11 @@ final class ConsoleKernelTest extends TestCase
     }
 
     #[Test]
-    public function handle_returns_zero_for_about_command(): void
+    public function handle_returns_zero_for_version_command(): void
     {
-        $_SERVER['argv'] = ['waaseyaa', 'about', '--no-ansi'];
+        // about was ported to native CLI in WP20 (MiscAServiceProvider).
+        // Use waaseyaa:version which remains Symfony-registered.
+        $_SERVER['argv'] = ['waaseyaa', 'waaseyaa:version', '--no-ansi'];
 
         $kernel = new ConsoleKernel($this->projectRoot);
         $exitCode = $kernel->handle();

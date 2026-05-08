@@ -7,11 +7,6 @@ namespace Waaseyaa\CLI;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Access\PermissionHandler;
 use Waaseyaa\Cache\CacheFactory;
-use Waaseyaa\CLI\Command\AboutCommand;
-use Waaseyaa\CLI\Command\AdminBuildCommand;
-use Waaseyaa\CLI\Command\AdminDevCommand;
-use Waaseyaa\CLI\Command\DebugContextCommand;
-use Waaseyaa\CLI\Command\EventListCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
 use Waaseyaa\CLI\Command\ServeCommand;
@@ -50,20 +45,7 @@ final class CliCommandRegistry
     ): array {
         return [
             new InstallCommand($entityTypeManager, $configManager),
-            new DebugContextCommand(),
             new ServeCommand($projectRoot),
-            new AdminDevCommand($projectRoot),
-            new AdminBuildCommand($projectRoot),
-            new AboutCommand(info: [
-                'name' => 'Waaseyaa',
-                'version' => (static function (): string {
-                    $pkg = \Composer\InstalledVersions::getRootPackage();
-                    return $pkg['pretty_version'];
-                })(),
-                'php' => PHP_VERSION,
-                'environment' => getenv('APP_ENV') ?: 'production',
-            ]),
-            new EventListCommand($dispatcher),
             new RouteListCommand($router),
             new SyncRulesCommand(
                 $projectRoot . '/vendor/waaseyaa/foundation/.claude/rules',

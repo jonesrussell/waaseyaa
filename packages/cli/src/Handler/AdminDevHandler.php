@@ -2,34 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
 use Waaseyaa\CLI\Support\AdminPackagePathResolver;
 
-#[AsCommand(
-    name: 'admin:dev',
-    description: 'Run the Nuxt admin SPA in development (npm run dev)',
-)]
-final class AdminDevCommand extends Command
+final class AdminDevHandler
 {
     public function __construct(
         private readonly string $projectRoot,
-    ) {
-        parent::__construct();
-    }
+    ) {}
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function execute(CliIO $io): int
     {
         try {
             $adminPath = (new AdminPackagePathResolver($this->projectRoot))->resolve();
         } catch (\RuntimeException $e) {
-            $output->writeln('<error>' . $e->getMessage() . '</error>');
+            $io->error($e->getMessage());
 
-            return self::FAILURE;
+            return 1;
         }
 
         $host = getenv('APP_HOST') !== false && getenv('APP_HOST') !== ''
@@ -42,10 +33,11 @@ final class AdminDevCommand extends Command
             ? (string) getenv('NUXT_BACKEND_URL')
             : 'http://' . $host . ':' . $port;
 
-        $output->writeln(sprintf('<info>Admin package:</info> %s', $adminPath));
-        $output->writeln(sprintf('<info>NUXT_BACKEND_URL=%s</info>', $backendUrl));
-        $output->writeln('<comment>Press Ctrl+C to stop.</comment>');
+        $io->writeln(sprintf('Admin package: %s', $adminPath));
+        $io->writeln(sprintf('NUXT_BACKEND_URL=%s', $backendUrl));
+        $io->writeln('Press Ctrl+C to stop.');
 
+        /** @var array<string, string> $env */
         $env = getenv();
         $env['NUXT_BACKEND_URL'] = $backendUrl;
 
@@ -58,14 +50,14 @@ final class AdminDevCommand extends Command
         );
 
         if (!is_resource($process)) {
-            $output->writeln('<error>Could not start npm.</error>');
+            $io->error('Could not start npm.');
 
-            return self::FAILURE;
+            return 1;
         }
 
         $exitCode = proc_close($process);
 
-        return $exitCode === 0 ? self::SUCCESS : self::FAILURE;
+        return $exitCode === 0 ? 0 : 1;
     }
 
     private static function npmBinary(): string

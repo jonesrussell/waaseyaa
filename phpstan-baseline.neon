@@ -271,12 +271,6 @@ parameters:
 			path: packages/cache/src/Backend/DatabaseBackend.php
 
 		-
-			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-			identifier: ternary.shortNotAllowed
-			count: 1
-			path: packages/cli/src/CliCommandRegistry.php
-
-		-
 			message: '#^If condition is always false\.$#'
 			identifier: if.alwaysFalse
 			count: 1
@@ -287,24 +281,6 @@ parameters:
 			identifier: method.dynamicName
 			count: 1
 			path: packages/cli/src/CliKernel.php
-
-		-
-			message: '#^Strict comparison using \!\=\= between lowercase\-string&non\-empty\-string and '''' will always evaluate to true\.$#'
-			identifier: notIdentical.alwaysTrue
-			count: 1
-			path: packages/cli/src/Command/DebugContextCommand.php
-
-		-
-			message: '#^Call to function method_exists\(\) with Symfony\\Component\\EventDispatcher\\EventDispatcherInterface and ''getListenerPriority'' will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: packages/cli/src/Command/EventListCommand.php
-
-		-
-			message: '#^Parameter \#1 \$eventName of method Symfony\\Component\\EventDispatcher\\EventDispatcherInterface\:\:getListenerPriority\(\) expects string, \(int\|string\) given\.$#'
-			identifier: argument.type
-			count: 1
-			path: packages/cli/src/Command/EventListCommand.php
 
 		-
 			message: '#^Casting to string something that''s already string\.$#'

@@ -76,11 +76,15 @@ final class CliCommandRegistryTest extends TestCase
 
             $names = array_map(static fn($command): string => $command->getName() ?? '', $commands);
 
-            $this->assertContains('about', $names);
             $this->assertContains('route:list', $names);
             $this->assertContains('waaseyaa:version', $names);
-            $this->assertContains('admin:dev', $names);
-            $this->assertContains('admin:build', $names);
+            // about, admin:dev, admin:build, debug:context, event:list were ported to native CLI
+            // in WP20 and are now owned by MiscAServiceProvider — not the Symfony registry.
+            $this->assertNotContains('about', $names);
+            $this->assertNotContains('admin:dev', $names);
+            $this->assertNotContains('admin:build', $names);
+            $this->assertNotContains('debug:context', $names);
+            $this->assertNotContains('event:list', $names);
             // scaffold:auth was ported to native CLI in WP19 and is now
             // owned by OtherScaffoldsServiceProvider — not the Symfony registry.
             $this->assertNotContains('scaffold:auth', $names);
