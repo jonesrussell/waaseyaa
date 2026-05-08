@@ -15,8 +15,8 @@ subtasks:
 - T056
 - T057
 - T058
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "946509"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "949174"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -73,3 +73,4 @@ spec-kitty agent action implement WP12 --agent <name>
 
 - 2026-05-08T13:12:49Z – claude:sonnet:implementer:implementer – shell_pid=946509 – Started implementation via action command
 - 2026-05-08T13:45:22Z – claude:sonnet:implementer:implementer – shell_pid=946509 – Ready for review (continuation — prior agent died after stubs; all gates green)
+- 2026-05-08T13:45:52Z – claude:opus-4-7:reviewer:reviewer – shell_pid=949174 – Started review via action command
