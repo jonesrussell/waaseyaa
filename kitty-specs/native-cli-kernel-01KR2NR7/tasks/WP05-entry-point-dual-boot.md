@@ -13,8 +13,8 @@ subtasks:
 - T023
 - T024
 - T025
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "887676"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "889589"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -150,3 +150,4 @@ spec-kitty agent action implement WP05 --agent <name>
 
 - 2026-05-08T04:18:54Z – claude:sonnet:implementer:implementer – shell_pid=887676 – Started implementation via action command
 - 2026-05-08T04:28:32Z – claude:sonnet:implementer:implementer – shell_pid=887676 – Ready for review: CliApplication static entry point, dual-boot adapter (LegacySymfonyCommandAdapter + LegacySymfonyCommandRegistrar), rewritten bin/waaseyaa, DualBootTest — all 7446 tests green
+- 2026-05-08T04:29:02Z – claude:opus-4-7:reviewer:reviewer – shell_pid=889589 – Started review via action command
