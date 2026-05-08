@@ -75,3 +75,4 @@ spec-kitty agent action implement WP19 --agent <name>
 - 2026-05-08T16:14:12Z – claude:sonnet:implementer:implementer – shell_pid=990677 – Ready for review: 4 commands ported to native CLI, all gates green
 - 2026-05-08T16:14:40Z – claude:opus-4-7:reviewer:reviewer – shell_pid=994209 – Started review via action command
 - 2026-05-08T16:15:54Z – claude:opus-4-7:reviewer:reviewer – shell_pid=994209 – Review passed: 4 WP01 fixtures unchanged (git diff = 0), HelpRenderer reproduces Symfony format byte-for-byte, snapshot test uses assertSame on real fixtures, no ghost imports, gates green.
+- 2026-05-08T18:06:42Z – claude:opus-4-7:reviewer:reviewer – shell_pid=994209 – Done override: Mission merged to main (cc36dfcd2)
