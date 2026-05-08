@@ -69,10 +69,10 @@
 | T056 | Port `Telescope/TelescopeClearCommand` → `TelescopeClearHandler` + migrate test + snapshot pass | WP12 | [D] |
 | T057 | Port `Telescope/TelescopePruneCommand` → `TelescopePruneHandler` + migrate test + snapshot pass | WP12 | [D] |
 | T058 | Port `Telescope/TelescopeValidateCommand` → `TelescopeValidateHandler` + migrate test + snapshot pass | WP12 | [D] |
-| T059 | Port `ScheduleListCommand` → `ScheduleListHandler` + migrate test + snapshot pass | WP13 | [P] |
-| T060 | Port `ScheduleRunCommand` → `ScheduleRunHandler` + migrate test + snapshot pass | WP13 | [P] |
-| T061 | Port `Perf/PerformanceBaselineCommand` → `PerformanceBaselineHandler` + migrate test + snapshot pass | WP13 | [P] |
-| T062 | Port `Perf/PerformanceCompareCommand` → `PerformanceCompareHandler` + migrate test + snapshot pass | WP13 | [P] |
+| T059 | Port `ScheduleListCommand` → `ScheduleListHandler` + migrate test + snapshot pass | WP13 | [D] |
+| T060 | Port `ScheduleRunCommand` → `ScheduleRunHandler` + migrate test + snapshot pass | WP13 | [D] |
+| T061 | Port `Perf/PerformanceBaselineCommand` → `PerformanceBaselineHandler` + migrate test + snapshot pass | WP13 | [D] |
+| T062 | Port `Perf/PerformanceCompareCommand` → `PerformanceCompareHandler` + migrate test + snapshot pass | WP13 | [D] |
 | T063 | Port `EntityCreateCommand` → `EntityCreateHandler` + migrate test + snapshot pass | WP14 | [P] |
 | T064 | Port `EntityListCommand` → `EntityListHandler` + migrate test + snapshot pass | WP14 | [P] |
 | T065 | Port `EntityTypeListCommand` → `EntityTypeListHandler` + migrate test + snapshot pass | WP14 | [P] |
@@ -351,10 +351,10 @@
 ### WP13 — Port: Schedule + Perf
 
 **Subtasks**:
-- [ ] T059 `ScheduleListCommand` → `ScheduleListHandler` (WP13)
-- [ ] T060 `ScheduleRunCommand` → `ScheduleRunHandler` (WP13)
-- [ ] T061 `Perf/PerformanceBaselineCommand` → `PerformanceBaselineHandler` (WP13)
-- [ ] T062 `Perf/PerformanceCompareCommand` → `PerformanceCompareHandler` (WP13)
+- [x] T059 `ScheduleListCommand` → `ScheduleListHandler` (WP13)
+- [x] T060 `ScheduleRunCommand` → `ScheduleRunHandler` (WP13)
+- [x] T061 `Perf/PerformanceBaselineCommand` → `PerformanceBaselineHandler` (WP13)
+- [x] T062 `Perf/PerformanceCompareCommand` → `PerformanceCompareHandler` (WP13)
 
 **Estimated prompt**: ~280 lines. **Dependencies**: WP05.
 
