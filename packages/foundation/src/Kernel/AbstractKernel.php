@@ -460,6 +460,20 @@ abstract class AbstractKernel
         return $this->projectRoot;
     }
 
+    /**
+     * Boot the kernel for CLI use without running a console application.
+     *
+     * Exposes the protected boot() for callers that need a fully-booted kernel
+     * (providers, entity type manager, database, dispatcher) without dispatching
+     * a command — specifically CliApplication's dual-boot bridge path.
+     *
+     * @internal Called by CliApplication to wire the legacy HasCommandsInterface bridge.
+     */
+    public function bootForCli(): void
+    {
+        $this->boot();
+    }
+
     public function getEntityTypeManager(): EntityTypeManager
     {
         return $this->entityTypeManager;

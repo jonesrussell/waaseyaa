@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Waaseyaa\CLI;
 
 use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Compat\LegacySymfonyCommandAdapter;
 use Waaseyaa\CLI\Compat\LegacySymfonyCommandRegistrar;
+use Waaseyaa\CLI\Exception\DuplicateCommandException;
 use Waaseyaa\CLI\Provider\CliKernelServiceProvider;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Foundation\Event\EventDispatcherInterface;
+use Waaseyaa\Foundation\Kernel\ConsoleKernel;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
@@ -94,8 +97,33 @@ final class CliApplication
         ?LoggerInterface $logger = null,
     ): int {
         $logger ??= new NullLogger();
-        $providers ??= [];
         $container ??= self::makeNullContainer();
+
+        // When no providers/deps are given, boot a ConsoleKernel to discover all
+        // registered service providers and the full set of legacy Symfony commands.
+        // This entire block is deleted in WP23 once all commands are ported.
+        /** @var list<\Symfony\Component\Console\Command\Command> $bootedSymfonyCommands */
+        $bootedSymfonyCommands = [];
+        if ($providers === null && $entityTypeManager === null && $database === null && $dispatcher === null) {
+            $consoleKernel = new ConsoleKernel($projectRoot, $logger);
+            try {
+                $consoleKernel->bootForCli();
+                $providers          = $consoleKernel->getProviders();
+                $entityTypeManager  = $consoleKernel->getEntityTypeManager();
+                $database           = $consoleKernel->getDatabase();
+                $dispatcher         = $consoleKernel->getEventDispatcher();
+                // Collect all booted Symfony commands (coreCommands + migrationCommands + plugin commands).
+                $bootedSymfonyCommands = $consoleKernel->buildBootedSymfonyCommands();
+            } catch (\Throwable $e) {
+                $logger->warning(sprintf(
+                    '[cli] Kernel boot failed; legacy commands unavailable: %s',
+                    $e->getMessage(),
+                ));
+                $providers = [];
+            }
+        }
+
+        $providers ??= [];
 
         $manifest = self::loadManifest($projectRoot);
 
@@ -111,14 +139,33 @@ final class CliApplication
         // Requires all three framework deps; skipped when running without a full boot.
         // This entire block is deleted in WP23 once all commands are ported.
         if ($entityTypeManager !== null && $database !== null && $dispatcher !== null) {
-            LegacySymfonyCommandRegistrar::registerAll(
-                registry: $registry,
-                providers: $providers,
-                entityTypeManager: $entityTypeManager,
-                database: $database,
-                dispatcher: $dispatcher,
-                logger: $logger,
-            );
+            if (getenv('WAASEYAA_CLI_LEGACY_BRIDGE') !== '0') {
+                LegacySymfonyCommandRegistrar::registerAll(
+                    registry: $registry,
+                    providers: $providers,
+                    entityTypeManager: $entityTypeManager,
+                    database: $database,
+                    dispatcher: $dispatcher,
+                    logger: $logger,
+                );
+
+                // Also adapt all core/migration Symfony commands that aren't in providers.
+                foreach ($bootedSymfonyCommands as $symfonyCommand) {
+                    try {
+                        $definition = LegacySymfonyCommandAdapter::adapt($symfonyCommand);
+                        $registry->register($definition);
+                    } catch (DuplicateCommandException) {
+                        // Already registered (e.g. via HasCommandsInterface provider) — T024 propagation
+                        // applies only to explicit provider registration above; core commands skip silently
+                        // here since they are framework-owned (not half-ported user commands).
+                    } catch (\Throwable $e) {
+                        $logger->warning(sprintf(
+                            '[cli] Could not adapt core command: %s',
+                            $e->getMessage(),
+                        ));
+                    }
+                }
+            }
         }
 
         $kernel = CliKernelServiceProvider::buildKernel(

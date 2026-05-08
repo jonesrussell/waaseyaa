@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\Cli;
+namespace Waaseyaa\CLI;
 
 use Waaseyaa\CLI\Exception\DuplicateCommandException;
 

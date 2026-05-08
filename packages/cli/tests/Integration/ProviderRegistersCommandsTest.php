@@ -12,7 +12,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Waaseyaa\CLI\CommandDefinition;
 use Waaseyaa\CLI\CommandRegistry;
 use Waaseyaa\CLI\Provider\CliKernelServiceProvider;
-use Waaseyaa\Cli\CliIO;
+use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasNativeCommandsInterface;
 

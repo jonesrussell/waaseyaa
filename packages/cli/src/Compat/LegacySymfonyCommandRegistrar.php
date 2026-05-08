@@ -57,12 +57,9 @@ final class LegacySymfonyCommandRegistrar
                     $definition = LegacySymfonyCommandAdapter::adapt($symfonyCommand);
                     $registry->register($definition);
                 } catch (DuplicateCommandException $e) {
-                    $logger->warning(sprintf(
-                        '[compat] Duplicate legacy command "%s" from provider "%s": %s — skipped.',
-                        $symfonyCommand->getName() ?? '(unnamed)',
-                        $provider::class,
-                        $e->getMessage(),
-                    ));
+                    // T024: propagate — a duplicate means a port is half-done.
+                    // The caller must fix the collision, not silently skip it.
+                    throw $e;
                 } catch (\Throwable $e) {
                     $logger->warning(sprintf(
                         '[compat] Could not adapt legacy command from provider "%s": %s',

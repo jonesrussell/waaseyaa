@@ -6,7 +6,6 @@ namespace Waaseyaa\CLI\Testing;
 
 use Psr\Container\ContainerInterface;
 use Waaseyaa\CLI\ArgumentDefinition;
-use Waaseyaa\CLI\ArgumentMode;
 use Waaseyaa\CLI\CommandDefinition;
 use Waaseyaa\CLI\Io\BufferedCliOutput;
 use Waaseyaa\CLI\Io\ConsoleCliIO;
@@ -83,10 +82,10 @@ final class CliTester
         $verbose = (bool) ($parsed->options['verbose'] ?? false);
 
         $io = new ConsoleCliIO(
-            input:   $parsed,
-            stdout:  $stdoutProxy,
-            stderr:  $stderrProxy,
-            stdin:   $this->stdin,
+            input: $parsed,
+            stdout: $stdoutProxy,
+            stderr: $stderrProxy,
+            stdin: $this->stdin,
             verbose: $verbose,
         );
 
@@ -157,7 +156,7 @@ final class CliTester
         [$fqn, $method] = $ref;
         $instance = $this->container->get($fqn);
 
-        return static fn (\Waaseyaa\CLI\CliIO $io): int => $instance->{$method}($io);
+        return static fn(\Waaseyaa\CLI\CliIO $io): int => $instance->{$method}($io);
     }
 
     /**
@@ -209,7 +208,7 @@ final class CliTester
 
         // Bucket arguments vs options by inspecting the definition.
         $argNames = array_map(
-            static fn (ArgumentDefinition $a) => $a->name,
+            static fn(ArgumentDefinition $a) => $a->name,
             $this->definition->arguments,
         );
 
@@ -248,13 +247,13 @@ final class CliTester
                     : ($flags[] = '--no-' . $longName),
                 OptionMode::Required, OptionMode::Optional => is_array($value)
                     ? array_push($flags, ...array_map(
-                        static fn ($v) => '--' . $longName . '=' . $v,
+                        static fn($v) => '--' . $longName . '=' . $v,
                         $value,
                     ))
                     : ($flags[] = '--' . $longName . '=' . $value),
                 OptionMode::Array_ => is_array($value)
                     ? array_push($flags, ...array_map(
-                        static fn ($v) => '--' . $longName . '=' . $v,
+                        static fn($v) => '--' . $longName . '=' . $v,
                         $value,
                     ))
                     : ($flags[] = '--' . $longName . '=' . $value),

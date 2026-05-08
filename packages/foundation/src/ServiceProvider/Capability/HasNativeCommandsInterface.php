@@ -25,7 +25,7 @@ interface HasNativeCommandsInterface
      * Called exactly once per process boot during registry construction.
      * Implementations SHOULD be pure (no side effects, idempotent).
      *
-     * @return iterable<\Waaseyaa\Cli\CommandDefinition>
+     * @return iterable<\Waaseyaa\CLI\CommandDefinition>
      */
     public function nativeCommands(): iterable;
 }

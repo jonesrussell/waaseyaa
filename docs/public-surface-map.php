@@ -227,7 +227,7 @@ return [
     // Layer 6: Interfaces — public
     'Waaseyaa\CLI\Ingestion\SourceConnectorInterface' => 'public',
     // WP04: native CLI kernel
-    'Waaseyaa\Cli\CliKernel' => 'public',
+    'Waaseyaa\CLI\CliKernel' => 'public',
     'Waaseyaa\CLI\Provider\CliKernelServiceProvider' => 'public',
     'Waaseyaa\AdminSurface\Action\SurfaceActionHandlerInterface' => 'public',
     'Waaseyaa\AdminSurface\Query\SurfaceFilterOperator' => 'public',
@@ -248,9 +248,9 @@ return [
     'Waaseyaa\StructuredImport\StructuredImporterInterface' => 'public',
 
     // Layer 6: CLI native kernel — WP02 (native-cli-kernel-01KR2NR7)
-    'Waaseyaa\Cli\ArgumentMode' => 'public',
-    'Waaseyaa\Cli\CliIO' => 'public',
-    'Waaseyaa\Cli\OptionMode' => 'public',
+    'Waaseyaa\CLI\ArgumentMode' => 'public',
+    'Waaseyaa\CLI\CliIO' => 'public',
+    'Waaseyaa\CLI\OptionMode' => 'public',
     'Waaseyaa\CLI\Parser\ParseErrorKind' => 'public',
 
     // Layer 6: CLI native kernel — WP03 (native-cli-kernel-01KR2NR7)

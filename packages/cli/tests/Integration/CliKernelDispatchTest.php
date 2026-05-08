@@ -17,7 +17,7 @@ use Waaseyaa\CLI\Io\BufferedCliOutput;
 use Waaseyaa\CLI\Io\EmptyStdinSource;
 use Waaseyaa\CLI\OptionDefinition;
 use Waaseyaa\CLI\OptionMode;
-use Waaseyaa\Cli\CliIO;
+use Waaseyaa\CLI\CliIO;
 
 /**
  * Integration tests for CliKernel::run().

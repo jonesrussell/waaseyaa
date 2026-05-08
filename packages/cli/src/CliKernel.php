@@ -154,7 +154,7 @@ final class CliKernel
         [$fqn, $method] = $ref;
         $instance = $this->container->get($fqn);
 
-        return static fn (CliIO $io): int => $instance->{$method}($io);
+        return static fn(CliIO $io): int => $instance->{$method}($io);
     }
 
     /**

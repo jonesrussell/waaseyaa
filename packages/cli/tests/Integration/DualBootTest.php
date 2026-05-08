@@ -23,7 +23,8 @@ use Waaseyaa\CLI\Io\EmptyStdinSource;
 use Waaseyaa\CLI\OptionDefinition;
 use Waaseyaa\CLI\OptionMode;
 use Waaseyaa\CLI\Provider\CliKernelServiceProvider;
-use Waaseyaa\Cli\CliIO;
+use Waaseyaa\CLI\CliIO;
+use Waaseyaa\CLI\Exception\DuplicateCommandException;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Database\DeleteInterface;
 use Waaseyaa\Database\InsertInterface;
@@ -333,11 +334,11 @@ final class DualBootTest extends TestCase
     }
 
     // -----------------------------------------------------------------------
-    // T025 — Duplicate command (native wins, legacy silently skipped)
+    // T025 — Duplicate command throws DuplicateCommandException (T024 contract)
     // -----------------------------------------------------------------------
 
     #[Test]
-    public function duplicateLegacyCommandIsSkippedNotThrown(): void
+    public function duplicateLegacyCommandThrowsDuplicateCommandException(): void
     {
         $nativeProvider = new class implements HasNativeCommandsInterface {
             public function nativeCommands(): iterable
@@ -345,7 +346,7 @@ final class DualBootTest extends TestCase
                 yield new CommandDefinition(
                     name: 'shared:cmd',
                     description: 'Native version.',
-                    handler: static fn (CliIO $io): int => 0,
+                    handler: static fn(CliIO $io): int => 0,
                 );
             }
         };
@@ -359,7 +360,7 @@ final class DualBootTest extends TestCase
                 $cmd = new class ('shared:cmd') extends SymfonyCommand {
                     protected function configure(): void
                     {
-                        $this->setDescription('Legacy version — should be skipped.');
+                        $this->setDescription('Legacy version — must collide.');
                     }
 
                     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -380,7 +381,10 @@ final class DualBootTest extends TestCase
             providerInstances: [$nativeProvider],
         );
 
-        // Must not throw — duplicate is logged and skipped.
+        // T024: collisions MUST propagate as DuplicateCommandException so that
+        // half-ported commands are caught loudly at boot, not silently skipped.
+        $this->expectException(DuplicateCommandException::class);
+
         LegacySymfonyCommandRegistrar::registerAll(
             registry: $registry,
             providers: [$legacyProvider],
@@ -388,9 +392,5 @@ final class DualBootTest extends TestCase
             database: $this->makeDatabase(),
             dispatcher: $this->makeDispatcher(),
         );
-
-        // Native version survives.
-        self::assertSame('Native version.', $registry->get('shared:cmd')?->description);
-        self::assertCount(1, $registry->all());
     }
 }

@@ -166,6 +166,113 @@ final class ConsoleKernel extends AbstractKernel
         return $app->run();
     }
 
+    /**
+     * Return all booted Symfony Console commands for the dual-boot bridge.
+     *
+     * Called by CliApplication after bootForCli() so the native CliKernel can
+     * expose all legacy Symfony commands through LegacySymfonyCommandRegistrar.
+     *
+     * @internal Used by CliApplication. Deleted in WP23 (native-cli-kernel-01KR2NR7).
+     * @return list<\Symfony\Component\Console\Command\Command>
+     */
+    public function buildBootedSymfonyCommands(): array
+    {
+        $envConfigDir = getenv('WAASEYAA_CONFIG_DIR');
+        $configDir = $this->config['config_dir']
+            ?? ($envConfigDir !== false && $envConfigDir !== '' ? $envConfigDir : $this->projectRoot . '/config/sync');
+        $activeDir = $this->projectRoot . '/config/active';
+
+        if (!is_dir($activeDir)) {
+            @mkdir($activeDir, 0755, true);
+        }
+        if (!is_dir($configDir)) {
+            @mkdir($configDir, 0755, true);
+        }
+
+        $activeStorage = new \Waaseyaa\Config\Storage\FileStorage($activeDir);
+        $syncStorage   = new \Waaseyaa\Config\Storage\FileStorage($configDir);
+        $configManager = new \Waaseyaa\Config\ConfigManager($activeStorage, $syncStorage, $this->dispatcher);
+
+        assert($this->database instanceof \Waaseyaa\Database\DBALDatabase);
+        $pdo = $this->database->getConnection()->getNativeConnection();
+        assert($pdo instanceof \PDO);
+
+        $cacheConfig = new \Waaseyaa\Cache\CacheConfiguration();
+        $cacheFactory = new \Waaseyaa\Cache\CacheFactory($cacheConfig);
+        $router = new \Waaseyaa\Routing\WaaseyaaRouter();
+        $permissionHandler = new \Waaseyaa\Access\PermissionHandler();
+        $manifestCompiler = new \Waaseyaa\Foundation\Discovery\PackageManifestCompiler(
+            basePath: $this->projectRoot,
+            storagePath: $this->projectRoot . '/storage',
+        );
+        $schemaRegistry = new \Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry($this->projectRoot . '/defaults');
+        $healthChecker = new \Waaseyaa\Foundation\Diagnostic\HealthChecker(
+            bootReport: $this->getBootReport(),
+            database: $this->database,
+            entityTypeManager: $this->entityTypeManager,
+            projectRoot: $this->projectRoot,
+            fieldRegistry: $this->fieldRegistry,
+        );
+        $typeIdNormalizer = new \Waaseyaa\Entity\EntityTypeIdNormalizer($this->entityTypeManager);
+
+        $semanticWarmer = null;
+        if (class_exists(\Waaseyaa\AI\Vector\SqliteEmbeddingStorage::class)) {
+            $embeddingStorage = new \Waaseyaa\AI\Vector\SqliteEmbeddingStorage($pdo);
+            $embeddingProvider = \Waaseyaa\AI\Vector\EmbeddingProviderFactory::fromConfig($this->config);
+            $semanticWarmer = new \Waaseyaa\AI\Vector\SemanticIndexWarmer(
+                entityTypeManager: $this->entityTypeManager,
+                embeddingStorage: $embeddingStorage,
+                embeddingProvider: $embeddingProvider,
+            );
+        }
+
+        $commandRegistry = new \Waaseyaa\CLI\CliCommandRegistry();
+        $commands = $commandRegistry->coreCommands(
+            projectRoot: $this->projectRoot,
+            config: $this->config,
+            manifest: $this->manifest,
+            dispatcher: $this->dispatcher,
+            entityTypeManager: $this->entityTypeManager,
+            lifecycleManager: $this->lifecycleManager,
+            entityAuditLogger: $this->entityAuditLogger,
+            database: $this->database,
+            configManager: $configManager,
+            cacheFactory: $cacheFactory,
+            router: $router,
+            permissionHandler: $permissionHandler,
+            manifestCompiler: $manifestCompiler,
+            schemaRegistry: $schemaRegistry,
+            healthChecker: $healthChecker,
+            typeIdNormalizer: $typeIdNormalizer,
+            semanticWarmer: $semanticWarmer,
+            pdo: $pdo,
+        );
+
+        $migrationsProvider   = fn() => $this->migrationLoader->loadAll();
+        $v2MigrationsProvider = fn(): array => $this->migrationLoader->loadAllV2();
+        $compiler = \Waaseyaa\Foundation\Schema\Compiler\Sqlite\SqliteCompiler::forVersion('3.40.0');
+        $commands = array_merge($commands, $commandRegistry->migrationCommands(
+            $this->migrator,
+            $migrationsProvider,
+            $v2MigrationsProvider,
+            $this->migrationRepository,
+            $compiler,
+            !$this->isDevelopmentMode(),
+        ));
+
+        foreach ($this->providers as $provider) {
+            if (!$provider instanceof HasCommandsInterface) {
+                continue;
+            }
+            $pluginCmds = $provider->commands($this->entityTypeManager, $this->database, $this->dispatcher);
+            if ($pluginCmds !== []) {
+                $commands = array_merge($commands, $pluginCmds);
+            }
+        }
+
+        return $commands;
+    }
+
     private function shouldUseMinimalConsole(): bool
     {
         $name = $this->requestedCommandName();

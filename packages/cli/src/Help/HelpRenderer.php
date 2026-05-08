@@ -6,9 +6,9 @@ namespace Waaseyaa\CLI\Help;
 
 use Waaseyaa\CLI\ArgumentDefinition;
 use Waaseyaa\CLI\ArgumentMode;
+use Waaseyaa\CLI\CommandDefinition;
 use Waaseyaa\CLI\OptionDefinition;
 use Waaseyaa\CLI\OptionMode;
-use Waaseyaa\CLI\CommandDefinition;
 
 /**
  * Renders deterministic --help output for a CommandDefinition.
@@ -62,7 +62,7 @@ final class HelpRenderer
         if ($command->arguments !== []) {
             $lines[] = 'Arguments:';
             $nameWidth = $this->maxNameWidth(
-                array_map(static fn (ArgumentDefinition $a) => $a->name, $command->arguments),
+                array_map(static fn(ArgumentDefinition $a) => $a->name, $command->arguments),
             );
             foreach ($command->arguments as $arg) {
                 $lines[] = '  ' . str_pad($arg->name, $nameWidth) . '  ' . $arg->description;
@@ -123,7 +123,7 @@ final class HelpRenderer
 
         // User-defined options, sorted alphabetically by long name.
         $sorted = $userOptions;
-        usort($sorted, static fn (OptionDefinition $a, OptionDefinition $b) => strcmp($a->name, $b->name));
+        usort($sorted, static fn(OptionDefinition $a, OptionDefinition $b) => strcmp($a->name, $b->name));
 
         foreach ($sorted as $opt) {
             $result[] = [

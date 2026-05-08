@@ -95,19 +95,19 @@ final class CliKernelServiceProvider
         $stdout = self::resolveOrFallback(
             $container,
             \Waaseyaa\CLI\Io\CliOutput::class . '.stdout',
-            static fn () => new StreamCliOutput(STDOUT),
+            static fn() => new StreamCliOutput(STDOUT),
         );
 
         $stderr = self::resolveOrFallback(
             $container,
             \Waaseyaa\CLI\Io\CliOutput::class . '.stderr',
-            static fn () => new StreamCliOutput(STDERR),
+            static fn() => new StreamCliOutput(STDERR),
         );
 
         $stdin = self::resolveOrFallback(
             $container,
             StdinSource::class,
-            static fn () => new StreamStdinSource(STDIN),
+            static fn() => new StreamStdinSource(STDIN),
         );
 
         return new CliKernel(
