@@ -15,8 +15,8 @@ subtasks:
 - T052
 - T053
 - T054
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "943315"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "945843"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -72,3 +72,4 @@ spec-kitty agent action implement WP11 --agent <name>
 
 - 2026-05-08T13:01:54Z – claude:sonnet:implementer:implementer – shell_pid=943315 – Started implementation via action command
 - 2026-05-08T13:10:21Z – claude:sonnet:implementer:implementer – shell_pid=943315 – Ready for review: queue:work, queue:failed, queue:retry, queue:flush ported to native handlers; QueueServiceProvider registered; all 4 gates green (cs-check, phpstan, phpunit 7470/7470, list clean); fixtures captured
+- 2026-05-08T13:10:55Z – claude:opus-4-7:reviewer:reviewer – shell_pid=945843 – Started review via action command
