@@ -16,8 +16,8 @@ subtasks:
 - T028
 - T029
 - T030
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "915362"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "917403"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -136,3 +136,4 @@ spec-kitty agent action implement WP06 --agent <name>
 - 2026-05-08T05:14:56Z – claude:opus-4-7:reviewer:reviewer – shell_pid=901427 – Moved to planned
 - 2026-05-08T11:20:29Z – claude:sonnet:implementer:implementer – shell_pid=915362 – Started implementation via action command
 - 2026-05-08T11:26:51Z – claude:sonnet:implementer:implementer – shell_pid=915362 – Cycle 2 fix: HelpRenderer Symfony parity, byte-for-byte diff for 4 ported commands
+- 2026-05-08T11:27:29Z – claude:opus-4-7:reviewer:reviewer – shell_pid=917403 – Started review via action command
