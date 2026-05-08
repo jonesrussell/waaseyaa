@@ -14,8 +14,8 @@ subtasks:
 - T108
 - T109
 - T110
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "1017291"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "1018593"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -110,3 +110,4 @@ spec-kitty agent action implement WP24 --agent <name>
 
 - 2026-05-08T17:38:48Z – claude:sonnet:implementer:implementer – shell_pid=1017291 – Started implementation via action command
 - 2026-05-08T17:42:27Z – claude:sonnet:implementer:implementer – shell_pid=1017291 – Ready for review: cli-kernel.md authored (10 sections), operator-diagnostics.md updated (no Symfony refs), CLAUDE.md orchestration table row added, drift detector clean
+- 2026-05-08T17:42:56Z – claude:opus-4-7:reviewer:reviewer – shell_pid=1018593 – Started review via action command
