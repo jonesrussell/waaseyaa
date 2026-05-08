@@ -1,10 +1,13 @@
 {
+  "change_mode": "bulk_edit",
   "created_at": "2026-05-08T02:13:04.322586+00:00",
-  "friendly_name": "native cli kernel",
+  "friendly_name": "Native CLI Kernel",
   "mission_id": "01KR2NR7GYWJKD6CPSN9P2FPC2",
   "mission_number": null,
   "mission_slug": "native-cli-kernel-01KR2NR7",
   "mission_type": "software-dev",
   "slug": "native-cli-kernel-01KR2NR7",
-  "target_branch": "main"
+  "source_description": "Replace Symfony Console with a Waaseyaa-native CLI runtime end-to-end. Hard-cut migration: every shipped Symfony Console command is ported in this mission, symfony/console runtime dep is dropped from packages/cli, bin/waaseyaa rewires onto the native kernel, CommandTester is replaced by a native CliTester, and docs/specs/cli-kernel.md is added with operator-diagnostics cross-refs updated.",
+  "target_branch": "main",
+  "vcs": "git"
 }

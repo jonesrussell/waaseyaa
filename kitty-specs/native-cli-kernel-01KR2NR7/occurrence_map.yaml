@@ -1,0 +1,118 @@
+# Occurrence map for mission native-cli-kernel-01KR2NR7 (DIRECTIVE_035).
+#
+# This mission renames the Symfony\Component\Console runtime substrate to a
+# Waaseyaa-native CLI runtime under Waaseyaa\Cli. The dominant identifier
+# being changed is the Symfony Console namespace; the secondary rename is
+# the HasCommandsInterface provider capability. Both are tracked here.
+#
+# Schema: src/doctrine/schemas/occurrence-map.schema.yaml
+
+target:
+  term: "Symfony\\Component\\Console"
+  replacement: "Waaseyaa\\Cli"
+  operation: rename
+
+categories:
+  code_symbols:
+    action: rename
+    # Internal class names: Command, Application, InputInterface, OutputInterface,
+    # CommandTester, etc., are replaced by Waaseyaa-native equivalents
+    # (CliKernel, CliApplication, CliIO, CommandDefinition, CliTester, etc.).
+    # Also covers HasCommandsInterface -> HasNativeCommandsInterface.
+
+  import_paths:
+    action: rename
+    # All `use Symfony\Component\Console\...` statements in first-party PHP
+    # files are removed and replaced with `use Waaseyaa\Cli\...` imports.
+    # Composer autoload PSR-4 entries for waaseyaa/cli are added; nothing
+    # else changes in autoload maps.
+
+  filesystem_paths:
+    action: manual_review
+    # Test fixture directories under packages/cli/tests/ may move to mirror
+    # the new namespace organization (e.g. tests/Unit/Kernel/, tests/Unit/Parser/).
+    # Each move is reviewed case-by-case during WP implementation. The
+    # packages/cli/ package directory itself does not move.
+
+  serialized_keys:
+    action: do_not_change
+    # JSON envelopes emitted by Health/SchemaCheck/Migrate commands are
+    # operator contracts (see docs/specs/operator-diagnostics.md). Field
+    # names like "status", "checks", "details", "uptime_ms", "schema_diff"
+    # are preserved verbatim. composer.json keys, .yaml config keys, and
+    # any other on-disk serialized key shapes are unchanged.
+
+  cli_commands:
+    action: do_not_change
+    # Public command names (health:check, health:report, schema:check,
+    # schema:list, migrate, migrate:rollback, migrate:status, make:migration,
+    # make:entity, make:provider, make:public, make:policy, make:job,
+    # make:listener, make:test, optimize, optimize:clear, optimize:config,
+    # optimize:manifest, queue:work, queue:flush, queue:retry, queue:failed,
+    # cache:clear, db:init, ingest:run, ingest:dashboard, search:reindex,
+    # semantic:warm, semantic:refresh, schedule:list, schedule:run,
+    # entity:create, entity:list, type:enable, type:disable, user:create,
+    # user:role, route:list, event:list, permission:list, audit:log,
+    # config:export, config:import, install, serve, scaffold:auth,
+    # bundle:scaffold, fixture:generate, fixture:scaffold,
+    # fixture-pack:refresh, relationship-type:scaffold, workflow:scaffold,
+    # extension:scaffold, debug:context, sync-rules, telescope:list,
+    # telescope:clear, telescope:prune, telescope:validate, perf:baseline,
+    # perf:compare, admin:dev, admin:build, about, list, version,
+    # nc:sync) are user-facing scripts' contract. They MUST NOT change
+    # name, argument signature, or option signature.
+    # Argument/option short and long names are likewise frozen.
+
+  user_facing_strings:
+    action: rename_if_user_visible
+    # Help text, error messages, and stderr notices that mention "Symfony
+    # Console" are rewritten to neutral framework-agnostic phrasing or
+    # "Waaseyaa CLI" where attribution is needed. Internal log labels and
+    # programmatic identifiers (covered by logs_telemetry) are not touched.
+
+  tests_fixtures:
+    action: rename
+    # All command tests are migrated from CommandTester to CliTester; test
+    # fixture data referencing "Symfony" / "Console" in narrative strings
+    # is updated to reflect the native runtime. Snapshot fixtures capturing
+    # CLI stdout/stderr (e.g. health:check JSON envelopes) are preserved
+    # byte-for-byte (covered by serialized_keys / cli_commands).
+
+  logs_telemetry:
+    action: do_not_change
+    # Telescope event names, structured-log channels, metric labels, and
+    # any analytics counters emitted by CLI commands are observability
+    # contracts. Existing dashboards and alerts depend on exact strings.
+
+exceptions:
+  - path: "packages/cli/composer.json"
+    action: rename
+    reason: "Runtime require for symfony/console is removed; this is the explicit goal of FR-011."
+
+  - path: "packages/foundation/src/ServiceProvider/Capability/HasCommandsInterface.php"
+    action: rename
+    reason: "Replaced by HasNativeCommandsInterface (FR-006). Hard-cut removal, no shim per C-006."
+
+  - path: "packages/cli/src/WaaseyaaApplication.php"
+    action: rename
+    reason: "Symfony Application subclass is removed and replaced by CliApplication."
+
+  - path: "packages/cli/src/CliCommandRegistry.php"
+    action: rename
+    reason: "Symfony-Application-backed registry is replaced by the native CommandRegistry."
+
+  - path: "docs/specs/cli-kernel.md"
+    action: rename
+    reason: "New spec authored by this mission (FR-013)."
+
+  - path: "docs/specs/operator-diagnostics.md"
+    action: rename
+    reason: "Cross-references updated from Symfony Console to CliKernel (FR-014)."
+
+  - path: "bin/waaseyaa"
+    action: rename
+    reason: "Entry-point rewires onto CliApplication (FR-009)."
+
+  - path: "packages/ai-agent/vendor/**"
+    action: do_not_change
+    reason: "Vendored dependencies — never edited by mission code."
