@@ -11,11 +11,11 @@
 
 | ID | Description | WP | Parallel |
 |----|---|----|----|
-| T001 | Capture pre-cut wall-time + memory baseline for `bin/waaseyaa list` and `health:check` (10 runs each, median) | WP01 | — |
-| T002 | Commit perf-harness script under `kitty-specs/.../scripts/` | WP01 | [P] |
-| T003 | Capture stdout/stderr/exit-code snapshots for every shipped public command | WP01 | [P] |
-| T004 | Record numbers in `plan.md` § Performance Baseline | WP01 | — |
-| T005 | Verify snapshot fixture set is comprehensive (one per public command from `bin/waaseyaa list`) | WP01 | — |
+| T001 | Capture pre-cut wall-time + memory baseline for `bin/waaseyaa list` and `health:check` (10 runs each, median) | WP01 | — | [D] |
+| T002 | Commit perf-harness script under `kitty-specs/.../scripts/` | WP01 | [D] |
+| T003 | Capture stdout/stderr/exit-code snapshots for every shipped public command | WP01 | [D] |
+| T004 | Record numbers in `plan.md` § Performance Baseline | WP01 | — | [D] |
+| T005 | Verify snapshot fixture set is comprehensive (one per public command from `bin/waaseyaa list`) | WP01 | — | [D] |
 | T006 | Implement `ArgumentMode` and `OptionMode` enums | WP02 | [P] |
 | T007 | Implement `ArgumentDefinition` readonly record + invariant tests | WP02 | [P] |
 | T008 | Implement `OptionDefinition` readonly record + invariant tests | WP02 | [P] |
@@ -139,11 +139,11 @@
 **Independent test**: Run `kitty-specs/.../scripts/perf-harness.sh list 10`; numbers appear in plan.md; `packages/cli/tests/Fixtures/snapshots/*.txt` exists for every command listed by `bin/waaseyaa list`.
 
 **Subtasks**:
-- [ ] T001 Capture pre-cut wall-time + memory baseline (WP01)
-- [ ] T002 Commit perf-harness script (WP01)
-- [ ] T003 Capture stdout/stderr/exit-code snapshots for every shipped public command (WP01)
-- [ ] T004 Record numbers in `plan.md` § Performance Baseline (WP01)
-- [ ] T005 Verify snapshot fixture set is comprehensive (WP01)
+- [x] T001 Capture pre-cut wall-time + memory baseline (WP01)
+- [x] T002 Commit perf-harness script (WP01)
+- [x] T003 Capture stdout/stderr/exit-code snapshots for every shipped public command (WP01)
+- [x] T004 Record numbers in `plan.md` § Performance Baseline (WP01)
+- [x] T005 Verify snapshot fixture set is comprehensive (WP01)
 
 **Implementation sketch**: Author `scripts/perf-harness.sh` per research §R-07. Author `scripts/snapshot-capture.sh` that loops over `bin/waaseyaa list` parsing the command names, runs each with `--help` and (where safe) with default args, captures stdout/stderr/exit-code into `packages/cli/tests/Fixtures/snapshots/<name>.txt`. Run harnesses, paste numbers into plan.md. **Estimated prompt**: ~280 lines.
 
