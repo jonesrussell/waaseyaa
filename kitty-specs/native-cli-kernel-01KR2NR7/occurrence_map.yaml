@@ -116,3 +116,31 @@ exceptions:
   - path: "packages/ai-agent/vendor/**"
     action: do_not_change
     reason: "Vendored dependencies — never edited by mission code."
+
+  - path: "kitty-specs/native-cli-kernel-01KR2NR7/scripts/perf-harness.sh"
+    action: rename
+    reason: "WP01 deliverable per research §R-07 — performance baseline harness."
+
+  - path: "kitty-specs/native-cli-kernel-01KR2NR7/scripts/snapshot-capture.sh"
+    action: rename
+    reason: "WP01 deliverable — captures help/noarg fixture snapshots for parity verification."
+
+  - path: "kitty-specs/native-cli-kernel-01KR2NR7/snapshots/**"
+    action: rename
+    reason: "WP01 deliverable — captured CLI snapshot fixtures (frozen baseline; future WPs verify against these)."
+
+  - path: "kitty-specs/native-cli-kernel-01KR2NR7/status.json"
+    action: do_not_change
+    reason: "Spec Kitty internal state file — auto-mutated by lane transitions, not a mission edit."
+
+  - path: "kitty-specs/native-cli-kernel-01KR2NR7/status.events.jsonl"
+    action: do_not_change
+    reason: "Spec Kitty internal event log — auto-mutated by lane transitions, not a mission edit."
+
+  - path: "kitty-specs/native-cli-kernel-01KR2NR7/tasks.md"
+    action: do_not_change
+    reason: "Spec Kitty task index — auto-touched by mark-status / move-task."
+
+  - path: "kitty-specs/native-cli-kernel-01KR2NR7/tasks/WP*.md"
+    action: do_not_change
+    reason: "Spec Kitty WP frontmatter — auto-mutated by lane transitions and review feedback."
