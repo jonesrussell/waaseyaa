@@ -15,6 +15,8 @@ subtasks:
 - T014
 - T015
 - T016
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "878165"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -133,3 +135,7 @@ Provide handler authors and test authors with a stable surface: `CliIO`, output 
 ```bash
 spec-kitty agent action implement WP03 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T03:36:12Z – claude:sonnet:implementer:implementer – shell_pid=878165 – Started implementation via action command
