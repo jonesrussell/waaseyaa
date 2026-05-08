@@ -104,12 +104,12 @@
 | T091 | Port `AdminDevCommand` → `AdminDevHandler` + migrate test + snapshot pass | WP20 | [D] |
 | T092 | Port `DebugContextCommand` → `DebugContextHandler` + migrate test + snapshot pass | WP20 | [D] |
 | T093 | Port `EventListCommand` → `EventListHandler` + migrate test + snapshot pass | WP20 | [D] |
-| T094 | Port `InstallCommand` → `InstallHandler` + migrate test + snapshot pass | WP21 | [P] |
-| T095 | Port `RouteListCommand` → `RouteListHandler` + migrate test + snapshot pass | WP21 | [P] |
-| T096 | Port `ServeCommand` → `ServeHandler` + migrate test + snapshot pass | WP21 | [P] |
-| T097 | Port `SyncRulesCommand` → `SyncRulesHandler` + migrate test + snapshot pass | WP21 | [P] |
-| T098 | Port `WaaseyaaVersionCommand` → `WaaseyaaVersionHandler` + migrate test + snapshot pass | WP21 | [P] |
-| T099 | Port `MakePluginCommand` provenance hooks (refactor `Provenance/ComposerProvenanceReporter` to drop Symfony Console) | WP21 | — |
+| T094 | Port `InstallCommand` → `InstallHandler` + migrate test + snapshot pass | WP21 | [D] |
+| T095 | Port `RouteListCommand` → `RouteListHandler` + migrate test + snapshot pass | WP21 | [D] |
+| T096 | Port `ServeCommand` → `ServeHandler` + migrate test + snapshot pass | WP21 | [D] |
+| T097 | Port `SyncRulesCommand` → `SyncRulesHandler` + migrate test + snapshot pass | WP21 | [D] |
+| T098 | Port `WaaseyaaVersionCommand` → `WaaseyaaVersionHandler` + migrate test + snapshot pass | WP21 | [D] |
+| T099 | Port `MakePluginCommand` provenance hooks (refactor `Provenance/ComposerProvenanceReporter` to drop Symfony Console) | WP21 | — | [D] |
 | T100 | Port `packages/northcloud/src/Command/NcSyncCommand` → `NcSyncHandler` + migrate test + snapshot pass | WP22 | [P] |
 | T101 | Update `packages/northcloud/src/Provider/NorthCloudServiceProvider` to implement `HasNativeCommandsInterface` and stop importing Symfony Console | WP22 | — |
 | T102 | Delete `packages/foundation/src/ServiceProvider/Capability/HasCommandsInterface.php` | WP23 | — |
@@ -452,12 +452,12 @@
 ### WP21 — Port: Misc cluster B (Install/Route/Serve/Sync/Version) + Provenance
 
 **Subtasks**:
-- [ ] T094 `InstallCommand` → `InstallHandler` (WP21)
-- [ ] T095 `RouteListCommand` → `RouteListHandler` (WP21)
-- [ ] T096 `ServeCommand` → `ServeHandler` (WP21)
-- [ ] T097 `SyncRulesCommand` → `SyncRulesHandler` (WP21)
-- [ ] T098 `WaaseyaaVersionCommand` → `WaaseyaaVersionHandler` (WP21)
-- [ ] T099 Refactor `Provenance/ComposerProvenanceReporter` to drop Symfony Console (WP21)
+- [x] T094 `InstallCommand` → `InstallHandler` (WP21)
+- [x] T095 `RouteListCommand` → `RouteListHandler` (WP21)
+- [x] T096 `ServeCommand` → `ServeHandler` (WP21)
+- [x] T097 `SyncRulesCommand` → `SyncRulesHandler` (WP21)
+- [x] T098 `WaaseyaaVersionCommand` → `WaaseyaaVersionHandler` (WP21)
+- [x] T099 Refactor `Provenance/ComposerProvenanceReporter` to drop Symfony Console (WP21)
 
 **Estimated prompt**: ~400 lines. **Dependencies**: WP05.
 
