@@ -18,8 +18,8 @@ subtasks:
 - T019
 - T020
 - T021
-agent: "claude:opus-4-7:reviewer:reviewer"
-shell_pid: "884659"
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "885388"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -172,3 +172,4 @@ spec-kitty agent action implement WP04 --agent <name>
 - 2026-05-08T04:08:07Z – claude:sonnet:implementer:implementer – shell_pid=881621 – Ready for review: CliKernel::run() + HasNativeCommandsInterface + manifest scan + CliKernelServiceProvider + 29 tests all green (7440 suite-wide)
 - 2026-05-08T04:08:39Z – claude:opus-4-7:reviewer:reviewer – shell_pid=884659 – Started review via action command
 - 2026-05-08T04:10:27Z – claude:opus-4-7:reviewer:reviewer – shell_pid=884659 – Moved to planned
+- 2026-05-08T04:11:06Z – claude:sonnet:implementer:implementer – shell_pid=885388 – Started implementation via action command
