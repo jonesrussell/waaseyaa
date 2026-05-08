@@ -15,8 +15,8 @@ subtasks:
 - T086
 - T087
 - T088
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "990677"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "994209"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -73,3 +73,4 @@ spec-kitty agent action implement WP19 --agent <name>
 
 - 2026-05-08T16:01:08Z – claude:sonnet:implementer:implementer – shell_pid=990677 – Started implementation via action command
 - 2026-05-08T16:14:12Z – claude:sonnet:implementer:implementer – shell_pid=990677 – Ready for review: 4 commands ported to native CLI, all gates green
+- 2026-05-08T16:14:40Z – claude:opus-4-7:reviewer:reviewer – shell_pid=994209 – Started review via action command
