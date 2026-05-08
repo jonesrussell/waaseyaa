@@ -117,6 +117,10 @@ exceptions:
     action: do_not_change
     reason: "Vendored dependencies — never edited by mission code."
 
+  - path: "kitty-specs/native-cli-kernel-01KR2NR7/occurrence_map.yaml"
+    action: manual_review
+    reason: "This file itself — exceptions are added as new categories of files surface during the mission."
+
   - path: "kitty-specs/native-cli-kernel-01KR2NR7/scripts/perf-harness.sh"
     action: rename
     reason: "WP01 deliverable per research §R-07 — performance baseline harness."
