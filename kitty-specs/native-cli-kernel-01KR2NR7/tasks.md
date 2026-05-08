@@ -27,11 +27,11 @@
 | T014 | Implement `HelpRenderer` (Usage/Description/Arguments/Options sections, deterministic output) + golden tests | WP03 | [D] |
 | T015 | Implement `CliTester::for/execute/executeMap/getExitCode/getStdout/getStderr/getOutput` + tests | WP03 | — | [D] |
 | T016 | TTY detection helper using `posix_isatty` → `stream_isatty` → false fallback | WP03 | [D] |
-| T017 | Add `HasNativeCommandsInterface` to `packages/foundation/src/ServiceProvider/Capability/` (no Symfony imports) | WP04 | — |
-| T018 | Contract test asserting interface file has zero `Symfony\` imports + iterable return type | WP04 | [P] |
-| T019 | Extend `PackageManifestCompiler` capability list to recognise the new interface | WP04 | — |
-| T020 | Implement `CliKernelServiceProvider::buildRegistry()` iterating providers via manifest | WP04 | — |
-| T021 | Implement `CliKernel::run(argv): int` (dispatch, exit codes, signal handling) + integration tests | WP04 | — |
+| T017 | Add `HasNativeCommandsInterface` to `packages/foundation/src/ServiceProvider/Capability/` (no Symfony imports) | WP04 | — | [D] |
+| T018 | Contract test asserting interface file has zero `Symfony\` imports + iterable return type | WP04 | [D] |
+| T019 | Extend `PackageManifestCompiler` capability list to recognise the new interface | WP04 | — | [D] |
+| T020 | Implement `CliKernelServiceProvider::buildRegistry()` iterating providers via manifest | WP04 | — | [D] |
+| T021 | Implement `CliKernel::run(argv): int` (dispatch, exit codes, signal handling) + integration tests | WP04 | — | [D] |
 | T022 | Implement `CliApplication::main()` entry-point class (no Symfony import) | WP05 | [P] |
 | T023 | Rewrite `bin/waaseyaa` to boot `CliApplication`; include temporary dual-boot adapter that ALSO discovers `HasCommandsInterface` providers | WP05 | — |
 | T024 | Add legacy adapter: wraps Symfony `Command` instances into `CommandDefinition` shims so they keep running through `CliKernel` while WPs 06-22 progress | WP05 | — |
@@ -206,11 +206,11 @@
 **Independent test**: Integration test — register a fake provider implementing `HasNativeCommandsInterface`, confirm its commands appear in the registry and dispatch through `CliKernel`.
 
 **Subtasks**:
-- [ ] T017 Add `HasNativeCommandsInterface` to foundation (WP04)
-- [ ] T018 Contract test asserting Symfony-import-free interface (WP04)
-- [ ] T019 Extend `PackageManifestCompiler` capability scan (WP04)
-- [ ] T020 Implement `CliKernelServiceProvider::buildRegistry()` (WP04)
-- [ ] T021 Implement `CliKernel::run(argv): int` + integration tests (WP04)
+- [x] T017 Add `HasNativeCommandsInterface` to foundation (WP04)
+- [x] T018 Contract test asserting Symfony-import-free interface (WP04)
+- [x] T019 Extend `PackageManifestCompiler` capability scan (WP04)
+- [x] T020 Implement `CliKernelServiceProvider::buildRegistry()` (WP04)
+- [x] T021 Implement `CliKernel::run(argv): int` + integration tests (WP04)
 
 **Implementation sketch**: Per [`contracts/has-native-commands.md`](./contracts/has-native-commands.md) and [`contracts/cli-kernel.md`](./contracts/cli-kernel.md). **Estimated prompt**: ~380 lines.
 
