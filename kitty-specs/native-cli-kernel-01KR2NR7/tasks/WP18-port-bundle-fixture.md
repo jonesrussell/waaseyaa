@@ -15,8 +15,8 @@ subtasks:
 - T082
 - T083
 - T084
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "988812"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "989904"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -76,3 +76,4 @@ spec-kitty agent action implement WP18 --agent <name>
 - 2026-05-08T15:55:57Z – claude:opus-4-7:reviewer:reviewer – shell_pid=988303 – Moved to planned
 - 2026-05-08T15:56:24Z – claude:sonnet:implementer:implementer – shell_pid=988812 – Started implementation via action command
 - 2026-05-08T15:58:53Z – claude:sonnet:implementer:implementer – shell_pid=988812 – Cycle 2 fix: __ naming, 3 WP01 baselines preserved, 1 pseudo for scaffold:bundle
+- 2026-05-08T15:59:17Z – claude:opus-4-7:reviewer:reviewer – shell_pid=989904 – Started review via action command
