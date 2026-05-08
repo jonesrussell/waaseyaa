@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Tests\Unit\Command\Make;
 
-use Waaseyaa\CLI\Command\Make\MakeMigrationCommand;
-use Waaseyaa\Foundation\Discovery\PackageManifest;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
+use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Handler\MakeMigrationHandler;
+use Waaseyaa\CLI\Provider\MakeServiceProviderA;
+use Waaseyaa\CLI\Testing\CliTester;
+use Waaseyaa\Foundation\Discovery\PackageManifest;
 
-#[CoversClass(MakeMigrationCommand::class)]
+#[CoversClass(MakeMigrationHandler::class)]
 final class MakeMigrationCommandTest extends TestCase
 {
     private string $tempDir;
@@ -32,12 +33,9 @@ final class MakeMigrationCommandTest extends TestCase
     public function it_generates_a_migration_with_create_table(): void
     {
         $tester = $this->createTester();
-        $tester->execute([
-            'name' => 'create_comments_table',
-            '--create' => 'comments',
-        ]);
+        $tester->execute(['create_comments_table', '--create=comments']);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
         $content = $this->getWrittenFileContent();
         $this->assertStringContainsString("schema->create('comments'", $content);
         $this->assertStringContainsString("schema->dropIfExists('comments')", $content);
@@ -48,7 +46,7 @@ final class MakeMigrationCommandTest extends TestCase
     public function it_guesses_table_name_from_migration_name(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'create_users_table']);
+        $tester->execute(['create_users_table']);
 
         $content = $this->getWrittenFileContent();
         $this->assertStringContainsString("'users'", $content);
@@ -58,12 +56,9 @@ final class MakeMigrationCommandTest extends TestCase
     public function it_includes_filename_in_output(): void
     {
         $tester = $this->createTester();
-        $tester->execute([
-            'name' => 'create_nodes_table',
-            '--create' => 'nodes',
-        ]);
+        $tester->execute(['create_nodes_table', '--create=nodes']);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('Created: migrations/', $output);
         $this->assertStringContainsString('create_nodes_table', $output);
     }
@@ -72,7 +67,7 @@ final class MakeMigrationCommandTest extends TestCase
     public function writesFileToMigrationsDirectory(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'create_posts_table', '--create' => 'posts']);
+        $tester->execute(['create_posts_table', '--create=posts']);
 
         $migrationsDir = $this->tempDir . '/migrations';
         $this->assertDirectoryExists($migrationsDir);
@@ -97,15 +92,10 @@ final class MakeMigrationCommandTest extends TestCase
             middleware: [],
         );
 
-        $command = new MakeMigrationCommand($this->tempDir, $manifest);
-        $tester = new CommandTester($command);
-        $tester->execute([
-            'name' => 'add_body_field',
-            '--table' => 'node',
-            '--package' => 'waaseyaa/node',
-        ]);
+        $tester = $this->createTester($manifest);
+        $tester->execute(['add_body_field', '--table=node', '--package=waaseyaa/node']);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
         $this->assertDirectoryExists($packageMigDir);
 
         $files = glob($packageMigDir . '/*.php');
@@ -123,35 +113,57 @@ final class MakeMigrationCommandTest extends TestCase
             middleware: [],
         );
 
-        $command = new MakeMigrationCommand($this->tempDir, $manifest);
-        $tester = new CommandTester($command);
-        $tester->execute([
-            'name' => 'test_migration',
-            '--package' => 'waaseyaa/nonexistent',
-        ]);
+        $tester = $this->createTester($manifest);
+        $tester->execute(['test_migration', '--package=waaseyaa/nonexistent']);
 
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
-        $this->assertStringContainsString('no registered migration directory', $tester->getDisplay());
+        $this->assertSame(1, $tester->getExitCode());
+        $this->assertStringContainsString('no registered migration directory', $tester->getStderr());
     }
 
     #[Test]
     public function it_fails_when_package_flag_used_without_manifest(): void
     {
-        $command = new MakeMigrationCommand($this->tempDir);
-        $tester = new CommandTester($command);
-        $tester->execute([
-            'name' => 'test_migration',
-            '--package' => 'waaseyaa/node',
-        ]);
+        $tester = $this->createTester();
+        $tester->execute(['test_migration', '--package=waaseyaa/node']);
 
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
-        $this->assertStringContainsString('PackageManifest not available', $tester->getDisplay());
+        $this->assertSame(1, $tester->getExitCode());
+        $this->assertStringContainsString('PackageManifest not available', $tester->getStderr());
     }
 
-    private function createTester(): CommandTester
+    private function createTester(?PackageManifest $manifest = null): CliTester
     {
-        $command = new MakeMigrationCommand($this->tempDir);
-        return new CommandTester($command);
+        $provider = new MakeServiceProviderA();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'make:migration') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
+
+        $tempDir = $this->tempDir;
+        $container = new class ($tempDir, $manifest) implements ContainerInterface {
+            public function __construct(
+                private readonly string $projectRoot,
+                private readonly ?PackageManifest $manifest,
+            ) {}
+
+            public function get(string $id): mixed
+            {
+                if ($id === MakeMigrationHandler::class) {
+                    return new MakeMigrationHandler($this->projectRoot, $this->manifest);
+                }
+                throw new \RuntimeException("Not found: {$id}");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === MakeMigrationHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
     }
 
     private function getWrittenFileContent(): string
@@ -170,8 +182,8 @@ final class MakeMigrationCommandTest extends TestCase
             if ($item === '.' || $item === '..') {
                 continue;
             }
-            $path = $dir . '/' . $item;
-            is_dir($path) ? $this->removeDir($path) : unlink($path);
+            $item_path = $dir . '/' . $item;
+            is_dir($item_path) ? $this->removeDir($item_path) : unlink($item_path);
         }
         rmdir($dir);
     }

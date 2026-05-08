@@ -7,21 +7,51 @@ namespace Waaseyaa\CLI\Tests\Unit\Command;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
+use Psr\Container\ContainerInterface;
 use Waaseyaa\AI\Vector\EmbeddingProviderInterface;
 use Waaseyaa\AI\Vector\EmbeddingStorageInterface;
 use Waaseyaa\AI\Vector\SemanticIndexWarmer;
-use Waaseyaa\CLI\Command\SemanticWarmCommand;
+use Waaseyaa\CLI\Handler\SemanticWarmHandler;
+use Waaseyaa\CLI\Provider\IngestSearchSemanticServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 
-#[CoversClass(SemanticWarmCommand::class)]
+#[CoversClass(SemanticWarmHandler::class)]
 final class SemanticWarmCommandTest extends TestCase
 {
+    private function makeTester(SemanticIndexWarmer $warmer): CliTester
+    {
+        $provider = new IngestSearchSemanticServiceProvider();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'semantic:warm') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition, 'semantic:warm command definition must exist');
+
+        $handler = new SemanticWarmHandler($warmer);
+        $container = new class ($handler) implements ContainerInterface {
+            public function __construct(private readonly SemanticWarmHandler $handler) {}
+
+            public function get(string $id): mixed
+            {
+                return $this->handler;
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === SemanticWarmHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
+    }
+
     #[Test]
     public function itFailsWhenNoEmbeddingProviderIsConfigured(): void
     {
@@ -31,15 +61,11 @@ final class SemanticWarmCommandTest extends TestCase
             embeddingProvider: null,
         );
 
-        $app = new Application();
-        $app->add(new SemanticWarmCommand($warmer));
-        $command = $app->find('semantic:warm');
-
-        $tester = new CommandTester($command);
+        $tester = $this->makeTester($warmer);
         $tester->execute([]);
 
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
-        $this->assertStringContainsString('Semantic warm status: skipped_no_provider', $tester->getDisplay());
+        $this->assertSame(1, $tester->getExitCode());
+        $this->assertStringContainsString('Semantic warm status: skipped_no_provider', $tester->getStdout());
     }
 
     #[Test]
@@ -66,8 +92,8 @@ final class SemanticWarmCommandTest extends TestCase
         $manager->method('hasDefinition')->with('node')->willReturn(true);
         $manager->method('getStorage')->with('node')->willReturn($storage);
 
-        $provider = $this->createMock(EmbeddingProviderInterface::class);
-        $provider->method('embed')->willReturn([0.2, 0.4]);
+        $embeddingProvider = $this->createMock(EmbeddingProviderInterface::class);
+        $embeddingProvider->method('embed')->willReturn([0.2, 0.4]);
 
         $embeddingStorage = $this->createMock(EmbeddingStorageInterface::class);
         $embeddingStorage->expects($this->once())->method('store')->with('node', '1', [0.2, 0.4]);
@@ -75,18 +101,14 @@ final class SemanticWarmCommandTest extends TestCase
         $warmer = new SemanticIndexWarmer(
             entityTypeManager: $manager,
             embeddingStorage: $embeddingStorage,
-            embeddingProvider: $provider,
+            embeddingProvider: $embeddingProvider,
         );
 
-        $app = new Application();
-        $app->add(new SemanticWarmCommand($warmer));
-        $command = $app->find('semantic:warm');
+        $tester = $this->makeTester($warmer);
+        $tester->executeMap(['--json' => true]);
 
-        $tester = new CommandTester($command);
-        $tester->execute(['--json' => true]);
-
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $output = $tester->getDisplay();
+        $this->assertSame(0, $tester->getExitCode());
+        $output = $tester->getStdout();
         $this->assertStringContainsString('"status": "ok"', $output);
         $this->assertStringContainsString('"processed_total": 1', $output);
     }

@@ -7,10 +7,12 @@ namespace Waaseyaa\CLI\Tests\Integration\Command\Make;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
-use Waaseyaa\CLI\Command\Make\MakePublicCommand;
+use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Handler\MakePublicHandler;
+use Waaseyaa\CLI\Provider\MakeServiceProviderB;
+use Waaseyaa\CLI\Testing\CliTester;
 
-#[CoversClass(MakePublicCommand::class)]
+#[CoversClass(MakePublicHandler::class)]
 final class MakePublicCommandTest extends TestCase
 {
     private string $tempDir;
@@ -29,12 +31,10 @@ final class MakePublicCommandTest extends TestCase
     #[Test]
     public function it_creates_public_index_php(): void
     {
-        $command = new MakePublicCommand($this->tempDir);
-        $tester = new CommandTester($command);
+        $tester = $this->createTester($this->tempDir);
+        $tester->execute([]);
 
-        $exit = $tester->execute([]);
-
-        self::assertSame(0, $exit);
+        self::assertSame(0, $tester->getExitCode());
         $target = $this->tempDir . '/public/index.php';
         self::assertFileExists($target);
         $contents = (string) file_get_contents($target);
@@ -51,13 +51,11 @@ final class MakePublicCommandTest extends TestCase
         $target = $this->tempDir . '/public/index.php';
         file_put_contents($target, '<?php // existing');
 
-        $command = new MakePublicCommand($this->tempDir);
-        $tester = new CommandTester($command);
+        $tester = $this->createTester($this->tempDir);
+        $tester->execute([]);
 
-        $exit = $tester->execute([]);
-
-        self::assertSame(0, $exit);
-        self::assertStringContainsString('already exists', $tester->getDisplay());
+        self::assertSame(0, $tester->getExitCode());
+        self::assertStringContainsString('already exists', $tester->getStdout());
         self::assertSame('<?php // existing', file_get_contents($target));
     }
 
@@ -68,13 +66,43 @@ final class MakePublicCommandTest extends TestCase
         $target = $this->tempDir . '/public/index.php';
         file_put_contents($target, '<?php // old');
 
-        $command = new MakePublicCommand($this->tempDir);
-        $tester = new CommandTester($command);
+        $tester = $this->createTester($this->tempDir);
+        $tester->execute(['--force']);
 
-        $exit = $tester->execute(['--force' => true]);
-
-        self::assertSame(0, $exit);
+        self::assertSame(0, $tester->getExitCode());
         self::assertStringContainsString('HttpKernel', (string) file_get_contents($target));
+    }
+
+    private function createTester(string $projectRoot): CliTester
+    {
+        $provider = new MakeServiceProviderB();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'make:public') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
+
+        $container = new class ($projectRoot) implements ContainerInterface {
+            public function __construct(private readonly string $projectRoot) {}
+
+            public function get(string $id): mixed
+            {
+                if ($id === MakePublicHandler::class) {
+                    return new MakePublicHandler($this->projectRoot);
+                }
+                throw new \RuntimeException("Not found: {$id}");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === MakePublicHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
     }
 
     private function removeDir(string $dir): void
@@ -90,11 +118,11 @@ final class MakePublicCommandTest extends TestCase
             if ($item === '.' || $item === '..') {
                 continue;
             }
-            $path = $dir . '/' . $item;
-            if (is_dir($path)) {
-                $this->removeDir($path);
+            $item_path = $dir . '/' . $item;
+            if (is_dir($item_path)) {
+                $this->removeDir($item_path);
             } else {
-                @unlink($path);
+                @unlink($item_path);
             }
         }
         @rmdir($dir);

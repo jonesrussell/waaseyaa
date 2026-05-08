@@ -1,4 +1,5 @@
 # Dependencies
+vendor
 vendor/
 packages/*/vendor/
 packages/*/composer.lock

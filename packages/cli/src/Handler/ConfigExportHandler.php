@@ -1,0 +1,27 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\CLI\Handler;
+
+use Waaseyaa\CLI\CliIO;
+use Waaseyaa\Config\ConfigManagerInterface;
+
+final class ConfigExportHandler
+{
+    public function __construct(
+        private readonly ConfigManagerInterface $configManager,
+    ) {}
+
+    public function execute(CliIO $io): int
+    {
+        $this->configManager->export();
+
+        $configs = $this->configManager->getActiveStorage()->listAll();
+        $count = count($configs);
+
+        $io->writeln(sprintf('Configuration exported. Active storage contains %d items.', $count));
+
+        return 0;
+    }
+}

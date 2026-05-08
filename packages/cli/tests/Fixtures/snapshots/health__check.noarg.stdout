@@ -1,0 +1,17 @@
++--------+-------------------------+--------------------------------------------------------------------------------------+
+| Status | Check                   | Message                                                                              |
++--------+-------------------------+--------------------------------------------------------------------------------------+
+| PASS   | Entity types            | 30 entity type(s) registered and enabled.                                            |
+| PASS   | Database                | Database is accessible.                                                              |
+| FAIL   | Schema: oidc_client     | Table "oidc_client" has 4 column(s) with schema drift.                               |
+| PASS   | Storage directory       | storage/framework/ exists.                                                           |
+| PASS   | Cache directory         | storage/framework/ is writable.                                                      |
+| FAIL   | Foreign key enforcement | SQLite PRAGMA foreign_keys = OFF. Per-bundle subtable CASCADE deletes will not fire. |
+| PASS   | Ingestion log           | No ingestion entries recorded.                                                       |
++--------+-------------------------+--------------------------------------------------------------------------------------+
+
+Remediations:
+  Schema: oidc_client: Delete the SQLite database and restart to recreate tables, or run `waaseyaa schema:check` for details.
+  Foreign key enforcement: Ensure the SQLite connection issues `PRAGMA foreign_keys = ON` on every connection. Waaseyaa configures this by default; external tooling may override.
+
+Health check failed.

@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Tests\Unit\Command\Make;
 
-use Waaseyaa\CLI\Command\Make\MakeEntityCommand;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
+use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Handler\MakeEntityHandler;
+use Waaseyaa\CLI\Provider\MakeServiceProviderA;
+use Waaseyaa\CLI\Testing\CliTester;
 
-#[CoversClass(MakeEntityCommand::class)]
+#[CoversClass(MakeEntityHandler::class)]
 final class MakeEntityCommandTest extends TestCase
 {
     #[Test]
     public function it_generates_an_entity_class(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'Article']);
+        $tester->execute(['Article']);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $output = $tester->getDisplay();
+        $this->assertSame(0, $tester->getExitCode());
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class Article extends ContentEntityBase', $output);
         $this->assertStringContainsString('use Waaseyaa\\Entity\\ContentEntityBase;', $output);
         $this->assertStringContainsString('declare(strict_types=1);', $output);
@@ -32,18 +32,39 @@ final class MakeEntityCommandTest extends TestCase
     public function it_converts_snake_case_to_pascal_case(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'blog_post']);
+        $tester->execute(['blog_post']);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class BlogPost extends ContentEntityBase', $output);
     }
 
-    private function createTester(): CommandTester
+    private function createTester(): CliTester
     {
-        $app = new Application();
-        $app->add(new MakeEntityCommand());
-        $command = $app->find('make:entity');
+        $provider = new MakeServiceProviderA();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'make:entity') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
 
-        return new CommandTester($command);
+        $container = new class implements ContainerInterface {
+            public function get(string $id): mixed
+            {
+                if ($id === MakeEntityHandler::class) {
+                    return new MakeEntityHandler();
+                }
+                throw new \RuntimeException("Not found: {$id}");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === MakeEntityHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
     }
 }

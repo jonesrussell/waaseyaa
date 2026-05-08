@@ -1,0 +1,16 @@
+Description:
+  Start the PHP development server
+
+Usage:
+  serve [options]
+
+Options:
+      --host[=HOST]     Specify which IP address the server should listen on. Set to 127.0.0.1 to restrict to localhost only. Can also be set via APP_HOST. [default: "0.0.0.0"]
+  -p, --port[=PORT]     Specify which port the server should listen on. Can also be set via APP_PORT. [default: "8080"]
+  -h, --help            Display help for the given command. When no command is given display help for the list command
+      --silent          Do not output any message
+  -q, --quiet           Only errors are displayed. All other output is suppressed
+  -V, --version         Display this application version
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction  Do not ask any interactive question
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Command\Make;
 
-use Symfony\Component\Console\Command\Command;
-
 /**
  * Base class for make:* scaffolding commands.
  *
@@ -13,7 +11,7 @@ use Symfony\Component\Console\Command\Command;
  *
  * @internal
  */
-abstract class AbstractMakeCommand extends Command
+abstract class AbstractMakeCommand
 {
     /**
      * Convert a snake_case or lower name to PascalCase.

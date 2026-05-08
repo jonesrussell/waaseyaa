@@ -1,0 +1,21 @@
+Description:
+  Disable a registered content type (does not delete it)
+
+Usage:
+  type:disable [options] [--] <type>
+
+Arguments:
+  type                  The entity type ID to disable (e.g. note)
+
+Options:
+      --actor=ACTOR     Actor ID for the audit log [default: "cli"]
+      --tenant=TENANT   Tenant ID (optional, for per-tenant disable) [default: ""]
+      --force           Allow disabling the last enabled type for the tenant
+  -y, --yes             Skip confirmation prompt
+  -h, --help            Display help for the given command. When no command is given display help for the list command
+      --silent          Do not output any message
+  -q, --quiet           Only errors are displayed. All other output is suppressed
+  -V, --version         Display this application version
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction  Do not ask any interactive question
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug

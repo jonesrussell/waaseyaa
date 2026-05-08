@@ -7,37 +7,63 @@ namespace Waaseyaa\CLI\Tests\Unit\Command;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
+use Psr\Container\ContainerInterface;
 use Waaseyaa\AI\Vector\EmbeddingProviderInterface;
 use Waaseyaa\AI\Vector\EmbeddingStorageInterface;
 use Waaseyaa\AI\Vector\SemanticIndexWarmer;
-use Waaseyaa\CLI\Command\SemanticRefreshCommand;
+use Waaseyaa\CLI\Handler\SemanticRefreshHandler;
+use Waaseyaa\CLI\Provider\IngestSearchSemanticServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 
-#[CoversClass(SemanticRefreshCommand::class)]
+#[CoversClass(SemanticRefreshHandler::class)]
 final class SemanticRefreshCommandTest extends TestCase
 {
+    private function makeTester(SemanticIndexWarmer $warmer): CliTester
+    {
+        $provider = new IngestSearchSemanticServiceProvider();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'semantic:refresh') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition, 'semantic:refresh command definition must exist');
+
+        $handler = new SemanticRefreshHandler($warmer);
+        $container = new class ($handler) implements ContainerInterface {
+            public function __construct(private readonly SemanticRefreshHandler $handler) {}
+
+            public function get(string $id): mixed
+            {
+                return $this->handler;
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === SemanticRefreshHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
+    }
+
     #[Test]
     public function itReturnsCursorForPartialBatchRun(): void
     {
         $warmer = $this->buildWarmerWithThreeNodes();
 
-        $app = new Application();
-        $app->add(new SemanticRefreshCommand($warmer));
-        $command = $app->find('semantic:refresh');
+        $tester = $this->makeTester($warmer);
+        $tester->executeMap(['--batch-size' => '2', '--json' => true]);
 
-        $tester = new CommandTester($command);
-        $tester->execute(['--batch-size' => '2', '--json' => true]);
+        $this->assertSame(0, $tester->getExitCode());
+        $decoded = json_decode($tester->getStdout(), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $decoded = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertSame(1, $decoded['runs']);
+        $this->assertSame(1, $decoded['batch_count']);
         $this->assertSame(2, $decoded['final']['batch_processed']);
         $this->assertSame(['type_index' => 0, 'offset' => 2], $decoded['final']['next_cursor']);
     }
@@ -47,17 +73,13 @@ final class SemanticRefreshCommandTest extends TestCase
     {
         $warmer = $this->buildWarmerWithThreeNodes();
 
-        $app = new Application();
-        $app->add(new SemanticRefreshCommand($warmer));
-        $command = $app->find('semantic:refresh');
+        $tester = $this->makeTester($warmer);
+        $tester->executeMap(['--batch-size' => '2', '--until-complete' => true, '--json' => true]);
 
-        $tester = new CommandTester($command);
-        $tester->execute(['--batch-size' => '2', '--until-complete' => true, '--json' => true]);
+        $this->assertSame(0, $tester->getExitCode());
+        $decoded = json_decode($tester->getStdout(), true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $decoded = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
-
-        $this->assertSame(2, $decoded['runs']);
+        $this->assertSame(2, $decoded['batch_count']);
         $this->assertNull($decoded['final']['next_cursor']);
     }
 

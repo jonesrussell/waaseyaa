@@ -7,14 +7,15 @@ namespace Waaseyaa\CLI\Tests\Unit\Command;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
-use Waaseyaa\CLI\Command\FixturePackRefreshCommand;
-use Waaseyaa\CLI\Command\IngestRunCommand;
+use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Handler\FixturePackRefreshHandler;
+use Waaseyaa\CLI\Handler\IngestRunHandler;
+use Waaseyaa\CLI\Provider\BundleFixtureServiceProvider;
+use Waaseyaa\CLI\Provider\IngestSearchSemanticServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 
-#[CoversClass(IngestRunCommand::class)]
-#[CoversClass(FixturePackRefreshCommand::class)]
+#[CoversClass(IngestRunHandler::class)]
+#[CoversClass(FixturePackRefreshHandler::class)]
 final class IngestionFixturePackRegressionTest extends TestCase
 {
     private string $tempDir;
@@ -63,8 +64,8 @@ final class IngestionFixturePackRegressionTest extends TestCase
             outputName: 'valid-second.json',
         );
 
-        $this->assertSame(Command::SUCCESS, $first['status']);
-        $this->assertSame(Command::SUCCESS, $second['status']);
+        $this->assertSame(0, $first['exitCode']);
+        $this->assertSame(0, $second['exitCode']);
         $this->assertSame($first['hash'], $second['hash']);
         $this->assertSame(0, $first['decoded']['meta']['error_count']);
         $this->assertSame(2, $first['decoded']['meta']['node_count']);
@@ -117,11 +118,11 @@ final class IngestionFixturePackRegressionTest extends TestCase
             $inference['decoded']['diagnostics']['inference'],
         ));
 
-        $this->assertSame(Command::FAILURE, $schema['status']);
+        $this->assertSame(1, $schema['exitCode']);
         $this->assertContains('schema.duplicate_source_uri', $schemaCodes);
-        $this->assertSame(Command::FAILURE, $validation['status']);
+        $this->assertSame(1, $validation['exitCode']);
         $this->assertContains('validation.semantic.insufficient_publishable_tokens', $validationCodes);
-        $this->assertSame(Command::SUCCESS, $inference['status']);
+        $this->assertSame(0, $inference['exitCode']);
         $this->assertContains('inference.relationship_inferred', $inferenceCodes);
         $this->assertSame(1, $inference['decoded']['meta']['inferred_relationship_count']);
     }
@@ -130,23 +131,38 @@ final class IngestionFixturePackRegressionTest extends TestCase
     public function fixture_pack_refresh_consumes_ingestion_scenarios_consistently(): void
     {
         $scenarioDir = $this->repoRoot() . '/tests/fixtures/scenarios';
-        $app = new Application();
-        $app->add(new FixturePackRefreshCommand());
-        $tester = new CommandTester($app->find('fixture:pack:refresh'));
 
-        $tester->execute([
-            '--input-dir' => $scenarioDir,
-            '--json' => true,
-        ]);
-        $first = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+        $provider = new BundleFixtureServiceProvider();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'fixture:pack:refresh') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
 
-        $tester->execute([
-            '--input-dir' => $scenarioDir,
-            '--json' => true,
-        ]);
-        $second = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+        $container = new class implements ContainerInterface {
+            public function get(string $id): mixed
+            {
+                return new FixturePackRefreshHandler();
+            }
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+            public function has(string $id): bool
+            {
+                return $id === FixturePackRefreshHandler::class;
+            }
+        };
+
+        $firstTester = CliTester::for($definition, $container);
+        $firstTester->executeMap(['--input-dir' => $scenarioDir, '--json' => true]);
+        $first = json_decode($firstTester->getStdout(), true, 512, JSON_THROW_ON_ERROR);
+
+        $secondTester = CliTester::for($definition, $container);
+        $secondTester->executeMap(['--input-dir' => $scenarioDir, '--json' => true]);
+        $second = json_decode($secondTester->getStdout(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame(0, $firstTester->getExitCode());
         $this->assertSame($first['hash'], $second['hash']);
         $this->assertGreaterThanOrEqual(3, $first['scenario_count']);
         $this->assertSame('ingestion-blocked', array_keys($first['scenarios'])[0]);
@@ -156,26 +172,46 @@ final class IngestionFixturePackRegressionTest extends TestCase
 
     /**
      * @param array<string, mixed> $extraOptions
-     * @return array{status:int,decoded:array<string,mixed>,hash:string}
+     * @return array{exitCode:int,decoded:array<string,mixed>,hash:string}
      */
     private function runIngest(string $inputPath, array $extraOptions, string $outputName): array
     {
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
-        $outputPath = $this->tempDir . '/' . $outputName;
+        $provider = new IngestSearchSemanticServiceProvider();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'ingest:run') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
 
+        $container = new class implements ContainerInterface {
+            public function get(string $id): mixed
+            {
+                return new IngestRunHandler();
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === IngestRunHandler::class;
+            }
+        };
+
+        $outputPath = $this->tempDir . '/' . $outputName;
         $options = array_merge([
             '--input' => $inputPath,
             '--output' => $outputPath,
         ], $extraOptions);
-        $tester->execute($options);
+
+        $cliTester = CliTester::for($definition, $container);
+        $cliTester->executeMap($options);
 
         $raw = (string) file_get_contents($outputPath);
         $decoded = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
 
         return [
-            'status' => $tester->getStatusCode(),
+            'exitCode' => $cliTester->getExitCode(),
             'decoded' => $decoded,
             'hash' => hash('sha256', $raw),
         ];

@@ -4,28 +4,25 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Tests\Unit\Command;
 
-use Waaseyaa\CLI\Command\MakeEntityTypeCommand;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
+use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Handler\MakeEntityTypeHandler;
+use Waaseyaa\CLI\Provider\MakeServiceProviderB;
+use Waaseyaa\CLI\Testing\CliTester;
 
-#[CoversClass(MakeEntityTypeCommand::class)]
-class MakeEntityTypeCommandTest extends TestCase
+#[CoversClass(MakeEntityTypeHandler::class)]
+final class MakeEntityTypeCommandTest extends TestCase
 {
     #[Test]
     public function it_generates_a_config_entity_by_default(): void
     {
-        $app = new Application();
-        $app->add(new MakeEntityTypeCommand());
-        $command = $app->find('make:entity-type');
-        $tester = new CommandTester($command);
-        $tester->execute(['name' => 'event']);
+        $tester = $this->createTester();
+        $tester->execute(['event']);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $output = $tester->getDisplay();
+        $this->assertSame(0, $tester->getExitCode());
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class Event extends ConfigEntityBase', $output);
         $this->assertStringContainsString('use Waaseyaa\\Entity\\ConfigEntityBase;', $output);
         $this->assertStringContainsString('declare(strict_types=1);', $output);
@@ -38,14 +35,11 @@ class MakeEntityTypeCommandTest extends TestCase
     #[Test]
     public function it_generates_a_content_entity_with_flag(): void
     {
-        $app = new Application();
-        $app->add(new MakeEntityTypeCommand());
-        $command = $app->find('make:entity-type');
-        $tester = new CommandTester($command);
-        $tester->execute(['name' => 'article', '--content' => true]);
+        $tester = $this->createTester();
+        $tester->execute(['article', '--content']);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $output = $tester->getDisplay();
+        $this->assertSame(0, $tester->getExitCode());
+        $output = $tester->getStdout();
         $this->assertStringContainsString('final class Article extends ContentEntityBase', $output);
         $this->assertStringContainsString('use Waaseyaa\\Entity\\ContentEntityBase;', $output);
         $this->assertStringContainsString('#[ContentEntityType(', $output);
@@ -53,5 +47,35 @@ class MakeEntityTypeCommandTest extends TestCase
         $this->assertStringContainsString('#[Field]', $output);
         $this->assertStringContainsString("id: 'article'", $output);
         $this->assertStringContainsString("EntityType::fromClass(Article::class, group: 'content')", $output);
+    }
+
+    private function createTester(): CliTester
+    {
+        $provider = new MakeServiceProviderB();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'make:entity-type') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
+
+        $container = new class implements ContainerInterface {
+            public function get(string $id): mixed
+            {
+                if ($id === MakeEntityTypeHandler::class) {
+                    return new MakeEntityTypeHandler();
+                }
+                throw new \RuntimeException("Not found: {$id}");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === MakeEntityTypeHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
     }
 }

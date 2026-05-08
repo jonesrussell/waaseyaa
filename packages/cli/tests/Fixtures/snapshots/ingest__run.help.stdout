@@ -1,0 +1,29 @@
+Description:
+  Run deterministic structured/unstructured ingestion and emit mapped content payloads
+
+Usage:
+  ingest:run [options]
+
+Options:
+  -i, --input=INPUT                                      Input file path (.json, .txt, .md)
+  -f, --format=FORMAT                                    Input format: auto|structured|unstructured [default: "auto"]
+      --default-bundle=DEFAULT-BUNDLE                    Default bundle for mapped nodes [default: "node"]
+      --default-workflow-state=DEFAULT-WORKFLOW-STATE    Default workflow state [default: "draft"]
+      --author-id=AUTHOR-ID                              Mapped author UID [default: "1"]
+      --timestamp=TIMESTAMP                              Deterministic ingest timestamp [default: "1735689600"]
+      --batch-id=BATCH-ID                                Batch idempotency key (defaults to deterministic hash)
+      --policy=POLICY                                    Ingestion policy: atomic_fail_fast|validate_only [default: "atomic_fail_fast"]
+      --source=SOURCE                                    Source identifier for audit metadata [default: "manual://default"]
+      --infer-relationships                              Infer candidate relationships from ingested text (review-safe defaults)
+      --authoring-assist                                 Emit deterministic AI-assisted authoring suggestions
+      --refresh-baseline=REFRESH-BASELINE                Optional baseline snapshot JSON path for refresh change detection
+      --refresh-snapshot-output=REFRESH-SNAPSHOT-OUTPUT  Optional output path for current refresh snapshot JSON
+  -o, --output=OUTPUT                                    Optional mapped output file (.json)
+      --diagnostics-output=DIAGNOSTICS-OUTPUT            Optional diagnostics output file (.json)
+  -h, --help                                             Display help for the given command. When no command is given display help for the list command
+      --silent                                           Do not output any message
+  -q, --quiet                                            Only errors are displayed. All other output is suppressed
+  -V, --version                                          Display this application version
+      --ansi|--no-ansi                                   Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction                                   Do not ask any interactive question
+  -v|vv|vvv, --verbose                                   Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug

@@ -1,0 +1,18 @@
+Description:
+  Generate deterministic workflow scaffold JSON
+
+Usage:
+  scaffold:workflow [options]
+
+Options:
+      --id=ID                  Workflow machine name
+      --bundle=BUNDLE          Bundle ID the workflow applies to
+      --state=STATE            State IDs (repeatable) (multiple values allowed)
+      --transition=TRANSITION  Transition in id:from:to:permission form (repeatable) (multiple values allowed)
+  -h, --help                   Display help for the given command. When no command is given display help for the list command
+      --silent                 Do not output any message
+  -q, --quiet                  Only errors are displayed. All other output is suppressed
+  -V, --version                Display this application version
+      --ansi|--no-ansi         Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction         Do not ask any interactive question
+  -v|vv|vvv, --verbose         Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
