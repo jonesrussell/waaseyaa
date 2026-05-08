@@ -289,36 +289,6 @@ parameters:
 			path: packages/cli/src/CliKernel.php
 
 		-
-			message: '#^Offset ''action'' on array\{entity_type_id\: string, action\: string, actor_id\: string, timestamp\: string\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/AuditLogCommand.php
-
-		-
-			message: '#^Offset ''actor_id'' on array\{entity_type_id\: string, action\: string, actor_id\: string, timestamp\: string\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/AuditLogCommand.php
-
-		-
-			message: '#^Offset ''entity_type_id'' on array\{entity_type_id\: string, action\: string, actor_id\: string, timestamp\: string\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/AuditLogCommand.php
-
-		-
-			message: '#^Offset ''tenant_id'' on array\{entity_type_id\: string, action\: string, actor_id\: string, timestamp\: string\} on left side of \?\? does not exist\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/AuditLogCommand.php
-
-		-
-			message: '#^Offset ''timestamp'' on array\{entity_type_id\: string, action\: string, actor_id\: string, timestamp\: string\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/AuditLogCommand.php
-
-		-
 			message: '#^Casting to string something that''s already string\.$#'
 			identifier: cast.useless
 			count: 2

@@ -48,13 +48,14 @@ final class AuditLogHandler
         $io->writeln(str_repeat('-', 90));
 
         foreach ($entries as $entry) {
+            /** @var array{entity_type_id: string, action: string, actor_id: string, timestamp: string, tenant_id?: string} $entry */
             $io->writeln(sprintf(
                 '%-20s %-12s %-20s %-20s %s',
-                $entry['entity_type_id'] ?? '',
-                $entry['action']         ?? '',
-                $entry['tenant_id']      ?? '',
-                $entry['actor_id']       ?? '',
-                $entry['timestamp']      ?? '',
+                $entry['entity_type_id'],
+                $entry['action'],
+                $entry['tenant_id'] ?? '',
+                $entry['actor_id'],
+                $entry['timestamp'],
             ));
         }
 
