@@ -4296,7 +4296,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "e3992503443593b51a3d56a3abaad08c807ea094"
+                "reference": "3cef93cb012f943a3b6464133236029a918e175e"
             },
             "require": {
                 "php": ">=8.4",
@@ -4305,6 +4305,7 @@
                 "waaseyaa/cache": "^0.1.0-alpha.150",
                 "waaseyaa/config": "^0.1.0-alpha.150",
                 "waaseyaa/entity": "^0.1.0-alpha.150",
+                "waaseyaa/queue": "^0.1.0-alpha.150",
                 "waaseyaa/user": "^0.1.0-alpha.150"
             },
             "require-dev": {
@@ -4326,7 +4327,8 @@
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderA",
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderB",
                         "Waaseyaa\\CLI\\Provider\\MigrateServiceProvider",
-                        "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider"
+                        "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\QueueServiceProvider"
                     ]
                 }
             },

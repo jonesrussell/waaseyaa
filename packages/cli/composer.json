@@ -6,11 +6,7 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../entity"
-        },
-        {
-            "type": "path",
-            "url": "../config"
+            "url": "../access"
         },
         {
             "type": "path",
@@ -18,15 +14,11 @@
         },
         {
             "type": "path",
-            "url": "../user"
+            "url": "../config"
         },
         {
             "type": "path",
-            "url": "../access"
-        },
-        {
-            "type": "path",
-            "url": "../typed-data"
+            "url": "../entity"
         },
         {
             "type": "path",
@@ -34,16 +26,29 @@
         },
         {
             "type": "path",
+            "url": "../queue"
+        },
+        {
+            "type": "path",
             "url": "../routing"
+        },
+        {
+            "type": "path",
+            "url": "../typed-data"
+        },
+        {
+            "type": "path",
+            "url": "../user"
         }
     ],
     "require": {
         "php": ">=8.4",
-        "waaseyaa/entity": "^0.1.0-alpha.150",
-        "waaseyaa/config": "^0.1.0-alpha.150",
-        "waaseyaa/cache": "^0.1.0-alpha.150",
-        "waaseyaa/user": "^0.1.0-alpha.150",
         "waaseyaa/access": "^0.1.0-alpha.150",
+        "waaseyaa/cache": "^0.1.0-alpha.150",
+        "waaseyaa/config": "^0.1.0-alpha.150",
+        "waaseyaa/entity": "^0.1.0-alpha.150",
+        "waaseyaa/queue": "^0.1.0-alpha.150",
+        "waaseyaa/user": "^0.1.0-alpha.150",
         "symfony/console": "^7.0"
     },
     "require-dev": {
@@ -76,7 +81,8 @@
                 "Waaseyaa\\CLI\\Provider\\MakeServiceProviderA",
                 "Waaseyaa\\CLI\\Provider\\MakeServiceProviderB",
                 "Waaseyaa\\CLI\\Provider\\MigrateServiceProvider",
-                "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider"
+                "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\QueueServiceProvider"
             ]
         }
     },
