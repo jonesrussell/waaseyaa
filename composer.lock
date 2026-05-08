@@ -4296,7 +4296,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "8e99089f2a107a754b6505a5e80fac3d1c846d12"
+                "reference": "6a37aa8f2470eb939f137f2ff4db16364f63f0ed"
             },
             "require": {
                 "php": ">=8.4",
@@ -4324,6 +4324,7 @@
                 "waaseyaa": {
                     "providers": [
                         "Waaseyaa\\CLI\\CliServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\BundleFixtureServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\EntityTypeServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\HealthSchemaServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderA",
@@ -4334,7 +4335,8 @@
                         "Waaseyaa\\CLI\\Provider\\SchedulePerfServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\IngestSearchSemanticServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\TelescopeServiceProvider",
-                        "Waaseyaa\\CLI\\Provider\\UserPermissionServiceProvider"
+                        "Waaseyaa\\CLI\\Provider\\UserPermissionServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\ConfigCacheDbAuditServiceProvider"
                     ]
                 }
             },
