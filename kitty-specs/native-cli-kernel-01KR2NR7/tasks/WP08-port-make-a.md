@@ -17,8 +17,8 @@ subtasks:
 - T039
 - T040
 - T041
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "928217"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "933164"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -107,3 +107,4 @@ spec-kitty agent action implement WP08 --agent <name>
 
 - 2026-05-08T12:06:26Z – claude:sonnet:implementer:implementer – shell_pid=928217 – Started implementation via action command
 - 2026-05-08T12:25:47Z – claude:sonnet:implementer:implementer – shell_pid=928217 – Ready for review: Make group A (Entity, Job, Listener, Migration, Policy) ported to native CLI. All 4 gates green. All 5 per-command diffs empty. 7457 tests pass.
+- 2026-05-08T12:26:20Z – claude:opus-4-7:reviewer:reviewer – shell_pid=933164 – Started review via action command
