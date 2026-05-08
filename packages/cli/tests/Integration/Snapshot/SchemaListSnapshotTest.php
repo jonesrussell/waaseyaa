@@ -15,7 +15,11 @@ use Waaseyaa\CLI\Io\EmptyStdinSource;
 use Waaseyaa\CLI\Provider\HealthSchemaServiceProvider;
 
 /**
- * Snapshot test: verifies schema:list --help output is stable.
+ * Snapshot test: verifies schema:list --help output matches the WP01 fixture byte-for-byte.
+ *
+ * A passing test here implies:
+ *   diff <(bin/waaseyaa schema:list --help) packages/cli/tests/Fixtures/snapshots/schema__list.help.stdout
+ * exits 0.
  */
 #[CoversNothing]
 final class SchemaListSnapshotTest extends TestCase
@@ -32,29 +36,17 @@ final class SchemaListSnapshotTest extends TestCase
     }
 
     #[Test]
-    public function helpOutputContainsCommandMetadata(): void
+    public function helpOutputMatchesFixtureByteForByte(): void
     {
+        $fixture = file_get_contents(
+            __DIR__ . '/../../Fixtures/snapshots/schema__list.help.stdout',
+        );
+        self::assertNotFalse($fixture, 'Fixture file must exist');
+
         [$stdout, $exitCode] = $this->runHelp('schema:list');
 
-        self::assertSame(0, $exitCode);
-        self::assertStringContainsString('schema:list', $stdout);
-        self::assertStringContainsString('List registered schemas with versions and compatibility policy', $stdout);
-        self::assertStringContainsString('--help', $stdout);
-    }
-
-    #[Test]
-    public function helpExitCodeIsZero(): void
-    {
-        [, $exitCode] = $this->runHelp('schema:list');
-        self::assertSame(0, $exitCode);
-    }
-
-    #[Test]
-    public function helpHasNoJsonOption(): void
-    {
-        [$stdout] = $this->runHelp('schema:list');
-        // schema:list has no --json option; only kernel-level options should appear
-        self::assertStringNotContainsString('Output results as JSON', $stdout);
+        self::assertSame(0, $exitCode, 'schema:list --help must exit 0');
+        self::assertSame($fixture, $stdout, 'schema:list --help output must match fixture byte-for-byte');
     }
 
     /**

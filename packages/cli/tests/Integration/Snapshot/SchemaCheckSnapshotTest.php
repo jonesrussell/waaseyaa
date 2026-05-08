@@ -15,7 +15,11 @@ use Waaseyaa\CLI\Io\EmptyStdinSource;
 use Waaseyaa\CLI\Provider\HealthSchemaServiceProvider;
 
 /**
- * Snapshot test: verifies schema:check --help output is stable.
+ * Snapshot test: verifies schema:check --help output matches the WP01 fixture byte-for-byte.
+ *
+ * A passing test here implies:
+ *   diff <(bin/waaseyaa schema:check --help) packages/cli/tests/Fixtures/snapshots/schema__check.help.stdout
+ * exits 0.
  */
 #[CoversNothing]
 final class SchemaCheckSnapshotTest extends TestCase
@@ -32,23 +36,17 @@ final class SchemaCheckSnapshotTest extends TestCase
     }
 
     #[Test]
-    public function helpOutputContainsCommandMetadata(): void
+    public function helpOutputMatchesFixtureByteForByte(): void
     {
+        $fixture = file_get_contents(
+            __DIR__ . '/../../Fixtures/snapshots/schema__check.help.stdout',
+        );
+        self::assertNotFalse($fixture, 'Fixture file must exist');
+
         [$stdout, $exitCode] = $this->runHelp('schema:check');
 
-        self::assertSame(0, $exitCode);
-        self::assertStringContainsString('schema:check', $stdout);
-        self::assertStringContainsString('Detect schema drift between entity type definitions and database tables', $stdout);
-        self::assertStringContainsString('--json', $stdout);
-        self::assertStringContainsString('Output results as JSON', $stdout);
-        self::assertStringContainsString('--help', $stdout);
-    }
-
-    #[Test]
-    public function helpExitCodeIsZero(): void
-    {
-        [, $exitCode] = $this->runHelp('schema:check');
-        self::assertSame(0, $exitCode);
+        self::assertSame(0, $exitCode, 'schema:check --help must exit 0');
+        self::assertSame($fixture, $stdout, 'schema:check --help output must match fixture byte-for-byte');
     }
 
     /**

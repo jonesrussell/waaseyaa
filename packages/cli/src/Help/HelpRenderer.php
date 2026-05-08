@@ -13,13 +13,13 @@ use Waaseyaa\CLI\OptionMode;
 /**
  * Renders deterministic --help output for a CommandDefinition.
  *
- * Output format (per research.md §R-06):
- *
- *   Usage:
- *     <name> [options] [--] <required_arg> [<optional_arg>] [<array_arg>...]
+ * Output format matches Symfony Console help output (WP01 snapshot contract):
  *
  *   Description:
  *     <description wrapped at 80 cols>
+ *
+ *   Usage:
+ *     <name> [options] [--] <required_arg> [<optional_arg>] [<array_arg>...]
  *
  *   Arguments:
  *     <name>      <description>
@@ -28,28 +28,52 @@ use Waaseyaa\CLI\OptionMode;
  *     -s, --long[=VALUE]   <description> [default: <val>]
  *
  * Options are sorted alphabetically by long name. Kernel-level flags
- * (--help, -v/--verbose, -q/--quiet, --no-interaction, --version) are
- * auto-injected after user-defined options.
+ * (--help, --silent, -q/--quiet, -V/--version, --ansi|--no-ansi,
+ * -n/--no-interaction, -v|vv|vvv/--verbose) are auto-injected after
+ * user-defined options, matching Symfony Console's exact wording.
  */
 final class HelpRenderer
 {
     private const WRAP_WIDTH = 80;
 
+    /**
+     * Kernel-level flags in the order Symfony Console renders them.
+     * Labels with pipe separators (like -v|vv|vvv) are pre-formatted.
+     */
     private const KERNEL_OPTIONS = [
-        ['long' => 'help',           'short' => 'h', 'desc' => 'Display help for the given command'],
-        ['long' => 'no-interaction', 'short' => null, 'desc' => 'Do not ask any interactive question'],
-        ['long' => 'quiet',          'short' => 'q', 'desc' => 'Do not output any message'],
-        ['long' => 'verbose',        'short' => 'v', 'desc' => 'Increase verbosity of messages'],
-        ['long' => 'version',        'short' => null, 'desc' => 'Display the application version'],
+        [
+            'label' => '-h, --help',
+            'desc'  => 'Display help for the given command. When no command is given display help for the list command',
+        ],
+        [
+            'label' => '    --silent',
+            'desc'  => 'Do not output any message',
+        ],
+        [
+            'label' => '-q, --quiet',
+            'desc'  => 'Only errors are displayed. All other output is suppressed',
+        ],
+        [
+            'label' => '-V, --version',
+            'desc'  => 'Display this application version',
+        ],
+        [
+            'label' => '    --ansi|--no-ansi',
+            'desc'  => 'Force (or disable --no-ansi) ANSI output',
+        ],
+        [
+            'label' => '-n, --no-interaction',
+            'desc'  => 'Do not ask any interactive question',
+        ],
+        [
+            'label' => '-v|vv|vvv, --verbose',
+            'desc'  => 'Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug',
+        ],
     ];
 
     public function render(CommandDefinition $command): string
     {
         $lines = [];
-
-        $lines[] = 'Usage:';
-        $lines[] = '  ' . $this->buildUsageLine($command);
-        $lines[] = '';
 
         if ($command->description !== '') {
             $lines[] = 'Description:';
@@ -58,6 +82,10 @@ final class HelpRenderer
             }
             $lines[] = '';
         }
+
+        $lines[] = 'Usage:';
+        $lines[] = '  ' . $this->buildUsageLine($command);
+        $lines[] = '';
 
         if ($command->arguments !== []) {
             $lines[] = 'Arguments:';
@@ -86,7 +114,12 @@ final class HelpRenderer
 
     private function buildUsageLine(CommandDefinition $command): string
     {
-        $parts = [$command->name, '[options]'];
+        $parts = [$command->name];
+
+        // Only add [options] when the command actually declares user options.
+        if ($command->options !== []) {
+            $parts[] = '[options]';
+        }
 
         $hasRequired = false;
         foreach ($command->arguments as $arg) {
@@ -133,11 +166,10 @@ final class HelpRenderer
             ];
         }
 
-        // Kernel-level flags, sorted alphabetically by long name (already sorted in const).
+        // Kernel-level flags in Symfony Console order with exact wording.
         foreach (self::KERNEL_OPTIONS as $k) {
-            $shortPart = $k['short'] !== null ? '-' . $k['short'] . ', ' : '    ';
             $result[] = [
-                'label'   => $shortPart . '--' . $k['long'],
+                'label'   => $k['label'],
                 'desc'    => $k['desc'],
                 'default' => '',
             ];
@@ -151,11 +183,12 @@ final class HelpRenderer
         $shortPart = $opt->shortcut !== null ? '-' . $opt->shortcut . ', ' : '    ';
         $longPart  = '--' . $opt->name;
 
+        $metavar = strtoupper($opt->name);
         $longPart .= match ($opt->mode) {
-            OptionMode::Required  => '=VALUE',
-            OptionMode::Optional  => '[=VALUE]',
+            OptionMode::Required  => '=' . $metavar,
+            OptionMode::Optional  => '[=' . $metavar . ']',
             OptionMode::Negatable => '',
-            OptionMode::Array_    => '=VALUE',
+            OptionMode::Array_    => '=' . $metavar,
             OptionMode::None      => '',
         };
 

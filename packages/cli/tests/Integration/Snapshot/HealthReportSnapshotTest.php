@@ -15,7 +15,11 @@ use Waaseyaa\CLI\Io\EmptyStdinSource;
 use Waaseyaa\CLI\Provider\HealthSchemaServiceProvider;
 
 /**
- * Snapshot test: verifies health:report --help output is stable.
+ * Snapshot test: verifies health:report --help output matches the WP01 fixture byte-for-byte.
+ *
+ * A passing test here implies:
+ *   diff <(bin/waaseyaa health:report --help) packages/cli/tests/Fixtures/snapshots/health__report.help.stdout
+ * exits 0.
  */
 #[CoversNothing]
 final class HealthReportSnapshotTest extends TestCase
@@ -32,32 +36,17 @@ final class HealthReportSnapshotTest extends TestCase
     }
 
     #[Test]
-    public function helpOutputContainsCommandMetadata(): void
+    public function helpOutputMatchesFixtureByteForByte(): void
     {
+        $fixture = file_get_contents(
+            __DIR__ . '/../../Fixtures/snapshots/health__report.help.stdout',
+        );
+        self::assertNotFalse($fixture, 'Fixture file must exist');
+
         [$stdout, $exitCode] = $this->runHelp('health:report');
 
-        self::assertSame(0, $exitCode);
-        self::assertStringContainsString('health:report', $stdout);
-        self::assertStringContainsString('Generate a full diagnostic report for operator review', $stdout);
-        self::assertStringContainsString('--json', $stdout);
-        self::assertStringContainsString('Output as JSON', $stdout);
-        self::assertStringContainsString('--output', $stdout);
-        self::assertStringContainsString('Write report to file', $stdout);
-        self::assertStringContainsString('--help', $stdout);
-    }
-
-    #[Test]
-    public function helpExitCodeIsZero(): void
-    {
-        [, $exitCode] = $this->runHelp('health:report');
-        self::assertSame(0, $exitCode);
-    }
-
-    #[Test]
-    public function outputOptionHasShortcutO(): void
-    {
-        [$stdout] = $this->runHelp('health:report');
-        self::assertStringContainsString('-o,', $stdout);
+        self::assertSame(0, $exitCode, 'health:report --help must exit 0');
+        self::assertSame($fixture, $stdout, 'health:report --help output must match fixture byte-for-byte');
     }
 
     /**

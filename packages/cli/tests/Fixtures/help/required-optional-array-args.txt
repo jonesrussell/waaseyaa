@@ -1,8 +1,8 @@
-Usage:
-  make [options] [--] <type> [<label>] [<fields>...]
-
 Description:
   Scaffold a new entity type.
+
+Usage:
+  make [--] <type> [<label>] [<fields>...]
 
 Arguments:
   type    Entity type machine name.
@@ -10,8 +10,10 @@ Arguments:
   fields  Field names to add.
 
 Options:
-  -h, --help            Display help for the given command
-      --no-interaction  Do not ask any interactive question
-  -q, --quiet           Do not output any message
-  -v, --verbose         Increase verbosity of messages
-      --version         Display the application version
+  -h, --help            Display help for the given command. When no command is given display help for the list command
+      --silent          Do not output any message
+  -q, --quiet           Only errors are displayed. All other output is suppressed
+  -V, --version         Display this application version
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction  Do not ask any interactive question
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
