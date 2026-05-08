@@ -243,6 +243,17 @@ return [
     // Layer 3: Services — public (single-entity-work-surface-01KQ7M1P)
     'Waaseyaa\StructuredImport\StructuredImporterInterface' => 'public',
 
+    // Layer 6: CLI native kernel — WP02 (native-cli-kernel-01KR2NR7)
+    'Waaseyaa\Cli\ArgumentMode' => 'public',
+    'Waaseyaa\Cli\CliIO' => 'public',
+    'Waaseyaa\Cli\OptionMode' => 'public',
+    'Waaseyaa\CLI\Parser\ParseErrorKind' => 'public',
+
+    // Layer 6: CLI native kernel — WP03 (native-cli-kernel-01KR2NR7)
+    'Waaseyaa\CLI\Io\CliInput' => 'public',
+    'Waaseyaa\CLI\Io\CliOutput' => 'public',
+    'Waaseyaa\CLI\Io\StdinSource' => 'public',
+
     // Layer 6: Interfaces — internal
     'Waaseyaa\Telescope\Storage\TelescopeStoreInterface' => 'internal',
     'Waaseyaa\Telescope\CodifiedContext\Validator\EmbeddingProviderInterface' => 'internal',

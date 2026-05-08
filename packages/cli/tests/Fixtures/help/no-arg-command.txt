@@ -1,0 +1,12 @@
+Usage:
+  list [options]
+
+Description:
+  List all registered commands.
+
+Options:
+  -h, --help            Display help for the given command
+      --no-interaction  Do not ask any interactive question
+  -q, --quiet           Do not output any message
+  -v, --verbose         Increase verbosity of messages
+      --version         Display the application version

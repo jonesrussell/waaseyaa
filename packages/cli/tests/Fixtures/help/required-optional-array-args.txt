@@ -1,0 +1,17 @@
+Usage:
+  make [options] [--] <type> [<label>] [<fields>...]
+
+Description:
+  Scaffold a new entity type.
+
+Arguments:
+  type    Entity type machine name.
+  label   Human-readable label.
+  fields  Field names to add.
+
+Options:
+  -h, --help            Display help for the given command
+      --no-interaction  Do not ask any interactive question
+  -q, --quiet           Do not output any message
+  -v, --verbose         Increase verbosity of messages
+      --version         Display the application version
