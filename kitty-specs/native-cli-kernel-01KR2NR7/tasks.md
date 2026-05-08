@@ -32,10 +32,10 @@
 | T019 | Extend `PackageManifestCompiler` capability list to recognise the new interface | WP04 | — | [D] |
 | T020 | Implement `CliKernelServiceProvider::buildRegistry()` iterating providers via manifest | WP04 | — | [D] |
 | T021 | Implement `CliKernel::run(argv): int` (dispatch, exit codes, signal handling) + integration tests | WP04 | — | [D] |
-| T022 | Implement `CliApplication::main()` entry-point class (no Symfony import) | WP05 | [P] |
-| T023 | Rewrite `bin/waaseyaa` to boot `CliApplication`; include temporary dual-boot adapter that ALSO discovers `HasCommandsInterface` providers | WP05 | — |
-| T024 | Add legacy adapter: wraps Symfony `Command` instances into `CommandDefinition` shims so they keep running through `CliKernel` while WPs 06-22 progress | WP05 | — |
-| T025 | Integration test: dual-boot serves both legacy Symfony commands and a single new native command end-to-end | WP05 | — |
+| T022 | Implement `CliApplication::main()` entry-point class (no Symfony import) | WP05 | [D] |
+| T023 | Rewrite `bin/waaseyaa` to boot `CliApplication`; include temporary dual-boot adapter that ALSO discovers `HasCommandsInterface` providers | WP05 | — | [D] |
+| T024 | Add legacy adapter: wraps Symfony `Command` instances into `CommandDefinition` shims so they keep running through `CliKernel` while WPs 06-22 progress | WP05 | — | [D] |
+| T025 | Integration test: dual-boot serves both legacy Symfony commands and a single new native command end-to-end | WP05 | — | [D] |
 | T026 | Port `HealthCheckCommand` → `HealthCheckHandler` + migrate test + snapshot pass | WP06 | [P] |
 | T027 | Port `HealthReportCommand` → `HealthReportHandler` + migrate test + snapshot pass | WP06 | [P] |
 | T028 | Port `SchemaCheckCommand` → `SchemaCheckHandler` + migrate test + snapshot pass | WP06 | [P] |
@@ -228,10 +228,10 @@
 **Independent test**: `bin/waaseyaa list` lists every command exactly as before, including a new test command registered via `HasNativeCommandsInterface`.
 
 **Subtasks**:
-- [ ] T022 Implement `CliApplication::main()` (WP05)
-- [ ] T023 Rewrite `bin/waaseyaa` to boot `CliApplication` with dual-boot discovery (WP05)
-- [ ] T024 Implement `LegacySymfonyCommandAdapter` wrapping Symfony `Command` into a `CommandDefinition` (WP05)
-- [ ] T025 Integration test: dual-boot serves both legacy + native end-to-end (WP05)
+- [x] T022 Implement `CliApplication::main()` (WP05)
+- [x] T023 Rewrite `bin/waaseyaa` to boot `CliApplication` with dual-boot discovery (WP05)
+- [x] T024 Implement `LegacySymfonyCommandAdapter` wrapping Symfony `Command` into a `CommandDefinition` (WP05)
+- [x] T025 Integration test: dual-boot serves both legacy + native end-to-end (WP05)
 
 **Implementation sketch**: `LegacySymfonyCommandAdapter` introspects a Symfony `Command` via reflection, builds an equivalent `CommandDefinition`, and delegates execution via a closure that converts `CliIO` back into Symfony `InputInterface`/`OutputInterface` adapter shims. Lives in `packages/cli/src/Compat/` and is deleted with extreme prejudice in WP23. **Estimated prompt**: ~440 lines.
 
