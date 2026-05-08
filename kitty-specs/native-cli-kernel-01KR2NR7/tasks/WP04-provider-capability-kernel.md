@@ -18,8 +18,8 @@ subtasks:
 - T019
 - T020
 - T021
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "885388"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "886666"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -174,3 +174,4 @@ spec-kitty agent action implement WP04 --agent <name>
 - 2026-05-08T04:10:27Z – claude:opus-4-7:reviewer:reviewer – shell_pid=884659 – Moved to planned
 - 2026-05-08T04:11:06Z – claude:sonnet:implementer:implementer – shell_pid=885388 – Started implementation via action command
 - 2026-05-08T04:15:19Z – claude:sonnet:implementer:implementer – shell_pid=885388 – Cycle 2 fix: namespace casing (CliKernel.php Waaseyaa\Cli -> Waaseyaa\CLI) + vendor symlink isolation (foundation symlink now points to worktree packages, not main repo). 1424 tests pass, 0 failures, main repo git status clean of foundation.
+- 2026-05-08T04:15:48Z – claude:opus-4-7:reviewer:reviewer – shell_pid=886666 – Started review via action command
