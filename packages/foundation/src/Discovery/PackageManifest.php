@@ -40,6 +40,8 @@ final class PackageManifest
         public readonly array $packageDeclarations = [],
         /** @var list<class-string> Classes carrying #[AsEntityType] that also implement DefinesEntityType */
         public readonly array $attributeEntityTypes = [],
+        /** @var list<class-string> Provider classes that implement HasNativeCommandsInterface */
+        public readonly array $nativeCommandProviders = [],
     ) {}
 
     /**
@@ -55,7 +57,7 @@ final class PackageManifest
         unset($data['commands'], $data['routes']);
 
         $requiredKeys = ['providers', 'migrations', 'field_types', 'middleware'];
-        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types'];
+        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types', 'native_command_providers'];
         $missing = array_diff($requiredKeys, array_keys($data));
 
         if ($missing !== []) {
@@ -85,6 +87,7 @@ final class PackageManifest
             policies: $data['policies'] ?? [],
             packageDeclarations: $data['package_declarations'] ?? [],
             attributeEntityTypes: $data['attribute_entity_types'] ?? [],
+            nativeCommandProviders: $data['native_command_providers'] ?? [],
         );
     }
 
@@ -105,6 +108,7 @@ final class PackageManifest
             'policies' => $this->policies,
             'package_declarations' => $this->packageDeclarations,
             'attribute_entity_types' => $this->attributeEntityTypes,
+            'native_command_providers' => $this->nativeCommandProviders,
         ];
     }
 }

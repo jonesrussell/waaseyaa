@@ -39,6 +39,7 @@ return [
     'Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface' => 'public',
+    'Waaseyaa\Foundation\ServiceProvider\Capability\HasNativeCommandsInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface' => 'public',
@@ -225,6 +226,9 @@ return [
 
     // Layer 6: Interfaces — public
     'Waaseyaa\CLI\Ingestion\SourceConnectorInterface' => 'public',
+    // WP04: native CLI kernel
+    'Waaseyaa\Cli\CliKernel' => 'public',
+    'Waaseyaa\CLI\Provider\CliKernelServiceProvider' => 'public',
     'Waaseyaa\AdminSurface\Action\SurfaceActionHandlerInterface' => 'public',
     'Waaseyaa\AdminSurface\Query\SurfaceFilterOperator' => 'public',
     'Waaseyaa\AdminSurface\Host\AbstractAdminSurfaceHost' => 'public',
