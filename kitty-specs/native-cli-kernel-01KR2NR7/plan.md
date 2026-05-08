@@ -51,9 +51,9 @@ Replace `symfony/console` as the runtime substrate of `packages/cli/` with a Waa
 
 | Metric | Pre-cut value | Post-cut threshold | Post-cut value | Pass? |
 |---|---|---|---|---|
-| `bin/waaseyaa list` wall-time (median of 10) | _captured by WP-01_ | ≤ 110% of pre-cut | _captured by WP-final_ | _WP-final_ |
-| `bin/waaseyaa list` peak memory | _captured by WP-01_ | ≤ pre-cut + 4 MiB | _captured by WP-final_ | _WP-final_ |
-| `bin/waaseyaa health:check --json` wall-time (median of 10) | _captured by WP-01_ | ≤ 110% of pre-cut | _captured by WP-final_ | _WP-final_ |
+| `bin/waaseyaa list` wall-time (median of 10) | 0.01 s | ≤ 110% of pre-cut | _captured by WP-final_ | _WP-final_ |
+| `bin/waaseyaa list` peak memory | 30336 KB | ≤ pre-cut + 4 MiB | _captured by WP-final_ | _WP-final_ |
+| `bin/waaseyaa health:check --json` wall-time (median of 10) | 0.01 s | ≤ 110% of pre-cut | _captured by WP-final_ | _WP-final_ |
 
 The harness script `kitty-specs/native-cli-kernel-01KR2NR7/scripts/perf-harness.sh` is created by WP-01 and lives there for the duration of the mission. It is deleted in WP-final after numbers are recorded.
 
