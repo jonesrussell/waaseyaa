@@ -16,8 +16,8 @@ subtasks:
 - T091
 - T092
 - T093
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "994802"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "998000"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -80,3 +80,4 @@ spec-kitty agent action implement WP20 --agent <name>
 
 - 2026-05-08T16:16:23Z – claude:sonnet:implementer:implementer – shell_pid=994802 – Started implementation via action command
 - 2026-05-08T16:29:10Z – claude:sonnet:implementer:implementer – shell_pid=994802 – Ready for review: 5 commands ported (About/AdminBuild/AdminDev/DebugContext/EventList) via MiscAServiceProvider; all 4 gates green; 7498/7498 tests pass; phpstan [OK] No errors; 5 snapshot fixtures verified byte-for-byte
+- 2026-05-08T16:29:42Z – claude:opus-4-7:reviewer:reviewer – shell_pid=998000 – Started review via action command
