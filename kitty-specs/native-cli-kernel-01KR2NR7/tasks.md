@@ -36,11 +36,11 @@
 | T023 | Rewrite `bin/waaseyaa` to boot `CliApplication`; include temporary dual-boot adapter that ALSO discovers `HasCommandsInterface` providers | WP05 | — | [D] |
 | T024 | Add legacy adapter: wraps Symfony `Command` instances into `CommandDefinition` shims so they keep running through `CliKernel` while WPs 06-22 progress | WP05 | — | [D] |
 | T025 | Integration test: dual-boot serves both legacy Symfony commands and a single new native command end-to-end | WP05 | — | [D] |
-| T026 | Port `HealthCheckCommand` → `HealthCheckHandler` + migrate test + snapshot pass | WP06 | [P] |
-| T027 | Port `HealthReportCommand` → `HealthReportHandler` + migrate test + snapshot pass | WP06 | [P] |
-| T028 | Port `SchemaCheckCommand` → `SchemaCheckHandler` + migrate test + snapshot pass | WP06 | [P] |
-| T029 | Port `SchemaListCommand` → `SchemaListHandler` + migrate test + snapshot pass | WP06 | [P] |
-| T030 | Update `packages/cli` ServiceProvider to register the four handlers via `HasNativeCommandsInterface` | WP06 | — |
+| T026 | Port `HealthCheckCommand` → `HealthCheckHandler` + migrate test + snapshot pass | WP06 | [D] |
+| T027 | Port `HealthReportCommand` → `HealthReportHandler` + migrate test + snapshot pass | WP06 | [D] |
+| T028 | Port `SchemaCheckCommand` → `SchemaCheckHandler` + migrate test + snapshot pass | WP06 | [D] |
+| T029 | Port `SchemaListCommand` → `SchemaListHandler` + migrate test + snapshot pass | WP06 | [D] |
+| T030 | Update `packages/cli` ServiceProvider to register the four handlers via `HasNativeCommandsInterface` | WP06 | — | [D] |
 | T031 | Port `MigrateCommand` → `MigrateHandler` + migrate test + snapshot pass | WP07 | [P] |
 | T032 | Port `MigrateRollbackCommand` → `MigrateRollbackHandler` + migrate test + snapshot pass | WP07 | [P] |
 | T033 | Port `MigrateStatusCommand` → `MigrateStatusHandler` + migrate test + snapshot pass | WP07 | [P] |
@@ -249,11 +249,11 @@
 **Independent test**: All four handlers' tests + snapshot integration tests pass; `bin/waaseyaa health:check --json` byte-equals WP01 fixture.
 
 **Subtasks**:
-- [ ] T026 Port `HealthCheckCommand` → `HealthCheckHandler` (WP06)
-- [ ] T027 Port `HealthReportCommand` → `HealthReportHandler` (WP06)
-- [ ] T028 Port `SchemaCheckCommand` → `SchemaCheckHandler` (WP06)
-- [ ] T029 Port `SchemaListCommand` → `SchemaListHandler` (WP06)
-- [ ] T030 Update `packages/cli` `CliServiceProvider` to register the four handlers via `HasNativeCommandsInterface` (WP06)
+- [x] T026 Port `HealthCheckCommand` → `HealthCheckHandler` (WP06)
+- [x] T027 Port `HealthReportCommand` → `HealthReportHandler` (WP06)
+- [x] T028 Port `SchemaCheckCommand` → `SchemaCheckHandler` (WP06)
+- [x] T029 Port `SchemaListCommand` → `SchemaListHandler` (WP06)
+- [x] T030 Update `packages/cli` `CliServiceProvider` to register the four handlers via `HasNativeCommandsInterface` (WP06)
 
 **Implementation sketch**: Follow the canonical port pattern (extracted into `quickstart.md`). Each command's `configure()` becomes a `CommandDefinition` literal in the provider; `execute(InputInterface, OutputInterface): int` becomes `execute(CliIO): int` on the handler class. **Estimated prompt**: ~340 lines.
 
