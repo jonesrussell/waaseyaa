@@ -52,11 +52,11 @@
 | T039 | Port `Make/MakeListenerCommand` → `MakeListenerHandler` + migrate test + snapshot pass | WP08 | [D] |
 | T040 | Port `Make/MakeMigrationCommand` → `MakeMigrationHandler` + migrate test + snapshot pass | WP08 | [D] |
 | T041 | Port `Make/MakePolicyCommand` → `MakePolicyHandler` + migrate test + snapshot pass | WP08 | [D] |
-| T042 | Port `Make/MakeProviderCommand` → `MakeProviderHandler` + migrate test + snapshot pass | WP09 | [P] |
-| T043 | Port `Make/MakePublicCommand` → `MakePublicHandler` + migrate integration test + snapshot pass | WP09 | [P] |
-| T044 | Port `Make/MakeTestCommand` → `MakeTestHandler` + migrate test + snapshot pass | WP09 | [P] |
-| T045 | Port `MakeEntityTypeCommand` → `MakeEntityTypeHandler` + migrate test + snapshot pass | WP09 | [P] |
-| T046 | Port `MakePluginCommand` → `MakePluginHandler` + migrate test + snapshot pass | WP09 | [P] |
+| T042 | Port `Make/MakeProviderCommand` → `MakeProviderHandler` + migrate test + snapshot pass | WP09 | [D] |
+| T043 | Port `Make/MakePublicCommand` → `MakePublicHandler` + migrate integration test + snapshot pass | WP09 | [D] |
+| T044 | Port `Make/MakeTestCommand` → `MakeTestHandler` + migrate test + snapshot pass | WP09 | [D] |
+| T045 | Port `MakeEntityTypeCommand` → `MakeEntityTypeHandler` + migrate test + snapshot pass | WP09 | [D] |
+| T046 | Port `MakePluginCommand` → `MakePluginHandler` + migrate test + snapshot pass | WP09 | [D] |
 | T047 | Port `Optimize/OptimizeCommand` → `OptimizeHandler` + migrate test + snapshot pass | WP10 | [P] |
 | T048 | Port `Optimize/OptimizeClearCommand` → `OptimizeClearHandler` + migrate test + snapshot pass | WP10 | [P] |
 | T049 | Port `Optimize/OptimizeConfigCommand` → `OptimizeConfigHandler` + migrate test + snapshot pass | WP10 | [P] |
@@ -301,11 +301,11 @@
 ### WP09 — Port: Make group B (Provider, Public, Test, EntityType, Plugin)
 
 **Subtasks**:
-- [ ] T042 Port `MakeProviderCommand` → `MakeProviderHandler` (WP09)
-- [ ] T043 Port `MakePublicCommand` → `MakePublicHandler` (WP09)
-- [ ] T044 Port `MakeTestCommand` → `MakeTestHandler` (WP09)
-- [ ] T045 Port `MakeEntityTypeCommand` → `MakeEntityTypeHandler` (WP09)
-- [ ] T046 Port `MakePluginCommand` → `MakePluginHandler` (WP09)
+- [x] T042 Port `MakeProviderCommand` → `MakeProviderHandler` (WP09)
+- [x] T043 Port `MakePublicCommand` → `MakePublicHandler` (WP09)
+- [x] T044 Port `MakeTestCommand` → `MakeTestHandler` (WP09)
+- [x] T045 Port `MakeEntityTypeCommand` → `MakeEntityTypeHandler` (WP09)
+- [x] T046 Port `MakePluginCommand` → `MakePluginHandler` (WP09)
 
 **Estimated prompt**: ~340 lines. **Dependencies**: WP08 (uses AbstractMakeHandler).
 
