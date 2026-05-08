@@ -72,3 +72,4 @@ spec-kitty agent action implement WP12 --agent <name>
 ## Activity Log
 
 - 2026-05-08T13:12:49Z – claude:sonnet:implementer:implementer – shell_pid=946509 – Started implementation via action command
+- 2026-05-08T13:45:22Z – claude:sonnet:implementer:implementer – shell_pid=946509 – Ready for review (continuation — prior agent died after stubs; all gates green)
