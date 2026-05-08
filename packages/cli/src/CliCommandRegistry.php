@@ -10,12 +10,7 @@ use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\Command\AboutCommand;
 use Waaseyaa\CLI\Command\AdminBuildCommand;
 use Waaseyaa\CLI\Command\AdminDevCommand;
-use Waaseyaa\CLI\Command\AuditLogCommand;
 use Waaseyaa\CLI\Command\BundleScaffoldCommand;
-use Waaseyaa\CLI\Command\CacheClearCommand;
-use Waaseyaa\CLI\Command\ConfigExportCommand;
-use Waaseyaa\CLI\Command\ConfigImportCommand;
-use Waaseyaa\CLI\Command\DbInitCommand;
 use Waaseyaa\CLI\Command\DebugContextCommand;
 use Waaseyaa\CLI\Command\EventListCommand;
 use Waaseyaa\CLI\Command\ExtensionScaffoldCommand;
@@ -62,11 +57,7 @@ final class CliCommandRegistry
         \PDO $pdo,
     ): array {
         return [
-            new DbInitCommand($projectRoot),
             new InstallCommand($entityTypeManager, $configManager),
-            new CacheClearCommand($cacheFactory),
-            new ConfigExportCommand($configManager),
-            new ConfigImportCommand($configManager),
             new DebugContextCommand(),
             new ScaffoldAuthCommand($projectRoot),
             new ServeCommand($projectRoot),
@@ -81,7 +72,6 @@ final class CliCommandRegistry
                 'php' => PHP_VERSION,
                 'environment' => getenv('APP_ENV') ?: 'production',
             ]),
-            new AuditLogCommand($lifecycleManager, $entityAuditLogger),
             new EventListCommand($dispatcher),
             new RouteListCommand($router),
             new FixtureScaffoldCommand(),

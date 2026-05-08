@@ -12,14 +12,15 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Cache\CacheFactory;
-use Waaseyaa\CLI\Command\CacheClearCommand;
-use Waaseyaa\CLI\Command\ConfigExportCommand;
-use Waaseyaa\CLI\Command\ConfigImportCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
+use Waaseyaa\CLI\Handler\CacheClearHandler;
+use Waaseyaa\CLI\Handler\ConfigExportHandler;
+use Waaseyaa\CLI\Handler\ConfigImportHandler;
 use Waaseyaa\CLI\Handler\EntityCreateHandler;
 use Waaseyaa\CLI\Handler\EntityListHandler;
 use Waaseyaa\CLI\Handler\UserCreateHandler;
 use Waaseyaa\CLI\Handler\UserRoleHandler;
+use Waaseyaa\CLI\Provider\ConfigCacheDbAuditServiceProvider;
 use Waaseyaa\CLI\Provider\EntityTypeServiceProvider;
 use Waaseyaa\CLI\Provider\UserPermissionServiceProvider;
 use Waaseyaa\CLI\Testing\CliTester;
@@ -122,13 +123,37 @@ final class CliCommandIntegrationTest extends TestCase
         $this->assertNotFalse($discoveryBin->get('key3'));
         $this->assertNotFalse($configBin->get('key4'));
 
-        // Run cache:clear command.
-        $command = new CacheClearCommand($this->cacheFactory);
-        $tester = new CommandTester($command);
+        // Run cache:clear command via native handler.
+        $provider = new ConfigCacheDbAuditServiceProvider();
+        $cacheClearDef = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'cache:clear') {
+                $cacheClearDef = $cmd;
+                break;
+            }
+        }
+        $this->assertNotNull($cacheClearDef);
+
+        $container = new class ($this->cacheFactory) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Cache\CacheFactoryInterface $factory) {}
+            public function get(string $id): mixed
+            {
+                if ($id === CacheClearHandler::class) {
+                    return new CacheClearHandler($this->factory);
+                }
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+            public function has(string $id): bool
+            {
+                return $id === CacheClearHandler::class;
+            }
+        };
+
+        $tester = CliTester::for($cacheClearDef, $container);
         $tester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertStringContainsString('All cache bins cleared', $tester->getDisplay());
+        $this->assertSame(0, $tester->getExitCode());
+        $this->assertStringContainsString('All cache bins cleared', $tester->getStdout());
 
         // Verify all caches are empty.
         $this->assertFalse($defaultBin->get('key1'));
@@ -149,13 +174,43 @@ final class CliCommandIntegrationTest extends TestCase
             'default' => 'stark',
         ]);
 
-        // Export via command.
-        $exportCommand = new ConfigExportCommand($this->configManager);
-        $exportTester = new CommandTester($exportCommand);
+        // Export via native handler.
+        $provider = new ConfigCacheDbAuditServiceProvider();
+        $exportDef = null;
+        $importDef = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'config:export') {
+                $exportDef = $cmd;
+            }
+            if ($cmd->name === 'config:import') {
+                $importDef = $cmd;
+            }
+        }
+        $this->assertNotNull($exportDef);
+        $this->assertNotNull($importDef);
+
+        $configManager = $this->configManager;
+        $configContainer = new class ($configManager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Config\ConfigManagerInterface $manager) {}
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    ConfigExportHandler::class => new ConfigExportHandler($this->manager),
+                    ConfigImportHandler::class => new ConfigImportHandler($this->manager),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+            public function has(string $id): bool
+            {
+                return in_array($id, [ConfigExportHandler::class, ConfigImportHandler::class], true);
+            }
+        };
+
+        $exportTester = CliTester::for($exportDef, $configContainer);
         $exportTester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $exportTester->getStatusCode());
-        $this->assertStringContainsString('Configuration exported. Active storage contains 2 items', $exportTester->getDisplay());
+        $this->assertSame(0, $exportTester->getExitCode());
+        $this->assertStringContainsString('Configuration exported. Active storage contains 2 items', $exportTester->getStdout());
 
         // Verify sync storage has the config.
         $this->assertSame(['name' => 'My Waaseyaa Site', 'slogan' => 'Built with Waaseyaa'], $this->syncStorage->read('system.site'));
@@ -171,13 +226,12 @@ final class CliCommandIntegrationTest extends TestCase
         $activeData = $this->activeStorage->read('system.site');
         $this->assertSame('Modified Site', $activeData['name']);
 
-        // Import via command (should restore from sync).
-        $importCommand = new ConfigImportCommand($this->configManager);
-        $importTester = new CommandTester($importCommand);
+        // Import via native handler (should restore from sync).
+        $importTester = CliTester::for($importDef, $configContainer);
         $importTester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $importTester->getStatusCode());
-        $this->assertStringContainsString('Configuration imported successfully', $importTester->getDisplay());
+        $this->assertSame(0, $importTester->getExitCode());
+        $this->assertStringContainsString('Configuration imported successfully', $importTester->getStdout());
 
         // Verify active matches sync after import.
         $restored = $this->activeStorage->read('system.site');

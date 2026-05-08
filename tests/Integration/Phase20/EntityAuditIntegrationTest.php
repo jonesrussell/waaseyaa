@@ -7,10 +7,12 @@ namespace Waaseyaa\Tests\Integration\Phase20;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Waaseyaa\CLI\Command\AuditLogCommand;
+use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\AuditLogHandler;
+use Waaseyaa\CLI\OptionDefinition;
+use Waaseyaa\CLI\OptionMode;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Entity\Audit\EntityAuditEntry;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
 use Waaseyaa\Entity\Audit\EntityWriteAuditListener;
@@ -111,7 +113,7 @@ final class EntityAuditIntegrationTest extends TestCase
 
         $tester = $this->runAuditCommand(['--entity-type' => 'note']);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('note', $output);
         $this->assertStringContainsString('create', $output);
         $this->assertStringNotContainsString('article', $output);
@@ -137,7 +139,7 @@ final class EntityAuditIntegrationTest extends TestCase
 
         $tester = $this->runAuditCommand(['--entity-type' => '']);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('note', $output);
         $this->assertStringContainsString('article', $output);
     }
@@ -171,16 +173,38 @@ final class EntityAuditIntegrationTest extends TestCase
         };
     }
 
-    private function runAuditCommand(array $input): CommandTester
+    /** @param array<string, mixed> $input */
+    private function runAuditCommand(array $input): CliTester
     {
         $lifecycleManager = new EntityTypeLifecycleManager($this->tempDir);
+        $handler = new AuditLogHandler($lifecycleManager, $this->auditLogger);
 
-        $app = new Application();
-        $app->add(new AuditLogCommand($lifecycleManager, $this->auditLogger));
+        $definition = new CommandDefinition(
+            name: 'audit:log',
+            description: 'Display the entity type lifecycle audit log, or entity-write audit log with --entity-type',
+            options: [
+                new OptionDefinition(name: 'type', mode: OptionMode::Required, description: 'Filter lifecycle log by entity type ID (e.g. note)', default: ''),
+                new OptionDefinition(name: 'tenant', mode: OptionMode::Required, description: 'Filter lifecycle log by tenant ID', default: ''),
+                new OptionDefinition(name: 'entity-type', mode: OptionMode::Required, description: 'Show entity-write audit log, optionally filtered by type (e.g. note)'),
+            ],
+            handler: \Closure::fromCallable([$handler, 'execute']),
+        );
 
-        $command = $app->find('audit:log');
-        $tester  = new CommandTester($command);
-        $tester->execute($input);
+        $container = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                throw new \RuntimeException("Not found: {$id}");
+            }
+            public function has(string $id): bool
+            {
+                return false;
+            }
+        };
+
+        $tester = CliTester::for($definition, $container);
+
+        // Map old-style input array (e.g. ['--entity-type' => 'note']) to executeMap.
+        $tester->executeMap($input);
 
         return $tester;
     }

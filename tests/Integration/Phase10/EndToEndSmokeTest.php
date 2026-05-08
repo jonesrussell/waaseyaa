@@ -20,11 +20,11 @@ use Waaseyaa\AI\Schema\SchemaRegistry;
 use Waaseyaa\Api\OpenApi\OpenApiGenerator;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Cache\CacheFactory;
-use Waaseyaa\CLI\Command\CacheClearCommand;
-use Waaseyaa\CLI\Command\ConfigExportCommand;
-use Waaseyaa\CLI\Command\ConfigImportCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
 use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\CacheClearHandler;
+use Waaseyaa\CLI\Handler\ConfigExportHandler;
+use Waaseyaa\CLI\Handler\ConfigImportHandler;
 use Waaseyaa\CLI\Handler\EntityCreateHandler;
 use Waaseyaa\CLI\Handler\EntityListHandler;
 use Waaseyaa\CLI\Handler\MigrateDefaultsHandler;
@@ -32,6 +32,7 @@ use Waaseyaa\CLI\Handler\TypeDisableHandler;
 use Waaseyaa\CLI\Handler\TypeEnableHandler;
 use Waaseyaa\CLI\OptionDefinition;
 use Waaseyaa\CLI\OptionMode;
+use Waaseyaa\CLI\Provider\ConfigCacheDbAuditServiceProvider;
 use Waaseyaa\CLI\Provider\EntityTypeServiceProvider;
 use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Config\ConfigManager;
@@ -191,13 +192,37 @@ final class EndToEndSmokeTest extends TestCase
         $this->assertNotFalse($defaultBin->get('page_1'));
         $this->assertNotFalse($renderBin->get('block_1'));
 
-        // Clear all caches via CLI.
-        $cacheClearCommand = new CacheClearCommand($cacheFactory);
-        $cacheClearTester = new CommandTester($cacheClearCommand);
+        // Clear all caches via native handler.
+        $provider = new ConfigCacheDbAuditServiceProvider();
+        $cacheClearDef = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'cache:clear') {
+                $cacheClearDef = $cmd;
+                break;
+            }
+        }
+        $this->assertNotNull($cacheClearDef);
+
+        $cacheClearContainer = new class ($cacheFactory) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Cache\CacheFactoryInterface $f) {}
+            public function get(string $id): mixed
+            {
+                if ($id === CacheClearHandler::class) {
+                    return new CacheClearHandler($this->f);
+                }
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+            public function has(string $id): bool
+            {
+                return $id === CacheClearHandler::class;
+            }
+        };
+
+        $cacheClearTester = CliTester::for($cacheClearDef, $cacheClearContainer);
         $cacheClearTester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $cacheClearTester->getStatusCode());
-        $this->assertStringContainsString('cleared', $cacheClearTester->getDisplay());
+        $this->assertSame(0, $cacheClearTester->getExitCode());
+        $this->assertStringContainsString('cleared', $cacheClearTester->getStdout());
 
         // Verify bins are empty.
         $this->assertFalse($defaultBin->get('page_1'));
@@ -205,11 +230,40 @@ final class EndToEndSmokeTest extends TestCase
 
         // --- Step 5: Config export, modify active, import to restore ---
 
-        // Export current config to sync.
-        $exportCommand = new ConfigExportCommand($configManager);
-        $exportTester = new CommandTester($exportCommand);
+        // Export current config to sync via native handler.
+        $configProvider = new ConfigCacheDbAuditServiceProvider();
+        $exportDef = null;
+        $importDef = null;
+        foreach ($configProvider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'config:export') {
+                $exportDef = $cmd;
+            }
+            if ($cmd->name === 'config:import') {
+                $importDef = $cmd;
+            }
+        }
+        $this->assertNotNull($exportDef);
+        $this->assertNotNull($importDef);
+
+        $configContainer = new class ($configManager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Config\ConfigManagerInterface $m) {}
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    ConfigExportHandler::class => new ConfigExportHandler($this->m),
+                    ConfigImportHandler::class => new ConfigImportHandler($this->m),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+            public function has(string $id): bool
+            {
+                return in_array($id, [ConfigExportHandler::class, ConfigImportHandler::class], true);
+            }
+        };
+
+        $exportTester = CliTester::for($exportDef, $configContainer);
         $exportTester->execute([]);
-        $this->assertSame(Command::SUCCESS, $exportTester->getStatusCode());
+        $this->assertSame(0, $exportTester->getExitCode());
 
         // Verify sync has the config.
         $syncSiteConfig = $syncStorage->read('system.site');
@@ -223,12 +277,11 @@ final class EndToEndSmokeTest extends TestCase
         $drifted = $activeStorage->read('system.site');
         $this->assertSame('Drifted Site Name', $drifted['name']);
 
-        // Import from sync to restore the original.
-        $importCommand = new ConfigImportCommand($configManager);
-        $importTester = new CommandTester($importCommand);
+        // Import from sync to restore the original via native handler.
+        $importTester = CliTester::for($importDef, $configContainer);
         $importTester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $importTester->getStatusCode());
+        $this->assertSame(0, $importTester->getExitCode());
 
         // Verify active config was restored.
         $restored = $activeStorage->read('system.site');
@@ -467,12 +520,36 @@ final class EndToEndSmokeTest extends TestCase
         $this->assertNotFalse($renderBin->get('block:header'));
         $this->assertNotFalse($discoveryBin->get('plugins:field'));
 
-        // Clear all caches via CacheClearCommand.
-        $command = new CacheClearCommand($cacheFactory);
-        $tester = new CommandTester($command);
+        // Clear all caches via native CacheClearHandler.
+        $cacheProvider = new ConfigCacheDbAuditServiceProvider();
+        $cacheSmokeDef = null;
+        foreach ($cacheProvider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'cache:clear') {
+                $cacheSmokeDef = $cmd;
+                break;
+            }
+        }
+        $this->assertNotNull($cacheSmokeDef);
+
+        $smokeCacheContainer = new class ($cacheFactory) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Cache\CacheFactoryInterface $f) {}
+            public function get(string $id): mixed
+            {
+                if ($id === CacheClearHandler::class) {
+                    return new CacheClearHandler($this->f);
+                }
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+            public function has(string $id): bool
+            {
+                return $id === CacheClearHandler::class;
+            }
+        };
+
+        $tester = CliTester::for($cacheSmokeDef, $smokeCacheContainer);
         $tester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
 
         // Verify everything is cleared.
         $this->assertFalse($defaultBin->get('entity:1'));

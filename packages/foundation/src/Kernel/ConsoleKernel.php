@@ -9,8 +9,13 @@ use Waaseyaa\Cache\Backend\DatabaseBackend;
 use Waaseyaa\Cache\CacheConfiguration;
 use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\CliCommandRegistry;
-use Waaseyaa\CLI\Command\DbInitCommand;
+use Waaseyaa\CLI\CliKernel;
 use Waaseyaa\CLI\Command\WaaseyaaVersionCommand;
+use Waaseyaa\CLI\CommandRegistry;
+use Waaseyaa\CLI\Help\HelpRenderer;
+use Waaseyaa\CLI\Io\EmptyStdinSource;
+use Waaseyaa\CLI\Io\StreamCliOutput;
+use Waaseyaa\CLI\Provider\ConfigCacheDbAuditServiceProvider;
 use Waaseyaa\CLI\WaaseyaaApplication;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\FileStorage;
@@ -224,9 +229,38 @@ final class ConsoleKernel extends AbstractKernel
                 new WaaseyaaVersionCommand($this->projectRoot),
             ]);
         } elseif ($requested === 'db:init') {
-            $app->registerCommands([
-                new DbInitCommand($this->projectRoot),
-            ]);
+            // db:init is now a native command served via ConfigCacheDbAuditServiceProvider.
+            // Build a minimal CliKernel with only the db:init command registered.
+            $registry = new CommandRegistry();
+            $provider = new ConfigCacheDbAuditServiceProvider();
+            $provider->setKernelContext($this->projectRoot, [], []);
+            foreach ($provider->nativeCommands() as $cmd) {
+                if ($cmd->name === 'db:init') {
+                    $registry->register($cmd);
+                    break;
+                }
+            }
+            $container = new class implements \Psr\Container\ContainerInterface {
+                public function get(string $id): mixed
+                {
+                    throw new \RuntimeException('Container not available in minimal console.');
+                }
+                public function has(string $id): bool
+                {
+                    return false;
+                }
+            };
+            $stdout = new StreamCliOutput(STDOUT);
+            $stderr = new StreamCliOutput(STDERR);
+            $kernel = new CliKernel(
+                registry: $registry,
+                container: $container,
+                help: new HelpRenderer(),
+                stdout: $stdout,
+                stderr: $stderr,
+                stdin: new EmptyStdinSource(),
+            );
+            return $kernel->run(array_slice($_SERVER['argv'] ?? [], 1));
         } else {
             // optimize:manifest is now handled by OptimizeServiceProvider via the native CliKernel.
             // The minimal console path is not reached for native commands.

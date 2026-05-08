@@ -2,13 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Foundation\Kernel\EnvLoader;
@@ -28,61 +24,51 @@ use Waaseyaa\Foundation\Migration\Migrator;
  * Runs outside the normal kernel boot so it can execute under APP_ENV=production
  * without tripping the DatabaseBootstrapper production guard. See ConsoleKernel::shouldUseMinimalConsole.
  */
-#[AsCommand(
-    name: 'db:init',
-    description: 'Initialize the database on first deploy and apply pending migrations.',
-)]
-final class DbInitCommand extends Command
+final class DbInitHandler
 {
-    public function __construct(private readonly string $projectRoot)
-    {
-        parent::__construct();
-    }
+    public function __construct(
+        private readonly string $projectRoot,
+    ) {}
 
-    protected function configure(): void
+    public function execute(CliIO $io): int
     {
-        $this->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show what would happen without creating files or running migrations.');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $dryRun = (bool) $input->getOption('dry-run');
+        $dryRun = (bool) $io->option('dry-run');
 
         EnvLoader::load($this->projectRoot . '/.env');
         $config = $this->loadConfig();
         $dbPath = $this->resolveDatabasePath($config);
 
         if ($dryRun) {
-            return $this->reportDryRun($dbPath, $output);
+            return $this->reportDryRun($dbPath, $io);
         }
 
-        if (!$this->ensureParentDirectory($dbPath, $output)) {
-            return self::FAILURE;
+        if (!$this->ensureParentDirectory($dbPath, $io)) {
+            return 1;
         }
 
-        $lockHandle = $this->acquireLock($dbPath, $output);
+        $lockHandle = $this->acquireLock($dbPath, $io);
         if ($lockHandle === null) {
-            return self::FAILURE;
+            return 1;
         }
 
         try {
             $fresh = !is_file($dbPath);
             if ($fresh) {
-                if (!$this->createDatabaseFile($dbPath, $output)) {
-                    return self::FAILURE;
+                if (!$this->createDatabaseFile($dbPath, $io)) {
+                    return 1;
                 }
-                $output->writeln(sprintf('Created database at %s.', $dbPath));
+                $io->writeln(sprintf('Created database at %s.', $dbPath));
             } else {
-                $output->writeln(sprintf('Database already present at %s.', $dbPath));
+                $io->writeln(sprintf('Database already present at %s.', $dbPath));
             }
 
             $database = DBALDatabase::createSqlite($dbPath);
             $connection = $database->getConnection();
 
             if (!$fresh && !$this->looksWaaseyaaInitialized($connection)) {
-                $output->writeln(sprintf('<error>Database at %s exists but does not look Waaseyaa-initialized (no waaseyaa_migrations table).</error>', $dbPath));
-                $output->writeln('<error>Refusing to touch it. Move the file aside (e.g. mv waaseyaa.sqlite waaseyaa.sqlite.bak) and re-run db:init.</error>');
-                return self::FAILURE;
+                $io->error(sprintf('Database at %s exists but does not look Waaseyaa-initialized (no waaseyaa_migrations table).', $dbPath));
+                $io->error('Refusing to touch it. Move the file aside (e.g. mv waaseyaa.sqlite waaseyaa.sqlite.bak) and re-run db:init.');
+                return 1;
             }
 
             $repository = new MigrationRepository($connection);
@@ -99,17 +85,17 @@ final class DbInitCommand extends Command
             $result = $migrator->run($migrations);
 
             if ($result->count === 0) {
-                $output->writeln('No pending migrations.');
+                $io->writeln('No pending migrations.');
             } else {
                 foreach ($result->migrations as $name) {
-                    $output->writeln(sprintf('  Migrated: %s', $name));
+                    $io->writeln(sprintf('  Migrated: %s', $name));
                 }
                 $label = $result->count === 1 ? 'migration' : 'migrations';
-                $output->writeln(sprintf('Ran %d %s.', $result->count, $label));
+                $io->writeln(sprintf('Ran %d %s.', $result->count, $label));
             }
 
-            $output->writeln('<info>Database ready.</info>');
-            return self::SUCCESS;
+            $io->writeln('Database ready.');
+            return 0;
         } finally {
             $this->releaseLock($lockHandle);
         }
@@ -156,37 +142,37 @@ final class DbInitCommand extends Command
         return rtrim($this->projectRoot, '/') . '/' . ltrim($path, './');
     }
 
-    private function reportDryRun(string $dbPath, OutputInterface $output): int
+    private function reportDryRun(string $dbPath, CliIO $io): int
     {
-        $output->writeln('<comment>--dry-run: no changes will be made.</comment>');
-        $output->writeln(sprintf('Database path: %s', $dbPath));
+        $io->writeln('--dry-run: no changes will be made.');
+        $io->writeln(sprintf('Database path: %s', $dbPath));
 
         $parent = dirname($dbPath);
-        $output->writeln(sprintf('Parent directory: %s (%s)', $parent, is_dir($parent) ? 'exists' : 'would be created'));
+        $io->writeln(sprintf('Parent directory: %s (%s)', $parent, is_dir($parent) ? 'exists' : 'would be created'));
 
         if ($dbPath === ':memory:') {
-            $output->writeln('Target is in-memory; nothing to persist.');
-            return self::SUCCESS;
+            $io->writeln('Target is in-memory; nothing to persist.');
+            return 0;
         }
 
         if (!is_file($dbPath)) {
-            $output->writeln('Database file: absent (would be created).');
-            $output->writeln('Would run all pending migrations on the new database.');
-            return self::SUCCESS;
+            $io->writeln('Database file: absent (would be created).');
+            $io->writeln('Would run all pending migrations on the new database.');
+            return 0;
         }
 
         try {
             $database = DBALDatabase::createSqlite($dbPath);
             $connection = $database->getConnection();
         } catch (\Throwable $e) {
-            $output->writeln(sprintf('<error>Cannot open existing database: %s</error>', $e->getMessage()));
-            return self::FAILURE;
+            $io->error(sprintf('Cannot open existing database: %s', $e->getMessage()));
+            return 1;
         }
 
         if (!$this->looksWaaseyaaInitialized($connection)) {
-            $output->writeln('<error>Database file exists but is not Waaseyaa-initialized.</error>');
-            $output->writeln('<error>db:init would refuse. Move the file aside and re-run.</error>');
-            return self::FAILURE;
+            $io->error('Database file exists but is not Waaseyaa-initialized.');
+            $io->error('db:init would refuse. Move the file aside and re-run.');
+            return 1;
         }
 
         $repository = new MigrationRepository($connection);
@@ -206,20 +192,20 @@ final class DbInitCommand extends Command
             }
         }
 
-        $output->writeln('Database file: present and initialized.');
+        $io->writeln('Database file: present and initialized.');
         if ($pending === []) {
-            $output->writeln('No pending migrations.');
+            $io->writeln('No pending migrations.');
         } else {
-            $output->writeln(sprintf('Would run %d pending migration(s):', count($pending)));
+            $io->writeln(sprintf('Would run %d pending migration(s):', count($pending)));
             foreach ($pending as $name) {
-                $output->writeln(sprintf('  - %s', $name));
+                $io->writeln(sprintf('  - %s', $name));
             }
         }
 
-        return self::SUCCESS;
+        return 0;
     }
 
-    private function ensureParentDirectory(string $dbPath, OutputInterface $output): bool
+    private function ensureParentDirectory(string $dbPath, CliIO $io): bool
     {
         if ($dbPath === ':memory:') {
             return true;
@@ -228,30 +214,30 @@ final class DbInitCommand extends Command
         $parent = dirname($dbPath);
         if (!is_dir($parent)) {
             if (!@mkdir($parent, 0o755, recursive: true) && !is_dir($parent)) {
-                $output->writeln(sprintf('<error>Cannot create parent directory: %s</error>', $parent));
-                $output->writeln(sprintf('<error>Expected writable by user: %s (uid %d).</error>', $this->processUserName(), $this->processUid()));
+                $io->error(sprintf('Cannot create parent directory: %s', $parent));
+                $io->error(sprintf('Expected writable by user: %s (uid %d).', $this->processUserName(), $this->processUid()));
                 return false;
             }
         }
 
         if (!is_writable($parent)) {
-            $output->writeln(sprintf('<error>Parent directory is not writable: %s</error>', $parent));
-            $output->writeln(sprintf('<error>Expected writable by user: %s (uid %d). Fix directory permissions and retry.</error>', $this->processUserName(), $this->processUid()));
+            $io->error(sprintf('Parent directory is not writable: %s', $parent));
+            $io->error(sprintf('Expected writable by user: %s (uid %d). Fix directory permissions and retry.', $this->processUserName(), $this->processUid()));
             return false;
         }
 
         return true;
     }
 
-    private function createDatabaseFile(string $dbPath, OutputInterface $output): bool
+    private function createDatabaseFile(string $dbPath, CliIO $io): bool
     {
         if ($dbPath === ':memory:') {
             return true;
         }
 
         if (@touch($dbPath) === false) {
-            $output->writeln(sprintf('<error>Cannot create database file: %s</error>', $dbPath));
-            $output->writeln(sprintf('<error>Expected writable by user: %s (uid %d). Fix permissions and retry.</error>', $this->processUserName(), $this->processUid()));
+            $io->error(sprintf('Cannot create database file: %s', $dbPath));
+            $io->error(sprintf('Expected writable by user: %s (uid %d). Fix permissions and retry.', $this->processUserName(), $this->processUid()));
             return false;
         }
 
@@ -270,7 +256,7 @@ final class DbInitCommand extends Command
     /**
      * @return resource|null
      */
-    private function acquireLock(string $dbPath, OutputInterface $output)
+    private function acquireLock(string $dbPath, CliIO $io)
     {
         if ($dbPath === ':memory:') {
             $memoryHandle = fopen('php://memory', 'r+');
@@ -285,13 +271,13 @@ final class DbInitCommand extends Command
         $lockPath = $parent . '/.db-init.lock';
         $handle = @fopen($lockPath, 'c');
         if ($handle === false) {
-            $output->writeln(sprintf('<error>Cannot open lock file: %s</error>', $lockPath));
+            $io->error(sprintf('Cannot open lock file: %s', $lockPath));
             return null;
         }
 
         if (!flock($handle, LOCK_EX | LOCK_NB)) {
             fclose($handle);
-            $output->writeln(sprintf('<error>Another db:init is in progress (lock held on %s). Exiting.</error>', $lockPath));
+            $io->error(sprintf('Another db:init is in progress (lock held on %s). Exiting.', $lockPath));
             return null;
         }
 
