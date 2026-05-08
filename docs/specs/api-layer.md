@@ -1,5 +1,6 @@
 # API Layer
 
+<!-- Spec reviewed 2026-05-08 - WaaseyaaRouter::match() maps Symfony UrlMatcher failures to Waaseyaa\Routing\Exception\RouteNotFoundException / RouteMethodNotAllowedException (previous callers expecting Symfony ResourceNotFoundException from match() must migrate); HttpKernel catches those Waaseyaa types for JSON 404/405; RouteBuilder::controller() + normalizeControllerDefault() coerce `[FQCN, method]` to `FQCN::method`; HttpKernel merges match params through normalizeControllerDefault (foundation-symfony-fallback-elimination-01KQZR1 WP03–WP04) -->
 <!-- Spec reviewed 2026-04-26 - ResourceSerializer prefers non-integer string id() for JSON:API resource id (config machine names); JsonApiController store machine-name path uses config heuristics (id=bundle, or non-default id without bundle, or no uuid); API integration fixtures now map per-entity metadata classes -->
 <!-- Spec reviewed 2026-04-25 - RouteBuilder::bind + RouteFingerprint for SSR app-controller binding metadata; see docs/specs/app-controller-invocation.md -->
 <!-- Spec reviewed 2026-04-24 - CodifiedContextController JSON camelCase (admin useCodifiedContext); CodifiedContextApiRouter; agent-context HTTP paths; CodifiedContextSessionStoreInterface + CodifiedContextSessionRow (packages/api); telescope-agent-context-telemetry.md; waaseyaa/telescope ships CodifiedContextSessionStoreAdapter (#1339 L4/L6 boundary) -->
@@ -74,8 +75,10 @@ Foundation still wires several shared HTTP surfaces that are not entity-package 
 
 | File | Namespace | Purpose |
 |------|-----------|---------|
-| `src/WaaseyaaRouter.php` | `Waaseyaa\Routing` | Wraps Symfony UrlMatcher + UrlGenerator |
-| `src/RouteBuilder.php` | `Waaseyaa\Routing` | Fluent API for building Symfony Route objects; `entityParameter()` sets `options.parameters.*.type = entity:{id}`; `bind()` sets `options._waaseyaa_app_bindings` for SSR post-load class checks |
+| `src/WaaseyaaRouter.php` | `Waaseyaa\Routing` | Wraps Symfony UrlMatcher + UrlGenerator; `match()` rethrows matcher failures as Waaseyaa routing exceptions (below) |
+| `src/Exception/RouteNotFoundException.php` | `Waaseyaa\Routing\Exception` | Thrown from `WaaseyaaRouter::match()` when no route matches the path (wraps Symfony `ResourceNotFoundException`) |
+| `src/Exception/RouteMethodNotAllowedException.php` | `Waaseyaa\Routing\Exception` | Thrown from `WaaseyaaRouter::match()` when the path matches but the HTTP method is not allowed (wraps Symfony `MethodNotAllowedException`) |
+| `src/RouteBuilder.php` | `Waaseyaa\Routing` | Fluent API for building Symfony Route objects; `entityParameter()` sets `options.parameters.*.type = entity:{id}`; `bind()` sets `options._waaseyaa_app_bindings` for SSR post-load class checks; `controller()` accepts `string`, `callable`, or `[FQCN, method]` and stores normalized `_controller` via `normalizeControllerDefault()` |
 | `src/RouteFingerprint.php` | `Waaseyaa\Routing` | Stable hash of path, methods, parameters, bindings, defaults for app-controller descriptor cache invalidation |
 | `src/RouteMatch.php` | `Waaseyaa\Routing` | Value object for matched route (name, route, parameters) |
 | `src/AccessChecker.php` (in `waaseyaa/access`, not routing) | `Waaseyaa\Access` | Route-level access checking via route options. Owned by the access package; routing depends on access (mission #824 WP05 surface A). |
@@ -576,6 +579,10 @@ final class WaaseyaaRouter
 
 Wraps Symfony `UrlMatcher` and `UrlGenerator`. Lazy-initializes matchers/generators and resets them when routes change.
 
+**`match(string $pathinfo): array`:** On success, returns the Symfony matcher parameter array (including `_route`). On failure, **does not** leak Symfony matcher exception types to callers: `Symfony\Component\Routing\Exception\ResourceNotFoundException` becomes `Waaseyaa\Routing\Exception\RouteNotFoundException`, and `Symfony\Component\Routing\Exception\MethodNotAllowedException` becomes `Waaseyaa\Routing\Exception\RouteMethodNotAllowedException` (previous exception is chained). Foundation `HttpKernel` catches the Waaseyaa types to emit JSON **404** / **405** responses for API-style requests without importing Symfony routing exception classes in the hot path.
+
+**`generate(...)`** continues to throw Symfony generator exceptions (`RouteNotFoundException`, `MissingMandatoryParametersException`, `InvalidParameterException`) — only the **match** path is wrapped.
+
 ### RouteBuilder
 
 Fluent API for building Symfony Route objects:
@@ -592,7 +599,7 @@ $route = RouteBuilder::create('/node/{node}')
 
 | Method | Route Option | Purpose |
 |--------|-------------|---------|
-| `controller(string\|callable)` | `_controller` | Sets the controller |
+| `controller(string\|callable\|array{0: string, 1: string})` | `_controller` | Sets the controller; two-element `[FQCN, method]` arrays are normalized to `FQCN::method` (same rule as `RouteBuilder::normalizeControllerDefault()`) |
 | `methods(string ...)` | (route methods) | Allowed HTTP methods |
 | `entityParameter(string $name, string $entityType)` | `parameters[$name] = ['type' => 'entity:{entityType}']` | Entity param upcasting |
 | `requirePermission(string $permission)` | `_permission` | Require specific permission |
