@@ -90,7 +90,8 @@
                 "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\QueueServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\SchedulePerfServiceProvider",
-                "Waaseyaa\\CLI\\Provider\\TelescopeServiceProvider"
+                "Waaseyaa\\CLI\\Provider\\TelescopeServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\UserPermissionServiceProvider"
             ]
         }
     },

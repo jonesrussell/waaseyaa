@@ -499,18 +499,6 @@ parameters:
 			path: packages/cli/src/Command/IngestRunCommand.php
 
 		-
-			message: '#^Offset ''description'' on array\{title\: string, description\: string\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/PermissionListCommand.php
-
-		-
-			message: '#^Offset ''title'' on array\{title\: string, description\: string\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/PermissionListCommand.php
-
-		-
 			message: '#^Casting to float something that''s already float\.$#'
 			identifier: cast.useless
 			count: 1
@@ -581,12 +569,6 @@ parameters:
 			identifier: if.condNotBoolean
 			count: 3
 			path: packages/cli/src/Command/SyncRulesCommand.php
-
-		-
-			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
-			identifier: if.condNotBoolean
-			count: 2
-			path: packages/cli/src/Command/UserRoleCommand.php
 
 		-
 			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'

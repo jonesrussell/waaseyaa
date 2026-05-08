@@ -26,7 +26,6 @@ use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
 use Waaseyaa\CLI\Command\IngestDashboardCommand;
 use Waaseyaa\CLI\Command\IngestRunCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\PermissionListCommand;
 use Waaseyaa\CLI\Command\RelationshipTypeScaffoldCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
 use Waaseyaa\CLI\Command\ScaffoldAuthCommand;
@@ -34,8 +33,6 @@ use Waaseyaa\CLI\Command\SemanticRefreshCommand;
 use Waaseyaa\CLI\Command\SemanticWarmCommand;
 use Waaseyaa\CLI\Command\ServeCommand;
 use Waaseyaa\CLI\Command\SyncRulesCommand;
-use Waaseyaa\CLI\Command\UserCreateCommand;
-use Waaseyaa\CLI\Command\UserRoleCommand;
 use Waaseyaa\CLI\Command\WaaseyaaVersionCommand;
 use Waaseyaa\CLI\Command\WorkflowScaffoldCommand;
 use Waaseyaa\Config\ConfigManager;
@@ -77,8 +74,6 @@ final class CliCommandRegistry
             new ConfigExportCommand($configManager),
             new ConfigImportCommand($configManager),
             new DebugContextCommand(),
-            new UserCreateCommand($entityTypeManager),
-            new UserRoleCommand($entityTypeManager),
             new ScaffoldAuthCommand($projectRoot),
             new ServeCommand($projectRoot),
             new AdminDevCommand($projectRoot),
@@ -95,7 +90,6 @@ final class CliCommandRegistry
             new AuditLogCommand($lifecycleManager, $entityAuditLogger),
             new EventListCommand($dispatcher),
             new RouteListCommand($router),
-            new PermissionListCommand($permissionHandler),
             ...($semanticWarmer !== null ? [
                 new SemanticWarmCommand($semanticWarmer),
                 new SemanticRefreshCommand($semanticWarmer),
