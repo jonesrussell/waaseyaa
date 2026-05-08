@@ -33,8 +33,8 @@ subtasks:
 - T104
 - T105
 - T106
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "1007657"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "1015982"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -151,3 +151,4 @@ spec-kitty agent action implement WP23 --agent <name>
 
 - 2026-05-08T17:06:21Z – claude:sonnet:implementer:implementer – shell_pid=1007657 – Started implementation via action command
 - 2026-05-08T17:34:15Z – claude:sonnet:implementer:implementer – shell_pid=1007657 – Hard-cut complete: deleted Compat/, WaaseyaaApplication, CliCommandRegistry, HasCommandsInterface, DualBootTest; removed symfony/console from all waaseyaa/* runtime requires; wired native CliKernel end-to-end via KernelHandlerContainer; all 7496 tests pass, cs/stan/layers/policy green.
+- 2026-05-08T17:35:03Z – claude:opus-4-7:reviewer:reviewer – shell_pid=1015982 – Started review via action command
