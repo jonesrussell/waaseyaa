@@ -119,3 +119,7 @@ Verify with `ls kitty-specs/native-cli-kernel-01KR2NR7/scripts/ 2>&1` returning 
 ```bash
 spec-kitty agent action implement WP25 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T17:49:00Z – unknown – Ready for review — final mission verification: NFR-001/NFR-002 PASS, byte-parity 71/71, full phpunit 7496/0/0, cs/stan/layers/policy/drift all GREEN
