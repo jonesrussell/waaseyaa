@@ -34,6 +34,10 @@
         },
         {
             "type": "path",
+            "url": "../scheduler"
+        },
+        {
+            "type": "path",
             "url": "../typed-data"
         },
         {
@@ -48,6 +52,7 @@
         "waaseyaa/config": "^0.1.0-alpha.150",
         "waaseyaa/entity": "^0.1.0-alpha.150",
         "waaseyaa/queue": "^0.1.0-alpha.150",
+        "waaseyaa/scheduler": "^0.1.0-alpha.150",
         "waaseyaa/user": "^0.1.0-alpha.150",
         "symfony/console": "^7.0"
     },
@@ -83,6 +88,7 @@
                 "Waaseyaa\\CLI\\Provider\\MigrateServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\QueueServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\SchedulePerfServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\TelescopeServiceProvider"
             ]
         }

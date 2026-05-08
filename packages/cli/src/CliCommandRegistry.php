@@ -29,8 +29,6 @@ use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
 use Waaseyaa\CLI\Command\IngestDashboardCommand;
 use Waaseyaa\CLI\Command\IngestRunCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\Perf\PerformanceBaselineCommand;
-use Waaseyaa\CLI\Command\Perf\PerformanceCompareCommand;
 use Waaseyaa\CLI\Command\PermissionListCommand;
 use Waaseyaa\CLI\Command\RelationshipTypeScaffoldCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
@@ -121,8 +119,6 @@ final class CliCommandRegistry
             new RelationshipTypeScaffoldCommand(),
             new WorkflowScaffoldCommand(),
             new ExtensionScaffoldCommand(),
-            new PerformanceBaselineCommand(),
-            new PerformanceCompareCommand(),
             new SyncRulesCommand(
                 $projectRoot . '/vendor/waaseyaa/foundation/.claude/rules',
                 $projectRoot . '/.claude/rules',
