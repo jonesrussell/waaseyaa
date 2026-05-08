@@ -18,9 +18,6 @@ use Waaseyaa\CLI\Command\ConfigExportCommand;
 use Waaseyaa\CLI\Command\ConfigImportCommand;
 use Waaseyaa\CLI\Command\DbInitCommand;
 use Waaseyaa\CLI\Command\DebugContextCommand;
-use Waaseyaa\CLI\Command\EntityCreateCommand;
-use Waaseyaa\CLI\Command\EntityListCommand;
-use Waaseyaa\CLI\Command\EntityTypeListCommand;
 use Waaseyaa\CLI\Command\EventListCommand;
 use Waaseyaa\CLI\Command\ExtensionScaffoldCommand;
 use Waaseyaa\CLI\Command\FixtureGenerateCommand;
@@ -37,8 +34,6 @@ use Waaseyaa\CLI\Command\SemanticRefreshCommand;
 use Waaseyaa\CLI\Command\SemanticWarmCommand;
 use Waaseyaa\CLI\Command\ServeCommand;
 use Waaseyaa\CLI\Command\SyncRulesCommand;
-use Waaseyaa\CLI\Command\TypeDisableCommand;
-use Waaseyaa\CLI\Command\TypeEnableCommand;
 use Waaseyaa\CLI\Command\UserCreateCommand;
 use Waaseyaa\CLI\Command\UserRoleCommand;
 use Waaseyaa\CLI\Command\WaaseyaaVersionCommand;
@@ -82,8 +77,6 @@ final class CliCommandRegistry
             new ConfigExportCommand($configManager),
             new ConfigImportCommand($configManager),
             new DebugContextCommand(),
-            new EntityCreateCommand($entityTypeManager),
-            new EntityListCommand($entityTypeManager),
             new UserCreateCommand($entityTypeManager),
             new UserRoleCommand($entityTypeManager),
             new ScaffoldAuthCommand($projectRoot),
@@ -99,9 +92,6 @@ final class CliCommandRegistry
                 'php' => PHP_VERSION,
                 'environment' => getenv('APP_ENV') ?: 'production',
             ]),
-            new EntityTypeListCommand($entityTypeManager),
-            new TypeDisableCommand($entityTypeManager, $lifecycleManager, $typeIdNormalizer),
-            new TypeEnableCommand($entityTypeManager, $lifecycleManager, $typeIdNormalizer),
             new AuditLogCommand($lifecycleManager, $entityAuditLogger),
             new EventListCommand($dispatcher),
             new RouteListCommand($router),

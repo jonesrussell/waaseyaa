@@ -18,7 +18,9 @@ use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\Command\CacheClearCommand;
 use Waaseyaa\CLI\Command\ConfigExportCommand;
 use Waaseyaa\CLI\Command\ConfigImportCommand;
-use Waaseyaa\CLI\Command\EntityCreateCommand;
+use Waaseyaa\CLI\Handler\EntityCreateHandler;
+use Waaseyaa\CLI\Provider\EntityTypeServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\MemoryStorage;
 use Waaseyaa\Entity\EntityType;
@@ -120,10 +122,38 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
     #[Test]
     public function testEntityCreatedViaCLICanBeRenderedBySSR(): void
     {
-        // Create an entity via EntityCreateCommand.
-        $createCommand = new EntityCreateCommand($this->entityTypeManager);
-        $tester = new CommandTester($createCommand);
-        $tester->execute([
+        // Create an entity via EntityCreateHandler.
+        $manager = $this->entityTypeManager;
+        $container = new class ($manager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly EntityTypeManager $manager) {}
+
+            public function get(string $id): mixed
+            {
+                if ($id === EntityCreateHandler::class) {
+                    return new EntityCreateHandler($this->manager);
+                }
+
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === EntityCreateHandler::class;
+            }
+        };
+
+        $provider = new EntityTypeServiceProvider();
+        $createDefinition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'entity:create') {
+                $createDefinition = $cmd;
+                break;
+            }
+        }
+        $this->assertNotNull($createDefinition);
+
+        $tester = CliTester::for($createDefinition, $container);
+        $tester->executeMap([
             'entity_type' => 'article',
             '--values' => json_encode([
                 'title' => 'Integration Test Article',
@@ -132,7 +162,7 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
                 'author' => 'admin',
             ]),
         ]);
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
 
         // Load entity from storage.
         $entity = $this->articleStorage->load(1);

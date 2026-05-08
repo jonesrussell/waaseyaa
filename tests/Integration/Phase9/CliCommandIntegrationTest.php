@@ -15,11 +15,13 @@ use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\Command\CacheClearCommand;
 use Waaseyaa\CLI\Command\ConfigExportCommand;
 use Waaseyaa\CLI\Command\ConfigImportCommand;
-use Waaseyaa\CLI\Command\EntityCreateCommand;
-use Waaseyaa\CLI\Command\EntityListCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
 use Waaseyaa\CLI\Command\UserCreateCommand;
 use Waaseyaa\CLI\Command\UserRoleCommand;
+use Waaseyaa\CLI\Handler\EntityCreateHandler;
+use Waaseyaa\CLI\Handler\EntityListHandler;
+use Waaseyaa\CLI\Provider\EntityTypeServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\MemoryStorage;
 use Waaseyaa\Entity\EntityType;
@@ -185,32 +187,54 @@ final class CliCommandIntegrationTest extends TestCase
     #[Test]
     public function testEntityCreateAndList(): void
     {
-        // Create entities via entity:create command.
-        $createCommand = new EntityCreateCommand($this->entityTypeManager);
+        $manager = $this->entityTypeManager;
+        $container = new class ($manager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager) {}
 
-        $tester1 = new CommandTester($createCommand);
-        $tester1->execute([
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    EntityCreateHandler::class => new EntityCreateHandler($this->manager),
+                    EntityListHandler::class   => new EntityListHandler($this->manager),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+
+            public function has(string $id): bool
+            {
+                return in_array($id, [EntityCreateHandler::class, EntityListHandler::class], true);
+            }
+        };
+
+        $provider = new EntityTypeServiceProvider();
+        $definitions = [];
+        foreach ($provider->nativeCommands() as $cmd) {
+            $definitions[$cmd->name] = $cmd;
+        }
+
+        // Create entities via entity:create handler.
+        $tester1 = CliTester::for($definitions['entity:create'], $container);
+        $tester1->executeMap([
             'entity_type' => 'article',
             '--values' => json_encode(['title' => 'First Article', 'type' => 'blog']),
         ]);
-        $this->assertSame(Command::SUCCESS, $tester1->getStatusCode());
-        $this->assertStringContainsString('Created article entity with ID:', $tester1->getDisplay());
+        $this->assertSame(0, $tester1->getExitCode());
+        $this->assertStringContainsString('Created article entity with ID:', $tester1->getStdout());
 
-        $tester2 = new CommandTester($createCommand);
-        $tester2->execute([
+        $tester2 = CliTester::for($definitions['entity:create'], $container);
+        $tester2->executeMap([
             'entity_type' => 'article',
             '--values' => json_encode(['title' => 'Second Article', 'type' => 'news']),
         ]);
-        $this->assertSame(Command::SUCCESS, $tester2->getStatusCode());
+        $this->assertSame(0, $tester2->getExitCode());
 
-        // List entities via entity:list command.
-        $listCommand = new EntityListCommand($this->entityTypeManager);
-        $listTester = new CommandTester($listCommand);
-        $listTester->execute(['entity_type' => 'article']);
+        // List entities via entity:list handler.
+        $listTester = CliTester::for($definitions['entity:list'], $container);
+        $listTester->executeMap(['entity_type' => 'article']);
 
-        $this->assertSame(Command::SUCCESS, $listTester->getStatusCode());
+        $this->assertSame(0, $listTester->getExitCode());
 
-        $output = $listTester->getDisplay();
+        $output = $listTester->getStdout();
         $this->assertStringContainsString('First Article', $output);
         $this->assertStringContainsString('Second Article', $output);
     }

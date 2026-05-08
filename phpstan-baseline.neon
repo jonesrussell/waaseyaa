@@ -583,12 +583,6 @@ parameters:
 			path: packages/cli/src/Command/SyncRulesCommand.php
 
 		-
-			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: packages/cli/src/Command/TypeDisableCommand.php
-
-		-
 			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
 			identifier: if.condNotBoolean
 			count: 2
