@@ -75,3 +75,4 @@ spec-kitty agent action implement WP12 --agent <name>
 - 2026-05-08T13:45:22Z – claude:sonnet:implementer:implementer – shell_pid=946509 – Ready for review (continuation — prior agent died after stubs; all gates green)
 - 2026-05-08T13:45:52Z – claude:opus-4-7:reviewer:reviewer – shell_pid=949174 – Started review via action command
 - 2026-05-08T13:47:18Z – claude:opus-4-7:reviewer:reviewer – shell_pid=949174 – Review passed: 30/30 byte-parity, HelpRenderer untouched, phpstan -37/+1 (net deletion), all gates green, pseudo-baseline documented in commit
+- 2026-05-08T18:06:28Z – claude:opus-4-7:reviewer:reviewer – shell_pid=949174 – Done override: Mission merged to main (cc36dfcd2)
