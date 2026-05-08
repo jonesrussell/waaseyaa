@@ -8,15 +8,14 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
-use Waaseyaa\CLI\Command\FixturePackRefreshCommand;
+use Waaseyaa\CLI\Handler\FixturePackRefreshHandler;
 use Waaseyaa\CLI\Handler\IngestRunHandler;
+use Waaseyaa\CLI\Provider\BundleFixtureServiceProvider;
 use Waaseyaa\CLI\Provider\IngestSearchSemanticServiceProvider;
 use Waaseyaa\CLI\Testing\CliTester;
 
 #[CoversClass(IngestRunHandler::class)]
-#[CoversClass(FixturePackRefreshCommand::class)]
+#[CoversClass(FixturePackRefreshHandler::class)]
 final class IngestionFixturePackRegressionTest extends TestCase
 {
     private string $tempDir;
@@ -132,23 +131,38 @@ final class IngestionFixturePackRegressionTest extends TestCase
     public function fixture_pack_refresh_consumes_ingestion_scenarios_consistently(): void
     {
         $scenarioDir = $this->repoRoot() . '/tests/fixtures/scenarios';
-        $app = new Application();
-        $app->add(new FixturePackRefreshCommand());
-        $tester = new CommandTester($app->find('fixture:pack:refresh'));
 
-        $tester->execute([
-            '--input-dir' => $scenarioDir,
-            '--json' => true,
-        ]);
-        $first = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+        $provider = new BundleFixtureServiceProvider();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'fixture:pack:refresh') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
 
-        $tester->execute([
-            '--input-dir' => $scenarioDir,
-            '--json' => true,
-        ]);
-        $second = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+        $container = new class implements ContainerInterface {
+            public function get(string $id): mixed
+            {
+                return new FixturePackRefreshHandler();
+            }
 
-        $this->assertSame(0, $tester->getStatusCode());
+            public function has(string $id): bool
+            {
+                return $id === FixturePackRefreshHandler::class;
+            }
+        };
+
+        $firstTester = CliTester::for($definition, $container);
+        $firstTester->executeMap(['--input-dir' => $scenarioDir, '--json' => true]);
+        $first = json_decode($firstTester->getStdout(), true, 512, JSON_THROW_ON_ERROR);
+
+        $secondTester = CliTester::for($definition, $container);
+        $secondTester->executeMap(['--input-dir' => $scenarioDir, '--json' => true]);
+        $second = json_decode($secondTester->getStdout(), true, 512, JSON_THROW_ON_ERROR);
+
+        $this->assertSame(0, $firstTester->getExitCode());
         $this->assertSame($first['hash'], $second['hash']);
         $this->assertGreaterThanOrEqual(3, $first['scenario_count']);
         $this->assertSame('ingestion-blocked', array_keys($first['scenarios'])[0]);

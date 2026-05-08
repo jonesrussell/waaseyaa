@@ -289,12 +289,6 @@ parameters:
 			path: packages/cli/src/CliKernel.php
 
 		-
-			message: '#^Casting to string something that''s already string\.$#'
-			identifier: cast.useless
-			count: 2
-			path: packages/cli/src/Command/BundleScaffoldCommand.php
-
-		-
 			message: '#^Strict comparison using \!\=\= between lowercase\-string&non\-empty\-string and '''' will always evaluate to true\.$#'
 			identifier: notIdentical.alwaysTrue
 			count: 1
@@ -323,42 +317,6 @@ parameters:
 			identifier: ternary.shortNotAllowed
 			count: 1
 			path: packages/cli/src/Command/ExtensionScaffoldCommand.php
-
-		-
-			message: '#^Match arm comparison between ''mixed\-workflow'' and ''mixed\-workflow'' is always true\.$#'
-			identifier: match.alwaysTrue
-			count: 1
-			path: packages/cli/src/Command/FixtureGenerateCommand.php
-
-		-
-			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: packages/cli/src/Command/FixturePackRefreshCommand.php
-
-		-
-			message: '#^Casting to int something that''s already int\<0, max\>\.$#'
-			identifier: cast.useless
-			count: 1
-			path: packages/cli/src/Command/FixturePackRefreshCommand.php
-
-		-
-			message: '#^Casting to string something that''s already string\.$#'
-			identifier: cast.useless
-			count: 2
-			path: packages/cli/src/Command/FixturePackRefreshCommand.php
-
-		-
-			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-			identifier: ternary.shortNotAllowed
-			count: 1
-			path: packages/cli/src/Command/FixturePackRefreshCommand.php
-
-		-
-			message: '#^Casting to string something that''s already string\.$#'
-			identifier: cast.useless
-			count: 2
-			path: packages/cli/src/Command/FixtureScaffoldCommand.php
 
 		-
 			message: '#^Casting to string something that''s already string\.$#'

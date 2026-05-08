@@ -2,78 +2,54 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
 
-#[AsCommand(
-    name: 'fixture:generate',
-    description: 'Generate deterministic fixture scenario JSON from topology templates',
-)]
-final class FixtureGenerateCommand extends Command
+final class FixtureGenerateHandler
 {
-    protected function configure(): void
+    public function execute(CliIO $io): int
     {
-        $this
-            ->addOption('template', null, InputOption::VALUE_REQUIRED, 'Template: fanout, chain, mixed-workflow')
-            ->addOption('count', null, InputOption::VALUE_REQUIRED, 'Node count', '8')
-            ->addOption('prefix', null, InputOption::VALUE_REQUIRED, 'Node key prefix', 'fixture')
-            ->addOption('bundle', null, InputOption::VALUE_REQUIRED, 'Node bundle/type', 'article')
-            ->addOption('timestamp', null, InputOption::VALUE_REQUIRED, 'Deterministic base timestamp', '1735689600')
-            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Optional output file path (.json)');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $template = strtolower(trim((string) $input->getOption('template')));
-        $count = max(2, (int) $input->getOption('count'));
-        $prefix = trim((string) $input->getOption('prefix'));
-        $bundle = trim((string) $input->getOption('bundle'));
-        $timestamp = max(0, (int) $input->getOption('timestamp'));
+        $template = strtolower(trim((string) ($io->option('template') ?? '')));
+        $count = max(2, (int) ($io->option('count') ?? 8));
+        $prefix = trim((string) ($io->option('prefix') ?? ''));
+        $bundle = trim((string) ($io->option('bundle') ?? ''));
+        $timestamp = max(0, (int) ($io->option('timestamp') ?? 1735689600));
 
         if ($template === '' || $prefix === '' || $bundle === '') {
-            $output->writeln('<error>--template, --prefix, and --bundle are required.</error>');
-            return Command::INVALID;
+            $io->error('--template, --prefix, and --bundle are required.');
+            return 2;
         }
         if (!in_array($template, ['fanout', 'chain', 'mixed-workflow'], true)) {
-            $output->writeln('<error>Unknown --template. Allowed: fanout, chain, mixed-workflow.</error>');
-            return Command::INVALID;
+            $io->error('Unknown --template. Allowed: fanout, chain, mixed-workflow.');
+            return 2;
         }
 
         $scenario = match ($template) {
             'fanout' => $this->fanoutScenario($count, $prefix, $bundle, $timestamp),
             'chain' => $this->chainScenario($count, $prefix, $bundle, $timestamp),
             'mixed-workflow' => $this->mixedWorkflowScenario($count, $prefix, $bundle, $timestamp),
-            default => null,
         };
-        if (!is_array($scenario)) {
-            $output->writeln('<error>Failed to generate scenario.</error>');
-            return Command::FAILURE;
-        }
 
         ksort($scenario['nodes']);
         usort($scenario['relationships'], static fn(array $a, array $b): int => strcmp((string) ($a['key'] ?? ''), (string) ($b['key'] ?? '')));
 
         $json = json_encode($scenario, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
-        $outputPath = $input->getOption('output');
-        if (is_string($outputPath) && trim($outputPath) !== '') {
+        $outputPath = trim((string) ($io->option('output') ?? ''));
+        if ($outputPath !== '') {
             $dir = dirname($outputPath);
             if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
-                $output->writeln(sprintf('<error>Unable to create output directory: %s</error>', $dir));
-                return Command::FAILURE;
+                $io->error(sprintf('Unable to create output directory: %s', $dir));
+                return 1;
             }
             file_put_contents($outputPath, $json . PHP_EOL);
-            $output->writeln(sprintf('Fixture scenario written: %s', $outputPath));
-            return Command::SUCCESS;
+            $io->writeln(sprintf('Fixture scenario written: %s', $outputPath));
+            return 0;
         }
 
-        $output->writeln($json);
+        $io->writeln($json);
 
-        return Command::SUCCESS;
+        return 0;
     }
 
     /**
@@ -87,14 +63,14 @@ final class FixtureGenerateCommand extends Command
 
         for ($i = 1; $i <= $count; $i++) {
             $key = sprintf('%s_%03d', $prefix, $i);
-            $nodes[$key] = $this->node($i, $bundle, $timestamp, $i === 1 ? 'published' : 'published');
+            $nodes[$key] = $this->node($i, $bundle, $timestamp, 'published');
             if ($i > 1) {
                 $relationships[] = $this->relationship(
                     key: sprintf('%s_to_%s_related', $anchor, $key),
                     from: $anchor,
                     to: $key,
                     relationshipType: 'related',
-                    status: 1,
+                    itemStatus: 1,
                     startDate: $timestamp - ($i * 60),
                 );
             }
@@ -120,7 +96,7 @@ final class FixtureGenerateCommand extends Command
                     from: $key,
                     to: $to,
                     relationshipType: 'related',
-                    status: 1,
+                    itemStatus: 1,
                     startDate: $timestamp - ($i * 120),
                 );
             }
@@ -149,7 +125,7 @@ final class FixtureGenerateCommand extends Command
                     from: $key,
                     to: $to,
                     relationshipType: 'supports',
-                    status: $state === 'published' ? 1 : 0,
+                    itemStatus: $state === 'published' ? 1 : 0,
                     startDate: $timestamp - ($i * 180),
                 );
             }
@@ -182,7 +158,7 @@ final class FixtureGenerateCommand extends Command
         string $from,
         string $to,
         string $relationshipType,
-        int $status,
+        int $itemStatus,
         int $startDate,
     ): array {
         return [
@@ -190,7 +166,7 @@ final class FixtureGenerateCommand extends Command
             'relationship_type' => $relationshipType,
             'from' => $from,
             'to' => $to,
-            'status' => $status,
+            'status' => $itemStatus,
             'start_date' => $startDate,
             'end_date' => null,
         ];

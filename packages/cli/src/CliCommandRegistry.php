@@ -10,13 +10,9 @@ use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\Command\AboutCommand;
 use Waaseyaa\CLI\Command\AdminBuildCommand;
 use Waaseyaa\CLI\Command\AdminDevCommand;
-use Waaseyaa\CLI\Command\BundleScaffoldCommand;
 use Waaseyaa\CLI\Command\DebugContextCommand;
 use Waaseyaa\CLI\Command\EventListCommand;
 use Waaseyaa\CLI\Command\ExtensionScaffoldCommand;
-use Waaseyaa\CLI\Command\FixtureGenerateCommand;
-use Waaseyaa\CLI\Command\FixturePackRefreshCommand;
-use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
 use Waaseyaa\CLI\Command\RelationshipTypeScaffoldCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
@@ -74,10 +70,6 @@ final class CliCommandRegistry
             ]),
             new EventListCommand($dispatcher),
             new RouteListCommand($router),
-            new FixtureScaffoldCommand(),
-            new FixtureGenerateCommand(),
-            new FixturePackRefreshCommand(),
-            new BundleScaffoldCommand(),
             new RelationshipTypeScaffoldCommand(),
             new WorkflowScaffoldCommand(),
             new ExtensionScaffoldCommand(),
