@@ -86,11 +86,11 @@
 | T073 | Port `SearchReindexCommand` → `SearchReindexHandler` + migrate test + snapshot pass | WP16 | [D] |
 | T074 | Port `SemanticWarmCommand` → `SemanticWarmHandler` + migrate test + snapshot pass | WP16 | [D] |
 | T075 | Port `SemanticRefreshCommand` → `SemanticRefreshHandler` + migrate test + snapshot pass | WP16 | [D] |
-| T076 | Port `ConfigExportCommand` → `ConfigExportHandler` + migrate test + snapshot pass | WP17 | [P] |
-| T077 | Port `ConfigImportCommand` → `ConfigImportHandler` + migrate test + snapshot pass | WP17 | [P] |
-| T078 | Port `CacheClearCommand` → `CacheClearHandler` + migrate test + snapshot pass | WP17 | [P] |
-| T079 | Port `DbInitCommand` → `DbInitHandler` + migrate test + snapshot pass | WP17 | [P] |
-| T080 | Port `AuditLogCommand` → `AuditLogHandler` + migrate test + snapshot pass | WP17 | [P] |
+| T076 | Port `ConfigExportCommand` → `ConfigExportHandler` + migrate test + snapshot pass | WP17 | [D] |
+| T077 | Port `ConfigImportCommand` → `ConfigImportHandler` + migrate test + snapshot pass | WP17 | [D] |
+| T078 | Port `CacheClearCommand` → `CacheClearHandler` + migrate test + snapshot pass | WP17 | [D] |
+| T079 | Port `DbInitCommand` → `DbInitHandler` + migrate test + snapshot pass | WP17 | [D] |
+| T080 | Port `AuditLogCommand` → `AuditLogHandler` + migrate test + snapshot pass | WP17 | [D] |
 | T081 | Port `BundleScaffoldCommand` → `BundleScaffoldHandler` + migrate test + snapshot pass | WP18 | [P] |
 | T082 | Port `FixtureScaffoldCommand` → `FixtureScaffoldHandler` + migrate test + snapshot pass | WP18 | [P] |
 | T083 | Port `FixtureGenerateCommand` → `FixtureGenerateHandler` + migrate test + snapshot pass | WP18 | [P] |
@@ -402,11 +402,11 @@
 ### WP17 — Port: Config + Cache + Db + Audit
 
 **Subtasks**:
-- [ ] T076 `ConfigExportCommand` → `ConfigExportHandler` (WP17)
-- [ ] T077 `ConfigImportCommand` → `ConfigImportHandler` (WP17)
-- [ ] T078 `CacheClearCommand` → `CacheClearHandler` (WP17)
-- [ ] T079 `DbInitCommand` → `DbInitHandler` (WP17)
-- [ ] T080 `AuditLogCommand` → `AuditLogHandler` (WP17)
+- [x] T076 `ConfigExportCommand` → `ConfigExportHandler` (WP17)
+- [x] T077 `ConfigImportCommand` → `ConfigImportHandler` (WP17)
+- [x] T078 `CacheClearCommand` → `CacheClearHandler` (WP17)
+- [x] T079 `DbInitCommand` → `DbInitHandler` (WP17)
+- [x] T080 `AuditLogCommand` → `AuditLogHandler` (WP17)
 
 **Estimated prompt**: ~340 lines. **Dependencies**: WP05.
 
