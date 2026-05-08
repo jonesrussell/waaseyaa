@@ -18,6 +18,8 @@ subtasks:
 - T019
 - T020
 - T021
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "881621"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -163,3 +165,7 @@ The factory is invoked exactly once per process (memoised in the provider).
 ```bash
 spec-kitty agent action implement WP04 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T03:51:52Z – claude:sonnet:implementer:implementer – shell_pid=881621 – Started implementation via action command
