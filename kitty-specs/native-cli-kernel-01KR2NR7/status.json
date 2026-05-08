@@ -1,7 +1,7 @@
 {
-  "event_count": 30,
-  "last_event_id": "01KR4BDZ3A7WY0327Q8DJ28KVQ",
-  "materialized_at": "2026-05-08T17:51:10.442106+00:00",
+  "event_count": 31,
+  "last_event_id": "01KR4C9A9HFTBE13JX8B5BHZDE",
+  "materialized_at": "2026-05-08T18:06:06.641681+00:00",
   "mission_number": "",
   "mission_slug": "native-cli-kernel-01KR2NR7",
   "mission_type": "software-dev",
@@ -10,19 +10,19 @@
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 0,
+    "done": 1,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
-    "planned": 24
+    "planned": 23
   },
   "work_packages": {
     "WP01": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KR2R00YNYYSFN0PCK2XDC896",
-      "last_transition_at": "2026-05-08T02:52:16.213217+00:00"
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR4C9A9HFTBE13JX8B5BHZDE",
+      "last_transition_at": "2026-05-08T18:06:06.641681+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",

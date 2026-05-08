@@ -159,3 +159,4 @@ spec-kitty agent action implement WP01 --agent <name>
 - 2026-05-08T03:23:11Z – claude:sonnet:implementer:implementer – shell_pid=873959 – Cycle 2 fix: plan.md baseline filled with literal harness output (list wall=0.01s mem=30336KB, health:check wall=0.01s)
 - 2026-05-08T03:23:33Z – claude:opus-4-7:reviewer:reviewer – shell_pid=875297 – Started review via action command
 - 2026-05-08T03:24:12Z – claude:opus-4-7:reviewer:reviewer – shell_pid=875297 – Review passed cycle 2: plan.md baseline filled with literal harness output
+- 2026-05-08T18:06:07Z – claude:opus-4-7:reviewer:reviewer – shell_pid=875297 – Done override: Mission merged to main (cc36dfcd2)
