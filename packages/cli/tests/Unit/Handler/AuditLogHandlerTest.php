@@ -29,10 +29,28 @@ final class AuditLogHandlerTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (is_dir($this->tempDir)) {
-            array_map('unlink', glob($this->tempDir . '/*') ?: []);
-            rmdir($this->tempDir);
+        $this->removeDirectory($this->tempDir);
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
         }
+
+        foreach (scandir($dir) as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $target_path = $dir . '/' . $entry;
+            if (is_dir($target_path)) {
+                $this->removeDirectory($target_path);
+            } else {
+                unlink($target_path);
+            }
+        }
+
+        rmdir($dir);
     }
 
     #[Test]

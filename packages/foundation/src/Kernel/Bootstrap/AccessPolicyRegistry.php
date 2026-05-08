@@ -39,6 +39,23 @@ final class AccessPolicyRegistry
                 $ref = new \ReflectionClass($class);
                 $constructor = $ref->getConstructor();
                 if ($constructor !== null && $constructor->getNumberOfRequiredParameters() > 0) {
+                    // Heuristic: only pass the entity-types array when the first
+                    // required parameter is typed as `array` (e.g. ConfigEntityAccessPolicy).
+                    // Policies that require injected services (e.g. EntityTypeManagerInterface)
+                    // cannot be auto-instantiated here and are skipped with an error.
+                    $firstParam = $constructor->getParameters()[0];
+                    $firstType = $firstParam->getType();
+                    $firstTypeName = $firstType instanceof \ReflectionNamedType ? $firstType->getName() : null;
+                    if ($firstTypeName !== 'array') {
+                        $this->logger->error(sprintf(
+                            'Cannot auto-instantiate access policy %s: constructor requires injected '
+                            . 'services (first parameter "%s" is not array). '
+                            . 'Register this policy manually in your service provider.',
+                            $class,
+                            $firstParam->getName(),
+                        ));
+                        continue;
+                    }
                     $policies[] = new $class($entityTypes);
                 } else {
                     $policies[] = new $class();

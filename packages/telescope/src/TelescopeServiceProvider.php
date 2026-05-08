@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Telescope;
 
+use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Telescope\CodifiedContext\CodifiedContextObserver;
 use Waaseyaa\Telescope\Recorder\CacheRecorder;
 use Waaseyaa\Telescope\Recorder\EventRecorder;
@@ -17,8 +18,12 @@ use Waaseyaa\Telescope\Storage\TelescopeStoreInterface;
  *
  * Configures the telescope storage backend and wires up all
  * recorders based on provided configuration.
+ *
+ * Also acts as a Waaseyaa service provider so that the kernel
+ * auto-discovers and binds this class as a singleton, making it
+ * available for injection (e.g. TelescopeRequestMiddleware).
  */
-final class TelescopeServiceProvider
+final class TelescopeServiceProvider extends ServiceProvider
 {
     private readonly TelescopeStoreInterface $store;
     private ?QueryRecorder $queryRecorder = null;
@@ -27,19 +32,32 @@ final class TelescopeServiceProvider
     private ?CacheRecorder $cacheRecorder = null;
     private ?CodifiedContextObserver $ccObserver = null;
 
+    /** @var array<string, mixed> */
+    private readonly array $telescopeConfig;
+
     /**
-     * @param array<string, mixed> $config Telescope configuration.
+     * @param array<string, mixed> $telescopeConfig Telescope configuration.
      */
     public function __construct(
-        private readonly array $config = [],
+        array $telescopeConfig = [],
         ?TelescopeStoreInterface $store = null,
     ) {
+        $this->telescopeConfig = $telescopeConfig;
         $this->store = $store ?? $this->createDefaultStore();
+    }
+
+    /**
+     * Bind this instance as the canonical singleton so middleware and other
+     * framework consumers can resolve it via DI.
+     */
+    public function register(): void
+    {
+        $this->singleton(self::class, fn() => $this);
     }
 
     public function isEnabled(): bool
     {
-        return (bool) ($this->config['enabled'] ?? true);
+        return (bool) ($this->telescopeConfig['enabled'] ?? true);
     }
 
     public function getStore(): TelescopeStoreInterface
@@ -60,8 +78,8 @@ final class TelescopeServiceProvider
         if ($this->queryRecorder === null) {
             $this->queryRecorder = new QueryRecorder(
                 store: $this->store,
-                slowQueryThreshold: (float) ($this->config['record']['slow_query_threshold'] ?? 100.0),
-                slowQueriesOnly: (bool) ($this->config['record']['slow_queries_only'] ?? false),
+                slowQueryThreshold: (float) ($this->telescopeConfig['record']['slow_query_threshold'] ?? 100.0),
+                slowQueriesOnly: (bool) ($this->telescopeConfig['record']['slow_queries_only'] ?? false),
             );
         }
 
@@ -98,7 +116,7 @@ final class TelescopeServiceProvider
         if ($this->requestRecorder === null) {
             $this->requestRecorder = new RequestRecorder(
                 store: $this->store,
-                ignorePaths: $this->config['ignore_paths'] ?? [],
+                ignorePaths: $this->telescopeConfig['ignore_paths'] ?? [],
             );
         }
 
@@ -141,7 +159,7 @@ final class TelescopeServiceProvider
 
     private function isRecordingEnabled(string $recorder): bool
     {
-        return (bool) ($this->config['record'][$recorder] ?? true);
+        return (bool) ($this->telescopeConfig['record'][$recorder] ?? true);
     }
 
     /**
@@ -152,7 +170,7 @@ final class TelescopeServiceProvider
      */
     private function isAgentContextRecordingEnabled(): bool
     {
-        $record = $this->config['record'] ?? [];
+        $record = $this->telescopeConfig['record'] ?? [];
         if (!is_array($record)) {
             return true;
         }
@@ -166,7 +184,7 @@ final class TelescopeServiceProvider
 
     private function createDefaultStore(): TelescopeStoreInterface
     {
-        $storagePath = $this->config['storage']['path'] ?? null;
+        $storagePath = $this->telescopeConfig['storage']['path'] ?? null;
 
         if ($storagePath !== null) {
             return SqliteTelescopeStore::createFromPath($storagePath);

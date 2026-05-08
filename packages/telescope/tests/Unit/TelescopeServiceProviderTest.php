@@ -30,7 +30,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function canBeDisabledViaConfig(): void
     {
-        $provider = new TelescopeServiceProvider(config: ['enabled' => false]);
+        $provider = new TelescopeServiceProvider(telescopeConfig: ['enabled' => false]);
 
         $this->assertFalse($provider->isEnabled());
     }
@@ -64,7 +64,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullQueryRecorderWhenDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: ['enabled' => false]);
+        $provider = new TelescopeServiceProvider(telescopeConfig: ['enabled' => false]);
 
         $this->assertNull($provider->getQueryRecorder());
     }
@@ -72,7 +72,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullQueryRecorderWhenQueriesRecordingDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: [
+        $provider = new TelescopeServiceProvider(telescopeConfig: [
             'record' => ['queries' => false],
         ]);
 
@@ -91,7 +91,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullEventRecorderWhenDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: ['enabled' => false]);
+        $provider = new TelescopeServiceProvider(telescopeConfig: ['enabled' => false]);
 
         $this->assertNull($provider->getEventRecorder());
     }
@@ -99,7 +99,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullEventRecorderWhenEventsRecordingDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: [
+        $provider = new TelescopeServiceProvider(telescopeConfig: [
             'record' => ['events' => false],
         ]);
 
@@ -118,7 +118,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullRequestRecorderWhenDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: ['enabled' => false]);
+        $provider = new TelescopeServiceProvider(telescopeConfig: ['enabled' => false]);
 
         $this->assertNull($provider->getRequestRecorder());
     }
@@ -126,7 +126,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullRequestRecorderWhenRequestsRecordingDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: [
+        $provider = new TelescopeServiceProvider(telescopeConfig: [
             'record' => ['requests' => false],
         ]);
 
@@ -145,7 +145,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullCacheRecorderWhenDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: ['enabled' => false]);
+        $provider = new TelescopeServiceProvider(telescopeConfig: ['enabled' => false]);
 
         $this->assertNull($provider->getCacheRecorder());
     }
@@ -153,7 +153,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullCacheRecorderWhenCacheRecordingDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: [
+        $provider = new TelescopeServiceProvider(telescopeConfig: [
             'record' => ['cache' => false],
         ]);
 
@@ -163,7 +163,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function queryRecorderRespectsSlowQueryConfig(): void
     {
-        $provider = new TelescopeServiceProvider(config: [
+        $provider = new TelescopeServiceProvider(telescopeConfig: [
             'record' => [
                 'slow_query_threshold' => 200.0,
                 'slow_queries_only' => true,
@@ -179,7 +179,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function requestRecorderRespectsIgnorePathsConfig(): void
     {
-        $provider = new TelescopeServiceProvider(config: [
+        $provider = new TelescopeServiceProvider(telescopeConfig: [
             'ignore_paths' => ['/health', '/api/broadcast/*'],
         ]);
 
@@ -200,7 +200,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullCodifiedContextObserverWhenTelescopeDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: ['enabled' => false]);
+        $provider = new TelescopeServiceProvider(telescopeConfig: ['enabled' => false]);
 
         $this->assertNull($provider->getCodifiedContextObserver());
     }
@@ -208,7 +208,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function returnsNullCodifiedContextObserverWhenCodifiedContextRecordingDisabled(): void
     {
-        $provider = new TelescopeServiceProvider(config: [
+        $provider = new TelescopeServiceProvider(telescopeConfig: [
             'record' => ['codified_context' => false],
         ]);
 
@@ -218,7 +218,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function agent_context_record_key_takes_precedence_when_present(): void
     {
-        $provider = new TelescopeServiceProvider(config: [
+        $provider = new TelescopeServiceProvider(telescopeConfig: [
             'record' => ['agent_context' => false, 'codified_context' => true],
         ]);
 
@@ -228,7 +228,7 @@ final class TelescopeServiceProviderTest extends TestCase
     #[Test]
     public function agent_context_true_enables_observer_even_when_codified_context_false(): void
     {
-        $provider = new TelescopeServiceProvider(config: [
+        $provider = new TelescopeServiceProvider(telescopeConfig: [
             'record' => ['agent_context' => true, 'codified_context' => false],
         ]);
 

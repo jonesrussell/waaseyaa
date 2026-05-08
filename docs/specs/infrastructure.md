@@ -1657,7 +1657,7 @@ Constructor: `(LoggerInterface $logger)`
 public function discover(PackageManifest $manifest): EntityAccessHandler
 ```
 
-Reads `$manifest->policies` (keyed by class name → entity type list), instantiates each policy class, and returns a wired `EntityAccessHandler`. Uses reflection heuristic: policies with required constructor parameters (e.g., `ConfigEntityAccessPolicy`) receive the entity type list; no-arg policies are instantiated directly. Missing classes and instantiation failures are logged, not fatal.
+Reads `$manifest->policies` (keyed by class name → entity type list), instantiates each policy class, and returns a wired `EntityAccessHandler`. Uses reflection heuristic: policies with required constructor parameters are inspected — if the first parameter is typed `array` (e.g., `ConfigEntityAccessPolicy`), the entity type list is passed; if the first parameter is a service type (e.g., `EntityTypeManagerInterface`), the policy cannot be auto-instantiated and is skipped with an error log (register it manually in your service provider instead). No-arg policies are instantiated directly. Missing classes and instantiation failures are logged, not fatal.
 
 ## File Reference
 
