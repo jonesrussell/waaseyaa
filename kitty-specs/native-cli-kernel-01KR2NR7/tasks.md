@@ -81,11 +81,11 @@
 | T068 | Port `UserCreateCommand` → `UserCreateHandler` + migrate test + snapshot pass | WP15 | [D] |
 | T069 | Port `UserRoleCommand` → `UserRoleHandler` + migrate test + snapshot pass | WP15 | [D] |
 | T070 | Port `PermissionListCommand` → `PermissionListHandler` + migrate test + snapshot pass | WP15 | [D] |
-| T071 | Port `IngestRunCommand` → `IngestRunHandler` + migrate test + snapshot pass + regression test fix | WP16 | [P] |
-| T072 | Port `IngestDashboardCommand` → `IngestDashboardHandler` + migrate test + snapshot pass | WP16 | [P] |
-| T073 | Port `SearchReindexCommand` → `SearchReindexHandler` + migrate test + snapshot pass | WP16 | [P] |
-| T074 | Port `SemanticWarmCommand` → `SemanticWarmHandler` + migrate test + snapshot pass | WP16 | [P] |
-| T075 | Port `SemanticRefreshCommand` → `SemanticRefreshHandler` + migrate test + snapshot pass | WP16 | [P] |
+| T071 | Port `IngestRunCommand` → `IngestRunHandler` + migrate test + snapshot pass + regression test fix | WP16 | [D] |
+| T072 | Port `IngestDashboardCommand` → `IngestDashboardHandler` + migrate test + snapshot pass | WP16 | [D] |
+| T073 | Port `SearchReindexCommand` → `SearchReindexHandler` + migrate test + snapshot pass | WP16 | [D] |
+| T074 | Port `SemanticWarmCommand` → `SemanticWarmHandler` + migrate test + snapshot pass | WP16 | [D] |
+| T075 | Port `SemanticRefreshCommand` → `SemanticRefreshHandler` + migrate test + snapshot pass | WP16 | [D] |
 | T076 | Port `ConfigExportCommand` → `ConfigExportHandler` + migrate test + snapshot pass | WP17 | [P] |
 | T077 | Port `ConfigImportCommand` → `ConfigImportHandler` + migrate test + snapshot pass | WP17 | [P] |
 | T078 | Port `CacheClearCommand` → `CacheClearHandler` + migrate test + snapshot pass | WP17 | [P] |
@@ -388,11 +388,11 @@
 ### WP16 — Port: Ingest + Search + Semantic
 
 **Subtasks**:
-- [ ] T071 `IngestRunCommand` → `IngestRunHandler` + regression test fix (WP16)
-- [ ] T072 `IngestDashboardCommand` → `IngestDashboardHandler` (WP16)
-- [ ] T073 `SearchReindexCommand` → `SearchReindexHandler` (WP16)
-- [ ] T074 `SemanticWarmCommand` → `SemanticWarmHandler` (WP16)
-- [ ] T075 `SemanticRefreshCommand` → `SemanticRefreshHandler` (WP16)
+- [x] T071 `IngestRunCommand` → `IngestRunHandler` + regression test fix (WP16)
+- [x] T072 `IngestDashboardCommand` → `IngestDashboardHandler` (WP16)
+- [x] T073 `SearchReindexCommand` → `SearchReindexHandler` (WP16)
+- [x] T074 `SemanticWarmCommand` → `SemanticWarmHandler` (WP16)
+- [x] T075 `SemanticRefreshCommand` → `SemanticRefreshHandler` (WP16)
 
 **Estimated prompt**: ~340 lines. **Dependencies**: WP05.
 **Risk**: `IngestionFixturePackRegressionTest.php` may need targeted updates.
