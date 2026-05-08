@@ -23,15 +23,16 @@ use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\Command\CacheClearCommand;
 use Waaseyaa\CLI\Command\ConfigExportCommand;
 use Waaseyaa\CLI\Command\ConfigImportCommand;
-use Waaseyaa\CLI\Command\EntityCreateCommand;
-use Waaseyaa\CLI\Command\EntityListCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\TypeDisableCommand;
-use Waaseyaa\CLI\Command\TypeEnableCommand;
 use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\EntityCreateHandler;
+use Waaseyaa\CLI\Handler\EntityListHandler;
 use Waaseyaa\CLI\Handler\MigrateDefaultsHandler;
+use Waaseyaa\CLI\Handler\TypeDisableHandler;
+use Waaseyaa\CLI\Handler\TypeEnableHandler;
 use Waaseyaa\CLI\OptionDefinition;
 use Waaseyaa\CLI\OptionMode;
+use Waaseyaa\CLI\Provider\EntityTypeServiceProvider;
 use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\MemoryStorage;
@@ -62,7 +63,7 @@ final class EndToEndSmokeTest extends TestCase
      * - EntityTypeManager with in-memory storage (Layer 1)
      * - ConfigManager with MemoryStorage (Layer 1)
      * - CacheFactory with MemoryBackend (Layer 0)
-     * - InstallCommand, EntityCreateCommand, EntityListCommand,
+     * - InstallCommand, entity:create handler, entity:list handler,
      *   CacheClearCommand, ConfigExportCommand, ConfigImportCommand (Layer 6)
      */
     #[Test]
@@ -138,24 +139,46 @@ final class EndToEndSmokeTest extends TestCase
 
         // --- Step 2: Create content via CLI ---
 
-        $createCommand = new EntityCreateCommand($entityTypeManager);
+        $entityProvider = new EntityTypeServiceProvider();
+        $entityDefinitions = [];
+        foreach ($entityProvider->nativeCommands() as $cmd) {
+            $entityDefinitions[$cmd->name] = $cmd;
+        }
+        $entityContainer = new class ($entityTypeManager) implements \Psr\Container\ContainerInterface {
+            public function __construct(
+                private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager,
+            ) {}
 
-        $createTester = new CommandTester($createCommand);
-        $createTester->execute([
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    EntityCreateHandler::class => new EntityCreateHandler($this->manager),
+                    EntityListHandler::class   => new EntityListHandler($this->manager),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+
+            public function has(string $id): bool
+            {
+                return in_array($id, [EntityCreateHandler::class, EntityListHandler::class], true);
+            }
+        };
+
+        $createTester = CliTester::for($entityDefinitions['entity:create'], $entityContainer);
+        $createTester->executeMap([
             'entity_type' => 'article',
             '--values' => json_encode(['title' => 'First Smoke Article', 'type' => 'blog']),
         ]);
-        $this->assertSame(Command::SUCCESS, $createTester->getStatusCode());
-        $this->assertStringContainsString('Created article entity with ID:', $createTester->getDisplay());
+        $this->assertSame(0, $createTester->getExitCode());
+        $this->assertStringContainsString('Created article entity with ID:', $createTester->getStdout());
 
         // --- Step 3: List content via CLI and verify ---
 
-        $listCommand = new EntityListCommand($entityTypeManager);
-        $listTester = new CommandTester($listCommand);
-        $listTester->execute(['entity_type' => 'article']);
+        $listTester = CliTester::for($entityDefinitions['entity:list'], $entityContainer);
+        $listTester->executeMap(['entity_type' => 'article']);
 
-        $this->assertSame(Command::SUCCESS, $listTester->getStatusCode());
-        $this->assertStringContainsString('First Smoke Article', $listTester->getDisplay());
+        $this->assertSame(0, $listTester->getExitCode());
+        $this->assertStringContainsString('First Smoke Article', $listTester->getStdout());
 
         // --- Step 4: Cache operations ---
 
@@ -501,9 +524,32 @@ final class EndToEndSmokeTest extends TestCase
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
         ));
 
-        $application = new \Symfony\Component\Console\Application();
-        $application->add(new TypeDisableCommand($entityTypeManager, $lifecycleManager));
-        $application->add(new TypeEnableCommand($entityTypeManager, $lifecycleManager));
+        // Build native CLI definitions for type:disable and type:enable.
+        $typeProvider = new EntityTypeServiceProvider();
+        $typeDefinitions = [];
+        foreach ($typeProvider->nativeCommands() as $cmd) {
+            $typeDefinitions[$cmd->name] = $cmd;
+        }
+        $typeContainer = new class ($entityTypeManager, $lifecycleManager) implements \Psr\Container\ContainerInterface {
+            public function __construct(
+                private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager,
+                private readonly \Waaseyaa\Entity\EntityTypeLifecycleManager $lifecycle,
+            ) {}
+
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    TypeDisableHandler::class => new TypeDisableHandler($this->manager, $this->lifecycle),
+                    TypeEnableHandler::class  => new TypeEnableHandler($this->manager, $this->lifecycle),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+
+            public function has(string $id): bool
+            {
+                return in_array($id, [TypeDisableHandler::class, TypeEnableHandler::class], true);
+            }
+        };
 
         // Build a CliTester for MigrateDefaultsHandler (native CLI pattern).
         $migrateDefaultsHandler = new MigrateDefaultsHandler($entityTypeManager, $lifecycleManager, $auditLogger, $tempDir);
@@ -533,16 +579,14 @@ final class EndToEndSmokeTest extends TestCase
 
         // --- Step 1: Disable all types for tenant "acme" ---
 
-        $disableNote = $application->find('type:disable');
-        $noteTester = new CommandTester($disableNote);
-        $noteTester->execute(['type' => 'note', '--tenant' => 'acme', '--yes' => true]);
-        $this->assertSame(Command::SUCCESS, $noteTester->getStatusCode());
+        $noteTester = CliTester::for($typeDefinitions['type:disable'], $typeContainer);
+        $noteTester->executeMap(['type' => 'note', '--tenant' => 'acme', '--yes' => true]);
+        $this->assertSame(0, $noteTester->getExitCode());
         $this->assertTrue($lifecycleManager->isDisabled('note', 'acme'));
 
-        $disableArticle = $application->find('type:disable');
-        $articleTester = new CommandTester($disableArticle);
-        $articleTester->execute(['type' => 'article', '--tenant' => 'acme', '--yes' => true, '--force' => true]);
-        $this->assertSame(Command::SUCCESS, $articleTester->getStatusCode());
+        $articleTester = CliTester::for($typeDefinitions['type:disable'], $typeContainer);
+        $articleTester->executeMap(['type' => 'article', '--tenant' => 'acme', '--yes' => true, '--force' => true]);
+        $this->assertSame(0, $articleTester->getExitCode());
         $this->assertTrue($lifecycleManager->isDisabled('article', 'acme'));
 
         // --- Step 2: migrate:defaults detects and fixes ---
