@@ -65,10 +65,10 @@
 | T052 | Port `QueueFailedCommand` → `QueueFailedHandler` + migrate test + snapshot pass | WP11 | [D] |
 | T053 | Port `QueueRetryCommand` → `QueueRetryHandler` + migrate test + snapshot pass | WP11 | [D] |
 | T054 | Port `QueueFlushCommand` → `QueueFlushHandler` + migrate test + snapshot pass | WP11 | [D] |
-| T055 | Port `Telescope/TelescopeListCommand` → `TelescopeListHandler` + migrate test + snapshot pass | WP12 | [P] |
-| T056 | Port `Telescope/TelescopeClearCommand` → `TelescopeClearHandler` + migrate test + snapshot pass | WP12 | [P] |
-| T057 | Port `Telescope/TelescopePruneCommand` → `TelescopePruneHandler` + migrate test + snapshot pass | WP12 | [P] |
-| T058 | Port `Telescope/TelescopeValidateCommand` → `TelescopeValidateHandler` + migrate test + snapshot pass | WP12 | [P] |
+| T055 | Port `Telescope/TelescopeListCommand` → `TelescopeListHandler` + migrate test + snapshot pass | WP12 | [D] |
+| T056 | Port `Telescope/TelescopeClearCommand` → `TelescopeClearHandler` + migrate test + snapshot pass | WP12 | [D] |
+| T057 | Port `Telescope/TelescopePruneCommand` → `TelescopePruneHandler` + migrate test + snapshot pass | WP12 | [D] |
+| T058 | Port `Telescope/TelescopeValidateCommand` → `TelescopeValidateHandler` + migrate test + snapshot pass | WP12 | [D] |
 | T059 | Port `ScheduleListCommand` → `ScheduleListHandler` + migrate test + snapshot pass | WP13 | [P] |
 | T060 | Port `ScheduleRunCommand` → `ScheduleRunHandler` + migrate test + snapshot pass | WP13 | [P] |
 | T061 | Port `Perf/PerformanceBaselineCommand` → `PerformanceBaselineHandler` + migrate test + snapshot pass | WP13 | [P] |
@@ -339,10 +339,10 @@
 ### WP12 — Port: Telescope group
 
 **Subtasks**:
-- [ ] T055 `TelescopeListCommand` → `TelescopeListHandler` (WP12)
-- [ ] T056 `TelescopeClearCommand` → `TelescopeClearHandler` (WP12)
-- [ ] T057 `TelescopePruneCommand` → `TelescopePruneHandler` (WP12)
-- [ ] T058 `TelescopeValidateCommand` → `TelescopeValidateHandler` (WP12)
+- [x] T055 `TelescopeListCommand` → `TelescopeListHandler` (WP12)
+- [x] T056 `TelescopeClearCommand` → `TelescopeClearHandler` (WP12)
+- [x] T057 `TelescopePruneCommand` → `TelescopePruneHandler` (WP12)
+- [x] T058 `TelescopeValidateCommand` → `TelescopeValidateHandler` (WP12)
 
 **Estimated prompt**: ~280 lines. **Dependencies**: WP05.
 
