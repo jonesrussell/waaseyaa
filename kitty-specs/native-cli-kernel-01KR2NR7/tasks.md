@@ -99,11 +99,11 @@
 | T086 | Port `WorkflowScaffoldCommand` → `WorkflowScaffoldHandler` + migrate test + snapshot pass | WP19 | [D] |
 | T087 | Port `ExtensionScaffoldCommand` → `ExtensionScaffoldHandler` + migrate test + snapshot pass | WP19 | [D] |
 | T088 | Port `ScaffoldAuthCommand` → `ScaffoldAuthHandler` + migrate test + snapshot pass | WP19 | [D] |
-| T089 | Port `AboutCommand` → `AboutHandler` + migrate test + snapshot pass | WP20 | [P] |
-| T090 | Port `AdminBuildCommand` → `AdminBuildHandler` + migrate test + snapshot pass | WP20 | [P] |
-| T091 | Port `AdminDevCommand` → `AdminDevHandler` + migrate test + snapshot pass | WP20 | [P] |
-| T092 | Port `DebugContextCommand` → `DebugContextHandler` + migrate test + snapshot pass | WP20 | [P] |
-| T093 | Port `EventListCommand` → `EventListHandler` + migrate test + snapshot pass | WP20 | [P] |
+| T089 | Port `AboutCommand` → `AboutHandler` + migrate test + snapshot pass | WP20 | [D] |
+| T090 | Port `AdminBuildCommand` → `AdminBuildHandler` + migrate test + snapshot pass | WP20 | [D] |
+| T091 | Port `AdminDevCommand` → `AdminDevHandler` + migrate test + snapshot pass | WP20 | [D] |
+| T092 | Port `DebugContextCommand` → `DebugContextHandler` + migrate test + snapshot pass | WP20 | [D] |
+| T093 | Port `EventListCommand` → `EventListHandler` + migrate test + snapshot pass | WP20 | [D] |
 | T094 | Port `InstallCommand` → `InstallHandler` + migrate test + snapshot pass | WP21 | [P] |
 | T095 | Port `RouteListCommand` → `RouteListHandler` + migrate test + snapshot pass | WP21 | [P] |
 | T096 | Port `ServeCommand` → `ServeHandler` + migrate test + snapshot pass | WP21 | [P] |
@@ -439,11 +439,11 @@
 ### WP20 — Port: Misc cluster A (About/Admin/Debug/Event)
 
 **Subtasks**:
-- [ ] T089 `AboutCommand` → `AboutHandler` (WP20)
-- [ ] T090 `AdminBuildCommand` → `AdminBuildHandler` (WP20)
-- [ ] T091 `AdminDevCommand` → `AdminDevHandler` (WP20)
-- [ ] T092 `DebugContextCommand` → `DebugContextHandler` (WP20)
-- [ ] T093 `EventListCommand` → `EventListHandler` (WP20)
+- [x] T089 `AboutCommand` → `AboutHandler` (WP20)
+- [x] T090 `AdminBuildCommand` → `AdminBuildHandler` (WP20)
+- [x] T091 `AdminDevCommand` → `AdminDevHandler` (WP20)
+- [x] T092 `DebugContextCommand` → `DebugContextHandler` (WP20)
+- [x] T093 `EventListCommand` → `EventListHandler` (WP20)
 
 **Estimated prompt**: ~340 lines. **Dependencies**: WP05.
 
