@@ -110,8 +110,8 @@
 | T097 | Port `SyncRulesCommand` → `SyncRulesHandler` + migrate test + snapshot pass | WP21 | [D] |
 | T098 | Port `WaaseyaaVersionCommand` → `WaaseyaaVersionHandler` + migrate test + snapshot pass | WP21 | [D] |
 | T099 | Port `MakePluginCommand` provenance hooks (refactor `Provenance/ComposerProvenanceReporter` to drop Symfony Console) | WP21 | — | [D] |
-| T100 | Port `packages/northcloud/src/Command/NcSyncCommand` → `NcSyncHandler` + migrate test + snapshot pass | WP22 | [P] |
-| T101 | Update `packages/northcloud/src/Provider/NorthCloudServiceProvider` to implement `HasNativeCommandsInterface` and stop importing Symfony Console | WP22 | — |
+| T100 | Port `packages/northcloud/src/Command/NcSyncCommand` → `NcSyncHandler` + migrate test + snapshot pass | WP22 | [D] |
+| T101 | Update `packages/northcloud/src/Provider/NorthCloudServiceProvider` to implement `HasNativeCommandsInterface` and stop importing Symfony Console | WP22 | — | [D] |
 | T102 | Delete `packages/foundation/src/ServiceProvider/Capability/HasCommandsInterface.php` | WP23 | — |
 | T103 | Delete `packages/cli/src/WaaseyaaApplication.php` and `packages/cli/src/CliCommandRegistry.php` | WP23 | [P] |
 | T104 | Remove dual-boot adapter from `bin/waaseyaa`; native discovery only | WP23 | — |
@@ -466,8 +466,8 @@
 ### WP22 — Port: Northcloud `nc:sync`
 
 **Subtasks**:
-- [ ] T100 Port `packages/northcloud/src/Command/NcSyncCommand` → `NcSyncHandler` (WP22)
-- [ ] T101 Update `NorthCloudServiceProvider` to implement `HasNativeCommandsInterface` (WP22)
+- [x] T100 Port `packages/northcloud/src/Command/NcSyncCommand` → `NcSyncHandler` (WP22)
+- [x] T101 Update `NorthCloudServiceProvider` to implement `HasNativeCommandsInterface` (WP22)
 
 **Estimated prompt**: ~220 lines. **Dependencies**: WP05.
 
