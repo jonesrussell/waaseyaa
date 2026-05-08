@@ -6,8 +6,8 @@ Usage:
 
 Options:
       --dry-run         Preview pending migrations without applying any SQL or writing to the ledger.
-      --json            Emit machine-readable JSON instead of human-readable text.
       --verify          Compare ledger checksums against the live source. Read-only.
+      --json            Emit machine-readable JSON instead of human-readable text.
   -h, --help            Display help for the given command. When no command is given display help for the list command
       --silent          Do not output any message
   -q, --quiet           Only errors are displayed. All other output is suppressed

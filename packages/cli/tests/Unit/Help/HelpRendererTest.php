@@ -123,11 +123,11 @@ final class HelpRendererTest extends TestCase
     }
 
     #[Test]
-    public function optionsAreSortedAlphabetically(): void
+    public function optionsAreRenderedInDeclarationOrder(): void
     {
         $cmd = new CommandDefinition(
             name: 'z-test',
-            description: 'Test option sort order.',
+            description: 'Test option declaration order.',
             options: [
                 new OptionDefinition(name: 'zebra', mode: OptionMode::None, description: 'Z option.'),
                 new OptionDefinition(name: 'apple', mode: OptionMode::None, description: 'A option.'),
@@ -138,16 +138,16 @@ final class HelpRendererTest extends TestCase
 
         $output = $this->renderer->render($cmd);
 
-        // apple < mango < zebra before kernel options
+        // Declaration order: zebra, apple, mango (matches Symfony Console DescriptorHelper behaviour)
+        $zebraPos = strpos($output, '--zebra');
         $applePos = strpos($output, '--apple');
         $mangoPos = strpos($output, '--mango');
-        $zebraPos = strpos($output, '--zebra');
 
+        self::assertIsInt($zebraPos);
         self::assertIsInt($applePos);
         self::assertIsInt($mangoPos);
-        self::assertIsInt($zebraPos);
+        self::assertLessThan($applePos, $zebraPos);
         self::assertLessThan($mangoPos, $applePos);
-        self::assertLessThan($zebraPos, $mangoPos);
     }
 
     #[Test]

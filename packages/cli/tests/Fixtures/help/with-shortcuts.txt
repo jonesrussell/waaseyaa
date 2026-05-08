@@ -5,7 +5,7 @@ Usage:
   build [options]
 
 Options:
-  -e, --env=ENV         Target environment. [default: local]
+  -e, --env=ENV         Target environment. [default: "local"]
   -w, --watch           Watch for changes.
   -h, --help            Display help for the given command. When no command is given display help for the list command
       --silent          Do not output any message

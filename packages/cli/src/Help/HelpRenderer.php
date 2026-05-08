@@ -27,7 +27,8 @@ use Waaseyaa\CLI\OptionMode;
  *   Options:
  *     -s, --long[=VALUE]   <description> [default: <val>]
  *
- * Options are sorted alphabetically by long name. Kernel-level flags
+ * User-defined options are rendered in declaration order (matching Symfony
+ * Console's DescriptorHelper behaviour). Kernel-level flags
  * (--help, --silent, -q/--quiet, -V/--version, --ansi|--no-ansi,
  * -n/--no-interaction, -v|vv|vvv/--verbose) are auto-injected after
  * user-defined options, matching Symfony Console's exact wording.
@@ -154,14 +155,17 @@ final class HelpRenderer
     {
         $result = [];
 
-        // User-defined options, sorted alphabetically by long name.
-        $sorted = $userOptions;
-        usort($sorted, static fn(OptionDefinition $a, OptionDefinition $b) => strcmp($a->name, $b->name));
+        // User-defined options in declaration order (matches Symfony Console behaviour).
+        foreach ($userOptions as $opt) {
+            $desc = $opt->description;
+            // Symfony Console appends "(multiple values allowed)" for VALUE_IS_ARRAY options.
+            if ($opt->mode === OptionMode::Array_) {
+                $desc .= ' (multiple values allowed)';
+            }
 
-        foreach ($sorted as $opt) {
             $result[] = [
                 'label'   => $this->buildOptionLabel($opt),
-                'desc'    => $opt->description,
+                'desc'    => $desc,
                 'default' => $this->formatDefault($opt),
             ];
         }
@@ -211,7 +215,8 @@ final class HelpRenderer
             return implode(', ', $default);
         }
 
-        return (string) $default;
+        // Symfony Console wraps string defaults in double-quotes.
+        return '"' . $default . '"';
     }
 
     /** @return list<string> */
