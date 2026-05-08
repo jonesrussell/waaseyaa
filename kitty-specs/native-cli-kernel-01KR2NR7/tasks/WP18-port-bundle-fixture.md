@@ -1,0 +1,67 @@
+---
+work_package_id: WP18
+title: 'Port: Bundle + Fixture scaffolds'
+dependencies:
+- WP05
+requirement_refs:
+- FR-010
+- FR-012
+- FR-015
+planning_base_branch: main
+merge_target_branch: main
+branch_strategy: Start `main` → planning base `main` → final merge `main`. Worktree per lanes.json.
+subtasks:
+- T081
+- T082
+- T083
+- T084
+history:
+- date: '2026-05-08'
+  note: Drafted by /spec-kitty.tasks.
+authoritative_surface: packages/cli/src/Command/
+execution_mode: code_change
+mission_id: 01KR2NR7GYWJKD6CPSN9P2FPC2
+mission_slug: native-cli-kernel-01KR2NR7
+owned_files:
+- packages/cli/src/Command/BundleScaffold*.php
+- packages/cli/src/Command/FixtureScaffold*.php
+- packages/cli/src/Command/FixtureGenerate*.php
+- packages/cli/src/Command/FixturePackRefresh*.php
+- packages/cli/src/Provider/BundleFixtureServiceProvider.php
+- packages/cli/tests/Unit/Command/BundleScaffold*Test.php
+- packages/cli/tests/Unit/Command/FixtureScaffold*Test.php
+- packages/cli/tests/Unit/Command/FixtureGenerate*Test.php
+- packages/cli/tests/Unit/Command/FixturePackRefresh*Test.php
+- packages/cli/tests/Integration/Snapshot/{BundleScaffold,FixtureScaffold,FixtureGenerate,FixturePackRefresh}SnapshotTest.php
+tags: []
+---
+
+# WP18 — Port: Bundle + Fixture scaffolds
+
+## Branch Strategy
+
+`main` → `main` per lanes.json.
+
+## Subtasks
+
+### T081 — Port `BundleScaffoldCommand` → `BundleScaffoldHandler`
+### T082 — Port `FixtureScaffoldCommand` → `FixtureScaffoldHandler`
+### T083 — Port `FixtureGenerateCommand` → `FixtureGenerateHandler`
+### T084 — Port `FixturePackRefreshCommand` → `FixturePackRefreshHandler`
+
+Apply canonical port pattern (see WP06).
+
+### T084-bonus — `BundleFixtureServiceProvider`
+
+## Definition of Done
+
+- [ ] Four legacy commands deleted, four handlers created.
+- [ ] Provider registered.
+- [ ] Tests + snapshot tests pass.
+- [ ] Full suite green.
+
+## Implementation command
+
+```bash
+spec-kitty agent action implement WP18 --agent <name>
+```
