@@ -75,7 +75,8 @@
                 "Waaseyaa\\CLI\\Provider\\HealthSchemaServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\MakeServiceProviderA",
                 "Waaseyaa\\CLI\\Provider\\MakeServiceProviderB",
-                "Waaseyaa\\CLI\\Provider\\MigrateServiceProvider"
+                "Waaseyaa\\CLI\\Provider\\MigrateServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider"
             ]
         }
     },

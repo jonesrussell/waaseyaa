@@ -29,10 +29,6 @@ use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
 use Waaseyaa\CLI\Command\IngestDashboardCommand;
 use Waaseyaa\CLI\Command\IngestRunCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\Optimize\OptimizeClearCommand;
-use Waaseyaa\CLI\Command\Optimize\OptimizeCommand;
-use Waaseyaa\CLI\Command\Optimize\OptimizeConfigCommand;
-use Waaseyaa\CLI\Command\Optimize\OptimizeManifestCommand;
 use Waaseyaa\CLI\Command\Perf\PerformanceBaselineCommand;
 use Waaseyaa\CLI\Command\Perf\PerformanceCompareCommand;
 use Waaseyaa\CLI\Command\PermissionListCommand;
@@ -52,7 +48,6 @@ use Waaseyaa\CLI\Command\UserCreateCommand;
 use Waaseyaa\CLI\Command\UserRoleCommand;
 use Waaseyaa\CLI\Command\WaaseyaaVersionCommand;
 use Waaseyaa\CLI\Command\WorkflowScaffoldCommand;
-use Waaseyaa\Config\Cache\ConfigCacheCompiler;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
@@ -60,7 +55,6 @@ use Waaseyaa\Entity\EntityTypeIdNormalizer;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
-use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 final class CliCommandRegistry
@@ -82,7 +76,6 @@ final class CliCommandRegistry
         CacheFactory $cacheFactory,
         WaaseyaaRouter $router,
         PermissionHandler $permissionHandler,
-        PackageManifestCompiler $manifestCompiler,
         EntityTypeIdNormalizer $typeIdNormalizer,
         ?SemanticIndexWarmer $semanticWarmer,
         \PDO $pdo,
@@ -131,13 +124,6 @@ final class CliCommandRegistry
             new RelationshipTypeScaffoldCommand(),
             new WorkflowScaffoldCommand(),
             new ExtensionScaffoldCommand(),
-            new OptimizeCommand(),
-            new OptimizeManifestCommand($manifestCompiler),
-            new OptimizeConfigCommand(new ConfigCacheCompiler(
-                $configManager->getActiveStorage(),
-                $projectRoot . '/storage/framework/config.php',
-            )),
-            new OptimizeClearCommand($projectRoot . '/storage'),
             new PerformanceBaselineCommand(),
             new PerformanceCompareCommand(),
             new TelescopeClearCommand(),

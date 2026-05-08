@@ -21,7 +21,6 @@ use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
-use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 #[CoversClass(CliCommandRegistry::class)]
@@ -71,7 +70,6 @@ final class CliCommandRegistryTest extends TestCase
                 cacheFactory: $cacheFactory,
                 router: $router,
                 permissionHandler: new PermissionHandler(),
-                manifestCompiler: new PackageManifestCompiler($projectRoot, $projectRoot . '/storage'),
                 typeIdNormalizer: new EntityTypeIdNormalizer($entityTypeManager),
                 semanticWarmer: null,
                 pdo: $pdo,
@@ -81,7 +79,6 @@ final class CliCommandRegistryTest extends TestCase
 
             $this->assertContains('about', $names);
             $this->assertContains('route:list', $names);
-            $this->assertContains('optimize:manifest', $names);
             $this->assertContains('waaseyaa:version', $names);
             $this->assertContains('admin:dev', $names);
             $this->assertContains('admin:build', $names);

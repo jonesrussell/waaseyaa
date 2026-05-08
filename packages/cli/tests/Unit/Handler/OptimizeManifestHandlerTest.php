@@ -1,22 +1,25 @@
 <?php
-declare(strict_types=1);
-namespace Waaseyaa\CLI\Tests\Unit\Command\Optimize;
 
-use Waaseyaa\CLI\Command\Optimize\OptimizeManifestCommand;
-use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
+declare(strict_types=1);
+
+namespace Waaseyaa\CLI\Tests\Unit\Handler;
+
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Tester\CommandTester;
+use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\OptimizeManifestHandler;
+use Waaseyaa\CLI\Testing\CliTester;
+use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 
-#[CoversClass(OptimizeManifestCommand::class)]
-final class OptimizeManifestCommandTest extends TestCase
+#[CoversClass(OptimizeManifestHandler::class)]
+final class OptimizeManifestHandlerTest extends TestCase
 {
     private string $tempDir;
 
     protected function setUp(): void
     {
-        $this->tempDir = sys_get_temp_dir() . '/waaseyaa_cmd_test_' . uniqid();
+        $this->tempDir = sys_get_temp_dir() . '/waaseyaa_manifest_handler_' . uniqid();
         mkdir($this->tempDir . '/vendor/composer', 0o755, true);
     }
 
@@ -50,19 +53,32 @@ final class OptimizeManifestCommandTest extends TestCase
         $storagePath = $this->tempDir . '/storage';
         $compiler = new PackageManifestCompiler($this->tempDir, $storagePath);
 
-        $command = new OptimizeManifestCommand($compiler);
-        $tester = new CommandTester($command);
+        $tester = $this->createTester($compiler);
         $tester->execute([]);
 
-        $this->assertSame(0, $tester->getStatusCode());
-        $output = $tester->getDisplay();
-        $this->assertStringContainsString('1 providers', $output);
-        $this->assertStringContainsString('0 attribute entity types', $output);
-        $this->assertStringContainsString('0 field types', $output);
-        $this->assertStringContainsString('0 middleware stacks', $output);
-
-        // Verify cache file was written
+        $this->assertSame(0, $tester->getExitCode());
+        $this->assertStringContainsString('1 providers', $tester->getStdout());
+        $this->assertStringContainsString('0 attribute entity types', $tester->getStdout());
+        $this->assertStringContainsString('0 field types', $tester->getStdout());
+        $this->assertStringContainsString('0 middleware stacks', $tester->getStdout());
         $this->assertFileExists($storagePath . '/framework/packages.php');
+    }
+
+    private function createTester(PackageManifestCompiler $compiler): CliTester
+    {
+        $handler = new OptimizeManifestHandler($compiler);
+        $definition = new CommandDefinition(
+            name: 'optimize:manifest',
+            description: 'Compile the package discovery manifest',
+            handler: \Closure::fromCallable([$handler, 'execute']),
+        );
+
+        $container = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed { throw new \RuntimeException("Not found: $id"); }
+            public function has(string $id): bool { return false; }
+        };
+
+        return CliTester::for($definition, $container);
     }
 
     private function removeDir(string $dir): void

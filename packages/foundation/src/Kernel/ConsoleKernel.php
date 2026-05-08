@@ -13,13 +13,11 @@ use Waaseyaa\Cache\CacheConfiguration;
 use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\CliCommandRegistry;
 use Waaseyaa\CLI\Command\DbInitCommand;
-use Waaseyaa\CLI\Command\Optimize\OptimizeManifestCommand;
 use Waaseyaa\CLI\Command\WaaseyaaVersionCommand;
 use Waaseyaa\CLI\WaaseyaaApplication;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\FileStorage;
 use Waaseyaa\Entity\EntityTypeIdNormalizer;
-use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Foundation\Discovery\StaleManifestException;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface;
 use Waaseyaa\Routing\WaaseyaaRouter;
@@ -89,10 +87,6 @@ final class ConsoleKernel extends AbstractKernel
         $cacheFactory = new CacheFactory($cacheConfig);
         $router = new WaaseyaaRouter();
         $permissionHandler = new PermissionHandler();
-        $manifestCompiler = new PackageManifestCompiler(
-            basePath: $this->projectRoot,
-            storagePath: $this->projectRoot . '/storage',
-        );
         $semanticWarmer = null;
         if (class_exists(SqliteEmbeddingStorage::class)) {
             $embeddingStorage = new SqliteEmbeddingStorage($pdo);
@@ -122,7 +116,6 @@ final class ConsoleKernel extends AbstractKernel
             cacheFactory: $cacheFactory,
             router: $router,
             permissionHandler: $permissionHandler,
-            manifestCompiler: $manifestCompiler,
             typeIdNormalizer: $typeIdNormalizer,
             semanticWarmer: $semanticWarmer,
             pdo: $pdo,
@@ -176,10 +169,6 @@ final class ConsoleKernel extends AbstractKernel
         $cacheFactory = new \Waaseyaa\Cache\CacheFactory($cacheConfig);
         $router = new \Waaseyaa\Routing\WaaseyaaRouter();
         $permissionHandler = new \Waaseyaa\Access\PermissionHandler();
-        $manifestCompiler = new \Waaseyaa\Foundation\Discovery\PackageManifestCompiler(
-            basePath: $this->projectRoot,
-            storagePath: $this->projectRoot . '/storage',
-        );
         $typeIdNormalizer = new \Waaseyaa\Entity\EntityTypeIdNormalizer($this->entityTypeManager);
 
         $semanticWarmer = null;
@@ -207,7 +196,6 @@ final class ConsoleKernel extends AbstractKernel
             cacheFactory: $cacheFactory,
             router: $router,
             permissionHandler: $permissionHandler,
-            manifestCompiler: $manifestCompiler,
             typeIdNormalizer: $typeIdNormalizer,
             semanticWarmer: $semanticWarmer,
             pdo: $pdo,
@@ -266,12 +254,8 @@ final class ConsoleKernel extends AbstractKernel
                 new DbInitCommand($this->projectRoot),
             ]);
         } else {
-            $app->registerCommands([
-                new OptimizeManifestCommand(new PackageManifestCompiler(
-                    basePath: $this->projectRoot,
-                    storagePath: $this->projectRoot . '/storage',
-                )),
-            ]);
+            // optimize:manifest is now handled by OptimizeServiceProvider via the native CliKernel.
+            // The minimal console path is not reached for native commands.
         }
 
         return $app->run();
