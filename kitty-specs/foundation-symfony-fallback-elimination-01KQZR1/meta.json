@@ -1,5 +1,18 @@
 {
+  "acceptance_history": [
+    {
+      "acceptance_mode": "local",
+      "accepted_at": "2026-05-08T00:22:26.000000+00:00",
+      "accepted_by": "jones",
+      "accepted_from_commit": "80e7828794ba2cb29fdbbad2d8ca27efe8b9b012"
+    }
+  ],
+  "acceptance_mode": "local",
+  "accepted_at": "2026-05-08T00:22:26.000000+00:00",
+  "accepted_by": "jones",
+  "accepted_from_commit": "80e7828794ba2cb29fdbbad2d8ca27efe8b9b012",
   "created_at": "2026-05-07T12:00:00.000000+00:00",
+  "follow_up_issue": "https://github.com/waaseyaa/framework/issues/1397",
   "friendly_name": "Foundation: Eliminate Symfony Fallback Wiring",
   "mission_id": "01KQZR1ELIMSYMFALLBACKPATH01",
   "mission_number": 5,

@@ -16,15 +16,21 @@
         "CHANGELOG.md",
         "docs/specs/infrastructure.md",
         "packages/foundation/src/Http/ControllerDispatcher.php",
+        "packages/foundation/src/Http/HttpServiceResolverInterface.php",
         "packages/foundation/src/Kernel/Http/HttpKernelServiceResolver.php",
         "packages/foundation/src/Kernel/HttpKernel.php",
         "packages/foundation/tests/Unit/Http/ControllerDispatcherTest.php",
         "packages/foundation/tests/Unit/Kernel/Http/HttpKernelServiceResolverTest.php",
         "packages/foundation/tests/Unit/Kernel/HttpKernelTest.php",
+        "packages/routing/src/Exception/RouteMethodNotAllowedException.php",
+        "packages/routing/src/Exception/RouteNotFoundException.php",
         "packages/routing/src/RouteBuilder.php",
         "packages/routing/src/WaaseyaaRouter.php",
+        "packages/routing/tests/Integration/EntityDeepLinkResolutionTest.php",
         "packages/routing/tests/Unit/RouteBuilderTest.php",
-        "packages/routing/tests/Unit/WaaseyaaRouterTest.php"
+        "packages/routing/tests/Unit/WaaseyaaRouterTest.php",
+        "tests/Integration/Phase13/InertiaMultipartCsrfIntegrationTest.php",
+        "tests/Integration/Phase7/ApiRoutingIntegrationTest.php"
       ],
       "predicted_surfaces": [
         "api",
@@ -52,8 +58,8 @@
       "parallel_group": 0
     }
   ],
-  "computed_at": "2026-05-07T23:52:30.834382+00:00",
-  "computed_from": "dependency_graph+ownership",
+  "computed_at": "2026-05-08T00:22:26.000000+00:00",
+  "computed_from": "dependency_graph+ownership+mission_close_sync",
   "planning_artifact_wps": [
     "WP01",
     "WP02"
