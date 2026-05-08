@@ -43,6 +43,10 @@
         {
             "type": "path",
             "url": "../user"
+        },
+        {
+            "type": "path",
+            "url": "../northcloud"
         }
     ],
     "require": {
@@ -51,6 +55,7 @@
         "waaseyaa/cache": "^0.1.0-alpha.150",
         "waaseyaa/config": "^0.1.0-alpha.150",
         "waaseyaa/entity": "^0.1.0-alpha.150",
+        "waaseyaa/northcloud": "^0.1.0-alpha.150",
         "waaseyaa/queue": "^0.1.0-alpha.150",
         "waaseyaa/scheduler": "^0.1.0-alpha.150",
         "waaseyaa/user": "^0.1.0-alpha.150",
@@ -97,7 +102,8 @@
                 "Waaseyaa\\CLI\\Provider\\ConfigCacheDbAuditServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\MiscAServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\MiscBServiceProvider",
-                "Waaseyaa\\CLI\\Provider\\OtherScaffoldsServiceProvider"
+                "Waaseyaa\\CLI\\Provider\\OtherScaffoldsServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\NorthCloudServiceProvider"
             ]
         }
     },
