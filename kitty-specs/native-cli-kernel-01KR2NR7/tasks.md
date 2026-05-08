@@ -95,10 +95,10 @@
 | T082 | Port `FixtureScaffoldCommand` → `FixtureScaffoldHandler` + migrate test + snapshot pass | WP18 | [D] |
 | T083 | Port `FixtureGenerateCommand` → `FixtureGenerateHandler` + migrate test + snapshot pass | WP18 | [D] |
 | T084 | Port `FixturePackRefreshCommand` → `FixturePackRefreshHandler` + migrate test + snapshot pass | WP18 | [D] |
-| T085 | Port `RelationshipTypeScaffoldCommand` → `RelationshipTypeScaffoldHandler` + migrate test + snapshot pass | WP19 | [P] |
-| T086 | Port `WorkflowScaffoldCommand` → `WorkflowScaffoldHandler` + migrate test + snapshot pass | WP19 | [P] |
-| T087 | Port `ExtensionScaffoldCommand` → `ExtensionScaffoldHandler` + migrate test + snapshot pass | WP19 | [P] |
-| T088 | Port `ScaffoldAuthCommand` → `ScaffoldAuthHandler` + migrate test + snapshot pass | WP19 | [P] |
+| T085 | Port `RelationshipTypeScaffoldCommand` → `RelationshipTypeScaffoldHandler` + migrate test + snapshot pass | WP19 | [D] |
+| T086 | Port `WorkflowScaffoldCommand` → `WorkflowScaffoldHandler` + migrate test + snapshot pass | WP19 | [D] |
+| T087 | Port `ExtensionScaffoldCommand` → `ExtensionScaffoldHandler` + migrate test + snapshot pass | WP19 | [D] |
+| T088 | Port `ScaffoldAuthCommand` → `ScaffoldAuthHandler` + migrate test + snapshot pass | WP19 | [D] |
 | T089 | Port `AboutCommand` → `AboutHandler` + migrate test + snapshot pass | WP20 | [P] |
 | T090 | Port `AdminBuildCommand` → `AdminBuildHandler` + migrate test + snapshot pass | WP20 | [P] |
 | T091 | Port `AdminDevCommand` → `AdminDevHandler` + migrate test + snapshot pass | WP20 | [P] |
@@ -427,10 +427,10 @@
 ### WP19 — Port: Other scaffolds (Relationship/Workflow/Extension/Auth)
 
 **Subtasks**:
-- [ ] T085 `RelationshipTypeScaffoldCommand` → `RelationshipTypeScaffoldHandler` (WP19)
-- [ ] T086 `WorkflowScaffoldCommand` → `WorkflowScaffoldHandler` (WP19)
-- [ ] T087 `ExtensionScaffoldCommand` → `ExtensionScaffoldHandler` (WP19)
-- [ ] T088 `ScaffoldAuthCommand` → `ScaffoldAuthHandler` (WP19)
+- [x] T085 `RelationshipTypeScaffoldCommand` → `RelationshipTypeScaffoldHandler` (WP19)
+- [x] T086 `WorkflowScaffoldCommand` → `WorkflowScaffoldHandler` (WP19)
+- [x] T087 `ExtensionScaffoldCommand` → `ExtensionScaffoldHandler` (WP19)
+- [x] T088 `ScaffoldAuthCommand` → `ScaffoldAuthHandler` (WP19)
 
 **Estimated prompt**: ~280 lines. **Dependencies**: WP05.
 
