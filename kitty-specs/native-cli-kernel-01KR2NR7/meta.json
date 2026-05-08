@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-08T02:13:04.322586+00:00",
+  "friendly_name": "native cli kernel",
+  "mission_id": "01KR2NR7GYWJKD6CPSN9P2FPC2",
+  "mission_number": null,
+  "mission_slug": "native-cli-kernel-01KR2NR7",
+  "mission_type": "software-dev",
+  "slug": "native-cli-kernel-01KR2NR7",
+  "target_branch": "main"
+}
