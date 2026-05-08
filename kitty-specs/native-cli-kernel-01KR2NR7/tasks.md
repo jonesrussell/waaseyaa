@@ -41,11 +41,11 @@
 | T028 | Port `SchemaCheckCommand` → `SchemaCheckHandler` + migrate test + snapshot pass | WP06 | [D] |
 | T029 | Port `SchemaListCommand` → `SchemaListHandler` + migrate test + snapshot pass | WP06 | [D] |
 | T030 | Update `packages/cli` ServiceProvider to register the four handlers via `HasNativeCommandsInterface` | WP06 | — | [D] |
-| T031 | Port `MigrateCommand` → `MigrateHandler` + migrate test + snapshot pass | WP07 | [P] |
-| T032 | Port `MigrateRollbackCommand` → `MigrateRollbackHandler` + migrate test + snapshot pass | WP07 | [P] |
-| T033 | Port `MigrateStatusCommand` → `MigrateStatusHandler` + migrate test + snapshot pass | WP07 | [P] |
-| T034 | Port `MigrateDefaultsCommand` → `MigrateDefaultsHandler` + migrate test + snapshot pass | WP07 | [P] |
-| T035 | Migrate `Migrate/` helper namespace if any test references CommandTester directly | WP07 | — |
+| T031 | Port `MigrateCommand` → `MigrateHandler` + migrate test + snapshot pass | WP07 | [D] |
+| T032 | Port `MigrateRollbackCommand` → `MigrateRollbackHandler` + migrate test + snapshot pass | WP07 | [D] |
+| T033 | Port `MigrateStatusCommand` → `MigrateStatusHandler` + migrate test + snapshot pass | WP07 | [D] |
+| T034 | Port `MigrateDefaultsCommand` → `MigrateDefaultsHandler` + migrate test + snapshot pass | WP07 | [D] |
+| T035 | Migrate `Migrate/` helper namespace if any test references CommandTester directly | WP07 | — | [D] |
 | T036 | Refactor `AbstractMakeCommand` (Symfony parent) into `AbstractMakeHandler` (POPO base) | WP08 | — |
 | T037 | Port `Make/MakeEntityCommand` → `MakeEntityHandler` + migrate test + snapshot pass | WP08 | [P] |
 | T038 | Port `Make/MakeJobCommand` → `MakeJobHandler` + migrate test + snapshot pass | WP08 | [P] |
@@ -271,11 +271,11 @@
 **Independent test**: `bin/waaseyaa migrate:status` byte-equals WP01 fixture; helper-class tests green.
 
 **Subtasks**:
-- [ ] T031 Port `MigrateCommand` → `MigrateHandler` (WP07)
-- [ ] T032 Port `MigrateRollbackCommand` → `MigrateRollbackHandler` (WP07)
-- [ ] T033 Port `MigrateStatusCommand` → `MigrateStatusHandler` (WP07)
-- [ ] T034 Port `MigrateDefaultsCommand` → `MigrateDefaultsHandler` (WP07)
-- [ ] T035 Migrate any `Migrate/` helper test that uses `CommandTester` to `CliTester` (WP07)
+- [x] T031 Port `MigrateCommand` → `MigrateHandler` (WP07)
+- [x] T032 Port `MigrateRollbackCommand` → `MigrateRollbackHandler` (WP07)
+- [x] T033 Port `MigrateStatusCommand` → `MigrateStatusHandler` (WP07)
+- [x] T034 Port `MigrateDefaultsCommand` → `MigrateDefaultsHandler` (WP07)
+- [x] T035 Migrate any `Migrate/` helper test that uses `CommandTester` to `CliTester` (WP07)
 
 **Estimated prompt**: ~360 lines.
 **Parallel ops**: T031–T034.
