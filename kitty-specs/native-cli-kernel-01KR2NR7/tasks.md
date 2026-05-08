@@ -78,9 +78,9 @@
 | T065 | Port `EntityTypeListCommand` → `EntityTypeListHandler` + migrate test + snapshot pass | WP14 | [D] |
 | T066 | Port `TypeEnableCommand` → `TypeEnableHandler` + migrate test + snapshot pass | WP14 | [D] |
 | T067 | Port `TypeDisableCommand` → `TypeDisableHandler` + migrate test + snapshot pass + lifecycle test fix | WP14 | [D] |
-| T068 | Port `UserCreateCommand` → `UserCreateHandler` + migrate test + snapshot pass | WP15 | [P] |
-| T069 | Port `UserRoleCommand` → `UserRoleHandler` + migrate test + snapshot pass | WP15 | [P] |
-| T070 | Port `PermissionListCommand` → `PermissionListHandler` + migrate test + snapshot pass | WP15 | [P] |
+| T068 | Port `UserCreateCommand` → `UserCreateHandler` + migrate test + snapshot pass | WP15 | [D] |
+| T069 | Port `UserRoleCommand` → `UserRoleHandler` + migrate test + snapshot pass | WP15 | [D] |
+| T070 | Port `PermissionListCommand` → `PermissionListHandler` + migrate test + snapshot pass | WP15 | [D] |
 | T071 | Port `IngestRunCommand` → `IngestRunHandler` + migrate test + snapshot pass + regression test fix | WP16 | [P] |
 | T072 | Port `IngestDashboardCommand` → `IngestDashboardHandler` + migrate test + snapshot pass | WP16 | [P] |
 | T073 | Port `SearchReindexCommand` → `SearchReindexHandler` + migrate test + snapshot pass | WP16 | [P] |
@@ -377,9 +377,9 @@
 ### WP15 — Port: User + Permission
 
 **Subtasks**:
-- [ ] T068 `UserCreateCommand` → `UserCreateHandler` (WP15)
-- [ ] T069 `UserRoleCommand` → `UserRoleHandler` (WP15)
-- [ ] T070 `PermissionListCommand` → `PermissionListHandler` (WP15)
+- [x] T068 `UserCreateCommand` → `UserCreateHandler` (WP15)
+- [x] T069 `UserRoleCommand` → `UserRoleHandler` (WP15)
+- [x] T070 `PermissionListCommand` → `PermissionListHandler` (WP15)
 
 **Estimated prompt**: ~240 lines. **Dependencies**: WP05.
 
