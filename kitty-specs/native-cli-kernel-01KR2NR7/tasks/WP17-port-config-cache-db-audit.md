@@ -82,3 +82,4 @@ spec-kitty agent action implement WP17 --agent <name>
 - 2026-05-08T15:39:47Z – claude:sonnet:implementer:implementer – shell_pid=982914 – Cycle 2 fix: phpstan green (5 stale baseline pruned + 5 ?? '' removed)
 - 2026-05-08T15:40:14Z – claude:opus-4-7:reviewer:reviewer – shell_pid=984350 – Started review via action command
 - 2026-05-08T15:42:37Z – claude:opus-4-7:reviewer:reviewer – shell_pid=984350 – Review passed cycle 2: phpstan green (5 baseline pruned + 5 errors fixed)
+- 2026-05-08T18:06:38Z – claude:opus-4-7:reviewer:reviewer – shell_pid=984350 – Done override: Mission merged to main (cc36dfcd2)
