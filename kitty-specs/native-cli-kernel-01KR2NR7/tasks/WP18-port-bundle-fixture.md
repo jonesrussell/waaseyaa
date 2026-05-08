@@ -15,8 +15,8 @@ subtasks:
 - T082
 - T083
 - T084
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "985272"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "988303"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -72,3 +72,4 @@ spec-kitty agent action implement WP18 --agent <name>
 
 - 2026-05-08T15:43:14Z – claude:sonnet:implementer:implementer – shell_pid=985272 – Started implementation via action command
 - 2026-05-08T15:54:03Z – claude:sonnet:implementer:implementer – shell_pid=985272 – Ready for review: ported BundleScaffoldHandler, FixtureScaffoldHandler, FixtureGenerateHandler, FixturePackRefreshHandler; BundleFixtureServiceProvider registered; ghost refs cleaned from CliCommandRegistry and IngestionFixturePackRegressionTest; 4 WP18 snapshots generated; BundleFixtureSnapshotTest green; full suite 7488/7488; phpstan [OK] No errors
+- 2026-05-08T15:54:35Z – claude:opus-4-7:reviewer:reviewer – shell_pid=988303 – Started review via action command
