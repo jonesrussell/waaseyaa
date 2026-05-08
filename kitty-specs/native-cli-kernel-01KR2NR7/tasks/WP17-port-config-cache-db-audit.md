@@ -16,8 +16,8 @@ subtasks:
 - T078
 - T079
 - T080
-agent: "claude:opus-4-7:reviewer:reviewer"
-shell_pid: "981658"
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "982914"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -78,3 +78,4 @@ spec-kitty agent action implement WP17 --agent <name>
 - 2026-05-08T15:32:43Z – claude:sonnet:implementer:implementer – shell_pid=977665 – Ready for review: 5 native handlers, ConfigCacheDbAuditServiceProvider, 5 snapshot tests (all byte-for-byte baseline match), 5 handler unit tests, ghost imports cleared in Phase9/10/20, ConsoleKernel db:init wired to native CliKernel, ServiceProviderContractTest updated. All 4 gates GREEN, 7474 tests 0 errors 0 failures.
 - 2026-05-08T15:33:10Z – claude:opus-4-7:reviewer:reviewer – shell_pid=981658 – Started review via action command
 - 2026-05-08T15:36:28Z – claude:opus-4-7:reviewer:reviewer – shell_pid=981658 – Moved to planned
+- 2026-05-08T15:36:56Z – claude:sonnet:implementer:implementer – shell_pid=982914 – Started implementation via action command
