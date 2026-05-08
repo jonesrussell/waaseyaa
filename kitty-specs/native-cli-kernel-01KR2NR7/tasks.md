@@ -46,12 +46,12 @@
 | T033 | Port `MigrateStatusCommand` → `MigrateStatusHandler` + migrate test + snapshot pass | WP07 | [D] |
 | T034 | Port `MigrateDefaultsCommand` → `MigrateDefaultsHandler` + migrate test + snapshot pass | WP07 | [D] |
 | T035 | Migrate `Migrate/` helper namespace if any test references CommandTester directly | WP07 | — | [D] |
-| T036 | Refactor `AbstractMakeCommand` (Symfony parent) into `AbstractMakeHandler` (POPO base) | WP08 | — |
-| T037 | Port `Make/MakeEntityCommand` → `MakeEntityHandler` + migrate test + snapshot pass | WP08 | [P] |
-| T038 | Port `Make/MakeJobCommand` → `MakeJobHandler` + migrate test + snapshot pass | WP08 | [P] |
-| T039 | Port `Make/MakeListenerCommand` → `MakeListenerHandler` + migrate test + snapshot pass | WP08 | [P] |
-| T040 | Port `Make/MakeMigrationCommand` → `MakeMigrationHandler` + migrate test + snapshot pass | WP08 | [P] |
-| T041 | Port `Make/MakePolicyCommand` → `MakePolicyHandler` + migrate test + snapshot pass | WP08 | [P] |
+| T036 | Refactor `AbstractMakeCommand` (Symfony parent) into `AbstractMakeHandler` (POPO base) | WP08 | — | [D] |
+| T037 | Port `Make/MakeEntityCommand` → `MakeEntityHandler` + migrate test + snapshot pass | WP08 | [D] |
+| T038 | Port `Make/MakeJobCommand` → `MakeJobHandler` + migrate test + snapshot pass | WP08 | [D] |
+| T039 | Port `Make/MakeListenerCommand` → `MakeListenerHandler` + migrate test + snapshot pass | WP08 | [D] |
+| T040 | Port `Make/MakeMigrationCommand` → `MakeMigrationHandler` + migrate test + snapshot pass | WP08 | [D] |
+| T041 | Port `Make/MakePolicyCommand` → `MakePolicyHandler` + migrate test + snapshot pass | WP08 | [D] |
 | T042 | Port `Make/MakeProviderCommand` → `MakeProviderHandler` + migrate test + snapshot pass | WP09 | [P] |
 | T043 | Port `Make/MakePublicCommand` → `MakePublicHandler` + migrate integration test + snapshot pass | WP09 | [P] |
 | T044 | Port `Make/MakeTestCommand` → `MakeTestHandler` + migrate test + snapshot pass | WP09 | [P] |
@@ -287,12 +287,12 @@
 ### WP08 — Port: Make group A (Entity, Job, Listener, Migration, Policy)
 
 **Subtasks**:
-- [ ] T036 Refactor `AbstractMakeCommand` → `AbstractMakeHandler` POPO base (WP08)
-- [ ] T037 Port `MakeEntityCommand` → `MakeEntityHandler` (WP08)
-- [ ] T038 Port `MakeJobCommand` → `MakeJobHandler` (WP08)
-- [ ] T039 Port `MakeListenerCommand` → `MakeListenerHandler` (WP08)
-- [ ] T040 Port `MakeMigrationCommand` → `MakeMigrationHandler` (WP08)
-- [ ] T041 Port `MakePolicyCommand` → `MakePolicyHandler` (WP08)
+- [x] T036 Refactor `AbstractMakeCommand` → `AbstractMakeHandler` POPO base (WP08)
+- [x] T037 Port `MakeEntityCommand` → `MakeEntityHandler` (WP08)
+- [x] T038 Port `MakeJobCommand` → `MakeJobHandler` (WP08)
+- [x] T039 Port `MakeListenerCommand` → `MakeListenerHandler` (WP08)
+- [x] T040 Port `MakeMigrationCommand` → `MakeMigrationHandler` (WP08)
+- [x] T041 Port `MakePolicyCommand` → `MakePolicyHandler` (WP08)
 
 **Estimated prompt**: ~380 lines. **Dependencies**: WP05.
 
