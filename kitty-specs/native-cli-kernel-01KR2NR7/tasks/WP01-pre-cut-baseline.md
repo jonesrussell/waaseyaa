@@ -16,7 +16,8 @@ subtasks:
 - T003
 - T004
 - T005
-shell_pid: '868332'
+shell_pid: "868332"
+agent: "claude:opus-4-7:implementer:implementer"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -147,3 +148,7 @@ Verify:
 ```bash
 spec-kitty agent action implement WP01 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T03:07:27Z – claude:opus-4-7:implementer:implementer – shell_pid=868332 – Assigned agent via action command
