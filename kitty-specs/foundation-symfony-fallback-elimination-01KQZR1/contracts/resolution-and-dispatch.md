@@ -20,10 +20,10 @@
 
 ## 3. `_controller` attribute
 
-**Approved** — disposition: **relocate or single-point normalize** (inventory row #3).
+**Approved** — WP04 complete: normalization lives in `waaseyaa/routing`, not in `ControllerDispatcher`.
 
 - **Default contract** entering `ControllerDispatcher`: string `FQCN::method`, or `Closure` / invokable object.
-- **Array `[FQCN, method]`**: normalize when routes are registered (`RouteBuilder` and any Symfony-native import path), **or** emit a structured deprecation from the single chosen locus with a removal milestone. `ControllerDispatcher` MUST NOT remain the long-term owner of array normalization once WP04 completes.
+- **Array `[FQCN, method]`**: `RouteBuilder::controller()` and `RouteBuilder::normalizeControllerDefault()` (used when `HttpKernel` copies match parameters onto the request) coerce to `FQCN::method`. `ControllerDispatcher` does not rewrite `_controller`.
 
 ## 4. Consumer-visible errors
 

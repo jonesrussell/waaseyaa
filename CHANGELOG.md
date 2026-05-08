@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Routing + HTTP resolver wiring (`foundation-symfony-fallback-elimination-01KQZR1` WP03)** — `WaaseyaaRouter::match()` now wraps Symfony `UrlMatcher` failures as `Waaseyaa\Routing\Exception\RouteNotFoundException` / `RouteMethodNotAllowedException`, and `HttpKernel` catches those Waaseyaa types for JSON 404/405 instead of `Symfony\Component\Routing\Exception\*`. `HttpKernelServiceResolver` takes a `KernelServicesInterface` instance and resolves `DatabaseInterface` through it (same semantics as `ProviderRegistryKernelServices`, no duplicate if-chain). Call sites and tests that expected Symfony `ResourceNotFoundException` directly from `WaaseyaaRouter::match()` should expect the new routing exceptions instead.
 
+- **`_controller` array defaults (`foundation-symfony-fallback-elimination-01KQZR1` WP04)** — `RouteBuilder::controller()` accepts `[FQCN, method]` and stores `FQCN::method`. `HttpKernel` applies `RouteBuilder::normalizeControllerDefault()` when merging route match parameters onto the request. `ControllerDispatcher` no longer normalizes array controllers (single locus in `waaseyaa/routing` + match handoff).
+
 ## [0.1.0-alpha.174] - 2026-05-07
 
 ### Fixed

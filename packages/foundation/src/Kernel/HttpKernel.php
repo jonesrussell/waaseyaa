@@ -40,6 +40,7 @@ use Waaseyaa\Foundation\ServiceProvider\Capability\HasMiddlewareInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasRenderCacheListenersInterface;
 use Waaseyaa\Routing\Exception\RouteMethodNotAllowedException;
 use Waaseyaa\Routing\Exception\RouteNotFoundException;
+use Waaseyaa\Routing\RouteBuilder;
 use Waaseyaa\Routing\WaaseyaaRouter;
 use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\Middleware\BearerAuthMiddleware;
@@ -292,7 +293,10 @@ final class HttpKernel extends AbstractKernel
         $routeName = $params['_route'] ?? '';
         $matchedRoute = $router->getRouteCollection()->get($routeName);
         foreach ($params as $key => $value) {
-            $httpRequest->attributes->set($key, $value);
+            $httpRequest->attributes->set(
+                $key,
+                $key === '_controller' ? RouteBuilder::normalizeControllerDefault($value) : $value,
+            );
         }
         if ($matchedRoute !== null) {
             $httpRequest->attributes->set('_route_object', $matchedRoute);

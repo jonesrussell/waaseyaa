@@ -34,6 +34,16 @@ final class RouteBuilderTest extends TestCase
     }
 
     #[Test]
+    public function controllerNormalizesTwoElementClassMethodArray(): void
+    {
+        $route = RouteBuilder::create('/x')
+            ->controller(['App\\Controller\\TestController', 'index'])
+            ->build();
+
+        $this->assertSame('App\\Controller\\TestController::index', $route->getDefault('_controller'));
+    }
+
+    #[Test]
     public function methodsSetsHttpMethods(): void
     {
         $route = RouteBuilder::create('/test')

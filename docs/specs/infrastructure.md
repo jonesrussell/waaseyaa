@@ -180,13 +180,15 @@ The provider list is read through a closure accessor so resolution sees the live
 
 ### HTTP service resolver (SSR controller-method DI)
 
-<!-- Spec reviewed 2026-05-07 - foundation-symfony-fallback-elimination-01KQZR1 WP03: HttpKernelServiceResolver delegates DatabaseInterface to KernelServicesInterface; WaaseyaaRouter exposes RouteNotFoundException / RouteMethodNotAllowedException -->
+<!-- Spec reviewed 2026-05-07 - foundation-symfony-fallback-elimination-01KQZR1 WP03–WP04: resolver + routing exceptions + RouteBuilder/_controller normalization -->
 
 `HttpKernel::getHttpServiceResolver()` returns `Waaseyaa\Foundation\Http\HttpServiceResolverInterface` (default impl `Waaseyaa\Foundation\Kernel\Http\HttpKernelServiceResolver`). SSR uses this seam to satisfy app-controller method dependencies — given a class name from a `\ReflectionNamedType` parameter, the resolver returns an instance or `null`. Replaces the legacy `\Closure(string): ?object` shape; mirrors the typed-resolver pattern introduced for `KernelServicesInterface` above. The default resolver walks provider bindings first; the narrow `DatabaseInterface` fallback delegates to the same `KernelServicesInterface` implementation used at bootstrap (`ProviderRegistryKernelServices`), not a second hard-coded map.
 
 `HttpServiceResolverInterface` is intentionally separate from `KernelServicesInterface`: the latter is finite, kernel-internal, and provider-scoped, while this surface is open-ended and driven by user-authored controller signatures. Naming the seam allows future tightening (allowed-types enforcement, caching, tracing) without affecting the kernel-services bus.
 
 **Routing miss surface.** `Waaseyaa\Routing\WaaseyaaRouter::match()` wraps Symfony `UrlMatcher` failures as `Waaseyaa\Routing\Exception\RouteNotFoundException` and `RouteMethodNotAllowedException` so `HttpKernel` handles 404/405 without importing `Symfony\Component\Routing\Exception\*` for expected misses.
+
+**`_controller` shape.** Symfony `Route` defaults may use `[FQCN, method]`; `RouteBuilder::controller()` normalizes that to `FQCN::method`, and `HttpKernel` applies `RouteBuilder::normalizeControllerDefault()` when copying matcher parameters onto the request so `ControllerDispatcher` always sees a string or invokable for `_controller`.
 
 ### HTTP error surface (JSON-first)
 

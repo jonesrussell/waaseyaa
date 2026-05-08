@@ -18,7 +18,9 @@ use Waaseyaa\Foundation\Log\NullLogger;
  *
  * Iterates DomainRouterInterface implementations in a deterministic chain.
  * Callable controllers (closures/invokables from service providers) are
- * handled as a fallback before the router chain.
+ * handled before the router chain. `_controller` MUST be a `Class::method`
+ * string or invokable; array `[Class, method]` defaults are normalized earlier
+ * ({@see \Waaseyaa\Routing\RouteBuilder::normalizeControllerDefault()}).
  */
 final class ControllerDispatcher
 {
@@ -55,20 +57,6 @@ final class ControllerDispatcher
                     'detail' => 'SSR rendering is not available. Install waaseyaa/ssr to enable HTML routes.',
                 ]],
             ]);
-        }
-
-        // Normalize Symfony-style [Class, method] array callables to the
-        // "Class::method" string form the router chain expects. Routes
-        // declared via the Symfony Route component commonly use the array
-        // form; the framework's domain routers all match on string form.
-        if (
-            is_array($controller)
-            && count($controller) === 2
-            && is_string($controller[0] ?? null)
-            && is_string($controller[1] ?? null)
-        ) {
-            $controller = $controller[0] . '::' . $controller[1];
-            $request->attributes->set('_controller', $controller);
         }
 
         // Callable controllers (closures/invokables from service providers).

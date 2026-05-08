@@ -49,12 +49,34 @@ final class RouteBuilder
     /**
      * Set the controller for this route.
      *
-     * @param string|callable $controller The controller reference.
+     * Symfony `Route` defaults may use `[FQCN, method]`; this builder normalizes
+     * that shape to the `FQCN::method` string domain routers expect.
+     *
+     * @param string|callable|array{0: string, 1: string} $controller
      */
-    public function controller(string|callable $controller): self
+    public function controller(string|callable|array $controller): self
     {
-        $this->defaults['_controller'] = $controller;
+        $this->defaults['_controller'] = self::normalizeControllerDefault($controller);
+
         return $this;
+    }
+
+    /**
+     * Coerce Symfony-style `[FQCN, method]` into the `FQCN::method` string.
+     * Pass-through for strings, callables, and other attribute values.
+     */
+    public static function normalizeControllerDefault(mixed $controller): mixed
+    {
+        if (
+            is_array($controller)
+            && count($controller) === 2
+            && is_string($controller[0] ?? null)
+            && is_string($controller[1] ?? null)
+        ) {
+            return $controller[0] . '::' . $controller[1];
+        }
+
+        return $controller;
     }
 
     /**
