@@ -156,3 +156,4 @@ spec-kitty agent action implement WP05 --agent <name>
 - 2026-05-08T04:53:06Z – claude:sonnet:implementer:implementer – shell_pid=890379 – Cycle 2 fix: bridge wired, casing fixed, contract restored
 - 2026-05-08T04:53:45Z – claude:opus-4-7:reviewer:reviewer – shell_pid=896443 – Started review via action command
 - 2026-05-08T04:56:56Z – claude:opus-4-7:reviewer:reviewer – shell_pid=896443 – Review passed cycle 2: bridge wired, gates green, casing fixed, contract restored
+- 2026-05-08T18:06:14Z – claude:opus-4-7:reviewer:reviewer – shell_pid=896443 – Done override: Mission merged to main (cc36dfcd2)
