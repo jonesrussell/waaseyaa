@@ -154,3 +154,4 @@ spec-kitty agent action implement WP01 --agent <name>
 - 2026-05-08T03:07:27Z – claude:opus-4-7:implementer:implementer – shell_pid=868332 – Assigned agent via action command
 - 2026-05-08T03:15:36Z – claude:opus-4-7:implementer:implementer – shell_pid=868332 – Ready for review: perf harness + snapshot-capture scripts committed to main (7dde270da); 67-command snapshot fixture set (225 files) committed to worktree branch (a923be435); 7251 tests green; plan.md Performance Baseline filled with literal harness output (list: 0.01s/30080KB, health:check: 0.01s)
 - 2026-05-08T03:17:17Z – claude:opus-4-7:reviewer:reviewer – shell_pid=873049 – Started review via action command
+- 2026-05-08T03:20:12Z – claude:opus-4-7:reviewer:reviewer – shell_pid=873049 – Moved to planned
