@@ -1,0 +1,9 @@
++-----------------------------+---------------------------------------------------------------------+----------+
+| Event                       | Listener                                                            | Priority |
++-----------------------------+---------------------------------------------------------------------+----------+
+| waaseyaa.entity.pre_save    | Waaseyaa\Entity\Audit\EntityWriteAuditListener::onPreSave           | 0        |
+| waaseyaa.entity.post_save   | Waaseyaa\Entity\Audit\EntityWriteAuditListener::onPostSave          | 0        |
+| waaseyaa.entity.post_save   | Waaseyaa\Search\EventSubscriber\SearchIndexSubscriber::onPostSave   | 0        |
+| waaseyaa.entity.post_delete | Waaseyaa\Entity\Audit\EntityWriteAuditListener::onPostDelete        | 0        |
+| waaseyaa.entity.post_delete | Waaseyaa\Search\EventSubscriber\SearchIndexSubscriber::onPostDelete | 0        |
++-----------------------------+---------------------------------------------------------------------+----------+

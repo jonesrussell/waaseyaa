@@ -1,0 +1,34 @@
++---------------------+--------------------+-------------------------------------------+--------------+--------------+
+| ID                  | Label              | Class                                     | Revisionable | Translatable |
++---------------------+--------------------+-------------------------------------------+--------------+--------------+
+| trace               | Trace              | Waaseyaa\AI\Observability\Trace           | No           | No           |
+| pipeline            | Pipeline           | Waaseyaa\AI\Pipeline\Pipeline             | No           | No           |
+| attachment          | Attachment         | Waaseyaa\Attachment\Attachment            | No           | No           |
+| reaction            | Reaction           | Waaseyaa\Engagement\Reaction              | No           | No           |
+| comment             | Comment            | Waaseyaa\Engagement\Comment               | No           | No           |
+| follow              | Follow             | Waaseyaa\Engagement\Follow                | No           | No           |
+| genealogy_tree      | Genealogy tree     | Waaseyaa\Genealogy\Entity\GenealogyTree   | No           | No           |
+| genealogy_person    | Genealogy person   | Waaseyaa\Genealogy\Entity\GenealogyPerson | No           | No           |
+| genealogy_family    | Genealogy family   | Waaseyaa\Genealogy\Entity\GenealogyFamily | No           | No           |
+| genealogy_event     | Genealogy event    | Waaseyaa\Genealogy\Entity\GenealogyEvent  | No           | No           |
+| group               | Group              | Waaseyaa\Groups\Group                     | No           | No           |
+| group_type          | Group type         | Waaseyaa\Groups\GroupType                 | No           | No           |
+| media               | Media              | Waaseyaa\Media\Media                      | No           | No           |
+| media_type          | Media Type         | Waaseyaa\Media\MediaType                  | No           | No           |
+| menu                | Menu               | Waaseyaa\Menu\Menu                        | No           | No           |
+| menu_link           | Menu Link          | Waaseyaa\Menu\MenuLink                    | No           | No           |
+| message_thread      | Message Thread     | Waaseyaa\Messaging\MessageThread          | No           | No           |
+| thread_participant  | Thread Participant | Waaseyaa\Messaging\ThreadParticipant      | No           | No           |
+| thread_message      | Thread Message     | Waaseyaa\Messaging\ThreadMessage          | No           | No           |
+| node                | Content            | Waaseyaa\Node\Node                        | No           | No           |
+| node_type           | Content Type       | Waaseyaa\Node\NodeType                    | No           | No           |
+| note                | Note               | Waaseyaa\Note\Note                        | No           | No           |
+| oidc_client         | OIDC Client        | Waaseyaa\Oidc\Entity\OidcClient           | No           | No           |
+| path_alias          | Path Alias         | Waaseyaa\Path\PathAlias                   | No           | No           |
+| relationship        | Relationship       | Waaseyaa\Relationship\Relationship        | No           | No           |
+| taxonomy_term       | Taxonomy Term      | Waaseyaa\Taxonomy\Term                    | No           | No           |
+| taxonomy_vocabulary | Vocabulary         | Waaseyaa\Taxonomy\Vocabulary              | No           | No           |
+| user                | User               | Waaseyaa\User\User                        | No           | No           |
+| user_block          | User Block         | Waaseyaa\User\UserBlock                   | No           | No           |
+| workflow            | Workflow           | Waaseyaa\Workflows\Workflow               | No           | No           |
++---------------------+--------------------+-------------------------------------------+--------------+--------------+

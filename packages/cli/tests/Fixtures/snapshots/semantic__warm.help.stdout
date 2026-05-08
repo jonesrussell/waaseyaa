@@ -1,0 +1,17 @@
+Description:
+  Warm semantic embeddings for deterministic read paths
+
+Usage:
+  semantic:warm [options]
+
+Options:
+  -t, --type=TYPE       Entity type ID(s) to warm (repeat option or pass comma-separated values) [default: ["node"]] (multiple values allowed)
+  -l, --limit=LIMIT     Per-type candidate limit (0 = no limit) [default: "0"]
+      --json            Emit the full warming report as JSON
+  -h, --help            Display help for the given command. When no command is given display help for the list command
+      --silent          Do not output any message
+  -q, --quiet           Only errors are displayed. All other output is suppressed
+  -V, --version         Display this application version
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction  Do not ask any interactive question
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug

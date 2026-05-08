@@ -1,0 +1,21 @@
+Description:
+  Render deterministic debug panels for workflow, traversal, and SSR context
+
+Usage:
+  debug:context [options]
+
+Options:
+      --entity-type=ENTITY-TYPE                  Source entity type [default: "node"]
+      --entity-id=ENTITY-ID                      Source entity ID [default: "1"]
+      --workflow-state=WORKFLOW-STATE            Workflow state [default: "draft"]
+      --status=STATUS                            Status flag (0/1) [default: "0"]
+      --relationship-counts=RELATIONSHIP-COUNTS  Traversal counts in outbound:inbound form [default: "0:0"]
+      --view-mode=VIEW-MODE                      SSR view mode [default: "full"]
+      --preview=PREVIEW                          SSR preview mode (0/1) [default: "0"]
+  -h, --help                                     Display help for the given command. When no command is given display help for the list command
+      --silent                                   Do not output any message
+  -q, --quiet                                    Only errors are displayed. All other output is suppressed
+  -V, --version                                  Display this application version
+      --ansi|--no-ansi                           Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction                           Do not ask any interactive question
+  -v|vv|vvv, --verbose                           Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
