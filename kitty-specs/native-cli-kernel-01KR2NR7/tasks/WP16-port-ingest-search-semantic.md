@@ -86,3 +86,4 @@ spec-kitty agent action implement WP16 --agent <name>
 - 2026-05-08T14:41:49Z – claude:sonnet:implementer:implementer – shell_pid=968029 – Started implementation via action command
 - 2026-05-08T15:03:45Z – claude:sonnet:implementer:implementer – shell_pid=968029 – Ready for review: 5 commands ported (ingest:run, ingest:dashboard, search:reindex, semantic:warm, semantic:refresh), all tests migrated, 4 gates green, 7467 tests pass
 - 2026-05-08T15:04:32Z – claude:opus-4-7:reviewer:reviewer – shell_pid=972920 – Started review via action command
+- 2026-05-08T15:06:23Z – claude:opus-4-7:reviewer:reviewer – shell_pid=972920 – Moved to planned
