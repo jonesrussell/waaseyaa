@@ -117,10 +117,10 @@
 | T104 | Remove dual-boot adapter from `bin/waaseyaa`; native discovery only | WP23 | — | [D] |
 | T105 | Drop `symfony/console` from `packages/cli/composer.json` runtime `require` | WP23 | — | [D] |
 | T106 | Run `composer why symfony/console` and assert no waaseyaa/* runtime chain depends on it | WP23 | — | [D] |
-| T107 | Author `docs/specs/cli-kernel.md` covering parser semantics, exit codes, provider contract, testing harness, layer placement | WP24 | — |
-| T108 | Update `docs/specs/operator-diagnostics.md` to reference `CliKernel`/`CommandDefinition` instead of Symfony Console | WP24 | [P] |
-| T109 | Extend orchestration table in `CLAUDE.md` (root and `packages/cli/CLAUDE.md` if present) with `cli-kernel.md` mapping | WP24 | [P] |
-| T110 | Run `tools/drift-detector.sh` and resolve any flagged staleness | WP24 | — |
+| T107 | Author `docs/specs/cli-kernel.md` covering parser semantics, exit codes, provider contract, testing harness, layer placement | WP24 | — | [D] |
+| T108 | Update `docs/specs/operator-diagnostics.md` to reference `CliKernel`/`CommandDefinition` instead of Symfony Console | WP24 | [D] |
+| T109 | Extend orchestration table in `CLAUDE.md` (root and `packages/cli/CLAUDE.md` if present) with `cli-kernel.md` mapping | WP24 | [D] |
+| T110 | Run `tools/drift-detector.sh` and resolve any flagged staleness | WP24 | — | [D] |
 | T111 | Re-run perf harness post-cut against `list` and `health:check`; record numbers in `plan.md` § Performance Baseline | WP25 | — |
 | T112 | Assert NFR-001 (≤ 110% baseline wall-time) and NFR-002 (≤ +4 MiB peak memory); fail WP if not met | WP25 | — |
 | T113 | Run all snapshot integration tests; assert byte-equality vs WP01-captured fixtures for every public command | WP25 | — |
@@ -491,10 +491,10 @@
 ### WP24 — Spec authoring & cross-refs
 
 **Subtasks**:
-- [ ] T107 Author `docs/specs/cli-kernel.md` (WP24)
-- [ ] T108 Update `docs/specs/operator-diagnostics.md` (WP24)
-- [ ] T109 Extend orchestration table in `CLAUDE.md` (WP24)
-- [ ] T110 Run `tools/drift-detector.sh`; resolve any flagged staleness (WP24)
+- [x] T107 Author `docs/specs/cli-kernel.md` (WP24)
+- [x] T108 Update `docs/specs/operator-diagnostics.md` (WP24)
+- [x] T109 Extend orchestration table in `CLAUDE.md` (WP24)
+- [x] T110 Run `tools/drift-detector.sh`; resolve any flagged staleness (WP24)
 
 **Estimated prompt**: ~300 lines. **Dependencies**: WP23.
 
