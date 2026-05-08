@@ -16,6 +16,8 @@ subtasks:
 - T073
 - T074
 - T075
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "968029"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -78,3 +80,7 @@ Apply canonical pattern.
 ```bash
 spec-kitty agent action implement WP16 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T14:41:49Z – claude:sonnet:implementer:implementer – shell_pid=968029 – Started implementation via action command
