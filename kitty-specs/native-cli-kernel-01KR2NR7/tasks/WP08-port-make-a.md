@@ -109,3 +109,4 @@ spec-kitty agent action implement WP08 --agent <name>
 - 2026-05-08T12:25:47Z – claude:sonnet:implementer:implementer – shell_pid=928217 – Ready for review: Make group A (Entity, Job, Listener, Migration, Policy) ported to native CLI. All 4 gates green. All 5 per-command diffs empty. 7457 tests pass.
 - 2026-05-08T12:26:20Z – claude:opus-4-7:reviewer:reviewer – shell_pid=933164 – Started review via action command
 - 2026-05-08T12:29:38Z – claude:opus-4-7:reviewer:reviewer – shell_pid=933164 – Review passed: byte-parity green for all 13 commands (5 new + 8 prior), no WP01 baselines modified, HelpRenderer fixes are scoped Symfony-parity bug fixes, gates green (cs/phpstan/7457 phpunit), no main-repo leakage.
+- 2026-05-08T18:06:20Z – claude:opus-4-7:reviewer:reviewer – shell_pid=933164 – Done override: Mission merged to main (cc36dfcd2)
