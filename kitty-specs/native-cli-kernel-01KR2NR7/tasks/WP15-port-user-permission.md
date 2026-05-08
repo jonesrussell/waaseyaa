@@ -14,8 +14,8 @@ subtasks:
 - T068
 - T069
 - T070
-agent: "claude:opus-4-7:reviewer:reviewer"
-shell_pid: "964359"
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "964834"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -77,3 +77,4 @@ spec-kitty agent action implement WP15 --agent <name>
 - 2026-05-08T14:31:13Z – claude:sonnet:implementer:implementer – shell_pid=963086 – Cycle 2 fix: Phase9 integration test migrated
 - 2026-05-08T14:31:42Z – claude:opus-4-7:reviewer:reviewer – shell_pid=964359 – Started review via action command
 - 2026-05-08T14:32:53Z – claude:opus-4-7:reviewer:reviewer – shell_pid=964359 – Moved to planned
+- 2026-05-08T14:33:17Z – claude:sonnet:implementer:implementer – shell_pid=964834 – Started implementation via action command
