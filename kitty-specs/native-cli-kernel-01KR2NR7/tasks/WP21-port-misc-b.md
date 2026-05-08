@@ -17,6 +17,8 @@ subtasks:
 - T097
 - T098
 - T099
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "998783"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -87,3 +89,7 @@ Yields five `CommandDefinition`s (`InstallHandler`, `RouteListHandler`, `ServeHa
 ```bash
 spec-kitty agent action implement WP21 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T16:31:49Z – claude:sonnet:implementer:implementer – shell_pid=998783 – Started implementation via action command
