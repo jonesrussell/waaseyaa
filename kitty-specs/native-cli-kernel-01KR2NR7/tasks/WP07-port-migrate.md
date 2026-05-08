@@ -16,6 +16,8 @@ subtasks:
 - T033
 - T034
 - T035
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "918527"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -100,3 +102,7 @@ Create `packages/cli/src/Provider/MigrateServiceProvider.php` implementing `HasN
 ```bash
 spec-kitty agent action implement WP07 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T11:30:17Z – claude:sonnet:implementer:implementer – shell_pid=918527 – Started implementation via action command
