@@ -15,6 +15,8 @@ subtasks:
 - T086
 - T087
 - T088
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "990677"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -66,3 +68,7 @@ Apply canonical port pattern (see WP06). Note `ScaffoldAuthCommandTest.php` live
 ```bash
 spec-kitty agent action implement WP19 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T16:01:08Z – claude:sonnet:implementer:implementer – shell_pid=990677 – Started implementation via action command
