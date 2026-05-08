@@ -2,52 +2,33 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
+use Waaseyaa\CLI\Command\Make\AbstractMakeHandler;
 
-#[AsCommand(
-    name: 'make:entity-type',
-    description: 'Generate an entity type class',
-)]
-class MakeEntityTypeCommand extends Command
+final class MakeEntityTypeHandler extends AbstractMakeHandler
 {
-    protected function configure(): void
+    public function execute(CliIO $io): int
     {
-        $this
-            ->addArgument('name', InputArgument::REQUIRED, 'The entity type name (e.g. "event")')
-            ->addOption('content', null, InputOption::VALUE_NONE, 'Generate a content entity (default is config entity)');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $name = $input->getArgument('name');
-        $isContent = (bool) $input->getOption('content');
+        $name = (string) $io->argument('name');
+        $isContent = (bool) $io->option('content');
 
         $className = str_replace('_', '', ucwords($name, '_'));
-        $typeId = strtolower((string) $name);
-        $label = ucwords(str_replace('_', ' ', (string) $name));
+        $typeId = strtolower($name);
+        $label = ucwords(strtr($name, '_', ' '));
 
         $template = $isContent
             ? $this->renderContentTemplate($className, $typeId, $label)
             : $this->renderConfigTemplate($className, $typeId);
 
-        $output->write($template);
+        $io->write($template);
 
-        return Command::SUCCESS;
+        return 0;
     }
 
     /**
      * Emit an attribute-first content entity scaffold.
-     *
-     * The generated class declares fields as `#[Field]`-decorated public typed
-     * properties. Register it with `EntityType::fromClass()` in your
-     * ServiceProvider — type metadata flows automatically from the attributes.
      */
     private function renderContentTemplate(string $className, string $typeId, string $label): string
     {
@@ -79,9 +60,7 @@ PHP;
     }
 
     /**
-     * Emit a config entity scaffold. Config entities continue to use the
-     * legacy `new EntityType(...)` registration since attribute reflection
-     * applies only to ContentEntityBase subclasses.
+     * Emit a config entity scaffold.
      */
     private function renderConfigTemplate(string $className, string $typeId): string
     {

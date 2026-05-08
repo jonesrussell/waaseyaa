@@ -29,11 +29,6 @@ use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
 use Waaseyaa\CLI\Command\IngestDashboardCommand;
 use Waaseyaa\CLI\Command\IngestRunCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\Make\MakeProviderCommand;
-use Waaseyaa\CLI\Command\Make\MakePublicCommand;
-use Waaseyaa\CLI\Command\Make\MakeTestCommand;
-use Waaseyaa\CLI\Command\MakeEntityTypeCommand;
-use Waaseyaa\CLI\Command\MakePluginCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeClearCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeConfigCommand;
@@ -103,11 +98,6 @@ final class CliCommandRegistry
             new EntityListCommand($entityTypeManager),
             new UserCreateCommand($entityTypeManager),
             new UserRoleCommand($entityTypeManager),
-            new MakePluginCommand(),
-            new MakeEntityTypeCommand(),
-            new MakeProviderCommand(),
-            new MakePublicCommand($projectRoot),
-            new MakeTestCommand(),
             new ScaffoldAuthCommand($projectRoot),
             new ServeCommand($projectRoot),
             new AdminDevCommand($projectRoot),

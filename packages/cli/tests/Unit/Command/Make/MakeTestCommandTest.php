@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Tests\Unit\Command\Make;
 
-use Waaseyaa\CLI\Command\Make\MakeTestCommand;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
+use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Handler\MakeTestHandler;
+use Waaseyaa\CLI\Provider\MakeServiceProviderB;
+use Waaseyaa\CLI\Testing\CliTester;
 
-#[CoversClass(MakeTestCommand::class)]
+#[CoversClass(MakeTestHandler::class)]
 final class MakeTestCommandTest extends TestCase
 {
     #[Test]
     public function it_generates_an_integration_test_by_default(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'NodeRepositoryTest']);
+        $tester->execute(['NodeRepositoryTest']);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $output = $tester->getDisplay();
+        $this->assertSame(0, $tester->getExitCode());
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class NodeRepositoryTest extends TestCase', $output);
         $this->assertStringContainsString('namespace App\\Tests\\Integration;', $output);
         $this->assertStringContainsString('declare(strict_types=1);', $output);
@@ -32,18 +32,39 @@ final class MakeTestCommandTest extends TestCase
     public function it_generates_a_unit_test_with_flag(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'NodeRepositoryTest', '--unit' => true]);
+        $tester->execute(['NodeRepositoryTest', '--unit']);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('namespace App\\Tests\\Unit;', $output);
     }
 
-    private function createTester(): CommandTester
+    private function createTester(): CliTester
     {
-        $app = new Application();
-        $app->add(new MakeTestCommand());
-        $command = $app->find('make:test');
+        $provider = new MakeServiceProviderB();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'make:test') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
 
-        return new CommandTester($command);
+        $container = new class implements ContainerInterface {
+            public function get(string $id): mixed
+            {
+                if ($id === MakeTestHandler::class) {
+                    return new MakeTestHandler();
+                }
+                throw new \RuntimeException("Not found: {$id}");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === MakeTestHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
     }
 }
