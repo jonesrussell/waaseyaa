@@ -17,10 +17,10 @@ use Waaseyaa\CLI\Provider\BundleFixtureServiceProvider;
 
 /**
  * Snapshot tests: verify scaffold:bundle, fixture:scaffold, fixture:generate,
- * fixture:pack:refresh --help output matches the WP18 baseline fixtures byte-for-byte.
+ * fixture:pack:refresh --help output matches the WP01 baseline fixtures byte-for-byte.
  *
- * Note: these fixtures did not exist in the WP01 baseline (a923be435) — they were
- * generated at WP18 port time and serve as the immutable native-renderer baseline.
+ * All four fixtures exist in the WP01 baseline (a923be435) under the canonical
+ * double-underscore naming convention used throughout the snapshot suite.
  */
 #[CoversNothing]
 final class BundleFixtureSnapshotTest extends TestCase
@@ -42,10 +42,10 @@ final class BundleFixtureSnapshotTest extends TestCase
     public static function helpFixtures(): array
     {
         return [
-            'scaffold:bundle'      => ['scaffold:bundle',      'scaffold_bundle.help.stdout'],
-            'fixture:scaffold'     => ['fixture:scaffold',     'fixture_scaffold.help.stdout'],
-            'fixture:generate'     => ['fixture:generate',     'fixture_generate.help.stdout'],
-            'fixture:pack:refresh' => ['fixture:pack:refresh', 'fixture_pack_refresh.help.stdout'],
+            'scaffold:bundle'      => ['scaffold:bundle',      'scaffold__bundle.help.stdout'],
+            'fixture:scaffold'     => ['fixture:scaffold',     'fixture__scaffold.help.stdout'],
+            'fixture:generate'     => ['fixture:generate',     'fixture__generate.help.stdout'],
+            'fixture:pack:refresh' => ['fixture:pack:refresh', 'fixture__pack__refresh.help.stdout'],
         ];
     }
 
