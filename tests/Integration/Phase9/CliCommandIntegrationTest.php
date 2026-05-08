@@ -16,11 +16,12 @@ use Waaseyaa\CLI\Command\CacheClearCommand;
 use Waaseyaa\CLI\Command\ConfigExportCommand;
 use Waaseyaa\CLI\Command\ConfigImportCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\UserCreateCommand;
-use Waaseyaa\CLI\Command\UserRoleCommand;
 use Waaseyaa\CLI\Handler\EntityCreateHandler;
 use Waaseyaa\CLI\Handler\EntityListHandler;
+use Waaseyaa\CLI\Handler\UserCreateHandler;
+use Waaseyaa\CLI\Handler\UserRoleHandler;
 use Waaseyaa\CLI\Provider\EntityTypeServiceProvider;
+use Waaseyaa\CLI\Provider\UserPermissionServiceProvider;
 use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\MemoryStorage;
@@ -242,15 +243,44 @@ final class CliCommandIntegrationTest extends TestCase
     #[Test]
     public function testUserCreateCommand(): void
     {
-        $command = new UserCreateCommand($this->entityTypeManager);
-        $tester = new CommandTester($command);
-        $tester->execute([
+        $manager = $this->entityTypeManager;
+        $container = new class ($manager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager) {}
+
+            public function get(string $id): mixed
+            {
+                if ($id === UserCreateHandler::class) {
+                    return new UserCreateHandler($this->manager);
+                }
+
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === UserCreateHandler::class;
+            }
+        };
+
+        $provider = new UserPermissionServiceProvider();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'user:create') {
+                $definition = $cmd;
+                break;
+            }
+        }
+
+        $this->assertNotNull($definition);
+
+        $tester = CliTester::for($definition, $container);
+        $tester->executeMap([
             'username' => 'testuser',
             '--email' => 'test@example.com',
         ]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertStringContainsString('Created user "testuser"', $tester->getDisplay());
+        $this->assertSame(0, $tester->getExitCode());
+        $this->assertStringContainsString('Created user "testuser"', $tester->getStdout());
 
         // Verify entity was created in storage.
         $user = $this->userStorage->load(1);
@@ -286,21 +316,52 @@ final class CliCommandIntegrationTest extends TestCase
     #[Test]
     public function testUserRoleAddAndRemove(): void
     {
+        $manager = $this->entityTypeManager;
+        $container = new class ($manager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager) {}
+
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    UserCreateHandler::class => new UserCreateHandler($this->manager),
+                    UserRoleHandler::class   => new UserRoleHandler($this->manager),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+
+            public function has(string $id): bool
+            {
+                return in_array($id, [UserCreateHandler::class, UserRoleHandler::class], true);
+            }
+        };
+
+        $provider = new UserPermissionServiceProvider();
+        $createDefinition = null;
+        $roleDefinition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'user:create') {
+                $createDefinition = $cmd;
+            } elseif ($cmd->name === 'user:role') {
+                $roleDefinition = $cmd;
+            }
+        }
+
+        $this->assertNotNull($createDefinition);
+        $this->assertNotNull($roleDefinition);
+
         // First create a user.
-        $createCommand = new UserCreateCommand($this->entityTypeManager);
-        $createTester = new CommandTester($createCommand);
-        $createTester->execute(['username' => 'editor']);
-        $this->assertSame(Command::SUCCESS, $createTester->getStatusCode());
+        $createTester = CliTester::for($createDefinition, $container);
+        $createTester->executeMap(['username' => 'editor']);
+        $this->assertSame(0, $createTester->getExitCode());
 
         // Add a role.
-        $roleCommand = new UserRoleCommand($this->entityTypeManager);
-        $addTester = new CommandTester($roleCommand);
-        $addTester->execute([
+        $addTester = CliTester::for($roleDefinition, $container);
+        $addTester->executeMap([
             'user_id' => '1',
             'role' => 'editor',
         ]);
-        $this->assertSame(Command::SUCCESS, $addTester->getStatusCode());
-        $this->assertStringContainsString('Added role "editor" to user 1', $addTester->getDisplay());
+        $this->assertSame(0, $addTester->getExitCode());
+        $this->assertStringContainsString('Added role "editor" to user 1', $addTester->getStdout());
 
         // Verify role is present.
         $user = $this->userStorage->load(1);
@@ -309,14 +370,14 @@ final class CliCommandIntegrationTest extends TestCase
         $this->assertContains('editor', $roles);
 
         // Remove the role.
-        $removeTester = new CommandTester($roleCommand);
-        $removeTester->execute([
+        $removeTester = CliTester::for($roleDefinition, $container);
+        $removeTester->executeMap([
             'user_id' => '1',
             'role' => 'editor',
             '--remove' => true,
         ]);
-        $this->assertSame(Command::SUCCESS, $removeTester->getStatusCode());
-        $this->assertStringContainsString('Removed role "editor" from user 1', $removeTester->getDisplay());
+        $this->assertSame(0, $removeTester->getExitCode());
+        $this->assertStringContainsString('Removed role "editor" from user 1', $removeTester->getStdout());
 
         // Verify role is gone.
         $user = $this->userStorage->load(1);
