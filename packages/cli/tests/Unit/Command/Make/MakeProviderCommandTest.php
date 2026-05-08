@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Tests\Unit\Command\Make;
 
-use Waaseyaa\CLI\Command\Make\MakeProviderCommand;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
+use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Handler\MakeProviderHandler;
+use Waaseyaa\CLI\Provider\MakeServiceProviderB;
+use Waaseyaa\CLI\Testing\CliTester;
 
-#[CoversClass(MakeProviderCommand::class)]
+#[CoversClass(MakeProviderHandler::class)]
 final class MakeProviderCommandTest extends TestCase
 {
     #[Test]
     public function it_generates_a_service_provider(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'SitemapServiceProvider']);
+        $tester->execute(['SitemapServiceProvider']);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $output = $tester->getDisplay();
+        $this->assertSame(0, $tester->getExitCode());
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class SitemapServiceProvider extends ServiceProvider', $output);
         $this->assertStringContainsString('public function register(): void', $output);
         $this->assertStringContainsString('public function boot(): void', $output);
@@ -33,9 +33,9 @@ final class MakeProviderCommandTest extends TestCase
     public function it_converts_snake_case_name(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'sitemap_service_provider']);
+        $tester->execute(['sitemap_service_provider']);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class SitemapServiceProvider extends ServiceProvider', $output);
     }
 
@@ -43,9 +43,9 @@ final class MakeProviderCommandTest extends TestCase
     public function it_appends_service_provider_suffix(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'Blog']);
+        $tester->execute(['Blog']);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class BlogServiceProvider extends ServiceProvider', $output);
     }
 
@@ -53,9 +53,9 @@ final class MakeProviderCommandTest extends TestCase
     public function it_generates_domain_provider_with_entity_boilerplate(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'Blog', '--domain' => true]);
+        $tester->execute(['Blog', '--domain']);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class BlogServiceProvider extends ServiceProvider', $output);
         $this->assertStringContainsString('EntityType::fromClass(', $output);
         $this->assertStringContainsString('Blog::class', $output);
@@ -68,19 +68,40 @@ final class MakeProviderCommandTest extends TestCase
     public function domain_flag_converts_multi_word_to_snake_case(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'UserProfile', '--domain' => true]);
+        $tester->execute(['UserProfile', '--domain']);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class UserProfileServiceProvider extends ServiceProvider', $output);
         $this->assertStringContainsString("group: 'user_profile'", $output);
     }
 
-    private function createTester(): CommandTester
+    private function createTester(): CliTester
     {
-        $app = new Application();
-        $app->add(new MakeProviderCommand());
-        $command = $app->find('make:provider');
+        $provider = new MakeServiceProviderB();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'make:provider') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
 
-        return new CommandTester($command);
+        $container = new class implements ContainerInterface {
+            public function get(string $id): mixed
+            {
+                if ($id === MakeProviderHandler::class) {
+                    return new MakeProviderHandler();
+                }
+                throw new \RuntimeException("Not found: {$id}");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === MakeProviderHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
     }
 }

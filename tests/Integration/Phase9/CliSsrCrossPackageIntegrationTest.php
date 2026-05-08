@@ -7,18 +7,19 @@ namespace Waaseyaa\Tests\Integration\Phase9;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Api\Tests\Fixtures\TestEntity;
 use Waaseyaa\Cache\CacheFactory;
-use Waaseyaa\CLI\Command\CacheClearCommand;
-use Waaseyaa\CLI\Command\ConfigExportCommand;
-use Waaseyaa\CLI\Command\ConfigImportCommand;
-use Waaseyaa\CLI\Command\EntityCreateCommand;
+use Waaseyaa\CLI\Handler\CacheClearHandler;
+use Waaseyaa\CLI\Handler\ConfigExportHandler;
+use Waaseyaa\CLI\Handler\ConfigImportHandler;
+use Waaseyaa\CLI\Handler\EntityCreateHandler;
+use Waaseyaa\CLI\Provider\ConfigCacheDbAuditServiceProvider;
+use Waaseyaa\CLI\Provider\EntityTypeServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\MemoryStorage;
 use Waaseyaa\Entity\EntityType;
@@ -120,10 +121,38 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
     #[Test]
     public function testEntityCreatedViaCLICanBeRenderedBySSR(): void
     {
-        // Create an entity via EntityCreateCommand.
-        $createCommand = new EntityCreateCommand($this->entityTypeManager);
-        $tester = new CommandTester($createCommand);
-        $tester->execute([
+        // Create an entity via EntityCreateHandler.
+        $manager = $this->entityTypeManager;
+        $container = new class ($manager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly EntityTypeManager $manager) {}
+
+            public function get(string $id): mixed
+            {
+                if ($id === EntityCreateHandler::class) {
+                    return new EntityCreateHandler($this->manager);
+                }
+
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === EntityCreateHandler::class;
+            }
+        };
+
+        $provider = new EntityTypeServiceProvider();
+        $createDefinition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'entity:create') {
+                $createDefinition = $cmd;
+                break;
+            }
+        }
+        $this->assertNotNull($createDefinition);
+
+        $tester = CliTester::for($createDefinition, $container);
+        $tester->executeMap([
             'entity_type' => 'article',
             '--values' => json_encode([
                 'title' => 'Integration Test Article',
@@ -132,7 +161,7 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
                 'author' => 'admin',
             ]),
         ]);
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
 
         // Load entity from storage.
         $entity = $this->articleStorage->load(1);
@@ -168,11 +197,27 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
             'keys' => ['id' => 'id', 'uuid' => 'uuid', 'label' => 'name'],
         ]);
 
-        // Export config.
-        $exportCommand = new ConfigExportCommand($this->configManager);
-        $exportTester = new CommandTester($exportCommand);
+        // Export config via native handler.
+        $provider = new ConfigCacheDbAuditServiceProvider();
+        $exportDef = null;
+        $importDef = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'config:export') {
+                $exportDef = $cmd;
+            }
+            if ($cmd->name === 'config:import') {
+                $importDef = $cmd;
+            }
+        }
+        $this->assertNotNull($exportDef);
+        $this->assertNotNull($importDef);
+
+        $configManager = $this->configManager;
+        $configContainer = $this->makeConfigContainer($configManager);
+
+        $exportTester = CliTester::for($exportDef, $configContainer);
         $exportTester->execute([]);
-        $this->assertSame(Command::SUCCESS, $exportTester->getStatusCode());
+        $this->assertSame(0, $exportTester->getExitCode());
 
         // Verify sync has the entity type configs.
         $this->assertNotFalse($this->syncStorage->read('entity_type.article'));
@@ -186,11 +231,10 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
             'keys' => ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'],
         ]);
 
-        // Import config (should restore from sync).
-        $importCommand = new ConfigImportCommand($this->configManager);
-        $importTester = new CommandTester($importCommand);
+        // Import config via native handler (should restore from sync).
+        $importTester = CliTester::for($importDef, $configContainer);
         $importTester->execute([]);
-        $this->assertSame(Command::SUCCESS, $importTester->getStatusCode());
+        $this->assertSame(0, $importTester->getExitCode());
 
         // Verify entity type definitions are restored.
         $articleConfig = $this->activeStorage->read('entity_type.article');
@@ -222,11 +266,36 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
         $this->assertNotFalse($cache->get('article:1'));
         $this->assertNotFalse($cache->get('article:2'));
 
-        // Clear cache via command.
-        $command = new CacheClearCommand($this->cacheFactory);
-        $tester = new CommandTester($command);
+        // Clear cache via native handler.
+        $provider = new ConfigCacheDbAuditServiceProvider();
+        $cacheClearDef = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'cache:clear') {
+                $cacheClearDef = $cmd;
+                break;
+            }
+        }
+        $this->assertNotNull($cacheClearDef);
+
+        $cacheFactory = $this->cacheFactory;
+        $cacheContainer = new class ($cacheFactory) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Cache\CacheFactoryInterface $f) {}
+            public function get(string $id): mixed
+            {
+                if ($id === CacheClearHandler::class) {
+                    return new CacheClearHandler($this->f);
+                }
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+            public function has(string $id): bool
+            {
+                return $id === CacheClearHandler::class;
+            }
+        };
+
+        $tester = CliTester::for($cacheClearDef, $cacheContainer);
         $tester->execute([]);
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
 
         // Verify cache is cleared.
         $this->assertFalse($cache->get('article:1'));
@@ -240,6 +309,24 @@ final class CliSsrCrossPackageIntegrationTest extends TestCase
         $article2 = $this->articleStorage->load(2);
         $this->assertNotNull($article2);
         $this->assertSame('Cached Article 2', $article2->label());
+    }
+    private function makeConfigContainer(\Waaseyaa\Config\ConfigManagerInterface $manager): \Psr\Container\ContainerInterface
+    {
+        return new class ($manager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Config\ConfigManagerInterface $m) {}
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    ConfigExportHandler::class => new ConfigExportHandler($this->m),
+                    ConfigImportHandler::class => new ConfigImportHandler($this->m),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+            public function has(string $id): bool
+            {
+                return in_array($id, [ConfigExportHandler::class, ConfigImportHandler::class], true);
+            }
+        };
     }
 }
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Provenance;
 
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
+use Waaseyaa\CLI\Io\CliOutput;
+use Waaseyaa\CLI\Io\StreamCliOutput;
 
 /**
  * Inspects composer.json / composer.lock for waaseyaa/* provenance (path SHA, versions, drift).
@@ -32,7 +32,7 @@ final class ComposerProvenanceReporter
         if ($json) {
             fwrite(STDOUT, json_encode($report->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT) . "\n");
         } else {
-            self::printHumanToStream($report, new StreamOutput(STDOUT));
+            self::printHuman($report, new StreamCliOutput(STDOUT));
         }
 
         if ($reportOnly) {
@@ -284,7 +284,10 @@ final class ComposerProvenanceReporter
         return preg_match('/^[a-f0-9]{40}$/i', $sha) === 1 ? strtolower($sha) : null;
     }
 
-    public static function printHumanToStream(ProvenanceReport $report, OutputInterface $out): void
+    /**
+     * Print a human-readable provenance report using native CliIO.
+     */
+    public static function printHuman(ProvenanceReport $report, CliOutput $out): void
     {
         $out->writeln('Waaseyaa framework provenance');
         $out->writeln('Project root: ' . $report->projectRootDisplay());

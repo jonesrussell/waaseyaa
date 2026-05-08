@@ -1,0 +1,14 @@
+Waaseyaa
+
+Key              Value                     
+Waaseyaa Version 0.1.0                     
+PHP Version      8.4.20                    
+Environment      production                
+Debug Mode       OFF                       
+Database         ./storage/waaseyaa.sqlite 
+Config Dir       ./config/sync             
+OS               Linux                     
+name             Waaseyaa                  
+version          dev-main                  
+php              8.4.20                    
+environment      production                

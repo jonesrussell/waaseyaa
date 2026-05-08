@@ -7,9 +7,9 @@ namespace Waaseyaa\Tests\Integration\Phase21;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
-use Waaseyaa\CLI\Command\SchemaListCommand;
+use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\SchemaListHandler;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry;
 
 /**
@@ -94,19 +94,34 @@ final class SchemaRegistryIntegrationTest extends TestCase
     #[Test]
     public function cliSchemaListOutputsCoreNote(): void
     {
-        $app = new Application();
-        $app->add(new SchemaListCommand($this->registry));
+        $handler    = new SchemaListHandler($this->registry);
+        $definition = new CommandDefinition(
+            name: 'schema:list',
+            description: 'List registered schemas with versions and compatibility policy',
+            handler: \Closure::fromCallable([$handler, 'execute']),
+        );
 
-        $command = $app->find('schema:list');
-        $tester  = new CommandTester($command);
+        $container = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                throw new \RuntimeException("Not found: $id");
+            }
+
+            public function has(string $id): bool
+            {
+                return false;
+            }
+        };
+
+        $tester = CliTester::for($definition, $container);
         $tester->execute([]);
 
-        $output = $tester->getDisplay();
+        $output = $tester->getStdout();
         $this->assertStringContainsString('core.note', $output);
         $this->assertStringContainsString('liberal', $output);
         $this->assertStringContainsString('ingestion.envelope', $output);
         $this->assertStringContainsString('ingestion_envelope', $output);
         $this->assertStringContainsString('experimental', $output);
-        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
     }
 }

@@ -1,0 +1,127 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\CLI\Tests\Unit\Handler;
+
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\InstallHandler;
+use Waaseyaa\CLI\OptionDefinition;
+use Waaseyaa\CLI\OptionMode;
+use Waaseyaa\CLI\Testing\CliTester;
+use Waaseyaa\Config\ConfigManagerInterface;
+use Waaseyaa\Config\StorageInterface;
+use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityTypeManagerInterface;
+use Waaseyaa\Entity\Storage\EntityStorageInterface;
+
+#[CoversClass(InstallHandler::class)]
+final class InstallHandlerTest extends TestCase
+{
+    private function makeDefinition(InstallHandler $handler): CommandDefinition
+    {
+        return new CommandDefinition(
+            name: 'install',
+            description: 'Install Waaseyaa with initial configuration',
+            options: [
+                new OptionDefinition(name: 'site-name', mode: OptionMode::Required, description: 'The name of the site', default: 'Waaseyaa'),
+                new OptionDefinition(name: 'site-mail', mode: OptionMode::Required, description: 'Site email address', default: 'admin@example.com'),
+                new OptionDefinition(name: 'admin-email', mode: OptionMode::Required, description: 'Admin user email', default: 'admin@example.com'),
+                new OptionDefinition(name: 'admin-password', mode: OptionMode::Required, description: 'Admin user password'),
+            ],
+            handler: \Closure::fromCallable([$handler, 'execute']),
+        );
+    }
+
+    private function makeContainer(): \Psr\Container\ContainerInterface
+    {
+        return new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                throw new \RuntimeException('Container::get not used in unit tests');
+            }
+
+            public function has(string $id): bool
+            {
+                return false;
+            }
+        };
+    }
+
+    #[Test]
+    public function it_installs_with_default_site_name(): void
+    {
+        $mockStorage = $this->createMock(StorageInterface::class);
+        $mockStorage->expects($this->once())
+            ->method('write')
+            ->with('system.site', $this->callback(static function (array $data): bool {
+                return $data['name'] === 'Waaseyaa' && $data['mail'] === 'admin@example.com';
+            }));
+
+        $mockConfigManager = $this->createMock(ConfigManagerInterface::class);
+        $mockConfigManager->method('getActiveStorage')->willReturn($mockStorage);
+
+        $mockEntity = $this->createMock(EntityInterface::class);
+
+        $mockEntityStorage = $this->createMock(EntityStorageInterface::class);
+        $mockEntityStorage->expects($this->once())
+            ->method('create')
+            ->with($this->callback(static function (array $values): bool {
+                return $values['name'] === 'admin' && $values['roles'] === ['administrator'];
+            }))
+            ->willReturn($mockEntity);
+        $mockEntityStorage->expects($this->once())->method('save');
+
+        $mockEntityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+        $mockEntityTypeManager->method('getStorage')->with('user')->willReturn($mockEntityStorage);
+
+        $handler = new InstallHandler(
+            entityTypeManager: $mockEntityTypeManager,
+            configManager: $mockConfigManager,
+        );
+
+        $tester = CliTester::for($this->makeDefinition($handler), $this->makeContainer());
+        $tester->executeMap([]);
+
+        self::assertSame(0, $tester->getExitCode());
+        self::assertStringContainsString('Creating admin user...', $tester->getStdout());
+        self::assertStringContainsString('Waaseyaa "Waaseyaa" installed successfully.', $tester->getStdout());
+    }
+
+    #[Test]
+    public function it_installs_with_custom_site_name(): void
+    {
+        $mockStorage = $this->createMock(StorageInterface::class);
+        $mockStorage->expects($this->once())
+            ->method('write')
+            ->with('system.site', $this->callback(static function (array $data): bool {
+                return $data['name'] === 'My Site';
+            }));
+
+        $mockConfigManager = $this->createMock(ConfigManagerInterface::class);
+        $mockConfigManager->method('getActiveStorage')->willReturn($mockStorage);
+
+        $mockEntity = $this->createMock(EntityInterface::class);
+
+        $mockEntityStorage = $this->createMock(EntityStorageInterface::class);
+        $mockEntityStorage->method('create')->willReturn($mockEntity);
+        $mockEntityStorage->method('save');
+
+        $mockEntityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+        $mockEntityTypeManager->method('getStorage')->willReturn($mockEntityStorage);
+
+        $handler = new InstallHandler(
+            entityTypeManager: $mockEntityTypeManager,
+            configManager: $mockConfigManager,
+        );
+
+        $tester = CliTester::for($this->makeDefinition($handler), $this->makeContainer());
+        $tester->executeMap(['--site-name' => 'My Site']);
+
+        self::assertSame(0, $tester->getExitCode());
+        self::assertStringContainsString('Waaseyaa "My Site" installed successfully.', $tester->getStdout());
+    }
+}

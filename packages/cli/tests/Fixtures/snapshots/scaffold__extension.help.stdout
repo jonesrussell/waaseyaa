@@ -1,0 +1,23 @@
+Description:
+  Generate deterministic external extension SDK scaffold JSON
+
+Usage:
+  scaffold:extension [options]
+
+Options:
+      --id=ID                                Plugin ID (machine name)
+      --label=LABEL                          Plugin label
+      --package=PACKAGE                      Composer package name (vendor/package)
+      --namespace=NAMESPACE                  Root PHP namespace (auto-derived from package when omitted)
+      --class=CLASS                          Extension class name [default: "KnowledgeExtension"]
+      --description=DESCRIPTION              Plugin description [default: "External knowledge tooling extension"]
+      --workflow-tag=WORKFLOW-TAG            Default workflow tag [default: "external-extension"]
+      --relationship-type=RELATIONSHIP-TYPE  Default traversal relationship type [default: "related"]
+      --discovery-hint=DISCOVERY-HINT        Default discovery hint [default: "external-discovery-hint"]
+  -h, --help                                 Display help for the given command. When no command is given display help for the list command
+      --silent                               Do not output any message
+  -q, --quiet                                Only errors are displayed. All other output is suppressed
+  -V, --version                              Display this application version
+      --ansi|--no-ansi                       Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction                       Do not ask any interactive question
+  -v|vv|vvv, --verbose                       Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug

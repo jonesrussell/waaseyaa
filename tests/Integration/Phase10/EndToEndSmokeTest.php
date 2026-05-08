@@ -7,8 +7,6 @@ namespace Waaseyaa\Tests\Integration\Phase10;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -20,15 +18,21 @@ use Waaseyaa\AI\Schema\SchemaRegistry;
 use Waaseyaa\Api\OpenApi\OpenApiGenerator;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Cache\CacheFactory;
-use Waaseyaa\CLI\Command\CacheClearCommand;
-use Waaseyaa\CLI\Command\ConfigExportCommand;
-use Waaseyaa\CLI\Command\ConfigImportCommand;
-use Waaseyaa\CLI\Command\EntityCreateCommand;
-use Waaseyaa\CLI\Command\EntityListCommand;
-use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\MigrateDefaultsCommand;
-use Waaseyaa\CLI\Command\TypeDisableCommand;
-use Waaseyaa\CLI\Command\TypeEnableCommand;
+use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\CacheClearHandler;
+use Waaseyaa\CLI\Handler\ConfigExportHandler;
+use Waaseyaa\CLI\Handler\ConfigImportHandler;
+use Waaseyaa\CLI\Handler\EntityCreateHandler;
+use Waaseyaa\CLI\Handler\EntityListHandler;
+use Waaseyaa\CLI\Handler\InstallHandler;
+use Waaseyaa\CLI\Handler\MigrateDefaultsHandler;
+use Waaseyaa\CLI\Handler\TypeDisableHandler;
+use Waaseyaa\CLI\Handler\TypeEnableHandler;
+use Waaseyaa\CLI\OptionDefinition;
+use Waaseyaa\CLI\OptionMode;
+use Waaseyaa\CLI\Provider\ConfigCacheDbAuditServiceProvider;
+use Waaseyaa\CLI\Provider\EntityTypeServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\MemoryStorage;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
@@ -58,7 +62,7 @@ final class EndToEndSmokeTest extends TestCase
      * - EntityTypeManager with in-memory storage (Layer 1)
      * - ConfigManager with MemoryStorage (Layer 1)
      * - CacheFactory with MemoryBackend (Layer 0)
-     * - InstallCommand, EntityCreateCommand, EntityListCommand,
+     * - InstallCommand, entity:create handler, entity:list handler,
      *   CacheClearCommand, ConfigExportCommand, ConfigImportCommand (Layer 6)
      */
     #[Test]
@@ -115,12 +119,36 @@ final class EndToEndSmokeTest extends TestCase
 
         // --- Step 1: Install Waaseyaa ---
 
-        $installCommand = new InstallCommand($entityTypeManager, $configManager);
-        $installTester = new CommandTester($installCommand);
-        $installTester->execute(['--site-name' => 'Smoke Test Site']);
+        $installHandler = new InstallHandler(
+            entityTypeManager: $entityTypeManager,
+            configManager: $configManager,
+        );
+        $installDefinition = new CommandDefinition(
+            name: 'install',
+            description: 'Install Waaseyaa with initial configuration',
+            options: [
+                new OptionDefinition(name: 'site-name', mode: OptionMode::Required, description: 'The name of the site', default: 'Waaseyaa'),
+                new OptionDefinition(name: 'site-mail', mode: OptionMode::Required, description: 'Site email address', default: 'admin@example.com'),
+                new OptionDefinition(name: 'admin-email', mode: OptionMode::Required, description: 'Admin user email', default: 'admin@example.com'),
+                new OptionDefinition(name: 'admin-password', mode: OptionMode::Required, description: 'Admin user password'),
+            ],
+            handler: \Closure::fromCallable([$installHandler, 'execute']),
+        );
+        $nullContainer = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                throw new \RuntimeException('Not used');
+            }
+            public function has(string $id): bool
+            {
+                return false;
+            }
+        };
+        $installTester = CliTester::for($installDefinition, $nullContainer);
+        $installTester->executeMap(['--site-name' => 'Smoke Test Site']);
 
-        $this->assertSame(Command::SUCCESS, $installTester->getStatusCode());
-        $this->assertStringContainsString('Smoke Test Site', $installTester->getDisplay());
+        $this->assertSame(0, $installTester->getExitCode());
+        $this->assertStringContainsString('Smoke Test Site', $installTester->getStdout());
 
         // Verify config was written.
         $siteConfig = $activeStorage->read('system.site');
@@ -134,24 +162,46 @@ final class EndToEndSmokeTest extends TestCase
 
         // --- Step 2: Create content via CLI ---
 
-        $createCommand = new EntityCreateCommand($entityTypeManager);
+        $entityProvider = new EntityTypeServiceProvider();
+        $entityDefinitions = [];
+        foreach ($entityProvider->nativeCommands() as $cmd) {
+            $entityDefinitions[$cmd->name] = $cmd;
+        }
+        $entityContainer = new class ($entityTypeManager) implements \Psr\Container\ContainerInterface {
+            public function __construct(
+                private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager,
+            ) {}
 
-        $createTester = new CommandTester($createCommand);
-        $createTester->execute([
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    EntityCreateHandler::class => new EntityCreateHandler($this->manager),
+                    EntityListHandler::class   => new EntityListHandler($this->manager),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+
+            public function has(string $id): bool
+            {
+                return in_array($id, [EntityCreateHandler::class, EntityListHandler::class], true);
+            }
+        };
+
+        $createTester = CliTester::for($entityDefinitions['entity:create'], $entityContainer);
+        $createTester->executeMap([
             'entity_type' => 'article',
             '--values' => json_encode(['title' => 'First Smoke Article', 'type' => 'blog']),
         ]);
-        $this->assertSame(Command::SUCCESS, $createTester->getStatusCode());
-        $this->assertStringContainsString('Created article entity with ID:', $createTester->getDisplay());
+        $this->assertSame(0, $createTester->getExitCode());
+        $this->assertStringContainsString('Created article entity with ID:', $createTester->getStdout());
 
         // --- Step 3: List content via CLI and verify ---
 
-        $listCommand = new EntityListCommand($entityTypeManager);
-        $listTester = new CommandTester($listCommand);
-        $listTester->execute(['entity_type' => 'article']);
+        $listTester = CliTester::for($entityDefinitions['entity:list'], $entityContainer);
+        $listTester->executeMap(['entity_type' => 'article']);
 
-        $this->assertSame(Command::SUCCESS, $listTester->getStatusCode());
-        $this->assertStringContainsString('First Smoke Article', $listTester->getDisplay());
+        $this->assertSame(0, $listTester->getExitCode());
+        $this->assertStringContainsString('First Smoke Article', $listTester->getStdout());
 
         // --- Step 4: Cache operations ---
 
@@ -164,13 +214,37 @@ final class EndToEndSmokeTest extends TestCase
         $this->assertNotFalse($defaultBin->get('page_1'));
         $this->assertNotFalse($renderBin->get('block_1'));
 
-        // Clear all caches via CLI.
-        $cacheClearCommand = new CacheClearCommand($cacheFactory);
-        $cacheClearTester = new CommandTester($cacheClearCommand);
+        // Clear all caches via native handler.
+        $provider = new ConfigCacheDbAuditServiceProvider();
+        $cacheClearDef = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'cache:clear') {
+                $cacheClearDef = $cmd;
+                break;
+            }
+        }
+        $this->assertNotNull($cacheClearDef);
+
+        $cacheClearContainer = new class ($cacheFactory) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Cache\CacheFactoryInterface $f) {}
+            public function get(string $id): mixed
+            {
+                if ($id === CacheClearHandler::class) {
+                    return new CacheClearHandler($this->f);
+                }
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+            public function has(string $id): bool
+            {
+                return $id === CacheClearHandler::class;
+            }
+        };
+
+        $cacheClearTester = CliTester::for($cacheClearDef, $cacheClearContainer);
         $cacheClearTester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $cacheClearTester->getStatusCode());
-        $this->assertStringContainsString('cleared', $cacheClearTester->getDisplay());
+        $this->assertSame(0, $cacheClearTester->getExitCode());
+        $this->assertStringContainsString('cleared', $cacheClearTester->getStdout());
 
         // Verify bins are empty.
         $this->assertFalse($defaultBin->get('page_1'));
@@ -178,11 +252,40 @@ final class EndToEndSmokeTest extends TestCase
 
         // --- Step 5: Config export, modify active, import to restore ---
 
-        // Export current config to sync.
-        $exportCommand = new ConfigExportCommand($configManager);
-        $exportTester = new CommandTester($exportCommand);
+        // Export current config to sync via native handler.
+        $configProvider = new ConfigCacheDbAuditServiceProvider();
+        $exportDef = null;
+        $importDef = null;
+        foreach ($configProvider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'config:export') {
+                $exportDef = $cmd;
+            }
+            if ($cmd->name === 'config:import') {
+                $importDef = $cmd;
+            }
+        }
+        $this->assertNotNull($exportDef);
+        $this->assertNotNull($importDef);
+
+        $configContainer = new class ($configManager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Config\ConfigManagerInterface $m) {}
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    ConfigExportHandler::class => new ConfigExportHandler($this->m),
+                    ConfigImportHandler::class => new ConfigImportHandler($this->m),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+            public function has(string $id): bool
+            {
+                return in_array($id, [ConfigExportHandler::class, ConfigImportHandler::class], true);
+            }
+        };
+
+        $exportTester = CliTester::for($exportDef, $configContainer);
         $exportTester->execute([]);
-        $this->assertSame(Command::SUCCESS, $exportTester->getStatusCode());
+        $this->assertSame(0, $exportTester->getExitCode());
 
         // Verify sync has the config.
         $syncSiteConfig = $syncStorage->read('system.site');
@@ -196,12 +299,11 @@ final class EndToEndSmokeTest extends TestCase
         $drifted = $activeStorage->read('system.site');
         $this->assertSame('Drifted Site Name', $drifted['name']);
 
-        // Import from sync to restore the original.
-        $importCommand = new ConfigImportCommand($configManager);
-        $importTester = new CommandTester($importCommand);
+        // Import from sync to restore the original via native handler.
+        $importTester = CliTester::for($importDef, $configContainer);
         $importTester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $importTester->getStatusCode());
+        $this->assertSame(0, $importTester->getExitCode());
 
         // Verify active config was restored.
         $restored = $activeStorage->read('system.site');
@@ -440,12 +542,36 @@ final class EndToEndSmokeTest extends TestCase
         $this->assertNotFalse($renderBin->get('block:header'));
         $this->assertNotFalse($discoveryBin->get('plugins:field'));
 
-        // Clear all caches via CacheClearCommand.
-        $command = new CacheClearCommand($cacheFactory);
-        $tester = new CommandTester($command);
+        // Clear all caches via native CacheClearHandler.
+        $cacheProvider = new ConfigCacheDbAuditServiceProvider();
+        $cacheSmokeDef = null;
+        foreach ($cacheProvider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'cache:clear') {
+                $cacheSmokeDef = $cmd;
+                break;
+            }
+        }
+        $this->assertNotNull($cacheSmokeDef);
+
+        $smokeCacheContainer = new class ($cacheFactory) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Cache\CacheFactoryInterface $f) {}
+            public function get(string $id): mixed
+            {
+                if ($id === CacheClearHandler::class) {
+                    return new CacheClearHandler($this->f);
+                }
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+            public function has(string $id): bool
+            {
+                return $id === CacheClearHandler::class;
+            }
+        };
+
+        $tester = CliTester::for($cacheSmokeDef, $smokeCacheContainer);
         $tester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
 
         // Verify everything is cleared.
         $this->assertFalse($defaultBin->get('entity:1'));
@@ -497,43 +623,88 @@ final class EndToEndSmokeTest extends TestCase
             keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
         ));
 
-        $application = new \Symfony\Component\Console\Application();
-        $application->add(new TypeDisableCommand($entityTypeManager, $lifecycleManager));
-        $application->add(new TypeEnableCommand($entityTypeManager, $lifecycleManager));
-        $application->add(new MigrateDefaultsCommand($entityTypeManager, $lifecycleManager, $auditLogger, $tempDir));
+        // Build native CLI definitions for type:disable and type:enable.
+        $typeProvider = new EntityTypeServiceProvider();
+        $typeDefinitions = [];
+        foreach ($typeProvider->nativeCommands() as $cmd) {
+            $typeDefinitions[$cmd->name] = $cmd;
+        }
+        $typeContainer = new class ($entityTypeManager, $lifecycleManager) implements \Psr\Container\ContainerInterface {
+            public function __construct(
+                private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager,
+                private readonly \Waaseyaa\Entity\EntityTypeLifecycleManager $lifecycle,
+            ) {}
+
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    TypeDisableHandler::class => new TypeDisableHandler($this->manager, $this->lifecycle),
+                    TypeEnableHandler::class  => new TypeEnableHandler($this->manager, $this->lifecycle),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+
+            public function has(string $id): bool
+            {
+                return in_array($id, [TypeDisableHandler::class, TypeEnableHandler::class], true);
+            }
+        };
+
+        // Build a CliTester for MigrateDefaultsHandler (native CLI pattern).
+        $migrateDefaultsHandler = new MigrateDefaultsHandler($entityTypeManager, $lifecycleManager, $auditLogger, $tempDir);
+        $migrateDefaultsDefinition = new CommandDefinition(
+            name: 'migrate:defaults',
+            description: 'Migrate default content type enablement for tenants',
+            options: [
+                new OptionDefinition(name: 'tenant', mode: OptionMode::Array_, description: 'Tenant IDs to migrate (repeatable)'),
+                new OptionDefinition(name: 'enable', mode: OptionMode::Required, description: 'Type ID to enable for all tenants (e.g. note)', default: ''),
+                new OptionDefinition(name: 'actor', mode: OptionMode::Required, description: 'Actor ID for audit log entries', default: 'cli'),
+                new OptionDefinition(name: 'yes', shortcut: 'y', mode: OptionMode::None, description: 'Skip confirmation prompts'),
+                new OptionDefinition(name: 'dry-run', mode: OptionMode::None, description: 'Report actions without making changes'),
+                new OptionDefinition(name: 'rollback', mode: OptionMode::None, description: 'Rollback previous migrate:defaults actions'),
+            ],
+            handler: \Closure::fromCallable([$migrateDefaultsHandler, 'execute']),
+        );
+        $container = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                throw new \RuntimeException("Not found: $id");
+            }
+            public function has(string $id): bool
+            {
+                return false;
+            }
+        };
 
         // --- Step 1: Disable all types for tenant "acme" ---
 
-        $disableNote = $application->find('type:disable');
-        $noteTester = new CommandTester($disableNote);
-        $noteTester->execute(['type' => 'note', '--tenant' => 'acme', '--yes' => true]);
-        $this->assertSame(Command::SUCCESS, $noteTester->getStatusCode());
+        $noteTester = CliTester::for($typeDefinitions['type:disable'], $typeContainer);
+        $noteTester->executeMap(['type' => 'note', '--tenant' => 'acme', '--yes' => true]);
+        $this->assertSame(0, $noteTester->getExitCode());
         $this->assertTrue($lifecycleManager->isDisabled('note', 'acme'));
 
-        $disableArticle = $application->find('type:disable');
-        $articleTester = new CommandTester($disableArticle);
-        $articleTester->execute(['type' => 'article', '--tenant' => 'acme', '--yes' => true, '--force' => true]);
-        $this->assertSame(Command::SUCCESS, $articleTester->getStatusCode());
+        $articleTester = CliTester::for($typeDefinitions['type:disable'], $typeContainer);
+        $articleTester->executeMap(['type' => 'article', '--tenant' => 'acme', '--yes' => true, '--force' => true]);
+        $this->assertSame(0, $articleTester->getExitCode());
         $this->assertTrue($lifecycleManager->isDisabled('article', 'acme'));
 
         // --- Step 2: migrate:defaults detects and fixes ---
 
-        $migrateCmd = $application->find('migrate:defaults');
-        $migrateTester = new CommandTester($migrateCmd);
-        $migrateTester->execute(['--tenant' => ['acme'], '--enable' => 'note', '--yes' => true]);
+        $migrateTester = CliTester::for($migrateDefaultsDefinition, $container);
+        $migrateTester->execute(['--tenant', 'acme', '--enable', 'note', '--yes']);
 
-        $this->assertSame(Command::SUCCESS, $migrateTester->getStatusCode());
+        $this->assertSame(0, $migrateTester->getExitCode());
         $this->assertFalse($lifecycleManager->isDisabled('note', 'acme'));
-        $this->assertStringContainsString('Enabled "note" for tenant "acme"', $migrateTester->getDisplay());
+        $this->assertStringContainsString('Enabled "note" for tenant "acme"', $migrateTester->getStdout());
 
         // --- Step 3: Rollback reverses ---
 
-        $rollbackTester = new CommandTester($migrateCmd);
-        $rollbackTester->execute(['--tenant' => ['acme'], '--rollback' => true, '--yes' => true]);
+        $rollbackTester = CliTester::for($migrateDefaultsDefinition, $container);
+        $rollbackTester->execute(['--tenant', 'acme', '--rollback', '--yes']);
 
-        $this->assertSame(Command::SUCCESS, $rollbackTester->getStatusCode());
+        $this->assertSame(0, $rollbackTester->getExitCode());
         $this->assertTrue($lifecycleManager->isDisabled('note', 'acme'));
-        $this->assertStringContainsString('Disabled "note" for tenant "acme"', $rollbackTester->getDisplay());
+        $this->assertStringContainsString('Disabled "note" for tenant "acme"', $rollbackTester->getStdout());
 
         // --- Step 4: Audit log contains both 'disabled' and 'enabled' actions for note/acme ---
 

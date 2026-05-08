@@ -7,19 +7,24 @@ namespace Waaseyaa\Tests\Integration\Phase9;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Cache\CacheFactory;
-use Waaseyaa\CLI\Command\CacheClearCommand;
-use Waaseyaa\CLI\Command\ConfigExportCommand;
-use Waaseyaa\CLI\Command\ConfigImportCommand;
-use Waaseyaa\CLI\Command\EntityCreateCommand;
-use Waaseyaa\CLI\Command\EntityListCommand;
-use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\UserCreateCommand;
-use Waaseyaa\CLI\Command\UserRoleCommand;
+use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\CacheClearHandler;
+use Waaseyaa\CLI\Handler\ConfigExportHandler;
+use Waaseyaa\CLI\Handler\ConfigImportHandler;
+use Waaseyaa\CLI\Handler\EntityCreateHandler;
+use Waaseyaa\CLI\Handler\EntityListHandler;
+use Waaseyaa\CLI\Handler\InstallHandler;
+use Waaseyaa\CLI\Handler\UserCreateHandler;
+use Waaseyaa\CLI\Handler\UserRoleHandler;
+use Waaseyaa\CLI\OptionDefinition;
+use Waaseyaa\CLI\OptionMode;
+use Waaseyaa\CLI\Provider\ConfigCacheDbAuditServiceProvider;
+use Waaseyaa\CLI\Provider\EntityTypeServiceProvider;
+use Waaseyaa\CLI\Provider\UserPermissionServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\MemoryStorage;
 use Waaseyaa\Entity\EntityType;
@@ -119,13 +124,37 @@ final class CliCommandIntegrationTest extends TestCase
         $this->assertNotFalse($discoveryBin->get('key3'));
         $this->assertNotFalse($configBin->get('key4'));
 
-        // Run cache:clear command.
-        $command = new CacheClearCommand($this->cacheFactory);
-        $tester = new CommandTester($command);
+        // Run cache:clear command via native handler.
+        $provider = new ConfigCacheDbAuditServiceProvider();
+        $cacheClearDef = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'cache:clear') {
+                $cacheClearDef = $cmd;
+                break;
+            }
+        }
+        $this->assertNotNull($cacheClearDef);
+
+        $container = new class ($this->cacheFactory) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Cache\CacheFactoryInterface $factory) {}
+            public function get(string $id): mixed
+            {
+                if ($id === CacheClearHandler::class) {
+                    return new CacheClearHandler($this->factory);
+                }
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+            public function has(string $id): bool
+            {
+                return $id === CacheClearHandler::class;
+            }
+        };
+
+        $tester = CliTester::for($cacheClearDef, $container);
         $tester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertStringContainsString('All cache bins cleared', $tester->getDisplay());
+        $this->assertSame(0, $tester->getExitCode());
+        $this->assertStringContainsString('All cache bins cleared', $tester->getStdout());
 
         // Verify all caches are empty.
         $this->assertFalse($defaultBin->get('key1'));
@@ -146,13 +175,43 @@ final class CliCommandIntegrationTest extends TestCase
             'default' => 'stark',
         ]);
 
-        // Export via command.
-        $exportCommand = new ConfigExportCommand($this->configManager);
-        $exportTester = new CommandTester($exportCommand);
+        // Export via native handler.
+        $provider = new ConfigCacheDbAuditServiceProvider();
+        $exportDef = null;
+        $importDef = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'config:export') {
+                $exportDef = $cmd;
+            }
+            if ($cmd->name === 'config:import') {
+                $importDef = $cmd;
+            }
+        }
+        $this->assertNotNull($exportDef);
+        $this->assertNotNull($importDef);
+
+        $configManager = $this->configManager;
+        $configContainer = new class ($configManager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Config\ConfigManagerInterface $manager) {}
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    ConfigExportHandler::class => new ConfigExportHandler($this->manager),
+                    ConfigImportHandler::class => new ConfigImportHandler($this->manager),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+            public function has(string $id): bool
+            {
+                return in_array($id, [ConfigExportHandler::class, ConfigImportHandler::class], true);
+            }
+        };
+
+        $exportTester = CliTester::for($exportDef, $configContainer);
         $exportTester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $exportTester->getStatusCode());
-        $this->assertStringContainsString('Configuration exported. Active storage contains 2 items', $exportTester->getDisplay());
+        $this->assertSame(0, $exportTester->getExitCode());
+        $this->assertStringContainsString('Configuration exported. Active storage contains 2 items', $exportTester->getStdout());
 
         // Verify sync storage has the config.
         $this->assertSame(['name' => 'My Waaseyaa Site', 'slogan' => 'Built with Waaseyaa'], $this->syncStorage->read('system.site'));
@@ -168,13 +227,12 @@ final class CliCommandIntegrationTest extends TestCase
         $activeData = $this->activeStorage->read('system.site');
         $this->assertSame('Modified Site', $activeData['name']);
 
-        // Import via command (should restore from sync).
-        $importCommand = new ConfigImportCommand($this->configManager);
-        $importTester = new CommandTester($importCommand);
+        // Import via native handler (should restore from sync).
+        $importTester = CliTester::for($importDef, $configContainer);
         $importTester->execute([]);
 
-        $this->assertSame(Command::SUCCESS, $importTester->getStatusCode());
-        $this->assertStringContainsString('Configuration imported successfully', $importTester->getDisplay());
+        $this->assertSame(0, $importTester->getExitCode());
+        $this->assertStringContainsString('Configuration imported successfully', $importTester->getStdout());
 
         // Verify active matches sync after import.
         $restored = $this->activeStorage->read('system.site');
@@ -185,32 +243,54 @@ final class CliCommandIntegrationTest extends TestCase
     #[Test]
     public function testEntityCreateAndList(): void
     {
-        // Create entities via entity:create command.
-        $createCommand = new EntityCreateCommand($this->entityTypeManager);
+        $manager = $this->entityTypeManager;
+        $container = new class ($manager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager) {}
 
-        $tester1 = new CommandTester($createCommand);
-        $tester1->execute([
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    EntityCreateHandler::class => new EntityCreateHandler($this->manager),
+                    EntityListHandler::class   => new EntityListHandler($this->manager),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+
+            public function has(string $id): bool
+            {
+                return in_array($id, [EntityCreateHandler::class, EntityListHandler::class], true);
+            }
+        };
+
+        $provider = new EntityTypeServiceProvider();
+        $definitions = [];
+        foreach ($provider->nativeCommands() as $cmd) {
+            $definitions[$cmd->name] = $cmd;
+        }
+
+        // Create entities via entity:create handler.
+        $tester1 = CliTester::for($definitions['entity:create'], $container);
+        $tester1->executeMap([
             'entity_type' => 'article',
             '--values' => json_encode(['title' => 'First Article', 'type' => 'blog']),
         ]);
-        $this->assertSame(Command::SUCCESS, $tester1->getStatusCode());
-        $this->assertStringContainsString('Created article entity with ID:', $tester1->getDisplay());
+        $this->assertSame(0, $tester1->getExitCode());
+        $this->assertStringContainsString('Created article entity with ID:', $tester1->getStdout());
 
-        $tester2 = new CommandTester($createCommand);
-        $tester2->execute([
+        $tester2 = CliTester::for($definitions['entity:create'], $container);
+        $tester2->executeMap([
             'entity_type' => 'article',
             '--values' => json_encode(['title' => 'Second Article', 'type' => 'news']),
         ]);
-        $this->assertSame(Command::SUCCESS, $tester2->getStatusCode());
+        $this->assertSame(0, $tester2->getExitCode());
 
-        // List entities via entity:list command.
-        $listCommand = new EntityListCommand($this->entityTypeManager);
-        $listTester = new CommandTester($listCommand);
-        $listTester->execute(['entity_type' => 'article']);
+        // List entities via entity:list handler.
+        $listTester = CliTester::for($definitions['entity:list'], $container);
+        $listTester->executeMap(['entity_type' => 'article']);
 
-        $this->assertSame(Command::SUCCESS, $listTester->getStatusCode());
+        $this->assertSame(0, $listTester->getExitCode());
 
-        $output = $listTester->getDisplay();
+        $output = $listTester->getStdout();
         $this->assertStringContainsString('First Article', $output);
         $this->assertStringContainsString('Second Article', $output);
     }
@@ -218,15 +298,44 @@ final class CliCommandIntegrationTest extends TestCase
     #[Test]
     public function testUserCreateCommand(): void
     {
-        $command = new UserCreateCommand($this->entityTypeManager);
-        $tester = new CommandTester($command);
-        $tester->execute([
+        $manager = $this->entityTypeManager;
+        $container = new class ($manager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager) {}
+
+            public function get(string $id): mixed
+            {
+                if ($id === UserCreateHandler::class) {
+                    return new UserCreateHandler($this->manager);
+                }
+
+                throw new \RuntimeException("Container::get({$id}) unexpected");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === UserCreateHandler::class;
+            }
+        };
+
+        $provider = new UserPermissionServiceProvider();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'user:create') {
+                $definition = $cmd;
+                break;
+            }
+        }
+
+        $this->assertNotNull($definition);
+
+        $tester = CliTester::for($definition, $container);
+        $tester->executeMap([
             'username' => 'testuser',
             '--email' => 'test@example.com',
         ]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertStringContainsString('Created user "testuser"', $tester->getDisplay());
+        $this->assertSame(0, $tester->getExitCode());
+        $this->assertStringContainsString('Created user "testuser"', $tester->getStdout());
 
         // Verify entity was created in storage.
         $user = $this->userStorage->load(1);
@@ -238,12 +347,36 @@ final class CliCommandIntegrationTest extends TestCase
     #[Test]
     public function testInstallCommand(): void
     {
-        $command = new InstallCommand($this->entityTypeManager, $this->configManager);
-        $tester = new CommandTester($command);
-        $tester->execute(['--site-name' => 'Test Waaseyaa']);
+        $handler = new InstallHandler(
+            entityTypeManager: $this->entityTypeManager,
+            configManager: $this->configManager,
+        );
+        $definition = new CommandDefinition(
+            name: 'install',
+            description: 'Install Waaseyaa with initial configuration',
+            options: [
+                new OptionDefinition(name: 'site-name', mode: OptionMode::Required, description: 'The name of the site', default: 'Waaseyaa'),
+                new OptionDefinition(name: 'site-mail', mode: OptionMode::Required, description: 'Site email address', default: 'admin@example.com'),
+                new OptionDefinition(name: 'admin-email', mode: OptionMode::Required, description: 'Admin user email', default: 'admin@example.com'),
+                new OptionDefinition(name: 'admin-password', mode: OptionMode::Required, description: 'Admin user password'),
+            ],
+            handler: \Closure::fromCallable([$handler, 'execute']),
+        );
+        $container = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                throw new \RuntimeException('Not used');
+            }
+            public function has(string $id): bool
+            {
+                return false;
+            }
+        };
+        $tester = CliTester::for($definition, $container);
+        $tester->executeMap(['--site-name' => 'Test Waaseyaa']);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $this->assertStringContainsString('Waaseyaa "Test Waaseyaa" installed successfully', $tester->getDisplay());
+        $this->assertSame(0, $tester->getExitCode());
+        $this->assertStringContainsString('Waaseyaa "Test Waaseyaa" installed successfully', $tester->getStdout());
 
         // Verify initial config was written.
         $siteConfig = $this->activeStorage->read('system.site');
@@ -262,21 +395,52 @@ final class CliCommandIntegrationTest extends TestCase
     #[Test]
     public function testUserRoleAddAndRemove(): void
     {
+        $manager = $this->entityTypeManager;
+        $container = new class ($manager) implements \Psr\Container\ContainerInterface {
+            public function __construct(private readonly \Waaseyaa\Entity\EntityTypeManagerInterface $manager) {}
+
+            public function get(string $id): mixed
+            {
+                return match ($id) {
+                    UserCreateHandler::class => new UserCreateHandler($this->manager),
+                    UserRoleHandler::class   => new UserRoleHandler($this->manager),
+                    default => throw new \RuntimeException("Container::get({$id}) unexpected"),
+                };
+            }
+
+            public function has(string $id): bool
+            {
+                return in_array($id, [UserCreateHandler::class, UserRoleHandler::class], true);
+            }
+        };
+
+        $provider = new UserPermissionServiceProvider();
+        $createDefinition = null;
+        $roleDefinition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'user:create') {
+                $createDefinition = $cmd;
+            } elseif ($cmd->name === 'user:role') {
+                $roleDefinition = $cmd;
+            }
+        }
+
+        $this->assertNotNull($createDefinition);
+        $this->assertNotNull($roleDefinition);
+
         // First create a user.
-        $createCommand = new UserCreateCommand($this->entityTypeManager);
-        $createTester = new CommandTester($createCommand);
-        $createTester->execute(['username' => 'editor']);
-        $this->assertSame(Command::SUCCESS, $createTester->getStatusCode());
+        $createTester = CliTester::for($createDefinition, $container);
+        $createTester->executeMap(['username' => 'editor']);
+        $this->assertSame(0, $createTester->getExitCode());
 
         // Add a role.
-        $roleCommand = new UserRoleCommand($this->entityTypeManager);
-        $addTester = new CommandTester($roleCommand);
-        $addTester->execute([
+        $addTester = CliTester::for($roleDefinition, $container);
+        $addTester->executeMap([
             'user_id' => '1',
             'role' => 'editor',
         ]);
-        $this->assertSame(Command::SUCCESS, $addTester->getStatusCode());
-        $this->assertStringContainsString('Added role "editor" to user 1', $addTester->getDisplay());
+        $this->assertSame(0, $addTester->getExitCode());
+        $this->assertStringContainsString('Added role "editor" to user 1', $addTester->getStdout());
 
         // Verify role is present.
         $user = $this->userStorage->load(1);
@@ -285,14 +449,14 @@ final class CliCommandIntegrationTest extends TestCase
         $this->assertContains('editor', $roles);
 
         // Remove the role.
-        $removeTester = new CommandTester($roleCommand);
-        $removeTester->execute([
+        $removeTester = CliTester::for($roleDefinition, $container);
+        $removeTester->executeMap([
             'user_id' => '1',
             'role' => 'editor',
             '--remove' => true,
         ]);
-        $this->assertSame(Command::SUCCESS, $removeTester->getStatusCode());
-        $this->assertStringContainsString('Removed role "editor" from user 1', $removeTester->getDisplay());
+        $this->assertSame(0, $removeTester->getExitCode());
+        $this->assertStringContainsString('Removed role "editor" from user 1', $removeTester->getStdout());
 
         // Verify role is gone.
         $user = $this->userStorage->load(1);

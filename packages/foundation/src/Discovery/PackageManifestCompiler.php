@@ -15,6 +15,9 @@ final class PackageManifestCompiler
     private const POLICY_ATTRIBUTE = 'Waaseyaa\\Access\\Gate\\PolicyAttribute';
     private const FORMATTER_ATTRIBUTE = 'Waaseyaa\\SSR\\Attribute\\AsFormatter';
 
+    /** @internal String FQN avoids upward layer import (Foundation must not import from CLI/L6). */
+    private const CAPABILITY_HAS_NATIVE_COMMANDS = 'Waaseyaa\\Foundation\\ServiceProvider\\Capability\\HasNativeCommandsInterface';
+
     /** @internal Cache file metadata; stripped before {@see PackageManifest::fromArray()} */
     private const MANIFEST_INPUTS_FP_KEY = '_manifest_inputs_fp';
 
@@ -45,6 +48,7 @@ final class PackageManifestCompiler
         $policies = [];
         $packageDeclarations = [];
         $attributeEntityTypes = [];
+        $nativeCommandProviders = [];
         $packages = [];
 
         // Read installed packages manifest
@@ -88,6 +92,18 @@ final class PackageManifestCompiler
         // Composer's installed.json excludes the root package, so app providers
         // declared in the project's extra.waaseyaa.providers must be read separately.
         $this->mergeRootWaaseyaaIntoLists($providers, $permissions, onlyAppendMissingFromRoot: false);
+
+        // Detect provider capability: HasNativeCommandsInterface
+        // Uses string constant to avoid importing from Layer 6 (CLI package).
+        foreach ($providers as $providerClass) {
+            if (!class_exists($providerClass)) {
+                continue;
+            }
+            $implements = class_implements($providerClass);
+            if (is_array($implements) && isset($implements[self::CAPABILITY_HAS_NATIVE_COMMANDS])) {
+                $nativeCommandProviders[] = $providerClass;
+            }
+        }
 
         // Scan classes for attributes
         foreach ($this->scanClasses() as $class) {
@@ -144,6 +160,7 @@ final class PackageManifestCompiler
             policies: $policies,
             packageDeclarations: $packageDeclarations,
             attributeEntityTypes: $attributeEntityTypes,
+            nativeCommandProviders: $nativeCommandProviders,
         );
     }
 

@@ -1,0 +1,107 @@
+waaseyaa 0.1.0
+
+Usage:
+  command [options] [arguments]
+
+Options:
+  -h, --help            Display help for the given command. When no command is given display help for the list command
+      --silent          Do not output any message
+  -q, --quiet           Only errors are displayed. All other output is suppressed
+  -V, --version         Display this application version
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction  Do not ask any interactive question
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+Available commands:
+  about                  Display information about the Waaseyaa installation
+  completion             Dump the shell completion script
+  help                   Display help for a command
+  install                Install Waaseyaa with initial configuration
+  list                   List commands
+  migrate                Run pending database migrations (use --dry-run to preview, --verify to audit)
+  optimize               Run all optimization compilers
+  serve                  Start the PHP development server
+  sync-rules             Sync framework rules from Waaseyaa to this app
+  telescope              List recent telescope entries
+ admin
+  admin:build            Build the Nuxt admin SPA for static hosting (npm run generate)
+  admin:dev              Run the Nuxt admin SPA in development (npm run dev)
+ audit
+  audit:log              Display the entity type lifecycle audit log, or entity-write audit log with --entity-type
+ cache
+  cache:clear            Clear one or all cache bins
+ config
+  config:export          Export active configuration to the sync directory
+  config:import          Import configuration from the sync directory
+ db
+  db:init                Initialize the database on first deploy and apply pending migrations.
+ debug
+  debug:context          Render deterministic debug panels for workflow, traversal, and SSR context
+ entity
+  entity:create          Create a new entity of a given type
+  entity:list            List entities of a given type
+ entity-type
+  entity-type:list       List all registered entity types
+ event
+  event:list             List all registered events and listeners
+ fixture
+  fixture:generate       Generate deterministic fixture scenario JSON from topology templates
+  fixture:pack:refresh   Refresh deterministic fixture-pack aggregate from scenario JSON files
+  fixture:scaffold       Generate deterministic workflow + relationship fixture scenario JSON
+ health
+  health:check           Run all diagnostic health checks and report results
+  health:report          Generate a full diagnostic report for operator review
+ ingest
+  ingest:dashboard       Build deterministic editorial dashboard summaries from ingest artifacts
+  ingest:run             Run deterministic structured/unstructured ingestion and emit mapped content payloads
+ make
+  make:entity            Generate a content entity class
+  make:entity-type       Generate an entity type class
+  make:job               Generate a queue job class
+  make:listener          Generate an event listener class
+  make:migration         Generate a migration file
+  make:plugin            Generate a plugin class with #[WaaseyaaPlugin] attribute
+  make:policy            Generate an access policy class
+  make:provider          Generate a service provider class
+  make:public            Scaffold the canonical public/index.php front controller
+  make:test              Generate a PHPUnit test class
+ migrate
+  migrate:defaults       Migrate default content type enablement for tenants
+  migrate:rollback       Roll back the last batch of migrations
+  migrate:status         Show the status of each migration
+ northcloud
+  northcloud:sync        Pull content from the NorthCloud Search API and persist entities via registered mappers
+ optimize
+  optimize:clear         Remove all cached optimization artifacts
+  optimize:config        Compile and cache all configuration
+  optimize:manifest      Compile the package discovery manifest
+ perf
+  perf:baseline          Generate a versioned performance baseline artifact
+  perf:compare           Compare current performance measurements against a baseline artifact
+ permission
+  permission:list        List all registered permissions
+ route
+  route:list             List all registered routes
+ scaffold
+  scaffold:auth          Copy framework auth UI files into your app for customization
+  scaffold:bundle        Generate deterministic bundle scaffold JSON
+  scaffold:extension     Generate deterministic external extension SDK scaffold JSON
+  scaffold:relationship  Generate deterministic relationship-type scaffold JSON
+  scaffold:workflow      Generate deterministic workflow scaffold JSON
+ schema
+  schema:check           Detect schema drift between entity type definitions and database tables
+  schema:list            List registered schemas with versions and compatibility policy
+ semantic
+  semantic:refresh       Run resumable semantic index refresh batches
+  semantic:warm          Warm semantic embeddings for deterministic read paths
+ telescope
+  telescope:clear        Clear all telescope entries
+  telescope:prune        Prune telescope entries older than retention period
+ type
+  type:disable           Disable a registered content type (does not delete it)
+  type:enable            Re-enable a previously disabled content type
+ user
+  user:create            Create a new user account
+  user:role              Add or remove a role from a user
+ waaseyaa
+  waaseyaa:version       Print waaseyaa/* framework provenance (path SHA, lockfile versions, drift vs golden SHA)

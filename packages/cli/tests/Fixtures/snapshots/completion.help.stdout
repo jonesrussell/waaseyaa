@@ -1,0 +1,46 @@
+Description:
+  Dump the shell completion script
+
+Usage:
+  completion [options] [--] [<shell>]
+
+Arguments:
+  shell                 The shell type (e.g. "bash"), the value of the "$SHELL" env var will be used if this is not given
+
+Options:
+      --debug           Tail the completion debug log
+  -h, --help            Display help for the given command. When no command is given display help for the list command
+      --silent          Do not output any message
+  -q, --quiet           Only errors are displayed. All other output is suppressed
+  -V, --version         Display this application version
+      --ansi|--no-ansi  Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction  Do not ask any interactive question
+  -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+
+Help:
+  The completion command dumps the shell completion script required
+  to use shell autocompletion (currently, bash, fish, zsh completion are supported).
+  
+  Static installation
+  -------------------
+  
+  Dump the script to a global completion file and restart your shell:
+  
+      packages/cli/bin/waaseyaa completion zsh | sudo tee $fpath[1]/_waaseyaa
+  
+  Or dump the script to a local file and source it:
+  
+      packages/cli/bin/waaseyaa completion zsh > completion.sh
+  
+      # source the file whenever you use the project
+      source completion.sh
+  
+      # or add this line at the end of your "~/.zshrc" file:
+      source /path/to/completion.sh
+  
+  Dynamic installation
+  --------------------
+  
+  Add this to the end of your shell configuration file (e.g. "~/.zshrc"):
+  
+      eval "$(/home/jones/dev/waaseyaa/.worktrees/native-cli-kernel-01KR2NR7-lane-a/packages/cli/bin/waaseyaa completion zsh)"
