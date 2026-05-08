@@ -2,12 +2,12 @@ Description:
   Scaffold a new entity type.
 
 Usage:
-  make [--] <type> [<label>] [<fields>...]
+  make <type> [<label>] [<fields>...]
 
 Arguments:
-  type    Entity type machine name.
-  label   Human-readable label.
-  fields  Field names to add.
+  type                  Entity type machine name.
+  label                 Human-readable label.
+  fields                Field names to add.
 
 Options:
   -h, --help            Display help for the given command. When no command is given display help for the list command

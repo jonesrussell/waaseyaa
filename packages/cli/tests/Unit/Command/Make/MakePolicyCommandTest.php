@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Tests\Unit\Command\Make;
 
-use Waaseyaa\CLI\Command\Make\MakePolicyCommand;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
+use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Handler\MakePolicyHandler;
+use Waaseyaa\CLI\Provider\MakeServiceProviderA;
+use Waaseyaa\CLI\Testing\CliTester;
 
-#[CoversClass(MakePolicyCommand::class)]
+#[CoversClass(MakePolicyHandler::class)]
 final class MakePolicyCommandTest extends TestCase
 {
     #[Test]
     public function it_generates_a_policy_class(): void
     {
         $tester = $this->createTester();
-        $tester->execute(['name' => 'ContentPolicy']);
+        $tester->execute(['ContentPolicy']);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $output = $tester->getDisplay();
+        $this->assertSame(0, $tester->getExitCode());
+        $output = $tester->getStdout();
         $this->assertStringContainsString('class ContentPolicy implements AccessPolicyInterface', $output);
         $this->assertStringContainsString('use Waaseyaa\\Access\\AccessPolicyInterface;', $output);
         $this->assertStringContainsString('public function view(', $output);
@@ -32,12 +32,33 @@ final class MakePolicyCommandTest extends TestCase
         $this->assertStringContainsString('declare(strict_types=1);', $output);
     }
 
-    private function createTester(): CommandTester
+    private function createTester(): CliTester
     {
-        $app = new Application();
-        $app->add(new MakePolicyCommand());
-        $command = $app->find('make:policy');
+        $provider = new MakeServiceProviderA();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'make:policy') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition);
 
-        return new CommandTester($command);
+        $container = new class implements ContainerInterface {
+            public function get(string $id): mixed
+            {
+                if ($id === MakePolicyHandler::class) {
+                    return new MakePolicyHandler();
+                }
+                throw new \RuntimeException("Not found: {$id}");
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === MakePolicyHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
     }
 }

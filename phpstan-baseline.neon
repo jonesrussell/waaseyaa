@@ -502,12 +502,6 @@ parameters:
 			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
 			identifier: if.condNotBoolean
 			count: 1
-			path: packages/cli/src/Command/Make/MakeListenerCommand.php
-
-		-
-			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
-			identifier: if.condNotBoolean
-			count: 1
 			path: packages/cli/src/Command/Make/MakeProviderCommand.php
 
 		-

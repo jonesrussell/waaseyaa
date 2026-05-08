@@ -29,11 +29,6 @@ use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
 use Waaseyaa\CLI\Command\IngestDashboardCommand;
 use Waaseyaa\CLI\Command\IngestRunCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\Make\MakeEntityCommand;
-use Waaseyaa\CLI\Command\Make\MakeJobCommand;
-use Waaseyaa\CLI\Command\Make\MakeListenerCommand;
-use Waaseyaa\CLI\Command\Make\MakeMigrationCommand;
-use Waaseyaa\CLI\Command\Make\MakePolicyCommand;
 use Waaseyaa\CLI\Command\Make\MakeProviderCommand;
 use Waaseyaa\CLI\Command\Make\MakePublicCommand;
 use Waaseyaa\CLI\Command\Make\MakeTestCommand;
@@ -110,11 +105,6 @@ final class CliCommandRegistry
             new UserRoleCommand($entityTypeManager),
             new MakePluginCommand(),
             new MakeEntityTypeCommand(),
-            new MakeEntityCommand(),
-            new MakeJobCommand(),
-            new MakeListenerCommand(),
-            new MakeMigrationCommand($projectRoot, $manifest),
-            new MakePolicyCommand(),
             new MakeProviderCommand(),
             new MakePublicCommand($projectRoot),
             new MakeTestCommand(),

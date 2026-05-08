@@ -88,11 +88,17 @@ final class HelpRenderer
         $lines[] = '  ' . $this->buildUsageLine($command);
         $lines[] = '';
 
+        $allOptions = $this->collectOptions($command->options);
+        $labelWidth = $this->maxNameWidth(array_column($allOptions, 'label'));
+
         if ($command->arguments !== []) {
             $lines[] = 'Arguments:';
-            $nameWidth = $this->maxNameWidth(
+            $argNameWidth = $this->maxNameWidth(
                 array_map(static fn(ArgumentDefinition $a) => $a->name, $command->arguments),
             );
+            // Align argument description column to match the option label column width,
+            // matching Symfony Console's output where both sections share one column.
+            $nameWidth = max($argNameWidth, $labelWidth);
             foreach ($command->arguments as $arg) {
                 $lines[] = '  ' . str_pad($arg->name, $nameWidth) . '  ' . $arg->description;
             }
@@ -100,8 +106,6 @@ final class HelpRenderer
         }
 
         $lines[] = 'Options:';
-        $allOptions = $this->collectOptions($command->options);
-        $labelWidth = $this->maxNameWidth(array_column($allOptions, 'label'));
         foreach ($allOptions as $opt) {
             $suffix = $opt['default'] !== '' ? ' [default: ' . $opt['default'] . ']' : '';
             $lines[] = '  ' . str_pad($opt['label'], $labelWidth) . '  ' . $opt['desc'] . $suffix;
@@ -130,7 +134,9 @@ final class HelpRenderer
             }
         }
 
-        if ($hasRequired) {
+        // [--] separator only appears when the command has both user options and
+        // required arguments — matching Symfony Console's exact behaviour.
+        if ($hasRequired && $command->options !== []) {
             $parts[] = '[--]';
         }
 

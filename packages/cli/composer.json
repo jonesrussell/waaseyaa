@@ -73,6 +73,7 @@
             "providers": [
                 "Waaseyaa\\CLI\\CliServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\HealthSchemaServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\MakeServiceProviderA",
                 "Waaseyaa\\CLI\\Provider\\MigrateServiceProvider"
             ]
         }
