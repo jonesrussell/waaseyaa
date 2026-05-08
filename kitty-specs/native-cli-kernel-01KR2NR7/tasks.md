@@ -112,11 +112,11 @@
 | T099 | Port `MakePluginCommand` provenance hooks (refactor `Provenance/ComposerProvenanceReporter` to drop Symfony Console) | WP21 | — | [D] |
 | T100 | Port `packages/northcloud/src/Command/NcSyncCommand` → `NcSyncHandler` + migrate test + snapshot pass | WP22 | [D] |
 | T101 | Update `packages/northcloud/src/Provider/NorthCloudServiceProvider` to implement `HasNativeCommandsInterface` and stop importing Symfony Console | WP22 | — | [D] |
-| T102 | Delete `packages/foundation/src/ServiceProvider/Capability/HasCommandsInterface.php` | WP23 | — |
-| T103 | Delete `packages/cli/src/WaaseyaaApplication.php` and `packages/cli/src/CliCommandRegistry.php` | WP23 | [P] |
-| T104 | Remove dual-boot adapter from `bin/waaseyaa`; native discovery only | WP23 | — |
-| T105 | Drop `symfony/console` from `packages/cli/composer.json` runtime `require` | WP23 | — |
-| T106 | Run `composer why symfony/console` and assert no waaseyaa/* runtime chain depends on it | WP23 | — |
+| T102 | Delete `packages/foundation/src/ServiceProvider/Capability/HasCommandsInterface.php` | WP23 | — | [D] |
+| T103 | Delete `packages/cli/src/WaaseyaaApplication.php` and `packages/cli/src/CliCommandRegistry.php` | WP23 | [D] |
+| T104 | Remove dual-boot adapter from `bin/waaseyaa`; native discovery only | WP23 | — | [D] |
+| T105 | Drop `symfony/console` from `packages/cli/composer.json` runtime `require` | WP23 | — | [D] |
+| T106 | Run `composer why symfony/console` and assert no waaseyaa/* runtime chain depends on it | WP23 | — | [D] |
 | T107 | Author `docs/specs/cli-kernel.md` covering parser semantics, exit codes, provider contract, testing harness, layer placement | WP24 | — |
 | T108 | Update `docs/specs/operator-diagnostics.md` to reference `CliKernel`/`CommandDefinition` instead of Symfony Console | WP24 | [P] |
 | T109 | Extend orchestration table in `CLAUDE.md` (root and `packages/cli/CLAUDE.md` if present) with `cli-kernel.md` mapping | WP24 | [P] |
@@ -478,11 +478,11 @@
 **Goal**: Make the cut. Remove the old interface, the Symfony Application subclass, the legacy registry, the dual-boot adapter, and the runtime composer require. After this WP, `composer why symfony/console` shows no first-party runtime chain.
 
 **Subtasks**:
-- [ ] T102 Delete `HasCommandsInterface.php` (WP23)
-- [ ] T103 Delete `WaaseyaaApplication.php` and `CliCommandRegistry.php` (WP23)
-- [ ] T104 Remove dual-boot adapter from `bin/waaseyaa` and the `packages/cli/src/Compat/` directory (WP23)
-- [ ] T105 Drop `symfony/console` from `packages/cli/composer.json` runtime `require` (WP23)
-- [ ] T106 Run `composer why symfony/console`; assert no waaseyaa/* runtime chain (WP23)
+- [x] T102 Delete `HasCommandsInterface.php` (WP23)
+- [x] T103 Delete `WaaseyaaApplication.php` and `CliCommandRegistry.php` (WP23)
+- [x] T104 Remove dual-boot adapter from `bin/waaseyaa` and the `packages/cli/src/Compat/` directory (WP23)
+- [x] T105 Drop `symfony/console` from `packages/cli/composer.json` runtime `require` (WP23)
+- [x] T106 Run `composer why symfony/console`; assert no waaseyaa/* runtime chain (WP23)
 
 **Estimated prompt**: ~260 lines. **Dependencies**: WP06, WP07, WP08, WP09, WP10, WP11, WP12, WP13, WP14, WP15, WP16, WP17, WP18, WP19, WP20, WP21, WP22 (all port WPs must be merged before the cut).
 
