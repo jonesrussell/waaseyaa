@@ -17,8 +17,8 @@ subtasks:
 - T097
 - T098
 - T099
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "998783"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "1003727"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -94,3 +94,4 @@ spec-kitty agent action implement WP21 --agent <name>
 
 - 2026-05-08T16:31:49Z – claude:sonnet:implementer:implementer – shell_pid=998783 – Started implementation via action command
 - 2026-05-08T16:51:54Z – claude:sonnet:implementer:implementer – shell_pid=998783 – Ready for review: 5 handlers (Install/RouteList/Serve/SyncRules/WaaseyaaVersion), MiscBServiceProvider, ComposerProvenanceReporter native path. All 4 gates green. 7508/0/0 phpunit. 5 snapshot tests green byte-for-byte.
+- 2026-05-08T16:52:30Z – claude:opus-4-7:reviewer:reviewer – shell_pid=1003727 – Started review via action command
