@@ -14,6 +14,8 @@ subtasks:
 - T108
 - T109
 - T110
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "1017291"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -103,3 +105,7 @@ For every spec the detector flags as stale relative to changes in this mission, 
 ```bash
 spec-kitty agent action implement WP24 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T17:38:48Z – claude:sonnet:implementer:implementer – shell_pid=1017291 – Started implementation via action command
