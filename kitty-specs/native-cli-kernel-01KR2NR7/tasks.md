@@ -57,10 +57,10 @@
 | T044 | Port `Make/MakeTestCommand` → `MakeTestHandler` + migrate test + snapshot pass | WP09 | [D] |
 | T045 | Port `MakeEntityTypeCommand` → `MakeEntityTypeHandler` + migrate test + snapshot pass | WP09 | [D] |
 | T046 | Port `MakePluginCommand` → `MakePluginHandler` + migrate test + snapshot pass | WP09 | [D] |
-| T047 | Port `Optimize/OptimizeCommand` → `OptimizeHandler` + migrate test + snapshot pass | WP10 | [P] |
-| T048 | Port `Optimize/OptimizeClearCommand` → `OptimizeClearHandler` + migrate test + snapshot pass | WP10 | [P] |
-| T049 | Port `Optimize/OptimizeConfigCommand` → `OptimizeConfigHandler` + migrate test + snapshot pass | WP10 | [P] |
-| T050 | Port `Optimize/OptimizeManifestCommand` → `OptimizeManifestHandler` + migrate test + snapshot pass | WP10 | [P] |
+| T047 | Port `Optimize/OptimizeCommand` → `OptimizeHandler` + migrate test + snapshot pass | WP10 | [D] |
+| T048 | Port `Optimize/OptimizeClearCommand` → `OptimizeClearHandler` + migrate test + snapshot pass | WP10 | [D] |
+| T049 | Port `Optimize/OptimizeConfigCommand` → `OptimizeConfigHandler` + migrate test + snapshot pass | WP10 | [D] |
+| T050 | Port `Optimize/OptimizeManifestCommand` → `OptimizeManifestHandler` + migrate test + snapshot pass | WP10 | [D] |
 | T051 | Port `QueueWorkCommand` → `QueueWorkHandler` + migrate test + snapshot pass | WP11 | [P] |
 | T052 | Port `QueueFailedCommand` → `QueueFailedHandler` + migrate test + snapshot pass | WP11 | [P] |
 | T053 | Port `QueueRetryCommand` → `QueueRetryHandler` + migrate test + snapshot pass | WP11 | [P] |
@@ -314,10 +314,10 @@
 ### WP10 — Port: Optimize group
 
 **Subtasks**:
-- [ ] T047 `Optimize/OptimizeCommand` → `OptimizeHandler` (WP10)
-- [ ] T048 `OptimizeClearCommand` → `OptimizeClearHandler` (WP10)
-- [ ] T049 `OptimizeConfigCommand` → `OptimizeConfigHandler` (WP10)
-- [ ] T050 `OptimizeManifestCommand` → `OptimizeManifestHandler` (WP10)
+- [x] T047 `Optimize/OptimizeCommand` → `OptimizeHandler` (WP10)
+- [x] T048 `OptimizeClearCommand` → `OptimizeClearHandler` (WP10)
+- [x] T049 `OptimizeConfigCommand` → `OptimizeConfigHandler` (WP10)
+- [x] T050 `OptimizeManifestCommand` → `OptimizeManifestHandler` (WP10)
 
 **Estimated prompt**: ~280 lines. **Dependencies**: WP05.
 
