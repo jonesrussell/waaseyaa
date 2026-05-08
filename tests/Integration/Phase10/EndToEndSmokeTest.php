@@ -7,8 +7,6 @@ namespace Waaseyaa\Tests\Integration\Phase10;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -20,13 +18,13 @@ use Waaseyaa\AI\Schema\SchemaRegistry;
 use Waaseyaa\Api\OpenApi\OpenApiGenerator;
 use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
 use Waaseyaa\Cache\CacheFactory;
-use Waaseyaa\CLI\Command\InstallCommand;
 use Waaseyaa\CLI\CommandDefinition;
 use Waaseyaa\CLI\Handler\CacheClearHandler;
 use Waaseyaa\CLI\Handler\ConfigExportHandler;
 use Waaseyaa\CLI\Handler\ConfigImportHandler;
 use Waaseyaa\CLI\Handler\EntityCreateHandler;
 use Waaseyaa\CLI\Handler\EntityListHandler;
+use Waaseyaa\CLI\Handler\InstallHandler;
 use Waaseyaa\CLI\Handler\MigrateDefaultsHandler;
 use Waaseyaa\CLI\Handler\TypeDisableHandler;
 use Waaseyaa\CLI\Handler\TypeEnableHandler;
@@ -121,12 +119,36 @@ final class EndToEndSmokeTest extends TestCase
 
         // --- Step 1: Install Waaseyaa ---
 
-        $installCommand = new InstallCommand($entityTypeManager, $configManager);
-        $installTester = new CommandTester($installCommand);
-        $installTester->execute(['--site-name' => 'Smoke Test Site']);
+        $installHandler = new InstallHandler(
+            entityTypeManager: $entityTypeManager,
+            configManager: $configManager,
+        );
+        $installDefinition = new CommandDefinition(
+            name: 'install',
+            description: 'Install Waaseyaa with initial configuration',
+            options: [
+                new OptionDefinition(name: 'site-name', mode: OptionMode::Required, description: 'The name of the site', default: 'Waaseyaa'),
+                new OptionDefinition(name: 'site-mail', mode: OptionMode::Required, description: 'Site email address', default: 'admin@example.com'),
+                new OptionDefinition(name: 'admin-email', mode: OptionMode::Required, description: 'Admin user email', default: 'admin@example.com'),
+                new OptionDefinition(name: 'admin-password', mode: OptionMode::Required, description: 'Admin user password'),
+            ],
+            handler: \Closure::fromCallable([$installHandler, 'execute']),
+        );
+        $nullContainer = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                throw new \RuntimeException('Not used');
+            }
+            public function has(string $id): bool
+            {
+                return false;
+            }
+        };
+        $installTester = CliTester::for($installDefinition, $nullContainer);
+        $installTester->executeMap(['--site-name' => 'Smoke Test Site']);
 
-        $this->assertSame(Command::SUCCESS, $installTester->getStatusCode());
-        $this->assertStringContainsString('Smoke Test Site', $installTester->getDisplay());
+        $this->assertSame(0, $installTester->getExitCode());
+        $this->assertStringContainsString('Smoke Test Site', $installTester->getStdout());
 
         // Verify config was written.
         $siteConfig = $activeStorage->read('system.site');

@@ -6,6 +6,7 @@ namespace Waaseyaa\CLI\Provenance;
 
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+use Waaseyaa\CLI\CliIO;
 
 /**
  * Inspects composer.json / composer.lock for waaseyaa/* provenance (path SHA, versions, drift).
@@ -285,6 +286,61 @@ final class ComposerProvenanceReporter
     }
 
     public static function printHumanToStream(ProvenanceReport $report, OutputInterface $out): void
+    {
+        $out->writeln('Waaseyaa framework provenance');
+        $out->writeln('Project root: ' . $report->projectRootDisplay());
+        $out->writeln('');
+
+        if ($report->goldenSha !== null) {
+            $out->writeln('Golden SHA: ' . $report->goldenSha);
+        } else {
+            $out->writeln('Golden SHA: (not set — WAASEYAA_GOLDEN_SHA or .waaseyaa-golden-sha)');
+        }
+
+        if ($report->pathMonorepoHead !== null) {
+            $out->writeln('Path monorepo HEAD: ' . $report->pathMonorepoHead);
+        } elseif ($report->hasPathInstalls()) {
+            $out->writeln('Path monorepo HEAD: (unresolved — run from project with path deps and git available)');
+        } else {
+            $out->writeln('Path monorepo HEAD: (no path installs in lockfile)');
+        }
+
+        $out->writeln('');
+        $out->writeln('composer.json waaseyaa/* constraint patterns: ' . count($report->uniqueConstraints));
+        foreach ($report->uniqueConstraints as $c) {
+            $out->writeln('  - ' . $c);
+        }
+
+        $out->writeln('');
+        $out->writeln('Resolved waaseyaa/* (composer.lock):');
+        foreach ($report->packages as $p) {
+            $line = sprintf(
+                '  %-28s %-18s %s',
+                $p->name,
+                $p->lockedVersion,
+                $p->sourceKind,
+            );
+            if ($p->gitHead !== null) {
+                $line .= ' head=' . $p->gitHead;
+            }
+            $out->writeln($line);
+        }
+
+        $out->writeln('');
+        $out->writeln('Drift summary:');
+        if ($report->driftMessages === []) {
+            $out->writeln('  (none)');
+        } else {
+            foreach ($report->driftMessages as $m) {
+                $out->writeln('  - ' . $m);
+            }
+        }
+    }
+
+    /**
+     * Print a human-readable provenance report using native CliIO (no Symfony Console dependency).
+     */
+    public static function printHuman(ProvenanceReport $report, CliIO $out): void
     {
         $out->writeln('Waaseyaa framework provenance');
         $out->writeln('Project root: ' . $report->projectRootDisplay());

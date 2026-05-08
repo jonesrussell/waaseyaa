@@ -79,8 +79,9 @@ final class ConsoleKernelTest extends TestCase
     public function handle_returns_zero_for_version_command(): void
     {
         // about was ported to native CLI in WP20 (MiscAServiceProvider).
-        // Use waaseyaa:version which remains Symfony-registered.
-        $_SERVER['argv'] = ['waaseyaa', 'waaseyaa:version', '--no-ansi'];
+        // waaseyaa:version was ported to native CLI in WP21 (MiscBServiceProvider).
+        // Native CliKernel does not support --no-ansi; run without it.
+        $_SERVER['argv'] = ['waaseyaa', 'waaseyaa:version'];
 
         $kernel = new ConsoleKernel($this->projectRoot);
         $exitCode = $kernel->handle();
@@ -124,8 +125,9 @@ final class ConsoleKernelTest extends TestCase
         mkdir($this->projectRoot . '/storage/framework', 0755, true);
         $this->writeStaleManifestCache();
 
-        // Any command triggers auto-recovery, not just optimize:manifest
-        $_SERVER['argv'] = ['waaseyaa', 'route:list', '--no-ansi'];
+        // Any command that boots the full kernel triggers auto-recovery.
+        // (route:list is now a native command and skips boot; use list which goes through boot.)
+        $_SERVER['argv'] = ['waaseyaa', 'list', '--no-ansi'];
 
         $kernel = new ConsoleKernel($this->projectRoot);
         $exitCode = $kernel->handle();

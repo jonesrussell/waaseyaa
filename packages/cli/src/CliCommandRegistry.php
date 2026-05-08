@@ -7,11 +7,6 @@ namespace Waaseyaa\CLI;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Access\PermissionHandler;
 use Waaseyaa\Cache\CacheFactory;
-use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\RouteListCommand;
-use Waaseyaa\CLI\Command\ServeCommand;
-use Waaseyaa\CLI\Command\SyncRulesCommand;
-use Waaseyaa\CLI\Command\WaaseyaaVersionCommand;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
@@ -43,16 +38,7 @@ final class CliCommandRegistry
         EntityTypeIdNormalizer $typeIdNormalizer,
         \PDO $pdo,
     ): array {
-        return [
-            new InstallCommand($entityTypeManager, $configManager),
-            new ServeCommand($projectRoot),
-            new RouteListCommand($router),
-            new SyncRulesCommand(
-                $projectRoot . '/vendor/waaseyaa/foundation/.claude/rules',
-                $projectRoot . '/.claude/rules',
-            ),
-            new WaaseyaaVersionCommand($projectRoot),
-        ];
+        return [];
     }
 
 }

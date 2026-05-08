@@ -96,6 +96,7 @@
                 "Waaseyaa\\CLI\\Provider\\UserPermissionServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\ConfigCacheDbAuditServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\MiscAServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\MiscBServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\OtherScaffoldsServiceProvider"
             ]
         }

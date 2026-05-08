@@ -74,19 +74,23 @@ final class CliCommandRegistryTest extends TestCase
                 pdo: $pdo,
             );
 
-            $names = array_map(static fn($command): string => $command->getName() ?? '', $commands);
+            // coreCommands() now returns [] — all commands ported to native CLI providers.
+            $this->assertSame([], $commands);
+            $names = [];
 
-            $this->assertContains('route:list', $names);
-            $this->assertContains('waaseyaa:version', $names);
-            // about, admin:dev, admin:build, debug:context, event:list were ported to native CLI
-            // in WP20 and are now owned by MiscAServiceProvider — not the Symfony registry.
+            // Ported to MiscBServiceProvider (WP21):
+            $this->assertNotContains('route:list', $names);
+            $this->assertNotContains('waaseyaa:version', $names);
+            $this->assertNotContains('install', $names);
+            $this->assertNotContains('serve', $names);
+            $this->assertNotContains('sync-rules', $names);
+            // Ported to MiscAServiceProvider (WP20):
             $this->assertNotContains('about', $names);
             $this->assertNotContains('admin:dev', $names);
             $this->assertNotContains('admin:build', $names);
             $this->assertNotContains('debug:context', $names);
             $this->assertNotContains('event:list', $names);
-            // scaffold:auth was ported to native CLI in WP19 and is now
-            // owned by OtherScaffoldsServiceProvider — not the Symfony registry.
+            // scaffold:auth was ported to native CLI in WP19.
             $this->assertNotContains('scaffold:auth', $names);
         } finally {
             $items = new \RecursiveIteratorIterator(
