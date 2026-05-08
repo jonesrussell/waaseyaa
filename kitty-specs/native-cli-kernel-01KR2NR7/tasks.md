@@ -22,11 +22,11 @@
 | T009 | Implement `CommandDefinition` (handler normalisation via `\Closure::fromCallable`) + invariant tests | WP02 | — | [D] |
 | T010 | Implement `CommandRegistry` (register/get/all/names, sorted, duplicate guard) + tests | WP02 | — | [D] |
 | T011 | Implement `ArgvParser` + `ParsedInput` + `ParseError` + full edge-case test matrix (FR-002) | WP02 | — | [D] |
-| T012 | Implement `CliInput`, `CliOutput`, `BufferedCliOutput`, `StdinSource` + `EmptyStdinSource` + `StringQueueStdinSource` | WP03 | [P] |
-| T013 | Implement `CliIO` (argument/option getters, write/writeln/error, ask/confirm with non-TTY fallback) + tests | WP03 | — |
-| T014 | Implement `HelpRenderer` (Usage/Description/Arguments/Options sections, deterministic output) + golden tests | WP03 | [P] |
-| T015 | Implement `CliTester::for/execute/executeMap/getExitCode/getStdout/getStderr/getOutput` + tests | WP03 | — |
-| T016 | TTY detection helper using `posix_isatty` → `stream_isatty` → false fallback | WP03 | [P] |
+| T012 | Implement `CliInput`, `CliOutput`, `BufferedCliOutput`, `StdinSource` + `EmptyStdinSource` + `StringQueueStdinSource` | WP03 | [D] |
+| T013 | Implement `CliIO` (argument/option getters, write/writeln/error, ask/confirm with non-TTY fallback) + tests | WP03 | — | [D] |
+| T014 | Implement `HelpRenderer` (Usage/Description/Arguments/Options sections, deterministic output) + golden tests | WP03 | [D] |
+| T015 | Implement `CliTester::for/execute/executeMap/getExitCode/getStdout/getStderr/getOutput` + tests | WP03 | — | [D] |
+| T016 | TTY detection helper using `posix_isatty` → `stream_isatty` → false fallback | WP03 | [D] |
 | T017 | Add `HasNativeCommandsInterface` to `packages/foundation/src/ServiceProvider/Capability/` (no Symfony imports) | WP04 | — |
 | T018 | Contract test asserting interface file has zero `Symfony\` imports + iterable return type | WP04 | [P] |
 | T019 | Extend `PackageManifestCompiler` capability list to recognise the new interface | WP04 | — |
@@ -184,11 +184,11 @@
 **Independent test**: `tests/Unit/Io/`, `tests/Unit/Kernel/HelpRendererTest.php`, `tests/Unit/Testing/CliTesterTest.php` all green.
 
 **Subtasks**:
-- [ ] T012 `CliInput`, `CliOutput`, `BufferedCliOutput`, `StdinSource`, `EmptyStdinSource`, `StringQueueStdinSource` (WP03)
-- [ ] T013 `CliIO` with non-TTY ask/confirm fallback + tests (WP03)
-- [ ] T014 `HelpRenderer` + golden tests (WP03)
-- [ ] T015 `CliTester::for/execute/executeMap/getExitCode/getStdout/getStderr/getOutput` + tests (WP03)
-- [ ] T016 TTY detection helper (WP03)
+- [x] T012 `CliInput`, `CliOutput`, `BufferedCliOutput`, `StdinSource`, `EmptyStdinSource`, `StringQueueStdinSource` (WP03)
+- [x] T013 `CliIO` with non-TTY ask/confirm fallback + tests (WP03)
+- [x] T014 `HelpRenderer` + golden tests (WP03)
+- [x] T015 `CliTester::for/execute/executeMap/getExitCode/getStdout/getStderr/getOutput` + tests (WP03)
+- [x] T016 TTY detection helper (WP03)
 
 **Implementation sketch**: Per [`contracts/cli-io.md`](./contracts/cli-io.md) and [`contracts/cli-tester.md`](./contracts/cli-tester.md). HelpRenderer goldens snapshot-tested. **Estimated prompt**: ~420 lines.
 
