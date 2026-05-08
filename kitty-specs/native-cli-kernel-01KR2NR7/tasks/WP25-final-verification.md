@@ -16,6 +16,8 @@ subtasks:
 - T113
 - T114
 - T115
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "1019179"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -119,3 +121,7 @@ Verify with `ls kitty-specs/native-cli-kernel-01KR2NR7/scripts/ 2>&1` returning 
 ```bash
 spec-kitty agent action implement WP25 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T17:44:45Z – claude:sonnet:implementer:implementer – shell_pid=1019179 – Started implementation via action command
