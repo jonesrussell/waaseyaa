@@ -54,7 +54,7 @@ final class ConsoleCliIO implements CliIO
 
     // --- Output ---
 
-    public function writeln(string $line): void
+    public function writeln(string $line = ''): void
     {
         $this->stdout->writeln($line);
     }

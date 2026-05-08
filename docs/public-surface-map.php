@@ -38,7 +38,6 @@ return [
     'Waaseyaa\Foundation\ServiceProvider\ServiceProvider' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface' => 'public',
-    'Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasNativeCommandsInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasHttpDomainRoutersInterface' => 'public',

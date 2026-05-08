@@ -465,9 +465,9 @@ abstract class AbstractKernel
      *
      * Exposes the protected boot() for callers that need a fully-booted kernel
      * (providers, entity type manager, database, dispatcher) without dispatching
-     * a command — specifically CliApplication's dual-boot bridge path.
+     * a command — specifically CliApplication's provider-boot path.
      *
-     * @internal Called by CliApplication to wire the legacy HasCommandsInterface bridge.
+     * @internal Called by CliApplication to obtain booted providers and the handler container.
      */
     public function bootForCli(): void
     {
@@ -523,6 +523,141 @@ abstract class AbstractKernel
     public function getProviders(): array
     {
         return $this->providers;
+    }
+
+    /**
+     * Build a PSR-11 container backed by the booted service providers.
+     *
+     * Resolution order:
+     *   1. Each provider's resolve() — covers all framework services and
+     *      explicitly bound abstracts (EntityTypeManager, DatabaseInterface, …).
+     *   2. Reflection-based auto-wiring — instantiates concrete handler classes
+     *      whose constructor parameters are resolvable from the same container.
+     *
+     * Used by CliApplication to resolve class-based command handlers at dispatch
+     * time. Must be called after bootForCli() / boot().
+     */
+    public function buildHandlerContainer(): \Psr\Container\ContainerInterface
+    {
+        $providers   = $this->providers;
+        $projectRoot = $this->projectRoot;
+
+        // Explicit kernel-owned bindings: maps abstract id → factory closure.
+        // These cover types that are not bound by any service provider but are
+        // required by command handlers (e.g. HealthChecker needs BootDiagnosticReport).
+        $kernel = $this;
+        /** @var array<string, \Closure(\Psr\Container\ContainerInterface): object> $kernelBindings */
+        $kernelBindings = [
+            // Interface aliases for framework types that providers bind as concrete class keys.
+            \Waaseyaa\Entity\EntityTypeManagerInterface::class =>
+                static fn(\Psr\Container\ContainerInterface $c) => $c->get(\Waaseyaa\Entity\EntityTypeManager::class),
+
+            // Kernel-owned services not bound by any provider.
+            \Waaseyaa\Foundation\Diagnostic\BootDiagnosticReport::class =>
+                static fn(\Psr\Container\ContainerInterface $c) => $kernel->getBootReport(),
+            \Waaseyaa\Foundation\Diagnostic\HealthCheckerInterface::class =>
+                static fn(\Psr\Container\ContainerInterface $c) => new \Waaseyaa\Foundation\Diagnostic\HealthChecker(
+                    bootReport: $c->get(\Waaseyaa\Foundation\Diagnostic\BootDiagnosticReport::class),
+                    database: $c->get(\Waaseyaa\Database\DatabaseInterface::class),
+                    entityTypeManager: $c->get(\Waaseyaa\Entity\EntityTypeManagerInterface::class),
+                    projectRoot: $projectRoot,
+                    logger: $c->get(\Waaseyaa\Foundation\Log\LoggerInterface::class),
+                ),
+        ];
+
+        return new class ($providers, $kernelBindings) implements \Psr\Container\ContainerInterface {
+            /** @var array<string, object> */
+            private array $cache = [];
+
+            /**
+             * @param list<ServiceProvider>                                           $providers
+             * @param array<string, \Closure(\Psr\Container\ContainerInterface): object> $kernelBindings
+             */
+            public function __construct(
+                private readonly array $providers,
+                private readonly array $kernelBindings,
+            ) {}
+
+            public function get(string $id): object
+            {
+                if (isset($this->cache[$id])) {
+                    return $this->cache[$id];
+                }
+
+                // 1. Explicit kernel bindings (BootDiagnosticReport, HealthCheckerInterface, …).
+                if (isset($this->kernelBindings[$id])) {
+                    $instance = ($this->kernelBindings[$id])($this);
+                    $this->cache[$id] = $instance;
+
+                    return $instance;
+                }
+
+                // 2. Provider bindings (EntityTypeManager, DatabaseInterface, …).
+                foreach ($this->providers as $provider) {
+                    try {
+                        $instance = $provider->resolve($id);
+                        $this->cache[$id] = $instance;
+
+                        return $instance;
+                    } catch (\Throwable) {
+                        // try next
+                    }
+                }
+
+                // 3. Reflection-based auto-wiring for concrete handler classes.
+                if (!class_exists($id)) {
+                    throw new class ($id) extends \RuntimeException implements \Psr\Container\NotFoundExceptionInterface {
+                        public function __construct(string $id)
+                        {
+                            parent::__construct(sprintf('No binding for "%s" in KernelHandlerContainer.', $id));
+                        }
+                    };
+                }
+
+                $ref = new \ReflectionClass($id);
+                $ctor = $ref->getConstructor();
+
+                if ($ctor === null || $ctor->getParameters() === []) {
+                    $instance = new $id();
+                    $this->cache[$id] = $instance;
+
+                    return $instance;
+                }
+
+                $args = [];
+                foreach ($ctor->getParameters() as $param) {
+                    $type = $param->getType();
+                    if ($type instanceof \ReflectionNamedType && !$type->isBuiltin()) {
+                        $args[] = $this->get($type->getName());
+                    } elseif ($param->isOptional()) {
+                        $args[] = $param->getDefaultValue();
+                    } else {
+                        throw new class ($id, $param->getName()) extends \RuntimeException implements \Psr\Container\NotFoundExceptionInterface {
+                            public function __construct(string $id, string $param)
+                            {
+                                parent::__construct(sprintf('Cannot auto-wire "%s": unresolvable parameter "$%s".', $id, $param));
+                            }
+                        };
+                    }
+                }
+
+                $instance = $ref->newInstanceArgs($args);
+                $this->cache[$id] = $instance;
+
+                return $instance;
+            }
+
+            public function has(string $id): bool
+            {
+                try {
+                    $this->get($id);
+
+                    return true;
+                } catch (\Throwable) {
+                    return false;
+                }
+            }
+        };
     }
 
     /**

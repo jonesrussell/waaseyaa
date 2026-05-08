@@ -1093,12 +1093,6 @@ parameters:
 			path: packages/foundation/src/Kernel/Bootstrap/KnowledgeExtensionBootstrapper.php
 
 		-
-			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-			identifier: ternary.shortNotAllowed
-			count: 1
-			path: packages/foundation/src/Kernel/ConsoleKernel.php
-
-		-
 			message: '#^Call to an undefined method Symfony\\Contracts\\EventDispatcher\\EventDispatcherInterface\:\:addListener\(\)\.$#'
 			identifier: method.notFound
 			count: 8

@@ -37,17 +37,21 @@ final class CliKernelServiceProvider
      * @param list<object>|null $providerInstances
      *   When non-null, use these already-instantiated providers instead of
      *   resolving from the manifest (useful in tests).
+     * @param string|null $projectRoot
+     *   Absolute project root. Used when instantiating providers directly (i.e.
+     *   when the container cannot resolve them). Passed to setKernelContext().
      */
     public static function buildRegistry(
         PackageManifest $manifest,
         ContainerInterface $container,
         ?array $providerInstances = null,
         ?LoggerInterface $logger = null,
+        ?string $projectRoot = null,
     ): CommandRegistry {
         $logger ??= new NullLogger();
         $registry = new CommandRegistry();
 
-        $providers = $providerInstances ?? self::resolveProviders($manifest, $container, $logger);
+        $providers = $providerInstances ?? self::resolveProviders($manifest, $container, $logger, $projectRoot);
 
         foreach ($providers as $provider) {
             if (!$provider instanceof HasNativeCommandsInterface) {
@@ -122,7 +126,11 @@ final class CliKernelServiceProvider
     }
 
     /**
-     * Resolve provider instances from the manifest via the container.
+     * Resolve provider instances from the manifest.
+     *
+     * Tries the container first; falls back to direct instantiation + setKernelContext()
+     * for ServiceProvider subclasses when the container cannot resolve them (e.g. when
+     * running without a full DI container, as in the default bin/waaseyaa boot path).
      *
      * @return list<object>
      */
@@ -130,18 +138,33 @@ final class CliKernelServiceProvider
         PackageManifest $manifest,
         ContainerInterface $container,
         LoggerInterface $logger,
+        ?string $projectRoot = null,
     ): array {
         $instances = [];
 
         foreach ($manifest->nativeCommandProviders as $providerClass) {
             try {
-                $instance = $container->get($providerClass);
-                if (is_object($instance)) {
-                    $instances[] = $instance;
+                if ($container->has($providerClass)) {
+                    $instance = $container->get($providerClass);
+                    if (is_object($instance)) {
+                        $instances[] = $instance;
+                    }
+                    continue;
                 }
+            } catch (\Throwable) {
+                // fall through to direct instantiation
+            }
+
+            // Direct instantiation for ServiceProvider subclasses (no-arg constructor).
+            try {
+                $instance = new $providerClass();
+                if ($instance instanceof \Waaseyaa\Foundation\ServiceProvider\ServiceProvider) {
+                    $instance->setKernelContext($projectRoot ?? (string) getcwd(), [], []);
+                }
+                $instances[] = $instance;
             } catch (\Throwable $e) {
                 $logger->warning(sprintf(
-                    'Could not resolve native command provider "%s": %s',
+                    'Could not instantiate native command provider "%s": %s',
                     $providerClass,
                     $e->getMessage(),
                 ));

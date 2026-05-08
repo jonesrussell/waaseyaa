@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI;
 
+use Waaseyaa\CLI\Io\CliOutput;
+
 /**
  * I/O surface passed to every command handler.
+ *
+ * Extends CliOutput so that utilities needing only write/writeln (e.g. report
+ * printers) can accept either a CliIO or a bare CliOutput.
  *
  * This interface is the type contract used by CommandDefinition and ArgvParser.
  * The concrete implementation (ConsoleCliIO) is delivered in WP03.
@@ -13,7 +18,7 @@ namespace Waaseyaa\CLI;
  *
  * Full behavioural contract: kitty-specs/native-cli-kernel-01KR2NR7/contracts/cli-io.md
  */
-interface CliIO
+interface CliIO extends CliOutput
 {
     // --- Argument & option access ---
 
@@ -41,17 +46,7 @@ interface CliIO
      */
     public function options(): array;
 
-    // --- Output ---
-
-    /**
-     * Write a line to stdout.
-     */
-    public function writeln(string $line): void;
-
-    /**
-     * Write raw text to stdout (no newline appended).
-     */
-    public function write(string $text): void;
+    // --- Output: write() and writeln() inherited from CliOutput ---
 
     /**
      * Write a line to stderr.
