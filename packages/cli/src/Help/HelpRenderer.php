@@ -35,6 +35,10 @@ use Waaseyaa\CLI\OptionMode;
  */
 final class HelpRenderer
 {
+    /**
+     * Description wrap width — only applied when stdout is a TTY.
+     * When piped (non-TTY), Symfony emits descriptions unwrapped.
+     */
     private const WRAP_WIDTH = 80;
 
     /**
@@ -78,8 +82,14 @@ final class HelpRenderer
 
         if ($command->description !== '') {
             $lines[] = 'Description:';
-            foreach ($this->wordWrap($command->description, self::WRAP_WIDTH - 2) as $wrapped) {
-                $lines[] = '  ' . $wrapped;
+            // Symfony does NOT wrap descriptions when stdout is piped (non-TTY).
+            // Only wrap when running in an interactive terminal.
+            if (stream_isatty(STDOUT)) {
+                foreach ($this->wordWrap($command->description, self::WRAP_WIDTH - 2) as $wrapped) {
+                    $lines[] = '  ' . $wrapped;
+                }
+            } else {
+                $lines[] = '  ' . $command->description;
             }
             $lines[] = '';
         }
@@ -107,7 +117,9 @@ final class HelpRenderer
 
         $lines[] = 'Options:';
         foreach ($allOptions as $opt) {
+            // Symfony Console token order: description [default: …] (multiple values allowed)
             $suffix = $opt['default'] !== '' ? ' [default: ' . $opt['default'] . ']' : '';
+            $suffix .= $opt['multiSuffix'];
             $lines[] = '  ' . str_pad($opt['label'], $labelWidth) . '  ' . $opt['desc'] . $suffix;
         }
         $lines[] = '';
@@ -155,7 +167,7 @@ final class HelpRenderer
 
     /**
      * @param list<OptionDefinition> $userOptions
-     * @return list<array{label: string, desc: string, default: string}>
+     * @return list<array{label: string, desc: string, default: string, multiSuffix: string}>
      */
     private function collectOptions(array $userOptions): array
     {
@@ -164,24 +176,32 @@ final class HelpRenderer
         // User-defined options in declaration order (matches Symfony Console behaviour).
         foreach ($userOptions as $opt) {
             $desc = $opt->description;
-            // Symfony Console appends "(multiple values allowed)" for VALUE_IS_ARRAY options.
+
+            // Symfony Console token order: description [default: …] (multiple values allowed)
+            // The default suffix is appended in render() after the desc; the multiple-values
+            // suffix must come AFTER the default token. We embed it into desc here as a
+            // trailing marker that render() will see after the [default: …] suffix is added.
+            // To get the correct order we carry the suffix separately and append it in render().
+            $multiSuffix = '';
             if ($opt->mode === OptionMode::Array_) {
-                $desc .= ' (multiple values allowed)';
+                $multiSuffix = ' (multiple values allowed)';
             }
 
             $result[] = [
-                'label'   => $this->buildOptionLabel($opt),
-                'desc'    => $desc,
-                'default' => $this->formatDefault($opt),
+                'label'      => $this->buildOptionLabel($opt),
+                'desc'       => $desc,
+                'default'    => $this->formatDefault($opt),
+                'multiSuffix' => $multiSuffix,
             ];
         }
 
         // Kernel-level flags in Symfony Console order with exact wording.
         foreach (self::KERNEL_OPTIONS as $k) {
             $result[] = [
-                'label'   => $k['label'],
-                'desc'    => $k['desc'],
-                'default' => '',
+                'label'       => $k['label'],
+                'desc'        => $k['desc'],
+                'default'     => '',
+                'multiSuffix' => '',
             ];
         }
 
@@ -218,7 +238,8 @@ final class HelpRenderer
         }
 
         if (is_array($default)) {
-            return implode(', ', $default);
+            // Symfony Console JSON-encodes array defaults: ["node"] not "node".
+            return json_encode($default, JSON_THROW_ON_ERROR);
         }
 
         // Symfony Console wraps string defaults in double-quotes.

@@ -5,7 +5,7 @@ Usage:
   semantic:warm [options]
 
 Options:
-  -t, --type=TYPE       Entity type ID(s) to warm (repeat option or pass comma-separated values) (multiple values allowed) [default: node]
+  -t, --type=TYPE       Entity type ID(s) to warm (repeat option or pass comma-separated values) [default: ["node"]] (multiple values allowed)
   -l, --limit=LIMIT     Per-type candidate limit (0 = no limit) [default: "0"]
       --json            Emit the full warming report as JSON
   -h, --help            Display help for the given command. When no command is given display help for the list command

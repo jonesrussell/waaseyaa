@@ -5,7 +5,7 @@ Usage:
   semantic:refresh [options]
 
 Options:
-  -t, --type=TYPE              Entity type ID(s) to refresh (repeat option or pass comma-separated values) (multiple values allowed) [default: node]
+  -t, --type=TYPE              Entity type ID(s) to refresh (repeat option or pass comma-separated values) [default: ["node"]] (multiple values allowed)
   -b, --batch-size=BATCH-SIZE  Maximum entities per batch execution [default: "200"]
       --cursor=CURSOR          Resume cursor JSON (e.g. {"type_index":0,"offset":200})
       --until-complete         Keep running batches until the refresh completes
