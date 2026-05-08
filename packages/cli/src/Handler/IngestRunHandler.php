@@ -2,13 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
 use Waaseyaa\CLI\Ingestion\AuthoringAssistBuilder;
 use Waaseyaa\CLI\Ingestion\IngestionEnvelopeNormalizer;
 use Waaseyaa\CLI\Ingestion\RelationshipInferenceEngine;
@@ -18,81 +14,57 @@ use Waaseyaa\CLI\Ingestion\SemanticRefreshTriggerPlanner;
 use Waaseyaa\CLI\Ingestion\ValidationDiagnosticEmitter;
 use Waaseyaa\CLI\Ingestion\ValidationGateValidator;
 
-#[AsCommand(
-    name: 'ingest:run',
-    description: 'Run deterministic structured/unstructured ingestion and emit mapped content payloads',
-)]
-final class IngestRunCommand extends Command
+final class IngestRunHandler
 {
     private const array VALID_STATES = ['draft', 'review', 'published', 'archived'];
 
-    protected function configure(): void
+    public function execute(CliIO $io): int
     {
-        $this
-            ->addOption('input', 'i', InputOption::VALUE_REQUIRED, 'Input file path (.json, .txt, .md)')
-            ->addOption('format', 'f', InputOption::VALUE_REQUIRED, 'Input format: auto|structured|unstructured', 'auto')
-            ->addOption('default-bundle', null, InputOption::VALUE_REQUIRED, 'Default bundle for mapped nodes', 'node')
-            ->addOption('default-workflow-state', null, InputOption::VALUE_REQUIRED, 'Default workflow state', 'draft')
-            ->addOption('author-id', null, InputOption::VALUE_REQUIRED, 'Mapped author UID', '1')
-            ->addOption('timestamp', null, InputOption::VALUE_REQUIRED, 'Deterministic ingest timestamp', '1735689600')
-            ->addOption('batch-id', null, InputOption::VALUE_REQUIRED, 'Batch idempotency key (defaults to deterministic hash)')
-            ->addOption('policy', null, InputOption::VALUE_REQUIRED, 'Ingestion policy: atomic_fail_fast|validate_only', 'atomic_fail_fast')
-            ->addOption('source', null, InputOption::VALUE_REQUIRED, 'Source identifier for audit metadata', 'manual://default')
-            ->addOption('infer-relationships', null, InputOption::VALUE_NONE, 'Infer candidate relationships from ingested text (review-safe defaults)')
-            ->addOption('authoring-assist', null, InputOption::VALUE_NONE, 'Emit deterministic AI-assisted authoring suggestions')
-            ->addOption('refresh-baseline', null, InputOption::VALUE_REQUIRED, 'Optional baseline snapshot JSON path for refresh change detection')
-            ->addOption('refresh-snapshot-output', null, InputOption::VALUE_REQUIRED, 'Optional output path for current refresh snapshot JSON')
-            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Optional mapped output file (.json)')
-            ->addOption('diagnostics-output', null, InputOption::VALUE_REQUIRED, 'Optional diagnostics output file (.json)');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $inputPath = trim($this->stringify($input->getOption('input')));
+        $inputPath = trim($this->stringify($io->option('input')));
         if ($inputPath === '') {
-            $output->writeln('<error>--input is required.</error>');
-            return Command::INVALID;
+            $io->error('--input is required.');
+            return 2;
         }
         if (!is_file($inputPath) || !is_readable($inputPath)) {
-            $output->writeln(sprintf('<error>Input file is not readable: %s</error>', $inputPath));
-            return Command::FAILURE;
+            $io->error(sprintf('Input file is not readable: %s', $inputPath));
+            return 1;
         }
 
-        $format = strtolower(trim($this->stringify($input->getOption('format'))));
+        $format = strtolower(trim($this->stringify($io->option('format'))));
         if (!in_array($format, ['auto', 'structured', 'unstructured'], true)) {
-            $output->writeln('<error>Invalid --format. Allowed: auto, structured, unstructured.</error>');
-            return Command::INVALID;
+            $io->error('Invalid --format. Allowed: auto, structured, unstructured.');
+            return 2;
         }
 
-        $defaultBundle = trim($this->stringify($input->getOption('default-bundle')));
-        $defaultState = strtolower(trim($this->stringify($input->getOption('default-workflow-state'))));
+        $defaultBundle = trim($this->stringify($io->option('default-bundle')));
+        $defaultState = strtolower(trim($this->stringify($io->option('default-workflow-state'))));
         if (!in_array($defaultState, self::VALID_STATES, true)) {
-            $output->writeln(sprintf('<error>Invalid --default-workflow-state "%s".</error>', $defaultState));
-            return Command::INVALID;
+            $io->error(sprintf('Invalid --default-workflow-state "%s".', $defaultState));
+            return 2;
         }
 
-        $timestamp = max(0, $this->intify($input->getOption('timestamp')));
-        $authorId = max(0, $this->intify($input->getOption('author-id')));
-        $policy = strtolower(trim($this->stringify($input->getOption('policy'))));
-        $source = trim($this->stringify($input->getOption('source')));
-        $inferRelationships = (bool) $input->getOption('infer-relationships');
-        $authoringAssistEnabled = (bool) $input->getOption('authoring-assist');
+        $timestamp = max(0, $this->intify($io->option('timestamp')));
+        $authorId = max(0, $this->intify($io->option('author-id')));
+        $policy = strtolower(trim($this->stringify($io->option('policy'))));
+        $source = trim($this->stringify($io->option('source')));
+        $inferRelationships = (bool) $io->option('infer-relationships');
+        $authoringAssistEnabled = (bool) $io->option('authoring-assist');
         if ($source === '') {
-            $output->writeln('<error>--source must be non-empty.</error>');
-            return Command::INVALID;
+            $io->error('--source must be non-empty.');
+            return 2;
         }
 
         $raw = file_get_contents($inputPath);
         if ($raw === false) {
-            $output->writeln(sprintf('<error>Unable to read input file: %s</error>', $inputPath));
-            return Command::FAILURE;
+            $io->error(sprintf('Unable to read input file: %s', $inputPath));
+            return 1;
         }
 
         $resolvedFormat = $format;
         if ($resolvedFormat === 'auto') {
             $resolvedFormat = str_ends_with(strtolower($inputPath), '.json') ? 'structured' : 'unstructured';
         }
-        $batchId = trim($this->stringify($input->getOption('batch-id')));
+        $batchId = trim($this->stringify($io->option('batch-id')));
         if ($batchId === '') {
             $batchId = 'batch_' . substr(sha1($inputPath . '|' . $source . '|' . $raw), 0, 16);
         }
@@ -167,7 +139,7 @@ final class IngestRunCommand extends Command
             itemCount: count((array) ($normalizedEnvelope['envelope']['items'] ?? [])),
         );
         $baselineRefreshSnapshot = $this->readRefreshBaseline(
-            trim($this->stringify($input->getOption('refresh-baseline') ?? '')),
+            trim($this->stringify($io->option('refresh-baseline') ?? '')),
             $diagnostics,
         );
         $refreshPlan = (new SemanticRefreshTriggerPlanner())->plan($currentRefreshSnapshot, $baselineRefreshSnapshot);
@@ -231,45 +203,45 @@ final class IngestRunCommand extends Command
 
         $encoded = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL;
 
-        $outputPath = trim($this->stringify($input->getOption('output') ?? ''));
+        $outputPath = trim($this->stringify($io->option('output') ?? ''));
         if ($outputPath !== '') {
-            if (!$this->writeFile($outputPath, $encoded, $output)) {
-                return Command::FAILURE;
+            if (!$this->writeFile($outputPath, $encoded, $io)) {
+                return 1;
             }
-            $output->writeln(sprintf('Mapped ingest output written: %s', $outputPath));
+            $io->writeln(sprintf('Mapped ingest output written: %s', $outputPath));
         } else {
-            $output->writeln($encoded);
+            $io->writeln($encoded);
         }
 
-        $diagnosticsPath = trim($this->stringify($input->getOption('diagnostics-output') ?? ''));
+        $diagnosticsPath = trim($this->stringify($io->option('diagnostics-output') ?? ''));
         if ($diagnosticsPath !== '') {
             $diagnosticPayload = json_encode([
                 'meta' => $result['meta'],
                 'diagnostics' => $diagnostics,
             ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL;
-            if (!$this->writeFile($diagnosticsPath, $diagnosticPayload, $output)) {
-                return Command::FAILURE;
+            if (!$this->writeFile($diagnosticsPath, $diagnosticPayload, $io)) {
+                return 1;
             }
-            $output->writeln(sprintf('Ingest diagnostics written: %s', $diagnosticsPath));
+            $io->writeln(sprintf('Ingest diagnostics written: %s', $diagnosticsPath));
         }
 
-        $refreshSnapshotOutputPath = trim($this->stringify($input->getOption('refresh-snapshot-output') ?? ''));
+        $refreshSnapshotOutputPath = trim($this->stringify($io->option('refresh-snapshot-output') ?? ''));
         if ($refreshSnapshotOutputPath !== '') {
             $refreshSnapshotPayload = json_encode($currentRefreshSnapshot, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL;
-            if (!$this->writeFile($refreshSnapshotOutputPath, $refreshSnapshotPayload, $output)) {
-                return Command::FAILURE;
+            if (!$this->writeFile($refreshSnapshotOutputPath, $refreshSnapshotPayload, $io)) {
+                return 1;
             }
-            $output->writeln(sprintf('Refresh snapshot written: %s', $refreshSnapshotOutputPath));
+            $io->writeln(sprintf('Refresh snapshot written: %s', $refreshSnapshotOutputPath));
         }
 
         $errorCount = count($diagnostics['schema']) + count($diagnostics['validation']) + count($diagnostics['errors']);
         if ($errorCount > 0) {
-            $output->writeln(sprintf('<error>Ingest completed with %d error(s).</error>', $errorCount));
-            return Command::FAILURE;
+            $io->error(sprintf('Ingest completed with %d error(s).', $errorCount));
+            return 1;
         }
 
-        $output->writeln(sprintf('Ingest completed successfully (%d nodes, %d relationships).', count($mapped['nodes']), count($mapped['relationships'])));
-        return Command::SUCCESS;
+        $io->writeln(sprintf('Ingest completed successfully (%d nodes, %d relationships).', count($mapped['nodes']), count($mapped['relationships'])));
+        return 0;
     }
 
     /**
@@ -773,16 +745,16 @@ final class IngestRunCommand extends Command
         return $value;
     }
 
-    private function writeFile(string $path, string $contents, OutputInterface $output): bool
+    private function writeFile(string $path, string $contents, CliIO $io): bool
     {
         $dir = dirname($path);
         if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
-            $output->writeln(sprintf('<error>Unable to create directory: %s</error>', $dir));
+            $io->error(sprintf('Unable to create directory: %s', $dir));
             return false;
         }
 
         if (file_put_contents($path, $contents) === false) {
-            $output->writeln(sprintf('<error>Unable to write file: %s</error>', $path));
+            $io->error(sprintf('Unable to write file: %s', $path));
             return false;
         }
 

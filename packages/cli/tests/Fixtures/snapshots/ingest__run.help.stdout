@@ -1,5 +1,6 @@
 Description:
-  Run deterministic structured/unstructured ingestion and emit mapped content payloads
+  Run deterministic structured/unstructured ingestion and emit mapped content
+  payloads
 
 Usage:
   ingest:run [options]

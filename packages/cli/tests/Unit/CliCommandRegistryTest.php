@@ -71,7 +71,6 @@ final class CliCommandRegistryTest extends TestCase
                 router: $router,
                 permissionHandler: new PermissionHandler(),
                 typeIdNormalizer: new EntityTypeIdNormalizer($entityTypeManager),
-                semanticWarmer: null,
                 pdo: $pdo,
             );
 

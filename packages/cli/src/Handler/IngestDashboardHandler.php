@@ -2,63 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
 
-#[AsCommand(
-    name: 'ingest:dashboard',
-    description: 'Build deterministic editorial dashboard summaries from ingest artifacts',
-)]
-final class IngestDashboardCommand extends Command
+final class IngestDashboardHandler
 {
-    protected function configure(): void
+    public function execute(CliIO $io): int
     {
-        $this
-            ->addOption(
-                'input',
-                'i',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Ingest artifact JSON path(s) (repeat or comma-separated)',
-            )
-            ->addOption(
-                'glob',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Optional glob pattern for ingest artifact JSON files',
-            )
-            ->addOption(
-                'output',
-                'o',
-                InputOption::VALUE_REQUIRED,
-                'Optional path to write dashboard payload',
-            )
-            ->addOption(
-                'json',
-                null,
-                InputOption::VALUE_NONE,
-                'Emit machine-readable JSON payload',
-            );
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $paths = $this->collectInputPaths($input);
+        $paths = $this->collectInputPaths($io);
         if ($paths === []) {
-            $output->writeln('<error>No ingest artifacts found. Use --input and/or --glob.</error>');
-            return Command::INVALID;
+            $io->error('No ingest artifacts found. Use --input and/or --glob.');
+            return 2;
         }
 
         $runs = [];
         foreach ($paths as $path) {
             $decoded = $this->readArtifact($path);
             if ($decoded === null) {
-                $output->writeln(sprintf('<error>Unable to decode ingest artifact: %s</error>', $path));
-                return Command::FAILURE;
+                $io->error(sprintf('Unable to decode ingest artifact: %s', $path));
+                return 1;
             }
             $runs[] = $this->buildRunRow($path, $decoded);
         }
@@ -70,29 +33,29 @@ final class IngestDashboardCommand extends Command
         $payload = $this->buildDashboardPayload($runs);
         $encoded = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR) . PHP_EOL;
 
-        $outputPath = trim((string) ($input->getOption('output') ?? ''));
+        $outputPath = trim((string) ($io->option('output') ?? ''));
         if ($outputPath !== '') {
-            if (!$this->writeFile($outputPath, $encoded, $output)) {
-                return Command::FAILURE;
+            if (!$this->writeFile($outputPath, $encoded, $io)) {
+                return 1;
             }
         }
 
-        if ((bool) $input->getOption('json')) {
-            $output->writeln($encoded);
+        if ((bool) $io->option('json')) {
+            $io->writeln($encoded);
         } else {
-            $output->writeln($this->renderTextDashboard($payload));
+            $io->writeln($this->renderTextDashboard($payload));
         }
 
-        return Command::SUCCESS;
+        return 0;
     }
 
     /**
      * @return list<string>
      */
-    private function collectInputPaths(InputInterface $input): array
+    private function collectInputPaths(CliIO $io): array
     {
         $paths = [];
-        $option = $input->getOption('input');
+        $option = $io->option('input');
         if (is_array($option)) {
             foreach ($option as $value) {
                 if (!is_string($value)) {
@@ -107,7 +70,7 @@ final class IngestDashboardCommand extends Command
             }
         }
 
-        $globPattern = trim((string) ($input->getOption('glob') ?? ''));
+        $globPattern = trim((string) ($io->option('glob') ?? ''));
         if ($globPattern !== '') {
             $matches = glob($globPattern) ?: [];
             sort($matches);
@@ -165,9 +128,9 @@ final class IngestDashboardCommand extends Command
             $state = strtolower(trim((string) ($node['workflow_state'] ?? 'draft')));
             $workflowStateCounts[$state] = (int) ($workflowStateCounts[$state] ?? 0) + 1;
 
-            $status = $this->normalizeStatus($node['status'] ?? 0);
+            $nodeStatus = $this->normalizeStatus($node['status'] ?? 0);
             $expected = $state === 'published' ? 1 : 0;
-            if ($status !== $expected) {
+            if ($nodeStatus !== $expected) {
                 $workflowMismatchCount++;
             }
         }
@@ -207,16 +170,16 @@ final class IngestDashboardCommand extends Command
         ];
     }
 
-    private function normalizeStatus(mixed $status): int
+    private function normalizeStatus(mixed $nodeStatus): int
     {
-        if (is_bool($status)) {
-            return $status ? 1 : 0;
+        if (is_bool($nodeStatus)) {
+            return $nodeStatus ? 1 : 0;
         }
-        if (is_numeric($status)) {
-            return ((int) $status) === 1 ? 1 : 0;
+        if (is_numeric($nodeStatus)) {
+            return ((int) $nodeStatus) === 1 ? 1 : 0;
         }
-        if (is_string($status)) {
-            return in_array(strtolower(trim($status)), ['1', 'true', 'published', 'yes'], true) ? 1 : 0;
+        if (is_string($nodeStatus)) {
+            return in_array(strtolower(trim($nodeStatus)), ['1', 'true', 'published', 'yes'], true) ? 1 : 0;
         }
 
         return 0;
@@ -254,9 +217,9 @@ final class IngestDashboardCommand extends Command
             }
         }
 
-        $result = array_keys($codes);
-        sort($result);
-        return $result;
+        $diagnosticResult = array_keys($codes);
+        sort($diagnosticResult);
+        return $diagnosticResult;
     }
 
     /**
@@ -273,9 +236,9 @@ final class IngestDashboardCommand extends Command
         $inferenceReviewPendingTotal = 0;
 
         foreach ($runs as $run) {
-            $status = (string) ($run['queue_status'] ?? 'ready');
-            if (array_key_exists($status, $queueStatusCounts)) {
-                $queueStatusCounts[$status]++;
+            $runStatus = (string) ($run['queue_status'] ?? 'ready');
+            if (array_key_exists($runStatus, $queueStatusCounts)) {
+                $queueStatusCounts[$runStatus]++;
             }
 
             $workflowCounts = (array) ($run['workflow_state_counts'] ?? []);
@@ -394,20 +357,20 @@ final class IngestDashboardCommand extends Command
         return implode(PHP_EOL, $lines) . PHP_EOL;
     }
 
-    private function writeFile(string $path, string $contents, OutputInterface $output): bool
+    private function writeFile(string $path, string $contents, CliIO $io): bool
     {
         $dir = dirname($path);
         if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
-            $output->writeln(sprintf('<error>Unable to create directory: %s</error>', $dir));
+            $io->error(sprintf('Unable to create directory: %s', $dir));
             return false;
         }
 
         if (file_put_contents($path, $contents) === false) {
-            $output->writeln(sprintf('<error>Unable to write file: %s</error>', $path));
+            $io->error(sprintf('Unable to write file: %s', $path));
             return false;
         }
 
-        $output->writeln(sprintf('Dashboard output written: %s', $path));
+        $io->writeln(sprintf('Dashboard output written: %s', $path));
         return true;
     }
 }

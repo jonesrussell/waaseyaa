@@ -7,12 +7,11 @@ namespace Waaseyaa\CLI\Tests\Unit\Command;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
-use Waaseyaa\CLI\Command\IngestDashboardCommand;
+use Waaseyaa\CLI\Handler\IngestDashboardHandler;
+use Waaseyaa\CLI\Provider\IngestSearchSemanticServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 
-#[CoversClass(IngestDashboardCommand::class)]
+#[CoversClass(IngestDashboardHandler::class)]
 final class IngestDashboardCommandTest extends TestCase
 {
     private string $tempDir;
@@ -33,6 +32,33 @@ final class IngestDashboardCommandTest extends TestCase
             $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
         }
         @rmdir($this->tempDir);
+    }
+
+    private function makeTester(): CliTester
+    {
+        $provider = new IngestSearchSemanticServiceProvider();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'ingest:dashboard') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition, 'ingest:dashboard command definition must exist');
+
+        $container = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                return new IngestDashboardHandler();
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === IngestDashboardHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
     }
 
     #[Test]
@@ -83,16 +109,14 @@ final class IngestDashboardCommandTest extends TestCase
             ],
         ), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        $app = new Application();
-        $app->add(new IngestDashboardCommand());
-        $tester = new CommandTester($app->find('ingest:dashboard'));
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => [$review, $blocked, $ready],
             '--json' => true,
         ]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $decoded = json_decode($tester->getDisplay(), true, 512, JSON_THROW_ON_ERROR);
+        $this->assertSame(0, $tester->getExitCode());
+        $decoded = json_decode($tester->getStdout(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertSame(3, $decoded['meta']['run_count']);
         $this->assertSame([
@@ -123,16 +147,14 @@ final class IngestDashboardCommandTest extends TestCase
 
         $outputPath = $this->tempDir . '/dashboard.json';
 
-        $app = new Application();
-        $app->add(new IngestDashboardCommand());
-        $tester = new CommandTester($app->find('ingest:dashboard'));
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--glob' => $this->tempDir . '/*.json',
             '--output' => $outputPath,
         ]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
-        $display = $tester->getDisplay();
+        $this->assertSame(0, $tester->getExitCode());
+        $display = $tester->getStdout();
         $this->assertStringContainsString('INGEST EDITORIAL DASHBOARD', $display);
         $this->assertStringContainsString('Queue: blocked=0 review=1 ready=0', $display);
         $this->assertFileExists($outputPath);
@@ -141,13 +163,11 @@ final class IngestDashboardCommandTest extends TestCase
     #[Test]
     public function it_fails_with_invalid_status_when_no_inputs_exist(): void
     {
-        $app = new Application();
-        $app->add(new IngestDashboardCommand());
-        $tester = new CommandTester($app->find('ingest:dashboard'));
+        $tester = $this->makeTester();
         $tester->execute([]);
 
-        $this->assertSame(Command::INVALID, $tester->getStatusCode());
-        $this->assertStringContainsString('No ingest artifacts found', $tester->getDisplay());
+        $this->assertSame(2, $tester->getExitCode());
+        $this->assertStringContainsString('No ingest artifacts found', $tester->getStderr());
     }
 
     /**

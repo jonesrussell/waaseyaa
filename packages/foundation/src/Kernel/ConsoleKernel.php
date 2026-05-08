@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Waaseyaa\Foundation\Kernel;
 
 use Waaseyaa\Access\PermissionHandler;
-use Waaseyaa\AI\Vector\EmbeddingProviderFactory;
-use Waaseyaa\AI\Vector\SemanticIndexWarmer;
-use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
 use Waaseyaa\Cache\Backend\DatabaseBackend;
 use Waaseyaa\Cache\CacheConfiguration;
 use Waaseyaa\Cache\CacheFactory;
@@ -87,16 +84,6 @@ final class ConsoleKernel extends AbstractKernel
         $cacheFactory = new CacheFactory($cacheConfig);
         $router = new WaaseyaaRouter();
         $permissionHandler = new PermissionHandler();
-        $semanticWarmer = null;
-        if (class_exists(SqliteEmbeddingStorage::class)) {
-            $embeddingStorage = new SqliteEmbeddingStorage($pdo);
-            $embeddingProvider = EmbeddingProviderFactory::fromConfig($this->config);
-            $semanticWarmer = new SemanticIndexWarmer(
-                entityTypeManager: $this->entityTypeManager,
-                embeddingStorage: $embeddingStorage,
-                embeddingProvider: $embeddingProvider,
-            );
-        }
         $typeIdNormalizer = new EntityTypeIdNormalizer($this->entityTypeManager);
 
         $app = new WaaseyaaApplication();
@@ -117,7 +104,6 @@ final class ConsoleKernel extends AbstractKernel
             router: $router,
             permissionHandler: $permissionHandler,
             typeIdNormalizer: $typeIdNormalizer,
-            semanticWarmer: $semanticWarmer,
             pdo: $pdo,
         ));
 
@@ -171,17 +157,6 @@ final class ConsoleKernel extends AbstractKernel
         $permissionHandler = new \Waaseyaa\Access\PermissionHandler();
         $typeIdNormalizer = new \Waaseyaa\Entity\EntityTypeIdNormalizer($this->entityTypeManager);
 
-        $semanticWarmer = null;
-        if (class_exists(\Waaseyaa\AI\Vector\SqliteEmbeddingStorage::class)) {
-            $embeddingStorage = new \Waaseyaa\AI\Vector\SqliteEmbeddingStorage($pdo);
-            $embeddingProvider = \Waaseyaa\AI\Vector\EmbeddingProviderFactory::fromConfig($this->config);
-            $semanticWarmer = new \Waaseyaa\AI\Vector\SemanticIndexWarmer(
-                entityTypeManager: $this->entityTypeManager,
-                embeddingStorage: $embeddingStorage,
-                embeddingProvider: $embeddingProvider,
-            );
-        }
-
         $commandRegistry = new \Waaseyaa\CLI\CliCommandRegistry();
         $commands = $commandRegistry->coreCommands(
             projectRoot: $this->projectRoot,
@@ -197,7 +172,6 @@ final class ConsoleKernel extends AbstractKernel
             router: $router,
             permissionHandler: $permissionHandler,
             typeIdNormalizer: $typeIdNormalizer,
-            semanticWarmer: $semanticWarmer,
             pdo: $pdo,
         );
 

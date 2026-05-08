@@ -2,42 +2,30 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Search\SearchIndexableInterface;
 use Waaseyaa\Search\SearchIndexerInterface;
 
-#[AsCommand(name: 'search:reindex', description: 'Rebuild the search index from all indexable entities')]
-final class SearchReindexCommand extends Command
+final class SearchReindexHandler
 {
     private const BATCH_SIZE = 100;
 
     public function __construct(
         private readonly SearchIndexerInterface $indexer,
         private readonly EntityTypeManagerInterface $entityTypeManager,
-    ) {
-        parent::__construct();
-    }
+    ) {}
 
-    protected function configure(): void
+    public function execute(CliIO $io): int
     {
-        $this->addOption('batch-size', 'b', InputOption::VALUE_REQUIRED, 'Entities per batch', (string) self::BATCH_SIZE);
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $batchSize = (int) $input->getOption('batch-size');
+        $batchSize = (int) ($io->option('batch-size') ?? self::BATCH_SIZE);
         if ($batchSize < 1) {
             $batchSize = self::BATCH_SIZE;
         }
 
-        $output->writeln('<info>Clearing search index...</info>');
+        $io->writeln('Clearing search index...');
         $this->indexer->removeAll();
 
         $totalIndexed = 0;
@@ -60,19 +48,19 @@ final class SearchReindexCommand extends Command
                 $batchCount++;
 
                 if ($batchCount >= $batchSize) {
-                    $output->writeln("  [{$entityType->id()}] Indexed $typeIndexed entities...");
+                    $io->writeln("  [{$entityType->id()}] Indexed $typeIndexed entities...");
                     $batchCount = 0;
                 }
             }
 
             if ($typeIndexed > 0) {
-                $output->writeln("<comment>{$entityType->id()}</comment>: indexed $typeIndexed entities");
+                $io->writeln("{$entityType->id()}: indexed $typeIndexed entities");
             }
         }
 
-        $output->writeln("<info>Reindex complete. $totalIndexed documents indexed.</info>");
-        $output->writeln('<info>Schema version: ' . $this->indexer->getSchemaVersion() . '</info>');
+        $io->writeln("Reindex complete. $totalIndexed documents indexed.");
+        $io->writeln('Schema version: ' . $this->indexer->getSchemaVersion());
 
-        return self::SUCCESS;
+        return 0;
     }
 }

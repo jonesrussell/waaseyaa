@@ -7,12 +7,11 @@ namespace Waaseyaa\CLI\Tests\Unit\Command;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Tester\CommandTester;
-use Waaseyaa\CLI\Command\IngestRunCommand;
+use Waaseyaa\CLI\Handler\IngestRunHandler;
+use Waaseyaa\CLI\Provider\IngestSearchSemanticServiceProvider;
+use Waaseyaa\CLI\Testing\CliTester;
 
-#[CoversClass(IngestRunCommand::class)]
+#[CoversClass(IngestRunHandler::class)]
 final class IngestRunCommandTest extends TestCase
 {
     private string $tempDir;
@@ -33,6 +32,33 @@ final class IngestRunCommandTest extends TestCase
             $item->isDir() ? rmdir($item->getPathname()) : unlink($item->getPathname());
         }
         @rmdir($this->tempDir);
+    }
+
+    private function makeTester(): CliTester
+    {
+        $provider = new IngestSearchSemanticServiceProvider();
+        $definition = null;
+        foreach ($provider->nativeCommands() as $cmd) {
+            if ($cmd->name === 'ingest:run') {
+                $definition = $cmd;
+                break;
+            }
+        }
+        self::assertNotNull($definition, 'ingest:run command definition must exist');
+
+        $container = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                return new IngestRunHandler();
+            }
+
+            public function has(string $id): bool
+            {
+                return $id === IngestRunHandler::class;
+            }
+        };
+
+        return CliTester::for($definition, $container);
     }
 
     #[Test]
@@ -59,11 +85,9 @@ final class IngestRunCommandTest extends TestCase
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-structured.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'structured',
             '--source' => 'dataset://test',
@@ -71,7 +95,7 @@ final class IngestRunCommandTest extends TestCase
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertSame('structured', $decoded['meta']['format']);
@@ -100,18 +124,16 @@ Workflow: published
 Intergenerational language memory notes preserve oral teaching continuity.
 TXT);
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-unstructured.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'unstructured',
             '--source' => 'manual://notes',
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertSame('unstructured', $decoded['meta']['format']);
@@ -135,18 +157,16 @@ TXT);
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-invalid.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'structured',
             '--source' => 'dataset://invalid',
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $this->assertSame(1, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertGreaterThan(0, $decoded['meta']['error_count']);
@@ -168,11 +188,9 @@ TXT);
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-unknown-scheme.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'structured',
             '--policy' => 'validate_only',
@@ -180,7 +198,7 @@ TXT);
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $this->assertSame(1, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertSame(1, $decoded['meta']['schema_error_count']);
@@ -221,11 +239,9 @@ TXT);
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-duplicate-source-uri.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'structured',
             '--policy' => 'validate_only',
@@ -233,7 +249,7 @@ TXT);
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $this->assertSame(1, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
         $schema = $decoded['diagnostics']['schema'];
 
@@ -263,11 +279,9 @@ TXT);
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-validate-only-validation-gates.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'structured',
             '--policy' => 'validate_only',
@@ -275,7 +289,7 @@ TXT);
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $this->assertSame(1, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
         $this->assertSame([], $decoded['nodes']);
         $this->assertSame([], $decoded['relationships']);
@@ -305,11 +319,9 @@ Workflow: draft
 Has enough words here to avoid semantic gate issues.
 TXT);
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-atomic-validation-gate-failure.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'unstructured',
             '--policy' => 'atomic_fail_fast',
@@ -317,7 +329,7 @@ TXT);
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::FAILURE, $tester->getStatusCode());
+        $this->assertSame(1, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertSame([], $decoded['nodes']);
@@ -355,11 +367,9 @@ TXT);
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-inference-enabled.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'structured',
             '--source' => 'dataset://inference',
@@ -367,7 +377,7 @@ TXT);
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertTrue($decoded['meta']['inference_enabled']);
@@ -421,12 +431,10 @@ TXT);
             ]],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-refresh-policy-change.json';
         $snapshotOutputPath = $this->tempDir . '/refresh-current.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'structured',
             '--source' => 'dataset://refresh',
@@ -437,7 +445,7 @@ TXT);
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertTrue($decoded['meta']['refresh_required']);
@@ -471,11 +479,9 @@ TXT);
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        $app = new Application();
-        $app->add(new IngestRunCommand());
-        $tester = new CommandTester($app->find('ingest:run'));
         $mappedPath = $this->tempDir . '/mapped-authoring-assist.json';
-        $tester->execute([
+        $tester = $this->makeTester();
+        $tester->executeMap([
             '--input' => $inputPath,
             '--format' => 'structured',
             '--source' => 'dataset://assist',
@@ -484,7 +490,7 @@ TXT);
             '--output' => $mappedPath,
         ]);
 
-        $this->assertSame(Command::SUCCESS, $tester->getStatusCode());
+        $this->assertSame(0, $tester->getExitCode());
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
         $this->assertTrue($decoded['meta']['authoring_assist_enabled']);
         $this->assertArrayHasKey('assist', $decoded);

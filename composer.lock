@@ -4296,7 +4296,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "32b431c19a470aeda55ad13765288f1247af75b1"
+                "reference": "8e99089f2a107a754b6505a5e80fac3d1c846d12"
             },
             "require": {
                 "php": ">=8.4",
@@ -4306,6 +4306,7 @@
                 "waaseyaa/config": "^0.1.0-alpha.150",
                 "waaseyaa/entity": "^0.1.0-alpha.150",
                 "waaseyaa/queue": "^0.1.0-alpha.150",
+                "waaseyaa/scheduler": "^0.1.0-alpha.150",
                 "waaseyaa/user": "^0.1.0-alpha.150"
             },
             "require-dev": {
@@ -4323,13 +4324,17 @@
                 "waaseyaa": {
                     "providers": [
                         "Waaseyaa\\CLI\\CliServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\EntityTypeServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\HealthSchemaServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderA",
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderB",
                         "Waaseyaa\\CLI\\Provider\\MigrateServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\QueueServiceProvider",
-                        "Waaseyaa\\CLI\\Provider\\TelescopeServiceProvider"
+                        "Waaseyaa\\CLI\\Provider\\SchedulePerfServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\IngestSearchSemanticServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\TelescopeServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\UserPermissionServiceProvider"
                     ]
                 }
             },

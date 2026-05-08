@@ -1,15 +1,11 @@
 Description:
-  Run resumable semantic index refresh batches
+  Rebuild the search index from all indexable entities
 
 Usage:
-  semantic:refresh [options]
+  search:reindex [options]
 
 Options:
-  -t, --type=TYPE              Entity type ID(s) to refresh (repeat option or pass comma-separated values) (multiple values allowed) [default: node]
-  -b, --batch-size=BATCH-SIZE  Maximum entities per batch execution [default: "200"]
-      --cursor=CURSOR          Resume cursor JSON (e.g. {"type_index":0,"offset":200})
-      --until-complete         Keep running batches until the refresh completes
-      --json                   Emit machine-readable JSON output
+  -b, --batch-size=BATCH-SIZE  Entities per batch [default: "100"]
   -h, --help                   Display help for the given command. When no command is given display help for the list command
       --silent                 Do not output any message
   -q, --quiet                  Only errors are displayed. All other output is suppressed

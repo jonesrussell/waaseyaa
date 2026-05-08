@@ -391,162 +391,6 @@ parameters:
 			path: packages/cli/src/Command/FixtureScaffoldCommand.php
 
 		-
-			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
-			identifier: function.alreadyNarrowedType
-			count: 1
-			path: packages/cli/src/Command/IngestDashboardCommand.php
-
-		-
-			message: '#^Casting to int something that''s already int\.$#'
-			identifier: cast.useless
-			count: 1
-			path: packages/cli/src/Command/IngestDashboardCommand.php
-
-		-
-			message: '#^Casting to int something that''s already int\<0, max\>\.$#'
-			identifier: cast.useless
-			count: 3
-			path: packages/cli/src/Command/IngestDashboardCommand.php
-
-		-
-			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-			identifier: ternary.shortNotAllowed
-			count: 1
-			path: packages/cli/src/Command/IngestDashboardCommand.php
-
-		-
-			message: '#^Casting to bool something that''s already bool\.$#'
-			identifier: cast.useless
-			count: 1
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Casting to string something that''s already string\.$#'
-			identifier: cast.useless
-			count: 12
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Offset ''inference'' does not exist on array\{errors\: list\<string\>, warnings\: list\<string\>, refresh\: list\<array\<string, mixed\>\>, refresh_summary\: array\{needs_refresh\: bool, primary_category\: string\|null, trigger_count\: int, categories\: list\<string\>\}\}\.$#'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Offset ''key'' on array\{key\: string, relationship_type\: string, from\: string, to\: string, inference_confidence\: float\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 2
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Offset ''location'' on array\{code\: ''inference…'', category\: ''inference'', message\: non\-falsy\-string, location\: non\-falsy\-string, item_index\: null, context\: array\{from\: string, to\: string, relationship_type\: string, inference_confidence\: float, inference_source\: string, inference_review_state\: string\}\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 2
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Offset ''needs_refresh'' on array\{needs_refresh\: bool, primary_category\: string\|null, trigger_count\: int, categories\: list\<string\>\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Offset ''schema'' does not exist on array\{errors\: list\<string\>, warnings\: list\<string\>, refresh\: list\<array\<string, mixed\>\>, refresh_summary\: array\{needs_refresh\: bool, primary_category\: string\|null, trigger_count\: int, categories\: list\<string\>\}\}\.$#'
-			identifier: offsetAccess.notFound
-			count: 5
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Offset ''validation'' does not exist on array\{errors\: list\<string\>, warnings\: list\<string\>, inference\?\: list\<array\<string, mixed\>\>\}\|array\{errors\: list\<string\>, warnings\: list\<string\>, schema\: non\-empty\-list\<array\<string, mixed\>\>, schema_summary\: array\{error_count\: int, warning_count\: int, codes\: list\<string\>\}\}\.$#'
-			identifier: offsetAccess.notFound
-			count: 1
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Offset ''validation'' does not exist on array\{errors\: list\<string\>, warnings\: list\<string\>, refresh\: list\<array\<string, mixed\>\>, refresh_summary\: array\{needs_refresh\: bool, primary_category\: string\|null, trigger_count\: int, categories\: list\<string\>\}\}\.$#'
-			identifier: offsetAccess.notFound
-			count: 3
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Parameter \#1 \$array \(list\<array\<string, mixed\>\>\) of array_values is already a list, call has no effect\.$#'
-			identifier: arrayValues.list
-			count: 1
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Parameter \#1 \$array \(list\<array\{source_uri\: string, ingested_at\: string, parser_version\: string\|null\}\>\) of array_values is already a list, call has no effect\.$#'
-			identifier: arrayValues.list
-			count: 1
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Result of && is always false\.$#'
-			identifier: booleanAnd.alwaysFalse
-			count: 1
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-			identifier: ternary.shortNotAllowed
-			count: 2
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Strict comparison using \=\=\= between non\-empty\-list\<array\<string, mixed\>\> and array\{\} will always evaluate to false\.$#'
-			identifier: identical.alwaysFalse
-			count: 1
-			path: packages/cli/src/Command/IngestRunCommand.php
-
-		-
-			message: '#^Casting to float something that''s already float\.$#'
-			identifier: cast.useless
-			count: 1
-			path: packages/cli/src/Command/SemanticRefreshCommand.php
-
-		-
-			message: '#^Casting to int something that''s already int\.$#'
-			identifier: cast.useless
-			count: 4
-			path: packages/cli/src/Command/SemanticRefreshCommand.php
-
-		-
-			message: '#^Offset ''batch_processed'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/SemanticRefreshCommand.php
-
-		-
-			message: '#^Offset ''duration_ms'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/SemanticRefreshCommand.php
-
-		-
-			message: '#^Offset ''missing_total'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/SemanticRefreshCommand.php
-
-		-
-			message: '#^Offset ''removed_total'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/SemanticRefreshCommand.php
-
-		-
-			message: '#^Offset ''status'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 2
-			path: packages/cli/src/Command/SemanticRefreshCommand.php
-
-		-
-			message: '#^Offset ''stored_total'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/SemanticRefreshCommand.php
-
-		-
 			message: '#^Casting to string something that''s already string\.$#'
 			identifier: cast.useless
 			count: 2
@@ -641,6 +485,150 @@ parameters:
 			identifier: identical.alwaysFalse
 			count: 1
 			path: packages/cli/src/CommandDefinition.php
+
+		-
+			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: packages/cli/src/Handler/IngestDashboardHandler.php
+
+		-
+			message: '#^Casting to int something that''s already int\.$#'
+			identifier: cast.useless
+			count: 1
+			path: packages/cli/src/Handler/IngestDashboardHandler.php
+
+		-
+			message: '#^Casting to int something that''s already int\<0, max\>\.$#'
+			identifier: cast.useless
+			count: 3
+			path: packages/cli/src/Handler/IngestDashboardHandler.php
+
+		-
+			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
+			identifier: ternary.shortNotAllowed
+			count: 1
+			path: packages/cli/src/Handler/IngestDashboardHandler.php
+
+		-
+			message: '#^Casting to bool something that''s already bool\.$#'
+			identifier: cast.useless
+			count: 1
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Casting to string something that''s already string\.$#'
+			identifier: cast.useless
+			count: 12
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Offset ''inference'' does not exist on array\{errors\: list\<string\>, warnings\: list\<string\>, refresh\: list\<array\<string, mixed\>\>, refresh_summary\: array\{needs_refresh\: bool, primary_category\: string\|null, trigger_count\: int, categories\: list\<string\>\}\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Offset ''key'' on array\{key\: string, relationship_type\: string, from\: string, to\: string, inference_confidence\: float\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Offset ''location'' on array\{code\: ''inference…'', category\: ''inference'', message\: non\-falsy\-string, location\: non\-falsy\-string, item_index\: null, context\: array\{from\: string, to\: string, relationship_type\: string, inference_confidence\: float, inference_source\: string, inference_review_state\: string\}\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 2
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Offset ''needs_refresh'' on array\{needs_refresh\: bool, primary_category\: string\|null, trigger_count\: int, categories\: list\<string\>\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Offset ''schema'' does not exist on array\{errors\: list\<string\>, warnings\: list\<string\>, refresh\: list\<array\<string, mixed\>\>, refresh_summary\: array\{needs_refresh\: bool, primary_category\: string\|null, trigger_count\: int, categories\: list\<string\>\}\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 5
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Offset ''validation'' does not exist on array\{errors\: list\<string\>, warnings\: list\<string\>, inference\?\: list\<array\<string, mixed\>\>\}\|array\{errors\: list\<string\>, warnings\: list\<string\>, schema\: non\-empty\-list\<array\<string, mixed\>\>, schema_summary\: array\{error_count\: int, warning_count\: int, codes\: list\<string\>\}\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 1
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Offset ''validation'' does not exist on array\{errors\: list\<string\>, warnings\: list\<string\>, refresh\: list\<array\<string, mixed\>\>, refresh_summary\: array\{needs_refresh\: bool, primary_category\: string\|null, trigger_count\: int, categories\: list\<string\>\}\}\.$#'
+			identifier: offsetAccess.notFound
+			count: 3
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<array\<string, mixed\>\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Parameter \#1 \$array \(list\<array\{source_uri\: string, ingested_at\: string, parser_version\: string\|null\}\>\) of array_values is already a list, call has no effect\.$#'
+			identifier: arrayValues.list
+			count: 1
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Result of && is always false\.$#'
+			identifier: booleanAnd.alwaysFalse
+			count: 1
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
+			identifier: ternary.shortNotAllowed
+			count: 2
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between non\-empty\-list\<array\<string, mixed\>\> and array\{\} will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: packages/cli/src/Handler/IngestRunHandler.php
+
+		-
+			message: '#^Offset ''duration_ms'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: packages/cli/src/Handler/SemanticRefreshHandler.php
+
+		-
+			message: '#^Offset ''missing_total'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: packages/cli/src/Handler/SemanticRefreshHandler.php
+
+		-
+			message: '#^Offset ''processed_total'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? does not exist\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: packages/cli/src/Handler/SemanticRefreshHandler.php
+
+		-
+			message: '#^Offset ''removed_total'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: packages/cli/src/Handler/SemanticRefreshHandler.php
+
+		-
+			message: '#^Offset ''status'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 3
+			path: packages/cli/src/Handler/SemanticRefreshHandler.php
+
+		-
+			message: '#^Offset ''stored_total'' on array\{contract_version\: string, contract_surface\: string, status\: string, requested_entity_types\: list\<string\>, batch_size\: int, batch_processed\: int, stored_total\: int, removed_total\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: packages/cli/src/Handler/SemanticRefreshHandler.php
 
 		-
 			message: '#^Call to function is_array\(\) with array\<string, mixed\> will always evaluate to true\.$#'

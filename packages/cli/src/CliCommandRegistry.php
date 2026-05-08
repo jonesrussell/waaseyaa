@@ -6,7 +6,6 @@ namespace Waaseyaa\CLI;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Access\PermissionHandler;
-use Waaseyaa\AI\Vector\SemanticIndexWarmer;
 use Waaseyaa\Cache\CacheFactory;
 use Waaseyaa\CLI\Command\AboutCommand;
 use Waaseyaa\CLI\Command\AdminBuildCommand;
@@ -23,14 +22,10 @@ use Waaseyaa\CLI\Command\ExtensionScaffoldCommand;
 use Waaseyaa\CLI\Command\FixtureGenerateCommand;
 use Waaseyaa\CLI\Command\FixturePackRefreshCommand;
 use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
-use Waaseyaa\CLI\Command\IngestDashboardCommand;
-use Waaseyaa\CLI\Command\IngestRunCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
 use Waaseyaa\CLI\Command\RelationshipTypeScaffoldCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
 use Waaseyaa\CLI\Command\ScaffoldAuthCommand;
-use Waaseyaa\CLI\Command\SemanticRefreshCommand;
-use Waaseyaa\CLI\Command\SemanticWarmCommand;
 use Waaseyaa\CLI\Command\ServeCommand;
 use Waaseyaa\CLI\Command\SyncRulesCommand;
 use Waaseyaa\CLI\Command\WaaseyaaVersionCommand;
@@ -64,7 +59,6 @@ final class CliCommandRegistry
         WaaseyaaRouter $router,
         PermissionHandler $permissionHandler,
         EntityTypeIdNormalizer $typeIdNormalizer,
-        ?SemanticIndexWarmer $semanticWarmer,
         \PDO $pdo,
     ): array {
         return [
@@ -90,15 +84,9 @@ final class CliCommandRegistry
             new AuditLogCommand($lifecycleManager, $entityAuditLogger),
             new EventListCommand($dispatcher),
             new RouteListCommand($router),
-            ...($semanticWarmer !== null ? [
-                new SemanticWarmCommand($semanticWarmer),
-                new SemanticRefreshCommand($semanticWarmer),
-            ] : []),
             new FixtureScaffoldCommand(),
             new FixtureGenerateCommand(),
             new FixturePackRefreshCommand(),
-            new IngestDashboardCommand(),
-            new IngestRunCommand(),
             new BundleScaffoldCommand(),
             new RelationshipTypeScaffoldCommand(),
             new WorkflowScaffoldCommand(),
