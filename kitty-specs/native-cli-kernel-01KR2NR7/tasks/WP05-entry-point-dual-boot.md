@@ -13,6 +13,8 @@ subtasks:
 - T023
 - T024
 - T025
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "887676"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -143,3 +145,7 @@ No `use Symfony\Component\Console\…` imports remain in this file. The dual-boo
 ```bash
 spec-kitty agent action implement WP05 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T04:18:54Z – claude:sonnet:implementer:implementer – shell_pid=887676 – Started implementation via action command
