@@ -73,11 +73,11 @@
 | T060 | Port `ScheduleRunCommand` → `ScheduleRunHandler` + migrate test + snapshot pass | WP13 | [D] |
 | T061 | Port `Perf/PerformanceBaselineCommand` → `PerformanceBaselineHandler` + migrate test + snapshot pass | WP13 | [D] |
 | T062 | Port `Perf/PerformanceCompareCommand` → `PerformanceCompareHandler` + migrate test + snapshot pass | WP13 | [D] |
-| T063 | Port `EntityCreateCommand` → `EntityCreateHandler` + migrate test + snapshot pass | WP14 | [P] |
-| T064 | Port `EntityListCommand` → `EntityListHandler` + migrate test + snapshot pass | WP14 | [P] |
-| T065 | Port `EntityTypeListCommand` → `EntityTypeListHandler` + migrate test + snapshot pass | WP14 | [P] |
-| T066 | Port `TypeEnableCommand` → `TypeEnableHandler` + migrate test + snapshot pass | WP14 | [P] |
-| T067 | Port `TypeDisableCommand` → `TypeDisableHandler` + migrate test + snapshot pass + lifecycle test fix | WP14 | [P] |
+| T063 | Port `EntityCreateCommand` → `EntityCreateHandler` + migrate test + snapshot pass | WP14 | [D] |
+| T064 | Port `EntityListCommand` → `EntityListHandler` + migrate test + snapshot pass | WP14 | [D] |
+| T065 | Port `EntityTypeListCommand` → `EntityTypeListHandler` + migrate test + snapshot pass | WP14 | [D] |
+| T066 | Port `TypeEnableCommand` → `TypeEnableHandler` + migrate test + snapshot pass | WP14 | [D] |
+| T067 | Port `TypeDisableCommand` → `TypeDisableHandler` + migrate test + snapshot pass + lifecycle test fix | WP14 | [D] |
 | T068 | Port `UserCreateCommand` → `UserCreateHandler` + migrate test + snapshot pass | WP15 | [P] |
 | T069 | Port `UserRoleCommand` → `UserRoleHandler` + migrate test + snapshot pass | WP15 | [P] |
 | T070 | Port `PermissionListCommand` → `PermissionListHandler` + migrate test + snapshot pass | WP15 | [P] |
@@ -363,11 +363,11 @@
 ### WP14 — Port: Entity + Type lifecycle
 
 **Subtasks**:
-- [ ] T063 `EntityCreateCommand` → `EntityCreateHandler` (WP14)
-- [ ] T064 `EntityListCommand` → `EntityListHandler` (WP14)
-- [ ] T065 `EntityTypeListCommand` → `EntityTypeListHandler` (WP14)
-- [ ] T066 `TypeEnableCommand` → `TypeEnableHandler` (WP14)
-- [ ] T067 `TypeDisableCommand` → `TypeDisableHandler` + lifecycle test fix (WP14)
+- [x] T063 `EntityCreateCommand` → `EntityCreateHandler` (WP14)
+- [x] T064 `EntityListCommand` → `EntityListHandler` (WP14)
+- [x] T065 `EntityTypeListCommand` → `EntityTypeListHandler` (WP14)
+- [x] T066 `TypeEnableCommand` → `TypeEnableHandler` (WP14)
+- [x] T067 `TypeDisableCommand` → `TypeDisableHandler` + lifecycle test fix (WP14)
 
 **Estimated prompt**: ~340 lines. **Dependencies**: WP05.
 **Risk**: `tests/Unit/Command/TypeLifecycleCommandTest.php` exercises both Enable+Disable; migrate together.
