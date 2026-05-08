@@ -2,19 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
 
-#[AsCommand(
-    name: 'scaffold:auth',
-    description: 'Copy framework auth UI files into your app for customization',
-)]
-final class ScaffoldAuthCommand extends Command
+final class ScaffoldAuthHandler
 {
     /** @var array<string, string> source (relative to packages/admin/app/) => dest (relative to app/) */
     private const FILE_MAP = [
@@ -25,22 +17,12 @@ final class ScaffoldAuthCommand extends Command
         'assets/auth.css' => 'assets/auth.css',
     ];
 
-    public function __construct(private readonly string $projectRoot)
-    {
-        parent::__construct();
-    }
+    public function __construct(private readonly string $projectRoot) {}
 
-    protected function configure(): void
+    public function execute(CliIO $io): int
     {
-        $this
-            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Overwrite existing files')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Show what would be copied without writing');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $force = (bool) $input->getOption('force');
-        $dryRun = (bool) $input->getOption('dry-run');
+        $force = (bool) $io->option('force');
+        $dryRun = (bool) $io->option('dry-run');
 
         $sourceBase = $this->projectRoot . '/packages/admin/app';
         $destBase = $this->projectRoot . '/app';
@@ -54,18 +36,18 @@ final class ScaffoldAuthCommand extends Command
             $destPath = $destBase . '/' . $destRel;
 
             if (!file_exists($srcPath)) {
-                $output->writeln('<comment>MISSING source: ' . $srcRel . '</comment>');
+                $io->writeln('<comment>MISSING source: ' . $srcRel . '</comment>');
                 continue;
             }
 
             if (file_exists($destPath) && !$force) {
-                $output->writeln('<comment>SKIP ' . $destRel . ' (already exists, use --force to overwrite)</comment>');
+                $io->writeln('<comment>SKIP ' . $destRel . ' (already exists, use --force to overwrite)</comment>');
                 ++$skipped;
                 continue;
             }
 
             if ($dryRun) {
-                $output->writeln('COPY ' . $srcRel . ' → ' . $destRel);
+                $io->writeln('COPY ' . $srcRel . ' → ' . $destRel);
                 continue;
             }
 
@@ -75,26 +57,26 @@ final class ScaffoldAuthCommand extends Command
             }
 
             copy($srcPath, $destPath);
-            $checksums[$destRel] = md5_file($destPath);
+            $checksums[$destRel] = (string) md5_file($destPath);
             ++$copied;
-            $output->writeln('<info>COPY</info> ' . $destRel);
+            $io->writeln('<info>COPY</info> ' . $destRel);
         }
 
         if (!$dryRun && $checksums !== []) {
             $this->writeManifest($destBase, $checksums);
         }
 
-        $output->writeln('');
+        $io->writeln('');
         if ($dryRun) {
-            $output->writeln('<info>Dry run complete. No files written.</info>');
+            $io->writeln('<info>Dry run complete. No files written.</info>');
         } else {
-            $output->writeln(sprintf('<info>Done. %d copied, %d skipped.</info>', $copied, $skipped));
+            $io->writeln(sprintf('<info>Done. %d copied, %d skipped.</info>', $copied, $skipped));
             if ($copied > 0) {
-                $output->writeln('You now own these files. Framework updates will no longer flow to them.');
+                $io->writeln('You now own these files. Framework updates will no longer flow to them.');
             }
         }
 
-        return Command::SUCCESS;
+        return 0;
     }
 
     /** @param array<string, string> $newChecksums */

@@ -94,7 +94,8 @@
                 "Waaseyaa\\CLI\\Provider\\IngestSearchSemanticServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\TelescopeServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\UserPermissionServiceProvider",
-                "Waaseyaa\\CLI\\Provider\\ConfigCacheDbAuditServiceProvider"
+                "Waaseyaa\\CLI\\Provider\\ConfigCacheDbAuditServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\OtherScaffoldsServiceProvider"
             ]
         }
     },

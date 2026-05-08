@@ -2,74 +2,52 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
 
-#[AsCommand(
-    name: 'scaffold:extension',
-    description: 'Generate deterministic external extension SDK scaffold JSON',
-)]
-final class ExtensionScaffoldCommand extends Command
+final class ExtensionScaffoldHandler
 {
-    protected function configure(): void
+    public function execute(CliIO $io): int
     {
-        $this
-            ->addOption('id', null, InputOption::VALUE_REQUIRED, 'Plugin ID (machine name)')
-            ->addOption('label', null, InputOption::VALUE_REQUIRED, 'Plugin label')
-            ->addOption('package', null, InputOption::VALUE_REQUIRED, 'Composer package name (vendor/package)')
-            ->addOption('namespace', null, InputOption::VALUE_REQUIRED, 'Root PHP namespace (auto-derived from package when omitted)')
-            ->addOption('class', null, InputOption::VALUE_REQUIRED, 'Extension class name', 'KnowledgeExtension')
-            ->addOption('description', null, InputOption::VALUE_REQUIRED, 'Plugin description', 'External knowledge tooling extension')
-            ->addOption('workflow-tag', null, InputOption::VALUE_REQUIRED, 'Default workflow tag', 'external-extension')
-            ->addOption('relationship-type', null, InputOption::VALUE_REQUIRED, 'Default traversal relationship type', 'related')
-            ->addOption('discovery-hint', null, InputOption::VALUE_REQUIRED, 'Default discovery hint', 'external-discovery-hint');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $id = strtolower(trim((string) $input->getOption('id')));
-        $label = trim((string) $input->getOption('label'));
-        $packageRaw = trim((string) $input->getOption('package'));
-        $class = trim((string) $input->getOption('class'));
-        $description = trim((string) $input->getOption('description'));
-        $workflowTag = trim((string) $input->getOption('workflow-tag'));
-        $relationshipType = strtolower(trim((string) $input->getOption('relationship-type')));
-        $discoveryHint = trim((string) $input->getOption('discovery-hint'));
+        $id = strtolower(trim((string) ($io->option('id') ?? '')));
+        $label = trim((string) ($io->option('label') ?? ''));
+        $packageRaw = trim((string) ($io->option('package') ?? ''));
+        $class = trim((string) ($io->option('class') ?? 'KnowledgeExtension'));
+        $description = trim((string) ($io->option('description') ?? 'External knowledge tooling extension'));
+        $workflowTag = trim((string) ($io->option('workflow-tag') ?? 'external-extension'));
+        $relationshipType = strtolower(trim((string) ($io->option('relationship-type') ?? 'related')));
+        $discoveryHint = trim((string) ($io->option('discovery-hint') ?? 'external-discovery-hint'));
 
         if ($id === '' || $label === '' || $packageRaw === '' || $class === '' || $description === '') {
-            $output->writeln('<error>--id, --label, --package, --class, and --description are required.</error>');
-            return Command::INVALID;
+            $io->error('--id, --label, --package, --class, and --description are required.');
+            return 2;
         }
         if (!$this->isValidPluginId($id)) {
-            $output->writeln('<error>--id must match: [a-z][a-z0-9_]*.</error>');
-            return Command::INVALID;
+            $io->error('--id must match: [a-z][a-z0-9_]*.');
+            return 2;
         }
         if (!$this->isValidPackageName($packageRaw)) {
-            $output->writeln('<error>--package must match composer format: vendor/package (lowercase).</error>');
-            return Command::INVALID;
+            $io->error('--package must match composer format: vendor/package (lowercase).');
+            return 2;
         }
         if (!$this->isValidClassName($class)) {
-            $output->writeln('<error>--class must be a valid PascalCase PHP class name.</error>');
-            return Command::INVALID;
+            $io->error('--class must be a valid PascalCase PHP class name.');
+            return 2;
         }
         if ($workflowTag === '' || $relationshipType === '' || $discoveryHint === '') {
-            $output->writeln('<error>--workflow-tag, --relationship-type, and --discovery-hint are required.</error>');
-            return Command::INVALID;
+            $io->error('--workflow-tag, --relationship-type, and --discovery-hint are required.');
+            return 2;
         }
 
         $package = strtolower($packageRaw);
-        $namespace = trim((string) $input->getOption('namespace'));
+        $namespace = trim((string) ($io->option('namespace') ?? ''));
         if ($namespace === '') {
             $namespace = $this->deriveNamespaceFromPackage($package);
         }
         if (!$this->isValidNamespace($namespace)) {
-            $output->writeln('<error>--namespace must be a valid PHP namespace.</error>');
-            return Command::INVALID;
+            $io->error('--namespace must be a valid PHP namespace.');
+            return 2;
         }
 
         $contracts = [
@@ -116,9 +94,9 @@ final class ExtensionScaffoldCommand extends Command
             ],
         ];
 
-        $output->writeln(json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
+        $io->writeln(json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR));
 
-        return Command::SUCCESS;
+        return 0;
     }
 
     private function isValidPluginId(string $id): bool
@@ -143,10 +121,11 @@ final class ExtensionScaffoldCommand extends Command
 
     private function deriveNamespaceFromPackage(string $package): string
     {
-        $segments = preg_split('/[\/._-]+/', $package) ?: [];
+        $segments = preg_split('/[\/._-]+/', $package);
+        $segments = $segments !== false ? $segments : [];
         $parts = [];
         foreach ($segments as $segment) {
-            $normalized = trim((string) $segment);
+            $normalized = trim($segment);
             if ($normalized === '') {
                 continue;
             }
@@ -156,28 +135,9 @@ final class ExtensionScaffoldCommand extends Command
         return implode('\\', $parts);
     }
 
-    private function buildComposerTemplate(string $package, string $namespace): string
-    {
-        $payload = [
-            'name' => $package,
-            'description' => 'External Waaseyaa knowledge tooling extension module',
-            'type' => 'library',
-            'require' => [
-                'php' => '^8.3',
-                'waaseyaa/plugin' => '@dev',
-            ],
-            'autoload' => [
-                'psr-4' => [
-                    $namespace . '\\' => 'src/',
-                ],
-            ],
-            'minimum-stability' => 'dev',
-            'prefer-stable' => true,
-        ];
-
-        return json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
-    }
-
+    /**
+     * @param array{interface: string, runner: string, surfaces: list<string>} $contracts
+     */
     private function buildReadmeTemplate(string $package, string $pluginId, array $contracts): string
     {
         return implode("\n", [
@@ -201,6 +161,28 @@ final class ExtensionScaffoldCommand extends Command
             '2. Publish package and wire it into app bootstrap.',
             '3. Verify via MCP and workflow/traversal diagnostics.',
         ]);
+    }
+
+    private function buildComposerTemplate(string $package, string $namespace): string
+    {
+        $payload = [
+            'name' => $package,
+            'description' => 'External Waaseyaa knowledge tooling extension module',
+            'type' => 'library',
+            'require' => [
+                'php' => '^8.3',
+                'waaseyaa/plugin' => '@dev',
+            ],
+            'autoload' => [
+                'psr-4' => [
+                    $namespace . '\\' => 'src/',
+                ],
+            ],
+            'minimum-stability' => 'dev',
+            'prefer-stable' => true,
+        ];
+
+        return json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
     }
 
     private function buildClassTemplate(
@@ -255,7 +237,6 @@ final class ExtensionScaffoldCommand extends Command
             '        return $context;',
             '    }',
             '}',
-            '',
         ]);
     }
 }

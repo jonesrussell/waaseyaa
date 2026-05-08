@@ -12,15 +12,11 @@ use Waaseyaa\CLI\Command\AdminBuildCommand;
 use Waaseyaa\CLI\Command\AdminDevCommand;
 use Waaseyaa\CLI\Command\DebugContextCommand;
 use Waaseyaa\CLI\Command\EventListCommand;
-use Waaseyaa\CLI\Command\ExtensionScaffoldCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\RelationshipTypeScaffoldCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
-use Waaseyaa\CLI\Command\ScaffoldAuthCommand;
 use Waaseyaa\CLI\Command\ServeCommand;
 use Waaseyaa\CLI\Command\SyncRulesCommand;
 use Waaseyaa\CLI\Command\WaaseyaaVersionCommand;
-use Waaseyaa\CLI\Command\WorkflowScaffoldCommand;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
@@ -55,7 +51,6 @@ final class CliCommandRegistry
         return [
             new InstallCommand($entityTypeManager, $configManager),
             new DebugContextCommand(),
-            new ScaffoldAuthCommand($projectRoot),
             new ServeCommand($projectRoot),
             new AdminDevCommand($projectRoot),
             new AdminBuildCommand($projectRoot),
@@ -70,9 +65,6 @@ final class CliCommandRegistry
             ]),
             new EventListCommand($dispatcher),
             new RouteListCommand($router),
-            new RelationshipTypeScaffoldCommand(),
-            new WorkflowScaffoldCommand(),
-            new ExtensionScaffoldCommand(),
             new SyncRulesCommand(
                 $projectRoot . '/vendor/waaseyaa/foundation/.claude/rules',
                 $projectRoot . '/.claude/rules',
