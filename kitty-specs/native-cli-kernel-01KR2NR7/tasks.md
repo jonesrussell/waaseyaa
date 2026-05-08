@@ -121,11 +121,11 @@
 | T108 | Update `docs/specs/operator-diagnostics.md` to reference `CliKernel`/`CommandDefinition` instead of Symfony Console | WP24 | [P] |
 | T109 | Extend orchestration table in `CLAUDE.md` (root and `packages/cli/CLAUDE.md` if present) with `cli-kernel.md` mapping | WP24 | [P] |
 | T110 | Run `tools/drift-detector.sh` and resolve any flagged staleness | WP24 | — |
-| T111 | Re-run perf harness post-cut against `list` and `health:check`; record numbers in `plan.md` § Performance Baseline | WP25 | — |
-| T112 | Assert NFR-001 (≤ 110% baseline wall-time) and NFR-002 (≤ +4 MiB peak memory); fail WP if not met | WP25 | — |
-| T113 | Run all snapshot integration tests; assert byte-equality vs WP01-captured fixtures for every public command | WP25 | — |
-| T114 | Run gate stack: `composer cs-check`, `composer phpstan`, `bin/check-package-layers`, `bin/check-composer-policy`, `tools/drift-detector.sh`, full `phpunit` | WP25 | — |
-| T115 | Delete the WP01 perf-harness script (transient artifact); confirm `kitty-specs/.../scripts/` is empty | WP25 | — |
+| T111 | Re-run perf harness post-cut against `list` and `health:check`; record numbers in `plan.md` § Performance Baseline | WP25 | — | [D] |
+| T112 | Assert NFR-001 (≤ 110% baseline wall-time) and NFR-002 (≤ +4 MiB peak memory); fail WP if not met | WP25 | — | [D] |
+| T113 | Run all snapshot integration tests; assert byte-equality vs WP01-captured fixtures for every public command | WP25 | — | [D] |
+| T114 | Run gate stack: `composer cs-check`, `composer phpstan`, `bin/check-package-layers`, `bin/check-composer-policy`, `tools/drift-detector.sh`, full `phpunit` | WP25 | — | [D] |
+| T115 | Delete the WP01 perf-harness script (transient artifact); confirm `kitty-specs/.../scripts/` is empty | WP25 | — | [D] |
 
 ---
 
@@ -505,11 +505,11 @@
 **Goal**: Prove the cut delivered. Re-run the WP01 perf harness, assert NFR thresholds, run all snapshot tests, run the gate stack, delete transient artefacts.
 
 **Subtasks**:
-- [ ] T111 Re-run perf harness post-cut; record numbers in plan.md (WP25)
-- [ ] T112 Assert NFR-001 + NFR-002 (WP25)
-- [ ] T113 Run all snapshot integration tests; assert byte-equality (WP25)
-- [ ] T114 Run gate stack (`cs-check`, `phpstan`, layer + composer + drift, full phpunit) (WP25)
-- [ ] T115 Delete WP01 perf-harness script (WP25)
+- [x] T111 Re-run perf harness post-cut; record numbers in plan.md (WP25)
+- [x] T112 Assert NFR-001 + NFR-002 (WP25)
+- [x] T113 Run all snapshot integration tests; assert byte-equality (WP25)
+- [x] T114 Run gate stack (`cs-check`, `phpstan`, layer + composer + drift, full phpunit) (WP25)
+- [x] T115 Delete WP01 perf-harness script (WP25)
 
 **Estimated prompt**: ~280 lines. **Dependencies**: WP24.
 
