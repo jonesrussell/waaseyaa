@@ -18,6 +18,8 @@ subtasks:
 - T009
 - T010
 - T011
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "875782"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -174,3 +176,7 @@ Land the parser, type definitions, and registry that everything else builds on. 
 ```bash
 spec-kitty agent action implement WP02 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T03:24:28Z – claude:sonnet:implementer:implementer – shell_pid=875782 – Started implementation via action command
