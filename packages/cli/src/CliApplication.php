@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\CLI;
 
 use Psr\Container\ContainerInterface;
+use Waaseyaa\CLI\Kernel\MigrateHandlerContainerDecorator;
 use Waaseyaa\CLI\Provider\CliKernelServiceProvider;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
@@ -85,7 +86,10 @@ final class CliApplication
             try {
                 $kernelBoot->bootForCli();
                 $providers = $kernelBoot->getProviders();
-                $container = $kernelBoot->buildHandlerContainer();
+                $container = new MigrateHandlerContainerDecorator(
+                    $kernelBoot->buildHandlerContainer(),
+                    $kernelBoot,
+                );
             } catch (\Throwable $e) {
                 fwrite(STDERR, sprintf("[Waaseyaa] Boot failed: %s\n", $e->getMessage()));
                 $providers = [];
