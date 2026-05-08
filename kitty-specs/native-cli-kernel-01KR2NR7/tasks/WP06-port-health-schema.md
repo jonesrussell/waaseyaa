@@ -16,8 +16,8 @@ subtasks:
 - T028
 - T029
 - T030
-agent: "claude:opus-4-7:reviewer:reviewer"
-shell_pid: "901427"
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "915362"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -134,3 +134,4 @@ spec-kitty agent action implement WP06 --agent <name>
 - 2026-05-08T05:10:38Z – claude:sonnet:implementer:implementer – shell_pid=897575 – Ready for review: 4 handlers ported, HealthSchemaServiceProvider wired, all 4 gates green (cs-check, phpstan, 7455 tests pass, bin shows health:check/health:report/schema:check/schema:list)
 - 2026-05-08T05:11:06Z – claude:opus-4-7:reviewer:reviewer – shell_pid=901427 – Started review via action command
 - 2026-05-08T05:14:56Z – claude:opus-4-7:reviewer:reviewer – shell_pid=901427 – Moved to planned
+- 2026-05-08T11:20:29Z – claude:sonnet:implementer:implementer – shell_pid=915362 – Started implementation via action command
