@@ -13,8 +13,8 @@ subtasks:
 - T023
 - T024
 - T025
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "890379"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "896443"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -154,3 +154,4 @@ spec-kitty agent action implement WP05 --agent <name>
 - 2026-05-08T04:31:52Z – claude:opus-4-7:reviewer:reviewer – shell_pid=889589 – Moved to planned
 - 2026-05-08T04:32:26Z – claude:sonnet:implementer:implementer – shell_pid=890379 – Started implementation via action command
 - 2026-05-08T04:53:06Z – claude:sonnet:implementer:implementer – shell_pid=890379 – Cycle 2 fix: bridge wired, casing fixed, contract restored
+- 2026-05-08T04:53:45Z – claude:opus-4-7:reviewer:reviewer – shell_pid=896443 – Started review via action command
