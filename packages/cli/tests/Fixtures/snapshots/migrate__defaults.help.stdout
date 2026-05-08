@@ -5,12 +5,12 @@ Usage:
   migrate:defaults [options]
 
 Options:
-      --tenant=TENANT   Tenant IDs to migrate (repeatable) (multiple values allowed)
-      --enable=ENABLE   Type ID to enable for all tenants (e.g. note) [default: ""]
-      --actor=ACTOR     Actor ID for audit log entries [default: "cli"]
-  -y, --yes             Skip confirmation prompts
+      --actor=ACTOR     Actor ID for audit log entries [default: cli]
       --dry-run         Report actions without making changes
+      --enable=ENABLE   Type ID to enable for all tenants (e.g. note)
       --rollback        Rollback previous migrate:defaults actions
+      --tenant=TENANT   Tenant IDs to migrate (repeatable)
+  -y, --yes             Skip confirmation prompts
   -h, --help            Display help for the given command. When no command is given display help for the list command
       --silent          Do not output any message
   -q, --quiet           Only errors are displayed. All other output is suppressed

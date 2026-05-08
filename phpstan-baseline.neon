@@ -523,12 +523,6 @@ parameters:
 			path: packages/cli/src/Command/Make/MakeTestCommand.php
 
 		-
-			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
-			identifier: booleanNot.exprNotBoolean
-			count: 2
-			path: packages/cli/src/Command/MigrateDefaultsCommand.php
-
-		-
 			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
 			identifier: ternary.shortNotAllowed
 			count: 1

@@ -26,9 +26,13 @@ use Waaseyaa\CLI\Command\ConfigImportCommand;
 use Waaseyaa\CLI\Command\EntityCreateCommand;
 use Waaseyaa\CLI\Command\EntityListCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
-use Waaseyaa\CLI\Command\MigrateDefaultsCommand;
 use Waaseyaa\CLI\Command\TypeDisableCommand;
 use Waaseyaa\CLI\Command\TypeEnableCommand;
+use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\MigrateDefaultsHandler;
+use Waaseyaa\CLI\OptionDefinition;
+use Waaseyaa\CLI\OptionMode;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\MemoryStorage;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
@@ -500,7 +504,32 @@ final class EndToEndSmokeTest extends TestCase
         $application = new \Symfony\Component\Console\Application();
         $application->add(new TypeDisableCommand($entityTypeManager, $lifecycleManager));
         $application->add(new TypeEnableCommand($entityTypeManager, $lifecycleManager));
-        $application->add(new MigrateDefaultsCommand($entityTypeManager, $lifecycleManager, $auditLogger, $tempDir));
+
+        // Build a CliTester for MigrateDefaultsHandler (native CLI pattern).
+        $migrateDefaultsHandler = new MigrateDefaultsHandler($entityTypeManager, $lifecycleManager, $auditLogger, $tempDir);
+        $migrateDefaultsDefinition = new CommandDefinition(
+            name: 'migrate:defaults',
+            description: 'Migrate default content type enablement for tenants',
+            options: [
+                new OptionDefinition(name: 'tenant', mode: OptionMode::Array_, description: 'Tenant IDs to migrate (repeatable)'),
+                new OptionDefinition(name: 'enable', mode: OptionMode::Required, description: 'Type ID to enable for all tenants (e.g. note)', default: ''),
+                new OptionDefinition(name: 'actor', mode: OptionMode::Required, description: 'Actor ID for audit log entries', default: 'cli'),
+                new OptionDefinition(name: 'yes', shortcut: 'y', mode: OptionMode::None, description: 'Skip confirmation prompts'),
+                new OptionDefinition(name: 'dry-run', mode: OptionMode::None, description: 'Report actions without making changes'),
+                new OptionDefinition(name: 'rollback', mode: OptionMode::None, description: 'Rollback previous migrate:defaults actions'),
+            ],
+            handler: \Closure::fromCallable([$migrateDefaultsHandler, 'execute']),
+        );
+        $container = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed
+            {
+                throw new \RuntimeException("Not found: $id");
+            }
+            public function has(string $id): bool
+            {
+                return false;
+            }
+        };
 
         // --- Step 1: Disable all types for tenant "acme" ---
 
@@ -518,22 +547,21 @@ final class EndToEndSmokeTest extends TestCase
 
         // --- Step 2: migrate:defaults detects and fixes ---
 
-        $migrateCmd = $application->find('migrate:defaults');
-        $migrateTester = new CommandTester($migrateCmd);
-        $migrateTester->execute(['--tenant' => ['acme'], '--enable' => 'note', '--yes' => true]);
+        $migrateTester = CliTester::for($migrateDefaultsDefinition, $container);
+        $migrateTester->execute(['--tenant', 'acme', '--enable', 'note', '--yes']);
 
-        $this->assertSame(Command::SUCCESS, $migrateTester->getStatusCode());
+        $this->assertSame(0, $migrateTester->getExitCode());
         $this->assertFalse($lifecycleManager->isDisabled('note', 'acme'));
-        $this->assertStringContainsString('Enabled "note" for tenant "acme"', $migrateTester->getDisplay());
+        $this->assertStringContainsString('Enabled "note" for tenant "acme"', $migrateTester->getStdout());
 
         // --- Step 3: Rollback reverses ---
 
-        $rollbackTester = new CommandTester($migrateCmd);
-        $rollbackTester->execute(['--tenant' => ['acme'], '--rollback' => true, '--yes' => true]);
+        $rollbackTester = CliTester::for($migrateDefaultsDefinition, $container);
+        $rollbackTester->execute(['--tenant', 'acme', '--rollback', '--yes']);
 
-        $this->assertSame(Command::SUCCESS, $rollbackTester->getStatusCode());
+        $this->assertSame(0, $rollbackTester->getExitCode());
         $this->assertTrue($lifecycleManager->isDisabled('note', 'acme'));
-        $this->assertStringContainsString('Disabled "note" for tenant "acme"', $rollbackTester->getDisplay());
+        $this->assertStringContainsString('Disabled "note" for tenant "acme"', $rollbackTester->getStdout());
 
         // --- Step 4: Audit log contains both 'disabled' and 'enabled' actions for note/acme ---
 

@@ -39,10 +39,6 @@ use Waaseyaa\CLI\Command\Make\MakePublicCommand;
 use Waaseyaa\CLI\Command\Make\MakeTestCommand;
 use Waaseyaa\CLI\Command\MakeEntityTypeCommand;
 use Waaseyaa\CLI\Command\MakePluginCommand;
-use Waaseyaa\CLI\Command\MigrateCommand;
-use Waaseyaa\CLI\Command\MigrateDefaultsCommand;
-use Waaseyaa\CLI\Command\MigrateRollbackCommand;
-use Waaseyaa\CLI\Command\MigrateStatusCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeClearCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeCommand;
 use Waaseyaa\CLI\Command\Optimize\OptimizeConfigCommand;
@@ -75,7 +71,6 @@ use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
-use Waaseyaa\Foundation\Migration\Migrator;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 final class CliCommandRegistry
@@ -114,13 +109,6 @@ final class CliCommandRegistry
             new UserCreateCommand($entityTypeManager),
             new UserRoleCommand($entityTypeManager),
             new MakePluginCommand(),
-            new MigrateDefaultsCommand(
-                $entityTypeManager,
-                $lifecycleManager,
-                $entityAuditLogger,
-                $projectRoot,
-                $typeIdNormalizer,
-            ),
             new MakeEntityTypeCommand(),
             new MakeEntityCommand(),
             new MakeJobCommand(),
@@ -183,30 +171,4 @@ final class CliCommandRegistry
         ];
     }
 
-    /**
-     * @param \Closure(): array<string, array<string, \Waaseyaa\Foundation\Migration\Migration>> $migrationsProvider
-     * @param \Closure(): list<\Waaseyaa\Foundation\Schema\Migration\MigrationInterfaceV2>|null  $v2MigrationsProvider
-     * @return list<\Symfony\Component\Console\Command\Command>
-     */
-    public function migrationCommands(
-        Migrator $migrator,
-        \Closure $migrationsProvider,
-        ?\Closure $v2MigrationsProvider = null,
-        ?\Waaseyaa\Foundation\Migration\MigrationRepository $migrationRepository = null,
-        ?\Waaseyaa\Foundation\Schema\Compiler\Sqlite\SqliteCompiler $compiler = null,
-        bool $isProduction = true,
-    ): array {
-        return [
-            new MigrateCommand(
-                $migrator,
-                $migrationsProvider,
-                $v2MigrationsProvider,
-                $migrationRepository,
-                $compiler,
-                $isProduction,
-            ),
-            new MigrateRollbackCommand($migrator, $migrationsProvider),
-            new MigrateStatusCommand($migrator, $migrationsProvider),
-        ];
-    }
 }

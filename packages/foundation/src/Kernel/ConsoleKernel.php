@@ -128,18 +128,6 @@ final class ConsoleKernel extends AbstractKernel
             pdo: $pdo,
         ));
 
-        $migrationsProvider = fn() => $this->migrationLoader->loadAll();
-        $v2MigrationsProvider = fn(): array => $this->migrationLoader->loadAllV2();
-        $compiler = \Waaseyaa\Foundation\Schema\Compiler\Sqlite\SqliteCompiler::forVersion('3.40.0');
-        $app->registerCommands($commandRegistry->migrationCommands(
-            $this->migrator,
-            $migrationsProvider,
-            $v2MigrationsProvider,
-            $this->migrationRepository,
-            $compiler,
-            ! $this->isDevelopmentMode(),
-        ));
-
         foreach ($this->providers as $provider) {
             if (!$provider instanceof HasCommandsInterface) {
                 continue;
@@ -224,18 +212,6 @@ final class ConsoleKernel extends AbstractKernel
             semanticWarmer: $semanticWarmer,
             pdo: $pdo,
         );
-
-        $migrationsProvider   = fn() => $this->migrationLoader->loadAll();
-        $v2MigrationsProvider = fn(): array => $this->migrationLoader->loadAllV2();
-        $compiler = \Waaseyaa\Foundation\Schema\Compiler\Sqlite\SqliteCompiler::forVersion('3.40.0');
-        $commands = array_merge($commands, $commandRegistry->migrationCommands(
-            $this->migrator,
-            $migrationsProvider,
-            $v2MigrationsProvider,
-            $this->migrationRepository,
-            $compiler,
-            !$this->isDevelopmentMode(),
-        ));
 
         foreach ($this->providers as $provider) {
             if (!$provider instanceof HasCommandsInterface) {
