@@ -91,10 +91,10 @@
 | T078 | Port `CacheClearCommand` → `CacheClearHandler` + migrate test + snapshot pass | WP17 | [D] |
 | T079 | Port `DbInitCommand` → `DbInitHandler` + migrate test + snapshot pass | WP17 | [D] |
 | T080 | Port `AuditLogCommand` → `AuditLogHandler` + migrate test + snapshot pass | WP17 | [D] |
-| T081 | Port `BundleScaffoldCommand` → `BundleScaffoldHandler` + migrate test + snapshot pass | WP18 | [P] |
-| T082 | Port `FixtureScaffoldCommand` → `FixtureScaffoldHandler` + migrate test + snapshot pass | WP18 | [P] |
-| T083 | Port `FixtureGenerateCommand` → `FixtureGenerateHandler` + migrate test + snapshot pass | WP18 | [P] |
-| T084 | Port `FixturePackRefreshCommand` → `FixturePackRefreshHandler` + migrate test + snapshot pass | WP18 | [P] |
+| T081 | Port `BundleScaffoldCommand` → `BundleScaffoldHandler` + migrate test + snapshot pass | WP18 | [D] |
+| T082 | Port `FixtureScaffoldCommand` → `FixtureScaffoldHandler` + migrate test + snapshot pass | WP18 | [D] |
+| T083 | Port `FixtureGenerateCommand` → `FixtureGenerateHandler` + migrate test + snapshot pass | WP18 | [D] |
+| T084 | Port `FixturePackRefreshCommand` → `FixturePackRefreshHandler` + migrate test + snapshot pass | WP18 | [D] |
 | T085 | Port `RelationshipTypeScaffoldCommand` → `RelationshipTypeScaffoldHandler` + migrate test + snapshot pass | WP19 | [P] |
 | T086 | Port `WorkflowScaffoldCommand` → `WorkflowScaffoldHandler` + migrate test + snapshot pass | WP19 | [P] |
 | T087 | Port `ExtensionScaffoldCommand` → `ExtensionScaffoldHandler` + migrate test + snapshot pass | WP19 | [P] |
@@ -415,10 +415,10 @@
 ### WP18 — Port: Bundle + Fixture scaffolds
 
 **Subtasks**:
-- [ ] T081 `BundleScaffoldCommand` → `BundleScaffoldHandler` (WP18)
-- [ ] T082 `FixtureScaffoldCommand` → `FixtureScaffoldHandler` (WP18)
-- [ ] T083 `FixtureGenerateCommand` → `FixtureGenerateHandler` (WP18)
-- [ ] T084 `FixturePackRefreshCommand` → `FixturePackRefreshHandler` (WP18)
+- [x] T081 `BundleScaffoldCommand` → `BundleScaffoldHandler` (WP18)
+- [x] T082 `FixtureScaffoldCommand` → `FixtureScaffoldHandler` (WP18)
+- [x] T083 `FixtureGenerateCommand` → `FixtureGenerateHandler` (WP18)
+- [x] T084 `FixturePackRefreshCommand` → `FixturePackRefreshHandler` (WP18)
 
 **Estimated prompt**: ~280 lines. **Dependencies**: WP05.
 
