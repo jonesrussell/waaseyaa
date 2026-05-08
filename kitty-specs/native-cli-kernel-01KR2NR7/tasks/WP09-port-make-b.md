@@ -16,8 +16,8 @@ subtasks:
 - T044
 - T045
 - T046
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "934354"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "938063"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -90,3 +90,4 @@ spec-kitty agent action implement WP09 --agent <name>
 
 - 2026-05-08T12:30:05Z – claude:sonnet:implementer:implementer – shell_pid=934354 – Started implementation via action command
 - 2026-05-08T12:42:54Z – claude:sonnet:implementer:implementer – shell_pid=934354 – Ready for review: 5 make:* handlers ported, all 4 gates green, per-command diffs empty
+- 2026-05-08T12:43:22Z – claude:opus-4-7:reviewer:reviewer – shell_pid=938063 – Started review via action command
