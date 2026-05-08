@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-05-08 - issue #1397: `Worker::run()` enforces `WorkerOptions::$memoryLimit` as MiB of **additional** allocation since the start of each `run()` call (`memory_get_usage(true)` baseline), not total PHP process RSS — embedded hosts (PHPUnit full suite, long-lived FPM) may already exceed the cap before `run()` begins; see `packages/queue/src/Worker/Worker.php`. -->
 <!-- Spec reviewed 2026-05-04d - issue #1301 (deferred mission #1257 WP09): portable orphan-bundle-subtable detection. SchemaInterface gained `listTableNames(): list<string>` (DBALSchema delegates to Doctrine's AbstractSchemaManager::listTableNames()). HealthChecker::findOrphanSubtables() replaced the SQLite-only `sqlite_master` LIKE query with `$this->database->schema()->listTableNames()` + `str_starts_with($name, $baseTable . '__')` filter — portable across SQLite, MySQL, PostgreSQL, and any other DBAL-supported driver. The `\Throwable` swallow path is gone (no longer needed). See docs/specs/bundle-scoped-storage.md §"Drift diagnostic" and docs/specs/operator-diagnostics.md §"Bundle Subtable Drift" for the operator-facing contract update. -->
 <!-- Spec reviewed 2026-05-04c - issue #1376 (deferred WP07-A from mission #1257): AbstractKernel::bootEntityTypeManager() now passes a bundle-subtable existence probe to EntityTypeManager so addBundleFields() can emit a once-per-(entity_type_id, bundle) `[BUNDLE_SUBTABLE_MISSING]` notice when the per-bundle subtable is not yet materialized on disk. Probe uses `$database->schema()->tableExists(SqlSchemaHandler::resolveSubtableName(...))`. See docs/specs/entity-system.md (header) for the full contract. -->
 <!-- Spec reviewed 2026-05-04b - issue #1309: added `COLUMN_DATA_STORAGE_DRIFT` to the DiagnosticCode table. HealthChecker gained `checkColumnDataStorageDrift()` (called from `checkRuntime()`), which warns when a field registered with `FieldStorage::Data` still has a backing column on the base table or a registered bundle subtable. Severity: warning. -->
@@ -1463,7 +1464,7 @@ Long-running daemon that processes jobs from a queue transport.
 - `$shouldQuit` flag set (via `stop()` or POSIX signal)
 - `maxJobs` reached (`$options->maxJobs > 0 && $processed >= $options->maxJobs`)
 - `maxTime` elapsed (`$options->maxTime > 0 && (time() - $startTime) >= $options->maxTime`)
-- Memory limit exceeded (`memory_get_usage(true) / 1024 / 1024 >= $options->memoryLimit`)
+- Memory growth budget exhausted (`$options->memoryLimit > 0` and `(memory_get_usage(true) - baselineBytes) >= $options->memoryLimit * 1024 * 1024`, where `baselineBytes` is captured once at the start of `run()` — **not** total process RSS; avoids exiting immediately when the host process is already large)
 
 **POSIX signal handling:** `listenForSignals()` registers SIGTERM/SIGINT handlers that set `$shouldQuit = true`. `pcntl_signal_dispatch()` is called each iteration in `shouldContinue()`. Gracefully degrades when `pcntl` extension is unavailable.
 
@@ -1474,7 +1475,7 @@ Long-running daemon that processes jobs from a queue transport.
 4. If `Job::isReleased()`, release back to queue with delay; otherwise `transport->ack()`
 5. On exception: retry with exponential backoff (`min(baseDelay * 2^(attempts-1), 3600)`) if under `maxTries`, otherwise record failure and call `Job::failed($e)` (best-effort)
 
-**WorkerOptions** (`packages/queue/src/Worker/WorkerOptions.php`): Controls `maxJobs`, `maxTime`, `memoryLimit`, `sleep` (seconds between polls), `maxTries`.
+**WorkerOptions** (`packages/queue/src/Worker/WorkerOptions.php`): Controls `maxJobs`, `maxTime`, `memoryLimit` (MiB of heap growth allowed during each `run()` call), `sleep` (seconds between polls), `maxTries`.
 
 ### Transport layer
 

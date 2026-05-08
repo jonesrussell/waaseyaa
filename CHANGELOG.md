@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`Worker::run()` memory guard vs host RSS (#1397)** — `WorkerOptions::$memoryLimit` is now enforced as **additional** allocation since the start of each `Worker::run()` call (baseline `memory_get_usage(true)`), not total PHP process memory. Long-running PHPUnit processes (and other embedded hosts) often exceed the default 128 MiB before `run()` begins, which previously made `shouldContinue()` exit immediately: `QueueIntegrationTest::workerRunProcessesMultipleJobsThroughDbalTransport` and `workerRunMixesSuccessAndFailure` returned `$processed === 0` under the full suite while passing in isolation. `runNextJob()` unchanged (no loop guard).
+
 ### Changed
 
 - **Routing + HTTP resolver wiring (`foundation-symfony-fallback-elimination-01KQZR1` WP03)** — `WaaseyaaRouter::match()` now wraps Symfony `UrlMatcher` failures as `Waaseyaa\Routing\Exception\RouteNotFoundException` / `RouteMethodNotAllowedException`, and `HttpKernel` catches those Waaseyaa types for JSON 404/405 instead of `Symfony\Component\Routing\Exception\*`. `HttpKernelServiceResolver` takes a `KernelServicesInterface` instance and resolves `DatabaseInterface` through it (same semantics as `ProviderRegistryKernelServices`, no duplicate if-chain). Call sites and tests that expected Symfony `ResourceNotFoundException` directly from `WaaseyaaRouter::match()` should expect the new routing exceptions instead.

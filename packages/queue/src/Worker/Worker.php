@@ -49,8 +49,12 @@ final class Worker
 
         $startTime = time();
         $processed = 0;
+        // Compare growth since this run began — not process RSS. PHPUnit (and other hosts)
+        // may already exceed memoryLimit megabytes before run(); absolute checks would exit
+        // immediately with zero jobs processed (see QueueIntegrationTest under full suite).
+        $memoryBaselineBytes = memory_get_usage(true);
 
-        while ($this->shouldContinue($options, $processed, $startTime)) {
+        while ($this->shouldContinue($options, $processed, $startTime, $memoryBaselineBytes)) {
             $raw = $this->transport->pop($queue);
 
             if ($raw === null) {
@@ -168,8 +172,12 @@ final class Worker
         return min($baseDelay * (2 ** ($attempts - 1)), 3600);
     }
 
-    private function shouldContinue(WorkerOptions $options, int $processed, int $startTime): bool
-    {
+    private function shouldContinue(
+        WorkerOptions $options,
+        int $processed,
+        int $startTime,
+        int $memoryBaselineBytes,
+    ): bool {
         if ($this->shouldQuit) {
             return false;
         }
@@ -186,8 +194,11 @@ final class Worker
             return false;
         }
 
-        if (memory_get_usage(true) / 1024 / 1024 >= $options->memoryLimit) {
-            return false;
+        if ($options->memoryLimit > 0) {
+            $limitBytes = $options->memoryLimit * 1024 * 1024;
+            if ((memory_get_usage(true) - $memoryBaselineBytes) >= $limitBytes) {
+                return false;
+            }
         }
 
         return true;
