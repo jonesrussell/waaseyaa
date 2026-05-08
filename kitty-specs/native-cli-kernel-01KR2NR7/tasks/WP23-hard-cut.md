@@ -150,3 +150,4 @@ spec-kitty agent action implement WP23 --agent <name>
 ## Activity Log
 
 - 2026-05-08T17:06:21Z – claude:sonnet:implementer:implementer – shell_pid=1007657 – Started implementation via action command
+- 2026-05-08T17:34:15Z – claude:sonnet:implementer:implementer – shell_pid=1007657 – Hard-cut complete: deleted Compat/, WaaseyaaApplication, CliCommandRegistry, HasCommandsInterface, DualBootTest; removed symfony/console from all waaseyaa/* runtime requires; wired native CliKernel end-to-end via KernelHandlerContainer; all 7496 tests pass, cs/stan/layers/policy green.
