@@ -479,9 +479,9 @@ final class InertiaMultipartCsrfIntegrationTest extends TestCase
 
         $mapPhp = "[\n";
         foreach ($psr4Map as $prefix => $dir) {
-            $mapPhp .= "    " . var_export($prefix, true) . " => " . var_export($dir, true) . ",\n";
+            $mapPhp .= '    ' . var_export($prefix, true) . ' => ' . var_export($dir, true) . ",\n";
         }
-        $mapPhp .= "]";
+        $mapPhp .= ']';
 
         $realAutoload = var_export($repoRoot . '/vendor/autoload.php', true);
 
