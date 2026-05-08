@@ -9,7 +9,7 @@ requirement_refs:
 - FR-015
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Start `main` → planning base `main` → final merge `main`. Worktree per lanes.json.
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T111
 - T112
@@ -25,7 +25,6 @@ mission_id: 01KR2NR7GYWJKD6CPSN9P2FPC2
 mission_slug: native-cli-kernel-01KR2NR7
 owned_files:
 - kitty-specs/native-cli-kernel-01KR2NR7/plan.md
-- kitty-specs/native-cli-kernel-01KR2NR7/scripts/**
 tags: []
 ---
 
