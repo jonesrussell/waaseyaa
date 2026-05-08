@@ -61,10 +61,10 @@
 | T048 | Port `Optimize/OptimizeClearCommand` → `OptimizeClearHandler` + migrate test + snapshot pass | WP10 | [D] |
 | T049 | Port `Optimize/OptimizeConfigCommand` → `OptimizeConfigHandler` + migrate test + snapshot pass | WP10 | [D] |
 | T050 | Port `Optimize/OptimizeManifestCommand` → `OptimizeManifestHandler` + migrate test + snapshot pass | WP10 | [D] |
-| T051 | Port `QueueWorkCommand` → `QueueWorkHandler` + migrate test + snapshot pass | WP11 | [P] |
-| T052 | Port `QueueFailedCommand` → `QueueFailedHandler` + migrate test + snapshot pass | WP11 | [P] |
-| T053 | Port `QueueRetryCommand` → `QueueRetryHandler` + migrate test + snapshot pass | WP11 | [P] |
-| T054 | Port `QueueFlushCommand` → `QueueFlushHandler` + migrate test + snapshot pass | WP11 | [P] |
+| T051 | Port `QueueWorkCommand` → `QueueWorkHandler` + migrate test + snapshot pass | WP11 | [D] |
+| T052 | Port `QueueFailedCommand` → `QueueFailedHandler` + migrate test + snapshot pass | WP11 | [D] |
+| T053 | Port `QueueRetryCommand` → `QueueRetryHandler` + migrate test + snapshot pass | WP11 | [D] |
+| T054 | Port `QueueFlushCommand` → `QueueFlushHandler` + migrate test + snapshot pass | WP11 | [D] |
 | T055 | Port `Telescope/TelescopeListCommand` → `TelescopeListHandler` + migrate test + snapshot pass | WP12 | [P] |
 | T056 | Port `Telescope/TelescopeClearCommand` → `TelescopeClearHandler` + migrate test + snapshot pass | WP12 | [P] |
 | T057 | Port `Telescope/TelescopePruneCommand` → `TelescopePruneHandler` + migrate test + snapshot pass | WP12 | [P] |
@@ -326,10 +326,10 @@
 ### WP11 — Port: Queue group
 
 **Subtasks**:
-- [ ] T051 `QueueWorkCommand` → `QueueWorkHandler` (WP11)
-- [ ] T052 `QueueFailedCommand` → `QueueFailedHandler` (WP11)
-- [ ] T053 `QueueRetryCommand` → `QueueRetryHandler` (WP11)
-- [ ] T054 `QueueFlushCommand` → `QueueFlushHandler` (WP11)
+- [x] T051 `QueueWorkCommand` → `QueueWorkHandler` (WP11)
+- [x] T052 `QueueFailedCommand` → `QueueFailedHandler` (WP11)
+- [x] T053 `QueueRetryCommand` → `QueueRetryHandler` (WP11)
+- [x] T054 `QueueFlushCommand` → `QueueFlushHandler` (WP11)
 
 **Estimated prompt**: ~280 lines. **Dependencies**: WP05.
 **Risk**: `Worker::run` baseline-memory check from #1397 is in `packages/queue/`, untouched here. The CLI handler just dispatches to it.
