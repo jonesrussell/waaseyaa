@@ -583,42 +583,6 @@ parameters:
 			path: packages/cli/src/Command/SyncRulesCommand.php
 
 		-
-			message: '#^Call to method getEntries\(\) on an unknown class Waaseyaa\\CLI\\Command\\Telescope\\TelescopeStoreInterface\.$#'
-			identifier: class.notFound
-			count: 1
-			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
-
-		-
-			message: '#^Offset ''summary'' on array\{time\: string, type\: string, summary\: string, duration\?\: float\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
-
-		-
-			message: '#^Offset ''time'' on array\{time\: string, type\: string, summary\: string, duration\?\: float\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
-
-		-
-			message: '#^Offset ''type'' on array\{time\: string, type\: string, summary\: string, duration\?\: float\} on left side of \?\? always exists and is not nullable\.$#'
-			identifier: nullCoalesce.offset
-			count: 1
-			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
-
-		-
-			message: '#^Parameter \$store of method Waaseyaa\\CLI\\Command\\Telescope\\TelescopeListCommand\:\:__construct\(\) has invalid type Waaseyaa\\CLI\\Command\\Telescope\\TelescopeStoreInterface\.$#'
-			identifier: class.notFound
-			count: 1
-			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
-
-		-
-			message: '#^Property Waaseyaa\\CLI\\Command\\Telescope\\TelescopeListCommand\:\:\$store has unknown class Waaseyaa\\CLI\\Command\\Telescope\\TelescopeStoreInterface as its type\.$#'
-			identifier: class.notFound
-			count: 1
-			path: packages/cli/src/Command/Telescope/TelescopeListCommand.php
-
-		-
 			message: '#^Call to an undefined method Symfony\\Component\\Console\\Helper\\HelperInterface\:\:ask\(\)\.$#'
 			identifier: method.notFound
 			count: 1

@@ -4296,7 +4296,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "3cef93cb012f943a3b6464133236029a918e175e"
+                "reference": "32b431c19a470aeda55ad13765288f1247af75b1"
             },
             "require": {
                 "php": ">=8.4",
@@ -4328,7 +4328,8 @@
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderB",
                         "Waaseyaa\\CLI\\Provider\\MigrateServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider",
-                        "Waaseyaa\\CLI\\Provider\\QueueServiceProvider"
+                        "Waaseyaa\\CLI\\Provider\\QueueServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\TelescopeServiceProvider"
                     ]
                 }
             },

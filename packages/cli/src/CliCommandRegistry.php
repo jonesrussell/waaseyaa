@@ -39,9 +39,6 @@ use Waaseyaa\CLI\Command\SemanticRefreshCommand;
 use Waaseyaa\CLI\Command\SemanticWarmCommand;
 use Waaseyaa\CLI\Command\ServeCommand;
 use Waaseyaa\CLI\Command\SyncRulesCommand;
-use Waaseyaa\CLI\Command\Telescope\TelescopeClearCommand;
-use Waaseyaa\CLI\Command\Telescope\TelescopeListCommand;
-use Waaseyaa\CLI\Command\Telescope\TelescopePruneCommand;
 use Waaseyaa\CLI\Command\TypeDisableCommand;
 use Waaseyaa\CLI\Command\TypeEnableCommand;
 use Waaseyaa\CLI\Command\UserCreateCommand;
@@ -126,9 +123,6 @@ final class CliCommandRegistry
             new ExtensionScaffoldCommand(),
             new PerformanceBaselineCommand(),
             new PerformanceCompareCommand(),
-            new TelescopeClearCommand(),
-            new TelescopeListCommand(),
-            new TelescopePruneCommand(),
             new SyncRulesCommand(
                 $projectRoot . '/vendor/waaseyaa/foundation/.claude/rules',
                 $projectRoot . '/.claude/rules',
