@@ -74,3 +74,4 @@ spec-kitty agent action implement WP22 --agent <name>
 - 2026-05-08T17:03:07Z – claude:sonnet:implementer:implementer – shell_pid=1004440 – Ready for review: ported northcloud:sync to native CLI; NcSyncHandler in packages/cli, NorthCloudServiceProvider in packages/cli/Provider, symfony/console dropped from packages/northcloud, snapshot test passes, all gates green (7509 tests, phpstan OK, composer-policy OK, layer-check OK)
 - 2026-05-08T17:03:27Z – claude:opus-4-7:reviewer:reviewer – shell_pid=1006844 – Started review via action command
 - 2026-05-08T17:05:27Z – claude:opus-4-7:reviewer:reviewer – shell_pid=1006844 – Review passed: all 17 port WPs done
+- 2026-05-08T18:06:46Z – claude:opus-4-7:reviewer:reviewer – shell_pid=1006844 – Done override: Mission merged to main (cc36dfcd2)
