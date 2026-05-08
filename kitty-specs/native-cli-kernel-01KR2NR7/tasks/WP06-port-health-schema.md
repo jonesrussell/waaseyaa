@@ -16,6 +16,8 @@ subtasks:
 - T028
 - T029
 - T030
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "897575"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -125,3 +127,7 @@ Register the provider in the package manifest (`packages/cli/composer.json` alre
 ```bash
 spec-kitty agent action implement WP06 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T04:57:26Z – claude:sonnet:implementer:implementer – shell_pid=897575 – Started implementation via action command
