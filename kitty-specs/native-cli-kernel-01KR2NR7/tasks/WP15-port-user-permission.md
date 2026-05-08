@@ -70,3 +70,4 @@ spec-kitty agent action implement WP15 --agent <name>
 ## Activity Log
 
 - 2026-05-08T14:16:46Z – claude:sonnet:implementer:implementer – shell_pid=959403 – Started implementation via action command
+- 2026-05-08T14:24:36Z – claude:sonnet:implementer:implementer – shell_pid=959403 – Ready for review: ported user:create, user:role, permission:list to native CLI. All 3 snapshot fixtures match WP01 baseline byte-for-byte. 487/487 tests GREEN, cs-check GREEN, phpstan GREEN, composer-policy GREEN.
