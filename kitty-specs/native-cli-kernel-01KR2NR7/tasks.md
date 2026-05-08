@@ -16,12 +16,12 @@
 | T003 | Capture stdout/stderr/exit-code snapshots for every shipped public command | WP01 | [D] |
 | T004 | Record numbers in `plan.md` § Performance Baseline | WP01 | — | [D] |
 | T005 | Verify snapshot fixture set is comprehensive (one per public command from `bin/waaseyaa list`) | WP01 | — | [D] |
-| T006 | Implement `ArgumentMode` and `OptionMode` enums | WP02 | [P] |
-| T007 | Implement `ArgumentDefinition` readonly record + invariant tests | WP02 | [P] |
-| T008 | Implement `OptionDefinition` readonly record + invariant tests | WP02 | [P] |
-| T009 | Implement `CommandDefinition` (handler normalisation via `\Closure::fromCallable`) + invariant tests | WP02 | — |
-| T010 | Implement `CommandRegistry` (register/get/all/names, sorted, duplicate guard) + tests | WP02 | — |
-| T011 | Implement `ArgvParser` + `ParsedInput` + `ParseError` + full edge-case test matrix (FR-002) | WP02 | — |
+| T006 | Implement `ArgumentMode` and `OptionMode` enums | WP02 | [D] |
+| T007 | Implement `ArgumentDefinition` readonly record + invariant tests | WP02 | [D] |
+| T008 | Implement `OptionDefinition` readonly record + invariant tests | WP02 | [D] |
+| T009 | Implement `CommandDefinition` (handler normalisation via `\Closure::fromCallable`) + invariant tests | WP02 | — | [D] |
+| T010 | Implement `CommandRegistry` (register/get/all/names, sorted, duplicate guard) + tests | WP02 | — | [D] |
+| T011 | Implement `ArgvParser` + `ParsedInput` + `ParseError` + full edge-case test matrix (FR-002) | WP02 | — | [D] |
 | T012 | Implement `CliInput`, `CliOutput`, `BufferedCliOutput`, `StdinSource` + `EmptyStdinSource` + `StringQueueStdinSource` | WP03 | [P] |
 | T013 | Implement `CliIO` (argument/option getters, write/writeln/error, ask/confirm with non-TTY fallback) + tests | WP03 | — |
 | T014 | Implement `HelpRenderer` (Usage/Description/Arguments/Options sections, deterministic output) + golden tests | WP03 | [P] |
@@ -161,12 +161,12 @@
 **Independent test**: New unit tests in `packages/cli/tests/Unit/Kernel/` and `Parser/` pass; existing Symfony-based commands still work (no regression).
 
 **Subtasks**:
-- [ ] T006 `ArgumentMode` and `OptionMode` enums (WP02)
-- [ ] T007 `ArgumentDefinition` + invariant tests (WP02)
-- [ ] T008 `OptionDefinition` + invariant tests (WP02)
-- [ ] T009 `CommandDefinition` (handler normalisation) + invariant tests (WP02)
-- [ ] T010 `CommandRegistry` + tests (WP02)
-- [ ] T011 `ArgvParser` + `ParsedInput` + `ParseError` + edge-case test matrix (WP02)
+- [x] T006 `ArgumentMode` and `OptionMode` enums (WP02)
+- [x] T007 `ArgumentDefinition` + invariant tests (WP02)
+- [x] T008 `OptionDefinition` + invariant tests (WP02)
+- [x] T009 `CommandDefinition` (handler normalisation) + invariant tests (WP02)
+- [x] T010 `CommandRegistry` + tests (WP02)
+- [x] T011 `ArgvParser` + `ParsedInput` + `ParseError` + edge-case test matrix (WP02)
 
 **Implementation sketch**: Follow [`data-model.md`](./data-model.md) and [`contracts/command-definition.md`](./contracts/command-definition.md). Parser test matrix sourced from [`research.md`](./research.md) §R-02. **Estimated prompt**: ~480 lines.
 
