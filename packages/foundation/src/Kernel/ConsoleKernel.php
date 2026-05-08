@@ -19,10 +19,8 @@ use Waaseyaa\CLI\WaaseyaaApplication;
 use Waaseyaa\Config\ConfigManager;
 use Waaseyaa\Config\Storage\FileStorage;
 use Waaseyaa\Entity\EntityTypeIdNormalizer;
-use Waaseyaa\Foundation\Diagnostic\HealthChecker;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Foundation\Discovery\StaleManifestException;
-use Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasCommandsInterface;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
@@ -105,15 +103,6 @@ final class ConsoleKernel extends AbstractKernel
                 embeddingProvider: $embeddingProvider,
             );
         }
-        $schemaRegistry = new DefaultsSchemaRegistry($this->projectRoot . '/defaults');
-        $healthChecker = new HealthChecker(
-            bootReport: $this->getBootReport(),
-            database: $this->database,
-            entityTypeManager: $this->entityTypeManager,
-            projectRoot: $this->projectRoot,
-            fieldRegistry: $this->fieldRegistry,
-        );
-
         $typeIdNormalizer = new EntityTypeIdNormalizer($this->entityTypeManager);
 
         $app = new WaaseyaaApplication();
@@ -134,8 +123,6 @@ final class ConsoleKernel extends AbstractKernel
             router: $router,
             permissionHandler: $permissionHandler,
             manifestCompiler: $manifestCompiler,
-            schemaRegistry: $schemaRegistry,
-            healthChecker: $healthChecker,
             typeIdNormalizer: $typeIdNormalizer,
             semanticWarmer: $semanticWarmer,
             pdo: $pdo,
@@ -205,14 +192,6 @@ final class ConsoleKernel extends AbstractKernel
             basePath: $this->projectRoot,
             storagePath: $this->projectRoot . '/storage',
         );
-        $schemaRegistry = new \Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry($this->projectRoot . '/defaults');
-        $healthChecker = new \Waaseyaa\Foundation\Diagnostic\HealthChecker(
-            bootReport: $this->getBootReport(),
-            database: $this->database,
-            entityTypeManager: $this->entityTypeManager,
-            projectRoot: $this->projectRoot,
-            fieldRegistry: $this->fieldRegistry,
-        );
         $typeIdNormalizer = new \Waaseyaa\Entity\EntityTypeIdNormalizer($this->entityTypeManager);
 
         $semanticWarmer = null;
@@ -241,8 +220,6 @@ final class ConsoleKernel extends AbstractKernel
             router: $router,
             permissionHandler: $permissionHandler,
             manifestCompiler: $manifestCompiler,
-            schemaRegistry: $schemaRegistry,
-            healthChecker: $healthChecker,
             typeIdNormalizer: $typeIdNormalizer,
             semanticWarmer: $semanticWarmer,
             pdo: $pdo,

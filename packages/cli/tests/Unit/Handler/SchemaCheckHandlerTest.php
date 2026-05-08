@@ -2,20 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Tests\Unit\Command;
+namespace Waaseyaa\CLI\Tests\Unit\Handler;
 
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
-use Waaseyaa\CLI\Command\SchemaCheckCommand;
+use Waaseyaa\CLI\CommandDefinition;
+use Waaseyaa\CLI\Handler\SchemaCheckHandler;
+use Waaseyaa\CLI\OptionDefinition;
+use Waaseyaa\CLI\OptionMode;
+use Waaseyaa\CLI\Testing\CliTester;
 use Waaseyaa\Foundation\Diagnostic\DiagnosticCode;
 use Waaseyaa\Foundation\Diagnostic\HealthCheckerInterface;
 use Waaseyaa\Foundation\Diagnostic\HealthCheckResult;
 
-#[CoversClass(SchemaCheckCommand::class)]
-final class SchemaCheckCommandTest extends TestCase
+#[CoversClass(SchemaCheckHandler::class)]
+final class SchemaCheckHandlerTest extends TestCase
 {
     #[Test]
     public function noDriftReturnsSuccess(): void
@@ -28,9 +30,8 @@ final class SchemaCheckCommandTest extends TestCase
         $tester = $this->createTester($checker);
         $tester->execute([]);
 
-        $this->assertSame(0, $tester->getStatusCode());
-        $output = $tester->getDisplay();
-        $this->assertStringContainsString('All schemas match', $output);
+        $this->assertSame(0, $tester->getExitCode());
+        $this->assertStringContainsString('All schemas match', $tester->getStdout());
     }
 
     #[Test]
@@ -49,10 +50,9 @@ final class SchemaCheckCommandTest extends TestCase
         $tester = $this->createTester($checker);
         $tester->execute([]);
 
-        $this->assertSame(1, $tester->getStatusCode());
-        $output = $tester->getDisplay();
-        $this->assertStringContainsString('DRIFT', $output);
-        $this->assertStringContainsString('type mismatch', $output);
+        $this->assertSame(1, $tester->getExitCode());
+        $this->assertStringContainsString('DRIFT', $tester->getStdout());
+        $this->assertStringContainsString('type mismatch', $tester->getStdout());
     }
 
     #[Test]
@@ -64,18 +64,30 @@ final class SchemaCheckCommandTest extends TestCase
         ]);
 
         $tester = $this->createTester($checker);
-        $tester->execute(['--json' => true]);
+        $tester->execute(['--json']);
 
-        $decoded = json_decode($tester->getDisplay(), true);
+        $decoded = json_decode($tester->getStdout(), true);
         $this->assertIsArray($decoded);
         $this->assertSame('pass', $decoded[0]['status']);
     }
 
-    private function createTester(HealthCheckerInterface $checker): CommandTester
+    private function createTester(HealthCheckerInterface $checker): CliTester
     {
-        $app = new Application();
-        $app->add(new SchemaCheckCommand($checker));
-        $command = $app->find('schema:check');
-        return new CommandTester($command);
+        $handler = new SchemaCheckHandler($checker);
+        $definition = new CommandDefinition(
+            name: 'schema:check',
+            description: 'Detect schema drift between entity type definitions and database tables',
+            options: [
+                new OptionDefinition(name: 'json', mode: OptionMode::None, description: 'Output results as JSON'),
+            ],
+            handler: \Closure::fromCallable([$handler, 'execute']),
+        );
+
+        $container = new class implements \Psr\Container\ContainerInterface {
+            public function get(string $id): mixed { throw new \RuntimeException("Not found: $id"); }
+            public function has(string $id): bool { return false; }
+        };
+
+        return CliTester::for($definition, $container);
     }
 }

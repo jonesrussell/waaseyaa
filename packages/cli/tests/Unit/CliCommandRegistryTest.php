@@ -20,11 +20,8 @@ use Waaseyaa\Entity\EntityTypeIdNormalizer;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
-use Waaseyaa\Foundation\Diagnostic\BootDiagnosticReport;
-use Waaseyaa\Foundation\Diagnostic\HealthChecker;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
-use Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 #[CoversClass(CliCommandRegistry::class)]
@@ -75,17 +72,6 @@ final class CliCommandRegistryTest extends TestCase
                 router: $router,
                 permissionHandler: new PermissionHandler(),
                 manifestCompiler: new PackageManifestCompiler($projectRoot, $projectRoot . '/storage'),
-                schemaRegistry: new DefaultsSchemaRegistry($projectRoot . '/defaults'),
-                healthChecker: new HealthChecker(
-                    bootReport: new BootDiagnosticReport(
-                        registeredTypes: ['node' => true],
-                        disabledTypeIds: [],
-                        schemaCompatibility: [],
-                    ),
-                    database: $database,
-                    entityTypeManager: $entityTypeManager,
-                    projectRoot: $projectRoot,
-                ),
                 typeIdNormalizer: new EntityTypeIdNormalizer($entityTypeManager),
                 semanticWarmer: null,
                 pdo: $pdo,

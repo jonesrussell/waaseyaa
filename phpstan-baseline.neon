@@ -391,36 +391,6 @@ parameters:
 			path: packages/cli/src/Command/FixtureScaffoldCommand.php
 
 		-
-			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
-			identifier: if.condNotBoolean
-			count: 1
-			path: packages/cli/src/Command/HealthCheckCommand.php
-
-		-
-			message: '#^Casting to string something that''s already string\.$#'
-			identifier: cast.useless
-			count: 1
-			path: packages/cli/src/Command/HealthReportCommand.php
-
-		-
-			message: '#^Only booleans are allowed in a negated boolean, mixed given\.$#'
-			identifier: booleanNot.exprNotBoolean
-			count: 1
-			path: packages/cli/src/Command/HealthReportCommand.php
-
-		-
-			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
-			identifier: if.condNotBoolean
-			count: 1
-			path: packages/cli/src/Command/HealthReportCommand.php
-
-		-
-			message: '#^Short ternary operator is not allowed\. Use null coalesce operator if applicable or consider using long ternary\.$#'
-			identifier: ternary.shortNotAllowed
-			count: 2
-			path: packages/cli/src/Command/HealthReportCommand.php
-
-		-
 			message: '#^Call to function is_string\(\) with string will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			count: 1
@@ -575,12 +545,6 @@ parameters:
 			identifier: nullCoalesce.offset
 			count: 1
 			path: packages/cli/src/Command/PermissionListCommand.php
-
-		-
-			message: '#^Only booleans are allowed in an if condition, mixed given\.$#'
-			identifier: if.condNotBoolean
-			count: 1
-			path: packages/cli/src/Command/SchemaCheckCommand.php
 
 		-
 			message: '#^Casting to float something that''s already float\.$#'

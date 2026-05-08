@@ -2,25 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Waaseyaa\CLI\Command;
+namespace Waaseyaa\CLI\Handler;
 
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
+use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Foundation\Diagnostic\HealthCheckerInterface;
 use Waaseyaa\Foundation\Diagnostic\HealthCheckResult;
 use Waaseyaa\Foundation\Ingestion\IngestionLogger;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
-#[AsCommand(
-    name: 'health:report',
-    description: 'Generate a full diagnostic report for operator review',
-)]
-final class HealthReportCommand extends Command
+final class HealthReportHandler
 {
     private readonly LoggerInterface $logger;
 
@@ -30,29 +21,21 @@ final class HealthReportCommand extends Command
         ?LoggerInterface $logger = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
-        parent::__construct();
     }
 
-    protected function configure(): void
-    {
-        $this
-            ->addOption('json', null, InputOption::VALUE_NONE, 'Output as JSON')
-            ->addOption('output', 'o', InputOption::VALUE_REQUIRED, 'Write report to file');
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    public function execute(CliIO $io): int
     {
         $systemInfo = $this->gatherSystemInfo();
         $healthResults = $this->checker->runAll();
         $ingestionSummary = $this->gatherIngestionSummary();
 
-        $outputFile = $input->getOption('output');
-        if ($outputFile !== null && !$input->getOption('json')) {
-            $output->writeln('<error>The --output option requires --json. Use: health:report --json --output report.json</error>');
-            return self::FAILURE;
+        $outputFile = $io->option('output');
+        if ($outputFile !== null && !$io->option('json')) {
+            $io->writeln('The --output option requires --json. Use: health:report --json --output report.json');
+            return 1;
         }
 
-        if ($input->getOption('json')) {
+        if ($io->option('json')) {
             $report = [
                 'generated_at' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
                 'system' => $systemInfo,
@@ -66,66 +49,57 @@ final class HealthReportCommand extends Command
             $json = json_encode($report, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
 
             if ($outputFile !== null) {
-                file_put_contents($outputFile, $json . "\n");
-                $output->writeln(sprintf('<info>Report written to %s</info>', $outputFile));
+                file_put_contents((string) $outputFile, $json . "\n");
+                $io->writeln(sprintf('Report written to %s', (string) $outputFile));
             } else {
-                $output->writeln($json);
+                $io->writeln($json);
             }
 
-            return self::SUCCESS;
+            return 0;
         }
 
         // --- System info ---
-        $output->writeln('<info>System Information</info>');
-        $table = new Table($output);
-        $table->setStyle('compact');
+        $io->writeln('System Information');
         foreach ($systemInfo as $key => $value) {
-            $table->addRow([$key, (string) $value]);
+            $io->writeln(sprintf('  %-20s %s', $key . ':', $value));
         }
-        $table->render();
-        $output->writeln('');
+        $io->writeln('');
 
         // --- Health checks ---
-        $output->writeln('<info>Health Checks</info>');
-        $table = new Table($output);
-        $table->setHeaders(['Status', 'Check', 'Message']);
+        $io->writeln('Health Checks');
         foreach ($healthResults as $result) {
-            $statusLabel = match ($result->status) {
-                'pass' => '<info>PASS</info>',
-                'warn' => '<comment>WARN</comment>',
-                'fail' => '<error>FAIL</error>',
-                default => $result->status,
+            $prefix = match ($result->status) {
+                'pass' => 'OK  ',
+                'warn' => 'WARN',
+                'fail' => 'FAIL',
+                default => '    ',
             };
-            $table->addRow([$statusLabel, $result->name, $result->message]);
+            $io->writeln(sprintf('  %s %s: %s', $prefix, $result->name, $result->message));
         }
-        $table->render();
-        $output->writeln('');
+        $io->writeln('');
 
         // --- Ingestion summary ---
         if ($ingestionSummary !== []) {
-            $output->writeln('<info>Ingestion Summary</info>');
-            $table = new Table($output);
-            $table->setStyle('compact');
+            $io->writeln('Ingestion Summary');
             foreach ($ingestionSummary as $key => $value) {
-                $display = is_array($value) ? json_encode($value, JSON_UNESCAPED_SLASHES) : (string) $value;
-                $table->addRow([$key, $display]);
+                $display = is_array($value) ? json_encode($value, JSON_THROW_ON_ERROR) : (string) $value;
+                $io->writeln(sprintf('  %-20s %s', $key . ':', $display));
             }
-            $table->render();
-            $output->writeln('');
+            $io->writeln('');
         }
 
         // --- Remediations ---
         $nonPassing = array_filter($healthResults, static fn(HealthCheckResult $r) => $r->status !== 'pass');
         if ($nonPassing !== []) {
-            $output->writeln('<comment>Remediations:</comment>');
+            $io->writeln('Remediations:');
             foreach ($nonPassing as $result) {
                 if ($result->remediation !== '') {
-                    $output->writeln(sprintf('  %s: %s', $result->name, $result->remediation));
+                    $io->writeln(sprintf('  %s: %s', $result->name, $result->remediation));
                 }
             }
         }
 
-        return self::SUCCESS;
+        return 0;
     }
 
     /** @return array<string, string> */
@@ -135,8 +109,8 @@ final class HealthReportCommand extends Command
             'PHP Version' => PHP_VERSION,
             'OS' => PHP_OS,
             'SAPI' => PHP_SAPI,
-            'Database' => getenv('WAASEYAA_DB') ?: './storage/waaseyaa.sqlite',
-            'Config Dir' => getenv('WAASEYAA_CONFIG_DIR') ?: './config/sync',
+            'Database' => getenv('WAASEYAA_DB') !== false ? getenv('WAASEYAA_DB') : './storage/waaseyaa.sqlite',
+            'Config Dir' => getenv('WAASEYAA_CONFIG_DIR') !== false ? getenv('WAASEYAA_CONFIG_DIR') : './config/sync',
             'Project Root' => $this->projectRoot,
             'Generated At' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
         ];
@@ -165,11 +139,11 @@ final class HealthReportCommand extends Command
         $lastRejected = null;
 
         foreach ($entries as $entry) {
-            $status = $entry['status'] ?? '';
-            if ($status === 'accepted') {
+            $entryStatus = $entry['status'] ?? '';
+            if ($entryStatus === 'accepted') {
                 $accepted++;
                 $lastAccepted = $entry['logged_at'] ?? null;
-            } elseif ($status === 'rejected') {
+            } elseif ($entryStatus === 'rejected') {
                 $rejected++;
                 $lastRejected = $entry['logged_at'] ?? null;
                 foreach ($entry['errors'] ?? [] as $error) {

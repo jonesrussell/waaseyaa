@@ -71,7 +71,8 @@
         },
         "waaseyaa": {
             "providers": [
-                "Waaseyaa\\CLI\\CliServiceProvider"
+                "Waaseyaa\\CLI\\CliServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\HealthSchemaServiceProvider"
             ]
         }
     },

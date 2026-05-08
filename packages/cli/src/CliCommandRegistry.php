@@ -26,8 +26,6 @@ use Waaseyaa\CLI\Command\ExtensionScaffoldCommand;
 use Waaseyaa\CLI\Command\FixtureGenerateCommand;
 use Waaseyaa\CLI\Command\FixturePackRefreshCommand;
 use Waaseyaa\CLI\Command\FixtureScaffoldCommand;
-use Waaseyaa\CLI\Command\HealthCheckCommand;
-use Waaseyaa\CLI\Command\HealthReportCommand;
 use Waaseyaa\CLI\Command\IngestDashboardCommand;
 use Waaseyaa\CLI\Command\IngestRunCommand;
 use Waaseyaa\CLI\Command\InstallCommand;
@@ -55,8 +53,6 @@ use Waaseyaa\CLI\Command\PermissionListCommand;
 use Waaseyaa\CLI\Command\RelationshipTypeScaffoldCommand;
 use Waaseyaa\CLI\Command\RouteListCommand;
 use Waaseyaa\CLI\Command\ScaffoldAuthCommand;
-use Waaseyaa\CLI\Command\SchemaCheckCommand;
-use Waaseyaa\CLI\Command\SchemaListCommand;
 use Waaseyaa\CLI\Command\SemanticRefreshCommand;
 use Waaseyaa\CLI\Command\SemanticWarmCommand;
 use Waaseyaa\CLI\Command\ServeCommand;
@@ -77,11 +73,9 @@ use Waaseyaa\Entity\Audit\EntityAuditLogger;
 use Waaseyaa\Entity\EntityTypeIdNormalizer;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
-use Waaseyaa\Foundation\Diagnostic\HealthCheckerInterface;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Discovery\PackageManifestCompiler;
 use Waaseyaa\Foundation\Migration\Migrator;
-use Waaseyaa\Foundation\Schema\DefaultsSchemaRegistry;
 use Waaseyaa\Routing\WaaseyaaRouter;
 
 final class CliCommandRegistry
@@ -104,8 +98,6 @@ final class CliCommandRegistry
         WaaseyaaRouter $router,
         PermissionHandler $permissionHandler,
         PackageManifestCompiler $manifestCompiler,
-        DefaultsSchemaRegistry $schemaRegistry,
-        HealthCheckerInterface $healthChecker,
         EntityTypeIdNormalizer $typeIdNormalizer,
         ?SemanticIndexWarmer $semanticWarmer,
         \PDO $pdo,
@@ -157,10 +149,6 @@ final class CliCommandRegistry
             new AuditLogCommand($lifecycleManager, $entityAuditLogger),
             new EventListCommand($dispatcher),
             new RouteListCommand($router),
-            new SchemaListCommand($schemaRegistry),
-            new SchemaCheckCommand($healthChecker),
-            new HealthCheckCommand($healthChecker),
-            new HealthReportCommand($healthChecker, $projectRoot),
             new PermissionListCommand($permissionHandler),
             ...($semanticWarmer !== null ? [
                 new SemanticWarmCommand($semanticWarmer),
