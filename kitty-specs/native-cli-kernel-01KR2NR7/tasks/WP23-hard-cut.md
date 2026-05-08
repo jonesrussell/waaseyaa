@@ -33,6 +33,8 @@ subtasks:
 - T104
 - T105
 - T106
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "1007657"
 history:
 - date: '2026-05-08'
   note: Drafted by /spec-kitty.tasks.
@@ -144,3 +146,7 @@ If a chain appears via `waaseyaa/northcloud`, that's a WP22 bug (the provider sh
 ```bash
 spec-kitty agent action implement WP23 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-08T17:06:21Z – claude:sonnet:implementer:implementer – shell_pid=1007657 – Started implementation via action command
