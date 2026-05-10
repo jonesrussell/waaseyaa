@@ -265,12 +265,6 @@ final class CliTester
 
     private function findOption(string $longName): ?OptionDefinition
     {
-        foreach ($this->definition->options as $opt) {
-            if ($opt->name === $longName) {
-                return $opt;
-            }
-        }
-
-        return null;
+        return array_find($this->definition->options, static fn(OptionDefinition $opt): bool => $opt->name === $longName);
     }
 }
