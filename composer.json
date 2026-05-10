@@ -349,6 +349,8 @@
         "phpstan/phpstan-strict-rules": "^2.0",
         "phpunit/phpunit": "^10.5",
         "sendgrid/sendgrid": "^8.1",
+        "shipmonk/composer-dependency-analyser": "^1.8",
+        "shipmonk/dead-code-detector": "^1.1",
         "waaseyaa/testing": "self.version"
     },
     "autoload": {
@@ -359,6 +361,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Waaseyaa\\Tools\\PHPStan\\": "tools/phpstan/",
             "Waaseyaa\\Cache\\Tests\\": "packages/cache/tests/",
             "Waaseyaa\\CLI\\Tests\\": "packages/cli/tests/",
             "Waaseyaa\\Config\\Tests\\": "packages/config/tests/",

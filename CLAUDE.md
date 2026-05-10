@@ -188,6 +188,42 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 - Brand color: Deep Teal (`#0d4f4f` → `#0f766e` → `#14b8a6`). Chosen to be distinct from Drupal (blue), Laravel (red), Django/Nuxt (green), Strapi (purple). Auth CSS tokens and AdminShell `--color-primary` use this palette.
 - Frontend entry point: `public/index.php` (PHP built-in server front controller)
 
+## Dead code audits and intentional scaffolding
+
+We run `shipmonk/dead-code-detector` via `phpstan-dead-code.neon` as a **warn-only** CI job (`bin/audit-dead-code`, mirrors `bin/audit-require-dev-layers`). Its purpose is to catch *new* unused code introduced by future PRs — not to delete existing scaffolding. A baseline (`phpstan-dead-code-baseline.neon`) suppresses pre-existing findings; only newly-introduced dead members appear in CI output.
+
+Reflection-discovered entrypoints (classes carrying `#[PolicyAttribute]` or `#[AsMiddleware]`, FQCNs declared in `extra.waaseyaa.providers`, `\Ingestion\EntityMapper\` namespaces, `RouteProviderInterface` implementors) are auto-marked as used by `tools/phpstan/WaaseyaaEntrypointProvider.php`. If you add a new discovery convention, extend that provider before relying on the audit.
+
+### Marking intentional scaffolding
+
+If you add code that is not yet referenced but is part of a planned extension point or feature, mark it with `@api` in PHPDoc. shipmonk's `ApiPhpDocUsageProvider` (enabled by default via `vendor/shipmonk/dead-code-detector/rules.neon`) treats `@api` as a "used by design" signal and will not report it as unused.
+
+Use `@api` for:
+- Public extension points (interfaces, abstract classes, traits) intended for third-party or cross-package use.
+- Attribute classes and entity types discovered via reflection or configuration.
+- Forthcoming feature stubs expected to be wired up in a later PR.
+
+```php
+/**
+ * @api
+ */
+final class SomeFutureExtensionPoint
+{
+    // ...
+}
+```
+
+Do **not** use `@api` for internal helpers, temporary spikes, or anything you would be comfortable deleting if it stayed unused. When in doubt, leave it off — unused internal code should be deleted once it is clearly not needed.
+
+### Triage rule for findings
+
+When acting on dead-code findings (separate from this CI gate):
+- **Public extension points / attributes / entities / reflection-discovered types / clearly-named forthcoming stubs** → either add `@api` and keep, or move into a feature branch until wired.
+- **Private/internal helpers, unused methods/properties/constants with no callers** → safe candidates for deletion or refactor.
+- For automated passes: only propose deletions for private/internal symbols with no `@api` and no references; leave anything public or reflective-looking alone unless explicitly approved.
+
+To regenerate the baseline after a triage sweep: `vendor/bin/phpstan analyse -c phpstan-dead-code.neon --generate-baseline=phpstan-dead-code-baseline.neon`. To inspect the historical backlog without running CI, grep `phpstan-dead-code-baseline.neon`.
+
 ## Architecture Gotchas
 - **Entity subclass constructors**: User, Node etc. only accept `(array $values)` and hardcode entityTypeId/entityKeys. SqlEntityStorage uses reflection to detect constructor shape.
 - **Dual-state bug pattern**: When data can come from two sources (e.g., attribute vs registry), always use one canonical source. Found repeatedly in ComponentRenderer, Pipeline, entity values.

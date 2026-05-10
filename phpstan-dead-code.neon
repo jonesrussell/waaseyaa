@@ -1,0 +1,15 @@
+includes:
+    - phpstan.neon
+    - vendor/shipmonk/dead-code-detector/rules.neon
+    - phpstan-dead-code-baseline.neon
+
+parameters:
+    tmpDir: tmp/phpstan-dead-code
+
+services:
+    -
+        class: Waaseyaa\Tools\PHPStan\WaaseyaaEntrypointProvider
+        tags:
+            - shipmonk.deadCode.memberUsageProvider
+        arguments:
+            projectRoot: %currentWorkingDirectory%

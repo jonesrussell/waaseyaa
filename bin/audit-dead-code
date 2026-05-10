@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# Warn-only dead code audit. Mirrors the pattern of bin/audit-require-dev-layers:
+# this script always exits 0; CI surfaces findings as a non-blocking signal.
+#
+# Detection: PHPStan + shipmonk/dead-code-detector with phpstan-dead-code.neon,
+# which layers on the project's standard phpstan.neon and registers the
+# WaaseyaaEntrypointProvider for our discovery patterns (policy attribute,
+# middleware attribute, extra.waaseyaa.providers, Ingestion/EntityMapper/*,
+# RouteProviderInterface implementors).
+#
+# Run locally:  bin/audit-dead-code
+# Auto-remove:  bin/audit-dead-code -- --error-format=removeDeadCode
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT_DIR"
+
+if [[ ! -x vendor/bin/phpstan ]]; then
+    echo "WARN: vendor/bin/phpstan not found; run 'composer install' before audit-dead-code." >&2
+    exit 0
+fi
+
+mkdir -p tmp/phpstan-dead-code
+
+echo "Running dead-code audit (warn-only) via phpstan-dead-code.neon..."
+echo
+
+set +e
+vendor/bin/phpstan analyse --configuration=phpstan-dead-code.neon --no-progress --memory-limit=2G "$@"
+exit_status=$?
+set -e
+
+echo
+if [[ "$exit_status" -eq 0 ]]; then
+    echo "OK — dead-code audit found no unused members."
+else
+    echo "Dead-code audit reported findings (exit=$exit_status). Review above; this gate is warn-only."
+fi
+exit 0

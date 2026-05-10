@@ -22,6 +22,31 @@ jobs:
       - name: Audit require-dev layer graph (warn-only)
         run: bash bin/audit-require-dev-layers
 
+  composer-deps-audit:
+    name: composer-deps-audit (warn-only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: vendor
+          key: composer-v2-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-v2-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run composer-dependency audit (warn-only)
+        run: bash bin/audit-composer-deps
+
   spec-drift:
     name: spec-drift
     runs-on: ubuntu-latest
@@ -86,6 +111,46 @@ jobs:
         with:
           path: tmp/phpstan
           key: phpstan-result-cache-${{ github.run_id }}
+
+  dead-code-audit:
+    name: dead-code-audit (warn-only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v5
+        with:
+          path: vendor
+          key: composer-v2-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-v2-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Restore dead-code PHPStan result cache
+        uses: actions/cache/restore@v5
+        with:
+          path: tmp/phpstan-dead-code
+          key: phpstan-dead-code-cache-${{ github.run_id }}
+          restore-keys: |
+            phpstan-dead-code-cache-
+
+      - name: Run dead-code audit (warn-only)
+        run: bash bin/audit-dead-code
+
+      - name: Save dead-code PHPStan result cache
+        uses: actions/cache/save@v5
+        if: ${{ !cancelled() }}
+        with:
+          path: tmp/phpstan-dead-code
+          key: phpstan-dead-code-cache-${{ github.run_id }}
 
   ci-unit-tests:
     name: ci/unit-tests

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Warn-only composer dependency audit. Mirrors bin/audit-dead-code:
+# always exits 0; CI surfaces findings as a non-blocking signal.
+#
+# Detection: shipmonk/composer-dependency-analyser, configured by
+# composer-dependency-analyser.php at the repo root. Scans every
+# packages/<name>/src and tests/ directory against the root composer.json
+# (path repositories collapse all sibling deps into the root vendor/ tree),
+# reporting unused, missing (shadow), and dev-in-prod dependencies.
+#
+# Per-package require accuracy is intentionally out of scope here — see
+# bin/check-package-layers and bin/check-composer-policy for that surface.
+#
+# Run locally:  bin/audit-composer-deps
+# Pass-through: bin/audit-composer-deps -- --format=junit
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT_DIR"
+
+if [[ ! -x vendor/bin/composer-dependency-analyser ]]; then
+    echo "WARN: vendor/bin/composer-dependency-analyser not found; run 'composer install' before audit-composer-deps." >&2
+    exit 0
+fi
+
+echo "Running composer-dependency audit (warn-only) via composer-dependency-analyser.php..."
+echo
+
+set +e
+vendor/bin/composer-dependency-analyser --config=composer-dependency-analyser.php "$@"
+exit_status=$?
+set -e
+
+echo
+if [[ "$exit_status" -eq 0 ]]; then
+    echo "OK — composer-dependency audit found no unused, missing, or shadow deps."
+else
+    echo "Composer-dependency audit reported findings (exit=$exit_status). Review above; this gate is warn-only."
+fi
+exit 0
