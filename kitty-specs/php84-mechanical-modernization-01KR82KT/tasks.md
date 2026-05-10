@@ -13,9 +13,9 @@
 | T004 | array_find swap in `IngestRunCommandTest.php:256` | WP01 | [D] |
 | T005 | Verify first-match semantics, then array_find swap in `SemanticRefreshTriggerPlanner.php:415` | WP02 | | [D] |
 | T006 | Read-only sweep of `packages/routing/src/` and `packages/access/src/` for `foreach { if return }` candidates | WP02 | | [D] |
-| T007 | Add `#[\Deprecated]` attribute on `FailedJobRepository`, keep docblock | WP03 | [P] |
-| T008 | Audit `MigrateDefaultsHandler.php:236`, `FixturePackRefreshHandler.php:41`, `PerformanceCompareCommand` for json_validate eligibility; close-with-rationale where decoded value is consumed | WP03 | [P] |
-| T009 | Final verification: run full PHPUnit, PHPStan level 5, PHP-CS-Fixer, layer + composer policy checks | WP03 | |
+| T007 | Add `#[\Deprecated]` attribute on `FailedJobRepository`, keep docblock | WP03 | [D] |
+| T008 | Audit `MigrateDefaultsHandler.php:236`, `FixturePackRefreshHandler.php:41`, `PerformanceCompareCommand` for json_validate eligibility; close-with-rationale where decoded value is consumed | WP03 | [D] |
+| T009 | Final verification: run full PHPUnit, PHPStan level 5, PHP-CS-Fixer, layer + composer policy checks | WP03 | | [D] |
 
 ---
 
@@ -94,9 +94,9 @@ See `tasks/WP02-array-find-production-and-sweep.md`.
 
 ### Included subtasks
 
-- [ ] T007 Add `#[\Deprecated(message: "Use FailedJobRepositoryInterface", since: "0.1")]` attribute to `packages/queue/src/FailedJobRepository.php` (class-level), keep `@deprecated` docblock
-- [ ] T008 Audit `MigrateDefaultsHandler.php:236`, `FixturePackRefreshHandler.php:41`, and locate-then-audit `PerformanceCompareCommand` (under `packages/cli/`); for each, document whether the decoded value is consumed downstream — if yes, close FR-007/008/009 with the standard rationale; if no, perform the json_validate swap
-- [ ] T009 Run final verification: `./vendor/bin/phpunit`, `composer phpstan`, `composer cs-check`, `bin/check-package-layers`, `composer check-composer-policy`
+- [x] T007 Add `#[\Deprecated(message: "Use FailedJobRepositoryInterface", since: "0.1")]` attribute to `packages/queue/src/FailedJobRepository.php` (class-level), keep `@deprecated` docblock
+- [x] T008 Audit `MigrateDefaultsHandler.php:236`, `FixturePackRefreshHandler.php:41`, and locate-then-audit `PerformanceCompareCommand` (under `packages/cli/`); for each, document whether the decoded value is consumed downstream — if yes, close FR-007/008/009 with the standard rationale; if no, perform the json_validate swap
+- [x] T009 Run final verification: `./vendor/bin/phpunit`, `composer phpstan`, `composer cs-check`, `bin/check-package-layers`, `composer check-composer-policy`
 
 ### Implementation sketch
 
