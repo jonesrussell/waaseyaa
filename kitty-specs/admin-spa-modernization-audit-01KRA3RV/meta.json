@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-10T23:32:45.613570+00:00",
+  "friendly_name": "admin spa modernization audit",
+  "mission_id": "01KRA3RV5GPMP178F2VMEX1TW1",
+  "mission_number": null,
+  "mission_slug": "admin-spa-modernization-audit-01KRA3RV",
+  "mission_type": "research",
+  "slug": "admin-spa-modernization-audit-01KRA3RV",
+  "target_branch": "main"
+}
