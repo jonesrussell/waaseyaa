@@ -6,5 +6,7 @@
   "mission_slug": "composer-internal-version-sweep-01KR96NA",
   "mission_type": "software-dev",
   "slug": "composer-internal-version-sweep-01KR96NA",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-10T15:22:33.742268+00:00"
 }

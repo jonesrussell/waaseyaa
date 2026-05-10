@@ -1,7 +1,7 @@
 {
-  "event_count": 5,
-  "last_event_id": "01KR97F2235M26Y607G0WFEGKH",
-  "materialized_at": "2026-05-10T15:18:04.099276+00:00",
+  "event_count": 7,
+  "last_event_id": "01KR97QAVZA5FRK9D1SSDY80JA",
+  "materialized_at": "2026-05-10T15:22:35.263464+00:00",
   "mission_number": "",
   "mission_slug": "composer-internal-version-sweep-01KR96NA",
   "mission_type": "software-dev",
@@ -12,17 +12,17 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 5
+    "planned": 4
   },
   "work_packages": {
     "WP01": {
-      "actor": "finalize-tasks",
+      "actor": "implement-command",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KR97F1E65JB7CKQ5ZYR75HZ1",
-      "last_transition_at": "2026-05-10T15:18:03.462429+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KR97QAVZA5FRK9D1SSDY80JA",
+      "last_transition_at": "2026-05-10T15:22:35.263464+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",
