@@ -23,10 +23,10 @@ See `spec.md` for goal and acceptance criteria, `plan.md` for inventory, design 
 | T031 | Unit tests for CP-NEW: tampered file produces non-zero exit with file path + expected value; matched files produce zero exit | WP03 | [D] |
 | T032 | `.github/workflows/ci.yml`: add `fetch-tags: true` (or `fetch-depth: 0`) to the `composer-policy` job's `actions/checkout` step so CP-NEW can resolve the latest tag | WP03 | [D] |
 | T033 | Verify on a real PR: open a draft, push, confirm CI's `composer-policy` job sees the tag and CP-NEW passes | WP03 | [D] |
-| T040 | Run `bin/sync-internal-versions 0.1.0-alpha.175` (or the current latest tag) against `packages/*/composer.json`; expect 56 files modified, 210 line edits | WP04 | [D]      |
-| T041 | Run `composer update --lock --no-install --ignore-platform-req=ext-gmp`; commit `composer.lock` alongside the manifest sweep | WP04 | [D]      |
-| T042 | Single commit: `chore(composer-policy): backfill internal version constraints to ^0.1.0-alpha.175` (adjust tag in subject if a newer alpha was cut between WP03 and WP04) | WP04 | [D]      |
-| T043 | Local verification: `bin/check-composer-policy` (incl. CP-NEW) passes; `composer phpstan`, `vendor/bin/phpunit`, `composer cs-check` all green | WP04 | [D]      |
+| T040 | Run `bin/sync-internal-versions 0.1.0-alpha.175` (or the current latest tag) against `packages/*/composer.json`; expect 56 files modified, 210 line edits | WP04 | [D] |
+| T041 | Run `composer update --lock --no-install --ignore-platform-req=ext-gmp`; commit `composer.lock` alongside the manifest sweep | WP04 | [D] |
+| T042 | Single commit: `chore(composer-policy): backfill internal version constraints to ^0.1.0-alpha.175` (adjust tag in subject if a newer alpha was cut between WP03 and WP04) | WP04 | [D] |
+| T043 | Local verification: `bin/check-composer-policy` (incl. CP-NEW) passes; `composer phpstan`, `vendor/bin/phpunit`, `composer cs-check` all green | WP04 | [D] |
 | T050 | `CLAUDE.md`: add one line under "Composer policy is codified and gated via `bin/check-composer-policy`" pointing at `bin/sync-internal-versions` and CP-NEW | WP05 | [P] [D]  |
 | T051 | `CHANGELOG.md` `[Unreleased]` `### Changed`: bullet describing the mechanism (sync script, CP-NEW gate, backfill commit), referencing this mission slug | WP05 | [P] [D]  |
 | T052 | Drift-detector pass: stamp any `docs/specs/*.md` that maps to `bin/check-composer-policy` or `scripts/release.sh` if drift-detector flags them | WP05 | [D]      |
@@ -73,10 +73,10 @@ Legend: `[D]` = description finalized. `[P]` = independently parallelizable insi
 
 | Subtask | Description |
 |---|---|
-| T040 | Run `bin/sync-internal-versions <current-tag>` against `packages/*/composer.json` (56 files, ~210 line edits) |
-| T041 | `composer update --lock --no-install --ignore-platform-req=ext-gmp`; commit `composer.lock` alongside |
-| T042 | Single commit: `chore(composer-policy): backfill internal version constraints to ^0.1.0-alpha.<NNN>` |
-| T043 | Local verification: `bin/check-composer-policy` (incl. CP-NEW), `composer phpstan`, `vendor/bin/phpunit`, `composer cs-check` all green |
+| T040 | Run `bin/sync-internal-versions <current-tag>` against `packages/*/composer.json` (56 files, ~210 line edits) | [D] |
+| T041 | `composer update --lock --no-install --ignore-platform-req=ext-gmp`; commit `composer.lock` alongside | [D] |
+| T042 | Single commit: `chore(composer-policy): backfill internal version constraints to ^0.1.0-alpha.<NNN>` | [D] |
+| T043 | Local verification: `bin/check-composer-policy` (incl. CP-NEW), `composer phpstan`, `vendor/bin/phpunit`, `composer cs-check` all green | [D] |
 
 ---
 
