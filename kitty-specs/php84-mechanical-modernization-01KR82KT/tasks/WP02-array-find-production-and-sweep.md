@@ -12,6 +12,8 @@ branch_strategy: Planning artifacts for this feature were generated on main. Dur
 subtasks:
 - T005
 - T006
+agent: "claude:opus-4-7:opus-implementer:implementer"
+shell_pid: "88915"
 history:
 - timestamp: '2026-05-10T04:40:07Z'
   actor: spec-kitty.tasks
@@ -119,3 +121,7 @@ The sweep covers `packages/routing/src/` and `packages/access/src/` — likely c
 ```bash
 spec-kitty agent action implement WP02 --agent <agent-name>
 ```
+
+## Activity Log
+
+- 2026-05-10T04:50:50Z – claude:opus-4-7:opus-implementer:implementer – shell_pid=88915 – Started implementation via action command
