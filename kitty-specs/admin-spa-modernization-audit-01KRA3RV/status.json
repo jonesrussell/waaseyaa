@@ -1,0 +1,42 @@
+{
+  "event_count": 6,
+  "last_event_id": "01KRA4WMN5ZZR449SH70N529HM",
+  "materialized_at": "2026-05-10T23:52:17.830004+00:00",
+  "mission_number": "",
+  "mission_slug": "admin-spa-modernization-audit-01KRA3RV",
+  "mission_type": "research",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 3,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRA4WGWFQEM7H9ZDTW0A0J1Z",
+      "last_transition_at": "2026-05-10T23:52:13.967712+00:00"
+    },
+    "WP02": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRA4WJSSXXMNB6M4KB4BXH8X",
+      "last_transition_at": "2026-05-10T23:52:15.929346+00:00"
+    },
+    "WP03": {
+      "actor": "user",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRA4WMN5ZZR449SH70N529HM",
+      "last_transition_at": "2026-05-10T23:52:17.830004+00:00"
+    }
+  }
+}

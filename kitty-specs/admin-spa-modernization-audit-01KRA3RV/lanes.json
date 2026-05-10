@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "mission_slug": "admin-spa-modernization-audit-01KRA3RV",
+  "mission_id": "01KRA3RV5GPMP178F2VMEX1TW1",
+  "mission_branch": "kitty/mission-admin-spa-modernization-audit-01KRA3RV",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP03"
+      ],
+      "write_scope": [
+        "docs/audits/admin-spa-modernization-2026-05-10.md",
+        "kitty-specs/admin-spa-modernization-audit-01KRA3RV/tasks/WP03-tooling-envelope-assembly.md",
+        "kitty-specs/admin-spa-modernization-audit-01KRA3RV/tasks/working/envelope-section.md",
+        "kitty-specs/admin-spa-modernization-audit-01KRA3RV/tasks/working/tooling-section.md",
+        "kitty-specs/admin-spa-modernization-audit-01KRA3RV/tasks/working/top5-section.md"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "workspace"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP01",
+        "WP02"
+      ],
+      "write_scope": [
+        "kitty-specs/admin-spa-modernization-audit-01KRA3RV/tasks/WP01-drift-inventory.md",
+        "kitty-specs/admin-spa-modernization-audit-01KRA3RV/tasks/WP02-coverage-walk.md",
+        "kitty-specs/admin-spa-modernization-audit-01KRA3RV/tasks/working/coverage-section.md",
+        "kitty-specs/admin-spa-modernization-audit-01KRA3RV/tasks/working/drift-section.md"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-10T23:42:35.745215+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP01",
+    "WP02"
+  ]
+}
