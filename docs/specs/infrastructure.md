@@ -1486,6 +1486,8 @@ Long-running daemon that processes jobs from a queue transport.
 
 `FailedJobRepositoryInterface` with implementations: `DatabaseFailedJobRepository` (DBAL-backed), `InMemoryFailedJobRepository` (testing).
 
+The legacy concrete `FailedJobRepository` class (a thin facade delegating to `InMemoryFailedJobRepository`) is **deprecated**. Its constructor carries a PHP 8.4 `#[\Deprecated(message: …, since: '0.1')]` attribute so that any `new FailedJobRepository(...)` call emits `E_USER_DEPRECATED` and surfaces in PHPStan/IDEs/Reflection. The class-level `@deprecated` docblock is retained because PHP 8.4's `\Deprecated` attribute disallows class targets (`Attribute::TARGET_FUNCTION | TARGET_METHOD | TARGET_CLASS_CONSTANT` only), so docblock and constructor-attribute together provide full coverage. New code MUST type-hint `FailedJobRepositoryInterface` and inject `InMemoryFailedJobRepository` or `DatabaseFailedJobRepository` directly.
+
 ### Message types
 
 | Message | Purpose |
