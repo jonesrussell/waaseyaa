@@ -1,8 +1,8 @@
 {
   "mission_slug": "php-8-5-upgrade-01KR8DN2",
-  "mission_number": null,
+  "mission_number": "",
   "mission_type": "software-dev",
-  "overall_verdict": "approved",
+  "overall_verdict": "pending",
   "criteria": [
     {
       "criterion_id": "FR-001",
@@ -52,13 +52,13 @@
       "pass_fail": "pass",
       "verified_by": "phpunit",
       "verified_at": "2026-05-10T14:00:00Z",
-      "notes": "Original audit predicted regression tests per fix; not added because the fixes are deletions/replacements with no new behavior to test — existing test coverage exercises the affected paths and would have surfaced regressions."
+      "notes": "Original audit predicted regression tests per fix; not added because the fixes are deletions/replacements with no new behavior to test \u2014 existing test coverage exercises the affected paths and would have surfaced regressions."
     },
     {
       "criterion_id": "FR-006",
       "description": "#[\\NoDiscard] applied to AccessResult, query-builder fluent methods, and EntityRepository::find*(); surfaced ignored-return call sites are fixed, not suppressed.",
       "proof_type": "code_review",
-      "evidence": "Commit 853849c25 applies NoDiscard to AccessResult::{allowed,forbidden,neutral,unauthenticated}, EntityRepositoryInterface::{find,findMany,findBy,loadRevision,rollback}, and DBALSelect fluent methods (10 methods). 16 call sites updated to capture mutating-fluent return values across SqlStorageDriver, SqlEntityQuery, SqlEntityStorage, DBALSelectTest. ValidationResult target skipped — class does not exist; package delegates to Symfony ConstraintViolationList.",
+      "evidence": "Commit 853849c25 applies NoDiscard to AccessResult::{allowed,forbidden,neutral,unauthenticated}, EntityRepositoryInterface::{find,findMany,findBy,loadRevision,rollback}, and DBALSelect fluent methods (10 methods). 16 call sites updated to capture mutating-fluent return values across SqlStorageDriver, SqlEntityQuery, SqlEntityStorage, DBALSelectTest. ValidationResult target skipped \u2014 class does not exist; package delegates to Symfony ConstraintViolationList.",
       "pass_fail": "pass",
       "verified_by": "phpunit",
       "verified_at": "2026-05-10T14:00:00Z",
@@ -68,17 +68,17 @@
       "criterion_id": "FR-007",
       "description": "PHP 8.4/8.5 ergonomic features adopted at clear-win sites: array_first/array_last, array_find, pipe operator.",
       "proof_type": "code_review",
-      "evidence": "Commit e65faf132 adopts array_find at 2 clear-win sites (SearchResult::getFacet, CliTester::findOption). array_first/array_last skipped — surveyed 5 reset() sites, all reject because surrounding type contracts (load() accepts int|string, not null) require an explicit empty guard either way. Pipe operator skipped — no clear-win sites; the most idiomatic candidates were already two-step expressions.",
+      "evidence": "Commit e65faf132 adopts array_find at 2 clear-win sites (SearchResult::getFacet, CliTester::findOption). array_first/array_last skipped \u2014 surveyed 5 reset() sites, all reject because surrounding type contracts (load() accepts int|string, not null) require an explicit empty guard either way. Pipe operator skipped \u2014 no clear-win sites; the most idiomatic candidates were already two-step expressions.",
       "pass_fail": "pass",
       "verified_by": "phpunit",
       "verified_at": "2026-05-10T14:00:00Z",
-      "notes": "Conservative interpretation of 'where they improve readability' — opportunistic, not exhaustive."
+      "notes": "Conservative interpretation of 'where they improve readability' \u2014 opportunistic, not exhaustive."
     },
     {
       "criterion_id": "FR-008",
       "description": ".php-cs-fixer.dist.php includes @PHP8x5Migration; lazy-init closures converted to const where applicable.",
       "proof_type": "code_review",
-      "evidence": "Commit f048604aa adds @PHP8x5Migration ruleset (cs-fixer 3.95+ canonical name; @PHP85Migration deprecated). 102 files touched: 52× octal_notation (0o prefix), 58× new_expression_parentheses (chained-new), 8× heredoc_indentation. closures-in-const skipped — surveyed all static methods, 0 candidates qualified (no first-class-callable patterns where the static method exists only as a Foo::method(...) reference).",
+      "evidence": "Commit f048604aa adds @PHP8x5Migration ruleset (cs-fixer 3.95+ canonical name; @PHP85Migration deprecated). 102 files touched: 52\u00d7 octal_notation (0o prefix), 58\u00d7 new_expression_parentheses (chained-new), 8\u00d7 heredoc_indentation. closures-in-const skipped \u2014 surveyed all static methods, 0 candidates qualified (no first-class-callable patterns where the static method exists only as a Foo::method(...) reference).",
       "pass_fail": "pass",
       "verified_by": "php-cs-fixer",
       "verified_at": "2026-05-10T14:00:00Z",
@@ -98,7 +98,7 @@
       "criterion_id": "FR-010",
       "description": "All hard-gate verification commands pass.",
       "proof_type": "automated_test",
-      "evidence": "Pre-push hook (lefthook) runs spec-drift, composer-policy, phpstan, phpunit on every push during the lane — all green on the latest commit 9b69f7874. PHPStan: 1193 files, 0 errors. PHPUnit: 7497 tests, 18118 assertions, 0 failures, 2 expected skips, 0 deprecations.",
+      "evidence": "Pre-push hook (lefthook) runs spec-drift, composer-policy, phpstan, phpunit on every push during the lane \u2014 all green on the latest commit 9b69f7874. PHPStan: 1193 files, 0 errors. PHPUnit: 7497 tests, 18118 assertions, 0 failures, 2 expected skips, 0 deprecations.",
       "pass_fail": "pass",
       "verified_by": "lefthook",
       "verified_at": "2026-05-10T14:00:00Z",
@@ -108,7 +108,7 @@
       "criterion_id": "QG-cs-check",
       "description": "Quality gate: composer cs-check (PHP-CS-Fixer dry-run) clean.",
       "proof_type": "automated_test",
-      "evidence": "composer cs-check after commit f048604aa applied the @PHP8x5Migration ruleset — files array empty.",
+      "evidence": "composer cs-check after commit f048604aa applied the @PHP8x5Migration ruleset \u2014 files array empty.",
       "pass_fail": "pass",
       "verified_by": "php-cs-fixer",
       "verified_at": "2026-05-10T14:00:00Z",
@@ -128,7 +128,7 @@
       "criterion_id": "QG-phpunit",
       "description": "Quality gate: full vendor/bin/phpunit suite passes with zero deprecations.",
       "proof_type": "automated_test",
-      "evidence": "Tests: 7497, Assertions: 18118, PHPUnit Warnings: 1 (no code coverage driver — pre-existing, unrelated), Deprecations: 0, Skipped: 2 (pre-existing).",
+      "evidence": "Tests: 7497, Assertions: 18118, PHPUnit Warnings: 1 (no code coverage driver \u2014 pre-existing, unrelated), Deprecations: 0, Skipped: 2 (pre-existing).",
       "pass_fail": "pass",
       "verified_by": "phpunit",
       "verified_at": "2026-05-10T14:00:00Z",
@@ -172,7 +172,7 @@
       "verification_method": "grep_absence",
       "verification_command": "git diff 1030f57bf..9b69f7874 -- packages/ | grep -E '@phpstan-ignore|@var\\s+|\\(void\\)'",
       "result": "confirmed_absent",
-      "evidence": "Diff scan shows no new ignore-pragmas or void casts in the WP03 fix-up commit (853849c25). All 16 call-site fixes are reassignment ($query = $query->method(...))."
+      "evidence": "grep found zero matches"
     },
     {
       "invariant_id": "NI-002",
@@ -180,15 +180,15 @@
       "verification_method": "grep_absence",
       "verification_command": "rg -n '\"php\"\\s*:' packages/cms/composer.json packages/core/composer.json packages/full/composer.json",
       "result": "confirmed_absent",
-      "evidence": "All three metapackages still rely on transitive constraint via siblings."
+      "evidence": "grep found zero matches"
     },
     {
       "invariant_id": "NI-003",
       "description": "DBALSelect fluent methods remain mutating-and-return-self; #[\\NoDiscard] did not introduce immutable-rebuild semantics.",
       "verification_method": "grep_presence",
       "verification_command": "rg -n 'return \\$this;' packages/database-legacy/src/Query/DBALSelect.php",
-      "result": "confirmed_present",
-      "evidence": "All marked methods still terminate with return $this; (lines 51, 66, 99, 117, 125, 138, 146, 154 verified during WP03 review)."
+      "result": "pending",
+      "evidence": "Unknown verification method: grep_presence"
     }
   ]
 }
