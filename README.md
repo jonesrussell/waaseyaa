@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/waaseyaa/framework/actions/workflows/ci.yml/badge.svg)](https://github.com/waaseyaa/framework/actions/workflows/ci.yml)
 [![License: GPL-2.0-or-later](https://img.shields.io/badge/License-GPL--2.0--or--later-blue.svg)](LICENSE.txt)
-[![PHP 8.4+](https://img.shields.io/badge/PHP-8.4%2B-8892BF.svg)](https://www.php.net/)
+[![PHP 8.5+](https://img.shields.io/badge/PHP-8.5%2B-8892BF.svg)](https://www.php.net/)
 
-A modern, entity-first, AI-native content management framework built on PHP 8.4+ and Symfony 7.
+A modern, entity-first, AI-native content management framework built on PHP 8.5+ and Symfony 7.
 
 Waaseyaa replaces Drupal's legacy runtime with a clean, modular architecture organized as independent Composer packages. Every subsystem — entities, fields, config, caching, routing, access control — is a standalone package with explicit interfaces, no global state, and no hidden coupling.
 
@@ -20,7 +20,7 @@ Waaseyaa replaces Drupal's legacy runtime with a clean, modular architecture org
 
 ## Requirements
 
-- PHP 8.4 or later
+- PHP 8.5 or later
 - Composer 2.x
 - SQLite 3 (default) or MySQL/PostgreSQL via Doctrine DBAL
 

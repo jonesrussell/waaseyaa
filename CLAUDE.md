@@ -177,7 +177,7 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 - `bin/waaseyaa optimize:manifest` — rebuild attribute-discovery manifest
 
 ## Code Style
-- PHP 8.4+, `declare(strict_types=1)` in every file
+- PHP 8.5+, `declare(strict_types=1)` in every file
 - Namespace pattern: `Waaseyaa\PackageName\` (e.g., `Waaseyaa\Entity\`, `Waaseyaa\AI\Schema\`)
 - Test namespace: `Waaseyaa\PackageName\Tests\Unit\` or `Waaseyaa\Tests\Integration\PhaseN\`
 - PHPUnit 10.5 attributes: `#[Test]`, `#[CoversClass(...)]`, `#[CoversNothing]` for integration tests
