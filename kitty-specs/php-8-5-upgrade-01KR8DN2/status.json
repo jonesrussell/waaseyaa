@@ -1,0 +1,63 @@
+{
+  "event_count": 6,
+  "last_event_id": "01KR8EFV8W72S1RFWZF4H1YERD",
+  "materialized_at": "2026-05-10T08:01:35.516625+00:00",
+  "mission_number": "",
+  "mission_slug": "php-8-5-upgrade-01KR8DN2",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 6
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR8EFTNTWV4Q7FM71KR7663T",
+      "last_transition_at": "2026-05-10T08:01:34.907019+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR8EFV3P2M4114F4X8BZTCS4",
+      "last_transition_at": "2026-05-10T08:01:35.350062+00:00"
+    },
+    "WP03": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR8EFV55764ABREDGSY2ETGN",
+      "last_transition_at": "2026-05-10T08:01:35.397961+00:00"
+    },
+    "WP04": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR8EFV6CHF10RD3PE0ZN3W9T",
+      "last_transition_at": "2026-05-10T08:01:35.436962+00:00"
+    },
+    "WP05": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR8EFV7PCMMYW8TM95WE9JEE",
+      "last_transition_at": "2026-05-10T08:01:35.478926+00:00"
+    },
+    "WP06": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR8EFV8W72S1RFWZF4H1YERD",
+      "last_transition_at": "2026-05-10T08:01:35.516625+00:00"
+    }
+  }
+}
