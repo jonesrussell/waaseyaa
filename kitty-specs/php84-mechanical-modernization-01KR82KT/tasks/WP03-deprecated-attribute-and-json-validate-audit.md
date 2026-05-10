@@ -15,6 +15,8 @@ subtasks:
 - T007
 - T008
 - T009
+agent: "claude:opus-4-7:opus-implementer:implementer"
+shell_pid: "90489"
 history:
 - timestamp: '2026-05-10T04:40:07Z'
   actor: spec-kitty.tasks
@@ -156,3 +158,7 @@ composer check-composer-policy           # composer manifest policy
 ```bash
 spec-kitty agent action implement WP03 --agent <agent-name>
 ```
+
+## Activity Log
+
+- 2026-05-10T04:54:24Z – claude:opus-4-7:opus-implementer:implementer – shell_pid=90489 – Started implementation via action command
