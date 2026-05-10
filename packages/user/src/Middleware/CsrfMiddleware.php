@@ -29,10 +29,7 @@ final class CsrfMiddleware implements HttpMiddlewareInterface
         $this->ensureToken();
 
         if (!$this->requiresValidation($request)) {
-            $response = $next->handle($request);
-            $this->attachXsrfCookie($request, $response);
-
-            return $response;
+            return $next->handle($request);
         }
 
         if (!$this->hasValidToken($request)) {
@@ -57,10 +54,7 @@ final class CsrfMiddleware implements HttpMiddlewareInterface
             ], 403, ['Content-Type' => 'application/vnd.api+json']);
         }
 
-        $response = $next->handle($request);
-        $this->attachXsrfCookie($request, $response);
-
-        return $response;
+        return $next->handle($request);
     }
 
     /**
@@ -158,32 +152,6 @@ final class CsrfMiddleware implements HttpMiddlewareInterface
         }
 
         return false;
-    }
-
-    private function attachXsrfCookie(Request $request, Response $response): void
-    {
-        // Only set cookie on text/html responses.
-        $contentType = $response->headers->get('Content-Type', '');
-        $primaryType = strtolower(trim(explode(';', $contentType)[0]));
-        if ($primaryType !== 'text/html') {
-            return;
-        }
-
-        // Idempotency: don't double-set if already present.
-        foreach ($response->headers->getCookies() as $cookie) {
-            if ($cookie->getName() === self::XSRF_COOKIE_NAME) {
-                return;
-            }
-        }
-
-        $cookie = Cookie::create(self::XSRF_COOKIE_NAME)
-            ->withValue(rawurlencode($this->getToken()))
-            ->withPath('/')
-            ->withSecure($request->isSecure())
-            ->withHttpOnly(false)
-            ->withSameSite(Cookie::SAMESITE_LAX);
-
-        $response->headers->setCookie($cookie);
     }
 
     private function ensureToken(): void
