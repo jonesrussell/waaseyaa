@@ -162,3 +162,4 @@ spec-kitty agent action implement WP03 --agent <agent-name>
 ## Activity Log
 
 - 2026-05-10T04:54:24Z – claude:opus-4-7:opus-implementer:implementer – shell_pid=90489 – Started implementation via action command
+- 2026-05-10T04:58:31Z – claude:opus-4-7:opus-implementer:implementer – shell_pid=90489 – WP03 ready: #[\Deprecated] applied to FailedJobRepository constructor (PHP 8.4 disallows class targets, ctor placement triggers deprecation on instantiation, surfacing in IDE/PHPStan/Reflection); FR-007/008/009 closed with rationale on mission branch (kitty-specs/php84-.../audit-fr-007-009.md); five-tool verification all green (7497 tests, PHPStan, cs-check, package-layers, composer-policy)
