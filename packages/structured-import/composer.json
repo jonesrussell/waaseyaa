@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "php": "^8.4",
+        "php": "^8.5",
         "waaseyaa/field": "^0.1.0-alpha.150",
         "waaseyaa/foundation": "^0.1.0-alpha.150"
     },

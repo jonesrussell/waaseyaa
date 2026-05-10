@@ -4,7 +4,7 @@
     "type": "library",
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "twig/twig": "^3.0",
         "waaseyaa/foundation": "^0.1.0-alpha.150",
         "waaseyaa/database-legacy": "^0.1.0-alpha.150",

@@ -54,7 +54,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "webonyx/graphql-php": "^15.31.5",
         "waaseyaa/entity": "^0.1.0-alpha.150",
         "waaseyaa/field": "^0.1.0-alpha.150",
