@@ -1,0 +1,42 @@
+{
+  "event_count": 3,
+  "last_event_id": "01KR836FQVKF35Z8P443V12ST1",
+  "materialized_at": "2026-05-10T04:44:14.460006+00:00",
+  "mission_number": "",
+  "mission_slug": "php84-mechanical-modernization-01KR82KT",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 3
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR836F664VMCMHKCRNBV083G",
+      "last_transition_at": "2026-05-10T04:44:13.894955+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR836FP1929QPS5NMGCDPYZ9",
+      "last_transition_at": "2026-05-10T04:44:14.401690+00:00"
+    },
+    "WP03": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KR836FQVKF35Z8P443V12ST1",
+      "last_transition_at": "2026-05-10T04:44:14.460006+00:00"
+    }
+  }
+}

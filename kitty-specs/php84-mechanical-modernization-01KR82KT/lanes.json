@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "mission_slug": "php84-mechanical-modernization-01KR82KT",
+  "mission_id": "01KR82KTVK0XEZX5VMA126NH8M",
+  "mission_branch": "kitty/mission-php84-mechanical-modernization-01KR82KT",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03"
+      ],
+      "write_scope": [
+        "packages/cli/src/Handler/FixturePackRefreshHandler.php",
+        "packages/cli/src/Handler/MigrateDefaultsHandler.php",
+        "packages/cli/src/Ingestion/SemanticRefreshTriggerPlanner.php",
+        "packages/cli/tests/Unit/Command/IngestRunCommandTest.php",
+        "packages/cli/tests/Unit/Ingestion/SchemaValidatorTest.php",
+        "packages/cli/tests/Unit/Ingestion/ValidationGateValidatorTest.php",
+        "packages/foundation/tests/Unit/Ingestion/PayloadValidatorTest.php",
+        "packages/queue/src/FailedJobRepository.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-10T04:44:14.510906+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP01"
+      }
+    ],
+    "total_merges": 2,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 2
+    }
+  }
+}
