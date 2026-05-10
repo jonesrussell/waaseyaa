@@ -1,7 +1,7 @@
 {
-  "event_count": 19,
-  "last_event_id": "01KR99CN6PVPRE48V4ZG8F5090",
-  "materialized_at": "2026-05-10T15:51:42.550996+00:00",
+  "event_count": 20,
+  "last_event_id": "01KR99GKYETJT81VV03F39XQK1",
+  "materialized_at": "2026-05-10T15:53:52.334608+00:00",
   "mission_number": "",
   "mission_slug": "composer-internal-version-sweep-01KR96NA",
   "mission_type": "software-dev",
@@ -11,8 +11,8 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 4,
-    "in_progress": 1,
+    "for_review": 5,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 0
   },
@@ -46,11 +46,11 @@
       "last_transition_at": "2026-05-10T15:48:39.906839+00:00"
     },
     "WP05": {
-      "actor": "sonnet",
+      "actor": "user",
       "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KR99CN6PVPRE48V4ZG8F5090",
-      "last_transition_at": "2026-05-10T15:51:42.550996+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KR99GKYETJT81VV03F39XQK1",
+      "last_transition_at": "2026-05-10T15:53:52.334608+00:00"
     }
   }
 }
