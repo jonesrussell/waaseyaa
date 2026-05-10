@@ -20,7 +20,99 @@ policy_id = {
     "core_runtime_surface": "CP004",
     "tight_internal_floor": "CP005",
     "self_version_scope": "CP006",
+    "version_sync": "CP-NEW",
 }
+
+# ---------------------------------------------------------------------------
+# CP-NEW: Cross-file internal constraint consistency.
+# Every waaseyaa/* constraint in packages/*/composer.json must equal
+# ^<current-git-tag> (the most recent vX.Y.Z tag on the repo).
+#
+# This depends on bin/lib/internal-version-sync.php (produced by WP01).
+# If the lib file is absent, CP-NEW is skipped with a clear error so merge
+# problems are loud, not silent.
+# ---------------------------------------------------------------------------
+
+import subprocess
+import sys as _sys
+
+_CP_NEW_LIB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lib", "internal-version-sync.php")
+_CP_NEW_EXPECTED_VERSION = None   # str | None — None means skip
+_CP_NEW_WARNING = None            # str | None — set when skipping with a reason
+
+def _resolve_cp_new_expected() -> None:
+    global _CP_NEW_EXPECTED_VERSION, _CP_NEW_WARNING
+
+    # Strategy A: delegate to the shared PHP lib when it exists.
+    if os.path.isfile(_CP_NEW_LIB):
+        php_code = (
+            "<?php "
+            f"require '{_CP_NEW_LIB}'; "
+            "try { echo resolveCurrentVersion(); } "
+            "catch (\\RuntimeException $e) { fwrite(STDERR, $e->getMessage()); exit(2); }"
+        )
+        try:
+            result = subprocess.run(
+                ["php", "-r", php_code],
+                capture_output=True, text=True, timeout=10
+            )
+            if result.returncode == 2:
+                # resolveCurrentVersion() threw — no tags found
+                _CP_NEW_WARNING = (
+                    "CP-NEW skipped: git tag resolution failed "
+                    f"({result.stderr.strip() or 'no tags found'}). "
+                    "Run in a repo with at least one vX.Y.Z tag to enable this check."
+                )
+                return
+            if result.returncode != 0:
+                _CP_NEW_WARNING = (
+                    f"CP-NEW skipped: bin/lib/internal-version-sync.php exited {result.returncode}: "
+                    f"{result.stderr.strip()}"
+                )
+                return
+            version = result.stdout.strip()
+            if not version:
+                _CP_NEW_WARNING = "CP-NEW skipped: resolveCurrentVersion() returned empty string."
+                return
+            _CP_NEW_EXPECTED_VERSION = version
+        except (subprocess.TimeoutExpired, FileNotFoundError) as exc:
+            _CP_NEW_WARNING = f"CP-NEW skipped: could not invoke php ({exc})."
+        return
+
+    # Strategy B (fallback): resolve git tag directly in Python.
+    # This path is active before WP01 merges, or if the lib is unavailable.
+    try:
+        result = subprocess.run(
+            ["git", "describe", "--tags", "--abbrev=0", "--match=v*.*.*"],
+            capture_output=True, text=True, timeout=10,
+            cwd=str(root)
+        )
+        if result.returncode != 0:
+            _CP_NEW_WARNING = (
+                "CP-NEW skipped: no git tags found matching v*.*.* — "
+                "this is expected in shallow CI clones without fetch-tags: true "
+                "and in local clones before the first release tag. "
+                "Add 'fetch-tags: true' to the composer-policy CI job checkout step."
+            )
+            return
+        raw = result.stdout.strip()
+        version = raw.lstrip("v")
+        if not version:
+            _CP_NEW_WARNING = "CP-NEW skipped: git tag produced empty version string."
+            return
+        _CP_NEW_EXPECTED_VERSION = version
+    except (subprocess.TimeoutExpired, FileNotFoundError) as exc:
+        _CP_NEW_WARNING = f"CP-NEW skipped: could not run git ({exc})."
+
+_resolve_cp_new_expected()
+
+
+def fail_cp_new(rel_path: str, pkg: str, actual: str, expected: str) -> None:
+    print(f"FAIL [CP-NEW] {rel_path}")
+    print(f"  package:  {pkg}")
+    print(f"  actual:   {actual}")
+    print(f"  expected: {expected}")
+    print(f"  fix:      run bin/sync-internal-versions after tagging, or run WP04 backfill")
 
 # Cross-package constraints in publishable manifests must include an explicit
 # pre-release floor (alpha/beta/rc/dev), otherwise Composer can resolve a
@@ -170,6 +262,36 @@ for path in in_scope:
                         f'{forbidden_pkg} in require',
                         f"move {forbidden_pkg} to suggest (core runtime must remain install-safe)",
                     )
+
+# ---------------------------------------------------------------------------
+# CP-NEW run: compare every packages/*/composer.json waaseyaa/* constraint
+# against the expected ^<current-version> literal.
+# ---------------------------------------------------------------------------
+
+if _CP_NEW_WARNING:
+    print(f"WARNING [CP-NEW] {_CP_NEW_WARNING}", file=sys.stderr)
+elif _CP_NEW_EXPECTED_VERSION is not None:
+    expected_constraint = f"^{_CP_NEW_EXPECTED_VERSION}"
+    for path in in_scope:
+        rel = path.relative_to(root).as_posix()
+        # CP-NEW only applies to per-package manifests, not root.
+        if not rel.startswith("packages/"):
+            continue
+        data = json.loads(path.read_text())
+        for sec in ("require", "require-dev"):
+            section = data.get(sec, {})
+            if not isinstance(section, dict):
+                continue
+            for pkg, version in section.items():
+                if not isinstance(version, str):
+                    continue
+                if pkg.startswith("waaseyaa/") and version != expected_constraint:
+                    # Only flag constraints that pass the tight-floor shape
+                    # (i.e. have a pre-release anchor). Non-anchored literals
+                    # are already caught by CP005; flagging them twice adds noise.
+                    if TIGHT_FLOOR_PATTERN.search(version):
+                        errors += 1
+                        fail_cp_new(rel, pkg, version, expected_constraint)
 
 if errors == 0:
     print("OK: Composer policy checks passed")
