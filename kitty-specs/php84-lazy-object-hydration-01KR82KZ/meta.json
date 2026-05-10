@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-10T04:34:09.195595+00:00",
+  "friendly_name": "php84 lazy object hydration",
+  "mission_id": "01KR82KZYWGMJPTTD5X54JKHKK",
+  "mission_number": null,
+  "mission_slug": "php84-lazy-object-hydration-01KR82KZ",
+  "mission_type": "software-dev",
+  "slug": "php84-lazy-object-hydration-01KR82KZ",
+  "target_branch": "main"
+}
