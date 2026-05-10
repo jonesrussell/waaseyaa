@@ -1,10 +1,12 @@
 {
   "created_at": "2026-05-10T23:32:45.613570+00:00",
-  "friendly_name": "admin spa modernization audit",
+  "friendly_name": "Admin SPA Modernization Audit",
   "mission_id": "01KRA3RV5GPMP178F2VMEX1TW1",
   "mission_number": null,
   "mission_slug": "admin-spa-modernization-audit-01KRA3RV",
   "mission_type": "research",
   "slug": "admin-spa-modernization-audit-01KRA3RV",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "source_description": "Audit-only mission producing a prioritized backlog of follow-up missions to bring packages/admin (the schema-driven admin SPA) into alignment with the current Waaseyaa framework. Covers framework alignment drift across the full v1.x lifetime, feature coverage gaps against the L2-L6 package list, dependency/tooling staleness, and package envelope/boundary health. Outputs docs/audits/admin-spa-modernization-2026-05-10.md plus GitHub follow-up issues with Track milestones. No code changes inside packages/admin and no backend changes."
 }
