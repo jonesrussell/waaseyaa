@@ -11,8 +11,8 @@
 | T002 | array_find swap in `PayloadValidatorTest.php:618` | WP01 | [D] |
 | T003 | array_find swap in `ValidationGateValidatorTest.php:80` | WP01 | [D] |
 | T004 | array_find swap in `IngestRunCommandTest.php:256` | WP01 | [D] |
-| T005 | Verify first-match semantics, then array_find swap in `SemanticRefreshTriggerPlanner.php:415` | WP02 | |
-| T006 | Read-only sweep of `packages/routing/src/` and `packages/access/src/` for `foreach { if return }` candidates | WP02 | |
+| T005 | Verify first-match semantics, then array_find swap in `SemanticRefreshTriggerPlanner.php:415` | WP02 | | [D] |
+| T006 | Read-only sweep of `packages/routing/src/` and `packages/access/src/` for `foreach { if return }` candidates | WP02 | | [D] |
 | T007 | Add `#[\Deprecated]` attribute on `FailedJobRepository`, keep docblock | WP03 | [P] |
 | T008 | Audit `MigrateDefaultsHandler.php:236`, `FixturePackRefreshHandler.php:41`, `PerformanceCompareCommand` for json_validate eligibility; close-with-rationale where decoded value is consumed | WP03 | [P] |
 | T009 | Final verification: run full PHPUnit, PHPStan level 5, PHP-CS-Fixer, layer + composer policy checks | WP03 | |
@@ -64,8 +64,8 @@ See `tasks/WP01-array-find-ingestion-tests.md`.
 
 ### Included subtasks
 
-- [ ] T005 Verify first-match semantics, then array_find swap in `packages/cli/src/Ingestion/SemanticRefreshTriggerPlanner.php:415`
-- [ ] T006 Read-only sweep of `packages/routing/src/` and `packages/access/src/` for `foreach { if return }` candidates; document findings in WP closing notes (no edits in those packages here — file follow-up issue if surfaces material count)
+- [x] T005 Verify first-match semantics, then array_find swap in `packages/cli/src/Ingestion/SemanticRefreshTriggerPlanner.php:415`
+- [x] T006 Read-only sweep of `packages/routing/src/` and `packages/access/src/` for `foreach { if return }` candidates; document findings in WP closing notes (no edits in those packages here — file follow-up issue if surfaces material count)
 
 ### Implementation sketch
 
