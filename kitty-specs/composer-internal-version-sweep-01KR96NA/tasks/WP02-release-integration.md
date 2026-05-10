@@ -16,7 +16,7 @@ subtasks:
 - T020
 - T021
 - T022
-shell_pid: '263152'
+shell_pid: "263152"
 history: []
 authoritative_surface: .github/workflows/release-cut.yml
 execution_mode: code_change
@@ -24,6 +24,7 @@ owned_files:
 - .github/workflows/release-cut.yml
 - scripts/release.sh
 tags: []
+agent: "sonnet"
 ---
 
 # WP02 — Release entry-point integration
@@ -37,3 +38,7 @@ Wire `bin/sync-internal-versions` (from WP01) into both release entry points so 
 - Both paths converge: a cut from either ends with the same tree shape (root version field unchanged, per-package literals all `^<version>`, lockfile regenerated).
 
 See `../plan.md` Design Decision D1 (reference is git tag) and Risk R4 (concurrency already handled by the workflow's `concurrency:` group).
+
+## Activity Log
+
+- 2026-05-10T15:32:48Z – sonnet – shell_pid=263152 – Assigned agent via action command
