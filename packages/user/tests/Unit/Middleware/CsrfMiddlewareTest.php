@@ -22,9 +22,10 @@ final class CsrfMiddlewareTest extends TestCase
     protected function setUp(): void
     {
         if (session_status() !== \PHP_SESSION_ACTIVE) {
-            // Use a mock session for tests.
-            $_SESSION = [];
+            session_start();
         }
+
+        $_SESSION = [];
 
         $this->middleware = new CsrfMiddleware();
 
@@ -38,6 +39,9 @@ final class CsrfMiddlewareTest extends TestCase
 
     protected function tearDown(): void
     {
+        if (session_status() === \PHP_SESSION_ACTIVE) {
+            session_destroy();
+        }
         $_SESSION = [];
     }
 
@@ -408,37 +412,8 @@ final class CsrfMiddlewareTest extends TestCase
 
     // -------------------------------------------------------------------------
     // T006 — Cookie writer: every contract §1 attribute pinned
+    // Tests call the static helper directly — the live path used by HttpKernel.
     // -------------------------------------------------------------------------
-
-    private function makePassthroughWithHtmlResponse(): HttpHandlerInterface
-    {
-        return new class implements HttpHandlerInterface {
-            public function handle(Request $request): Response
-            {
-                return new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
-            }
-        };
-    }
-
-    private function makePassthroughWithJsonResponse(): HttpHandlerInterface
-    {
-        return new class implements HttpHandlerInterface {
-            public function handle(Request $request): Response
-            {
-                return new Response('{}', 200, ['Content-Type' => 'application/json']);
-            }
-        };
-    }
-
-    private function makePassthroughWithOctetStreamResponse(): HttpHandlerInterface
-    {
-        return new class implements HttpHandlerInterface {
-            public function handle(Request $request): Response
-            {
-                return new Response('binary', 200, ['Content-Type' => 'application/octet-stream']);
-            }
-        };
-    }
 
     #[Test]
     public function cookieName(): void
@@ -446,7 +421,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
@@ -460,7 +436,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = $token;
 
         $request = Request::create('/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
@@ -473,7 +450,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
@@ -486,7 +464,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('https://example.com/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
@@ -499,7 +478,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('http://example.com/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
@@ -512,7 +492,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
@@ -525,7 +506,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
@@ -538,7 +520,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
@@ -552,7 +535,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $cookies = $response->headers->getCookies();
         $this->assertCount(1, $cookies);
@@ -566,7 +550,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/api', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithJsonResponse());
+        $response = new Response('{}', 200, ['Content-Type' => 'application/json']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $this->assertCount(0, $response->headers->getCookies());
     }
@@ -577,7 +562,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/download', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithOctetStreamResponse());
+        $response = new Response('binary', 200, ['Content-Type' => 'application/octet-stream']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $this->assertCount(0, $response->headers->getCookies());
     }
@@ -588,7 +574,8 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/page', 'GET');
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $xsrfCookies = array_filter(
             $response->headers->getCookies(),
@@ -603,25 +590,14 @@ final class CsrfMiddlewareTest extends TestCase
         $_SESSION['_csrf_token'] = bin2hex(random_bytes(32));
 
         $request = Request::create('/page', 'GET');
+        $response = new Response('<html></html>', 200, ['Content-Type' => 'text/html; charset=UTF-8']);
 
-        // First pass
-        $response = $this->middleware->process($request, $this->makePassthroughWithHtmlResponse());
-
-        // Second pass: simulate re-running the middleware on the already-cookie-set response
-        $responseWithCookie = $response;
-        $nextWithPresetCookie = new class ($responseWithCookie) implements HttpHandlerInterface {
-            public function __construct(private readonly Response $inner) {}
-
-            public function handle(Request $request): Response
-            {
-                return $this->inner;
-            }
-        };
-
-        $finalResponse = $this->middleware->process($request, $nextWithPresetCookie);
+        // Call the static helper twice on the same response — should remain idempotent.
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
+        CsrfMiddleware::attachCookieIfHtml($request, $response);
 
         $xsrfCookies = array_filter(
-            $finalResponse->headers->getCookies(),
+            $response->headers->getCookies(),
             fn($c) => $c->getName() === 'XSRF-TOKEN',
         );
         $this->assertCount(1, $xsrfCookies);

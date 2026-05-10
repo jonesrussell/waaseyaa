@@ -1,5 +1,6 @@
 # Access Control
 
+<!-- Spec reviewed 2026-05-10 - #1395 dead-code removal: CsrfMiddleware::attachXsrfCookie() instance method deleted; attachCookieIfHtml() static helper (called by HttpKernel) remains the sole live cookie-attachment path. No change to session resolution, gate logic, or access pipeline semantics. -->
 <!-- Spec reviewed 2026-05-10 - WP05 php-8.5 upgrade: @PHP8x5Migration cs-fixer pass — AuthorizationMiddleware and EntityAccessHandler touched by octal_notation + new_expression_parentheses rules only; no semantic change to access pipeline or gate logic. -->
 <!-- Spec reviewed 2026-05-10 - WP03 php-8.5 upgrade: AccessResult::allowed/forbidden/neutral/unauthenticated gained #[\NoDiscard] — no semantic change to access pipeline, gate logic, or AccessChecker. -->
 <!-- Spec reviewed 2026-05-01 - Auth README added under packages/auth/ (skeleton only — purpose, layer, key classes); no AuthManager/RateLimiter/TwoFactorManager contract change. Reaffirms WP05 paired-nullable invariants and AccessChecker placement (mission #824 WP09 surface F, closes #849) -->
