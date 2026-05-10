@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-10T15:04:01.793156+00:00",
+  "friendly_name": "composer internal version sweep",
+  "mission_id": "01KR96NAPQY0RSTKMY286NV16W",
+  "mission_number": null,
+  "mission_slug": "composer-internal-version-sweep-01KR96NA",
+  "mission_type": "software-dev",
+  "slug": "composer-internal-version-sweep-01KR96NA",
+  "target_branch": "main"
+}
