@@ -42,3 +42,4 @@ See `../plan.md` Design Decision D1 (reference is git tag) and Risk R4 (concurre
 ## Activity Log
 
 - 2026-05-10T15:32:48Z – sonnet – shell_pid=263152 – Assigned agent via action command
+- 2026-05-10T15:34:36Z – sonnet – shell_pid=263152 – Ready for review
