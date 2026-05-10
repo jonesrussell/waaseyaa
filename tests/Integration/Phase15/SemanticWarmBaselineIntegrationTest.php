@@ -93,7 +93,7 @@ final class SemanticWarmBaselineIntegrationTest extends TestCase
             ],
         ));
 
-        (new RelationshipSchemaManager($this->database))->ensure();
+        new RelationshipSchemaManager($this->database)->ensure();
 
         $this->serializer = new ResourceSerializer($this->entityTypeManager);
         $this->accessHandler = new EntityAccessHandler([
@@ -133,14 +133,14 @@ final class SemanticWarmBaselineIntegrationTest extends TestCase
         $semanticSearch = $searchController->search('water', 'node', 10)->toArray();
         $semanticSearchDurationMs = $this->durationMs($semanticSearchStarted);
 
-        $keywordSearch = (new SearchController(
+        $keywordSearch = new SearchController(
             entityTypeManager: $this->entityTypeManager,
             serializer: $this->serializer,
             embeddingStorage: $this->embeddingStorage,
             embeddingProvider: null,
             accessHandler: $this->accessHandler,
             account: $this->account,
-        ))->search('water', 'node', 10)->toArray();
+        )->search('water', 'node', 10)->toArray();
 
         $mcp = new McpController(
             entityTypeManager: $this->entityTypeManager,
@@ -274,7 +274,7 @@ final class SemanticWarmBaselineIntegrationTest extends TestCase
         }
 
         $relationshipStorage = $this->entityTypeManager->getStorage('relationship');
-        (new RelationshipSchemaManager($this->database))->ensure();
+        new RelationshipSchemaManager($this->database)->ensure();
         foreach (WorkflowFixturePack::discoveryRelationships() as $fixture) {
             $relationship = $relationshipStorage->create([
                 'relationship_type' => $fixture['relationship_type'],
@@ -365,7 +365,7 @@ final class SemanticWarmBaselineIntegrationTest extends TestCase
     private function writeBaselineContract(array $baseline): void
     {
         $dir = dirname(self::BASELINE_ARTIFACT);
-        if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        if (!is_dir($dir) && !mkdir($dir, 0o755, true) && !is_dir($dir)) {
             $this->fail(sprintf('Failed to create baseline directory: %s', $dir));
         }
 

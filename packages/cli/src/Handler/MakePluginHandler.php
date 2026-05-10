@@ -16,20 +16,20 @@ final class MakePluginHandler extends AbstractMakeHandler
         $pluginId = strtolower($name);
 
         $template = <<<PHP
-<?php
+            <?php
 
-declare(strict_types=1);
+            declare(strict_types=1);
 
-namespace App\Plugin;
+            namespace App\Plugin;
 
-use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
+            use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 
-#[WaaseyaaPlugin(id: '{$pluginId}', label: '{$className}')]
-class {$className}
-{
-}
+            #[WaaseyaaPlugin(id: '{$pluginId}', label: '{$className}')]
+            class {$className}
+            {
+            }
 
-PHP;
+            PHP;
 
         $io->write($template);
 

@@ -13,6 +13,7 @@ return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         '@PER-CS2.0' => true,
+        '@PHP8x5Migration' => true,
         'declare_strict_types' => true,
         'ordered_imports' => ['sort_algorithm' => 'alpha'],
         'trailing_comma_in_multiline' => [

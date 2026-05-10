@@ -429,7 +429,7 @@ final class ValueCaster
             return $stored;
         }
 
-        $backingType = (new ReflectionEnum($enumClass))->getBackingType();
+        $backingType = new ReflectionEnum($enumClass)->getBackingType();
         if ($backingType === null) {
             throw CastException::invalidCastSpec($field);
         }
@@ -485,7 +485,7 @@ final class ValueCaster
             return $domain->value;
         }
 
-        $backingType = (new ReflectionEnum($enumClass))->getBackingType();
+        $backingType = new ReflectionEnum($enumClass)->getBackingType();
         if ($backingType === null) {
             throw CastException::invalidCastSpec($field);
         }

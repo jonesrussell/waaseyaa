@@ -29,7 +29,7 @@ final readonly class IngestionLogEntry
     ) {
         $this->loggedAt = $loggedAt !== ''
             ? $loggedAt
-            : (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM);
+            : new \DateTimeImmutable()->format(\DateTimeInterface::ATOM);
     }
 
     public static function success(Envelope $envelope): self
@@ -58,7 +58,7 @@ final readonly class IngestionLogEntry
             type: $type,
             status: 'rejected',
             traceId: $traceId,
-            timestamp: (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            timestamp: new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
             errors: $errors,
         );
     }

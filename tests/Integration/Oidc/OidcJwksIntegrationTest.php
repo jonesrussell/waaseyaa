@@ -21,9 +21,9 @@ final class OidcJwksIntegrationTest extends TestCase
         $this->repoRoot = (string) realpath(__DIR__ . '/../../..');
         $this->projectRoot = sys_get_temp_dir() . '/waaseyaa_oidc_jwks_' . uniqid();
 
-        mkdir($this->projectRoot . '/config', 0755, true);
-        mkdir($this->projectRoot . '/storage', 0755, true);
-        mkdir($this->projectRoot . '/keys', 0755, true);
+        mkdir($this->projectRoot . '/config', 0o755, true);
+        mkdir($this->projectRoot . '/storage', 0o755, true);
+        mkdir($this->projectRoot . '/keys', 0o755, true);
 
         self::assertTrue(symlink($this->repoRoot . '/vendor', $this->projectRoot . '/vendor'));
 
@@ -142,25 +142,25 @@ final class OidcJwksIntegrationTest extends TestCase
         $publicKeyPath = $this->publicKeyPath;
 
         return <<<PHP
-<?php
+            <?php
 
-declare(strict_types=1);
+            declare(strict_types=1);
 
-return [
-    'database' => '{$databasePath}',
-    'environment' => 'local',
-    'app' => ['url' => 'http://localhost', 'name' => 'Waaseyaa Oidc JWKS Test'],
-    'cors_origins' => ['http://localhost:3000'],
-    'oidc' => [
-        'issuer' => 'https://id.example',
-        'signing_keys' => [
-            'integration-key' => [
-                'algorithm' => 'RS256',
-                'public_key_path' => '{$publicKeyPath}',
-            ],
-        ],
-    ],
-];
-PHP;
+            return [
+                'database' => '{$databasePath}',
+                'environment' => 'local',
+                'app' => ['url' => 'http://localhost', 'name' => 'Waaseyaa Oidc JWKS Test'],
+                'cors_origins' => ['http://localhost:3000'],
+                'oidc' => [
+                    'issuer' => 'https://id.example',
+                    'signing_keys' => [
+                        'integration-key' => [
+                            'algorithm' => 'RS256',
+                            'public_key_path' => '{$publicKeyPath}',
+                        ],
+                    ],
+                ],
+            ];
+            PHP;
     }
 }

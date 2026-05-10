@@ -248,7 +248,7 @@ final class MigrateDefaultsHandler
         $file = $this->migrationLogFile();
         $dir = dirname($file);
         if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            mkdir($dir, 0o755, true);
         }
 
         $payload = json_encode([
@@ -256,7 +256,7 @@ final class MigrateDefaultsHandler
             'type_id' => $typeId,
             'actor_id' => $actor,
             'action' => $action,
-            'timestamp' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'timestamp' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
         ], JSON_THROW_ON_ERROR);
 
         file_put_contents($file, $payload . "\n", FILE_APPEND | LOCK_EX);

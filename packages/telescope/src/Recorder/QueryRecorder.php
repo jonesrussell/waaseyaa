@@ -43,7 +43,7 @@ final class QueryRecorder
             'duration' => $duration,
             'connection' => $connection,
             'slow' => $duration >= $this->slowQueryThreshold,
-            'timestamp' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'timestamp' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 

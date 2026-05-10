@@ -38,10 +38,10 @@ final class DebugToolbarMiddleware implements HttpMiddlewareInterface
         }
 
         $bar = <<<HTML
-<div id="waaseyaa-debug-bar" style="position:fixed;left:0;right:0;bottom:0;z-index:2147483000;background:#111827;color:#e5e7eb;font:12px/1.4 system-ui;padding:6px 10px;display:flex;gap:16px;border-top:1px solid #374151;">
-  <span>Waaseyaa</span><span>{$elapsedMs} ms</span><span>{$peakMb} MB</span>
-</div>
-HTML;
+            <div id="waaseyaa-debug-bar" style="position:fixed;left:0;right:0;bottom:0;z-index:2147483000;background:#111827;color:#e5e7eb;font:12px/1.4 system-ui;padding:6px 10px;display:flex;gap:16px;border-top:1px solid #374151;">
+              <span>Waaseyaa</span><span>{$elapsedMs} ms</span><span>{$peakMb} MB</span>
+            </div>
+            HTML;
 
         $updated = str_replace('</body>', $bar . '</body>', $content, $count);
         if ($count < 1) {

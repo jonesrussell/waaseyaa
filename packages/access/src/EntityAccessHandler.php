@@ -184,7 +184,7 @@ class EntityAccessHandler
      */
     private function resolveBundles(AccessPolicyInterface $policy): array
     {
-        $attributes = (new \ReflectionClass($policy))->getAttributes(AccessPolicy::class);
+        $attributes = new \ReflectionClass($policy)->getAttributes(AccessPolicy::class);
         if ($attributes === []) {
             return [];
         }

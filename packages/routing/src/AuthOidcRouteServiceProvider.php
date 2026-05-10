@@ -157,9 +157,9 @@ final class AuthOidcRouteServiceProvider extends ServiceProvider
         } catch (\Throwable) {
         }
 
-        (new OidcHttpRoutes(
+        new OidcHttpRoutes(
             authorizeController: $authorizeController,
             tokenController: $tokenController,
-        ))->registerRoutes($router);
+        )->registerRoutes($router);
     }
 }

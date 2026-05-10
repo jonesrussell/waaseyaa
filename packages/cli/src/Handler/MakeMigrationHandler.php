@@ -40,7 +40,7 @@ final class MakeMigrationHandler extends AbstractMakeHandler
         }
 
         if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0755, true);
+            mkdir($targetDir, 0o755, true);
         }
 
         $targetPath = $targetDir . '/' . $filename;

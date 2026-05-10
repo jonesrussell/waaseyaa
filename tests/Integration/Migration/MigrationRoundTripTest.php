@@ -23,7 +23,7 @@ final class MigrationRoundTripTest extends TestCase
     protected function setUp(): void
     {
         $this->tempDir = sys_get_temp_dir() . '/waaseyaa_migration_rt_' . uniqid();
-        mkdir($this->tempDir . '/migrations', 0777, true);
+        mkdir($this->tempDir . '/migrations', 0o777, true);
     }
 
     protected function tearDown(): void
@@ -36,26 +36,26 @@ final class MigrationRoundTripTest extends TestCase
     {
         // 1. Write a migration file
         file_put_contents($this->tempDir . '/migrations/20260317_143000_create_articles.php', <<<'PHP'
-        <?php
-        declare(strict_types=1);
-        use Waaseyaa\Foundation\Migration\Migration;
-        use Waaseyaa\Foundation\Migration\SchemaBuilder;
-        return new class extends Migration {
-            public function up(SchemaBuilder $schema): void
-            {
-                $schema->create('articles', function ($table) {
-                    $table->id();
-                    $table->string('title', 255);
-                    $table->text('body')->nullable();
-                    $table->timestamps();
-                });
-            }
-            public function down(SchemaBuilder $schema): void
-            {
-                $schema->dropIfExists('articles');
-            }
-        };
-        PHP);
+            <?php
+            declare(strict_types=1);
+            use Waaseyaa\Foundation\Migration\Migration;
+            use Waaseyaa\Foundation\Migration\SchemaBuilder;
+            return new class extends Migration {
+                public function up(SchemaBuilder $schema): void
+                {
+                    $schema->create('articles', function ($table) {
+                        $table->id();
+                        $table->string('title', 255);
+                        $table->text('body')->nullable();
+                        $table->timestamps();
+                    });
+                }
+                public function down(SchemaBuilder $schema): void
+                {
+                    $schema->dropIfExists('articles');
+                }
+            };
+            PHP);
 
         // 2. Set up infrastructure
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);

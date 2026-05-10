@@ -44,10 +44,10 @@ final class LanguageResolver
             $headers['accept-language'] = $acceptLanguage;
         }
 
-        $context = (new LanguageNegotiator(
+        $context = new LanguageNegotiator(
             negotiators: [new UrlPrefixNegotiator(), new AcceptHeaderNegotiator()],
             languageManager: $manager,
-        ))->negotiate($path, $headers);
+        )->negotiate($path, $headers);
         $negotiatedLanguage = $context->getContentLanguage();
         $manager->setCurrentLanguage($negotiatedLanguage);
         $langcode = $negotiatedLanguage->id;

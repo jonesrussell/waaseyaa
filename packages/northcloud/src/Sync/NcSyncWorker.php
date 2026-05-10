@@ -42,7 +42,7 @@ final class NcSyncWorker
                     sampleLimit: $sampleLimit,
                 );
             } catch (\Throwable $e) {
-                $result = (new NcSyncResult())->withFetchFailed();
+                $result = new NcSyncResult()->withFetchFailed();
                 fprintf(
                     STDERR,
                     "[%s] Sync exception (%s): %s\n%s\n",

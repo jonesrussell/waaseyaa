@@ -137,7 +137,7 @@ final class SqlEntityStorage implements EntityStorageInterface
             return null;
         }
 
-        return $this->load(reset($ids));
+        return $this->load(array_first($ids));
     }
 
     /**
@@ -424,7 +424,7 @@ final class SqlEntityStorage implements EntityStorageInterface
      */
     private function instantiateEntity(string $class, array $values): EntityInterface
     {
-        return (new Hydration\EntityInstantiator($this->entityType))->instantiate($class, $values);
+        return new Hydration\EntityInstantiator($this->entityType)->instantiate($class, $values);
     }
 
     /**

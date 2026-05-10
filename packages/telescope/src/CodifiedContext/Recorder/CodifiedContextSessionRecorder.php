@@ -24,7 +24,7 @@ final class CodifiedContextSessionRecorder
             'event_type' => 'session_start',
             'repo_hash' => $repoHash,
             'metadata' => $metadata,
-            'occurred_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'occurred_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 
@@ -35,7 +35,7 @@ final class CodifiedContextSessionRecorder
             'event_type' => 'session_end',
             'duration_ms' => $durationMs,
             'event_count' => $eventCount,
-            'occurred_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'occurred_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 }

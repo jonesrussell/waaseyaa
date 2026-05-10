@@ -22,11 +22,11 @@ final class SsrHttpKernelIntegrationTest extends TestCase
         $this->repoRoot = (string) realpath(__DIR__ . '/../../..');
         $this->projectRoot = sys_get_temp_dir() . '/waaseyaa_ssr_http_' . uniqid();
 
-        mkdir($this->projectRoot . '/config', 0755, true);
-        mkdir($this->projectRoot . '/storage', 0755, true);
-        mkdir($this->projectRoot . '/templates', 0755, true);
-        mkdir($this->projectRoot . '/packages/demo/templates', 0755, true);
-        mkdir($this->projectRoot . '/packages/ssr/templates', 0755, true);
+        mkdir($this->projectRoot . '/config', 0o755, true);
+        mkdir($this->projectRoot . '/storage', 0o755, true);
+        mkdir($this->projectRoot . '/templates', 0o755, true);
+        mkdir($this->projectRoot . '/packages/demo/templates', 0o755, true);
+        mkdir($this->projectRoot . '/packages/ssr/templates', 0o755, true);
 
         $this->assertTrue(symlink($this->repoRoot . '/vendor', $this->projectRoot . '/vendor'));
 
@@ -36,21 +36,21 @@ final class SsrHttpKernelIntegrationTest extends TestCase
         file_put_contents(
             $this->projectRoot . '/templates/node.full.html.twig',
             <<<TWIG
-<article data-template="app-node-full">
-  <h1>{{ fields.title.formatted|raw }}</h1>
-  <time>{{ fields.created.formatted|raw }}</time>
-  <div class="author">{{ fields.uid.formatted|raw }}</div>
-</article>
-TWIG,
+                <article data-template="app-node-full">
+                  <h1>{{ fields.title.formatted|raw }}</h1>
+                  <time>{{ fields.created.formatted|raw }}</time>
+                  <div class="author">{{ fields.uid.formatted|raw }}</div>
+                </article>
+                TWIG,
         );
 
         file_put_contents(
             $this->projectRoot . '/templates/node.teaser.html.twig',
             <<<TWIG
-<article data-template="app-node-teaser">
-  <h2>{{ fields.title.formatted|raw }}</h2>
-</article>
-TWIG,
+                <article data-template="app-node-teaser">
+                  <h2>{{ fields.title.formatted|raw }}</h2>
+                </article>
+                TWIG,
         );
 
         file_put_contents(
@@ -259,33 +259,33 @@ TWIG,
         $databasePath = $this->projectRoot . '/storage/waaseyaa.sqlite';
 
         return <<<PHP
-<?php
+            <?php
 
-declare(strict_types=1);
+            declare(strict_types=1);
 
-return [
-    'database' => '{$databasePath}',
-    'environment' => 'local',
-    'app' => ['url' => 'http://localhost', 'name' => 'Waaseyaa Test'],
-    'cors_origins' => ['http://localhost:3000'],
-    'ssr' => [
-        'theme' => '',
-        'cache_max_age' => 300,
-    ],
-    'view_modes' => [
-        'node' => [
-            'full' => [
-                'title' => ['formatter' => 'string', 'weight' => 0],
-                'created' => ['formatter' => 'datetime', 'settings' => ['format' => 'Y-m-d'], 'weight' => 1],
-                'uid' => ['formatter' => 'entity_reference', 'settings' => ['label' => 'Author', 'url_pattern' => '/user/{id}'], 'weight' => 2],
-            ],
-            'teaser' => [
-                'title' => ['formatter' => 'string', 'weight' => 0],
-            ],
-        ],
-    ],
-];
-PHP;
+            return [
+                'database' => '{$databasePath}',
+                'environment' => 'local',
+                'app' => ['url' => 'http://localhost', 'name' => 'Waaseyaa Test'],
+                'cors_origins' => ['http://localhost:3000'],
+                'ssr' => [
+                    'theme' => '',
+                    'cache_max_age' => 300,
+                ],
+                'view_modes' => [
+                    'node' => [
+                        'full' => [
+                            'title' => ['formatter' => 'string', 'weight' => 0],
+                            'created' => ['formatter' => 'datetime', 'settings' => ['format' => 'Y-m-d'], 'weight' => 1],
+                            'uid' => ['formatter' => 'entity_reference', 'settings' => ['label' => 'Author', 'url_pattern' => '/user/{id}'], 'weight' => 2],
+                        ],
+                        'teaser' => [
+                            'title' => ['formatter' => 'string', 'weight' => 0],
+                        ],
+                    ],
+                ],
+            ];
+            PHP;
     }
 
     private function bootKernel(): HttpKernel

@@ -45,7 +45,7 @@ final class ExceptionHandler
         if ($e instanceof WaaseyaaException) {
             return sprintf(
                 "[%s] %s\n  Type: %s\n  Status: %d",
-                (new \ReflectionClass($e))->getShortName(),
+                new \ReflectionClass($e)->getShortName(),
                 $e->getMessage(),
                 $e->problemType,
                 $e->statusCode,
@@ -54,7 +54,7 @@ final class ExceptionHandler
 
         return sprintf(
             "[%s] %s\n  File: %s:%d",
-            (new \ReflectionClass($e))->getShortName(),
+            new \ReflectionClass($e)->getShortName(),
             $e->getMessage(),
             $e->getFile(),
             $e->getLine(),

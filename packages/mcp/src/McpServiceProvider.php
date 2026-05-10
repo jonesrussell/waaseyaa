@@ -14,6 +14,6 @@ final class McpServiceProvider extends ServiceProvider
 
     public function routes(WaaseyaaRouter $router, EntityTypeManagerInterface $entityTypeManager): void
     {
-        (new McpRouteProvider())->registerRoutes($router);
+        new McpRouteProvider()->registerRoutes($router);
     }
 }

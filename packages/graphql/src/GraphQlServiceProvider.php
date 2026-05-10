@@ -39,6 +39,6 @@ final class GraphQlServiceProvider extends ServiceProvider implements HasHttpDom
 
     public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
-        (new GraphQlRouteProvider())->registerRoutes($router);
+        new GraphQlRouteProvider()->registerRoutes($router);
     }
 }

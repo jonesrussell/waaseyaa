@@ -92,7 +92,7 @@ final class FixturePackRefreshHandler
         $outputPath = trim((string) ($io->option('output') ?? ''));
         if ($outputPath !== '') {
             $dir = dirname($outputPath);
-            if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+            if (!is_dir($dir) && !mkdir($dir, 0o755, true) && !is_dir($dir)) {
                 $io->error(sprintf('Unable to create output directory: %s', $dir));
                 return 1;
             }

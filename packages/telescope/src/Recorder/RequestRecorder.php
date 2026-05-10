@@ -47,7 +47,7 @@ final class RequestRecorder
             'duration' => $duration,
             'controller' => $controller,
             'middleware' => $middleware,
-            'timestamp' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'timestamp' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 

@@ -124,20 +124,20 @@ final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepo
         }
 
         $this->database->query(<<<'SQL'
-            CREATE TABLE IF NOT EXISTS oidc_authorization_codes (
-                code VARCHAR(128) PRIMARY KEY,
-                client_id VARCHAR(255) NOT NULL,
-                account_id VARCHAR(255) NOT NULL,
-                redirect_uri TEXT NOT NULL,
-                scopes TEXT NOT NULL,
-                code_challenge VARCHAR(128) NOT NULL,
-                code_challenge_method VARCHAR(16) NOT NULL,
-                issued_at INTEGER NOT NULL,
-                expires_at INTEGER NOT NULL,
-                consumed_at INTEGER,
-                nonce VARCHAR(255)
-            )
-        SQL);
+                CREATE TABLE IF NOT EXISTS oidc_authorization_codes (
+                    code VARCHAR(128) PRIMARY KEY,
+                    client_id VARCHAR(255) NOT NULL,
+                    account_id VARCHAR(255) NOT NULL,
+                    redirect_uri TEXT NOT NULL,
+                    scopes TEXT NOT NULL,
+                    code_challenge VARCHAR(128) NOT NULL,
+                    code_challenge_method VARCHAR(16) NOT NULL,
+                    issued_at INTEGER NOT NULL,
+                    expires_at INTEGER NOT NULL,
+                    consumed_at INTEGER,
+                    nonce VARCHAR(255)
+                )
+            SQL);
 
         // Tables provisioned before #1289 lack the nonce column. Adding it lazily
         // keeps the "one migration per schema bump" pattern and avoids a separate

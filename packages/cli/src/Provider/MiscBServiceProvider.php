@@ -57,10 +57,10 @@ final class MiscBServiceProvider extends ServiceProvider implements HasNativeCom
                 /** @var \Waaseyaa\Entity\EntityTypeManagerInterface $entityTypeManager */
                 $entityTypeManager = $this->resolve(\Waaseyaa\Entity\EntityTypeManagerInterface::class);
 
-                return (new InstallHandler(
+                return new InstallHandler(
                     entityTypeManager: $entityTypeManager,
                     configManager: $configManager,
-                ))->execute($io);
+                )->execute($io);
             },
         );
 
@@ -78,7 +78,7 @@ final class MiscBServiceProvider extends ServiceProvider implements HasNativeCom
                 /** @var \Waaseyaa\Routing\WaaseyaaRouter $router */
                 $router = $this->resolve(\Waaseyaa\Routing\WaaseyaaRouter::class);
 
-                return (new RouteListHandler(router: $router))->execute($io);
+                return new RouteListHandler(router: $router)->execute($io);
             },
         );
 

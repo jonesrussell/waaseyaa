@@ -89,7 +89,7 @@ final class PerformanceFixturePackIntegrationTest extends TestCase
                 'end_date' => ['type' => 'integer'],
             ],
         ));
-        (new RelationshipSchemaManager($database))->ensure();
+        new RelationshipSchemaManager($database)->ensure();
 
         $nodeStorage = $entityTypeManager->getStorage('node');
         $nodeIdsByKey = [];
@@ -100,7 +100,7 @@ final class PerformanceFixturePackIntegrationTest extends TestCase
         }
 
         $relationshipStorage = $entityTypeManager->getStorage('relationship');
-        (new RelationshipSchemaManager($database))->ensure();
+        new RelationshipSchemaManager($database)->ensure();
         foreach (WorkflowFixturePack::performanceRelationshipsLargeGraph() as $fixture) {
             $relationship = $relationshipStorage->create([
                 'relationship_type' => $fixture['relationship_type'],

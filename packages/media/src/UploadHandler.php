@@ -39,7 +39,7 @@ final class UploadHandler
 
         $tmpName = $file['tmp_name'] ?? '';
         if ($tmpName !== '' && is_file($tmpName)) {
-            $detectedType = (new \finfo(FILEINFO_MIME_TYPE))->file($tmpName);
+            $detectedType = new \finfo(FILEINFO_MIME_TYPE)->file($tmpName);
         } else {
             $detectedType = $file['type'] ?? '';
         }
@@ -78,7 +78,7 @@ final class UploadHandler
         $targetDir = $this->basePath . '/' . $subdir;
 
         if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0755, true);
+            mkdir($targetDir, 0o755, true);
         }
 
         $filename = $this->generateSafeFilename($file['name'] ?? 'upload.bin');

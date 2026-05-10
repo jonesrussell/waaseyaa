@@ -189,7 +189,7 @@ final class DiscoveryApiHandler
      */
     public function isDiscoveryEntityPublic(string $entityType, array $values): bool
     {
-        return (new WorkflowVisibility())->isEntityPublic($entityType, $values);
+        return new WorkflowVisibility()->isEntityPublic($entityType, $values);
     }
 
     public function createDiscoveryService(): RelationshipDiscoveryService

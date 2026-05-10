@@ -21,7 +21,7 @@ final class ExceptionRenderer
     {
         if ($this->debug) {
             return [
-                'body' => (new DevExceptionRenderer($this->solutionRegistry))->render($e),
+                'body' => new DevExceptionRenderer($this->solutionRegistry)->render($e),
                 'statusCode' => 500,
                 'contentType' => 'text/html; charset=UTF-8',
             ];

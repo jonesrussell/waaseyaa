@@ -602,7 +602,7 @@ final class EndToEndSmokeTest extends TestCase
         // --- Setup ---
 
         $tempDir = sys_get_temp_dir() . '/waaseyaa_migration_test_' . uniqid();
-        mkdir($tempDir, 0755, true);
+        mkdir($tempDir, 0o755, true);
 
         $lifecycleManager = new EntityTypeLifecycleManager($tempDir);
         $auditLogger = new EntityAuditLogger($tempDir);

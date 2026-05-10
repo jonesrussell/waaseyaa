@@ -228,16 +228,16 @@ final class CsrfMiddleware implements HttpMiddlewareInterface
     private function renderHtmlError(): string
     {
         return <<<'HTML'
-        <!DOCTYPE html>
-        <html lang="en">
-        <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>403 Forbidden</title>
-        <style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#111827;color:#F3F4F6}
-        .box{text-align:center;max-width:420px;padding:2rem}.code{font-size:4rem;font-weight:700;color:#F59E0B;margin:0}.msg{color:#9CA3AF;margin:1rem 0;line-height:1.6}
-        a{color:#F59E0B;text-decoration:none}a:hover{text-decoration:underline}</style></head>
-        <body><div class="box"><p class="code">403</p><h1>Invalid Security Token</h1>
-        <p class="msg">Your form submission could not be verified. Please go back and try again.</p>
-        <p><a href="javascript:history.back()">Go back</a></p></div></body></html>
-        HTML;
+            <!DOCTYPE html>
+            <html lang="en">
+            <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>403 Forbidden</title>
+            <style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#111827;color:#F3F4F6}
+            .box{text-align:center;max-width:420px;padding:2rem}.code{font-size:4rem;font-weight:700;color:#F59E0B;margin:0}.msg{color:#9CA3AF;margin:1rem 0;line-height:1.6}
+            a{color:#F59E0B;text-decoration:none}a:hover{text-decoration:underline}</style></head>
+            <body><div class="box"><p class="code">403</p><h1>Invalid Security Token</h1>
+            <p class="msg">Your form submission could not be verified. Please go back and try again.</p>
+            <p><a href="javascript:history.back()">Go back</a></p></div></body></html>
+            HTML;
     }
 }

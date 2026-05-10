@@ -27,6 +27,6 @@ final class ApiServiceProvider extends ServiceProvider implements HasHttpDomainR
 
     public function routes(WaaseyaaRouter $router, EntityTypeManager $entityTypeManager): void
     {
-        (new JsonApiRouteProvider($entityTypeManager))->registerRoutes($router);
+        new JsonApiRouteProvider($entityTypeManager)->registerRoutes($router);
     }
 }

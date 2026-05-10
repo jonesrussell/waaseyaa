@@ -16,7 +16,7 @@ final class HtmlFormatter implements FieldFormatterInterface
 
     public function __construct()
     {
-        $config = (new HtmlSanitizerConfig())
+        $config = new HtmlSanitizerConfig()
             ->allowSafeElements()
             ->forceHttpsUrls();
         $this->sanitizer = new HtmlSanitizer($config);

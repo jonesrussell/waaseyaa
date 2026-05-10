@@ -37,7 +37,7 @@ final class HealthReportHandler
 
         if ($io->option('json')) {
             $report = [
-                'generated_at' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+                'generated_at' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
                 'system' => $systemInfo,
                 'health_checks' => array_map(
                     static fn(HealthCheckResult $r) => $r->toArray(),
@@ -112,7 +112,7 @@ final class HealthReportHandler
             'Database' => getenv('WAASEYAA_DB') !== false ? getenv('WAASEYAA_DB') : './storage/waaseyaa.sqlite',
             'Config Dir' => getenv('WAASEYAA_CONFIG_DIR') !== false ? getenv('WAASEYAA_CONFIG_DIR') : './config/sync',
             'Project Root' => $this->projectRoot,
-            'Generated At' => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            'Generated At' => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
         ];
     }
 

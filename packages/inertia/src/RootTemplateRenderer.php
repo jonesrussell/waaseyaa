@@ -36,18 +36,18 @@ final class RootTemplateRenderer implements InertiaFullPageRendererInterface
         $assetTags = $this->assetManager?->assetTags() ?? '';
 
         return <<<HTML
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            {$assetTags}
-        </head>
-        <body>
-            <div id="app"></div>
-            {$scriptTag}
-        </body>
-        </html>
-        HTML;
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                {$assetTags}
+            </head>
+            <body>
+                <div id="app"></div>
+                {$scriptTag}
+            </body>
+            </html>
+            HTML;
     }
 }

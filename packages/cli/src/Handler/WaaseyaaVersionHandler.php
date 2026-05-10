@@ -15,7 +15,7 @@ final class WaaseyaaVersionHandler
 
     public function execute(CliIO $io): int
     {
-        $report = (new ComposerProvenanceReporter($this->projectRoot))->analyze();
+        $report = new ComposerProvenanceReporter($this->projectRoot)->analyze();
 
         if ($io->option('json')) {
             $io->writeln(json_encode($report->toArray(), JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT));

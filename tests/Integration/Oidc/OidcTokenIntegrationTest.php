@@ -39,9 +39,9 @@ final class OidcTokenIntegrationTest extends TestCase
         $this->repoRoot = (string) realpath(__DIR__ . '/../../..');
         $this->projectRoot = sys_get_temp_dir() . '/waaseyaa_oidc_token_' . uniqid();
 
-        mkdir($this->projectRoot . '/config', 0755, true);
-        mkdir($this->projectRoot . '/storage', 0755, true);
-        mkdir($this->projectRoot . '/keys', 0755, true);
+        mkdir($this->projectRoot . '/config', 0o755, true);
+        mkdir($this->projectRoot . '/storage', 0o755, true);
+        mkdir($this->projectRoot . '/keys', 0o755, true);
 
         self::assertTrue(symlink($this->repoRoot . '/vendor', $this->projectRoot . '/vendor'));
 
@@ -197,36 +197,36 @@ final class OidcTokenIntegrationTest extends TestCase
         $publicKeyPath = $this->projectRoot . '/keys/signing.pub';
 
         return <<<PHP
-<?php
+            <?php
 
-declare(strict_types=1);
+            declare(strict_types=1);
 
-return [
-    'database' => '{$databasePath}',
-    'environment' => 'local',
-    'app' => ['url' => 'http://localhost', 'name' => 'Waaseyaa Oidc Token Test'],
-    'cors_origins' => ['http://localhost:3000'],
-    'oidc' => [
-        'issuer' => '{$this->issuer()}',
-        'signing_keys' => [
-            'test-kid' => [
-                'algorithm' => 'RS256',
-                'public_key_path' => '{$publicKeyPath}',
-                'private_key_path' => '{$privateKeyPath}',
-            ],
-        ],
-        'clients' => [
-            'minoo-web' => [
-                'name' => 'Minoo',
-                'redirect_uris' => ['https://minoo.test/callback'],
-                'scopes' => ['openid'],
-                'grant_types' => ['authorization_code'],
-                'is_confidential' => false,
-            ],
-        ],
-    ],
-];
-PHP;
+            return [
+                'database' => '{$databasePath}',
+                'environment' => 'local',
+                'app' => ['url' => 'http://localhost', 'name' => 'Waaseyaa Oidc Token Test'],
+                'cors_origins' => ['http://localhost:3000'],
+                'oidc' => [
+                    'issuer' => '{$this->issuer()}',
+                    'signing_keys' => [
+                        'test-kid' => [
+                            'algorithm' => 'RS256',
+                            'public_key_path' => '{$publicKeyPath}',
+                            'private_key_path' => '{$privateKeyPath}',
+                        ],
+                    ],
+                    'clients' => [
+                        'minoo-web' => [
+                            'name' => 'Minoo',
+                            'redirect_uris' => ['https://minoo.test/callback'],
+                            'scopes' => ['openid'],
+                            'grant_types' => ['authorization_code'],
+                            'is_confidential' => false,
+                        ],
+                    ],
+                ],
+            ];
+            PHP;
     }
 
     private function issuer(): string

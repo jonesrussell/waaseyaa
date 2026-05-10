@@ -33,7 +33,7 @@ final class EventRecorder
             'event' => $eventClass,
             'payload' => $payload,
             'listeners' => $listeners,
-            'timestamp' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'timestamp' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 }

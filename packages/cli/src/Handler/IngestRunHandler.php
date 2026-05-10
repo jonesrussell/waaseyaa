@@ -89,9 +89,9 @@ final class IngestRunHandler
             policy: $policy,
             timestamp: $timestamp,
         );
-        $normalizedEnvelope = (new IngestionEnvelopeNormalizer())->normalize($schemaEnvelope);
-        $violations = (new SchemaValidator())->validate($normalizedEnvelope['envelope']);
-        $diagnostics['schema'] = (new SchemaDiagnosticEmitter())->emit($violations);
+        $normalizedEnvelope = new IngestionEnvelopeNormalizer()->normalize($schemaEnvelope);
+        $violations = new SchemaValidator()->validate($normalizedEnvelope['envelope']);
+        $diagnostics['schema'] = new SchemaDiagnosticEmitter()->emit($violations);
         $diagnostics['schema_summary'] = $this->buildSchemaSummary($diagnostics['schema']);
 
         $mappedCandidate = ['nodes' => [], 'relationships' => []];
@@ -106,7 +106,7 @@ final class IngestRunHandler
                 $diagnostics,
             );
             if ($inferRelationships && $diagnostics['errors'] === []) {
-                $inferredRelationships = (new RelationshipInferenceEngine())->infer(
+                $inferredRelationships = new RelationshipInferenceEngine()->infer(
                     $mappedCandidate['nodes'],
                     $mappedCandidate['relationships'],
                 );
@@ -122,11 +122,11 @@ final class IngestRunHandler
             }
         }
         if ($diagnostics['schema'] === [] && $diagnostics['errors'] === []) {
-            $validationViolations = (new ValidationGateValidator())->validate(
+            $validationViolations = new ValidationGateValidator()->validate(
                 $mappedCandidate['nodes'],
                 $mappedCandidate['relationships'],
             );
-            $diagnostics['validation'] = (new ValidationDiagnosticEmitter())->emit($validationViolations);
+            $diagnostics['validation'] = new ValidationDiagnosticEmitter()->emit($validationViolations);
         }
         $diagnostics['validation_summary'] = $this->buildValidationSummary($diagnostics['validation']);
 
@@ -142,13 +142,13 @@ final class IngestRunHandler
             trim($this->stringify($io->option('refresh-baseline') ?? '')),
             $diagnostics,
         );
-        $refreshPlan = (new SemanticRefreshTriggerPlanner())->plan($currentRefreshSnapshot, $baselineRefreshSnapshot);
+        $refreshPlan = new SemanticRefreshTriggerPlanner()->plan($currentRefreshSnapshot, $baselineRefreshSnapshot);
         $diagnostics['refresh'] = $refreshPlan['diagnostics'];
         $diagnostics['refresh_summary'] = $refreshPlan['summary'];
 
         $assistPayload = null;
         if ($authoringAssistEnabled && $diagnostics['schema'] === [] && $diagnostics['errors'] === []) {
-            $assistPayload = (new AuthoringAssistBuilder())->build(
+            $assistPayload = new AuthoringAssistBuilder()->build(
                 envelope: $normalizedEnvelope['envelope'],
                 nodes: $mappedCandidate['nodes'],
                 relationships: $mappedCandidate['relationships'],
@@ -748,7 +748,7 @@ final class IngestRunHandler
     private function writeFile(string $path, string $contents, CliIO $io): bool
     {
         $dir = dirname($path);
-        if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        if (!is_dir($dir) && !mkdir($dir, 0o755, true) && !is_dir($dir)) {
             $io->error(sprintf('Unable to create directory: %s', $dir));
             return false;
         }

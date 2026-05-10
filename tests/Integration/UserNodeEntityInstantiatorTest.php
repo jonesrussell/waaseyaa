@@ -29,7 +29,7 @@ final class UserNodeEntityInstantiatorTest extends TestCase
             ],
         );
 
-        $entity = (new EntityInstantiator($entityType))->instantiate(User::class, [
+        $entity = new EntityInstantiator($entityType)->instantiate(User::class, [
             'uid' => 5,
             'name' => 'entity',
             'mail' => 'e@example.test',
@@ -56,7 +56,7 @@ final class UserNodeEntityInstantiatorTest extends TestCase
             ],
         );
 
-        $entity = (new EntityInstantiator($entityType))->instantiate(Node::class, [
+        $entity = new EntityInstantiator($entityType)->instantiate(Node::class, [
             'nid' => 9,
             'type' => 'page',
             'title' => 'Hello',

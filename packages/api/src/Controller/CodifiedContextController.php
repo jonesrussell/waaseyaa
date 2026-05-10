@@ -261,7 +261,7 @@ final class CodifiedContextController
 
     private static function epochAtom(): string
     {
-        return (new \DateTimeImmutable('@0'))->format(\DateTimeInterface::ATOM);
+        return new \DateTimeImmutable('@0')->format(\DateTimeInterface::ATOM);
     }
 
     private static function normalizeDriftScoreInt(mixed $value): ?int

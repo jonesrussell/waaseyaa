@@ -228,11 +228,11 @@ final class AgentExecutor
                         timestamp: \time(),
                     );
 
-                    $toolResults[] = (new Provider\ToolResultBlock(
+                    $toolResults[] = new Provider\ToolResultBlock(
                         toolUseId: $toolUseBlock->id,
                         content: $resultText,
                         isError: $isError,
-                    ))->toArray();
+                    )->toArray();
                 }
 
                 $messages[] = ['role' => 'user', 'content' => $toolResults];
@@ -341,11 +341,11 @@ final class AgentExecutor
                         timestamp: \time(),
                     );
 
-                    $toolResults[] = (new Provider\ToolResultBlock(
+                    $toolResults[] = new Provider\ToolResultBlock(
                         toolUseId: $toolUseBlock->id,
                         content: $resultText,
                         isError: $isError,
-                    ))->toArray();
+                    )->toArray();
                 }
 
                 $messages[] = ['role' => 'user', 'content' => $toolResults];

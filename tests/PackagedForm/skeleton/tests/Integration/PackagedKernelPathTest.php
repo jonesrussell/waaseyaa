@@ -94,7 +94,7 @@ final class PackagedKernelPathTest extends TestCase
 
         $this->removeDir($storageRoot);
 
-        mkdir($frameworkRoot, 0755, true);
+        mkdir($frameworkRoot, 0o755, true);
     }
 
     private function removeDir(string $dir): void

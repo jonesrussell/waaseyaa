@@ -169,7 +169,7 @@ final class EntityTypeLifecycleManager
             Audit\LifecycleAuditKey::EntityTypeId->value => $entityTypeId,
             Audit\LifecycleAuditKey::Action->value       => $action,
             Audit\LifecycleAuditKey::ActorId->value      => (string) $actorId,
-            Audit\LifecycleAuditKey::Timestamp->value    => (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM),
+            Audit\LifecycleAuditKey::Timestamp->value    => new \DateTimeImmutable()->format(\DateTimeInterface::ATOM),
         ];
 
         $tenantId = $this->normalizeTenantId($tenantId);
@@ -195,7 +195,7 @@ final class EntityTypeLifecycleManager
     private function ensureDirectory(string $dir): void
     {
         if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            mkdir($dir, 0o755, true);
         }
     }
 

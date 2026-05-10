@@ -154,7 +154,7 @@ final class OidcServiceProvider extends ServiceProvider
             return;
         }
 
-        (new OidcClientSeeder($storage))->seed($clients);
+        new OidcClientSeeder($storage)->seed($clients);
     }
 
     /**

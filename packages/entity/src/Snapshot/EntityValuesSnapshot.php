@@ -100,7 +100,7 @@ final readonly class EntityValuesSnapshot
             return $raw;
         }
 
-        return (new ValueCaster())->castIn($field, $raw, $this->casts[$field]);
+        return new ValueCaster()->castIn($field, $raw, $this->casts[$field]);
     }
 
     /**

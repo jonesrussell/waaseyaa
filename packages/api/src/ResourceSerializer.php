@@ -210,6 +210,6 @@ final class ResourceSerializer
             return null;
         }
 
-        return (new \DateTimeImmutable('@' . $ts))->format(\DateTimeInterface::ATOM);
+        return new \DateTimeImmutable('@' . $ts)->format(\DateTimeInterface::ATOM);
     }
 }

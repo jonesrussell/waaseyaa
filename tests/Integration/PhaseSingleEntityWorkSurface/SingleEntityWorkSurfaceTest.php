@@ -71,7 +71,7 @@ final class SingleEntityWorkSurfaceTest extends TestCase
         $this->database = DBALDatabase::createSqlite();
 
         // ── Attachment schema + repository ──────────────────────��─────────────
-        (new AttachmentSchema($this->database))->ensureTable();
+        new AttachmentSchema($this->database)->ensureTable();
 
         $attachmentEntityType = EntityType::fromClass(Attachment::class);
         $resolver = new SingleConnectionResolver($this->database);
@@ -152,7 +152,7 @@ final class SingleEntityWorkSurfaceTest extends TestCase
     public function f3_fieldAutoSaveControllerReturns404ForUnknownEntityType(): void
     {
         // Compile fields first so registry is populated.
-        (new BundleTemplateCompiler($this->fieldRegistry))->compile([SampleProfileTemplate::class]);
+        new BundleTemplateCompiler($this->fieldRegistry)->compile([SampleProfileTemplate::class]);
 
         $controller = new \Waaseyaa\Api\Controller\FieldAutoSaveController(
             entityTypeManager: $this->buildEmptyEntityTypeManager(),
@@ -171,7 +171,7 @@ final class SingleEntityWorkSurfaceTest extends TestCase
     #[Test]
     public function f3_fieldAutoSaveControllerReturns415ForNonJsonContentType(): void
     {
-        (new BundleTemplateCompiler($this->fieldRegistry))->compile([SampleProfileTemplate::class]);
+        new BundleTemplateCompiler($this->fieldRegistry)->compile([SampleProfileTemplate::class]);
 
         $controller = new \Waaseyaa\Api\Controller\FieldAutoSaveController(
             entityTypeManager: $this->buildEmptyEntityTypeManager(),
@@ -249,7 +249,7 @@ final class SingleEntityWorkSurfaceTest extends TestCase
     #[Test]
     public function f5_gfmTableImporterMatchesFourAndUnmatchesOne(): void
     {
-        (new BundleTemplateCompiler($this->fieldRegistry))->compile([SampleProfileTemplate::class]);
+        new BundleTemplateCompiler($this->fieldRegistry)->compile([SampleProfileTemplate::class]);
 
         $importer = new GfmTableImporter(
             registry: $this->fieldRegistry,
@@ -291,7 +291,7 @@ final class SingleEntityWorkSurfaceTest extends TestCase
     #[Test]
     public function f6_formDescriptorBuilderProducesOrderedDescriptors(): void
     {
-        (new BundleTemplateCompiler($this->fieldRegistry))->compile([SampleProfileTemplate::class]);
+        new BundleTemplateCompiler($this->fieldRegistry)->compile([SampleProfileTemplate::class]);
 
         $builder = new FormDescriptorBuilder(registry: $this->fieldRegistry);
 

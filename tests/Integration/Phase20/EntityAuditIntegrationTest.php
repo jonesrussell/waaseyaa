@@ -35,7 +35,7 @@ final class EntityAuditIntegrationTest extends TestCase
     protected function setUp(): void
     {
         $this->tempDir     = sys_get_temp_dir() . '/waaseyaa_audit_integration_' . uniqid();
-        mkdir($this->tempDir . '/storage/framework', 0755, true);
+        mkdir($this->tempDir . '/storage/framework', 0o755, true);
 
         $this->auditLogger = new EntityAuditLogger($this->tempDir);
         $this->dispatcher  = new EventDispatcher();

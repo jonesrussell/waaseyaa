@@ -34,7 +34,7 @@ require $repoRoot . '/vendor/autoload.php';
 
 $kernel = new HttpKernel($projectRoot);
 
-$bootMethod = (new ReflectionClass(HttpKernel::class))->getMethod('boot');
+$bootMethod = new ReflectionClass(HttpKernel::class)->getMethod('boot');
 $bootMethod->invoke($kernel);
 
 $resolver = $kernel->getHttpServiceResolver();

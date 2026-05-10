@@ -87,7 +87,7 @@ final class DiscoveryFixtureConsumersIntegrationTest extends TestCase
                 'end_date' => ['type' => 'integer'],
             ],
         ));
-        (new RelationshipSchemaManager($this->database))->ensure();
+        new RelationshipSchemaManager($this->database)->ensure();
 
         $this->serializer = new ResourceSerializer($this->entityTypeManager);
         $this->accessHandler = new EntityAccessHandler([
@@ -216,7 +216,7 @@ final class DiscoveryFixtureConsumersIntegrationTest extends TestCase
         }
 
         $relationshipStorage = $this->entityTypeManager->getStorage('relationship');
-        (new RelationshipSchemaManager($this->database))->ensure();
+        new RelationshipSchemaManager($this->database)->ensure();
         foreach (WorkflowFixturePack::discoveryRelationships() as $fixture) {
             $relationship = $relationshipStorage->create([
                 'relationship_type' => $fixture['relationship_type'],

@@ -37,7 +37,7 @@ final class SqliteCodifiedContextStore implements CodifiedContextStoreInterface
 
         $id = bin2hex(random_bytes(16));
         $sessionId = $data['session_id'] ?? '';
-        $createdAt = (new \DateTimeImmutable())->format('Y-m-d H:i:s.u');
+        $createdAt = new \DateTimeImmutable()->format('Y-m-d H:i:s.u');
 
         $stmt = $this->pdo->prepare(
             'INSERT INTO telescope_cc_entries (id, type, session_id, data, created_at) VALUES (:id, :type, :session_id, :data, :created_at)',

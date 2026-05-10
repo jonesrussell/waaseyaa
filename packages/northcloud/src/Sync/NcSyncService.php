@@ -54,11 +54,11 @@ final class NcSyncService
 
         if ($response === null) {
             error_log('NcSyncService: failed to fetch content from NorthCloud');
-            return (new NcSyncResult())->withFetchFailed();
+            return new NcSyncResult()->withFetchFailed();
         }
 
         $hits = $response['hits'];
-        $result = (new NcSyncResult())->withFetched(\count($hits));
+        $result = new NcSyncResult()->withFetched(\count($hits));
 
         foreach ($hits as $hit) {
             if (!\is_array($hit)) {
