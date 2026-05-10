@@ -1,108 +1,173 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Plan: Upgrade Waaseyaa to PHP 8.5
 
+**Mission:** `php-8-5-upgrade-01KR8DN2` (`software-dev`)
+**Target branch:** `main`
+**Mission branch:** `kitty/mission-php-8-5-upgrade-01KR8DN2`
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
+See `spec.md` for goal, acceptance criteria, and constraints. This document is
+the implementation plan: critical files, sequencing, verification matrix, and
+risks.
 
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
+---
 
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+## Inventory (verified during plan-mode exploration)
 
-## Summary
+| Surface | Count | Current value | Target |
+|---|---:|---|---|
+| `composer.json` files with `>=8.4` | 57 | `>=8.4` | `>=8.5` |
+| `composer.json` files with `^8.4` | 2 (`packages/attachment/`, `packages/structured-import/`) | `^8.4` | `^8.5` |
+| `composer.json` with `>=8.3` | 1 (`examples/consumer-test/`) | `>=8.3` | `>=8.5` |
+| Root `composer.json` | 1 | `>=8.4` | `>=8.5` |
+| GitHub Actions workflows | 3 (`ci.yml`, `skeleton-smoke.yml`, `release.yml`) | `php-version: '8.4'` | `'8.5'` (4 occurrences) |
+| Skeleton Dockerfile | 1 (`skeleton/Dockerfile`) | `php:8.4-fpm-alpine` | `php:8.5-fpm-alpine` |
+| README PHP references | 3 lines (badge + prose) | `8.4` / `8.4+` | `8.5` / `8.5+` |
+| `CLAUDE.md` Code Style | 1 line | `PHP 8.4+` | `PHP 8.5+` |
+| `.kittify/charter/charter.md` | 6 lines (already updated this mission) | — | — |
+| `phpstan.neon` `phpVersion` | not set | — | `80500` |
+| `.php-cs-fixer.dist.php` | no PHP target | — | add `@PHP85Migration` |
+| Local PHP runtime | — | 8.5.6 | sufficient for verification |
 
-[Extract from feature spec: primary requirement + technical approach from research]
+No `platform.php` config in any composer.json. No `.tool-versions` or
+`.php-version` files. No `PHP_VERSION_ID` / `version_compare()` runtime checks
+in framework source.
 
-## Technical Context
+---
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+## Critical files
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [Project-specific test approach or NEEDS CLARIFICATION]
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+### Constraint bump (WP01)
 
-## Charter Check
+- `composer.json` (root)
+- `packages/*/composer.json` × 60
+- `examples/consumer-test/composer.json`
+- `skeleton/Dockerfile`
+- `.github/workflows/ci.yml`, `skeleton-smoke.yml`, `release.yml`
+- `phpstan.neon` (add `parameters.phpVersion: 80500`)
+- `composer.lock` (regenerate)
+- `README.md`, `CLAUDE.md`, `docs/specs/*.md` (grep + edit)
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+### Deprecation sweep audit zones (WP02)
 
-[Gates determined based on charter file]
+- `packages/typed-data/src/Primitive/`
+- `packages/database-legacy/src/Query/`
+- `packages/foundation/src/Ingestion/`, `packages/ingestion/`
+- `packages/http-client/`, `packages/foundation/src/Http/`
+- `packages/foundation/src/Kernel/` (`HttpKernel.php`, `ConsoleKernel.php`,
+  `Bootstrap/Error*` if any)
+- `packages/error-handler/`, `packages/debug/`
 
-## Project Structure
+### `#[\NoDiscard]` targets (WP03)
 
-### Documentation (this feature)
+- `packages/access/src/AccessResult.php`
+- `packages/validation/`
+- `packages/typed-data/`
+- `packages/database-legacy/src/Query/DBALSelect.php` and entity query
+  builders in `packages/entity-storage/`
+- `packages/api/` `EntityRepository::find*()`
+
+### Adoption hot zones (WP04)
+
+- `packages/foundation/src/Ingestion/` validators
+- `packages/typed-data/` transforms
+- string-normalization helpers (grep-driven)
+
+### CS-fixer rule + closures (WP05)
+
+- `.php-cs-fixer.dist.php`
+- attribute classes under `packages/routing/src/Attribute/`,
+  `packages/typed-data/src/Attribute/` (verify locations via grep)
+
+### Changelog + verification (WP06)
+
+- `CHANGELOG.md` `[Unreleased]` section only
+
+---
+
+## Reused utilities and conventions
+
+- `bin/check-composer-policy` — invariant gate for the manifest changes
+- `bin/check-package-layers` — runs unchanged; no edges shift
+- `bin/audit-dead-code` — baseline-aware, must stay green
+- `tools/drift-detector.sh` — last-mile spec drift check
+- Per `feedback_regression_tests.md`: every deprecation fix in WP02 ships with
+  a regression test
+- Per `feedback_changelog_release_workflow.md`: only `[Unreleased]` is edited;
+  release-cut.yml promotes at tag time
+- Per `feedback_pr_traceability_signals.md`: PR body references mission slug;
+  after merge, manually close any tracking issue and edit GitHub Release notes
+
+---
+
+## Work-package sequencing
 
 ```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
+WP01 (constraint bump + CI + Docker + lockfile + phpstan pin + docs + charter)
+   │
+   ├──► WP02 (8.5 deprecation sweep)         ┐
+   ├──► WP03 (#[\NoDiscard] adoption)        │
+   ├──► WP04 (pipe / array_first / array_find) ├─ parallel after WP01
+   └──► WP05 (closures-in-const + cs-fixer)  ┘
+                          │
+                          ▼
+                    WP06 (CHANGELOG + verification + follow-up issues)
 ```
 
-### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+WP01 is foundational and lands first. WP02–WP05 can run in parallel
+worktrees (or sequentially in this mission, since the work is small enough).
+WP06 closes the mission.
 
-```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
+---
 
-tests/
-├── contract/
-├── integration/
-└── unit/
+## Verification matrix (mission-level)
 
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
+Run after WP06 completes; gates the `accept` step.
 
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
+| Command | Expected | Gate |
+|---|---|---|
+| `composer phpstan` | clean at level 5, `phpVersion: 80500` | hard |
+| `vendor/bin/phpunit` (no `-v` flag) | full suite green, **zero** PHP 8.5 deprecation notices | hard |
+| `composer cs-check` | clean | hard |
+| `bin/check-composer-policy` | green (CP002/CP003/CP006) | hard |
+| `bin/check-package-layers` | green (no edges change) | hard |
+| `bin/audit-dead-code` | no new findings beyond baseline | hard |
+| `tools/drift-detector.sh` | no drift | hard |
+| `php -v` | `PHP 8.5.x` | hard (sanity) |
+| `php --ri uri` (info) | bundled `Uri` extension reported | informational |
+| `composer create-project waaseyaa/skeleton` against branch | installs cleanly on PHP 8.5 host | manual smoke |
+| CI matrix | only PHP 8.5 jobs run; no 8.4 jobs | hard (CI) |
+| Skeleton smoke workflow | green on `php:8.5-fpm-alpine` | hard (CI) |
 
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
+---
 
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
-```
+## Risks and mitigations
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+| Risk | Mitigation |
+|---|---|
+| Unknown deprecation surface in WP02 | Audit-first (`rg`), timebox each grep; document zero-finding hot zones explicitly |
+| `#[\NoDiscard]` cascade across API/middleware | Treat surfaced ignored-return call sites as bugs to fix in WP03, not warnings to suppress |
+| Composer < 2.8 in CI breaks platform repo handling on 8.5 | Pin `setup-php` `tools: composer:2.8` (or run `composer self-update --2`) in WP01 |
+| Downstream consumer breakage on 8.4 | Out of scope; CHANGELOG bullet flags the floor bump; full migration note in v1.x release notes |
+| Working-tree leakage (other missions' `status.json` artifacts) | Stage explicitly per file in commits; do not `git add -A` |
+| Local PHP differs from CI PHP | Confirmed local is 8.5.6; CI also uses 8.5 once WP01 lands |
 
-## Complexity Tracking
+---
 
-*Fill ONLY if Charter Check has violations that must be justified*
+## Out of scope (file as follow-up issues in WP06)
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+- `#[\Override]` adoption sweep (PHP 8.3 feature; large mechanical diff;
+  separate mission)
+- Migration to bundled native `Uri` extension as a first-class HTTP/IRI
+  primitive (contract-affecting; needs its own spec)
+- `EntityRepository` `mixed` → typed/generic return tightening beyond what
+  `#[\NoDiscard]` work touches
+- Consumer migration guide for downstream apps still on 8.4 (release-notes
+  artifact at tag time)
+
+---
+
+## PR strategy
+
+Single PR `chore(php-8.5): upgrade required PHP version to 8.5` against
+`main`. Body references mission slug per `docs/specs/workflow.md` and the
+PR template. Each WP lands as one or more commits; the PR is opened in
+draft after WP01 commits, marked ready when WP06 verification passes.
