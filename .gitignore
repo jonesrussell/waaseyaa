@@ -96,3 +96,13 @@ node-compile-cache/
 .kittify/workspaces/
 .claude/worktrees/
 phpstan-tests/
+
+# Runtime/test artifacts that leak into repo root (see #TODO: trace and fix at source).
+/csrf_upload_*
+/perf-baseline-*
+/perf-current-*
+/waaseyaa_audit_handler_*
+/waaseyaa_ssr_http_*
+# PHP tempnam() output (3-letter prefix + 18+ alnum chars). Pattern is strict
+# enough not to match phpstan*.neon, phpunit.xml.dist, etc. (those have '.' or '-').
+/php[A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9][A-Za-z0-9]*
