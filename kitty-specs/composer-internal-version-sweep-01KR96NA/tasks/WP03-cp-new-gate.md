@@ -16,7 +16,7 @@ subtasks:
 - T031
 - T032
 - T033
-shell_pid: '264766'
+shell_pid: "264766"
 history: []
 authoritative_surface: bin/check-composer-policy
 execution_mode: code_change
@@ -25,6 +25,7 @@ owned_files:
 - .github/workflows/ci.yml
 - tests/Integration/ReleaseTooling/CpNewCheckTest.php
 tags: []
+agent: "sonnet"
 ---
 
 # WP03 — CP-NEW gate
@@ -39,3 +40,7 @@ Extend `bin/check-composer-policy` with **CP-NEW**: every `waaseyaa/*` constrain
 - Verified on a real PR — CI's `composer-policy` job sees the tag and passes.
 
 See `../plan.md` Design Decision D1 (git-tag reference) and Risk R2 (shallow-clone tag fetch).
+
+## Activity Log
+
+- 2026-05-10T15:39:48Z – sonnet – shell_pid=264766 – Assigned agent via action command
