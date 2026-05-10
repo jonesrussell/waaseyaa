@@ -15,7 +15,7 @@ final class FieldDefinitionTest extends TestCase
     #[Test]
     public function minimalFieldToArray(): void
     {
-        $field = new FieldDefinition('title', 'Title', 'string');
+        $field = new FieldDefinition(name: 'title', label: 'Title', type: 'string');
 
         $array = $field->toArray();
 
@@ -30,7 +30,7 @@ final class FieldDefinitionTest extends TestCase
     #[Test]
     public function fullyConfiguredField(): void
     {
-        $field = new FieldDefinition('body', 'Body', 'string');
+        $field = new FieldDefinition(name: 'body', label: 'Body', type: 'string');
         $field->widget('richtext')
             ->weight(10)
             ->required()
@@ -49,7 +49,7 @@ final class FieldDefinitionTest extends TestCase
     #[Test]
     public function readOnlyField(): void
     {
-        $field = new FieldDefinition('uuid', 'UUID', 'string');
+        $field = new FieldDefinition(name: 'uuid', label: 'UUID', type: 'string');
         $field->readOnly();
 
         $array = $field->toArray();

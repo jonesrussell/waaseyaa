@@ -209,18 +209,18 @@ final class SqlSchemaHandlerTest extends TestCase
         $handler = new SqlSchemaHandler($this->entityType, $this->database);
         $m = new ReflectionMethod(SqlSchemaHandler::class, 'deriveColumnSpec');
 
-        $textLong = new FieldDefinition('description', 'text_long');
+        $textLong = new FieldDefinition(name: 'description', type: 'text_long');
         self::assertSame('text', $this->invokeDeriveColumnSpec($m, $handler, $textLong)['type']);
 
-        $uri = new FieldDefinition('url', 'uri');
+        $uri = new FieldDefinition(name: 'url', type: 'uri');
         $uriSpec = $this->invokeDeriveColumnSpec($m, $handler, $uri);
         self::assertSame('varchar', $uriSpec['type']);
         self::assertSame(2048, $uriSpec['length']);
 
-        $uriCustom = new FieldDefinition('booking_url', 'uri', settings: ['length' => 512]);
+        $uriCustom = new FieldDefinition(name: 'booking_url', type: 'uri', settings: ['length' => 512]);
         self::assertSame(512, $this->invokeDeriveColumnSpec($m, $handler, $uriCustom)['length']);
 
-        $ref = new FieldDefinition('community_id', 'entity_reference', targetEntityTypeId: 'node');
+        $ref = new FieldDefinition(name: 'community_id', type: 'entity_reference', targetEntityTypeId: 'node');
         self::assertSame('int', $this->invokeDeriveColumnSpec($m, $handler, $ref)['type']);
     }
 
@@ -237,7 +237,7 @@ final class SqlSchemaHandlerTest extends TestCase
 
         $handler = new SqlSchemaHandler($this->entityType, $this->database, null, null, $logger);
         $m = new ReflectionMethod(SqlSchemaHandler::class, 'deriveColumnSpec');
-        $field = new FieldDefinition('weird', 'not_a_real_field_type');
+        $field = new FieldDefinition(name: 'weird', type: 'not_a_real_field_type');
         $spec = $this->invokeDeriveColumnSpec($m, $handler, $field);
         self::assertSame('text', $spec['type']);
     }
