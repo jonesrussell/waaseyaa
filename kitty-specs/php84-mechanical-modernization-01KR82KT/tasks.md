@@ -7,10 +7,10 @@
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
-| T001 | array_find swap in `SchemaValidatorTest.php` (8 sites: 81, 103, 124, 144, 166, 186, 208, 230, 250, 275) | WP01 | [P] |
-| T002 | array_find swap in `PayloadValidatorTest.php:618` | WP01 | [P] |
-| T003 | array_find swap in `ValidationGateValidatorTest.php:80` | WP01 | [P] |
-| T004 | array_find swap in `IngestRunCommandTest.php:256` | WP01 | [P] |
+| T001 | array_find swap in `SchemaValidatorTest.php` (8 sites: 81, 103, 124, 144, 166, 186, 208, 230, 250, 275) | WP01 | [P] | [D] |
+| T002 | array_find swap in `PayloadValidatorTest.php:618` | WP01 | [D] |
+| T003 | array_find swap in `ValidationGateValidatorTest.php:80` | WP01 | [D] |
+| T004 | array_find swap in `IngestRunCommandTest.php:256` | WP01 | [D] |
 | T005 | Verify first-match semantics, then array_find swap in `SemanticRefreshTriggerPlanner.php:415` | WP02 | |
 | T006 | Read-only sweep of `packages/routing/src/` and `packages/access/src/` for `foreach { if return }` candidates | WP02 | |
 | T007 | Add `#[\Deprecated]` attribute on `FailedJobRepository`, keep docblock | WP03 | [P] |
@@ -30,10 +30,10 @@
 
 ### Included subtasks
 
-- [ ] T001 array_find swap in `packages/cli/tests/Unit/Ingestion/SchemaValidatorTest.php` (lines 81, 103, 124, 144, 166, 186, 208, 230, 250, 275)
-- [ ] T002 array_find swap in `packages/foundation/tests/Unit/Ingestion/PayloadValidatorTest.php:618`
-- [ ] T003 array_find swap in `packages/cli/tests/Unit/Ingestion/ValidationGateValidatorTest.php:80`
-- [ ] T004 array_find swap in `packages/cli/tests/Unit/Command/IngestRunCommandTest.php:256`
+- [x] T001 array_find swap in `packages/cli/tests/Unit/Ingestion/SchemaValidatorTest.php` (lines 81, 103, 124, 144, 166, 186, 208, 230, 250, 275)
+- [x] T002 array_find swap in `packages/foundation/tests/Unit/Ingestion/PayloadValidatorTest.php:618`
+- [x] T003 array_find swap in `packages/cli/tests/Unit/Ingestion/ValidationGateValidatorTest.php:80`
+- [x] T004 array_find swap in `packages/cli/tests/Unit/Command/IngestRunCommandTest.php:256`
 
 ### Implementation sketch
 
