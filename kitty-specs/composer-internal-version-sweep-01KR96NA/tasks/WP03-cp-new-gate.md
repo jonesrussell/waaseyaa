@@ -44,3 +44,4 @@ See `../plan.md` Design Decision D1 (git-tag reference) and Risk R2 (shallow-clo
 ## Activity Log
 
 - 2026-05-10T15:39:48Z – sonnet – shell_pid=264766 – Assigned agent via action command
+- 2026-05-10T15:43:17Z – sonnet – shell_pid=264766 – Ready for review
