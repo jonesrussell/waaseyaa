@@ -17,7 +17,7 @@ subtasks:
 - T012
 - T013
 - T014
-shell_pid: '260335'
+shell_pid: "260335"
 history: []
 authoritative_surface: bin/sync-internal-versions
 execution_mode: code_change
@@ -29,6 +29,7 @@ owned_files:
 - tests/Fixtures/release-tooling/manifest-unusual-key-order.json
 - tests/Fixtures/release-tooling/manifest-with-require-dev.json
 tags: []
+agent: "sonnet"
 ---
 
 # WP01 — Sync helper script + library + tests
@@ -43,3 +44,7 @@ Build the foundation: a PHP script that, given a target version, rewrites every 
 - New tests pass; PHPStan, cs-check, package-layers, existing composer-policy gates green.
 
 See `../tasks.md` for the T-IDs in this WP. See `../plan.md` for design decisions D2 (JSON round-trip) and D3 (sync vs gate separation).
+
+## Activity Log
+
+- 2026-05-10T15:22:35Z – sonnet – shell_pid=260335 – Assigned agent via action command
