@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Warn-only dead-code and composer-dependency audits** — Two new CI gates wired to the same warn-only pattern as `bin/audit-require-dev-layers`. (1) `bin/audit-dead-code` runs `shipmonk/dead-code-detector` via `phpstan-dead-code.neon` (separate config layered on `phpstan.neon` + `vendor/shipmonk/dead-code-detector/rules.neon`) with `tools/phpstan/WaaseyaaEntrypointProvider.php` marking reflection-discovered classes as used (`#[PolicyAttribute]`, `#[AsMiddleware]`, `extra.waaseyaa.providers` FQCNs, `\Ingestion\EntityMapper\` namespaces, `RouteProviderInterface` implementors). 1332 pre-existing findings captured in `phpstan-dead-code-baseline.neon` so CI surfaces only newly-introduced dead members. (2) `bin/audit-composer-deps` runs `shipmonk/composer-dependency-analyser` against the root composer.json with every `packages/*/src` (prod) and `tests/`/`testing/` (dev) auto-added as scan paths via `composer-dependency-analyser.php`; 83 pre-existing findings (4 unused root deps, 16 shadow deps, 12 shadow ext-*, 4 dev-in-prod, 15 prod-only-in-dev, 32 unknown classes from PHPStan/PHPUnit fixture stubs) baselined inline via `ignoreErrorsOnPackages` / `ignoreErrorsOnExtensions` / `ignoreUnknownClassesRegex`. Both wrappers always exit 0 (warn-only) and support `--` passthrough for tool flags. New `dead-code-audit` and `composer-deps-audit` jobs added to `.github/workflows/ci.yml`. New CLAUDE.md section documents the `@api` PHPDoc convention (recognised by shipmonk's `ApiPhpDocUsageProvider` by default) for marking intentional scaffolding so future triage passes don't auto-delete forthcoming-feature stubs. Per-package require accuracy intentionally out of scope — that's `bin/check-package-layers` + `bin/check-composer-policy`.
+
 ## [0.1.0-alpha.175] - 2026-05-08
 
 ### Changed
