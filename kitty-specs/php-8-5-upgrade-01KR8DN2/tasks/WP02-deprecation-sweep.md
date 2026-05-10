@@ -1,5 +1,7 @@
 ---
 work_package_id: WP02
+agent: "opus"
+shell_pid: "0"
 title: 'PHP 8.5 deprecation sweep: scalar casts, curl_close, OB handlers, shutdown, DateTime'
 dependencies:
 - WP01

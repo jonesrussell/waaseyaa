@@ -1,5 +1,7 @@
 ---
 work_package_id: WP05
+agent: "opus"
+shell_pid: "0"
 title: CS-fixer @PHP85Migration rule + closures-in-const + attribute simplification
 dependencies:
 - WP01

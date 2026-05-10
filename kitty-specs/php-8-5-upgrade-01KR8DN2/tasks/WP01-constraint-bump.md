@@ -1,5 +1,7 @@
 ---
 work_package_id: WP01
+agent: "opus"
+shell_pid: "0"
 title: 'Constraint bump: composer.json × 62, CI, Docker, lockfile, phpstan pin, docs, charter'
 dependencies: []
 requirement_refs:

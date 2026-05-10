@@ -1,5 +1,7 @@
 ---
 work_package_id: WP04
+agent: "opus"
+shell_pid: "0"
 title: Pipe operator + array_first/array_last + array_find adoption
 dependencies:
 - WP01

@@ -2,6 +2,7 @@
   "mission_slug": "php-8-5-upgrade-01KR8DN2",
   "mission_number": null,
   "mission_type": "software-dev",
+  "overall_verdict": "approved",
   "criteria": [
     {
       "criterion_id": "FR-001",

@@ -1,5 +1,7 @@
 ---
 work_package_id: WP06
+agent: "opus"
+shell_pid: "0"
 title: CHANGELOG [Unreleased] bullet + full verification matrix + follow-up issues + PR ready
 dependencies:
 - WP01

@@ -1,5 +1,7 @@
 ---
 work_package_id: WP03
+agent: "opus"
+shell_pid: "0"
 title: '#[\NoDiscard] adoption on AccessResult, ValidationResult, query builders, EntityRepository::find*()'
 dependencies:
 - WP01
