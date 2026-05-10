@@ -127,8 +127,8 @@ jobs:
 
       - name: Sync internal waaseyaa/* version constraints
         # bin/sync-internal-versions is produced by WP01 (composer-internal-version-sweep).
-        # No composer install step is needed here — the script requires only `php` and
-        # `jq` (standard on ubuntu-latest), both available after checkout.
+        # The script is pure PHP (no composer autoloader required) — only `php` is
+        # needed, which is standard on ubuntu-latest after the setup-php steps above.
         env:
           VERSION: ${{ inputs.version }}
         run: |
