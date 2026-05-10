@@ -1,0 +1,12 @@
+{
+    "name": "waaseyaa/test-require-dev",
+    "description": "Fixture: waaseyaa/* deps in both require and require-dev",
+    "require": {
+        "php": ">=8.5",
+        "waaseyaa/foundation": "^0.1.0-alpha.150"
+    },
+    "require-dev": {
+        "waaseyaa/testing": "^0.1.0-alpha.150",
+        "phpunit/phpunit": "^10.5"
+    }
+}

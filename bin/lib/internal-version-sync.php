@@ -1,0 +1,203 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Shared library for internal waaseyaa/* version synchronisation.
+ *
+ * Used by bin/sync-internal-versions (WP01) and bin/check-composer-policy
+ * CP-NEW gate (WP03). All public functions are @api — they are intentional
+ * extension points shared across multiple bin scripts.
+ *
+ * @api
+ */
+
+/**
+ * Resolve the most recent semver git tag and return it without the leading 'v'.
+ *
+ * @param string|null $repoRoot Absolute path to the repository root.
+ *                              Defaults to two directories above this file
+ *                              (i.e. the monorepo root when the file lives at
+ *                              bin/lib/internal-version-sync.php).
+ *
+ * @throws \RuntimeException When no matching tag is found or git fails.
+ */
+function resolveCurrentVersion(?string $repoRoot = null): string
+{
+    if ($repoRoot === null) {
+        $repoRoot = dirname(__DIR__, 2);
+    }
+
+    $repoRoot = rtrim($repoRoot, '/');
+
+    $cmd = sprintf(
+        'git -C %s describe --tags --abbrev=0 --match=%s 2>&1',
+        escapeshellarg($repoRoot),
+        escapeshellarg('v*.*.*'),
+    );
+
+    $output = shell_exec($cmd);
+
+    if ($output === null || $output === false || trim($output) === '') {
+        throw new \RuntimeException(
+            sprintf('Could not resolve current version from git tags in %s.', $repoRoot),
+        );
+    }
+
+    $tag = trim($output);
+
+    if (!str_starts_with($tag, 'v')) {
+        throw new \RuntimeException(
+            sprintf('Unexpected git tag format (expected v-prefix): %s', $tag),
+        );
+    }
+
+    return ltrim($tag, 'v');
+}
+
+/**
+ * Return the caret constraint string for a given version.
+ *
+ * @param string $version Version without leading 'v' (e.g. "0.1.0-alpha.176").
+ */
+function expectedConstraint(string $version): string
+{
+    return '^' . $version;
+}
+
+/**
+ * Extract all waaseyaa/* package keys present in require and/or require-dev.
+ *
+ * @param array<string, mixed> $manifest Parsed composer.json array.
+ *
+ * @return list<string> Deduplicated, sorted list of waaseyaa/* package names.
+ */
+function findInternalDeps(array $manifest): array
+{
+    /** @var array<string, string> $require */
+    $require = is_array($manifest['require'] ?? null) ? $manifest['require'] : [];
+    /** @var array<string, string> $requireDev */
+    $requireDev = is_array($manifest['require-dev'] ?? null) ? $manifest['require-dev'] : [];
+
+    $all = array_merge(array_keys($require), array_keys($requireDev));
+
+    $internal = array_values(array_unique(array_filter(
+        $all,
+        static fn (string $pkg): bool => str_starts_with($pkg, 'waaseyaa/'),
+    )));
+
+    sort($internal);
+
+    return $internal;
+}
+
+/**
+ * Validate and normalise a version string.
+ *
+ * Accepts versions with or without a leading 'v' prefix and returns the
+ * normalised form without the prefix.
+ *
+ * Rejects:
+ *  - empty / whitespace-only strings
+ *  - dev-* aliases
+ *  - the literal "self.version"
+ *  - strings containing wildcard characters (* ? x X)
+ *  - strings not matching the semver prerelease shape
+ *    ^v?[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$
+ *
+ * @throws \InvalidArgumentException On any invalid input.
+ */
+function validateVersionInput(string $input): string
+{
+    if (trim($input) === '') {
+        throw new \InvalidArgumentException(
+            'Version must not be empty or whitespace.',
+        );
+    }
+
+    if (str_contains($input, ' ') || str_contains($input, "\t")) {
+        throw new \InvalidArgumentException(
+            sprintf('Version must not contain whitespace: "%s".', $input),
+        );
+    }
+
+    if (str_starts_with(strtolower($input), 'dev-')) {
+        throw new \InvalidArgumentException(
+            sprintf('dev-* aliases are not valid release versions: "%s".', $input),
+        );
+    }
+
+    if ($input === 'self.version') {
+        throw new \InvalidArgumentException(
+            '"self.version" is a Composer meta-token, not a release version.',
+        );
+    }
+
+    foreach (['*', '?', 'x', 'X'] as $wildcard) {
+        if (str_contains($input, $wildcard)) {
+            throw new \InvalidArgumentException(
+                sprintf('Version must not contain wildcard or placeholder characters: "%s".', $input),
+            );
+        }
+    }
+
+    $pattern = '/^v?[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9.-]+)?$/';
+    if (preg_match($pattern, $input) !== 1) {
+        throw new \InvalidArgumentException(
+            sprintf(
+                'Version "%s" does not match the expected shape '
+                . '(e.g. 0.1.0-alpha.176 or v0.1.0-alpha.176).',
+                $input,
+            ),
+        );
+    }
+
+    return ltrim($input, 'v');
+}
+
+/**
+ * Rewrite all waaseyaa/* constraints in a single composer.json file to the
+ * given caret constraint, preserving JSON formatting (indentation, key order,
+ * trailing newline). Returns true when the file was modified, false when it
+ * was already up to date (no-op / idempotent).
+ *
+ * Uses a regex-based in-place substitution so that indentation, trailing
+ * commas (where the JSON was originally hand-authored with them), and key
+ * ordering are all preserved byte-for-byte for every line that does NOT
+ * contain a waaseyaa/* constraint.
+ *
+ * @throws \RuntimeException On read/write failure.
+ */
+function syncManifestFile(string $manifestPath, string $constraint): bool
+{
+    $original = file_get_contents($manifestPath);
+    if ($original === false) {
+        throw new \RuntimeException(sprintf('Cannot read %s', $manifestPath));
+    }
+
+    // Replace every "waaseyaa/<anything>": "<old-constraint>" occurrence.
+    // The value is always a JSON string — quoted, possibly with a trailing comma.
+    // We preserve everything before and after the version string value.
+    $updated = preg_replace_callback(
+        '/"(waaseyaa\/[^"]+)"\s*:\s*"([^"]*)"/',
+        static function (array $matches) use ($constraint): string {
+            return '"' . $matches[1] . '": "' . $constraint . '"';
+        },
+        $original,
+    );
+
+    if ($updated === null) {
+        throw new \RuntimeException(sprintf('Regex substitution failed for %s', $manifestPath));
+    }
+
+    if ($updated === $original) {
+        return false;
+    }
+
+    $written = file_put_contents($manifestPath, $updated);
+    if ($written === false) {
+        throw new \RuntimeException(sprintf('Cannot write %s', $manifestPath));
+    }
+
+    return true;
+}
