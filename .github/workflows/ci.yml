@@ -12,6 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-tags: true  # fetch-tags: required for CP-NEW (composer-internal-version-sweep WP03)
 
       - name: Enforce composer policy
         run: bash bin/check-composer-policy
