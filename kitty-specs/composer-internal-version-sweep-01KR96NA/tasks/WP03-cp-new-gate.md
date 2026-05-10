@@ -9,13 +9,14 @@ planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 base_branch: kitty/mission-composer-internal-version-sweep-01KR96NA
-base_commit: 297934b3c3b3cfd9ce4ed32004e467aa73e8d78b
-created_at: '2026-05-10T15:10:00+00:00'
+base_commit: dcc5e5086cc489a83ef54d664883a16107b62496
+created_at: '2026-05-10T15:39:46.780839+00:00'
 subtasks:
 - T030
 - T031
 - T032
 - T033
+shell_pid: '264766'
 history: []
 authoritative_surface: bin/check-composer-policy
 execution_mode: code_change
