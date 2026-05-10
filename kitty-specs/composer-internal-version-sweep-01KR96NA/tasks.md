@@ -16,9 +16,9 @@ See `spec.md` for goal and acceptance criteria, `plan.md` for inventory, design 
 | T012 | Create test fixtures under `tests/Fixtures/release-tooling/` (manifest with trailing comma, manifest with unusual key order, manifest with `require-dev` siblings) | WP01 | [D] |
 | T013 | `tests/Integration/ReleaseTooling/SyncInternalVersionsTest.php`: idempotency, JSON formatting preservation, refusal of `""` / `dev-main` / `self.version` / `^*` / `0.1.x` | WP01 | [D] |
 | T014 | Verify WP01 against gates: phpunit (new tests pass), phpstan, cs-check, package-layers, composer-policy (existing rules; CP-NEW lands in WP03) | WP01 | [D] |
-| T020 | Add `Sync internal versions` step to `.github/workflows/release-cut.yml` before the CHANGELOG-promotion + commit + tag steps; runs `bin/sync-internal-versions ${{ inputs.version }}` minus the leading `v` | WP02 | [P] [D]  |
-| T021 | Mirror the same step in `scripts/release.sh` (deprecated but kept as fallback): bash function calling the same script with the parsed `$SEMVER` | WP02 | [P] [D]  |
-| T022 | Manual dry-run verification: invoke release-cut.yml against a sandbox tag (or local equivalent); confirm tree shape matches `scripts/release.sh` output | WP02 | [D]      |
+| T020 | Add `Sync internal versions` step to `.github/workflows/release-cut.yml` before the CHANGELOG-promotion + commit + tag steps; runs `bin/sync-internal-versions ${{ inputs.version }}` minus the leading `v` | WP02 | [P] [D]  | [D] |
+| T021 | Mirror the same step in `scripts/release.sh` (deprecated but kept as fallback): bash function calling the same script with the parsed `$SEMVER` | WP02 | [P] [D]  | [D] |
+| T022 | Manual dry-run verification: invoke release-cut.yml against a sandbox tag (or local equivalent); confirm tree shape matches `scripts/release.sh` output | WP02 | [D] |
 | T030 | Extend `bin/check-composer-policy` with **CP-NEW**: every `waaseyaa/*` constraint in `packages/*/composer.json` must equal `^<resolveCurrentVersion()>`; reuse `bin/lib/internal-version-sync.php` | WP03 | [D]      |
 | T031 | Unit tests for CP-NEW: tampered file produces non-zero exit with file path + expected value; matched files produce zero exit | WP03 | [D]      |
 | T032 | `.github/workflows/ci.yml`: add `fetch-tags: true` (or `fetch-depth: 0`) to the `composer-policy` job's `actions/checkout` step so CP-NEW can resolve the latest tag | WP03 | [D]      |
@@ -52,9 +52,9 @@ Legend: `[D]` = description finalized. `[P]` = independently parallelizable insi
 
 | Subtask | Description |
 |---|---|
-| T020 | Add `Sync internal versions` step to `.github/workflows/release-cut.yml` inside the existing concurrency group |
-| T021 | Mirror the step in `scripts/release.sh` (deprecated fallback per #1385) |
-| T022 | Manual dry-run: invoke release-cut.yml against a sandbox; confirm both paths converge to the same tree |
+| T020 | Add `Sync internal versions` step to `.github/workflows/release-cut.yml` inside the existing concurrency group | [D] |
+| T021 | Mirror the step in `scripts/release.sh` (deprecated fallback per #1385) | [D] |
+| T022 | Manual dry-run: invoke release-cut.yml against a sandbox; confirm both paths converge to the same tree | [D] |
 
 ---
 
@@ -108,8 +108,8 @@ WP02 and WP03 can run in parallel after WP01.
 | FR | Tasks |
 |---|---|
 | FR-001 | T010, T011, T013 |
-| FR-002 | T021 |
-| FR-003 | T020 |
+| FR-002 | T021 | [D] |
+| FR-003 | T020 | [D] |
 | FR-004 | T040, T041, T042 |
 | FR-005 | T030, T031, T032, T033 |
 | FR-006 | T012, T013 |
