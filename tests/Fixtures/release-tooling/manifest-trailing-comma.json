@@ -1,0 +1,9 @@
+{
+    "name": "waaseyaa/test-trailing-comma",
+    "description": "Fixture: trailing comma in require block",
+    "require": {
+        "php": ">=8.5",
+        "waaseyaa/foundation": "^0.1.0-alpha.150",
+        "waaseyaa/entity": "^0.1.0-alpha.150"
+    }
+}

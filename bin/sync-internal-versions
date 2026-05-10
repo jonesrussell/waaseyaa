@@ -1,0 +1,68 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * bin/sync-internal-versions <version>
+ *
+ * Rewrites every waaseyaa/* constraint in packages/(*)/composer.json so that
+ * both `require` and `require-dev` entries pin exactly ^<version>.
+ *
+ * Idempotent: running twice with the same version produces no diff on the
+ * second run.
+ *
+ * Exit codes:
+ *   0 — success
+ *   1 — bad input (invalid version argument)
+ *   2 — runtime error (I/O failure, etc.)
+ */
+
+require __DIR__ . '/lib/internal-version-sync.php';
+
+// ── argv validation ───────────────────────────────────────────────────────────
+
+if ($argc < 2 || trim((string) ($argv[1] ?? '')) === '') {
+    fwrite(STDERR, "Usage: bin/sync-internal-versions <version>\n");
+    fwrite(STDERR, "Example: bin/sync-internal-versions 0.1.0-alpha.176\n");
+    exit(1);
+}
+
+try {
+    $version = validateVersionInput($argv[1]);
+} catch (\InvalidArgumentException $e) {
+    fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
+    exit(1);
+}
+
+$constraint = expectedConstraint($version);
+
+// ── locate packages ───────────────────────────────────────────────────────────
+
+$repoRoot = dirname(__DIR__);
+$manifests = glob($repoRoot . '/packages/*/composer.json');
+
+if ($manifests === false || $manifests === []) {
+    fwrite(STDERR, "Error: no packages/*/composer.json files found under {$repoRoot}.\n");
+    exit(2);
+}
+
+// ── sync each manifest ────────────────────────────────────────────────────────
+
+$updatedCount = 0;
+
+foreach ($manifests as $manifestPath) {
+    try {
+        $changed = syncManifestFile($manifestPath, $constraint);
+    } catch (\RuntimeException $e) {
+        fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
+        exit(2);
+    }
+
+    if ($changed) {
+        ++$updatedCount;
+    }
+}
+
+echo "Updated {$updatedCount} file(s) — version {$constraint}\n";
+exit(0);

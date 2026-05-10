@@ -1,0 +1,9 @@
+{
+    "description": "Fixture: unusual key order (description before name)",
+    "name": "waaseyaa/test-unusual-key-order",
+    "require": {
+        "waaseyaa/access": "^0.1.0-alpha.150",
+        "php": ">=8.5",
+        "waaseyaa/foundation": "^0.1.0-alpha.150"
+    }
+}
