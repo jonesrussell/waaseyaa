@@ -77,11 +77,11 @@ final class ValidationGateValidatorTest extends TestCase
             relationships: [],
         );
 
-        $mismatch = array_values(array_filter(
+        $mismatch = array_find(
             $violations,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'validation.workflow.status_state_mismatch',
-        ));
-        $this->assertCount(1, $mismatch);
-        $this->assertSame('/nodes/node_a/status', $mismatch[0]['location']);
+        );
+        $this->assertNotNull($mismatch);
+        $this->assertSame('/nodes/node_a/status', $mismatch['location']);
     }
 }

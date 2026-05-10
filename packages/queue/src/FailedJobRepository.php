@@ -13,6 +13,10 @@ final class FailedJobRepository implements FailedJobRepositoryInterface
 {
     private readonly InMemoryFailedJobRepository $inner;
 
+    #[\Deprecated(
+        message: 'Use FailedJobRepositoryInterface with InMemoryFailedJobRepository or DatabaseFailedJobRepository instead',
+        since: '0.1',
+    )]
     public function __construct()
     {
         $this->inner = new InMemoryFailedJobRepository();

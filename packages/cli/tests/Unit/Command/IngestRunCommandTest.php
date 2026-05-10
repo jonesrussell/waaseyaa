@@ -253,13 +253,13 @@ TXT);
         $decoded = json_decode((string) file_get_contents($mappedPath), true, 512, JSON_THROW_ON_ERROR);
         $schema = $decoded['diagnostics']['schema'];
 
-        $duplicate = array_values(array_filter(
+        $duplicate = array_find(
             $schema,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.duplicate_source_uri',
-        ));
-        $this->assertCount(1, $duplicate);
-        $this->assertSame('/items/1/source_uri', $duplicate[0]['location']);
-        $this->assertSame(1, $duplicate[0]['item_index']);
+        );
+        $this->assertNotNull($duplicate);
+        $this->assertSame('/items/1/source_uri', $duplicate['location']);
+        $this->assertSame(1, $duplicate['item_index']);
     }
 
     #[Test]

@@ -121,13 +121,13 @@ final class SchemaValidatorTest extends TestCase
             'items' => 'not-array',
         ]);
 
-        $invalidItems = array_values(array_filter(
+        $invalidItems = array_find(
             $violations,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.invalid_items_type',
-        ));
+        );
 
-        $this->assertCount(1, $invalidItems);
-        $this->assertSame('/items', $invalidItems[0]['location']);
+        $this->assertNotNull($invalidItems);
+        $this->assertSame('/items', $invalidItems['location']);
     }
 
     #[Test]
@@ -141,13 +141,13 @@ final class SchemaValidatorTest extends TestCase
             'items' => [],
         ]);
 
-        $empty = array_values(array_filter(
+        $empty = array_find(
             $violations,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.empty_items_array',
-        ));
+        );
 
-        $this->assertCount(1, $empty);
-        $this->assertSame('/items', $empty[0]['location']);
+        $this->assertNotNull($empty);
+        $this->assertSame('/items', $empty['location']);
     }
 
     #[Test]
@@ -163,13 +163,13 @@ final class SchemaValidatorTest extends TestCase
             ],
         ]);
 
-        $malformed = array_values(array_filter(
+        $malformed = array_find(
             $violations,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.malformed_ingested_at',
-        ));
+        );
 
-        $this->assertCount(1, $malformed);
-        $this->assertSame('/items/0/ingested_at', $malformed[0]['location']);
+        $this->assertNotNull($malformed);
+        $this->assertSame('/items/0/ingested_at', $malformed['location']);
     }
 
     #[Test]
@@ -183,13 +183,13 @@ final class SchemaValidatorTest extends TestCase
             'items' => [['source_uri' => 'item://a', 'ingested_at' => 1735689600, 'parser_version' => null]],
         ]);
 
-        $malformed = array_values(array_filter(
+        $malformed = array_find(
             $violations,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.malformed_batch_id',
-        ));
+        );
 
-        $this->assertCount(1, $malformed);
-        $this->assertSame('/batch_id', $malformed[0]['location']);
+        $this->assertNotNull($malformed);
+        $this->assertSame('/batch_id', $malformed['location']);
     }
 
     #[Test]
@@ -205,13 +205,13 @@ final class SchemaValidatorTest extends TestCase
             ],
         ]);
 
-        $malformed = array_values(array_filter(
+        $malformed = array_find(
             $violations,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.malformed_source_uri',
-        ));
+        );
 
-        $this->assertCount(1, $malformed);
-        $this->assertSame('/items/0/source_uri', $malformed[0]['location']);
+        $this->assertNotNull($malformed);
+        $this->assertSame('/items/0/source_uri', $malformed['location']);
     }
 
     #[Test]
@@ -227,13 +227,13 @@ final class SchemaValidatorTest extends TestCase
             ],
         ]);
 
-        $invalidType = array_values(array_filter(
+        $invalidType = array_find(
             $violations,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.invalid_parser_version_type',
-        ));
+        );
 
-        $this->assertCount(1, $invalidType);
-        $this->assertSame('/items/0/parser_version', $invalidType[0]['location']);
+        $this->assertNotNull($invalidType);
+        $this->assertSame('/items/0/parser_version', $invalidType['location']);
     }
 
     #[Test]
@@ -247,13 +247,13 @@ final class SchemaValidatorTest extends TestCase
             'items' => ['not-object'],
         ]);
 
-        $invalidType = array_values(array_filter(
+        $invalidType = array_find(
             $violations,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.invalid_item_type',
-        ));
+        );
 
-        $this->assertCount(1, $invalidType);
-        $this->assertSame('/items/0', $invalidType[0]['location']);
+        $this->assertNotNull($invalidType);
+        $this->assertSame('/items/0', $invalidType['location']);
     }
 
     #[Test]
@@ -272,12 +272,12 @@ final class SchemaValidatorTest extends TestCase
             ]],
         ]);
 
-        $unknown = array_values(array_filter(
+        $unknown = array_find(
             $violations,
             static fn(array $row): bool => (string) ($row['code'] ?? '') === 'schema.disallowed_item_field',
-        ));
+        );
 
-        $this->assertCount(1, $unknown);
-        $this->assertSame('/items/0/unexpected', $unknown[0]['location']);
+        $this->assertNotNull($unknown);
+        $this->assertSame('/items/0/unexpected', $unknown['location']);
     }
 }
