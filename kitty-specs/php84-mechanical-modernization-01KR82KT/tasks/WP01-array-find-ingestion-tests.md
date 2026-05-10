@@ -18,7 +18,8 @@ subtasks:
 - T002
 - T003
 - T004
-shell_pid: '86581'
+shell_pid: "86581"
+agent: "claude:opus-4-7:opus-implementer:implementer"
 history:
 - timestamp: '2026-05-10T04:40:07Z'
   actor: spec-kitty.tasks
@@ -139,3 +140,7 @@ Returns the first element matching the predicate, or `null` if none match. **The
 ```bash
 spec-kitty agent action implement WP01 --agent <agent-name>
 ```
+
+## Activity Log
+
+- 2026-05-10T04:45:05Z – claude:opus-4-7:opus-implementer:implementer – shell_pid=86581 – Assigned agent via action command
