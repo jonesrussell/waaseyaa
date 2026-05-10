@@ -48,7 +48,6 @@ final class SsrServiceProviderHttpRoutersTest extends TestCase
 
         $ref = new \ReflectionClass($provider);
         $pageHandlerProp = $ref->getProperty('ssrPageHandler');
-        $pageHandlerProp->setAccessible(true);
         $pageHandlerProp->setValue($provider, $handler);
 
         $kernel = new HttpKernel('/tmp');

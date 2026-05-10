@@ -208,7 +208,6 @@ final class SqlSchemaHandlerTest extends TestCase
     {
         $handler = new SqlSchemaHandler($this->entityType, $this->database);
         $m = new ReflectionMethod(SqlSchemaHandler::class, 'deriveColumnSpec');
-        $m->setAccessible(true);
 
         $textLong = new FieldDefinition('description', 'text_long');
         self::assertSame('text', $this->invokeDeriveColumnSpec($m, $handler, $textLong)['type']);
@@ -238,7 +237,6 @@ final class SqlSchemaHandlerTest extends TestCase
 
         $handler = new SqlSchemaHandler($this->entityType, $this->database, null, null, $logger);
         $m = new ReflectionMethod(SqlSchemaHandler::class, 'deriveColumnSpec');
-        $m->setAccessible(true);
         $field = new FieldDefinition('weird', 'not_a_real_field_type');
         $spec = $this->invokeDeriveColumnSpec($m, $handler, $field);
         self::assertSame('text', $spec['type']);

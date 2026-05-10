@@ -7,6 +7,7 @@
 <!-- Spec reviewed 2026-05-04 - cs-fixer sweep applied to AbstractKernel.php (alphabetical import sort only, no behavior change). Spec contents verified accurate; no infrastructure-spec contract changed. -->
 <!-- Spec reviewed 2026-05-02b - mission #1257 WP10 review hardening (PR #1367): `AbstractKernel::resolveCommunityScope()` no longer falls back to a null scope unconditionally when tenancy is declared but no `CommunityContextInterface` is bound. In production (any environment NOT in {local, dev, development, testing}), missing context throws `[TENANCY_MISCONFIGURED] RuntimeException` — silent disablement of community isolation in production is a data-leak posture, not a tolerable misconfiguration. In development the prior log-once + null-scope path stays so tests / CLI / bare bootstrap don't crash. -->
 <!-- Spec reviewed 2026-05-02 - mission #1257 WP10: AbstractKernel gained `setCommunityContext(?CommunityContextInterface)` plus a private `resolveCommunityScope(EntityTypeInterface)` helper that the EntityRepository factory uses to inject CommunityScope into SqlStorageDriver when the EntityType declares `tenancy: ['scope' => 'community']`. When tenancy is declared but no context is bound, the kernel logs a once-per-type warning and falls back to a null scope (no boot crash; superseded by the 2026-05-02b production-throw guard above). EntityTypeManager now also receives the kernel logger so it can emit the C1 deprecation warning. Wiring contract details live in docs/specs/entity-system.md §C1 / §Community Scoping; no infrastructure-spec contract changed. -->
+<!-- Spec reviewed 2026-05-10 - StreamHttpClient migrated from $http_response_header (deprecated in PHP 8.5) to http_get_last_response_headers(); behaviour unchanged (mission php-8-5-upgrade WP02) -->
 <!-- Spec reviewed 2026-05-01b - BootFailureMessageFormatter extracted as a public seam in packages/foundation/src/Kernel/: HttpKernel::bootFailureJsonResponse delegates clientSafeBootFailureDetail mapping to the formatter, eliminating 3× setAccessible() in HttpKernelBootFailureTest; behavior unchanged (mission #824 WP09 surface H) -->
 <!-- Spec reviewed 2026-05-01 - README skeletons added under packages/billing/, packages/deployer/, packages/github/, packages/http-client/, packages/inertia/ (purpose, layer, key classes only); StripeClientInterface, GitHubClient, HttpClientInterface, Inertia adapter, and Deployer recipe contracts unchanged from prior review (mission #824 WP09 surface F, closes #849) -->
 <!-- Spec reviewed 2026-04-26 - Package-declared migrations: extra.waaseyaa.migrations path, MigrationLoader glob order, OIDC exemplar migration (#1286) -->
@@ -936,7 +937,7 @@ final readonly class HttpResponse
 
 File: `packages/http-client/src/StreamHttpClient.php`
 
-Implementation using `file_get_contents()` with stream contexts. Throws `HttpRequestException` on failure.
+Implementation using `file_get_contents()` with stream contexts. Throws `HttpRequestException` on failure. Response headers are read via `http_get_last_response_headers()` (PHP 8.5+); the legacy magic predefined `$http_response_header` was deprecated in 8.5.
 
 ### HttpRequestException
 

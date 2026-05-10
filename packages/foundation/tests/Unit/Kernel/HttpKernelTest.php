@@ -143,10 +143,8 @@ final class HttpKernelTest extends TestCase
         $kernel = new HttpKernel('/tmp/test-project');
 
         $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
 
         $method = new \ReflectionMethod(HttpKernel::class, 'isDevelopmentMode');
-        $method->setAccessible(true);
 
         $configProp->setValue($kernel, ['environment' => 'development']);
         $this->assertTrue($method->invoke($kernel));
@@ -164,11 +162,9 @@ final class HttpKernelTest extends TestCase
         $kernel = new HttpKernel('/tmp/test-project');
 
         $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
         $configProp->setValue($kernel, ['environment' => 'development']);
 
         $method = new \ReflectionMethod(HttpKernel::class, 'shouldUseDevFallbackAccount');
-        $method->setAccessible(true);
 
         $this->assertFalse($method->invoke($kernel, 'cli-server'));
     }
@@ -179,10 +175,8 @@ final class HttpKernelTest extends TestCase
         $kernel = new HttpKernel('/tmp/test-project');
 
         $configProp = new \ReflectionProperty(\Waaseyaa\Foundation\Kernel\AbstractKernel::class, 'config');
-        $configProp->setAccessible(true);
 
         $method = new \ReflectionMethod(HttpKernel::class, 'shouldUseDevFallbackAccount');
-        $method->setAccessible(true);
 
         $configProp->setValue($kernel, [
             'environment' => 'development',
@@ -209,11 +203,9 @@ final class HttpKernelTest extends TestCase
         $kernel = new HttpKernel($this->projectRoot);
 
         $boot = new \ReflectionMethod(AbstractKernel::class, 'boot');
-        $boot->setAccessible(true);
         $boot->invoke($kernel);
 
         $etmProp = new \ReflectionProperty(AbstractKernel::class, 'entityTypeManager');
-        $etmProp->setAccessible(true);
         $entityTypeManager = $etmProp->getValue($kernel);
 
         $registrar = new BuiltinRouteRegistrar($entityTypeManager);
@@ -249,15 +241,12 @@ final class HttpKernelTest extends TestCase
         $kernel = new HttpKernel($this->projectRoot);
 
         $boot = new \ReflectionMethod(AbstractKernel::class, 'boot');
-        $boot->setAccessible(true);
         $boot->invoke($kernel);
 
         $entityTypeManagerProperty = new \ReflectionProperty(AbstractKernel::class, 'entityTypeManager');
-        $entityTypeManagerProperty->setAccessible(true);
         $entityTypeManager = $entityTypeManagerProperty->getValue($kernel);
 
         $providersProperty = new \ReflectionProperty(AbstractKernel::class, 'providers');
-        $providersProperty->setAccessible(true);
         $providers = $providersProperty->getValue($kernel);
 
         $router = new \Waaseyaa\Routing\WaaseyaaRouter(new \Symfony\Component\Routing\RequestContext('', 'GET'));

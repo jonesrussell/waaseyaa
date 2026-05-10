@@ -6,10 +6,12 @@ namespace Waaseyaa\Queue\Tests\Unit;
 
 use Waaseyaa\Queue\FailedJobRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(FailedJobRepository::class)]
+#[IgnoreDeprecations]
 final class FailedJobRepositoryTest extends TestCase
 {
     #[Test]

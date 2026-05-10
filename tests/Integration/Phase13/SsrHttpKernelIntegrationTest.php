@@ -292,7 +292,6 @@ PHP;
     {
         $kernel = new HttpKernel($this->projectRoot);
         $boot = new \ReflectionMethod(AbstractKernel::class, 'boot');
-        $boot->setAccessible(true);
         $boot->invoke($kernel);
 
         return $kernel;
