@@ -365,8 +365,8 @@ final class DBALSelectTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $this->db->select('users', 'u')
-            ->orderBy('u.name', 'INVALID');
+        $select = $this->db->select('users', 'u');
+        $select = $select->orderBy('u.name', 'INVALID');
     }
 
     public function testFluentInterface(): void

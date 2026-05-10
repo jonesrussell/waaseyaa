@@ -507,7 +507,7 @@ final class HttpKernel extends AbstractKernel
 
         $detail = $showDetail
             ? $e->getMessage()
-            : (new BootFailureMessageFormatter())->format($e);
+            : new BootFailureMessageFormatter()->format($e);
 
         try {
             $body = json_encode([

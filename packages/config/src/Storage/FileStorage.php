@@ -188,7 +188,7 @@ final class FileStorage implements StorageInterface
     private function ensureDirectory(): void
     {
         if (!is_dir($this->directory)) {
-            mkdir($this->directory, 0777, true);
+            mkdir($this->directory, 0o777, true);
         }
     }
 }

@@ -78,7 +78,7 @@ final class AccessVisibilityConsistencyIntegrationTest extends TestCase
             ],
         ));
         $manager->getStorage('relationship');
-        (new RelationshipSchemaManager($database))->ensure();
+        new RelationshipSchemaManager($database)->ensure();
 
         $nodeStorage = $manager->getStorage('node');
         $anchor = $nodeStorage->create([

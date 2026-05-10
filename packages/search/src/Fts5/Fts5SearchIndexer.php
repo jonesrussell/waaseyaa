@@ -19,28 +19,28 @@ final class Fts5SearchIndexer implements SearchIndexerInterface
     public function ensureSchema(): void
     {
         $this->database->query(<<<'SQL'
-            CREATE VIRTUAL TABLE IF NOT EXISTS search_index USING fts5(
-                document_id UNINDEXED,
-                title,
-                body,
-                tokenize='porter unicode61'
-            )
-        SQL);
+                CREATE VIRTUAL TABLE IF NOT EXISTS search_index USING fts5(
+                    document_id UNINDEXED,
+                    title,
+                    body,
+                    tokenize='porter unicode61'
+                )
+            SQL);
 
         $this->database->query(<<<'SQL'
-            CREATE TABLE IF NOT EXISTS search_metadata (
-                document_id TEXT PRIMARY KEY,
-                entity_type TEXT NOT NULL,
-                content_type TEXT NOT NULL DEFAULT '',
-                source_name TEXT NOT NULL DEFAULT '',
-                quality_score INTEGER NOT NULL DEFAULT 0,
-                topics TEXT NOT NULL DEFAULT '[]',
-                url TEXT NOT NULL DEFAULT '',
-                og_image TEXT NOT NULL DEFAULT '',
-                created_at TEXT NOT NULL,
-                schema_version TEXT NOT NULL
-            )
-        SQL);
+                CREATE TABLE IF NOT EXISTS search_metadata (
+                    document_id TEXT PRIMARY KEY,
+                    entity_type TEXT NOT NULL,
+                    content_type TEXT NOT NULL DEFAULT '',
+                    source_name TEXT NOT NULL DEFAULT '',
+                    quality_score INTEGER NOT NULL DEFAULT 0,
+                    topics TEXT NOT NULL DEFAULT '[]',
+                    url TEXT NOT NULL DEFAULT '',
+                    og_image TEXT NOT NULL DEFAULT '',
+                    created_at TEXT NOT NULL,
+                    schema_version TEXT NOT NULL
+                )
+            SQL);
 
         $this->database->query('CREATE INDEX IF NOT EXISTS idx_search_meta_entity_type ON search_metadata(entity_type)');
         $this->database->query('CREATE INDEX IF NOT EXISTS idx_search_meta_content_type ON search_metadata(content_type)');

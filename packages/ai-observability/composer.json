@@ -11,7 +11,7 @@
         {"type": "path", "url": "../database-legacy"}
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "waaseyaa/ai-agent": "^0.1.0-alpha.150",
         "waaseyaa/database-legacy": "^0.1.0-alpha.150",
         "waaseyaa/entity": "^0.1.0-alpha.150",

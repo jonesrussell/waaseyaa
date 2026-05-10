@@ -48,7 +48,7 @@ final class ApiDiscoveryIntegrationTest extends TestCase
         ));
 
         $this->router = new WaaseyaaRouter(new RequestContext('', 'GET'));
-        (new JsonApiRouteProvider($this->entityTypeManager))->registerRoutes($this->router);
+        new JsonApiRouteProvider($this->entityTypeManager)->registerRoutes($this->router);
     }
 
     #[Test]

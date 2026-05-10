@@ -121,7 +121,7 @@ final class SsrPageHandler
             $contentLangcode = $language['langcode'];
             $aliasLookupPath = $language['alias_path'];
             if ($aliasLookupPath === '/') {
-                $response = (new RenderController($twig))->renderPath('/', $account);
+                $response = new RenderController($twig)->renderPath('/', $account);
                 $headers = $this->extractHeaders($response);
                 $headers['Cache-Control'] = $cacheControlHeader;
                 return $this->htmlResult($response->getStatusCode(), (string) $response->getContent(), $headers);
@@ -149,7 +149,7 @@ final class SsrPageHandler
             $targetStorage = $this->entityTypeManager->getStorage($resolved->entityTypeId);
             $entity = $targetStorage->load($resolved->entityId);
             if ($entity === null) {
-                $response = (new RenderController($twig))->renderNotFound($aliasLookupPath, $account);
+                $response = new RenderController($twig)->renderNotFound($aliasLookupPath, $account);
                 $headers = $this->extractHeaders($response);
                 $headers['Cache-Control'] = $cacheControlHeader;
                 return $this->htmlResult($response->getStatusCode(), (string) $response->getContent(), $headers);
@@ -159,7 +159,7 @@ final class SsrPageHandler
             $visibilityResolver = new EditorialVisibilityResolver();
             $visibility = $visibilityResolver->canRender($entity, $account, $previewRequested);
             if ($visibility->isForbidden()) {
-                $response = (new RenderController($twig))->renderForbidden($aliasLookupPath, $account);
+                $response = new RenderController($twig)->renderForbidden($aliasLookupPath, $account);
                 $headers = $this->extractHeaders($response);
                 $headers['Cache-Control'] = $cacheControlHeader;
                 return $this->htmlResult($response->getStatusCode(), (string) $response->getContent(), $headers);
@@ -219,7 +219,7 @@ final class SsrPageHandler
             $twigEntityContext = $renderContext;
             $twigEntityContext['account'] = $account;
 
-            $response = (new RenderController($twig, $entityRenderer))->renderEntity($entity, $viewMode, $twigEntityContext);
+            $response = new RenderController($twig, $entityRenderer)->renderEntity($entity, $viewMode, $twigEntityContext);
             if (
                 !$account->isAuthenticated()
                 && !$previewRequested

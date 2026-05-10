@@ -16,7 +16,7 @@ final class AdminBuildHandler
     public function execute(CliIO $io): int
     {
         try {
-            $adminPath = (new AdminPackagePathResolver($this->projectRoot))->resolve();
+            $adminPath = new AdminPackagePathResolver($this->projectRoot)->resolve();
         } catch (\RuntimeException $e) {
             $io->error($e->getMessage());
 

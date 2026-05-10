@@ -167,14 +167,14 @@ final class AppControllerRouter implements DomainRouterInterface
         $escapedDetail = $esc($detail);
 
         $html = <<<HTML
-        <!DOCTYPE html>
-        <html lang="en">
-        <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{$statusCode} {$escapedTitle}</title>
-        <style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#111827;color:#F3F4F6}
-        .box{text-align:center;max-width:420px;padding:2rem}.code{font-size:4rem;font-weight:700;color:#F59E0B;margin:0}.msg{color:#9CA3AF;margin:1rem 0;line-height:1.6}</style></head>
-        <body><div class="box"><p class="code">{$statusCode}</p><h1>{$escapedTitle}</h1><p class="msg">{$escapedDetail}</p></div></body></html>
-        HTML;
+            <!DOCTYPE html>
+            <html lang="en">
+            <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>{$statusCode} {$escapedTitle}</title>
+            <style>body{font-family:system-ui,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#111827;color:#F3F4F6}
+            .box{text-align:center;max-width:420px;padding:2rem}.code{font-size:4rem;font-weight:700;color:#F59E0B;margin:0}.msg{color:#9CA3AF;margin:1rem 0;line-height:1.6}</style></head>
+            <body><div class="box"><p class="code">{$statusCode}</p><h1>{$escapedTitle}</h1><p class="msg">{$escapedDetail}</p></div></body></html>
+            HTML;
 
         return new Response($html, $statusCode, [
             'Content-Type' => 'text/html; charset=UTF-8',

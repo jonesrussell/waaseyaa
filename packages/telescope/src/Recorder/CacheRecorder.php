@@ -35,7 +35,7 @@ final class CacheRecorder
             'operation' => $operation,
             'key' => $key,
             'duration' => $duration,
-            'timestamp' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'timestamp' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ];
 
         if ($value !== null) {

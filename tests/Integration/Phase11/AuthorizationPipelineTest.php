@@ -125,7 +125,7 @@ final class AuthorizationPipelineTest extends TestCase
         $userStorage = $this->entityTypeManager->getStorage('user');
         $accessChecker = new AccessChecker();
 
-        return (new HttpPipeline())
+        return new HttpPipeline()
             ->withMiddleware(new SessionMiddleware($userStorage))
             ->withMiddleware(new AuthorizationMiddleware($accessChecker));
     }

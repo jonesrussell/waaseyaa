@@ -23,19 +23,19 @@ final class ErrorPreviewController
 
         $safe = htmlspecialchars((string) $code, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $body = <<<HTML
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Error {$safe}</title>
-  <style>body{font-family:system-ui;margin:2rem;}</style>
-</head>
-<body>
-  <h1>Error {$safe}</h1>
-  <p>Preview of the production error shell (debug mode only).</p>
-</body>
-</html>
-HTML;
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <title>Error {$safe}</title>
+              <style>body{font-family:system-ui;margin:2rem;}</style>
+            </head>
+            <body>
+              <h1>Error {$safe}</h1>
+              <p>Preview of the production error shell (debug mode only).</p>
+            </body>
+            </html>
+            HTML;
 
         return new Response($body, $code, ['Content-Type' => 'text/html; charset=UTF-8']);
     }

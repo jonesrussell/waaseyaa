@@ -378,7 +378,6 @@ final class SessionMiddlewareTest extends TestCase
                 'use_strict_mode' => true,
             ]);
             $method = new \ReflectionMethod(SessionMiddleware::class, 'applySessionCookieIni');
-            $method->setAccessible(true);
             $method->invoke($middleware);
 
             $this->assertSame('1', ini_get('session.cookie_httponly'));
@@ -411,7 +410,6 @@ final class SessionMiddlewareTest extends TestCase
                 'secure' => 'auto',
             ], ['10.0.0.1']);
             $method = new \ReflectionMethod(SessionMiddleware::class, 'applySessionCookieIni');
-            $method->setAccessible(true);
             $method->invoke($middleware);
 
             $this->assertSame('0', ini_get('session.cookie_secure'));
@@ -439,7 +437,6 @@ final class SessionMiddlewareTest extends TestCase
                 'secure' => 'auto',
             ], ['10.0.0.1']);
             $method = new \ReflectionMethod(SessionMiddleware::class, 'applySessionCookieIni');
-            $method->setAccessible(true);
             $method->invoke($middleware);
 
             $this->assertSame('1', ini_get('session.cookie_secure'));

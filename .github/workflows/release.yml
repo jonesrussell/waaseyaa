@@ -24,7 +24,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: pdo_sqlite, sqlite3, mbstring, xml
           coverage: none
 
@@ -69,7 +69,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: pdo_sqlite, sqlite3, mbstring, xml
           coverage: none
 
@@ -130,7 +130,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: pdo_sqlite, sqlite3, mbstring, xml
           coverage: none
 
@@ -175,7 +175,7 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.5'
           extensions: pdo_sqlite, sqlite3, mbstring, xml
           coverage: none
 

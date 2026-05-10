@@ -50,10 +50,10 @@ final class InertiaMultipartCsrfIntegrationTest extends TestCase
         $this->runner       = __DIR__ . '/Fixtures/csrf_kernel_runner.php';
 
         // Create the temp project directory structure.
-        mkdir($this->projectRoot . '/config', 0755, true);
-        mkdir($this->projectRoot . '/storage', 0755, true);
-        mkdir($this->projectRoot . '/vendor/composer', 0755, true);
-        mkdir($this->sessionPath, 0755, true);
+        mkdir($this->projectRoot . '/config', 0o755, true);
+        mkdir($this->projectRoot . '/storage', 0o755, true);
+        mkdir($this->projectRoot . '/vendor/composer', 0o755, true);
+        mkdir($this->sessionPath, 0o755, true);
 
         // Create a custom autoload.php that first registers the worktree's
         // modified packages with prepend priority, then falls through to the
@@ -486,30 +486,30 @@ final class InertiaMultipartCsrfIntegrationTest extends TestCase
         $realAutoload = var_export($repoRoot . '/vendor/autoload.php', true);
 
         $autoloadContent = <<<PHP
-<?php
-// Custom autoload wrapper for CSRF integration tests.
-// Loads the real Composer autoloader first (it registers itself with prepend),
-// then adds the worktree PSR-4 override on top with prepend so it wins.
-// Order matters: load real autoloader first, then prepend our override.
+            <?php
+            // Custom autoload wrapper for CSRF integration tests.
+            // Loads the real Composer autoloader first (it registers itself with prepend),
+            // then adds the worktree PSR-4 override on top with prepend so it wins.
+            // Order matters: load real autoloader first, then prepend our override.
 
-require_once {$realAutoload};
+            require_once {$realAutoload};
 
-\$worktreePsr4Map = {$mapPhp};
+            \$worktreePsr4Map = {$mapPhp};
 
-spl_autoload_register(static function (string \$class) use (\$worktreePsr4Map): void {
-    foreach (\$worktreePsr4Map as \$prefix => \$baseDir) {
-        if (!str_starts_with(\$class, \$prefix)) {
-            continue;
-        }
-        \$relative = str_replace('\\\\', '/', substr(\$class, strlen(\$prefix))) . '.php';
-        \$candidate = \$baseDir . '/' . \$relative;
-        if (is_file(\$candidate)) {
-            require_once \$candidate;
-            return;
-        }
-    }
-}, prepend: true);
-PHP;
+            spl_autoload_register(static function (string \$class) use (\$worktreePsr4Map): void {
+                foreach (\$worktreePsr4Map as \$prefix => \$baseDir) {
+                    if (!str_starts_with(\$class, \$prefix)) {
+                        continue;
+                    }
+                    \$relative = str_replace('\\\\', '/', substr(\$class, strlen(\$prefix))) . '.php';
+                    \$candidate = \$baseDir . '/' . \$relative;
+                    if (is_file(\$candidate)) {
+                        require_once \$candidate;
+                        return;
+                    }
+                }
+            }, prepend: true);
+            PHP;
 
         file_put_contents($this->projectRoot . '/vendor/autoload.php', $autoloadContent);
     }
@@ -556,17 +556,17 @@ PHP;
         $databasePath = $this->projectRoot . '/storage/waaseyaa.sqlite';
 
         return <<<PHP
-<?php
+            <?php
 
-declare(strict_types=1);
+            declare(strict_types=1);
 
-return [
-    'database'    => '{$databasePath}',
-    'environment' => 'local',
-    'app'         => ['url' => 'http://localhost', 'name' => 'CSRF Integration Test'],
-    'cors_origins' => ['http://localhost:3000'],
-];
-PHP;
+            return [
+                'database'    => '{$databasePath}',
+                'environment' => 'local',
+                'app'         => ['url' => 'http://localhost', 'name' => 'CSRF Integration Test'],
+                'cors_origins' => ['http://localhost:3000'],
+            ];
+            PHP;
     }
 
     private function removeDirectory(string $dir): void

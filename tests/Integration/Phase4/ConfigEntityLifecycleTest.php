@@ -31,8 +31,8 @@ final class ConfigEntityLifecycleTest extends TestCase
         $this->tempDir = sys_get_temp_dir() . '/waaseyaa_config_test_' . uniqid();
         $this->activeDirPath = $this->tempDir . '/active';
         $this->syncDirPath = $this->tempDir . '/sync';
-        mkdir($this->activeDirPath, 0777, true);
-        mkdir($this->syncDirPath, 0777, true);
+        mkdir($this->activeDirPath, 0o777, true);
+        mkdir($this->syncDirPath, 0o777, true);
     }
 
     protected function tearDown(): void

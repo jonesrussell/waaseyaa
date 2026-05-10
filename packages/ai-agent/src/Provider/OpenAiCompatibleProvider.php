@@ -94,11 +94,8 @@ final class OpenAiCompatibleProvider implements ProviderInterface
 
         if ($responseBody === false) {
             $error = \curl_error($ch);
-            \curl_close($ch);
             throw new \RuntimeException("cURL error: {$error}");
         }
-
-        \curl_close($ch);
 
         if (!\is_string($responseBody)) {
             throw new \RuntimeException('Unexpected cURL response type.');

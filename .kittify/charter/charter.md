@@ -11,7 +11,7 @@ Integration tests cover cross-package boundaries. Each subsystem provides
 in-memory implementations of its key interfaces so consuming packages can
 test against them without booting a real database or full kernel.
 
-CI testing matrix (mandatory): tests must run on PHP 8.4 across both
+CI testing matrix (mandatory): tests must run on PHP 8.5 across both
 Ubuntu LTS and Debian stable, with SQLite and PostgreSQL as mandatory
 database backends. MySQL is optional but encouraged. The full matrix is
 declared in the canonical CI template at
@@ -30,7 +30,7 @@ work package — no WP merges without its tests passing.
 
 - Mandatory before merge (all enforced by CI; any CI job failure blocks
 merge):
-  - Full PHPUnit suite green across the mandatory CI matrix (PHP 8.4 ×
+  - Full PHPUnit suite green across the mandatory CI matrix (PHP 8.5 ×
     Ubuntu/Debian × SQLite/Postgres). No skipped tests without
     justification.
   - PHPStan analysis clean against the committed baseline; new violations
@@ -153,7 +153,7 @@ template_set: software-dev-default
 ## Policy Summary
 
 - Intent: Waaseyaa is a modern, entity-first, AI-native PHP content management
-framework targeting PHP 8.4+. It is a clean-room replacement for Drupal's
+framework targeting PHP 8.5+. It is a clean-room replacement for Drupal's
 runtime: takes the conceptual lessons (entity model, fieldable content,
 pluggable storage) but ships none of the legacy code, none of the global
 state, and no compatibility shims. The framework is delivered as a
@@ -166,7 +166,7 @@ actionable by AI agents — MCP tools generate from entity definitions,
 schema flows into authoring assistance, and vector indexing is a
 first-class capability rather than a bolt-on.
 
-- Languages/Frameworks: PHP 8.4+ as the runtime baseline (no support for older versions). Symfony
+- Languages/Frameworks: PHP 8.5+ as the runtime baseline (no support for older versions). Symfony
 7 components (HttpFoundation, Console, Routing, DependencyInjection,
 Validator, etc.) as the foundation libraries. Doctrine DBAL (in-flight via
 the doctrine-dbal-cutover mission) for the database layer. Twig for SSR.
@@ -179,7 +179,7 @@ Integration tests cover cross-package boundaries. Each subsystem provides
 in-memory implementations of its key interfaces so consuming packages can
 test against them without booting a real database or full kernel.
 
-CI testing matrix (mandatory): tests must run on PHP 8.4 across both
+CI testing matrix (mandatory): tests must run on PHP 8.5 across both
 Ubuntu LTS and Debian stable, with SQLite and PostgreSQL as mandatory
 database backends. MySQL is optional but encouraged. The full matrix is
 declared in the canonical CI template at
@@ -195,7 +195,7 @@ work package — no WP merges without its tests passing.
 
 - Quality Gates: Mandatory before merge (all enforced by CI; any CI job failure blocks
 merge):
-  - Full PHPUnit suite green across the mandatory CI matrix (PHP 8.4 ×
+  - Full PHPUnit suite green across the mandatory CI matrix (PHP 8.5 ×
     Ubuntu/Debian × SQLite/Postgres). No skipped tests without
     justification.
   - PHPStan analysis clean against the committed baseline; new violations

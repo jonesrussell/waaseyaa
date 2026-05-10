@@ -20,7 +20,7 @@ abstract class WaaseyaaException extends \RuntimeException
     {
         return [
             'type' => $this->problemType,
-            'title' => (new \ReflectionClass($this))->getShortName(),
+            'title' => new \ReflectionClass($this)->getShortName(),
             'detail' => $this->getMessage(),
             'status' => $this->statusCode,
         ];

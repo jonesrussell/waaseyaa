@@ -148,7 +148,7 @@ final class NcSyncHandler
 
             $directory = dirname($reportPath);
             if (!is_dir($directory)) {
-                @mkdir($directory, 0775, true);
+                @mkdir($directory, 0o775, true);
             }
 
             $tmp = $reportPath . '.tmp';

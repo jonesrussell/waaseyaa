@@ -29,7 +29,7 @@ final class InertiaServiceProvider extends ServiceProvider implements HasMiddlew
         if ($root === null && $cwd === false) {
             return;
         }
-        $root = $root ?? $cwd;
+        $root ??= $cwd;
         $viteRaw = $_ENV['VITE_DEV_SERVER'] ?? getenv('VITE_DEV_SERVER');
         $devServerUrl = is_string($viteRaw) && $viteRaw !== '' ? $viteRaw : null;
 

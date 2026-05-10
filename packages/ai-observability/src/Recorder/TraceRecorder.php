@@ -50,7 +50,7 @@ final class TraceRecorder implements TraceRecorderInterface
             return;
         }
         $trace->set('status', $status);
-        $trace->set('ended_at', (new \DateTimeImmutable())->format('Y-m-d H:i:s'));
+        $trace->set('ended_at', new \DateTimeImmutable()->format('Y-m-d H:i:s'));
         $this->traces->save($trace);
         $this->context->clear($handle->uuid);
     }
@@ -81,7 +81,7 @@ final class TraceRecorder implements TraceRecorderInterface
     {
         $this->database->update('trace_span')
             ->fields([
-                'ended_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+                'ended_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
                 'status' => $status,
                 'attributes' => json_encode($attributes, JSON_THROW_ON_ERROR),
             ])

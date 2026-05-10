@@ -130,14 +130,14 @@ final class AiMcpIntegrationTest extends TestCase
         $this->assertSame($expectedResourceId, $semantic['data'][0]['id']);
 
         // 4) Keyword fallback works with no provider.
-        $fallback = (new SearchController(
+        $fallback = new SearchController(
             entityTypeManager: $this->entityTypeManager,
             serializer: $this->serializer,
             embeddingStorage: $this->embeddingStorage,
             embeddingProvider: null,
             accessHandler: $this->accessHandler,
             account: $this->account,
-        ))->search('teaching', 'node', 5)->toArray();
+        )->search('teaching', 'node', 5)->toArray();
         $this->assertSame('keyword', $fallback['meta']['mode']);
         $this->assertCount(1, $fallback['data']);
 

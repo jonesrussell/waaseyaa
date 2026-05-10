@@ -27,7 +27,7 @@ final class EntityAuditEntry
     ) {
         $this->timestamp = $timestamp !== ''
             ? $timestamp
-            : (new \DateTimeImmutable())->format(\DateTimeInterface::ATOM);
+            : new \DateTimeImmutable()->format(\DateTimeInterface::ATOM);
     }
 
     /** @return array<string, mixed> */

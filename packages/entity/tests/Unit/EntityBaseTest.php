@@ -289,7 +289,6 @@ class EntityBaseTest extends TestCase
         $dup = $entity->duplicate();
 
         $ref = new \ReflectionProperty(EntityBase::class, 'values');
-        $ref->setAccessible(true);
         /** @var array<string, mixed> $srcBag */
         $srcBag = $ref->getValue($entity);
         /** @var array<string, mixed> $dupBag */

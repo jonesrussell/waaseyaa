@@ -72,7 +72,7 @@ final readonly class OptionDefinition
 
         // Normalise defaults per mode
         if ($mode === OptionMode::Array_) {
-            $default = $default ?? [];
+            $default ??= [];
         } elseif ($mode === OptionMode::None) {
             $default = false;
         } elseif ($mode === OptionMode::Negatable) {

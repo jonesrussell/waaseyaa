@@ -109,8 +109,8 @@ final class EntityTypeCollisionIntegrationTest extends TestCase
     {
         $this->projectRoot = sys_get_temp_dir() . '/waaseyaa_entity_type_collision_' . uniqid();
 
-        mkdir($this->projectRoot . '/config', 0755, true);
-        mkdir($this->projectRoot . '/storage/framework', 0755, true);
+        mkdir($this->projectRoot . '/config', 0o755, true);
+        mkdir($this->projectRoot . '/storage/framework', 0o755, true);
 
         file_put_contents(
             $this->projectRoot . '/config/waaseyaa.php',

@@ -50,7 +50,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "waaseyaa/access": "^0.1.0-alpha.150",
         "waaseyaa/cache": "^0.1.0-alpha.150",
         "waaseyaa/config": "^0.1.0-alpha.150",

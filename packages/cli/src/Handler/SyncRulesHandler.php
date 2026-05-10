@@ -28,7 +28,7 @@ final class SyncRulesHandler
             if ($dryRun) {
                 $io->writeln('Would create: ' . $this->targetDir);
             } else {
-                mkdir($this->targetDir, 0755, true);
+                mkdir($this->targetDir, 0o755, true);
             }
         }
 

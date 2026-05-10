@@ -53,7 +53,7 @@ final class ScaffoldAuthHandler
 
             $destDir = dirname($destPath);
             if (!is_dir($destDir)) {
-                mkdir($destDir, 0755, true);
+                mkdir($destDir, 0o755, true);
             }
 
             copy($srcPath, $destPath);
@@ -86,7 +86,7 @@ final class ScaffoldAuthHandler
         $manifestPath = $manifestDir . '/scaffold-manifest.json';
 
         if (!is_dir($manifestDir)) {
-            mkdir($manifestDir, 0755, true);
+            mkdir($manifestDir, 0o755, true);
         }
 
         $existing = [];

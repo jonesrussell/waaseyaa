@@ -19,8 +19,8 @@ final class OidcDiscoveryIntegrationTest extends TestCase
         $this->repoRoot = (string) realpath(__DIR__ . '/../../..');
         $this->projectRoot = sys_get_temp_dir() . '/waaseyaa_oidc_discovery_' . uniqid();
 
-        mkdir($this->projectRoot . '/config', 0755, true);
-        mkdir($this->projectRoot . '/storage', 0755, true);
+        mkdir($this->projectRoot . '/config', 0o755, true);
+        mkdir($this->projectRoot . '/storage', 0o755, true);
 
         self::assertTrue(symlink($this->repoRoot . '/vendor', $this->projectRoot . '/vendor'));
 
@@ -105,17 +105,17 @@ final class OidcDiscoveryIntegrationTest extends TestCase
         $databasePath = $this->projectRoot . '/storage/waaseyaa.sqlite';
 
         return <<<PHP
-<?php
+            <?php
 
-declare(strict_types=1);
+            declare(strict_types=1);
 
-return [
-    'database' => '{$databasePath}',
-    'environment' => 'local',
-    'app' => ['url' => 'http://localhost', 'name' => 'Waaseyaa Oidc Test'],
-    'cors_origins' => ['http://localhost:3000'],
-    'oidc' => ['issuer' => 'https://id.example'],
-];
-PHP;
+            return [
+                'database' => '{$databasePath}',
+                'environment' => 'local',
+                'app' => ['url' => 'http://localhost', 'name' => 'Waaseyaa Oidc Test'],
+                'cors_origins' => ['http://localhost:3000'],
+                'oidc' => ['issuer' => 'https://id.example'],
+            ];
+            PHP;
     }
 }

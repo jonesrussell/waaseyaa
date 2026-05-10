@@ -154,7 +154,7 @@ final class Mission1257KernelPathTest extends TestCase
 
         // HealthChecker requires a project root with `storage/framework/`.
         $this->projectRoot = sys_get_temp_dir() . '/wp11_kernel_' . uniqid();
-        mkdir($this->projectRoot . '/storage/framework', 0755, true);
+        mkdir($this->projectRoot . '/storage/framework', 0o755, true);
     }
 
     protected function tearDown(): void

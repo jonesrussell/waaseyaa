@@ -360,7 +360,7 @@ final class IngestDashboardHandler
     private function writeFile(string $path, string $contents, CliIO $io): bool
     {
         $dir = dirname($path);
-        if (!is_dir($dir) && !mkdir($dir, 0755, true) && !is_dir($dir)) {
+        if (!is_dir($dir) && !mkdir($dir, 0o755, true) && !is_dir($dir)) {
             $io->error(sprintf('Unable to create directory: %s', $dir));
             return false;
         }

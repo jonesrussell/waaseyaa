@@ -54,7 +54,7 @@ final class StreamHttpClient implements HttpClientInterface
         }
 
         /** @var list<string> $responseHeaderLines */
-        $responseHeaderLines = $http_response_header;
+        $responseHeaderLines = http_get_last_response_headers() ?? [];
         $statusCode = $this->parseStatusCode($responseHeaderLines);
         $responseHeaders = $this->parseHeaders($responseHeaderLines);
 

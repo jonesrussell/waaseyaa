@@ -31,7 +31,7 @@ final class CodifiedContextValidationRecorder
             'components' => $components,
             'issues' => $issues,
             'recommendation' => $recommendation,
-            'occurred_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'occurred_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 }

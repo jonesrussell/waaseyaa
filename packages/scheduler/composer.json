@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "dragonmantank/cron-expression": "^3.0",
         "waaseyaa/foundation": "^0.1.0-alpha.150",
         "waaseyaa/queue": "^0.1.0-alpha.150",

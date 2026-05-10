@@ -291,7 +291,7 @@ final class ApiRoutingIntegrationTest extends TestCase
         ));
 
         $router = new WaaseyaaRouter(new RequestContext('', 'GET'));
-        (new ApiServiceProvider())->routes($router, $entityTypeManager);
+        new ApiServiceProvider()->routes($router, $entityTypeManager);
 
         $routes = $router->getRouteCollection();
 
@@ -353,7 +353,7 @@ final class ApiRoutingIntegrationTest extends TestCase
     private function createApiRouter(string $method): WaaseyaaRouter
     {
         $router = new WaaseyaaRouter(new RequestContext('', $method));
-        (new ApiServiceProvider())->routes($router, $this->entityTypeManager);
+        new ApiServiceProvider()->routes($router, $this->entityTypeManager);
 
         return $router;
     }

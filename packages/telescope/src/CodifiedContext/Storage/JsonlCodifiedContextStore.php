@@ -25,7 +25,7 @@ final class JsonlCodifiedContextStore implements CodifiedContextStoreInterface
     {
         $id = bin2hex(random_bytes(16));
         $sessionId = $data['session_id'] ?? '';
-        $createdAt = (new \DateTimeImmutable())->format('Y-m-d H:i:s.u');
+        $createdAt = new \DateTimeImmutable()->format('Y-m-d H:i:s.u');
 
         $line = json_encode([
             'id' => $id,

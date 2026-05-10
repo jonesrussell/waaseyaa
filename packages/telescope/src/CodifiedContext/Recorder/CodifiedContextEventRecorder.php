@@ -25,7 +25,7 @@ final class CodifiedContextEventRecorder
             'context_hash' => $contextHash,
             'file_paths' => $filePaths,
             'total_bytes' => $totalBytes,
-            'occurred_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'occurred_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 
@@ -36,7 +36,7 @@ final class CodifiedContextEventRecorder
             'event_type' => 'context_hash',
             'context_hash' => $contextHash,
             'algorithm' => $algorithm,
-            'occurred_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'occurred_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 
@@ -46,7 +46,7 @@ final class CodifiedContextEventRecorder
             'session_id' => $sessionId,
             'event_type' => 'context_fail',
             'error_message' => $errorMessage,
-            'occurred_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'occurred_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ];
 
         if ($filePath !== null) {
@@ -64,7 +64,7 @@ final class CodifiedContextEventRecorder
             'output_hash' => $outputHash,
             'references' => $references,
             'token_count' => $tokenCount,
-            'occurred_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'occurred_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 
@@ -76,7 +76,7 @@ final class CodifiedContextEventRecorder
             'drift_score' => $driftScore,
             'severity' => $severity,
             'issues' => $issues,
-            'occurred_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'occurred_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 
@@ -88,7 +88,7 @@ final class CodifiedContextEventRecorder
             'original_score' => $originalScore,
             'corrected_score' => $correctedScore,
             'corrections' => $corrections,
-            'occurred_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s.u'),
+            'occurred_at' => new \DateTimeImmutable()->format('Y-m-d H:i:s.u'),
         ]);
     }
 }

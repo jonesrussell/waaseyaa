@@ -74,10 +74,10 @@ final class DbInitHandler
             $repository = new MigrationRepository($connection);
             $repository->createTable();
 
-            $manifest = (new PackageManifestCompiler(
+            $manifest = new PackageManifestCompiler(
                 basePath: $this->projectRoot,
                 storagePath: $this->projectRoot . '/storage',
-            ))->load();
+            )->load();
             $loader = new MigrationLoader($this->projectRoot, $manifest);
             $migrations = $loader->loadAll();
 
@@ -177,11 +177,11 @@ final class DbInitHandler
 
         $repository = new MigrationRepository($connection);
         $repository->createTable();
-        $manifest = (new PackageManifestCompiler(
+        $manifest = new PackageManifestCompiler(
             basePath: $this->projectRoot,
             storagePath: $this->projectRoot . '/storage',
-        ))->load();
-        $migrations = (new MigrationLoader($this->projectRoot, $manifest))->loadAll();
+        )->load();
+        $migrations = new MigrationLoader($this->projectRoot, $manifest)->loadAll();
 
         $pending = [];
         foreach ($migrations as $package => $set) {

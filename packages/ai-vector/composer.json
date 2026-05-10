@@ -42,7 +42,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.5",
         "waaseyaa/entity": "^0.1.0-alpha.150",
         "waaseyaa/queue": "^0.1.0-alpha.150",
         "waaseyaa/api": "^0.1.0-alpha.150",

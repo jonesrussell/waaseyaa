@@ -71,7 +71,6 @@ final class CastPersistenceIntegrationTest extends TestCase
     ): void {
         $ref = new ReflectionClass($driver);
         $prop = $ref->getProperty('store');
-        $prop->setAccessible(true);
         /** @var array<string, array<string, array<string, mixed>>> $store */
         $store = $prop->getValue($driver);
         foreach ($patch as $key => $value) {
@@ -297,7 +296,6 @@ final class CastPersistenceIntegrationTest extends TestCase
     ): array {
         $ref = new ReflectionClass($driver);
         $prop = $ref->getProperty('store');
-        $prop->setAccessible(true);
         /** @var array<string, array<string, array<string, mixed>>> $store */
         $store = $prop->getValue($driver);
 

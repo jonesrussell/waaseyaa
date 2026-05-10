@@ -19,7 +19,7 @@ final class MakePublicHandler extends AbstractMakeHandler
         $target = $publicDir . '/index.php';
         $stub = dirname(__DIR__, 2) . '/templates/public/index.php.stub';
 
-        if (!is_dir($publicDir) && !@mkdir($publicDir, 0755, true) && !is_dir($publicDir)) {
+        if (!is_dir($publicDir) && !@mkdir($publicDir, 0o755, true) && !is_dir($publicDir)) {
             $io->writeln(sprintf('<error>Failed to create directory %s</error>', $publicDir));
 
             return 1;

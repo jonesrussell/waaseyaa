@@ -164,7 +164,7 @@ abstract class AbstractKernel
 
     protected function bootDatabase(): void
     {
-        $this->database = (new DatabaseBootstrapper())->boot($this->projectRoot, $this->config);
+        $this->database = new DatabaseBootstrapper()->boot($this->projectRoot, $this->config);
     }
 
     protected function bootEntityTypeManager(): void
@@ -317,7 +317,7 @@ abstract class AbstractKernel
 
     protected function compileManifest(): void
     {
-        $this->manifest = (new ManifestBootstrapper())->boot($this->projectRoot);
+        $this->manifest = new ManifestBootstrapper()->boot($this->projectRoot);
     }
 
     protected function bootMigrations(): void
@@ -348,12 +348,12 @@ abstract class AbstractKernel
 
     protected function loadAppEntityTypes(): void
     {
-        (new AppEntityTypeLoader($this->logger))->load($this->projectRoot, $this->entityTypeManager);
+        new AppEntityTypeLoader($this->logger)->load($this->projectRoot, $this->entityTypeManager);
     }
 
     protected function validateContentTypes(): void
     {
-        (new ContentTypeValidator())->validate(
+        new ContentTypeValidator()->validate(
             $this->entityTypeManager,
             $this->lifecycleManager->getDisabledTypeIds(),
         );
@@ -361,17 +361,17 @@ abstract class AbstractKernel
 
     protected function bootProviders(): void
     {
-        (new ProviderRegistry($this->logger))->boot($this->providers);
+        new ProviderRegistry($this->logger)->boot($this->providers);
     }
 
     protected function discoverAccessPolicies(): void
     {
-        $this->accessHandler = (new AccessPolicyRegistry($this->logger))->discover($this->manifest);
+        $this->accessHandler = new AccessPolicyRegistry($this->logger)->discover($this->manifest);
     }
 
     protected function bootKnowledgeExtensionRunner(): void
     {
-        $this->knowledgeExtensionRunner = (new KnowledgeExtensionBootstrapper($this->logger))
+        $this->knowledgeExtensionRunner = new KnowledgeExtensionBootstrapper($this->logger)
             ->boot($this->projectRoot, $this->config);
     }
 

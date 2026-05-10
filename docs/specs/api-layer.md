@@ -1,5 +1,6 @@
 # API Layer
 
+<!-- Spec reviewed 2026-05-10 - WP05 php-8.5 upgrade: @PHP8x5Migration cs-fixer pass — ApiServiceProvider, JsonApiController, ResourceSerializer, CodifiedContextController, DiscoveryApiHandler, AuthOidcRouteServiceProvider touched by new_expression_parentheses rule only; no semantic change to API layer contracts. -->
 <!-- Spec reviewed 2026-05-08 - WaaseyaaRouter::match() maps Symfony UrlMatcher failures to Waaseyaa\Routing\Exception\RouteNotFoundException / RouteMethodNotAllowedException (previous callers expecting Symfony ResourceNotFoundException from match() must migrate); HttpKernel catches those Waaseyaa types for JSON 404/405; RouteBuilder::controller() + normalizeControllerDefault() coerce `[FQCN, method]` to `FQCN::method`; HttpKernel merges match params through normalizeControllerDefault (foundation-symfony-fallback-elimination-01KQZR1 WP03–WP04) -->
 <!-- Spec reviewed 2026-04-26 - ResourceSerializer prefers non-integer string id() for JSON:API resource id (config machine names); JsonApiController store machine-name path uses config heuristics (id=bundle, or non-default id without bundle, or no uuid); API integration fixtures now map per-entity metadata classes -->
 <!-- Spec reviewed 2026-04-25 - RouteBuilder::bind + RouteFingerprint for SSR app-controller binding metadata; see docs/specs/app-controller-invocation.md -->

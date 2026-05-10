@@ -35,7 +35,6 @@ final class MercurePublisher
 
         $result = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
         return $result !== false && $httpCode >= 200 && $httpCode < 300;
     }

@@ -113,7 +113,7 @@ final class McpEndpointSmokeTest extends TestCase
 
         // --- Step 2: Route registration ---
         $router = new WaaseyaaRouter();
-        (new McpServiceProvider())->routes($router, $entityTypeManager);
+        new McpServiceProvider()->routes($router, $entityTypeManager);
 
         $routes = $router->getRouteCollection();
         $this->assertNotNull($routes->get('mcp.endpoint'));

@@ -34,11 +34,6 @@ final readonly class SearchResult
 
     public function getFacet(string $name): ?SearchFacet
     {
-        foreach ($this->facets as $facet) {
-            if ($facet->name === $name) {
-                return $facet;
-            }
-        }
-        return null;
+        return array_find($this->facets, static fn(SearchFacet $facet): bool => $facet->name === $name);
     }
 }

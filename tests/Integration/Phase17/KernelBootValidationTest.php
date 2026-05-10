@@ -30,8 +30,8 @@ final class KernelBootValidationTest extends TestCase
     protected function setUp(): void
     {
         $this->projectRoot = sys_get_temp_dir() . '/waaseyaa_boot_validation_' . uniqid();
-        mkdir($this->projectRoot . '/config', 0755, true);
-        mkdir($this->projectRoot . '/storage/framework', 0755, true);
+        mkdir($this->projectRoot . '/config', 0o755, true);
+        mkdir($this->projectRoot . '/storage/framework', 0o755, true);
 
         file_put_contents(
             $this->projectRoot . '/config/waaseyaa.php',
@@ -101,15 +101,15 @@ final class KernelBootValidationTest extends TestCase
     public function bootSucceedsWithOneRegisteredContentType(): void
     {
         $this->writeEntityTypes(<<<'PHP'
-[
-    new \Waaseyaa\Entity\EntityType(
-        id: 'note',
-        label: 'Note',
-        class: \Waaseyaa\Note\Note::class,
-        keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
-    ),
-]
-PHP);
+            [
+                new \Waaseyaa\Entity\EntityType(
+                    id: 'note',
+                    label: 'Note',
+                    class: \Waaseyaa\Note\Note::class,
+                    keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title'],
+                ),
+            ]
+            PHP);
 
         $kernel = $this->newKernel();
         $kernel->publicBoot();
@@ -121,11 +121,11 @@ PHP);
     public function bootSucceedsWithMultipleContentTypes(): void
     {
         $this->writeEntityTypes(<<<'PHP'
-[
-    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title']),
-    new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type']),
-]
-PHP);
+            [
+                new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title']),
+                new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type']),
+            ]
+            PHP);
 
         $kernel = $this->newKernel();
         $kernel->publicBoot();
@@ -137,12 +137,12 @@ PHP);
     public function bootHaltsWithDefaultTypeDisabledWhenAllTypesDisabled(): void
     {
         $this->writeEntityTypes(<<<'PHP'
-[
-    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title']),
-]
-PHP);
+            [
+                new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title']),
+            ]
+            PHP);
 
-        (new EntityTypeLifecycleManager($this->projectRoot))->disable('note', 'test');
+        new EntityTypeLifecycleManager($this->projectRoot)->disable('note', 'test');
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessageMatches('/DEFAULT_TYPE_DISABLED/');
@@ -154,13 +154,13 @@ PHP);
     public function bootSucceedsWhenOnlyOneOfTwoTypesIsDisabled(): void
     {
         $this->writeEntityTypes(<<<'PHP'
-[
-    new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title']),
-    new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type']),
-]
-PHP);
+            [
+                new \Waaseyaa\Entity\EntityType(id: 'note', label: 'Note', class: \Waaseyaa\Note\Note::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title']),
+                new \Waaseyaa\Entity\EntityType(id: 'article', label: 'Article', class: \Waaseyaa\Api\Tests\Fixtures\ArticleContentTestEntity::class, keys: ['id' => 'id', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type']),
+            ]
+            PHP);
 
-        (new EntityTypeLifecycleManager($this->projectRoot))->disable('article', 'test');
+        new EntityTypeLifecycleManager($this->projectRoot)->disable('article', 'test');
 
         $kernel = $this->newKernel();
         $kernel->publicBoot();

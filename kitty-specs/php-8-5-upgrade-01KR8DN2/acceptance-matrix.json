@@ -1,0 +1,194 @@
+{
+  "mission_slug": "php-8-5-upgrade-01KR8DN2",
+  "mission_number": "",
+  "mission_type": "software-dev",
+  "overall_verdict": "pending",
+  "criteria": [
+    {
+      "criterion_id": "FR-001",
+      "description": "All first-party composer.json files require >=8.5 (or ^8.5 where caret form was already in use); 3 metapackages (cms, core, full) have no php key by design.",
+      "proof_type": "code_review",
+      "evidence": "66 packages bumped in commit 1030f57bf; verified via grep -r '\"php\":' packages/*/composer.json. Metapackages packages/cms, packages/core, packages/full intentionally omit php key per CP006.",
+      "pass_fail": "pass",
+      "verified_by": "check-composer-policy",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": "bin/check-composer-policy green throughout."
+    },
+    {
+      "criterion_id": "FR-002",
+      "description": "All GitHub Actions workflows (ci.yml, skeleton-smoke.yml, release.yml) set php-version: '8.5' with no leftover 8.4 jobs.",
+      "proof_type": "code_review",
+      "evidence": "10 occurrences of php-version: '8.5' across 3 workflow files in commit 1030f57bf; rg -n 'php-version:' .github/workflows/ shows zero 8.4 references.",
+      "pass_fail": "pass",
+      "verified_by": "independent-reviewer",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "FR-003",
+      "description": "Skeleton Dockerfile uses php:8.5-fpm-alpine.",
+      "proof_type": "code_review",
+      "evidence": "skeleton/Dockerfile bumped to FROM php:8.5-fpm-alpine in commit 1030f57bf.",
+      "pass_fail": "pass",
+      "verified_by": "independent-reviewer",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "FR-004",
+      "description": "phpstan.neon declares parameters.phpVersion: 80500.",
+      "proof_type": "code_review",
+      "evidence": "phpstan.neon contains phpVersion: 80500 (commit ac9c5afb6).",
+      "pass_fail": "pass",
+      "verified_by": "phpstan",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "FR-005",
+      "description": "Zero PHP 8.5 deprecation notices in first-party code; each category cleared with appropriate fix or suppression.",
+      "proof_type": "automated_test",
+      "evidence": "vendor/bin/phpunit --display-deprecations: 7497 tests, 18118 assertions, Deprecations: 0. Three categories cleared in commits c9a6c1988 + 8be1d52a2: (1) Reflection::setAccessible() removed at 22 sites; (2) $http_response_header replaced with http_get_last_response_headers() in StreamHttpClient.php; (3) FailedJobRepositoryTest annotated with #[IgnoreDeprecations] for the still-shipped deprecated class.",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": "Original audit predicted regression tests per fix; not added because the fixes are deletions/replacements with no new behavior to test \u2014 existing test coverage exercises the affected paths and would have surfaced regressions."
+    },
+    {
+      "criterion_id": "FR-006",
+      "description": "#[\\NoDiscard] applied to AccessResult, query-builder fluent methods, and EntityRepository::find*(); surfaced ignored-return call sites are fixed, not suppressed.",
+      "proof_type": "code_review",
+      "evidence": "Commit 853849c25 applies NoDiscard to AccessResult::{allowed,forbidden,neutral,unauthenticated}, EntityRepositoryInterface::{find,findMany,findBy,loadRevision,rollback}, and DBALSelect fluent methods (10 methods). 16 call sites updated to capture mutating-fluent return values across SqlStorageDriver, SqlEntityQuery, SqlEntityStorage, DBALSelectTest. ValidationResult target skipped \u2014 class does not exist; package delegates to Symfony ConstraintViolationList.",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": "ValidationResult skip rationale documented in commit message and CHANGELOG entry."
+    },
+    {
+      "criterion_id": "FR-007",
+      "description": "PHP 8.4/8.5 ergonomic features adopted at clear-win sites: array_first/array_last, array_find, pipe operator.",
+      "proof_type": "code_review",
+      "evidence": "Commit e65faf132 adopts array_find at 2 clear-win sites (SearchResult::getFacet, CliTester::findOption). array_first/array_last skipped \u2014 surveyed 5 reset() sites, all reject because surrounding type contracts (load() accepts int|string, not null) require an explicit empty guard either way. Pipe operator skipped \u2014 no clear-win sites; the most idiomatic candidates were already two-step expressions.",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": "Conservative interpretation of 'where they improve readability' \u2014 opportunistic, not exhaustive."
+    },
+    {
+      "criterion_id": "FR-008",
+      "description": ".php-cs-fixer.dist.php includes @PHP8x5Migration; lazy-init closures converted to const where applicable.",
+      "proof_type": "code_review",
+      "evidence": "Commit f048604aa adds @PHP8x5Migration ruleset (cs-fixer 3.95+ canonical name; @PHP85Migration deprecated). 102 files touched: 52\u00d7 octal_notation (0o prefix), 58\u00d7 new_expression_parentheses (chained-new), 8\u00d7 heredoc_indentation. closures-in-const skipped \u2014 surveyed all static methods, 0 candidates qualified (no first-class-callable patterns where the static method exists only as a Foo::method(...) reference).",
+      "pass_fail": "pass",
+      "verified_by": "php-cs-fixer",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": "Closures-in-const skip rationale documented in commit message."
+    },
+    {
+      "criterion_id": "FR-009",
+      "description": "CHANGELOG.md [Unreleased] includes a bullet describing the bump and adopted features. README, CLAUDE.md, charter, and docs/specs/* reference PHP 8.5 throughout.",
+      "proof_type": "code_review",
+      "evidence": "CHANGELOG.md [Unreleased] > ### Changed contains the 'PHP 8.5 baseline upgrade' bullet (commit 9b69f7874). README.md, CLAUDE.md prose updated to 8.5+ in commit ac9c5afb6. docs/specs/access-control.md, entity-system.md, infrastructure.md, api-layer.md, debugging-dx.md, mcp-endpoint.md carry 'Spec reviewed 2026-05-10' WP02/WP03/WP05 stamps.",
+      "pass_fail": "pass",
+      "verified_by": "independent-reviewer",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "FR-010",
+      "description": "All hard-gate verification commands pass.",
+      "proof_type": "automated_test",
+      "evidence": "Pre-push hook (lefthook) runs spec-drift, composer-policy, phpstan, phpunit on every push during the lane \u2014 all green on the latest commit 9b69f7874. PHPStan: 1193 files, 0 errors. PHPUnit: 7497 tests, 18118 assertions, 0 failures, 2 expected skips, 0 deprecations.",
+      "pass_fail": "pass",
+      "verified_by": "lefthook",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": "bin/audit-dead-code and bin/audit-require-dev-layers are warn-only and not part of the hard-gate matrix; left unverified in this acceptance pass."
+    },
+    {
+      "criterion_id": "QG-cs-check",
+      "description": "Quality gate: composer cs-check (PHP-CS-Fixer dry-run) clean.",
+      "proof_type": "automated_test",
+      "evidence": "composer cs-check after commit f048604aa applied the @PHP8x5Migration ruleset \u2014 files array empty.",
+      "pass_fail": "pass",
+      "verified_by": "php-cs-fixer",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "QG-phpstan",
+      "description": "Quality gate: composer phpstan (level 5, 1193 files) clean.",
+      "proof_type": "automated_test",
+      "evidence": "Pre-push hook on commit 9b69f7874: 1193/1193, [OK] No errors.",
+      "pass_fail": "pass",
+      "verified_by": "phpstan",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "QG-phpunit",
+      "description": "Quality gate: full vendor/bin/phpunit suite passes with zero deprecations.",
+      "proof_type": "automated_test",
+      "evidence": "Tests: 7497, Assertions: 18118, PHPUnit Warnings: 1 (no code coverage driver \u2014 pre-existing, unrelated), Deprecations: 0, Skipped: 2 (pre-existing).",
+      "pass_fail": "pass",
+      "verified_by": "phpunit",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "QG-package-layers",
+      "description": "Quality gate: bin/check-package-layers clean.",
+      "proof_type": "automated_test",
+      "evidence": "bin/check-package-layers green throughout the lane; no upward dependency edges introduced.",
+      "pass_fail": "pass",
+      "verified_by": "check-package-layers",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "QG-composer-policy",
+      "description": "Quality gate: bin/check-composer-policy clean.",
+      "proof_type": "automated_test",
+      "evidence": "bin/check-composer-policy green on commit 9b69f7874. CP002 (@dev forbidden), CP003 (no wildcard internal constraints), CP006 (self.version only at root) all satisfied.",
+      "pass_fail": "pass",
+      "verified_by": "check-composer-policy",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    },
+    {
+      "criterion_id": "QG-spec-drift",
+      "description": "Quality gate: tools/drift-detector.sh reports no stale specs against the merged commits.",
+      "proof_type": "automated_test",
+      "evidence": "Pre-push hook spec-drift green on commit 9b69f7874. Specs updated for StreamHttpClient (infrastructure.md), AccessResult/EntityRepositoryInterface (access-control.md, entity-system.md), and the WP05 cs-fixer pass (api-layer.md, debugging-dx.md, mcp-endpoint.md).",
+      "pass_fail": "pass",
+      "verified_by": "drift-detector",
+      "verified_at": "2026-05-10T14:00:00Z",
+      "notes": ""
+    }
+  ],
+  "negative_invariants": [
+    {
+      "invariant_id": "NI-001",
+      "description": "No @phpstan-ignore, @var inline assertions, or type casts introduced to silence #[\\NoDiscard] warnings. All warnings fixed by capturing return values or actually using them.",
+      "verification_method": "grep_absence",
+      "verification_command": "git diff 1030f57bf..9b69f7874 -- packages/ | grep -E '@phpstan-ignore|@var\\s+|\\(void\\)'",
+      "result": "confirmed_absent",
+      "evidence": "grep found zero matches"
+    },
+    {
+      "invariant_id": "NI-002",
+      "description": "Three metapackages (cms, core, full) remain free of an explicit php key per CP006 (self.version + sibling shape).",
+      "verification_method": "grep_absence",
+      "verification_command": "rg -n '\"php\"\\s*:' packages/cms/composer.json packages/core/composer.json packages/full/composer.json",
+      "result": "confirmed_absent",
+      "evidence": "grep found zero matches"
+    },
+    {
+      "invariant_id": "NI-003",
+      "description": "DBALSelect fluent methods remain mutating-and-return-self; #[\\NoDiscard] did not introduce immutable-rebuild semantics.",
+      "verification_method": "grep_presence",
+      "verification_command": "rg -n 'return \\$this;' packages/database-legacy/src/Query/DBALSelect.php",
+      "result": "pending",
+      "evidence": "Unknown verification method: grep_presence"
+    }
+  ]
+}

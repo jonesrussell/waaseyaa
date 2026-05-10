@@ -146,7 +146,7 @@ final class JsonApiController
         $resource = $this->serializer->serialize($entity, $this->accessHandler, $this->account);
 
         // Apply sparse fieldsets per JSON:API spec (attributes and relationships).
-        $parsedQuery = (new QueryParser())->parse($query);
+        $parsedQuery = new QueryParser()->parse($query);
         if (isset($parsedQuery->sparseFieldsets[$entityTypeId])) {
             $allowedFields = $parsedQuery->sparseFieldsets[$entityTypeId];
             $resource = SparseFieldsetApplicator::apply($resource, $allowedFields);

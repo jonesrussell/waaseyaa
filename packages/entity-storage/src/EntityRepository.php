@@ -497,6 +497,6 @@ final class EntityRepository implements EntityRepositoryInterface
      */
     private function instantiateEntity(string $class, array $values): EntityInterface
     {
-        return (new Hydration\EntityInstantiator($this->entityType))->instantiate($class, $values);
+        return new Hydration\EntityInstantiator($this->entityType)->instantiate($class, $values);
     }
 }

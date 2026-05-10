@@ -16,7 +16,7 @@ final class LocalFileRepository implements FileRepositoryInterface
     public function __construct(
         private readonly string $rootDir,
     ) {
-        if (!is_dir($this->rootDir) && !mkdir($this->rootDir, 0755, true) && !is_dir($this->rootDir)) {
+        if (!is_dir($this->rootDir) && !mkdir($this->rootDir, 0o755, true) && !is_dir($this->rootDir)) {
             throw new \RuntimeException(sprintf('Unable to create files root directory: %s', $this->rootDir));
         }
     }
@@ -26,7 +26,7 @@ final class LocalFileRepository implements FileRepositoryInterface
         $metadataPath = $this->resolveMetadataPath($file->uri);
         $directory = dirname($metadataPath);
 
-        if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
+        if (!is_dir($directory) && !mkdir($directory, 0o755, true) && !is_dir($directory)) {
             throw new \RuntimeException(sprintf('Unable to create file metadata directory: %s', $directory));
         }
 
