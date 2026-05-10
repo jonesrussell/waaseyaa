@@ -1,7 +1,7 @@
 {
-  "event_count": 20,
-  "last_event_id": "01KR99GKYETJT81VV03F39XQK1",
-  "materialized_at": "2026-05-10T15:53:52.334608+00:00",
+  "event_count": 25,
+  "last_event_id": "01KR99K5VE58AWKNSVS8K0WQ0R",
+  "materialized_at": "2026-05-10T15:55:16.206841+00:00",
   "mission_number": "",
   "mission_slug": "composer-internal-version-sweep-01KR96NA",
   "mission_type": "software-dev",
@@ -10,47 +10,47 @@
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 0,
-    "for_review": 5,
+    "done": 5,
+    "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
     "planned": 0
   },
   "work_packages": {
     "WP01": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KR984WBQJY1GCR4XMQXK7ZGA",
-      "last_transition_at": "2026-05-10T15:29:59.159338+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR99K1X0THDYZY76WS4Q8HFV",
+      "last_transition_at": "2026-05-10T15:55:12.160554+00:00"
     },
     "WP02": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KR98DB9G9J0X0GS5HQRMEMGS",
-      "last_transition_at": "2026-05-10T15:34:36.592255+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR99K2WE0QYFD3KBJ2X5HPX9",
+      "last_transition_at": "2026-05-10T15:55:13.166130+00:00"
     },
     "WP03": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KR98X7P1YHJ2K7M9ZKJV2MS3",
-      "last_transition_at": "2026-05-10T15:43:17.185632+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR99K3VJKQ7K5MWQGXQHKSEE",
+      "last_transition_at": "2026-05-10T15:55:14.162860+00:00"
     },
     "WP04": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KR9972V2EYQWZN59206GB2GS",
-      "last_transition_at": "2026-05-10T15:48:39.906839+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR99K4VKV5NCT3TXXD30HFVW",
+      "last_transition_at": "2026-05-10T15:55:15.187963+00:00"
     },
     "WP05": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KR99GKYETJT81VV03F39XQK1",
-      "last_transition_at": "2026-05-10T15:53:52.334608+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR99K5VE58AWKNSVS8K0WQ0R",
+      "last_transition_at": "2026-05-10T15:55:16.206841+00:00"
     }
   }
 }
