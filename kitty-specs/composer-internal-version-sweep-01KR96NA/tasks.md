@@ -27,10 +27,10 @@ See `spec.md` for goal and acceptance criteria, `plan.md` for inventory, design 
 | T041 | Run `composer update --lock --no-install --ignore-platform-req=ext-gmp`; commit `composer.lock` alongside the manifest sweep | WP04 | [D] |
 | T042 | Single commit: `chore(composer-policy): backfill internal version constraints to ^0.1.0-alpha.175` (adjust tag in subject if a newer alpha was cut between WP03 and WP04) | WP04 | [D] |
 | T043 | Local verification: `bin/check-composer-policy` (incl. CP-NEW) passes; `composer phpstan`, `vendor/bin/phpunit`, `composer cs-check` all green | WP04 | [D] |
-| T050 | `CLAUDE.md`: add one line under "Composer policy is codified and gated via `bin/check-composer-policy`" pointing at `bin/sync-internal-versions` and CP-NEW | WP05 | [P] [D]  |
-| T051 | `CHANGELOG.md` `[Unreleased]` `### Changed`: bullet describing the mechanism (sync script, CP-NEW gate, backfill commit), referencing this mission slug | WP05 | [P] [D]  |
-| T052 | Drift-detector pass: stamp any `docs/specs/*.md` that maps to `bin/check-composer-policy` or `scripts/release.sh` if drift-detector flags them | WP05 | [D]      |
-| T053 | Mark PR ready for review; verify all hard gates green on the final commit | WP05 | [D]      |
+| T050 | `CLAUDE.md`: add one line under "Composer policy is codified and gated via `bin/check-composer-policy`" pointing at `bin/sync-internal-versions` and CP-NEW | WP05 | [P] [D]  | [D] |
+| T051 | `CHANGELOG.md` `[Unreleased]` `### Changed`: bullet describing the mechanism (sync script, CP-NEW gate, backfill commit), referencing this mission slug | WP05 | [P] [D]  | [D] |
+| T052 | Drift-detector pass: stamp any `docs/specs/*.md` that maps to `bin/check-composer-policy` or `scripts/release.sh` if drift-detector flags them | WP05 | [D] |
+| T053 | Mark PR ready for review; verify all hard gates green on the final commit | WP05 | [D] |
 
 Legend: `[D]` = description finalized. `[P]` = independently parallelizable inside the WP.
 
@@ -84,10 +84,10 @@ Legend: `[D]` = description finalized. `[P]` = independently parallelizable insi
 
 | Subtask | Description |
 |---|---|
-| T050 | `CLAUDE.md`: add one line under "Composer policy is codified" pointing at `bin/sync-internal-versions` and CP-NEW |
-| T051 | `CHANGELOG.md` `[Unreleased]` `### Changed`: bullet describing the mechanism, referencing this mission slug |
-| T052 | Drift-detector pass: stamp specs that map to `bin/check-composer-policy` or `scripts/release.sh` if flagged |
-| T053 | Mark PR ready for review; verify all hard gates green on the final commit |
+| T050 | `CLAUDE.md`: add one line under "Composer policy is codified" pointing at `bin/sync-internal-versions` and CP-NEW | [D] |
+| T051 | `CHANGELOG.md` `[Unreleased]` `### Changed`: bullet describing the mechanism, referencing this mission slug | [D] |
+| T052 | Drift-detector pass: stamp specs that map to `bin/check-composer-policy` or `scripts/release.sh` if flagged | [D] |
+| T053 | Mark PR ready for review; verify all hard gates green on the final commit | [D] |
 
 ---
 
