@@ -34,7 +34,7 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
  *
  * Spec: FR-011.
  */
-#[PolicyAttribute('attachment')]
+#[PolicyAttribute(entityType: 'attachment')]
 final class ParentDelegatedAccessPolicy implements AccessPolicyInterface
 {
     public function __construct(
