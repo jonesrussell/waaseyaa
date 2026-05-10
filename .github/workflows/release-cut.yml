@@ -125,6 +125,17 @@ jobs:
           fi
           echo "::notice::[Unreleased] has content."
 
+      - name: Sync internal waaseyaa/* version constraints
+        # bin/sync-internal-versions is produced by WP01 (composer-internal-version-sweep).
+        # No composer install step is needed here — the script requires only `php` and
+        # `jq` (standard on ubuntu-latest), both available after checkout.
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          # Strip the leading 'v' (release-cut input is 'vX.Y.Z[-pre]'; sync expects bare semver)
+          SEMVER="${VERSION#v}"
+          bin/sync-internal-versions "$SEMVER"
+
       - name: Mutate CHANGELOG and capture tag message
         id: changelog
         env:
