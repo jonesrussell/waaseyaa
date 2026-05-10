@@ -10,11 +10,15 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-php84-mechanical-modernization-01KR82KT
+base_commit: d7d5270dea54a7ae309e7492c70a979a94715f5c
+created_at: '2026-05-10T04:45:04.418208+00:00'
 subtasks:
 - T001
 - T002
 - T003
 - T004
+shell_pid: '86581'
 history:
 - timestamp: '2026-05-10T04:40:07Z'
   actor: spec-kitty.tasks

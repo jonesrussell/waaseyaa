@@ -6,5 +6,7 @@
   "mission_slug": "php84-mechanical-modernization-01KR82KT",
   "mission_type": "software-dev",
   "slug": "php84-mechanical-modernization-01KR82KT",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-10T04:45:03.865460+00:00"
 }
