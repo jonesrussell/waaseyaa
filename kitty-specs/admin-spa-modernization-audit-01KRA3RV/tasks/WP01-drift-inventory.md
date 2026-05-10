@@ -250,3 +250,7 @@ for direct inclusion in the final audit doc.
 ```bash
 spec-kitty agent action implement WP01 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-10T23:52:14Z – unknown – Moved to done
