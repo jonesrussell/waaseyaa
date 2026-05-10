@@ -1,7 +1,7 @@
 {
-  "event_count": 6,
-  "last_event_id": "01KR8EFV8W72S1RFWZF4H1YERD",
-  "materialized_at": "2026-05-10T08:01:35.516625+00:00",
+  "event_count": 12,
+  "last_event_id": "01KR95A3B7QEY4W83PSZTTHHMR",
+  "materialized_at": "2026-05-10T14:40:24.423901+00:00",
   "mission_number": "",
   "mission_slug": "php-8-5-upgrade-01KR8DN2",
   "mission_type": "software-dev",
@@ -10,54 +10,54 @@
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 0,
+    "done": 6,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
-    "planned": 6
+    "planned": 0
   },
   "work_packages": {
     "WP01": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KR8EFTNTWV4Q7FM71KR7663T",
-      "last_transition_at": "2026-05-10T08:01:34.907019+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR959JKTNRK2E6VJT8AWXT9T",
+      "last_transition_at": "2026-05-10T14:40:07.290997+00:00"
     },
     "WP02": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KR8EFV3P2M4114F4X8BZTCS4",
-      "last_transition_at": "2026-05-10T08:01:35.350062+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR959ZC55R8HKFFKPHNZYDE1",
+      "last_transition_at": "2026-05-10T14:40:20.357960+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KR8EFV55764ABREDGSY2ETGN",
-      "last_transition_at": "2026-05-10T08:01:35.397961+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR95A0BZN8FDAB9ACA4YB9TZ",
+      "last_transition_at": "2026-05-10T14:40:21.375098+00:00"
     },
     "WP04": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KR8EFV6CHF10RD3PE0ZN3W9T",
-      "last_transition_at": "2026-05-10T08:01:35.436962+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR95A1BR5PJ8K6WAD0X0FA0S",
+      "last_transition_at": "2026-05-10T14:40:22.392513+00:00"
     },
     "WP05": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KR8EFV7PCMMYW8TM95WE9JEE",
-      "last_transition_at": "2026-05-10T08:01:35.478926+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR95A2BZ1JX49QZ5SMHT7S7K",
+      "last_transition_at": "2026-05-10T14:40:23.423527+00:00"
     },
     "WP06": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KR8EFV8W72S1RFWZF4H1YERD",
-      "last_transition_at": "2026-05-10T08:01:35.516625+00:00"
+      "actor": "opus",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KR95A3B7QEY4W83PSZTTHHMR",
+      "last_transition_at": "2026-05-10T14:40:24.423901+00:00"
     }
   }
 }

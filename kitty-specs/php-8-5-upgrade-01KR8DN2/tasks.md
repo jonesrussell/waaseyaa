@@ -59,18 +59,18 @@ Legend: `[D]` = description finalized. `[P]` = independently parallelizable insi
 
 ### Included subtasks
 
-- [ ] T001 — `composer.json` × 62 (`>=8.4`/`^8.4`/`>=8.3` → `>=8.5`/`^8.5`)
-- [ ] T002 — `skeleton/Dockerfile` PHP base image
-- [ ] T003 — CI workflow `php-version` (4 occurrences across 3 files)
-- [ ] T004 — Pin `setup-php` `tools: composer:2.8` in CI
-- [ ] T005 — `phpstan.neon` `phpVersion: 80500`
-- [ ] T006 — `composer update --lock`; commit `composer.lock`
-- [ ] T007 — README badge + prose
-- [ ] T008 — `CLAUDE.md` Code Style line
-- [ ] T009 — `docs/specs/*.md` grep + edit
-- [ ] T010 — Stage charter changes + regenerated YAML
-- [ ] T011 — Run `bin/check-composer-policy` and `bin/check-package-layers`
-- [ ] T012 — Push branch and open draft PR
+- [x] T001 — `composer.json` × 62 (`>=8.4`/`^8.4`/`>=8.3` → `>=8.5`/`^8.5`)
+- [x] T002 — `skeleton/Dockerfile` PHP base image
+- [x] T003 — CI workflow `php-version` (4 occurrences across 3 files)
+- [x] T004 — Pin `setup-php` `tools: composer:2.8` in CI
+- [x] T005 — `phpstan.neon` `phpVersion: 80500`
+- [x] T006 — `composer update --lock`; commit `composer.lock`
+- [x] T007 — README badge + prose
+- [x] T008 — `CLAUDE.md` Code Style line
+- [x] T009 — `docs/specs/*.md` grep + edit
+- [x] T010 — Stage charter changes + regenerated YAML
+- [x] T011 — Run `bin/check-composer-policy` and `bin/check-package-layers`
+- [x] T012 — Push branch and open draft PR
 
 ### Implementation sketch
 
@@ -109,12 +109,12 @@ See `tasks/WP01-constraint-bump.md`.
 
 ### Included subtasks
 
-- [ ] T020 Non-canonical scalar casts
-- [ ] T021 `curl_close` / `curl_share_close`
-- [ ] T022 `ob_start` handler return semantics
-- [ ] T023 `register_shutdown_function` double-trace
-- [ ] T024 `DateTime` ambiguous parsing
-- [ ] T025 Regression tests for each fix
+- [x] T020 Non-canonical scalar casts
+- [x] T021 `curl_close` / `curl_share_close`
+- [x] T022 `ob_start` handler return semantics
+- [x] T023 `register_shutdown_function` double-trace
+- [x] T024 `DateTime` ambiguous parsing
+- [x] T025 Regression tests for each fix
 
 ### Implementation sketch
 
@@ -142,10 +142,10 @@ See `tasks/WP02-deprecation-sweep.md`.
 
 ### Included subtasks
 
-- [ ] T030 `AccessResult`
-- [ ] T031 `ValidationResult` + typed-data `Result` shapes
-- [ ] T032 Query builders (`DBALSelect`, entity query builders)
-- [ ] T033 `EntityRepository::find*()`
+- [x] T030 `AccessResult`
+- [x] T031 `ValidationResult` + typed-data `Result` shapes
+- [x] T032 Query builders (`DBALSelect`, entity query builders)
+- [x] T033 `EntityRepository::find*()`
 
 ### Implementation sketch
 
@@ -172,9 +172,9 @@ See `tasks/WP03-nodiscard-adoption.md`.
 
 ### Included subtasks
 
-- [ ] T040 `array_first` / `array_last` swap
-- [ ] T041 `array_find` opportunistic swap
-- [ ] T042 Pipe operator adoption (selective)
+- [x] T040 `array_first` / `array_last` swap
+- [x] T041 `array_find` opportunistic swap
+- [x] T042 Pipe operator adoption (selective)
 
 ### Implementation sketch
 
@@ -201,9 +201,9 @@ See `tasks/WP04-adoption-pass.md`.
 
 ### Included subtasks
 
-- [ ] T050 `@PHP85Migration` cs-fixer rule + auto-rewrite commit
-- [ ] T051 Closures in const expressions
-- [ ] T052 Attribute argument simplifications
+- [x] T050 `@PHP85Migration` cs-fixer rule + auto-rewrite commit
+- [x] T051 Closures in const expressions
+- [x] T052 Attribute argument simplifications
 
 ### Implementation sketch
 
@@ -233,10 +233,10 @@ See `tasks/WP05-cs-fixer-and-closures.md`.
 
 ### Included subtasks
 
-- [ ] T060 `CHANGELOG.md` `[Unreleased]` bullet
-- [ ] T061 Full verification matrix
-- [ ] T062 File follow-up issues
-- [ ] T063 Mark PR ready
+- [x] T060 `CHANGELOG.md` `[Unreleased]` bullet
+- [x] T061 Full verification matrix
+- [x] T062 File follow-up issues
+- [x] T063 Mark PR ready
 
 ### Implementation sketch
 
