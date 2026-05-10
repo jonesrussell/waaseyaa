@@ -48,3 +48,4 @@ See `../tasks.md` for the T-IDs in this WP. See `../plan.md` for design decision
 ## Activity Log
 
 - 2026-05-10T15:22:35Z – sonnet – shell_pid=260335 – Assigned agent via action command
+- 2026-05-10T15:29:59Z – sonnet – shell_pid=260335 – Ready for review: 26/26 tests pass, phpstan clean, cs-check clean, idempotency verified
