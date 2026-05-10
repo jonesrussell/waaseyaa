@@ -47,6 +47,10 @@ grep -q '## \[Unreleased\]' CHANGELOG.md || { echo "ERROR: no [Unreleased] secti
 UNRELEASED_CONTENT=$(sed -n '/^## \[Unreleased\]/,/^## \[/{/^## \[/d;/^$/d;/^### /d;p;}' CHANGELOG.md)
 [ -n "$UNRELEASED_CONTENT" ] || { echo "ERROR: [Unreleased] section has no entries"; exit 1; }
 
+# Sync internal waaseyaa/* version constraints across packages/*/composer.json
+# (matches release-cut.yml's behaviour; kept in lockstep per #1385).
+bin/sync-internal-versions "$SEMVER"
+
 # Extract unreleased section for tag message
 TAG_MSG=$(sed -n '/^## \[Unreleased\]/,/^## \[/{/^## \[Unreleased\]/d;/^## \[/d;p;}' CHANGELOG.md)
 
