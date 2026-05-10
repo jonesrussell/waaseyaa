@@ -79,6 +79,8 @@ owned_files:
 - packages/validation/composer.json
 - packages/workflows/composer.json
 tags: []
+agent: "sonnet"
+shell_pid: "266283"
 ---
 
 # WP04 — Backfill
@@ -94,3 +96,7 @@ Run `bin/sync-internal-versions <current-tag>` against the current state, regene
 - Idempotency confirmed: re-running the sync produces no diff.
 
 See `../plan.md` Design Decision D4 (single mechanical commit) and Risk R1 (lockfile diff size is expected).
+
+## Activity Log
+
+- 2026-05-10T15:45:57Z – sonnet – shell_pid=266283 – Started implementation via action command
