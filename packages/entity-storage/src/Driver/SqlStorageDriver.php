@@ -197,7 +197,7 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
             ->condition($this->idKey, $id);
 
         if ($this->communityScope?->isActive()) {
-            $query->condition('community_id', $this->communityScope->getCommunityId());
+            $query = $query->condition('community_id', $this->communityScope->getCommunityId());
         }
 
         foreach ($query->execute() as $_row) {
@@ -215,11 +215,11 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
             ->countQuery();
 
         if ($this->communityScope?->isActive()) {
-            $query->condition('community_id', $this->communityScope->getCommunityId());
+            $query = $query->condition('community_id', $this->communityScope->getCommunityId());
         }
 
         foreach ($criteria as $field => $value) {
-            $query->condition($this->resolveField($db, $entityType, $field), $value);
+            $query = $query->condition($this->resolveField($db, $entityType, $field), $value);
         }
 
         $result = $query->execute();
@@ -244,21 +244,21 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
             ->fields($entityType);
 
         if ($this->communityScope?->isActive()) {
-            $query->condition('community_id', $this->communityScope->getCommunityId());
+            $query = $query->condition('community_id', $this->communityScope->getCommunityId());
         }
 
         foreach ($criteria as $field => $value) {
-            $query->condition($this->resolveField($db, $entityType, $field), $value);
+            $query = $query->condition($this->resolveField($db, $entityType, $field), $value);
         }
 
         if ($orderBy !== null) {
             foreach ($orderBy as $field => $direction) {
-                $query->orderBy($this->resolveField($db, $entityType, $field), strtoupper($direction));
+                $query = $query->orderBy($this->resolveField($db, $entityType, $field), strtoupper($direction));
             }
         }
 
         if ($limit !== null) {
-            $query->range(0, $limit);
+            $query = $query->range(0, $limit);
         }
 
         $result = $query->execute();
@@ -288,7 +288,7 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
             ->condition($this->idKey, $id);
 
         if ($this->communityScope?->isActive()) {
-            $baseQuery->condition('community_id', $this->communityScope->getCommunityId());
+            $baseQuery = $baseQuery->condition('community_id', $this->communityScope->getCommunityId());
         }
 
         $baseResult = $baseQuery->execute();
@@ -344,7 +344,7 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
             ->condition($this->idKey, $idList, 'IN');
 
         if ($this->communityScope?->isActive()) {
-            $baseQuery->condition('community_id', $this->communityScope->getCommunityId());
+            $baseQuery = $baseQuery->condition('community_id', $this->communityScope->getCommunityId());
         }
 
         $bases = [];

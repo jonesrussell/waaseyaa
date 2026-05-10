@@ -492,14 +492,14 @@ final class SqlEntityQuery implements EntityQueryInterface
         if ($this->isCount) {
             $select = $select->countQuery();
         } else {
-            $select->addField($this->tableName, $this->idKey);
+            $select = $select->addField($this->tableName, $this->idKey);
         }
 
         foreach ($requiredJoins as $bundle) {
             $subtable = SqlSchemaHandler::resolveSubtableName($this->tableName, $bundle, $this->entityType->id());
             $baseQuoted = $this->database->quoteIdentifier($this->tableName);
             $subQuoted = $this->database->quoteIdentifier($subtable);
-            $select->join(
+            $select = $select->join(
                 $subtable,
                 $subtable,
                 $baseQuoted . '.' . $this->idKey . ' = ' . $subQuoted . '.' . $this->idKey,
@@ -514,9 +514,9 @@ final class SqlEntityQuery implements EntityQueryInterface
             $field = $this->resolveField($fieldName, $routing);
 
             if ($operator === 'IS NULL') {
-                $select->isNull($field);
+                $select = $select->isNull($field);
             } elseif ($operator === 'IS NOT NULL') {
-                $select->isNotNull($field);
+                $select = $select->isNotNull($field);
             } elseif ($operator === 'IN') {
                 $rawValues = is_array($condition['value']) ? $condition['value'] : [$condition['value']];
                 if (self::expressionResolvesViaJsonExtract($field)) {
@@ -535,28 +535,28 @@ final class SqlEntityQuery implements EntityQueryInterface
                         $rawValues,
                     );
                 }
-                $select->condition($field, $values, 'IN');
+                $select = $select->condition($field, $values, 'IN');
             } elseif ($operator === 'CONTAINS') {
                 // String-pattern operator: do not coerce, callers want string semantics.
                 $escaped = str_replace(['%', '_'], ['\\%', '\\_'], (string) $condition['value']);
-                $select->condition($field, '%' . $escaped . '%', 'LIKE');
+                $select = $select->condition($field, '%' . $escaped . '%', 'LIKE');
             } elseif ($operator === 'STARTS_WITH') {
                 $escaped = str_replace(['%', '_'], ['\\%', '\\_'], (string) $condition['value']);
-                $select->condition($field, $escaped . '%', 'LIKE');
+                $select = $select->condition($field, $escaped . '%', 'LIKE');
             } else {
                 $value = $this->coerceConditionValue($fieldName, $condition['value'], $bundle);
-                $select->condition($field, $value, $condition['operator']);
+                $select = $select->condition($field, $value, $condition['operator']);
             }
         }
 
         // Apply sorts.
         foreach ($this->sorts as $sort) {
-            $select->orderBy($this->resolveField($sort['field'], $routing), $sort['direction']);
+            $select = $select->orderBy($this->resolveField($sort['field'], $routing), $sort['direction']);
         }
 
         // Apply range.
         if ($this->rangeLimit !== null) {
-            $select->range($this->rangeOffset ?? 0, $this->rangeLimit);
+            $select = $select->range($this->rangeOffset ?? 0, $this->rangeLimit);
         }
 
         $result = $select->execute();

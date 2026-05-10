@@ -150,7 +150,7 @@ final class SqlEntityStorage implements EntityStorageInterface
             ->fields($this->tableName);
 
         if (!empty($ids)) {
-            $query->condition($this->idKey, $ids, 'IN');
+            $query = $query->condition($this->idKey, $ids, 'IN');
         }
 
         $result = $query->execute();

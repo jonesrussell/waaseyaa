@@ -34,6 +34,7 @@ final class DBALSelect implements SelectInterface
         $this->qb->from($connection->quoteIdentifier($table), $this->tableAlias);
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function fields(string $tableAlias, array $fields = []): static
     {
         $this->hasExplicitFields = true;
@@ -50,6 +51,7 @@ final class DBALSelect implements SelectInterface
         return $this;
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function addField(string $tableAlias, string $field, string $alias = ''): static
     {
         $this->hasExplicitFields = true;
@@ -64,6 +66,7 @@ final class DBALSelect implements SelectInterface
         return $this;
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function condition(string $field, mixed $value, string $operator = '='): static
     {
         $operator = strtoupper($operator);
@@ -106,6 +109,7 @@ final class DBALSelect implements SelectInterface
         };
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function isNull(string $field): static
     {
         $this->qb->andWhere($field . ' IS NULL');
@@ -113,6 +117,7 @@ final class DBALSelect implements SelectInterface
         return $this;
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function isNotNull(string $field): static
     {
         $this->qb->andWhere($field . ' IS NOT NULL');
@@ -120,6 +125,7 @@ final class DBALSelect implements SelectInterface
         return $this;
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function orderBy(string $field, string $direction = 'ASC'): static
     {
         $direction = strtoupper($direction);
@@ -132,6 +138,7 @@ final class DBALSelect implements SelectInterface
         return $this;
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function range(int $offset, int $limit): static
     {
         $this->qb->setFirstResult($offset)->setMaxResults($limit);
@@ -139,6 +146,7 @@ final class DBALSelect implements SelectInterface
         return $this;
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function join(string $table, string $alias, string $condition): static
     {
         $this->qb->innerJoin($this->tableAlias, $table, $alias, $condition);
@@ -146,6 +154,7 @@ final class DBALSelect implements SelectInterface
         return $this;
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function leftJoin(string $table, string $alias, string $condition): static
     {
         $this->qb->leftJoin($this->tableAlias, $table, $alias, $condition);
@@ -153,6 +162,7 @@ final class DBALSelect implements SelectInterface
         return $this;
     }
 
+    #[\NoDiscard('fluent builder — chain or assign the return value')]
     public function countQuery(): static
     {
         $clone = clone $this;

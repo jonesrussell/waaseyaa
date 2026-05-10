@@ -23,6 +23,7 @@ interface EntityRepositoryInterface
      * @param bool $fallback Whether to apply language fallback chain.
      * @return EntityInterface|null The entity, or null if not found.
      */
+    #[\NoDiscard('lookup result must be checked for null')]
     public function find(string $id, ?string $langcode = null, bool $fallback = false): ?EntityInterface;
 
     /**
@@ -33,6 +34,7 @@ interface EntityRepositoryInterface
      * @param list<int|string> $ids
      * @return list<EntityInterface>
      */
+    #[\NoDiscard('lookup result must be checked for null')]
     public function findMany(array $ids, ?string $langcode = null, bool $fallback = false): array;
 
     /**
@@ -43,6 +45,7 @@ interface EntityRepositoryInterface
      * @param int|null $limit Maximum number of results.
      * @return EntityInterface[] Matching entities.
      */
+    #[\NoDiscard('lookup result must be checked for null')]
     public function findBy(array $criteria, ?array $orderBy = null, ?int $limit = null): array;
 
     /**
@@ -87,6 +90,7 @@ interface EntityRepositoryInterface
      * @param int $revisionId The revision ID.
      * @return EntityInterface|null The entity hydrated from the revision, or null.
      */
+    #[\NoDiscard('lookup result must be checked for null')]
     public function loadRevision(string $entityId, int $revisionId): ?EntityInterface;
 
     /**
@@ -100,6 +104,7 @@ interface EntityRepositoryInterface
      * @return EntityInterface The entity hydrated from the new revision.
      * @throws \InvalidArgumentException If the target revision does not exist.
      */
+    #[\NoDiscard('lookup result must be checked for null')]
     public function rollback(string $entityId, int $targetRevisionId): EntityInterface;
 
     /**

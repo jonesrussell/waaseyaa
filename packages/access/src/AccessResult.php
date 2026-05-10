@@ -23,6 +23,7 @@ final readonly class AccessResult
     /**
      * Create an Allowed result.
      */
+    #[\NoDiscard('ignoring an access decision is a security bug')]
     public static function allowed(string $reason = ''): self
     {
         return new self(AccessStatus::ALLOWED, $reason);
@@ -31,6 +32,7 @@ final readonly class AccessResult
     /**
      * Create a Neutral result (no opinion).
      */
+    #[\NoDiscard('ignoring an access decision is a security bug')]
     public static function neutral(string $reason = ''): self
     {
         return new self(AccessStatus::NEUTRAL, $reason);
@@ -39,6 +41,7 @@ final readonly class AccessResult
     /**
      * Create a Forbidden result.
      */
+    #[\NoDiscard('ignoring an access decision is a security bug')]
     public static function forbidden(string $reason = ''): self
     {
         return new self(AccessStatus::FORBIDDEN, $reason);
@@ -49,6 +52,7 @@ final readonly class AccessResult
      *
      * Semantically distinct from Forbidden: 401 vs 403.
      */
+    #[\NoDiscard('ignoring an access decision is a security bug')]
     public static function unauthenticated(string $reason = ''): self
     {
         return new self(AccessStatus::UNAUTHENTICATED, $reason);
