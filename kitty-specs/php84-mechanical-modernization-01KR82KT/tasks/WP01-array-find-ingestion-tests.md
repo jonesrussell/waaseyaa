@@ -144,3 +144,4 @@ spec-kitty agent action implement WP01 --agent <agent-name>
 ## Activity Log
 
 - 2026-05-10T04:45:05Z – claude:opus-4-7:opus-implementer:implementer – shell_pid=86581 – Assigned agent via action command
+- 2026-05-10T04:49:01Z – claude:opus-4-7:opus-implementer:implementer – shell_pid=86581 – WP01 ready: array_find swap applied to 10 first-match sites across SchemaValidatorTest (8), ValidationGateValidatorTest (1), IngestRunCommandTest (1). Suite green (7497 tests). PayloadValidatorTest:618 and SchemaValidatorTest:81,103 left untouched: those are list-rebuild patterns (multi-result + iteration), not first-match — array_find would break test semantics. WP estimate of 10 first-match sites matches actual swaps.
