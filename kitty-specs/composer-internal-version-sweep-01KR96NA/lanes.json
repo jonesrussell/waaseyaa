@@ -1,0 +1,146 @@
+{
+  "version": 1,
+  "mission_slug": "composer-internal-version-sweep-01KR96NA",
+  "mission_id": "01KR96NAPQY0RSTKMY286NV16W",
+  "mission_branch": "kitty/mission-composer-internal-version-sweep-01KR96NA",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP04",
+        "WP05"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "bin/lib/internal-version-sync.php",
+        "bin/sync-internal-versions",
+        "composer.lock",
+        "packages/access/composer.json",
+        "packages/admin-surface/composer.json",
+        "packages/ai-agent/composer.json",
+        "packages/ai-observability/composer.json",
+        "packages/ai-pipeline/composer.json",
+        "packages/ai-schema/composer.json",
+        "packages/ai-vector/composer.json",
+        "packages/api/composer.json",
+        "packages/attachment/composer.json",
+        "packages/auth/composer.json",
+        "packages/billing/composer.json",
+        "packages/bimaaji/composer.json",
+        "packages/cli/composer.json",
+        "packages/cms/composer.json",
+        "packages/core/composer.json",
+        "packages/debug/composer.json",
+        "packages/engagement/composer.json",
+        "packages/entity-storage/composer.json",
+        "packages/entity/composer.json",
+        "packages/error-handler/composer.json",
+        "packages/field/composer.json",
+        "packages/foundation/composer.json",
+        "packages/full/composer.json",
+        "packages/genealogy/composer.json",
+        "packages/geo/composer.json",
+        "packages/graphql/composer.json",
+        "packages/groups/composer.json",
+        "packages/inertia/composer.json",
+        "packages/mail/composer.json",
+        "packages/mcp/composer.json",
+        "packages/media/composer.json",
+        "packages/menu/composer.json",
+        "packages/messaging/composer.json",
+        "packages/node/composer.json",
+        "packages/northcloud/composer.json",
+        "packages/note/composer.json",
+        "packages/notification/composer.json",
+        "packages/oauth-provider/composer.json",
+        "packages/oidc/composer.json",
+        "packages/path/composer.json",
+        "packages/plugin/composer.json",
+        "packages/queue/composer.json",
+        "packages/relationship/composer.json",
+        "packages/routing/composer.json",
+        "packages/scheduler/composer.json",
+        "packages/search/composer.json",
+        "packages/seo/composer.json",
+        "packages/ssr/composer.json",
+        "packages/state/composer.json",
+        "packages/structured-import/composer.json",
+        "packages/taxonomy/composer.json",
+        "packages/telescope/composer.json",
+        "packages/testing/composer.json",
+        "packages/user/composer.json",
+        "packages/validation/composer.json",
+        "packages/workflows/composer.json",
+        "tests/Fixtures/release-tooling/manifest-trailing-comma.json",
+        "tests/Fixtures/release-tooling/manifest-unusual-key-order.json",
+        "tests/Fixtures/release-tooling/manifest-with-require-dev.json",
+        "tests/Integration/ReleaseTooling/SyncInternalVersionsTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-b",
+      "wp_ids": [
+        "WP02"
+      ],
+      "write_scope": [
+        ".github/workflows/release-cut.yml",
+        "scripts/release.sh"
+      ],
+      "predicted_surfaces": [
+        "legacy-cleanup",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-c",
+      "wp_ids": [
+        "WP03"
+      ],
+      "write_scope": [
+        ".github/workflows/ci.yml",
+        "bin/check-composer-policy",
+        "tests/Integration/ReleaseTooling/CpNewCheckTest.php"
+      ],
+      "predicted_surfaces": [
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-10T15:18:04.135060+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP01"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP04"
+      }
+    ],
+    "total_merges": 2,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 2
+    }
+  }
+}
