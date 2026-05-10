@@ -9,8 +9,8 @@
         "psr/simple-cache": "^3.0"
     },
     "suggest": {
-        "waaseyaa/entity": "Required for EntityCacheInvalidator listener",
-        "waaseyaa/config": "Required for ConfigCacheInvalidator listener"
+        "waaseyaa/entity": "^0.1.0-alpha.175",
+        "waaseyaa/config": "^0.1.0-alpha.175"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"

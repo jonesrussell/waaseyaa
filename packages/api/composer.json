@@ -47,15 +47,15 @@
     ],
     "require": {
         "php": ">=8.5",
-        "waaseyaa/entity": "^0.1.0-alpha.150",
-        "waaseyaa/foundation": "^0.1.0-alpha.150",
-        "waaseyaa/routing": "^0.1.0-alpha.150",
-        "waaseyaa/access": "^0.1.0-alpha.150"
+        "waaseyaa/entity": "^0.1.0-alpha.175",
+        "waaseyaa/foundation": "^0.1.0-alpha.175",
+        "waaseyaa/routing": "^0.1.0-alpha.175",
+        "waaseyaa/access": "^0.1.0-alpha.175"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5",
-        "waaseyaa/database-legacy": "^0.1.0-alpha.150",
-        "waaseyaa/telescope": "^0.1.0-alpha.150"
+        "waaseyaa/database-legacy": "^0.1.0-alpha.175",
+        "waaseyaa/telescope": "^0.1.0-alpha.175"
     },
     "autoload": {
         "psr-4": {
