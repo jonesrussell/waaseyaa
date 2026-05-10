@@ -319,3 +319,7 @@ WP02 already filed their own.
 ```bash
 spec-kitty agent action implement WP03 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-10T23:52:18Z – unknown – Done override: Mission executed inline by opus; outputs in docs/audits/ and umbrella issues #1411-#1415
