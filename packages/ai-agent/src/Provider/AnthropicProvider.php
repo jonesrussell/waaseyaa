@@ -192,11 +192,8 @@ final class AnthropicProvider implements StreamingProviderInterface
 
         if ($responseBody === false) {
             $error = \curl_error($ch);
-            \curl_close($ch);
             throw new \RuntimeException("cURL error: {$error}");
         }
-
-        \curl_close($ch);
 
         if (!\is_string($responseBody)) {
             throw new \RuntimeException('Unexpected cURL response type.');
@@ -275,7 +272,6 @@ final class AnthropicProvider implements StreamingProviderInterface
 
         \curl_exec($ch);
         $httpCode = \curl_getinfo($ch, \CURLINFO_HTTP_CODE);
-        \curl_close($ch);
 
         if ($httpCode >= 400) {
             $errorMessage = "HTTP {$httpCode}";
