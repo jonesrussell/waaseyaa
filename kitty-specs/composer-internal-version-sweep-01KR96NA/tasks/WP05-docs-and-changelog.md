@@ -25,6 +25,8 @@ owned_files:
 - CHANGELOG.md
 - CLAUDE.md
 tags: []
+agent: "sonnet"
+shell_pid: "268372"
 ---
 
 # WP05 — Docs + CHANGELOG + close-out
@@ -38,3 +40,7 @@ One-line note in `CLAUDE.md` pointing at the new sync script and CP-NEW. One bul
 - `tools/drift-detector.sh` reports no STALE specs (or stamps applied where it does).
 - All hard gates green on the final commit.
 - PR marked ready for review.
+
+## Activity Log
+
+- 2026-05-10T15:51:42Z – sonnet – shell_pid=268372 – Started implementation via action command
