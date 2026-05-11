@@ -15,7 +15,7 @@ const appName = computed(() => config.public.appName ?? 'Waaseyaa')
       :src="props.logoUrl"
       :alt="appName"
       class="auth-brand-logo"
-    />
+    >
     <h1 class="auth-brand-title">{{ appName }}</h1>
     <p v-if="props.tagline" class="auth-brand-tagline">{{ props.tagline }}</p>
   </div>

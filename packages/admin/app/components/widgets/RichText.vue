@@ -61,8 +61,8 @@ function onInput(event: Event) {
       contenteditable
       class="field-input field-richtext"
       :class="{ disabled }"
-      v-html="sanitized"
       @input="onInput"
+      v-html="sanitized"
     />
     <p v-if="description" class="field-description">{{ description }}</p>
   </div>

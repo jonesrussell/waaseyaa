@@ -5,6 +5,14 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
 
+  modules: ['@nuxt/eslint'],
+
+  eslint: {
+    config: {
+      stylistic: false,
+    },
+  },
+
   nitro: {
     prerender: {
       // Backend may be unreachable during static generation in CI.

@@ -35,7 +35,7 @@ const inputType = computed(() => {
       :aria-label="label"
       class="field-input"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-    />
+    >
     <p v-if="description" class="field-description">{{ description }}</p>
   </div>
 </template>

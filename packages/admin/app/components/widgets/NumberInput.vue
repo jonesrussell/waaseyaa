@@ -33,7 +33,7 @@ function onInput(event: Event) {
       :max="schema?.maximum"
       class="field-input"
       @input="onInput"
-    />
+    >
     <p v-if="description" class="field-description">{{ description }}</p>
   </div>
 </template>
