@@ -9,6 +9,7 @@ use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Access\Exception\PartialAccessContextException;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\FieldStorage;
@@ -32,6 +33,17 @@ use Waaseyaa\Field\FieldStorage;
  */
 final class SchemaPresenter
 {
+    /**
+     * @param FieldDefinitionRegistryInterface|null $fieldDefinitionRegistry
+     *   When provided, the bundle property in the rendered schema gains an
+     *   `enum` of declared bundle names (via `bundleNamesFor()`). Null leaves
+     *   the bundle property as a bare string for backward compatibility with
+     *   pre-M3A callers — see #1413.
+     */
+    public function __construct(
+        private readonly ?FieldDefinitionRegistryInterface $fieldDefinitionRegistry = null,
+    ) {}
+
     /**
      * Known widget mappings from field types to UI widget hints.
      *
@@ -120,6 +132,8 @@ final class SchemaPresenter
             throw PartialAccessContextException::forSerializer(__METHOD__);
         }
 
+        $keys = $entityType->getKeys();
+
         $schema = [
             '$schema' => 'https://json-schema.org/draft-07/schema#',
             'title' => $entityType->getLabel(),
@@ -128,11 +142,14 @@ final class SchemaPresenter
             'x-entity-type' => $entityType->id(),
             'x-translatable' => $entityType->isTranslatable(),
             'x-revisionable' => $entityType->isRevisionable(),
+            // The property name that holds the bundle value (e.g. 'type' for
+            // nodes). Null when the entity type has no bundle key. Admin SPA
+            // reads this to render a bundle filter / selector — see #1413.
+            'x-bundle-key' => $keys['bundle'] ?? null,
         ];
 
         $properties = [];
         $required = [];
-        $keys = $entityType->getKeys();
 
         // Add system properties from entity keys.
         $systemProperties = $this->buildSystemProperties($keys, $entityType);
@@ -300,11 +317,21 @@ final class SchemaPresenter
         }
 
         if (isset($keys['bundle'])) {
-            $properties[$keys['bundle']] = [
+            $bundleProperty = [
                 'type' => 'string',
                 'description' => 'The entity bundle.',
                 'x-widget' => 'hidden',
             ];
+
+            if ($this->fieldDefinitionRegistry !== null) {
+                $bundleNames = $this->fieldDefinitionRegistry->bundleNamesFor($entityType->id());
+                if ($bundleNames !== []) {
+                    sort($bundleNames);
+                    $bundleProperty['enum'] = $bundleNames;
+                }
+            }
+
+            $properties[$keys['bundle']] = $bundleProperty;
         }
 
         if (isset($keys['langcode']) && $entityType->isTranslatable()) {

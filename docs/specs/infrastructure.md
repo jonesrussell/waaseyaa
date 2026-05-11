@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-05-10 - M3A (#1413) SchemaRouter ctor takes optional FieldDefinitionRegistryInterface and forwards to SchemaPresenter; HttpKernel passes $this->fieldRegistry. Pure wiring change; no infrastructure contract surface affected. -->
 <!-- Spec reviewed 2026-05-10 - WP05 php-8.5 upgrade: @PHP8x5Migration cs-fixer pass — AbstractKernel, HttpKernel, ExceptionHandler, WaaseyaaException, IngestionLogger, IngestionLogEntry, InertiaServiceProvider, RootTemplateRenderer, StreamHttpClient touched by new_expression_parentheses + octal_notation rules only; no semantic change to infrastructure contracts. -->
 <!-- Spec reviewed 2026-05-10 - WP03 php-8.5 upgrade: DBALSelect fluent methods (fields/addField/condition/isNull/isNotNull/orderBy/range/join/leftJoin/countQuery) gained #[\NoDiscard] — no change to query builder semantics or DBAL abstraction contract. -->
 <!-- Spec reviewed 2026-05-08 - issue #1397: `Worker::run()` enforces `WorkerOptions::$memoryLimit` as MiB of **additional** allocation since the start of each `run()` call (`memory_get_usage(true)` baseline), not total PHP process RSS — embedded hosts (PHPUnit full suite, long-lived FPM) may already exceed the cap before `run()` begins; see `packages/queue/src/Worker/Worker.php`. -->

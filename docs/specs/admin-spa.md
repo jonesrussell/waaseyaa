@@ -1,5 +1,6 @@
 # Admin SPA
 
+<!-- Spec reviewed 2026-05-10 - M3A (#1413) bundle filter wiring: SchemaPresenter exposes top-level `x-bundle-key` and (when FieldDefinitionRegistry is wired) `enum` of bundle names on the bundle property; SchemaRouter forwards the registry from HttpKernel; SchemaList renders a bundle-filter dropdown above the entity table and passes `filter[<bundleKey>]=<value>` to the list query; EntitySchema TS gains `'x-bundle-key'?: string | null`; en/fr i18n strings added; tenancy + SchemaForm bundle picker deferred to follow-ups -->
 <!-- Spec reviewed 2026-05-10 - M2A (#1412) envelope tightening: packages/admin/package.json marked `"private": true` (no downstream consumers found in workspace); exports map and files array removed; engines added (`node: ">=22.12.0"`); README rewritten to a ~55-line publishable summary; build:contracts script retained as forward-compat type-check; admin contracts CI gate unchanged -->
 <!-- Spec reviewed 2026-05-10 - #1419 follow-up: Playwright webServer in CI uses `npm run build && npm run preview` (production-mode, ~3s startup) instead of `npm run dev` (>240s in CI, dev-mode-specific stall; local devs keep dev mode for HMR) -->
 <!-- Spec reviewed 2026-05-10 - #1419 follow-up: Playwright webServer timeout 120s → 240s to absorb CI cold-start of nuxt prepare + Vite optimize + Nitro build; local dev unchanged -->

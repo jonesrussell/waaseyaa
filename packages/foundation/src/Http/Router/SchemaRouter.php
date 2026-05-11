@@ -11,6 +11,7 @@ use Waaseyaa\Api\Controller\SchemaController;
 use Waaseyaa\Api\OpenApi\OpenApiGenerator;
 use Waaseyaa\Api\Schema\SchemaPresenter;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
 
 final class SchemaRouter implements DomainRouterInterface
@@ -20,6 +21,7 @@ final class SchemaRouter implements DomainRouterInterface
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
         private readonly EntityAccessHandler $accessHandler,
+        private readonly ?FieldDefinitionRegistryInterface $fieldDefinitionRegistry = null,
     ) {}
 
     public function supports(Request $request): bool
@@ -38,7 +40,7 @@ final class SchemaRouter implements DomainRouterInterface
         }
 
         $ctx = WaaseyaaContext::fromRequest($request);
-        $schemaPresenter = new SchemaPresenter();
+        $schemaPresenter = new SchemaPresenter($this->fieldDefinitionRegistry);
         $schemaController = new SchemaController($this->entityTypeManager, $schemaPresenter, $this->accessHandler, $ctx->account);
         $document = $schemaController->show($request->attributes->get('entity_type'));
         return $this->jsonApiResponse($document->statusCode, $document->toArray());
