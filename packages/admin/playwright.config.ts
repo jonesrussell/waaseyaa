@@ -25,6 +25,8 @@ export default defineConfig({
     command: 'npm run dev',
     url: 'http://localhost:3000/admin',
     reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
+    // 240s gives cold-start CI runners headroom over Nuxt's prepare + Vite
+    // optimize + Nitro build sequence; locally `nuxt dev` is ready in seconds.
+    timeout: 240 * 1000,
   },
 })

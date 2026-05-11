@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Admin SPA `admin/integration` CI regression — Nuxt 4.4.5 dev-server broken (issue #1419)** — Nuxt 4.4.5 introduced a regression in `@nuxt/vite-builder`'s `resolveServerEntry` that fails `nuxt dev` with `No entry found in rollupOptions.input`. Caret-range `"nuxt": "^4.4.4"` from M1A allowed npm to resolve to 4.4.5, breaking Playwright's `webServer: 'npm run dev'` bootstrap and therefore the `admin/integration` GitHub Actions job. Pinned `"nuxt": "4.4.4"` exact in `packages/admin/package.json`. `nuxt build` was unaffected (production build path uses a different entry resolution code path). Local verification: `nuxt dev` starts cleanly on `http://localhost:3000/admin/`; vitest 187/187 pass; typecheck clean; lint 0 errors. Unpinning becomes safe when Nuxt ships a fixed 4.4.6+ that resolves [Nuxt upstream issue tracking the regression].
+
 ### Added
 
 - **Admin SPA `@nuxt/eslint` adoption (M1B-eslint, audit `admin-spa-modernization-audit-01KRA3RV`, issue #1411)** — Added `@nuxt/eslint` ^1.15.2 and `eslint` ^9.39.4 as devDependencies, registered as a Nuxt module in `packages/admin/nuxt.config.ts`, scaffolded `packages/admin/eslint.config.mjs` importing the auto-generated `.nuxt/eslint.config.mjs`. New `lint` and `lint:fix` scripts wired. Adoption baseline: 0 errors / 61 warnings (mostly `@typescript-eslint/no-explicit-any` × 40 + unused `vi` imports × 12 + intentional `vue/no-v-html` × 2). Noisy rules tuned to `warn` so the suite passes at zero errors; a follow-up "baseline cleanup" pass can tighten incrementally. `vue/html-self-closing` `--fix` ran across 14 auth/widget files (valid HTML5 void-element form). Verified: `npm run lint` exit 0, `npm test` 187/187 pass, `npm run typecheck` clean. Nuxt modules `@nuxt/image`, `@nuxt/icon`, `@nuxt/fonts` deferred from M1B's original audit scope — each needs its own validation and config and will land as separate follow-ups.
