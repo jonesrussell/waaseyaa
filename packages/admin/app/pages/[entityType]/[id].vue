@@ -75,6 +75,12 @@ function onError(message: string) {
       @saved="onSaved"
       @error="onError"
     />
+
+    <WorkflowTransitionHistoryTimeline
+      :key="`history-${entityType}-${entityId}`"
+      :entity-type="entityType"
+      :entity-id="entityId"
+    />
   </div>
 </template>
 
