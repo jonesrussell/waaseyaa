@@ -1,5 +1,6 @@
 # Admin SPA
 
+<!-- Spec reviewed 2026-05-10 - #1419 follow-up: Playwright webServer in CI uses `npm run build && npm run preview` (production-mode, ~3s startup) instead of `npm run dev` (>240s in CI, dev-mode-specific stall; local devs keep dev mode for HMR) -->
 <!-- Spec reviewed 2026-05-10 - #1419 follow-up: Playwright webServer timeout 120s → 240s to absorb CI cold-start of nuxt prepare + Vite optimize + Nitro build; local dev unchanged -->
 <!-- Spec reviewed 2026-05-10 - Nuxt 4.4.5 dev-server regression (#1419): pinned `"nuxt": "4.4.4"` exact in packages/admin/package.json; Tech Stack table version unchanged; rationale and unpin condition in CHANGELOG -->
 <!-- Spec reviewed 2026-05-10 - M1B (#1411) @nuxt/eslint adoption: nuxt.config.ts gains modules and eslint config; new packages/admin/eslint.config.mjs imports `.nuxt/eslint.config.mjs`; lint/lint:fix scripts wired; @typescript-eslint/no-explicit-any et al. set to warn (61 deferred baseline warnings); admin contracts unchanged -->
