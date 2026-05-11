@@ -8,10 +8,10 @@ const editorial = {
   id: 'editorial',
   label: 'Editorial',
   states: [
-    { id: 'draft', label: 'Draft', weight: 0 },
-    { id: 'review', label: 'Review', weight: 1 },
-    { id: 'published', label: 'Published', weight: 2 },
-    { id: 'archived', label: 'Archived', weight: 3 },
+    { id: 'draft', label: 'Draft', weight: 0, metadata: { legacy_status: 0 } },
+    { id: 'review', label: 'Review', weight: 1, metadata: {} },
+    { id: 'published', label: 'Published', weight: 2, metadata: { legacy_status: 1 } },
+    { id: 'archived', label: 'Archived', weight: 3, metadata: {} },
   ],
   transitions: [
     { id: 'submit_for_review', label: 'Submit for Review', from: ['draft'], to: 'review', weight: 0 },
@@ -43,5 +43,25 @@ describe('useWorkflowDefinitions', () => {
     expect(workflows.value[0].id).toBe('editorial')
     expect(workflows.value[0].states).toHaveLength(4)
     expect(workflows.value[0].transitions).toHaveLength(1)
+  })
+
+  it('findById returns the matching workflow after fetch', async () => {
+    const { useWorkflowDefinitions } = await import('~/composables/useWorkflowDefinitions')
+    const { fetchWorkflows, findById } = useWorkflowDefinitions()
+    await fetchWorkflows()
+    expect(findById('editorial')?.id).toBe('editorial')
+  })
+
+  it('findById returns null for an unknown id', async () => {
+    const { useWorkflowDefinitions } = await import('~/composables/useWorkflowDefinitions')
+    const { fetchWorkflows, findById } = useWorkflowDefinitions()
+    await fetchWorkflows()
+    expect(findById('nonexistent')).toBeNull()
+  })
+
+  it('findById returns null before fetch (workflows are empty)', async () => {
+    const { useWorkflowDefinitions } = await import('~/composables/useWorkflowDefinitions')
+    const { findById } = useWorkflowDefinitions()
+    expect(findById('editorial')).toBeNull()
   })
 })

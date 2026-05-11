@@ -2,6 +2,7 @@ export interface WorkflowState {
   id: string
   label: string
   weight: number
+  metadata: Record<string, unknown>
 }
 
 export interface WorkflowTransition {
@@ -39,5 +40,9 @@ export function useWorkflowDefinitions() {
     }
   }
 
-  return { workflows, loading, error, fetchWorkflows }
+  function findById(id: string): WorkflowDefinition | null {
+    return workflows.value.find(w => w.id === id) ?? null
+  }
+
+  return { workflows, loading, error, fetchWorkflows, findById }
 }
