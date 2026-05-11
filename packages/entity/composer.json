@@ -31,12 +31,12 @@
     ],
     "require": {
         "php": ">=8.5",
-        "waaseyaa/typed-data": "^0.1.0-alpha.176",
-        "waaseyaa/plugin": "^0.1.0-alpha.176",
-        "waaseyaa/cache": "^0.1.0-alpha.176",
-        "waaseyaa/config": "^0.1.0-alpha.176",
-        "waaseyaa/foundation": "^0.1.0-alpha.176",
-        "waaseyaa/validation": "^0.1.0-alpha.176",
+        "waaseyaa/typed-data": "^0.1.0-alpha.177",
+        "waaseyaa/plugin": "^0.1.0-alpha.177",
+        "waaseyaa/cache": "^0.1.0-alpha.177",
+        "waaseyaa/config": "^0.1.0-alpha.177",
+        "waaseyaa/foundation": "^0.1.0-alpha.177",
+        "waaseyaa/validation": "^0.1.0-alpha.177",
         "symfony/event-dispatcher": "^7.0",
         "symfony/uid": "^7.0",
         "symfony/validator": "^7.0"

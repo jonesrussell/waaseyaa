@@ -43,11 +43,11 @@
     ],
     "require": {
         "php": ">=8.5",
-        "waaseyaa/entity": "^0.1.0-alpha.176",
-        "waaseyaa/queue": "^0.1.0-alpha.176",
-        "waaseyaa/api": "^0.1.0-alpha.176",
-        "waaseyaa/access": "^0.1.0-alpha.176",
-        "waaseyaa/workflows": "^0.1.0-alpha.176"
+        "waaseyaa/entity": "^0.1.0-alpha.177",
+        "waaseyaa/queue": "^0.1.0-alpha.177",
+        "waaseyaa/api": "^0.1.0-alpha.177",
+        "waaseyaa/access": "^0.1.0-alpha.177",
+        "waaseyaa/workflows": "^0.1.0-alpha.177"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
