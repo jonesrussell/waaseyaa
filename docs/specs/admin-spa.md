@@ -1,5 +1,6 @@
 # Admin SPA
 
+<!-- Spec reviewed 2026-05-10 - M1A (#1411) dep bumps: Tech Stack table refreshed to nuxt ^4.4.4, vue ^3.5.34, vue-router ^5.0.6, typescript ^6.0.3, @types/node ^25.6.2; admin contracts unchanged -->
 <!-- Spec reviewed 2026-04-24 - useCodifiedContext + E2E: `/api/telescope/agent-context/…` (legacy HTTP alias on server); Nuxt routes still `/telescope/codified-context/*`; cross-link telescope-agent-context-telemetry.md -->
 <!-- Spec reviewed 2026-04-21 - IngestSummaryWidget: NC sync status from `/api/staff/nc-sync-status`; dashboard link `/staff/ingestion` (staff surface, not admin SPA catch-all) -->
 <!-- Spec reviewed 2026-04-08 - normalizeAppBaseURL (ufo cleanDoubleSlashes + joinURL): shared by admin plugin and auth.global so adminPathBase matches normalized base; surface $fetch uses joinURL paths; packages/admin/app/runtime/normalizeAppBaseURL.ts -->
@@ -81,11 +82,11 @@ The skeleton's `.env.example` sets `WAASEYAA_DEV_FALLBACK_ACCOUNT=true` by defau
 
 | Dependency     | Version   | Purpose                         |
 |----------------|-----------|---------------------------------|
-| Nuxt           | ^4.4.2    | SSR/SPA framework, file-based routing, auto-imports |
-| Vue            | ^3.5.0    | Composition API, reactivity     |
-| vue-router     | ^5.0.0    | Client-side routing (v5 exports Volar `sfc-route-blocks`; required for `nuxi typecheck` with Nuxt 4) |
-| TypeScript     | ^5.6.0    | Type checking (devDependency)   |
-| @types/node    | ^22.0.0   | Node type definitions           |
+| Nuxt           | ^4.4.4    | SSR/SPA framework, file-based routing, auto-imports |
+| Vue            | ^3.5.34   | Composition API, reactivity     |
+| vue-router     | ^5.0.6    | Client-side routing (v5 exports Volar `sfc-route-blocks`; required for `nuxi typecheck` with Nuxt 4) |
+| TypeScript     | ^6.0.3    | Type checking (devDependency)   |
+| @types/node    | ^25.6.2   | Node type definitions           |
 | @playwright/test | ^1.59.1 | E2E browser testing in CI and local `test:e2e` runs |
 
 No CSS framework. Styles are defined in `packages/admin/app/components/layout/AdminShell.vue` as global CSS using CSS custom properties (`--color-primary`, `--color-surface`, etc.).
