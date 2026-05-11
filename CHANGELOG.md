@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Admin SPA package envelope tightened (M2A, audit `admin-spa-modernization-audit-01KRA3RV`, issue #1412)** — `packages/admin/` is now explicitly marked `"private": true` because the audit found zero downstream consumers of `@waaseyaa/admin` / `@waaseyaa/admin/adapters` imports across the workspace. Removed the misleading `exports` map (`./`, `./adapters`, `./nuxt`) and the `files` array. Added `"engines": { "node": ">=22.12.0" }` matching Nuxt 4.4.4's constraint. Description clarified to "monorepo workspace member, not published to npm". `build:contracts` script and the `admin/contracts` CI job retained as a forward-compat type-check gate (still produces `dist/` artifact uploaded by CI). README rewritten from a 21-line i18n-only stub to a ~55-line publishable summary that points at `docs/specs/admin-spa.md` as the canonical reference and covers stack, develop/test/build commands, the bootstrap-contract validation gate, and a pointer at the modernization audit. Future M2 work deferred (separate sub-missions): commit the `dist/` output or remove `build:contracts` entirely; pre-built-tarball model from PR #1350; downstream-consumer integration if/when one appears.
+
 ### Fixed
 
 - **Admin SPA `admin/integration` CI regression — Nuxt 4.4.5 dev-server broken (issue #1419)** — Nuxt 4.4.5 introduced a regression in `@nuxt/vite-builder`'s `resolveServerEntry` that fails `nuxt dev` with `No entry found in rollupOptions.input`. Caret-range `"nuxt": "^4.4.4"` from M1A allowed npm to resolve to 4.4.5, breaking Playwright's `webServer: 'npm run dev'` bootstrap and therefore the `admin/integration` GitHub Actions job. Pinned `"nuxt": "4.4.4"` exact in `packages/admin/package.json`. `nuxt build` was unaffected (production build path uses a different entry resolution code path). Local verification: `nuxt dev` starts cleanly on `http://localhost:3000/admin/`; vitest 187/187 pass; typecheck clean; lint 0 errors. Unpinning becomes safe when Nuxt ships a fixed 4.4.6+ that resolves [Nuxt upstream issue tracking the regression].
