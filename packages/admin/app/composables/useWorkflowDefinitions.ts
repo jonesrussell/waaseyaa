@@ -1,3 +1,21 @@
+export interface DryRunRequest {
+  workflow_id: string
+  bundle: string
+  from_state: string
+  to_state: string
+  account_uid: number
+}
+
+export interface DryRunResult {
+  allowed: boolean
+  neutral: boolean
+  forbidden: boolean
+  reason: string | null
+  required_permission: string
+  transition_id: string
+  transition_label: string
+}
+
 export interface WorkflowState {
   id: string
   label: string
@@ -44,5 +62,13 @@ export function useWorkflowDefinitions() {
     return workflows.value.find(w => w.id === id) ?? null
   }
 
-  return { workflows, loading, error, fetchWorkflows, findById }
+  async function dryRun(payload: DryRunRequest): Promise<DryRunResult> {
+    const response = await apiFetch<{ data: DryRunResult }>('/api/workflow-definitions/dry-run', {
+      method: 'POST',
+      body: payload,
+    })
+    return response.data
+  }
+
+  return { workflows, loading, error, fetchWorkflows, findById, dryRun }
 }

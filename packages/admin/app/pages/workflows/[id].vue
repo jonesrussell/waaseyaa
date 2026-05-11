@@ -131,6 +131,10 @@ function metadataEntries(metadata: Record<string, unknown>): Array<[string, stri
           </tbody>
         </table>
       </section>
+      <WorkflowTransitionDryRunForm
+        :workflow-id="workflowId"
+        :states="sortedStates"
+      />
     </template>
   </div>
 </template>
