@@ -154,7 +154,14 @@ final class SchemaPresenterTest extends TestCase
         // Sorted alphabetically so consumers (admin SPA dropdowns) get
         // deterministic ordering without re-sorting client-side.
         $this->assertSame(['announcement', 'article', 'page'], $properties['type']['enum']);
-        $this->assertSame('hidden', $properties['type']['x-widget']);
+
+        // M3B (#1413): with a known bundle set, bundle becomes a real
+        // user-facing field on create — required select sorted to the top
+        // (negative x-weight) with a friendly label.
+        $this->assertSame('select', $properties['type']['x-widget']);
+        $this->assertSame('Bundle', $properties['type']['x-label']);
+        $this->assertTrue($properties['type']['x-required']);
+        $this->assertSame(-100, $properties['type']['x-weight']);
     }
 
     #[Test]
@@ -177,6 +184,8 @@ final class SchemaPresenterTest extends TestCase
 
         $this->assertArrayHasKey('type', $schema['properties']);
         $this->assertArrayNotHasKey('enum', $schema['properties']['type']);
+        // Without enum, the bundle property stays hidden (pre-M3B behavior).
+        $this->assertSame('hidden', $schema['properties']['type']['x-widget']);
     }
 
     #[Test]
@@ -190,6 +199,7 @@ final class SchemaPresenterTest extends TestCase
 
         $this->assertArrayHasKey('type', $schema['properties']);
         $this->assertArrayNotHasKey('enum', $schema['properties']['type']);
+        $this->assertSame('hidden', $schema['properties']['type']['x-widget']);
     }
 
     #[Test]
