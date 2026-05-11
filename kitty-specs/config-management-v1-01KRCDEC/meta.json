@@ -1,10 +1,11 @@
 {
   "created_at": "2026-05-11T21:00:17.146586+00:00",
-  "friendly_name": "config management v1",
+  "friendly_name": "Configuration Management v1 (Sync)",
   "mission_id": "01KRCDEC7V1843QZ61CY0PH842",
   "mission_number": null,
   "mission_slug": "config-management-v1-01KRCDEC",
   "mission_type": "software-dev",
   "slug": "config-management-v1-01KRCDEC",
+  "source_description": "Canonical doctrine spec at docs/specs/config-management-v1.md (ratified per stability charter \u00a712.4 in commit 370d4163e). Mission metadata at docs/specs/missions/M-003-config-management-v1/mission.json.",
   "target_branch": "main"
 }

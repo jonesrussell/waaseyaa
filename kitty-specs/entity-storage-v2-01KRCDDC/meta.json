@@ -1,10 +1,11 @@
 {
   "created_at": "2026-05-11T20:59:44.468993+00:00",
-  "friendly_name": "entity storage v2",
+  "friendly_name": "Entity Storage v2 (Multi-Backend Field Storage)",
   "mission_id": "01KRCDDCANY3P1530VBVD1ERP9",
   "mission_number": null,
   "mission_slug": "entity-storage-v2-01KRCDDC",
   "mission_type": "software-dev",
   "slug": "entity-storage-v2-01KRCDDC",
+  "source_description": "Canonical doctrine spec at docs/specs/entity-storage-v2.md (ratified per stability charter \u00a712.4 in commit 370d4163e). Mission metadata at docs/specs/missions/M-001-entity-storage-v2/mission.json.",
   "target_branch": "main"
 }
