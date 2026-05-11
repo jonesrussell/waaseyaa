@@ -29,7 +29,7 @@ function onLocaleChange(event: Event) {
     <a href="#main-content" class="skip-link">{{ t('skip_to_main_content') }}</a>
     <header class="topbar" role="banner">
       <button class="topbar-toggle" :aria-label="t('toggle_menu')" @click="toggleSidebar">
-        <span class="topbar-toggle-icon">&#9776;</span>
+        <Icon name="heroicons:bars-3" class="topbar-toggle-icon" aria-hidden="true" />
       </button>
       <NuxtLink to="/" class="topbar-brand">{{ appName }}</NuxtLink>
       <nav

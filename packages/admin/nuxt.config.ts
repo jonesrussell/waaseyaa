@@ -5,7 +5,12 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
 
-  modules: ['@nuxt/eslint'],
+  modules: ['@nuxt/eslint', '@nuxt/icon'],
+
+  icon: {
+    mode: 'css',
+    cssLayer: 'base',
+  },
 
   eslint: {
     config: {
