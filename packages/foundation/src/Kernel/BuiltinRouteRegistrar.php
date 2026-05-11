@@ -141,6 +141,15 @@ final class BuiltinRouteRegistrar
                 ->build(),
         );
 
+        $router->addRoute(
+            'api.workflow_definitions.dry_run',
+            RouteBuilder::create('/api/workflow-definitions/dry-run')
+                ->controller('Waaseyaa\\Api\\Workflow\\WorkflowDryRunController::dryRun')
+                ->requireRole('admin')
+                ->methods('POST')
+                ->build(),
+        );
+
         $ccController = 'Waaseyaa\\Api\\Controller\\CodifiedContextController';
         $router->addRoute(
             'api.telescope.agent_context.sessions',
