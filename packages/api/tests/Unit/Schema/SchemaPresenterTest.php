@@ -105,6 +105,94 @@ final class SchemaPresenterTest extends TestCase
     }
 
     #[Test]
+    public function presentExposesBundleKeyAtTopLevel(): void
+    {
+        $withBundle = $this->createEntityType();
+        $schema = $this->presenter->present($withBundle);
+
+        $this->assertArrayHasKey('x-bundle-key', $schema);
+        $this->assertSame('type', $schema['x-bundle-key']);
+
+        $withoutBundle = $this->createEntityType(keys: [
+            'id' => 'id',
+            'uuid' => 'uuid',
+            'label' => 'title',
+        ]);
+        $schema2 = $this->presenter->present($withoutBundle);
+
+        $this->assertArrayHasKey('x-bundle-key', $schema2);
+        $this->assertNull($schema2['x-bundle-key']);
+    }
+
+    #[Test]
+    public function presentExposesBundleEnumWhenRegistryProvided(): void
+    {
+        // Real anonymous class implements the registry contract (intersection
+        // types and final classes prevent PHPUnit mocks; anonymous classes are
+        // the canonical pattern for SchemaPresenter tests).
+        $registry = new class implements \Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface {
+            public function registerCoreFields(string $entityTypeId, array $fields): void {}
+            public function mergeCoreFields(string $entityTypeId, array $fields): void {}
+            public function registerBundleFields(string $entityTypeId, string $bundle, array $fields): void {}
+            public function coreFieldsFor(string $entityTypeId): array { return []; }
+            public function bundleFieldsFor(string $entityTypeId, string $bundle): array { return []; }
+            public function bundleNamesFor(string $entityTypeId): array
+            {
+                return ['announcement', 'article', 'page'];
+            }
+            public function bundlesDefiningField(string $entityTypeId, string $fieldName): array { return []; }
+        };
+
+        $presenter = new SchemaPresenter($registry);
+        $entityType = $this->createEntityType();
+
+        $schema = $presenter->present($entityType);
+        $properties = $schema['properties'];
+
+        $this->assertArrayHasKey('type', $properties);
+        $this->assertArrayHasKey('enum', $properties['type']);
+        // Sorted alphabetically so consumers (admin SPA dropdowns) get
+        // deterministic ordering without re-sorting client-side.
+        $this->assertSame(['announcement', 'article', 'page'], $properties['type']['enum']);
+        $this->assertSame('hidden', $properties['type']['x-widget']);
+    }
+
+    #[Test]
+    public function presentOmitsBundleEnumWhenRegistryReturnsEmpty(): void
+    {
+        $registry = new class implements \Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface {
+            public function registerCoreFields(string $entityTypeId, array $fields): void {}
+            public function mergeCoreFields(string $entityTypeId, array $fields): void {}
+            public function registerBundleFields(string $entityTypeId, string $bundle, array $fields): void {}
+            public function coreFieldsFor(string $entityTypeId): array { return []; }
+            public function bundleFieldsFor(string $entityTypeId, string $bundle): array { return []; }
+            public function bundleNamesFor(string $entityTypeId): array { return []; }
+            public function bundlesDefiningField(string $entityTypeId, string $fieldName): array { return []; }
+        };
+
+        $presenter = new SchemaPresenter($registry);
+        $entityType = $this->createEntityType();
+
+        $schema = $presenter->present($entityType);
+
+        $this->assertArrayHasKey('type', $schema['properties']);
+        $this->assertArrayNotHasKey('enum', $schema['properties']['type']);
+    }
+
+    #[Test]
+    public function presentOmitsBundleEnumWhenNoRegistryProvided(): void
+    {
+        // Default no-arg constructor preserves pre-M3A behavior.
+        $presenter = new SchemaPresenter();
+        $entityType = $this->createEntityType();
+
+        $schema = $presenter->present($entityType);
+
+        $this->assertArrayHasKey('type', $schema['properties']);
+        $this->assertArrayNotHasKey('enum', $schema['properties']['type']);
+    }
+
+    #[Test]
     public function presentWithFieldDefinitions(): void
     {
         $entityType = $this->createEntityType();

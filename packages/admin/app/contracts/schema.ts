@@ -28,6 +28,12 @@ export interface EntitySchema {
   'x-entity-type': string
   'x-translatable': boolean
   'x-revisionable': boolean
+  /**
+   * The property name that holds the bundle value (e.g. 'type' for nodes).
+   * Null when the entity type has no bundle key. Drives the bundle filter in
+   * `SchemaList`. Added in M3A (#1413).
+   */
+  'x-bundle-key'?: string | null
   properties: Record<string, SchemaProperty>
   required?: string[]
 }

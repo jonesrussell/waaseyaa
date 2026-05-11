@@ -27,6 +27,22 @@ const limit = ref(25)
 const sortField = ref<string | null>(null)
 const sortAsc = ref(true)
 const listError = ref<string | null>(null)
+const bundleFilter = ref<string | null>(null)
+
+// Bundle filter target: the property name that holds the bundle value (e.g.
+// 'type' for nodes). Schema exposes this as `x-bundle-key` (M3A, #1413).
+const bundleKey = computed(() => schema.value?.['x-bundle-key'] ?? null)
+
+// Available bundles for the dropdown — null when the entity type isn't
+// bundle-shaped or the backend SchemaPresenter wasn't built with a
+// FieldDefinitionRegistry (pre-M3A behavior).
+const bundleOptions = computed<string[] | null>(() => {
+  const key = bundleKey.value
+  if (!key) return null
+  const property = schema.value?.properties?.[key]
+  const values = property?.enum
+  return values && values.length > 0 ? values : null
+})
 
 // Visible columns: prefer fields with x-list-display:true; fall back to first 6
 // non-hidden fields when no schema field declares x-list-display.
@@ -45,6 +61,9 @@ async function fetchEntities() {
     }
     if (sortField.value) {
       query.sort = (sortAsc.value ? '' : '-') + sortField.value
+    }
+    if (bundleKey.value && bundleFilter.value) {
+      query.filter = { ...(query.filter ?? {}), [bundleKey.value]: bundleFilter.value }
     }
     const result = await list(props.entityType, query)
     entities.value = result.data
@@ -159,6 +178,22 @@ watch(messages, (msgs) => {
     <div v-if="schemaLoading || loading" class="loading">{{ t('loading') }}</div>
     <div v-else-if="listError" class="error">{{ listError }}</div>
     <template v-else>
+      <div v-if="bundleOptions" class="entity-filters">
+        <label class="entity-filter-label">
+          {{ t('bundle_filter_label') }}
+          <select
+            v-model="bundleFilter"
+            class="entity-filter-select"
+            data-testid="bundle-filter"
+            @change="() => { offset = 0; fetchEntities() }"
+          >
+            <option :value="null">{{ t('bundle_filter_all') }}</option>
+            <option v-for="bundle in bundleOptions" :key="bundle" :value="bundle">
+              {{ bundle }}
+            </option>
+          </select>
+        </label>
+      </div>
       <table class="entity-table">
         <thead>
           <tr>

@@ -139,5 +139,8 @@
   "telescope_cc_no_sessions": "No codified context sessions recorded yet.",
   "telescope_cc_semantic": "Semantic Alignment",
   "telescope_cc_structural": "Structural Checks",
-  "telescope_cc_contradictions": "Contradiction Checks"
+  "telescope_cc_contradictions": "Contradiction Checks",
+
+  "bundle_filter_label": "Bundle:",
+  "bundle_filter_all": "All bundles"
 }
