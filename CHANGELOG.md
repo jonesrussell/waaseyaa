@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Skeleton's `public/index.php` had wrong relative paths — fresh sites 500 on every HTTP request (issue #1439)** — `skeleton/public/index.php` referenced `__DIR__ . '/../../public'`, `__DIR__ . '/../../vendor/autoload.php'`, and `dirname(__DIR__, 2)`. These resolve correctly only when the file is executed in-place inside the framework monorepo (where `skeleton/public/` is two levels deep from a real `vendor/`); in a materialized project produced by `composer create-project waaseyaa/waaseyaa`, `public/` is one level deep, so all three paths walked one level above the project root, every request hit a `require()` of a missing autoload, and the HTTP entry point 500'd before reaching any framework code. Fix: drop the redundant intermediate `..`, leaving `__DIR__` for the docroot lookup, `__DIR__ . '/../vendor/autoload.php'` for autoload, and `dirname(__DIR__)` for project root. Discovered while smoke-testing the v0.1.0-alpha.176 release.
+
+### Changed
+
+- **`skeleton-smoke.yml` now hits the HTTP entry point (issue #1439 follow-up)** — Previously the workflow exercised only CLI surfaces (`waaseyaa migrate`, an entity round-trip script) so it never caught the kind of HTTP-only regression that shipped alpha.176's broken `public/index.php`. New step starts `./vendor/bin/waaseyaa serve --host=127.0.0.1 --port=8088` in the background after migrations, waits up to 20s for the listener, then asserts `GET /` returns a non-5xx, non-zero status. 4xx is acceptable (route may or may not exist); 5xx and connection failure fail the job and dump the first 50 lines of the response body for triage.
+
+- **Deleted `v0.1.0` stable tag (issue #1440)** — A misfire 2026-03-04 `v0.1.0` tag (no GitHub Release, no release notes, pre-dated the alpha series numbering) was sitting at the top of Packagist's version list for `waaseyaa/framework`. Under semver precedence (stable > pre-release) it outranked every alpha tag we've cut since, so `composer create-project waaseyaa/waaseyaa my-site --stability=dev` silently pinned new sites to that obsolete metapackage (alpha.158-era siblings) instead of the current alpha line. Tag removed from `origin` and locally; Packagist re-crawls on the next webhook delivery and the highest matching version for `^0.1.0-alpha.150` becomes the current alpha tag.
+
 ## [0.1.0-alpha.176] - 2026-05-11
 
 ### Added
