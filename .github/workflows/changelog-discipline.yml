@@ -1,0 +1,37 @@
+name: changelog-discipline
+
+# Enforces charter §8.2 — every PR that touches public-surface files must
+# also touch CHANGELOG.md (under an appropriate section) or an upgrade-guide
+# file under docs/upgrades/.
+#
+# This is a soft check: maintainers may override with a documented rationale
+# in the PR description containing the marker "no-changelog: <reason>".
+#
+# Governed by docs/specs/stability-charter.md §8.2 and §11 Q3.
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  changelog-discipline:
+    runs-on: ubuntu-latest
+    name: Changelog discipline check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run changelog discipline check
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: bash tools/check-changelog-discipline.sh "origin/${{ github.base_ref }}"
+
+      - name: Annotate PR on failure
+        if: failure()
+        run: |
+          echo "::error::Changelog discipline check failed."
+          echo "::error::PR modifies public-surface files but does not update CHANGELOG.md or docs/upgrades/."
+          echo "::error::Either update one of those, or add 'no-changelog: <reason>' to the PR description."
+          echo "::error::See docs/specs/stability-charter.md §8.2."

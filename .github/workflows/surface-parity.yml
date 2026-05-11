@@ -1,0 +1,51 @@
+name: surface-parity
+
+# Enforces charter §8.1 — public-surface-map.php must remain in sync with the
+# framework's actual exported surface. Fails the PR when:
+#   - A symbol exists in source but is missing from the map (untracked surface)
+#   - A symbol exists in the map but is missing from source (removed without
+#     a deprecation entry)
+#   - A symbol's tier classification was downgraded without a deprecation
+#     entry in the matching changelog
+#
+# Governed by docs/specs/stability-charter.md §8.1 and §11 Q3.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/**/src/**'
+      - 'src/**'
+      - 'docs/public-surface-map.php'
+      - 'docs/public-surface-map.md'
+      - 'CHANGELOG.md'
+
+jobs:
+  surface-parity:
+    runs-on: ubuntu-latest
+    name: Public-surface-map parity check
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run surface parity check
+        run: php tools/check-surface-parity.php --base "origin/${{ github.base_ref }}"
+
+      - name: Annotate PR on failure
+        if: failure()
+        run: |
+          echo "::error::Public-surface-map parity check failed."
+          echo "::error::See docs/specs/stability-charter.md §8.1 for the policy."
+          echo "::error::Fix: update docs/public-surface-map.php and/or add a deprecation entry."
