@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.176] - 2026-05-11
+
 ### Added
 
 - **Admin SPA workflow dry-run transition form (M4A-4 phase 2, issue #1434 / umbrella #1414)** — New `<WorkflowTransitionDryRunForm>` component on `/admin/workflows/[id]` (third section, below the transitions matrix). Form fields: bundle (text), from/to state (dropdowns from workflow.states), account UID (number). On submit calls `dryRun()` (new method on `useWorkflowDefinitions` composable, POST `/api/workflow-definitions/dry-run`). Result rendered inline: allowed (brand teal via `--color-primary`), forbidden (red, with reason text), neutral (muted gray). Stateless — no history or caching; operator can re-submit freely. `DryRunRequest` and `DryRunResult` TypeScript interfaces exported from the composable. 18 new i18n strings in en.json + fr.json. 2 new vitest cases for `dryRun` success and shape (203/203 total, up from 201). typecheck clean, lint 0 errors, `npm test` green.
