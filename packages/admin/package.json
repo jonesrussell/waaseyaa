@@ -39,7 +39,7 @@
         "lint:fix": "eslint . --fix"
     },
     "dependencies": {
-        "nuxt": "^4.4.4",
+        "nuxt": "4.4.4",
         "vue": "^3.5.34",
         "vue-router": "^5.0.6"
     },
