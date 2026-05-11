@@ -38,8 +38,10 @@ npm run test:e2e             # Playwright; uses production preview in CI, dev in
 ```bash
 npm run build                # Nuxt SPA build → .output/
 npm run preview              # Serve the built output locally
-npm run build:contracts      # Compile contract types to dist/ (verification gate; no consumer)
+npm run build:contracts      # Emit contract types to dist/ (verification gate; no consumer)
 ```
+
+`build:contracts` is distinct from `typecheck`: it proves the `contracts/` and `adapters/` modules can be *emitted* as standalone `.d.ts` files via `tsconfig.contracts.json` (caught early: any accidental dependency on Nuxt auto-imports, Vue composition API magic, or non-published transitive types). `dist/` is gitignored — the artifact is verification-only and is uploaded for inspection by the `admin/contracts` CI job (14-day retention). No downstream package currently imports `@waaseyaa/admin`, but the gate keeps the contract surface clean for the day one does.
 
 ## Bootstrap contract validation
 
