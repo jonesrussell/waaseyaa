@@ -397,6 +397,7 @@ final class HttpKernel extends AbstractKernel
             new HttpRouter\EntityTypeLifecycleRouter($this->entityTypeManager, $this->lifecycleManager),
             new HttpRouter\SchemaRouter($this->entityTypeManager, $this->accessHandler, $this->fieldRegistry),
             new HttpRouter\CodifiedContextApiRouter($this->codifiedContextSessionStore),
+            new HttpRouter\WorkflowDefinitionsApiRouter(),
             new HttpRouter\SearchRouter($this->config, $this->database, $this->entityTypeManager),
             new HttpRouter\McpRouter($this->entityTypeManager, $this->accessHandler, $this->database, $this->config, $this->mcpReadCache),
         ];

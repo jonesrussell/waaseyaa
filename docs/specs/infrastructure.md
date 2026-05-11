@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-05-11 - M4A-1 (#1428 / umbrella #1414) new kernel-adjacent route registrar `WorkflowDefinitionsApiRouter` in foundation/src/Http/Router/ wired alongside CodifiedContextApiRouter et al. in HttpKernel::$foundationRouters; route entry added to BuiltinRouteRegistrar for `GET /api/workflow-definitions` (admin-role-gated). Pure wiring change; no infrastructure contract surface affected. -->
 <!-- Spec reviewed 2026-05-10 - M3A (#1413) SchemaRouter ctor takes optional FieldDefinitionRegistryInterface and forwards to SchemaPresenter; HttpKernel passes $this->fieldRegistry. Pure wiring change; no infrastructure contract surface affected. -->
 <!-- Spec reviewed 2026-05-10 - WP05 php-8.5 upgrade: @PHP8x5Migration cs-fixer pass — AbstractKernel, HttpKernel, ExceptionHandler, WaaseyaaException, IngestionLogger, IngestionLogEntry, InertiaServiceProvider, RootTemplateRenderer, StreamHttpClient touched by new_expression_parentheses + octal_notation rules only; no semantic change to infrastructure contracts. -->
 <!-- Spec reviewed 2026-05-10 - WP03 php-8.5 upgrade: DBALSelect fluent methods (fields/addField/condition/isNull/isNotNull/orderBy/range/join/leftJoin/countQuery) gained #[\NoDiscard] — no change to query builder semantics or DBAL abstraction contract. -->
