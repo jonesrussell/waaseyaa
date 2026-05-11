@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Integration tests for the CP-NEW gate in bin/check-composer-policy.
  *
- * CP-NEW verifies that every waaseyaa/* constraint in packages/*/composer.json
+ * CP-NEW verifies that every waaseyaa/* constraint in packages/<name>/composer.json
  * matches ^<current-git-tag>. These tests run the script in controlled temp
  * directories so they are hermetic and do not depend on real package manifests.
  *
@@ -32,7 +32,7 @@ final class CpNewCheckTest extends TestCase
         parent::setUp();
         $this->tempDir   = sys_get_temp_dir() . '/waaseyaa_cpnew_test_' . uniqid('', true);
         $this->scriptPath = dirname(__DIR__, 3) . '/bin/check-composer-policy';
-        mkdir($this->tempDir, 0755, true);
+        mkdir($this->tempDir, 0o755, true);
     }
 
     protected function tearDown(): void
@@ -75,7 +75,7 @@ final class CpNewCheckTest extends TestCase
 
         // Package manifest.
         $pkgDir = $this->tempDir . '/packages/' . $packageName;
-        mkdir($pkgDir, 0755, true);
+        mkdir($pkgDir, 0o755, true);
 
         $pkgManifest = [
             'name'   => 'waaseyaa/' . $packageName,
@@ -94,7 +94,11 @@ final class CpNewCheckTest extends TestCase
         );
 
         // Init git repo and optionally add a tag so CP-NEW can resolve.
+        // Set local user.email/user.name so `git commit` works in CI containers
+        // that have no global git identity configured.
         exec('git -C ' . escapeshellarg($this->tempDir) . ' init -q 2>&1');
+        exec('git -C ' . escapeshellarg($this->tempDir) . ' config user.email "test@example.com" 2>&1');
+        exec('git -C ' . escapeshellarg($this->tempDir) . ' config user.name "Test" 2>&1');
         exec('git -C ' . escapeshellarg($this->tempDir) . ' commit --allow-empty -m "init" -q 2>&1');
 
         if ($gitTag !== null) {
@@ -171,19 +175,34 @@ final class CpNewCheckTest extends TestCase
 
         $result = $this->runGate();
 
-        self::assertNotEquals(0, $result['exit_code'],
+        self::assertNotEquals(
+            0,
+            $result['exit_code'],
             'CP-NEW should exit non-zero when a constraint does not match the current tag. '
-            . 'stdout: ' . $result['stdout'] . ' stderr: ' . $result['stderr']);
+            . 'stdout: ' . $result['stdout'] . ' stderr: ' . $result['stderr'],
+        );
 
         $combined = $result['stdout'] . $result['stderr'];
-        self::assertStringContainsString('CP-NEW', $combined,
-            'Output should reference the CP-NEW rule identifier.');
-        self::assertStringContainsString('^0.1.0-alpha.99', $combined,
-            'Output should show the actual (wrong) constraint.');
-        self::assertStringContainsString('^0.1.0-alpha.176', $combined,
-            'Output should show the expected constraint derived from the git tag.');
-        self::assertStringContainsString('packages/foo/composer.json', $combined,
-            'Output should include the file path that contains the violation.');
+        self::assertStringContainsString(
+            'CP-NEW',
+            $combined,
+            'Output should reference the CP-NEW rule identifier.',
+        );
+        self::assertStringContainsString(
+            '^0.1.0-alpha.99',
+            $combined,
+            'Output should show the actual (wrong) constraint.',
+        );
+        self::assertStringContainsString(
+            '^0.1.0-alpha.176',
+            $combined,
+            'Output should show the expected constraint derived from the git tag.',
+        );
+        self::assertStringContainsString(
+            'packages/foo/composer.json',
+            $combined,
+            'Output should include the file path that contains the violation.',
+        );
     }
 
     #[Test]
@@ -198,12 +217,18 @@ final class CpNewCheckTest extends TestCase
 
         $result = $this->runGate();
 
-        self::assertEquals(0, $result['exit_code'],
+        self::assertEquals(
+            0,
+            $result['exit_code'],
             'CP-NEW should exit 0 when all constraints match the current tag. '
-            . 'stdout: ' . $result['stdout'] . ' stderr: ' . $result['stderr']);
+            . 'stdout: ' . $result['stdout'] . ' stderr: ' . $result['stderr'],
+        );
 
-        self::assertStringNotContainsString('CP-NEW', $result['stdout'],
-            'No CP-NEW violations should be reported when constraints match.');
+        self::assertStringNotContainsString(
+            'CP-NEW',
+            $result['stdout'],
+            'No CP-NEW violations should be reported when constraints match.',
+        );
     }
 
     #[Test]
@@ -219,15 +244,24 @@ final class CpNewCheckTest extends TestCase
 
         $result = $this->runGate();
 
-        self::assertEquals(0, $result['exit_code'],
+        self::assertEquals(
+            0,
+            $result['exit_code'],
             'CP-NEW must exit 0 (not fail hard) when no git tags are found. '
-            . 'stdout: ' . $result['stdout'] . ' stderr: ' . $result['stderr']);
+            . 'stdout: ' . $result['stdout'] . ' stderr: ' . $result['stderr'],
+        );
 
         $combined = $result['stdout'] . $result['stderr'];
-        self::assertStringContainsString('CP-NEW', $combined,
-            'A CP-NEW warning must be emitted to explain the skip.');
-        self::assertStringNotContainsString('FAIL [CP-NEW]', $combined,
-            'No FAIL line should appear — only a warning.');
+        self::assertStringContainsString(
+            'CP-NEW',
+            $combined,
+            'A CP-NEW warning must be emitted to explain the skip.',
+        );
+        self::assertStringNotContainsString(
+            'FAIL [CP-NEW]',
+            $combined,
+            'No FAIL line should appear — only a warning.',
+        );
     }
 
     #[Test]
@@ -242,11 +276,17 @@ final class CpNewCheckTest extends TestCase
 
         $result = $this->runGate();
 
-        self::assertEquals(0, $result['exit_code'],
+        self::assertEquals(
+            0,
+            $result['exit_code'],
             'CP-NEW should produce no violation for a package with no waaseyaa/* deps. '
-            . 'stdout: ' . $result['stdout'] . ' stderr: ' . $result['stderr']);
+            . 'stdout: ' . $result['stdout'] . ' stderr: ' . $result['stderr'],
+        );
 
-        self::assertStringNotContainsString('CP-NEW', $result['stdout'],
-            'No CP-NEW output expected when there are no internal dependencies.');
+        self::assertStringNotContainsString(
+            'CP-NEW',
+            $result['stdout'],
+            'No CP-NEW output expected when there are no internal dependencies.',
+        );
     }
 }
