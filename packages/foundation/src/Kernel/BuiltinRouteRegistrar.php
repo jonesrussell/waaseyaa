@@ -132,6 +132,15 @@ final class BuiltinRouteRegistrar
                 ->build(),
         );
 
+        $router->addRoute(
+            'api.workflow_definitions.list',
+            RouteBuilder::create('/api/workflow-definitions')
+                ->controller('Waaseyaa\\Api\\Workflow\\WorkflowDefinitionsController::list')
+                ->requireRole('admin')
+                ->methods('GET')
+                ->build(),
+        );
+
         $ccController = 'Waaseyaa\\Api\\Controller\\CodifiedContextController';
         $router->addRoute(
             'api.telescope.agent_context.sessions',

@@ -43,14 +43,19 @@
         {
             "type": "path",
             "url": "../telescope"
+        },
+        {
+            "type": "path",
+            "url": "../workflows"
         }
     ],
     "require": {
         "php": ">=8.5",
+        "waaseyaa/access": "^0.1.0-alpha.175",
         "waaseyaa/entity": "^0.1.0-alpha.175",
         "waaseyaa/foundation": "^0.1.0-alpha.175",
         "waaseyaa/routing": "^0.1.0-alpha.175",
-        "waaseyaa/access": "^0.1.0-alpha.175"
+        "waaseyaa/workflows": "^0.1.0-alpha.175"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5",
