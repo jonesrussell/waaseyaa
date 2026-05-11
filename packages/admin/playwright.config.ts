@@ -22,11 +22,12 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    // CI uses production-mode `build && preview` because `nuxt dev` exhibits
+    // 100x slowdown on GitHub Actions runners (>240s vs <5s local). Local devs
+    // keep `npm run dev` for HMR. See #1419 for the dev-mode investigation.
+    command: process.env.CI ? 'npm run build && npm run preview' : 'npm run dev',
     url: 'http://localhost:3000/admin',
     reuseExistingServer: !process.env.CI,
-    // 240s gives cold-start CI runners headroom over Nuxt's prepare + Vite
-    // optimize + Nitro build sequence; locally `nuxt dev` is ready in seconds.
     timeout: 240 * 1000,
   },
 })
