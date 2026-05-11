@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-11T20:59:44.468993+00:00",
+  "friendly_name": "entity storage v2",
+  "mission_id": "01KRCDDCANY3P1530VBVD1ERP9",
+  "mission_number": null,
+  "mission_slug": "entity-storage-v2-01KRCDDC",
+  "mission_type": "software-dev",
+  "slug": "entity-storage-v2-01KRCDDC",
+  "target_branch": "main"
+}
