@@ -390,7 +390,7 @@ Eight of the deltas are already proposed as dependabot PRs. M1 picks all of them
 
 | Finding | Class | Size | Notes |
 |---|---|---|---|
-| <a name="E-Mod-01"></a>E-Mod-01 No Nuxt modules adopted | envelope-defect | XS | `nuxt.config.ts` has zero modules. Adopt as a baseline: `@nuxt/eslint` (lint integration), `@nuxt/image` (responsive img), `@nuxt/icon` (icon set), `@nuxt/fonts` (font loading). Folded into M1. |
+| <a name="E-Mod-01"></a>E-Mod-01 No Nuxt modules adopted | envelope-defect | XS | `nuxt.config.ts` has zero modules. Adopt as a baseline: `@nuxt/eslint` (lint integration), `@nuxt/image` (responsive img), `@nuxt/icon` (icon set), `@nuxt/fonts` (font loading). Folded into M1. **Status (2026-05-11): `@nuxt/eslint` adopted (M1B-eslint, PR #1389-ish); `@nuxt/icon` adopted (M1B-icon, PR #1425). `@nuxt/image` and `@nuxt/fonts` deferred indefinitely per M1B-image/fonts investigation — admin SPA has zero `<img>` tags, zero `background-image` rules, zero static image assets (only `public/favicon.ico`), and uses the system font stack (`-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`) in `AdminShell.vue`. Adopting these modules now would install infrastructure for nothing. Revisit when the SPA actually grows images or web fonts (e.g. when a brand-asset page lands or when design moves off the system stack). The audit row stays open as informational — half adopted, half consciously deferred.** |
 | E-Mod-02 No CSS framework | informational | — | Intentional — global CSS in `AdminShell.vue`. Documented in admin-spa.md. Not a defect. |
 | E-Mod-03 No i18n module | minor | S | i18n is handled by `useLanguage.ts` composable rather than `@nuxtjs/i18n`. Consider migration in a later mission. |
 
