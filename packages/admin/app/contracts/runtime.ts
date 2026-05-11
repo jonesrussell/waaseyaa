@@ -1,7 +1,6 @@
-import type { AuthAdapter } from './auth'
+import type { AuthAdapter, AdminTenant, AdminAccount  } from './auth'
 import type { TransportAdapter } from './transport'
 import type { CatalogEntry } from './catalog'
-import type { AdminTenant, AdminAccount } from './auth'
 import type { AdminSurfaceHeaderLink, AdminSurfaceSidebarItem } from './surface-ui'
 
 export interface AdminAuthConfig {

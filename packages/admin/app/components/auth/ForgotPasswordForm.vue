@@ -18,7 +18,7 @@
           autocomplete="email"
           required
           :disabled="loading"
-        />
+        >
       </div>
 
       <button type="submit" class="auth-form-btn" :disabled="loading">

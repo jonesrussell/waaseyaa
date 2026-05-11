@@ -122,7 +122,7 @@ function onFileChange(event: Event) {
       class="field-input"
       :disabled="disabled || uploading"
       @change="onFileChange"
-    />
+    >
 
     <div v-if="uploading" class="field-upload-progress">
       <progress :value="progress" max="100" />
@@ -134,7 +134,7 @@ function onFileChange(event: Event) {
       :src="previewUrl"
       alt="Image preview"
       class="field-upload-preview"
-    />
+    >
 
     <p v-if="modelValue" class="field-description">
       {{ modelValue }}

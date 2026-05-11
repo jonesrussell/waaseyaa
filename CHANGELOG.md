@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Admin SPA `@nuxt/eslint` adoption (M1B-eslint, audit `admin-spa-modernization-audit-01KRA3RV`, issue #1411)** — Added `@nuxt/eslint` ^1.15.2 and `eslint` ^9.39.4 as devDependencies, registered as a Nuxt module in `packages/admin/nuxt.config.ts`, scaffolded `packages/admin/eslint.config.mjs` importing the auto-generated `.nuxt/eslint.config.mjs`. New `lint` and `lint:fix` scripts wired. Adoption baseline: 0 errors / 61 warnings (mostly `@typescript-eslint/no-explicit-any` × 40 + unused `vi` imports × 12 + intentional `vue/no-v-html` × 2). Noisy rules tuned to `warn` so the suite passes at zero errors; a follow-up "baseline cleanup" pass can tighten incrementally. `vue/html-self-closing` `--fix` ran across 14 auth/widget files (valid HTML5 void-element form). Verified: `npm run lint` exit 0, `npm test` 187/187 pass, `npm run typecheck` clean. Nuxt modules `@nuxt/image`, `@nuxt/icon`, `@nuxt/fonts` deferred from M1B's original audit scope — each needs its own validation and config and will land as separate follow-ups.
+
 ### Changed
 
 - **Admin SPA dependency bump (M1A, audit `admin-spa-modernization-audit-01KRA3RV`, issue #1411)** — Eight `packages/admin/` dependencies advanced to current stable: `nuxt 4.4.2 → 4.4.4`, `vue 3.5.0 → 3.5.34`, `vue-router 5.0.4 → 5.0.6`, `@nuxt/test-utils 4.0.0 → 4.0.3`, `@types/node 25.5.2 → 25.6.2`, `@vitest/coverage-v8 4.0.18 → 4.1.5`, `@vue/test-utils 2.4.6 → 2.4.10`, `happy-dom 20.8.3 → 20.9.0`, `vitest 4.0.18 → 4.1.5`. New `typecheck` script (`vue-tsc --noEmit`) wired in. `vue-tsc` major bump 2.2 → 3.2 (PR #1354) intentionally deferred per audit M1 risk note — keep isolated. Nuxt module adoption (`@nuxt/eslint`, `@nuxt/image`, `@nuxt/icon`, `@nuxt/fonts`) deferred to M1B; each module needs its own validation. Verified locally: `npm test` 187/187 tests pass, `npm run typecheck` clean. Supersedes dependabot PRs #1345, #1351, #1352, #1355, #1398, #1401.

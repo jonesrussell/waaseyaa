@@ -22,7 +22,7 @@ const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>()
         :disabled="disabled"
         class="toggle-checkbox"
         @change="emit('update:modelValue', ($event.target as HTMLInputElement).checked)"
-      />
+      >
       <span>{{ label }}</span>
       <span v-if="required" class="required">*</span>
     </label>

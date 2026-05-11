@@ -13,7 +13,7 @@
         autocomplete="new-password"
         required
         :disabled="loading"
-      />
+      >
     </div>
 
     <div class="auth-form-field">
@@ -25,7 +25,7 @@
         autocomplete="new-password"
         required
         :disabled="loading"
-      />
+      >
     </div>
 
     <button type="submit" class="auth-form-btn" :disabled="loading">

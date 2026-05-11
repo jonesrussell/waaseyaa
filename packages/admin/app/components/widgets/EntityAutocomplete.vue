@@ -149,7 +149,7 @@ function clear() {
         @blur="onBlur"
         @focus="onFocus"
         @keydown="onKeydown"
-      />
+      >
       <button
         v-if="inputValue"
         type="button"

@@ -34,7 +34,7 @@ const localValue = computed(() => {
       :disabled="disabled"
       class="field-input"
       @input="emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-    />
+    >
     <p v-if="description" class="field-description">{{ description }}</p>
   </div>
 </template>

@@ -68,7 +68,7 @@ function onInput(event: Event) {
       pattern="[a-z0-9_]+"
       class="field-input field-input--machine-name"
       @input="onInput"
-    />
+    >
     <p v-if="description" class="field-description">{{ description }}</p>
   </div>
 </template>
