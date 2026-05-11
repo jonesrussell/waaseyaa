@@ -327,7 +327,17 @@ final class SchemaPresenter
                 $bundleNames = $this->fieldDefinitionRegistry->bundleNamesFor($entityType->id());
                 if ($bundleNames !== []) {
                     sort($bundleNames);
+                    // With a known set of bundles, the bundle becomes a real
+                    // user-facing field on create: a required select sorted to
+                    // the top of the form. M3B (#1413). Edit-side enforcement
+                    // of bundle immutability is the storage layer's
+                    // responsibility, not the schema's — see notes in
+                    // docs/specs/entity-system.md.
                     $bundleProperty['enum'] = $bundleNames;
+                    $bundleProperty['x-widget'] = 'select';
+                    $bundleProperty['x-label'] = 'Bundle';
+                    $bundleProperty['x-required'] = true;
+                    $bundleProperty['x-weight'] = -100;
                 }
             }
 
