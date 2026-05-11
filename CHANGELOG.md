@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.177] - 2026-05-11
+
 ### Fixed
 
 - **Skeleton's `public/index.php` had wrong relative paths — fresh sites 500 on every HTTP request (issue #1439)** — `skeleton/public/index.php` referenced `__DIR__ . '/../../public'`, `__DIR__ . '/../../vendor/autoload.php'`, and `dirname(__DIR__, 2)`. These resolve correctly only when the file is executed in-place inside the framework monorepo (where `skeleton/public/` is two levels deep from a real `vendor/`); in a materialized project produced by `composer create-project waaseyaa/waaseyaa`, `public/` is one level deep, so all three paths walked one level above the project root, every request hit a `require()` of a missing autoload, and the HTTP entry point 500'd before reaching any framework code. Fix: drop the redundant intermediate `..`, leaving `__DIR__` for the docroot lookup, `__DIR__ . '/../vendor/autoload.php'` for autoload, and `dirname(__DIR__)` for project root. Discovered while smoke-testing the v0.1.0-alpha.176 release.
