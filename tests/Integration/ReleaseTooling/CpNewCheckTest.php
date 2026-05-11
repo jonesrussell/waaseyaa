@@ -283,7 +283,10 @@ final class CpNewCheckTest extends TestCase
             . 'stdout: ' . $result['stdout'] . ' stderr: ' . $result['stderr'],
         );
 
-        self::assertStringNotContainsString('CP-NEW', $result['stdout'],
-            'No CP-NEW output expected when there are no internal dependencies.');
+        self::assertStringNotContainsString(
+            'CP-NEW',
+            $result['stdout'],
+            'No CP-NEW output expected when there are no internal dependencies.',
+        );
     }
 }
