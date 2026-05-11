@@ -43,7 +43,7 @@ final class WorkflowDefinitionsController
      * @return array{data: list<array{
      *   id: string,
      *   label: string,
-     *   states: list<array{id: string, label: string, weight: int}>,
+     *   states: list<array{id: string, label: string, weight: int, metadata: array<string, mixed>}>,
      *   transitions: list<array{id: string, label: string, from: list<string>, to: string, weight: int}>
      * }>}
      */
@@ -60,7 +60,7 @@ final class WorkflowDefinitionsController
      * @return array{
      *   id: string,
      *   label: string,
-     *   states: list<array{id: string, label: string, weight: int}>,
+     *   states: list<array{id: string, label: string, weight: int, metadata: array<string, mixed>}>,
      *   transitions: list<array{id: string, label: string, from: list<string>, to: string, weight: int}>
      * }
      */
@@ -72,6 +72,7 @@ final class WorkflowDefinitionsController
                 'id' => $state->id,
                 'label' => $state->label,
                 'weight' => $state->weight,
+                'metadata' => $state->metadata,
             ];
         }
 

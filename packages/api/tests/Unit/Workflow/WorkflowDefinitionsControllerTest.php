@@ -41,6 +41,7 @@ final class WorkflowDefinitionsControllerTest extends TestCase
         self::assertSame('draft', $draft['id']);
         self::assertSame('Draft', $draft['label']);
         self::assertSame(0, $draft['weight']);
+        self::assertSame(['legacy_status' => 0], $draft['metadata']);
     }
 
     #[Test]
@@ -72,7 +73,7 @@ final class WorkflowDefinitionsControllerTest extends TestCase
 
         self::assertCount(2, $payload['data']);
         self::assertSame('custom', $payload['data'][1]['id']);
-        self::assertSame([['id' => 'open', 'label' => 'Open', 'weight' => 0]], $payload['data'][1]['states']);
+        self::assertSame([['id' => 'open', 'label' => 'Open', 'weight' => 0, 'metadata' => []]], $payload['data'][1]['states']);
         self::assertSame([], $payload['data'][1]['transitions']);
     }
 
