@@ -119,3 +119,37 @@ jobs:
         env:
           APP_ENV: local
         run: php "$GITHUB_WORKSPACE/framework/tools/skeleton-smoke/smoke.php" "$PWD"
+
+      - name: HTTP entry-point smoke
+        working-directory: smoke-app
+        env:
+          APP_ENV: local
+        run: |
+          # Catches the class of bug where skeleton's public/index.php has
+          # wrong relative paths (issue #1439) — `waaseyaa serve` spawns
+          # php -S which doesn't fail at startup, only at first request.
+          ./vendor/bin/waaseyaa serve --host=127.0.0.1 --port=8088 &
+          PHP_PID=$!
+          trap "kill $PHP_PID 2>/dev/null || true" EXIT
+          # Wait for listener (up to 20s).
+          for i in $(seq 1 20); do
+            if curl -fsS -o /dev/null --max-time 2 http://127.0.0.1:8088/healthz; then
+              break
+            fi
+            # 4xx is acceptable (route may not exist); we only reject 5xx and connection failure.
+            code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 2 http://127.0.0.1:8088/healthz || echo "000")
+            if [[ "$code" =~ ^[1-4][0-9][0-9]$ ]]; then
+              echo "Server responded with HTTP $code (acceptable — non-5xx)"
+              break
+            fi
+            sleep 1
+          done
+          # Final assertion: backend must respond with non-5xx, non-zero status.
+          code=$(curl -s -o /tmp/smoke-body.txt -w '%{http_code}' --max-time 5 http://127.0.0.1:8088/)
+          echo "GET / -> HTTP $code"
+          if [[ "$code" == "000" ]] || [[ "$code" =~ ^5[0-9][0-9]$ ]]; then
+            echo "::error::HTTP entry-point smoke failed (status=$code)"
+            echo "--- response body ---"
+            head -50 /tmp/smoke-body.txt || true
+            exit 1
+          fi
