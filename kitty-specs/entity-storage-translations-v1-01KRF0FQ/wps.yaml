@@ -1,0 +1,368 @@
+# Work Package Manifest: M-006 entity-storage-translations-v1
+# Derived from spec.md §10 + plan.md "Project Structure" + research.md decisions
+# Subtask count: 79 across 14 WPs (target 3-7 per WP, max 10)
+
+work_packages:
+  - id: WP01
+    title: "Foundation: TranslatableInterface + EntityTranslationException + ContentEntityBase wire-up"
+    dependencies: []
+    owned_files:
+      - "packages/entity/src/TranslatableInterface.php"
+      - "packages/entity/src/TranslatableEntityTrait.php"
+      - "packages/entity/src/ContentEntityBase.php"
+      - "packages/entity/src/Exception/EntityTranslationException.php"
+      - "packages/entity/tests/Unit/Translatable*"
+      - "packages/entity/tests/Unit/Exception/EntityTranslationException*"
+    requirement_refs:
+      - FR-006
+      - FR-007
+      - FR-008
+      - FR-009
+      - FR-010
+      - FR-011
+      - FR-012
+      - FR-013
+      - FR-014
+      - FR-054
+      - FR-055
+      - FR-056
+    subtasks:
+      - T001
+      - T002
+      - T003
+      - T004
+      - T005
+    prompt_file: "tasks/WP01-foundation-translatable-interface.md"
+
+  - id: WP02
+    title: "EntityType boot validation for translatable types"
+    dependencies:
+      - WP01
+    owned_files:
+      - "packages/entity/src/EntityType.php"
+      - "packages/entity/src/Exception/InvalidEntityTypeException.php"
+      - "packages/entity/tests/Unit/EntityType*"
+    requirement_refs:
+      - FR-001
+      - FR-002
+      - FR-003
+      - FR-004
+      - FR-005
+      - FR-057
+    subtasks:
+      - T006
+      - T007
+      - T008
+      - T009
+    prompt_file: "tasks/WP02-entity-type-boot-validation.md"
+
+  - id: WP03
+    title: "FieldDefinition::translatable() builder + per-field flag validation"
+    dependencies:
+      - WP01
+    owned_files:
+      - "packages/field/src/FieldDefinition.php"
+      - "packages/field/src/Exception/InvalidFieldDefinitionException.php"
+      - "packages/field/tests/Unit/FieldDefinition*"
+    requirement_refs:
+      - FR-016
+      - FR-017
+      - FR-018
+      - FR-019
+    subtasks:
+      - T010
+      - T011
+      - T012
+      - T013
+      - T014
+    prompt_file: "tasks/WP03-field-definition-translatable.md"
+
+  - id: WP04
+    title: "sql-blob backend translation storage + schema-sync extension"
+    dependencies:
+      - WP01
+      - WP02
+    owned_files:
+      - "packages/entity-storage/src/Backend/SqlBlobBackend.php"
+      - "packages/entity-storage/src/Backend/SqlBlobBackend*.php"
+      - "packages/entity-storage/src/EntitySchemaSync.php"
+      - "packages/entity-storage/src/SqlSchemaHandler.php"
+      - "packages/entity-storage/tests/Backend/SqlBlob*"
+    requirement_refs:
+      - FR-020
+      - FR-021
+      - FR-022
+      - FR-023
+      - FR-024
+      - FR-025
+      - NFR-001
+    subtasks:
+      - T015
+      - T016
+      - T017
+      - T018
+      - T019
+      - T020
+    prompt_file: "tasks/WP04-sql-blob-translation-storage.md"
+
+  - id: WP05
+    title: "sql-column backend translation storage"
+    dependencies:
+      - WP01
+      - WP02
+      - WP03
+      - WP04
+    owned_files:
+      - "packages/entity-storage/src/Backend/SqlColumnBackend*.php"
+      - "packages/entity-storage/src/Hydration/SqlColumnTranslationHydrator.php"
+      - "packages/entity-storage/src/Schema/TranslationSchemaHandler.php"
+      - "packages/entity-storage/tests/Backend/SqlColumn*"
+      - "packages/entity-storage/tests/Hydration/SqlColumnTranslation*"
+    requirement_refs:
+      - FR-026
+      - FR-027
+      - FR-028
+      - FR-029
+      - FR-030
+      - FR-031
+      - FR-032
+      - NFR-001
+    subtasks:
+      - T021
+      - T022
+      - T023
+      - T024
+      - T025
+      - T026
+    prompt_file: "tasks/WP05-sql-column-translation-storage.md"
+
+  - id: WP06
+    title: "FallbackChainResolver + trait fallback wiring"
+    dependencies:
+      - WP04
+      - WP05
+    owned_files:
+      - "packages/entity/src/Hydration/FallbackChainResolver.php"
+      - "packages/entity/src/Exception/InvalidConfigurationException.php"
+      - "packages/entity/tests/Unit/Hydration/FallbackChain*"
+    requirement_refs:
+      - FR-015
+      - FR-037
+      - FR-038
+      - FR-039
+      - NFR-002
+    subtasks:
+      - T027
+      - T028
+      - T029
+      - T030
+      - T031
+    prompt_file: "tasks/WP06-fallback-chain-resolver.md"
+
+  - id: WP07
+    title: "SaveContext::withLangcode + coordinator write-semantics matrix"
+    dependencies:
+      - WP04
+      - WP05
+    owned_files:
+      - "packages/entity-storage/src/SaveContext.php"
+      - "packages/entity-storage/src/EntityStorageCoordinator.php"
+      - "packages/entity-storage/tests/Coordinator/Translation*"
+      - "packages/entity-storage/tests/SaveContext*"
+    requirement_refs:
+      - FR-033
+      - FR-034
+      - FR-035
+      - FR-036
+    subtasks:
+      - T034
+      - T035
+      - T036
+      - T037
+      - T038
+      - T039
+    prompt_file: "tasks/WP07-save-context-coordinator-write-path.md"
+
+  - id: WP08
+    title: "Lifecycle events with langcode + TranslationEvent class"
+    dependencies:
+      - WP07
+    owned_files:
+      - "packages/entity/src/Event/EntityEvent.php"
+      - "packages/entity/src/Event/TranslationEvent.php"
+      - "packages/entity/src/Event/EntityEvents.php"
+      - "packages/entity-storage/src/CoordinatorLifecycleDispatcher.php"
+      - "packages/entity/tests/Event/*"
+      - "packages/entity-storage/tests/Coordinator/EventDispatch*"
+    requirement_refs:
+      - FR-043
+      - FR-044
+      - FR-045
+      - FR-046
+    subtasks:
+      - T040
+      - T041
+      - T042
+      - T043
+      - T044
+      - T045
+    prompt_file: "tasks/WP08-lifecycle-events-langcode.md"
+
+  - id: WP09
+    title: "Access policy translate operation"
+    dependencies:
+      - WP01
+    owned_files:
+      - "packages/access/src/Gate/AccessChecker.php"
+      - "packages/access/tests/Unit/AccessChecker*"
+      - "packages/access/tests/Unit/Translate*"
+    requirement_refs:
+      - FR-047
+      - FR-048
+      - FR-049
+    subtasks:
+      - T046
+      - T047
+      - T048
+      - T049
+      - T050
+    prompt_file: "tasks/WP09-access-policy-translate-operation.md"
+
+  - id: WP10
+    title: "EntityRepository: findTranslations() + LanguageManager wire-up"
+    dependencies:
+      - WP06
+    owned_files:
+      - "packages/entity-storage/src/EntityRepository.php"
+      - "packages/entity-storage/tests/Repository/FindTranslations*"
+      - "packages/entity-storage/tests/Repository/FallbackChain*"
+      - "packages/entity-storage/tests/Repository/LanguageManager*"
+    requirement_refs:
+      - FR-040
+      - FR-041
+      - FR-042
+      - NFR-005
+      - C-004
+    subtasks:
+      - T032
+      - T033
+      - T051
+      - T052
+      - T053
+      - T054
+      - T055
+      - T056
+    prompt_file: "tasks/WP10-find-translations-helper.md"
+
+  - id: WP11
+    title: "Migration generator --add-translations flag"
+    dependencies:
+      - WP04
+      - WP05
+    owned_files:
+      - "packages/cli/src/Command/MakeMigrationCommand.php"
+      - "packages/cli/src/Command/MakeMigration*.php"
+      - "packages/cli/tests/Unit/MakeMigration*"
+      - "packages/cli/tests/Integration/AddTranslations*"
+    requirement_refs:
+      - FR-050
+      - FR-051
+      - FR-052
+      - FR-053
+    subtasks:
+      - T057
+      - T058
+      - T059
+      - T060
+      - T061
+      - T062
+      - T063
+    prompt_file: "tasks/WP11-migration-generator-add-translations.md"
+
+  - id: WP12
+    title: "Translation configuration in skeleton config/waaseyaa.php"
+    dependencies: []
+    owned_files:
+      - "config/waaseyaa.php"
+      - "tests/Integration/Config/Translation*"
+    requirement_refs:
+      - FR-037
+      - FR-041
+      - C-004
+    subtasks:
+      - T064
+      - T065
+      - T066
+    prompt_file: "tasks/WP12-translation-configuration.md"
+
+  - id: WP13
+    title: "Contract test suite + test_translatable_entity fixture"
+    dependencies:
+      - WP01
+      - WP04
+      - WP05
+    owned_files:
+      - "packages/entity/testing/TranslatableEntityContractTest.php"
+      - "packages/entity/testing/**"
+      - "packages/entity/composer.json"
+      - "packages/entity-storage/tests/Fixtures/TestTranslatableEntity.php"
+      - "packages/entity-storage/tests/Fixtures/test_translatable_entity*"
+      - "packages/entity-storage/tests/Contract/SqlBlob*"
+      - "packages/entity-storage/tests/Contract/SqlColumn*"
+    requirement_refs:
+      - FR-058
+      - FR-059
+      - FR-060
+      - FR-061
+      - NFR-003
+      - NFR-004
+    subtasks:
+      - T067
+      - T068
+      - T069
+      - T070
+      - T071
+      - T072
+    prompt_file: "tasks/WP13-contract-test-suite-fixture.md"
+
+  - id: WP14
+    title: "Documentation + charter update + CHANGELOG + M-004 unblock"
+    dependencies:
+      - WP01
+      - WP02
+      - WP03
+      - WP04
+      - WP05
+      - WP06
+      - WP07
+      - WP08
+      - WP09
+      - WP10
+      - WP11
+      - WP12
+      - WP13
+    owned_files:
+      - "docs/cookbook/translating-an-entity-type.md"
+      - "docs/specs/stability-charter.md"
+      - "docs/specs/public-surface-map.md"
+      - "docs/public-surface-map.php"
+      - "docs/specs/entity-storage-translatable-revisions.md"
+      - "kitty-specs/entity-storage-translatable-revisions-01KRCDEE/spec.md"
+      - "CHANGELOG.md"
+      - "docs/specs/missions/README.md"
+      - "docs/specs/entity-storage-translations-v1.md"
+      - "kitty-specs/entity-storage-translations-v1-01KRF0FQ/spec.md"
+    requirement_refs:
+      - FR-062
+      - FR-063
+      - FR-064
+      - SC-05
+    subtasks:
+      - T073
+      - T074
+      - T075
+      - T076
+      - T077
+      - T078
+      - T079
+    prompt_file: "tasks/WP14-documentation-charter-unblock.md"
