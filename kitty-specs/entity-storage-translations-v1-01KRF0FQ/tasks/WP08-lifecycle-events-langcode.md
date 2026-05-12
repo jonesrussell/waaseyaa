@@ -203,3 +203,4 @@ spec-kitty agent action implement WP08 --agent <name>
 ## Activity Log
 
 - 2026-05-12T23:29:56Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=592130 – Started implementation via action command
+- 2026-05-12T23:40:10Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=592130 – Lifecycle: EntityEvent extended with langcode, TranslationEvent subclass, 6 new constants, dispatch ordering tests + atomic rollback verification
