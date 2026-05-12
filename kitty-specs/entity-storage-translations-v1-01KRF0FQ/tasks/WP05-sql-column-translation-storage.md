@@ -35,6 +35,8 @@ owned_files:
 - packages/entity-storage/tests/Backend/SqlColumn*
 - packages/entity-storage/tests/Hydration/SqlColumnTranslation*
 tags: []
+agent: "claude:opus:waaseyaa-implementer:implementer"
+shell_pid: "542078"
 ---
 
 # WP05 — sql-column backend translation storage
@@ -178,3 +180,7 @@ Ship sql-column backend support for translatable entity types: sibling `<table>_
 ```bash
 spec-kitty agent action implement WP05 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-12T22:48:18Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=542078 – Started implementation via action command
