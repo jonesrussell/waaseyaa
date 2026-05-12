@@ -1,7 +1,7 @@
 {
-  "event_count": 52,
-  "last_event_id": "01KRF8ZW1ESHGVNF7QQCMK1QCP",
-  "materialized_at": "2026-05-12T23:40:10.158810+00:00",
+  "event_count": 53,
+  "last_event_id": "01KRF91VJZKXEA64A1CAXC5W6T",
+  "materialized_at": "2026-05-12T23:41:15.231093+00:00",
   "mission_number": "",
   "mission_slug": "entity-storage-translations-v1-01KRF0FQ",
   "mission_type": "software-dev",
@@ -11,9 +11,9 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 1,
+    "for_review": 0,
     "in_progress": 0,
-    "in_review": 0,
+    "in_review": 1,
     "planned": 6
   },
   "work_packages": {
@@ -67,11 +67,11 @@
       "last_transition_at": "2026-05-12T23:29:19.446173+00:00"
     },
     "WP08": {
-      "actor": "user",
+      "actor": "claude:opus:waaseyaa-reviewer:reviewer",
       "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KRF8ZW1ESHGVNF7QQCMK1QCP",
-      "last_transition_at": "2026-05-12T23:40:10.158810+00:00"
+      "lane": "in_review",
+      "last_event_id": "01KRF91VJZKXEA64A1CAXC5W6T",
+      "last_transition_at": "2026-05-12T23:41:15.231093+00:00"
     },
     "WP09": {
       "actor": "finalize-tasks",
