@@ -1777,10 +1777,12 @@ types (FR-014, FR-015).
 
 ### Definition validation
 
-`DefinitionValidator` (in `Waaseyaa\EntityStorage\Query`) validates
-`FieldDefinition` objects at registration time. It throws
-`UnsupportedQueryException` when the active backend reports `supportsQuery()` =
-`false`. `UnsupportedListingException` is thrown when listing is unsupported.
+`DefinitionValidator` (in `Waaseyaa\EntityStorage\Query`) enforces FR-021's
+fail-fast contract at kernel boot time. `AbstractKernel::validateQueryDefinitions()`
+calls `validateAll()` after all service providers have registered their entity
+types and before the booted flag is set. It throws `UnsupportedQueryException`
+when any indexed field's resolved backend reports `supportsQuery()` = `false`.
+Boot fails immediately — there is no silent fallback and no runtime retry.
 
 ### Revisionable entities (WP07–WP09)
 

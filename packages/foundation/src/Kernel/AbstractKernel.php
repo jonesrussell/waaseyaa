@@ -15,10 +15,13 @@ use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
+use Waaseyaa\EntityStorage\Backend\BackendRegistrarFactory;
+use Waaseyaa\EntityStorage\BackendResolver;
 use Waaseyaa\EntityStorage\Connection\SingleConnectionResolver;
 use Waaseyaa\EntityStorage\Driver\RevisionableStorageDriver;
 use Waaseyaa\EntityStorage\Driver\SqlStorageDriver;
 use Waaseyaa\EntityStorage\EntityRepository;
+use Waaseyaa\EntityStorage\Query\DefinitionValidator;
 use Waaseyaa\EntityStorage\SqlEntityStorage;
 use Waaseyaa\EntityStorage\SqlSchemaHandler;
 use Waaseyaa\EntityStorage\Tenancy\CommunityScope;
@@ -150,6 +153,7 @@ abstract class AbstractKernel
         $this->validateContentTypes();
         $this->bootProviders();
         $this->discoverAccessPolicies();
+        $this->validateQueryDefinitions();
         $this->bootKnowledgeExtensionRunner();
 
         $this->finalizeBoot();
@@ -367,6 +371,24 @@ abstract class AbstractKernel
     protected function discoverAccessPolicies(): void
     {
         $this->accessHandler = new AccessPolicyRegistry($this->logger)->discover($this->manifest);
+    }
+
+    /**
+     * Enforce FR-021 fail-fast contract: every indexed field must be backed by
+     * a backend that returns true from supportsQuery(). Called once at boot,
+     * after all service providers have registered their entity types, and before
+     * the booted flag is set. Boot fails immediately on the first violation —
+     * there is no silent fallback and no runtime retry.
+     *
+     * @throws \Waaseyaa\EntityStorage\Exception\UnsupportedQueryException
+     */
+    protected function validateQueryDefinitions(): void
+    {
+        $registrar = new BackendRegistrarFactory($this->manifest->providers)->create();
+        $registrar->build();
+
+        $resolver = new BackendResolver($registrar);
+        new DefinitionValidator($this->entityTypeManager, $resolver, $this->logger)->validateAll();
     }
 
     protected function bootKnowledgeExtensionRunner(): void
