@@ -152,6 +152,65 @@ return [
     'Waaseyaa\EntityStorage\Connection\ConnectionResolverInterface' => 'public',
     'Waaseyaa\EntityStorage\Exception\UnknownFieldException' => 'public',
     'Waaseyaa\EntityStorage\Exception\BundleAmbiguousFieldException' => 'public',
+    // entity-storage-v2 mission public surface (WP01–WP12, M-001)
+    'Waaseyaa\EntityStorage\RevisionableEntityStorageInterface' => 'public',
+    // WP01 — backend registration
+    'Waaseyaa\EntityStorage\Backend\FieldStorageBackendInterface' => 'public',
+    'Waaseyaa\EntityStorage\Backend\HasFieldStorageBackendsInterface' => 'public',
+    'Waaseyaa\EntityStorage\Backend\IsFrameworkBackendProviderInterface' => 'public',
+    'Waaseyaa\EntityStorage\Backend\ReservedBackendIds' => 'public',
+    'Waaseyaa\EntityStorage\Backend\BackendRegistrar' => 'public',
+    'Waaseyaa\EntityStorage\Backend\BackendRegistrarFactory' => 'public',
+    'Waaseyaa\EntityStorage\Exception\UnsupportedQueryException' => 'public',
+    'Waaseyaa\EntityStorage\Exception\UnsupportedListingException' => 'public',
+    // WP02 — coordinator
+    'Waaseyaa\EntityStorage\EntityStorageCoordinator' => 'public',
+    'Waaseyaa\EntityStorage\BackendResolver' => 'public',
+    'Waaseyaa\EntityStorage\Exception\UnknownBackendException' => 'public',
+    // WP03 — sql-blob backend
+    'Waaseyaa\EntityStorage\Backend\SqlBlobBackend' => 'public',
+    // WP04 — lifecycle events
+    'Waaseyaa\EntityStorage\Event\EntityLifecycleEventInterface' => 'public',
+    'Waaseyaa\EntityStorage\Event\BeforeSaveEvent' => 'public',
+    'Waaseyaa\EntityStorage\Event\AfterSaveEvent' => 'public',
+    'Waaseyaa\EntityStorage\Event\BeforeDeleteEvent' => 'public',
+    'Waaseyaa\EntityStorage\Event\AfterDeleteEvent' => 'public',
+    'Waaseyaa\EntityStorage\Event\AbortOperationException' => 'public',
+    'Waaseyaa\EntityStorage\Exception\PartialSaveException' => 'public',
+    'Waaseyaa\EntityStorage\SaveContext' => 'public',
+    'Waaseyaa\EntityStorage\CoordinatorLifecycleDispatcher' => 'public',
+    // WP05 — sql-column backend
+    'Waaseyaa\EntityStorage\Backend\SqlColumnBackend' => 'public',
+    'Waaseyaa\EntityStorage\Backend\SqlColumnSchemaBuilder' => 'public',
+    'Waaseyaa\EntityStorage\Backend\SqlColumnQueryTranslator' => 'public',
+    'Waaseyaa\EntityStorage\Backend\TypeMapping' => 'public',
+    // WP06 — definition validator
+    'Waaseyaa\EntityStorage\Query\DefinitionValidator' => 'public',
+    // WP07 — revisionable entities (entity package)
+    'Waaseyaa\Entity\RevisionableEntityInterface' => 'public',
+    'Waaseyaa\Entity\RevisionableEntityTrait' => 'public',
+    'Waaseyaa\Entity\RevisionMetadata' => 'public',
+    'Waaseyaa\EntityStorage\Schema\RevisionTableBuilder' => 'public',
+    // WP08 — revisionable storage
+    'Waaseyaa\EntityStorage\RevisionableSqlBlobStorage' => 'public',
+    'Waaseyaa\EntityStorage\RevisionableSqlColumnStorage' => 'public',
+    'Waaseyaa\EntityStorage\RevisionPruner' => 'public',
+    'Waaseyaa\EntityStorage\RevisionPruningPolicy' => 'public',
+    'Waaseyaa\EntityStorage\RevisionPruningReport' => 'public',
+    // WP09 — revision access (access package)
+    'Waaseyaa\Access\Gate\RevisionAccessRouter' => 'public',
+    // WP10 — migration CLI (cli package)
+    'Waaseyaa\Cli\Handler\MakeStorageMigrationHandler' => 'public',
+    'Waaseyaa\Cli\Provider\MakeStorageMigrationServiceProvider' => 'public',
+    'Waaseyaa\Cli\Command\Migration\StorageMigrationEmitter' => 'public',
+    'Waaseyaa\Cli\Command\Migration\StorageMigrationTemplate' => 'public',
+    'Waaseyaa\Cli\Command\Migration\BackfillHelper' => 'public',
+    'Waaseyaa\Cli\Command\Migration\UnmappedFieldTypeException' => 'public',
+    'Waaseyaa\Cli\Command\Migration\BackfillRowCountMismatchException' => 'public',
+    // WP12 — conformance test harness (autoload-dev only; still part of stable surface for extenders)
+    'Waaseyaa\EntityStorage\Testing\Contract\FieldStorageBackendContractTestCase' => 'public',
+    // EntityQuery marker interface
+    'Waaseyaa\EntityStorage\Query\EntityQuery' => 'public',
     'Waaseyaa\Access\AccountInterface' => 'public',
     'Waaseyaa\Access\AccessPolicyInterface' => 'public',
     'Waaseyaa\Access\FieldAccessPolicyInterface' => 'public',

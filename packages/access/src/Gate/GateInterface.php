@@ -9,9 +9,30 @@ namespace Waaseyaa\Access\Gate;
  *
  * The Gate resolves the appropriate policy for the subject and delegates
  * the ability check to the matching policy method.
+ *
+ * @api
  */
 interface GateInterface
 {
+    /**
+     * Operation constants for well-known entity access operations.
+     *
+     * Use these instead of bare strings to avoid typos and enable IDE navigation.
+     */
+    public const string VIEW = 'view';
+    public const string CREATE = 'create';
+    public const string UPDATE = 'update';
+    public const string DELETE = 'delete';
+
+    /**
+     * Per-revision view operation.
+     *
+     * Policies that declare this op must implement viewRevision(). Policies
+     * that do NOT declare it fall back to the entity-level view() check via
+     * RevisionAccessRouter — no default-deny. See contracts/revisionable-entity.md §11.2.
+     */
+    public const string VIEW_REVISION = 'view_revision';
+
     /**
      * Determine if the given ability is allowed for the user on the subject.
      *

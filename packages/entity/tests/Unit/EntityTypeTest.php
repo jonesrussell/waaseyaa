@@ -59,7 +59,7 @@ class EntityTypeTest extends TestCase
 
     public function testAllProperties(): void
     {
-        $keys = ['id' => 'nid', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type'];
+        $keys = ['id' => 'nid', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type', 'revision' => 'vid'];
         $constraints = ['UniqueField' => ['field' => 'title']];
 
         $type = new EntityType(

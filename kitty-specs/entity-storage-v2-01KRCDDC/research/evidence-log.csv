@@ -1,0 +1,40 @@
+finding_id,decision_id,source_id,quote_or_pointer,impact
+F001,D1,S001,"spec §3.1 — FieldStorageBackendInterface is the central contract; backends register via provider capability.",Anchors the stable-surface backend contract.
+F002,D1,S003,"ADR 010 §Contract — interface signature spec.",Authoritative shape for the interface.
+F003,D2,S001,"spec §5.2 — reserved id namespace: sql-blob, sql-column, vector.",Locks the framework-owned id set.
+F004,D2,S001,"spec §5.1 — registrar raises BackendIdCollisionException on duplicates.",Defines failure mode at boot.
+F005,D3,S001,"spec §7.1 + §12.4 — sql-blob refactor must be behavior-identical; WP03 carries the behavior-identity test suite.",Gates WP03 acceptance.
+F006,D3,S010,"packages/entity-storage/src/SqlEntityStorage.php — current single-backend implementation; this is the path being refactored.",Identifies the code under refactor.
+F007,D3,S011,"packages/entity-storage/src/SqlSchemaHandler.php — adds the _data TEXT column; splits/merges field values into JSON.",Identifies the current _data path being lifted into sql-blob.
+F008,D4,S001,"spec §8.2 — type mapping table (FR-012a deliverable) for sql-column.",Locks initial SQL type mapping.
+F009,D4,S001,"spec §3.7 — UnsupportedQueryException raised at definition validation time, not query time.",Failure timing is part of the contract.
+F010,D5,S001,"spec §3.5 + §6 — coordinator owns all four lifecycle event dispatches.",Backends do not emit lifecycle events.
+F011,D5,S004,"ADR 011 — defines event classes and AbortOperationException.",Authoritative on lifecycle semantics.
+F012,D6,S001,"spec §6.5 — PartialSaveException carries committedBackends + uncommittedBackends; AfterSaveEvent does not fire on partial failure.",Locks fan-out failure semantics.
+F013,D6,S001,"spec §3.9 — true atomicity across heterogeneous backends is unachievable; explicit failure is the chosen path.",Justifies no-silent-rollback rule.
+F014,D7,S001,"spec §3.6 — EntityType::revisionable opt-in; entityKeys.revision slot.",Locks revision opt-in shape.
+F015,D7,S005,"ADR 016 — revisions are first-class but opt-in per entity type.",Authoritative on revision opt-in.
+F016,D7,S013,"packages/entity/src/EntityType.php — current EntityType class; gains revisionable + primaryStorageBackend fields per spec §5.3.",Identifies the EntityType file to modify.
+F017,D8,S001,"spec §9.1 — canonical revision table shape co-designed with sql-column.",Defines revision table schema.
+F018,D8,S001,"spec §7.3 — sql-blob also supports revisions for entity types that opt in without migrating to columns.",Keeps the opt-in path open.
+F019,D9,S001,"spec §11.1 — view_revision op declared via PolicyAttribute operations array.",Locks per-revision access shape.
+F020,D9,S001,"spec §11.2 — view_revision falls back to view when undeclared; framework MUST NOT default-deny.",Prevents silent denial of legacy policies.
+F021,D10,S001,"spec §10.1 — bin/waaseyaa make:storage-migration <entity_type> generates per-type migrations.",CLI surface.
+F022,D10,S006,"ADR 009 — migration manifest discovery is the substrate.",WP10 rides existing migration runner.
+F023,D11,S001,"spec §15 — teaching is the canonical validation pick (~50 fields, query patterns, editorial revision use case).",Locks WP11 target.
+F024,D11,S002,"mission.json validation_entity_type=teaching and validation_consumer=minoo.",Authoritative on validation pair.
+F025,D11,S001,"spec §15 — engagement entities are explicitly NOT the first validation type (volume too high).",Defends against scope drift.
+F026,D11,S014,"packages/entity/src/FieldableInterface.php — Minoo teaching entity must implement Fieldable to be exercised end-to-end.",Surface compatibility check.
+F027,GEN,S007,"charter §3.2.7 + §3.2.8 — this mission contributes-to-beta-gate; revisions in production is criterion 8.",Anchors mission to charter beta gate.
+F028,GEN,S015,"audit findings F1 + F8 — single-backend assumption blocks ADRs 010/011/015/016.",Documents the audit-originated rationale.
+F029,GEN,S016,"M-002 mission.json — downstream_unblocks: WP05 lists this mission migration manifest as substrate.",Confirms downstream dependency.
+F030,GEN,S017,"M-004 mission.json — builds on revision substrate from this mission.",Confirms downstream dependency.
+F031,GEN,S019,"CLAUDE.md Layer Architecture table — entity-storage/entity at Layer 1 (Core Data); cli at Layer 6.",Layer rule check for new packages and CLI command.
+F032,GEN,S020,".claude/rules/entity-storage-invariant.md — canonical pipeline is Entity to Driver to Repository to DBAL.",Coordinator and backends must preserve this pipeline.
+F033,Q1,S001,"spec §16.1 — registration order across packages is an open question; recommendation: composer installed.json order + priority override.",Resolve before WP01.
+F034,Q2,S001,"spec §16.2 — recommendation: ride existing bin/waaseyaa migrate system; no parallel runner.",Resolve before WP10.
+F035,Q3,S001,"spec §16.3 — keep reversible default; add expectedReverseSeconds docblock warning.",Resolve before WP10.
+F036,Q4,S001+S008,"spec §16.4 — sql-column to sql-column evolution coordinates with schema-evolution-v2.md (mission #529).",Resolve before WP10.
+F037,Q5,S001,"spec §16.5 — RevisionPruner ships disabled; pruning policy is app concern.",Resolve before WP07/WP08.
+F038,Q6,S001,"spec §16.6 — SaveContext recommendation: dedicated value-object class (not flags array).",Resolve before WP04.
+F039,SCOPE,S001,"spec §1.2 + §2.2 — explicit non-goals: moderation, per-field translation, revision admin UI, vector impl, remote backend, cross-backend joins, auto-pruning, listing admin UI, mass Minoo migration.",Reviewers must reject WP work that crosses these lines.

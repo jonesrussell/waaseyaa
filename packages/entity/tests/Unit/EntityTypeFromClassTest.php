@@ -14,6 +14,7 @@ use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\EmptyFieldsFixture;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\FactoryChildFixture;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\MissingAttributeFixture;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\NoLabelFixture;
+use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\RevisionableFixture;
 use Waaseyaa\Entity\Tests\Fixtures\AttributeFirstEntities\SimpleFixture;
 
 require_once __DIR__ . '/../Fixtures/AttributeFirstEntities/FactoryTestFixtures.php';
@@ -115,8 +116,9 @@ final class EntityTypeFromClassTest extends TestCase
 
     public function testOverrideParametersAreHonored(): void
     {
+        // RevisionableFixture declares a revision key so revisionable: true passes T036.
         $type = EntityType::fromClass(
-            SimpleFixture::class,
+            RevisionableFixture::class,
             storageClass: 'Custom\\Storage',
             revisionable: true,
             translatable: true,

@@ -42,6 +42,7 @@ class StubEntityTypeManager implements EntityTypeManagerInterface
             public function getBundleEntityType(): ?string { return null; }
             public function getConstraints(): array { return []; }
             public function getFieldDefinitions(): array { return []; }
+            public function getPrimaryStorageBackend(): ?string { return null; }
             public function getGroup(): ?string { return null; }
             public function getDescription(): ?string { return null; }
             public function getTenancy(): ?array { return null; }

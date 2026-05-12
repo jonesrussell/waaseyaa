@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace Waaseyaa\EntityStorage;
 
 use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
+use Waaseyaa\EntityStorage\Backend\ReservedBackendIds;
+use Waaseyaa\EntityStorage\Backend\SqlColumnSchemaBuilder;
+use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\FieldStorage;
 use Waaseyaa\Foundation\Log\LoggerInterface;
@@ -39,6 +43,12 @@ final class SqlSchemaHandler
      *   which bundles are "known". When $fieldRegistry is also null the
      *   bundle loop is skipped and behavior matches the pre-bundle-scoped
      *   status quo.
+     * @param string $primaryBackendId The primary storage backend id for this entity type.
+     *   `sql-blob` (default) emits the `_data` TEXT column for dynamic fields.
+     *   `sql-column` (WP05) defers to SqlColumnSchemaBuilder and does NOT emit `_data`.
+     *   Any other value is treated as `sql-blob` during the WP03–WP04 migration window.
+     * @param FieldDefinition[] $entityLevelFields Entity-level field definitions to add as columns
+     *   when primaryBackendId is `sql-column`. Ignored for sql-blob.
      */
     public function __construct(
         private readonly EntityTypeInterface $entityType,
@@ -46,6 +56,8 @@ final class SqlSchemaHandler
         private readonly ?FieldDefinitionRegistryInterface $fieldRegistry = null,
         private readonly ?\Closure $bundleEnumerator = null,
         ?LoggerInterface $logger = null,
+        private readonly string $primaryBackendId = ReservedBackendIds::SQL_BLOB,
+        private readonly array $entityLevelFields = [],
     ) {
         $this->tableName = $this->entityType->id();
         $this->logger = $logger ?? new NullLogger();
@@ -68,7 +80,31 @@ final class SqlSchemaHandler
         $schema = $this->database->schema();
 
         if (!$schema->tableExists($this->tableName)) {
-            $schema->createTable($this->tableName, $this->buildTableSpec());
+            if ($this->primaryBackendId === ReservedBackendIds::SQL_COLUMN
+                && $this->database instanceof DBALDatabase
+                && $this->entityLevelFields !== []
+            ) {
+                // sql-column path (WP05): SqlColumnSchemaBuilder adds per-field columns
+                // to the base spec and emits indexes for indexed() fields.
+                $builder = new SqlColumnSchemaBuilder($this->database, $this->logger);
+                $builder->buildTable(
+                    $this->entityType,
+                    $this->tableName,
+                    $this->entityLevelFields,
+                    $this->buildTableSpec(),
+                );
+            } else {
+                $schema->createTable($this->tableName, $this->buildTableSpec());
+            }
+        } elseif ($this->primaryBackendId === ReservedBackendIds::SQL_COLUMN
+            && $this->database instanceof DBALDatabase
+            && $this->entityLevelFields !== []
+        ) {
+            // Table already exists: additively add any new field columns.
+            $builder = new SqlColumnSchemaBuilder($this->database, $this->logger);
+            foreach ($this->entityLevelFields as $field) {
+                $builder->addFieldColumn($this->tableName, $field);
+            }
         }
 
         if (!$this->shouldProcessBundles()) {
@@ -388,11 +424,18 @@ final class SqlSchemaHandler
         }
 
         // Data blob for extra/dynamic fields (JSON-encoded).
-        $fields['_data'] = [
-            'type' => 'text',
-            'not null' => true,
-            'default' => '{}',
-        ];
+        // sql-column backend (WP05) manages its own columns and does not use _data.
+        if ($this->primaryBackendId !== ReservedBackendIds::SQL_COLUMN) {
+            $fields['_data'] = [
+                'type' => 'text',
+                'not null' => true,
+                'default' => '{}',
+            ];
+        } else {
+            // sql-column backend: per-field columns are added by SqlColumnSchemaBuilder
+            // in ensureTable() after this spec is used to create the base table.
+            // No _data column is emitted here (wired in ensureTable() below).
+        }
 
         $spec = [
             'fields' => $fields,

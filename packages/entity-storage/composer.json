@@ -56,6 +56,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "Waaseyaa\\EntityStorage\\Testing\\Contract\\": "testing/Contract/",
             "Waaseyaa\\EntityStorage\\Tests\\": "tests/"
         }
     },

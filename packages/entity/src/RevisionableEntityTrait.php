@@ -5,12 +5,142 @@ declare(strict_types=1);
 namespace Waaseyaa\Entity;
 
 /**
- * Implements RevisionableInterface for entity classes.
+ * Default implementations for entity revision support.
  *
- * Requires the using class to extend EntityBase (needs $values and $entityKeys).
+ * This trait satisfies two revision contracts:
+ *
+ * 1. The **pre-WP07 `RevisionableInterface`** (legacy): `getRevisionId()`,
+ *    `isDefaultRevision()`, `isLatestRevision()`, `setNewRevision()`,
+ *    `isNewRevision()`, `setRevisionLog()`, `getRevisionLog()`.
+ *    These read/write values from the entity's `$values` array and are
+ *    used by `EntityRepository` and `RevisionableStorageDriver`.
+ *
+ * 2. The **WP07 `RevisionableEntityInterface`** (new): `revisionId()`,
+ *    `isCurrentRevision()`, `revisionMetadata()`, and corresponding setters.
+ *    These are hydrated by the storage layer after persisting/loading a
+ *    revision row. Application code uses the new interface for read access;
+ *    the storage layer calls the `set*` helpers.
+ *
+ * ## Usage
+ *
+ * ```php
+ * final class Teaching extends ContentEntityBase implements RevisionableEntityInterface
+ * {
+ *     use RevisionableEntityTrait;
+ *
+ *     public function __construct(array $values = [])
+ *     {
+ *         parent::__construct($values, 'teaching', [
+ *             'id' => 'tid', 'uuid' => 'uuid', 'revision' => 'vid',
+ *         ]);
+ *     }
+ * }
+ * ```
+ *
+ * @api
  */
 trait RevisionableEntityTrait
 {
+    // -------------------------------------------------------------------------
+    // WP07 fields (new RevisionableEntityInterface contract)
+    // -------------------------------------------------------------------------
+
+    /**
+     * The revision id for this entity instance (WP07 contract).
+     *
+     * `null` until the entity has been persisted (INSERT) for the first time.
+     * The storage layer sets this after writing the revision row.
+     *
+     * @api
+     */
+    private int|string|null $revisionId = null;
+
+    /**
+     * Whether this instance represents the current (latest) revision.
+     *
+     * Defaults to `true` for new (unsaved) entities. The storage layer
+     * sets this to `false` when loading a historical revision via
+     * `loadRevision()`.
+     *
+     * @api
+     */
+    private bool $isCurrentRevision = true;
+
+    /**
+     * Per-revision metadata (author, timestamp, log message).
+     *
+     * `null` until the first save, or when loaded from a pre-revision-aware row.
+     *
+     * @api
+     */
+    private ?RevisionMetadata $revisionMetadata = null;
+
+    /**
+     * @api
+     */
+    public function revisionId(): int|string|null
+    {
+        return $this->revisionId;
+    }
+
+    /**
+     * @api
+     */
+    public function isCurrentRevision(): bool
+    {
+        return $this->isCurrentRevision;
+    }
+
+    /**
+     * @api
+     */
+    public function revisionMetadata(): ?RevisionMetadata
+    {
+        return $this->revisionMetadata;
+    }
+
+    /**
+     * Set the revision id.
+     *
+     * Called by the storage layer after persisting a new revision row.
+     * Application code should not call this directly.
+     *
+     * @api
+     */
+    public function setRevisionId(int|string|null $revisionId): void
+    {
+        $this->revisionId = $revisionId;
+    }
+
+    /**
+     * Set whether this instance is the current revision.
+     *
+     * Called by the storage layer. Application code should not call this directly.
+     *
+     * @api
+     */
+    public function setIsCurrentRevision(bool $isCurrentRevision): void
+    {
+        $this->isCurrentRevision = $isCurrentRevision;
+    }
+
+    /**
+     * Set the revision metadata.
+     *
+     * Called by the storage layer after persisting or loading a revision row.
+     * Application code should not call this directly.
+     *
+     * @api
+     */
+    public function setRevisionMetadata(?RevisionMetadata $metadata): void
+    {
+        $this->revisionMetadata = $metadata;
+    }
+
+    // -------------------------------------------------------------------------
+    // Legacy RevisionableInterface methods (pre-WP07, preserved for compat)
+    // -------------------------------------------------------------------------
+
     /** @var bool|null null = use entity type default */
     private ?bool $newRevision = null;
 

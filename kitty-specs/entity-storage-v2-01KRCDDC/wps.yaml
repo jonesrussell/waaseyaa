@@ -1,0 +1,300 @@
+work_packages:
+- id: WP01
+  title: Backend contract + registration
+  dependencies: []
+  owned_files:
+  - packages/entity-storage/src/Backend/FieldStorageBackendInterface.php
+  - packages/entity-storage/src/Backend/HasFieldStorageBackendsInterface.php
+  - packages/entity-storage/src/Backend/ReservedBackendIds.php
+  - packages/entity-storage/src/Exception/BackendIdCollisionException.php
+  - packages/entity-storage/src/Backend/BackendRegistrar.php
+  - packages/field/src/FieldDefinition.php
+  - packages/entity-storage/tests/Unit/Backend/**
+  - packages/field/tests/Unit/FieldDefinitionStoredInTest.php
+  requirement_refs:
+  - FR-001
+  - FR-002
+  - FR-003
+  - FR-004
+  - FR-005
+  - FR-006
+  subtasks:
+  - T001
+  - T002
+  - T003
+  - T004
+  - T005
+  - T006
+  - T007
+  prompt_file: tasks/WP01-backend-contract-registration.md
+- id: WP02
+  title: Coordinator scaffold + fan-out skeleton (no events yet)
+  dependencies:
+  - WP01
+  owned_files:
+  - packages/entity-storage/src/EntityStorageCoordinator.php
+  - packages/entity-storage/src/EntityStorageFactory.php
+  - packages/entity-storage/src/BackendResolver.php
+  - packages/entity-storage/tests/Integration/Coordinator/**
+  requirement_refs:
+  - FR-017
+  - FR-018
+  - FR-019
+  - FR-020
+  - FR-021
+  subtasks:
+  - T008
+  - T009
+  - T010
+  - T011
+  - T012
+  prompt_file: tasks/WP02-coordinator-scaffold-fan-out-skeleton-no-events-ye.md
+- id: WP03
+  title: sql-blob backend refactor + behavior-identity tests
+  dependencies:
+  - WP01
+  - WP02
+  owned_files:
+  - packages/entity-storage/src/Backend/SqlBlobBackend.php
+  - packages/entity-storage/src/SqlEntityStorage.php
+  - packages/entity-storage/src/SqlSchemaHandler.php
+  - packages/entity-storage/tests/Integration/BehaviorIdentity/**
+  requirement_refs:
+  - FR-007
+  - FR-008
+  - FR-009
+  - FR-010
+  - FR-049
+  - FR-052
+  subtasks:
+  - T013
+  - T014
+  - T015
+  - T016
+  - T017
+  prompt_file: tasks/WP03-sql-blob-backend-refactor-behavior-identity-tests.md
+- id: WP04
+  title: Lifecycle events in coordinator + PartialSaveException
+  dependencies:
+  - WP02
+  owned_files:
+  - packages/entity-storage/src/Event/**
+  - packages/entity-storage/src/Exception/PartialSaveException.php
+  - packages/entity-storage/src/SaveContext.php
+  - packages/entity-storage/src/CoordinatorLifecycleDispatcher.php
+  - packages/entity-storage/tests/Integration/Events/**
+  requirement_refs:
+  - FR-020
+  - FR-022
+  - FR-023
+  - FR-024
+  - FR-025
+  - FR-026
+  - FR-027
+  - FR-046
+  - FR-047
+  - FR-048
+  subtasks:
+  - T018
+  - T019
+  - T020
+  - T021
+  - T022
+  - T023
+  - T024
+  prompt_file: tasks/WP04-lifecycle-events-in-coordinator-partialsaveexcepti.md
+- id: WP05
+  title: sql-column backend (non-revisionable)
+  dependencies:
+  - WP01
+  - WP02
+  owned_files:
+  - packages/entity-storage/src/Backend/SqlColumnBackend.php
+  - packages/entity-storage/src/Backend/SqlColumnSchemaBuilder.php
+  - packages/entity-storage/src/Backend/SqlColumnQueryTranslator.php
+  - packages/entity-storage/src/Backend/TypeMapping.php
+  - packages/entity-storage/tests/Integration/SqlColumn/**
+  requirement_refs:
+  - FR-011
+  - FR-012
+  - FR-012a
+  - FR-013
+  - FR-014
+  - FR-015
+  - FR-016
+  subtasks:
+  - T025
+  - T026
+  - T027
+  - T028
+  - T029
+  - T030
+  prompt_file: tasks/WP05-sql-column-backend-non-revisionable.md
+- id: WP06
+  title: Query support + UnsupportedQueryException at definition validation
+  dependencies:
+  - WP03
+  - WP05
+  owned_files:
+  - packages/entity-storage/src/Exception/UnsupportedQueryException.php
+  - packages/entity-storage/src/Exception/UnsupportedListingException.php
+  - packages/entity-storage/src/Query/DefinitionValidator.php
+  - packages/entity-storage/tests/Integration/Query/**
+  requirement_refs:
+  - FR-009
+  - FR-014
+  - FR-015
+  - FR-021
+  - FR-046
+  subtasks:
+  - T031
+  - T032
+  - T033
+  - T034
+  prompt_file: tasks/WP06-query-support-unsupportedqueryexception-at-definit.md
+- id: WP07
+  title: Revision schema design + EntityType opt-in
+  dependencies:
+  - WP05
+  owned_files:
+  - packages/entity/src/EntityType.php
+  - packages/entity/src/RevisionableEntityInterface.php
+  - packages/entity/src/RevisionableEntityTrait.php
+  - packages/entity/src/RevisionMetadata.php
+  - packages/entity-storage/src/Schema/RevisionTableBuilder.php
+  - packages/entity/tests/Unit/EntityTypeRevisionableTest.php
+  - packages/entity-storage/tests/Integration/RevisionSchema/**
+  requirement_refs:
+  - FR-028
+  - FR-029
+  - FR-030
+  - FR-031
+  subtasks:
+  - T035
+  - T036
+  - T037
+  - T038
+  - T039
+  prompt_file: tasks/WP07-revision-schema-design-entitytype-opt-in.md
+- id: WP08
+  title: RevisionableEntityStorageInterface + load/list/setCurrent
+  dependencies:
+  - WP07
+  owned_files:
+  - packages/entity-storage/src/RevisionableEntityStorageInterface.php
+  - packages/entity-storage/src/RevisionableSqlBlobStorage.php
+  - packages/entity-storage/src/RevisionableSqlColumnStorage.php
+  - packages/entity-storage/src/RevisionPruner.php
+  - packages/entity-storage/src/RevisionPruningPolicy.php
+  - packages/entity-storage/src/RevisionPruningReport.php
+  - packages/entity-storage/tests/Integration/Revisions/**
+  requirement_refs:
+  - FR-032
+  - FR-033
+  - FR-034
+  - FR-035
+  - FR-036
+  - FR-037
+  subtasks:
+  - T040
+  - T041
+  - T042
+  - T043
+  - T044
+  - T045
+  - T046
+  prompt_file: tasks/WP08-revisionableentitystorageinterface-load-list-setcu.md
+- id: WP09
+  title: Per-revision access (view_revision op + fallback)
+  dependencies:
+  - WP08
+  owned_files:
+  - packages/access/src/Gate/GateInterface.php
+  - packages/access/src/Gate/Op.php
+  - packages/access/src/Gate/RevisionAccessRouter.php
+  - packages/access/tests/Integration/ViewRevision/**
+  requirement_refs:
+  - FR-038
+  - FR-039
+  - FR-040
+  subtasks:
+  - T047
+  - T048
+  - T049
+  - T050
+  prompt_file: tasks/WP09-per-revision-access-view-revision-op-fallback.md
+- id: WP10
+  title: Storage-migration generator CLI
+  dependencies:
+  - WP05
+  - WP07
+  - WP08
+  owned_files:
+  - packages/cli/src/Command/MakeStorageMigrationCommand.php
+  - packages/cli/src/Command/Migration/StorageMigrationTemplate.php
+  - packages/cli/src/Command/Migration/StorageMigrationEmitter.php
+  - packages/cli/src/Command/Migration/BackfillHelper.php
+  - packages/cli/tests/Integration/MakeStorageMigration/**
+  requirement_refs:
+  - FR-041
+  - FR-042
+  - FR-043
+  - FR-044
+  - FR-045
+  subtasks:
+  - T051
+  - T052
+  - T053
+  - T054
+  - T055
+  - T056
+  prompt_file: tasks/WP10-storage-migration-generator-cli.md
+- id: WP11
+  title: First Minoo entity migration (validation) + upgrade-guide pilot
+  dependencies:
+  - WP10
+  owned_files:
+  - docs/upgrades/waaseyaa-alpha-X-to-Y.md
+  - docs/upgrades/README.md
+  - kitty-specs/entity-storage-v2-01KRCDDC/validation/**
+  requirement_refs:
+  - FR-056
+  subtasks:
+  - T057
+  - T058
+  - T059
+  - T060
+  - T061
+  - T062
+  prompt_file: tasks/WP11-first-minoo-entity-migration-validation-upgrade-gu.md
+- id: WP12
+  title: Backend-conformance suite + docs (entity-system.md, field-storage-backends.md)
+  dependencies:
+  - WP04
+  - WP06
+  - WP09
+  owned_files:
+  - packages/entity-storage/testing/Contract/FieldStorageBackendContractTestCase.php
+  - packages/entity-storage/tests/Contract/Backend/SqlBlobConformanceTest.php
+  - packages/entity-storage/tests/Contract/Backend/SqlColumnConformanceTest.php
+  - docs/specs/entity-system.md
+  - docs/specs/field-storage-backends.md
+  - docs/public-surface-map.md
+  - public-surface-map.php
+  requirement_refs:
+  - FR-049
+  - FR-050
+  - FR-051
+  - FR-052
+  - FR-053
+  - FR-054
+  - FR-055
+  subtasks:
+  - T063
+  - T064
+  - T065
+  - T066
+  - T067
+  - T068
+  - T069
+  prompt_file: tasks/WP12-backend-conformance-suite-docs-entity-system-md-fi.md

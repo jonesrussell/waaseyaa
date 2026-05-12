@@ -26,6 +26,18 @@ final class SimpleFixture extends ContentEntityBase
 }
 
 /**
+ * Revisionable entity fixture — carries a revision key so that
+ * EntityType::fromClass(RevisionableFixture::class, revisionable: true) passes T036.
+ */
+#[ContentEntityType(id: 'revisionable_fixture', label: 'Revisionable Fixture')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', revision: 'vid')]
+final class RevisionableFixture extends ContentEntityBase
+{
+    #[Field(label: 'Title')]
+    public string $title = '';
+}
+
+/**
  * Entity with no #[Field] properties — empty field-map case.
  */
 #[ContentEntityType(id: 'empty_fields', label: 'Empty Fields')]

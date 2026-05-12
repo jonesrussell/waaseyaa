@@ -1,0 +1,21 @@
+source_id,kind,path_or_url,title,relevance,consulted_at
+S001,spec,docs/specs/entity-storage-v2.md,Entity Storage v2 — Multi-Backend Storage with Revisions (canonical mission spec),primary,2026-05-11
+S002,mission-metadata,docs/specs/missions/M-001-entity-storage-v2/mission.json,M-001 mission descriptor (WP count, governing ADRs, validation entity),primary,2026-05-11
+S003,adr,docs/adr/010-multi-backend-field-storage.md,ADR 010 — Multi-backend field storage contract,primary,2026-05-11
+S004,adr,docs/adr/011-entity-lifecycle-events.md,ADR 011 — Entity lifecycle events,primary,2026-05-11
+S005,adr,docs/adr/016-revisions-first-class.md,ADR 016 — Revisions first class,primary,2026-05-11
+S006,adr,docs/adr/009-migration-manifest-discovery.md,ADR 009 — Migration manifest discovery (substrate for WP10),supporting,2026-05-11
+S007,charter,docs/specs/stability-charter.md,Stability charter §3.2 (beta gate criteria) and §5.3 (stable surface registry),primary,2026-05-11
+S008,spec,docs/specs/schema-evolution-v2.md,Sibling mission — sql-column schema evolution coordination,supporting,2026-05-11
+S009,surface-map,docs/specs/public-surface-map.md,Public surface map — Layer 1 entity-storage and entity package entries,supporting,2026-05-11
+S010,code,packages/entity-storage/src/SqlEntityStorage.php,Current single-backend storage path (target of sql-blob refactor),primary,2026-05-11
+S011,code,packages/entity-storage/src/SqlSchemaHandler.php,Current schema handler — defines `_data` column path,primary,2026-05-11
+S012,code,packages/entity-storage/src/EntityRepository.php,High-level entity repository (will sit above coordinator),supporting,2026-05-11
+S013,code,packages/entity/src/EntityType.php,EntityType class — gains revisionable + primaryStorageBackend slots,primary,2026-05-11
+S014,code,packages/entity/src/FieldableInterface.php,Field-capable entity surface,supporting,2026-05-11
+S015,audit,docs/audits/2026-05-11-framework-app-audit.md,Framework/app audit — findings F1 and F8 originate this mission,primary,2026-05-11
+S016,downstream-mission,docs/specs/missions/M-002-migration-platform-v1/mission.json,M-002 — downstream consumer (WP05 inherits migration manifest path),supporting,2026-05-11
+S017,downstream-mission,docs/specs/missions/M-004-entity-storage-translatable-revisions/mission.json,M-004 — downstream consumer (builds on revision substrate),supporting,2026-05-11
+S018,minoo-context,/home/jones/dev/minoo (validation app — teaching entity selection),Minoo teaching entity — WP11 validation target,supporting,2026-05-11
+S019,project-claude-md,CLAUDE.md (project root),Layer architecture, gotchas, persistence-pipeline invariant,primary,2026-05-11
+S020,project-claude-md,.claude/rules/entity-storage-invariant.md,Canonical persistence pipeline rule (Entity → Driver → Repository → DBAL),primary,2026-05-11

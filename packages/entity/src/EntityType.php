@@ -49,6 +49,10 @@ final readonly class EntityType implements EntityTypeInterface
      * @param string|null $bundleEntityType The entity type ID that provides bundles (e.g. 'node_type' for 'node').
      * @param array<string, mixed> $constraints Validation constraints.
      * @param string|null $description Human-readable description of the entity type.
+     * @param string|null $primaryStorageBackend Per-entity-type primary storage backend id.
+     *   `null` (default) means the framework default (`sql-blob`) is used by `BackendResolver`.
+     *   Override to `'sql-column'` (or another registered backend id) to change the default
+     *   for all fields that have not set their own backend via `FieldDefinition::storedIn()`.
      * @param array{scope: string}|null $tenancy Declarative tenancy slot. `null` = non-tenant.
      *   Currently the only accepted shape is `['scope' => 'community']`. Replaces the
      *   legacy `HasCommunityInterface` marker (mission #1257 §C1).
@@ -58,6 +62,7 @@ final readonly class EntityType implements EntityTypeInterface
      *   Application code MUST NOT pass this argument; doing so is unsupported.
      *
      * @throws \InvalidArgumentException If `$tenancy` is provided and does not match `['scope' => 'community']`.
+     * @throws \InvalidArgumentException If `$revisionable` is `true` and `$keys['revision']` is absent or empty.
      */
     public function __construct(
         private string $id,
@@ -72,9 +77,22 @@ final readonly class EntityType implements EntityTypeInterface
         private array $constraints = [],
         private ?string $group = null,
         private ?string $description = null,
+        private ?string $primaryStorageBackend = null,
         private ?array $tenancy = null,
         private array $_fieldDefinitions = [],
     ) {
+        // T036: revisionable entity types must declare a non-empty revision key.
+        if ($this->revisionable) {
+            $revisionKey = $this->keys['revision'] ?? '';
+            if ($revisionKey === '') {
+                throw new \InvalidArgumentException(\sprintf(
+                    'Entity type "%s" declares revisionable=true but entityKeys[\'revision\'] is absent '
+                    . 'or empty. Add a revision key, e.g. keys: [\'revision\' => \'vid\'].',
+                    $this->id,
+                ));
+            }
+        }
+
         if ($this->tenancy !== null) {
             $this->validateTenancy($this->tenancy);
         }
@@ -272,6 +290,19 @@ final readonly class EntityType implements EntityTypeInterface
     public function isRevisionable(): bool
     {
         return $this->revisionable;
+    }
+
+    /**
+     * The primary storage backend id configured for this entity type.
+     *
+     * Returns `null` when none was explicitly set; `BackendResolver` resolves
+     * `null` to the framework default (`sql-blob`).
+     *
+     * @api
+     */
+    public function getPrimaryStorageBackend(): ?string
+    {
+        return $this->primaryStorageBackend;
     }
 
     public function getRevisionDefault(): bool

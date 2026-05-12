@@ -38,6 +38,18 @@ interface EntityTypeInterface
      */
     public function getFieldDefinitions(): array;
 
+    /**
+     * The primary storage backend id for this entity type.
+     *
+     * `null` means "use the framework default" — `BackendResolver` resolves
+     * that to `sql-blob` at runtime. An explicit value (e.g. `'sql-column'`)
+     * overrides the framework default for all fields that have not set their
+     * own backend via `FieldDefinition::storedIn()`.
+     *
+     * @api
+     */
+    public function getPrimaryStorageBackend(): ?string;
+
     /** @return string|null Admin sidebar group key (e.g. 'content', 'taxonomy'). */
     public function getGroup(): ?string;
 

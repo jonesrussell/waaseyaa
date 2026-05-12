@@ -1668,3 +1668,162 @@ $compiler->compile([ProfileTemplate::class, ArticleTemplate::class]);
 Duplicate field keys or duplicate normalized prompt aliases within the same bundle throw `\InvalidArgumentException`.
 
 → See `docs/specs/work-surface.md` F2 for usage and `docs/specs/bundle-scoped-fields.md` for the full bundle-scoped field contract.
+
+---
+
+## Field storage backends (mission `entity-storage-v2-01KRCDDC`)
+
+The entity storage layer supports multiple pluggable field storage backends under
+the `waaseyaa/entity-storage` package. This section documents the multi-backend
+architecture introduced by that mission.
+
+### Overview
+
+Prior to this mission, all field values were stored in a single `_data` JSON blob
+column alongside entity-key columns. The multi-backend architecture allows each
+`FieldDefinition` to declare which backend stores its values. Two built-in
+backends are provided:
+
+| Backend id   | Class                 | Storage strategy                              |
+|------------- |---------------------- |---------------------------------------------- |
+| `sql-blob`   | `SqlBlobBackend`      | JSON `_data` blob; all fields in one column   |
+| `sql-column` | `SqlColumnBackend`    | Dedicated SQL column per field                |
+
+### FieldStorageBackendInterface
+
+Every backend implements `Waaseyaa\EntityStorage\Backend\FieldStorageBackendInterface`:
+
+```php
+interface FieldStorageBackendInterface
+{
+    public function id(): string;
+    public function read(EntityInterface $entity, FieldDefinition $field): mixed;
+    public function write(EntityInterface $entity, FieldDefinition $field, mixed $value): void;
+    public function delete(EntityInterface $entity): void;
+    public function supportsQuery(FieldDefinition $field, EntityQuery $query): bool;
+}
+```
+
+Contract obligations:
+- `id()` — returns a stable non-empty string; two calls must return the same value.
+- `read()` — returns the stored value or `null` when absent.
+- `write()` — idempotent: writing the same field twice yields the second value, not both.
+- `delete()` — removes all data the backend holds for the entity; idempotent (second call must not throw).
+- `supportsQuery()` — returns `true` iff this backend can satisfy a field-level predicate query for the given field type and query object. Callers check this at definition-validation time.
+
+### Backend registration
+
+Backends are registered via `BackendRegistrar`. The two built-in backends are
+pre-registered by the framework. Third-party backends implement
+`HasFieldStorageBackendsInterface` and return their instances from
+`fieldStorageBackends()`. The `BackendRegistrarFactory` creates a registrar
+bound to a specific entity type.
+
+`IsFrameworkBackendProviderInterface` is a marker interface reserved for
+built-in backend providers — application code must not implement it.
+
+`ReservedBackendIds` holds the canonical string constants for the two built-in
+backends: `SQL_BLOB = 'sql-blob'` and `SQL_COLUMN = 'sql-column'`.
+
+### EntityStorageCoordinator
+
+`EntityStorageCoordinator` is the fan-out engine. On save, it dispatches
+`BeforeSaveEvent`, then calls each backend's `write()` in registration order. On
+delete, it calls each backend's `delete()`, then dispatches `AfterDeleteEvent`.
+
+`BackendResolver` resolves which backend is responsible for a given
+`FieldDefinition` (consulting `FieldDefinition::getBackendId()` or falling back
+to the entity type's primary storage backend).
+
+`UnknownBackendException` is thrown when a field references a backend id that is
+not registered.
+
+### Lifecycle events (WP04)
+
+The coordinator dispatches four lifecycle events:
+
+| Event class             | When dispatched                                      |
+|------------------------ |----------------------------------------------------- |
+| `BeforeSaveEvent`       | Before any backend write; listener may abort via `AbortOperationException` |
+| `AfterSaveEvent`        | After all backends commit; NOT dispatched on partial failure |
+| `BeforeDeleteEvent`     | Before any backend delete; listener may abort        |
+| `AfterDeleteEvent`      | After all backends confirm delete                    |
+
+All four implement `EntityLifecycleEventInterface`.
+
+`PartialSaveException` is thrown when at least one backend succeeds and at least
+one fails. Its `$errorCode` property (not `$code` — see upgrade guide §1.4 note)
+carries a `string` diagnostic code. `SaveContext` is an immutable value object
+passed to save operations; it carries revision flags. `CoordinatorLifecycleDispatcher`
+dispatches these events from the coordinator.
+
+`AbortOperationException` is thrown by event listeners to abort the operation
+before any backend is written.
+
+### sql-blob backend
+
+`SqlBlobBackend` stores all field values as JSON in a `_data` TEXT column on the
+entity table. Fields explicitly marked `FieldStorage::Data` always go to `_data`.
+`supportsQuery()` returns `false` for all field types — the blob backend delegates
+queries to the column-equality path in `SqlEntityStorage`.
+
+### sql-column backend
+
+`SqlColumnBackend` stores each field in its own SQL column. Schema management is
+handled by `SqlColumnSchemaBuilder`. Query translation is handled by
+`SqlColumnQueryTranslator`. `TypeMapping` maps `FieldDefinition` type strings to
+DBAL column type names. `supportsQuery()` returns `true` for all non-vector field
+types (FR-014, FR-015).
+
+### Definition validation
+
+`DefinitionValidator` (in `Waaseyaa\EntityStorage\Query`) validates
+`FieldDefinition` objects at registration time. It throws
+`UnsupportedQueryException` when the active backend reports `supportsQuery()` =
+`false`. `UnsupportedListingException` is thrown when listing is unsupported.
+
+### Revisionable entities (WP07–WP09)
+
+Entity types that opt in to revisioning declare `isRevisionable(): true` and set
+a `getPrimaryStorageBackend()` in their `EntityType`. The entity class implements
+`RevisionableEntityInterface` (in `waaseyaa/entity`) and may use the
+`RevisionableEntityTrait` mixin. `RevisionMetadata` is an immutable value object
+carrying revision id, author, timestamp, and log message. `RevisionTableBuilder`
+creates the `{entity_type}_revision` table.
+
+Revisionable storage is provided by `RevisionableSqlBlobStorage` and
+`RevisionableSqlColumnStorage`, both implementing
+`RevisionableEntityStorageInterface`. `RevisionPruner` removes old revisions
+according to a `RevisionPruningPolicy`; results are returned as
+`RevisionPruningReport`. `RevisionAccessRouter` (in `waaseyaa/access`) maps
+`GateInterface::VIEW_REVISION` operations to the revision access policy.
+
+### Storage migration CLI (WP10)
+
+`MakeStorageMigrationHandler` and `MakeStorageMigrationServiceProvider` (in
+`waaseyaa/cli`) wire the `make:storage-migration` command. `StorageMigrationEmitter`
+generates PHP migration files from a `StorageMigrationTemplate`. `BackfillHelper`
+populates new columns from existing `_data` blob values. `UnmappedFieldTypeException`
+is thrown when a field type has no column mapping. `BackfillRowCountMismatchException`
+is thrown when the backfill row count differs from the expected count.
+
+### Conformance test harness (WP12, FR-049)
+
+`FieldStorageBackendContractTestCase` (in `Waaseyaa\EntityStorage\Testing\Contract`,
+mapped under `testing/` not `src/`) is an abstract PHPUnit test base class.
+Any class implementing `FieldStorageBackendInterface` should subclass it and pass
+all inherited tests:
+
+1. `idIsStableString` — `id()` returns a stable non-empty string.
+2. `readWriteDeleteRoundTrip` — full CRUD round-trip: write → read → delete → read returns null.
+3. `idempotentRewrite` — writing twice yields the second value.
+4. `supportsQueryContract` — `supportsQuery()` returns the declared bool.
+5. `deleteCascade` — `delete()` is idempotent; second call must not throw.
+
+**Placement rule:** This class lives under `testing/` and is registered via
+`autoload-dev` only. Placing it under `src/` would expose the
+`PHPUnit\Framework\TestCase` parent to production class scans, crashing consumer
+kernel boot.
+
+→ See `docs/specs/field-storage-backends.md` for the full backend contract and
+type-mapping table.

@@ -43,8 +43,24 @@ final class EntityRepository implements EntityRepositoryInterface
         private readonly ?DatabaseInterface $database = null,
         ?EntityEventFactoryInterface $eventFactory = null,
         private readonly ?EntityValidator $validator = null,
+        // WP02 coordinator slot — reserved for field-level multi-backend fan-out.
+        // Null until WP10 activates per-field routing; WP04 wires lifecycle events.
+        // Must remain the last parameter to avoid breaking existing call sites.
+        private readonly ?EntityStorageCoordinator $coordinator = null,
     ) {
         $this->eventFactory = $eventFactory ?? new DefaultEntityEventFactory();
+    }
+
+    /**
+     * Return the coordinator for field-level multi-backend fan-out, if configured.
+     *
+     * @api
+     * @internal Exposed for WP04/WP10 integration; callers outside entity-storage
+     *   should not rely on this method — use the repository's high-level CRUD API.
+     */
+    public function getCoordinator(): ?EntityStorageCoordinator
+    {
+        return $this->coordinator;
     }
 
     /**

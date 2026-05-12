@@ -2347,6 +2347,12 @@ parameters:
 			path: packages/entity-storage/src/EntitySchemaSync.php
 
 		-
+			message: '#^Unused Waaseyaa\\EntityStorage\\Query\\DefinitionValidator\:\:validateAll$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: packages/entity-storage/src/Query/DefinitionValidator.php
+
+		-
 			message: '#^Unused Waaseyaa\\EntityStorage\\Schema\\EntityDiffFactory\:\:forEntityType$#'
 			identifier: shipmonk.deadMethod
 			count: 1
@@ -2707,7 +2713,25 @@ parameters:
 			path: packages/entity/src/Repository/EntityRepositoryInterface.php
 
 		-
+			message: '#^Property Waaseyaa\\Entity\\RevisionableEntityTrait\:\:\$isCurrentRevision is never read$#'
+			identifier: shipmonk.deadProperty.neverRead
+			count: 1
+			path: packages/entity/src/RevisionableEntityTrait.php
+
+		-
 			message: '#^Property Waaseyaa\\Entity\\RevisionableEntityTrait\:\:\$newRevision is never read$#'
+			identifier: shipmonk.deadProperty.neverRead
+			count: 1
+			path: packages/entity/src/RevisionableEntityTrait.php
+
+		-
+			message: '#^Property Waaseyaa\\Entity\\RevisionableEntityTrait\:\:\$revisionId is never read$#'
+			identifier: shipmonk.deadProperty.neverRead
+			count: 1
+			path: packages/entity/src/RevisionableEntityTrait.php
+
+		-
+			message: '#^Property Waaseyaa\\Entity\\RevisionableEntityTrait\:\:\$revisionMetadata is never read$#'
 			identifier: shipmonk.deadProperty.neverRead
 			count: 1
 			path: packages/entity/src/RevisionableEntityTrait.php
@@ -2720,6 +2744,12 @@ parameters:
 
 		-
 			message: '#^Unused Waaseyaa\\Entity\\RevisionableEntityTrait\:\:getRevisionLog$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: packages/entity/src/RevisionableEntityTrait.php
+
+		-
+			message: '#^Unused Waaseyaa\\Entity\\RevisionableEntityTrait\:\:isCurrentRevision$#'
 			identifier: shipmonk.deadMethod
 			count: 1
 			path: packages/entity/src/RevisionableEntityTrait.php
@@ -2743,13 +2773,43 @@ parameters:
 			path: packages/entity/src/RevisionableEntityTrait.php
 
 		-
+			message: '#^Unused Waaseyaa\\Entity\\RevisionableEntityTrait\:\:revisionId$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: packages/entity/src/RevisionableEntityTrait.php
+
+		-
+			message: '#^Unused Waaseyaa\\Entity\\RevisionableEntityTrait\:\:revisionMetadata$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: packages/entity/src/RevisionableEntityTrait.php
+
+		-
+			message: '#^Unused Waaseyaa\\Entity\\RevisionableEntityTrait\:\:setIsCurrentRevision$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: packages/entity/src/RevisionableEntityTrait.php
+
+		-
 			message: '#^Unused Waaseyaa\\Entity\\RevisionableEntityTrait\:\:setNewRevision$#'
 			identifier: shipmonk.deadMethod
 			count: 1
 			path: packages/entity/src/RevisionableEntityTrait.php
 
 		-
+			message: '#^Unused Waaseyaa\\Entity\\RevisionableEntityTrait\:\:setRevisionId$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: packages/entity/src/RevisionableEntityTrait.php
+
+		-
 			message: '#^Unused Waaseyaa\\Entity\\RevisionableEntityTrait\:\:setRevisionLog$#'
+			identifier: shipmonk.deadMethod
+			count: 1
+			path: packages/entity/src/RevisionableEntityTrait.php
+
+		-
+			message: '#^Unused Waaseyaa\\Entity\\RevisionableEntityTrait\:\:setRevisionMetadata$#'
 			identifier: shipmonk.deadMethod
 			count: 1
 			path: packages/entity/src/RevisionableEntityTrait.php
@@ -3707,12 +3767,6 @@ parameters:
 			identifier: shipmonk.deadMethod
 			count: 1
 			path: packages/foundation/src/Ingestion/PayloadValidator.php
-
-		-
-			message: '#^Property Waaseyaa\\Foundation\\Kernel\\AbstractKernel\:\:\$fieldRegistry is never read$#'
-			identifier: shipmonk.deadProperty.neverRead
-			count: 1
-			path: packages/foundation/src/Kernel/AbstractKernel.php
 
 		-
 			message: '#^Unused Waaseyaa\\Foundation\\Kernel\\AbstractKernel\:\:applyDiscoveryExtensionContext$#'

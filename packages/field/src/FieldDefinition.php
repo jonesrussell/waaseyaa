@@ -31,6 +31,8 @@ final readonly class FieldDefinition implements FieldDefinitionInterface, \Array
         private ?FieldTypeManager $fieldTypeManager = null,
         private string $group = '',
         private array $promptAliases = [],
+        private ?string $backendId = null,
+        private bool $fieldIndexed = false,
     ) {}
 
     public function getName(): string
@@ -190,6 +192,97 @@ final readonly class FieldDefinition implements FieldDefinitionInterface, \Array
     public function getStored(): FieldStorage
     {
         return $this->stored;
+    }
+
+    /**
+     * Return a new instance pinned to the given storage backend id.
+     *
+     * At boot, {@see \Waaseyaa\EntityStorage\Backend\BackendRegistrar} validates
+     * the id against the registered set and raises {@see \InvalidArgumentException}
+     * for unknown ids. The method itself accepts any string — validation is
+     * deferred to registration time so definition objects can be constructed
+     * before backends are registered.
+     *
+     * @api
+     * @see \Waaseyaa\EntityStorage\Backend\BackendRegistrar::validateFieldBackendIds()
+     */
+    public function storedIn(string $backendId): self
+    {
+        return new self(
+            name: $this->name,
+            type: $this->type,
+            cardinality: $this->cardinality,
+            settings: $this->settings,
+            targetEntityTypeId: $this->targetEntityTypeId,
+            targetBundle: $this->targetBundle,
+            translatable: $this->translatable,
+            revisionable: $this->revisionable,
+            defaultValue: $this->defaultValue,
+            label: $this->label,
+            description: $this->description,
+            required: $this->required,
+            readOnly: $this->readOnly,
+            constraints: $this->constraints,
+            stored: $this->stored,
+            fieldTypeManager: $this->fieldTypeManager,
+            group: $this->group,
+            promptAliases: $this->promptAliases,
+            backendId: $backendId,
+            fieldIndexed: $this->fieldIndexed,
+        );
+    }
+
+    /**
+     * Return the backend id set via {@see storedIn()}, or null if none was set.
+     *
+     * @api
+     */
+    public function getBackendId(): ?string
+    {
+        return $this->backendId;
+    }
+
+    /**
+     * Return a new instance marked for B-tree indexing under the sql-column backend.
+     *
+     * Has no effect if the field is not routed to the sql-column backend.
+     *
+     * @api
+     */
+    public function indexed(): self
+    {
+        return new self(
+            name: $this->name,
+            type: $this->type,
+            cardinality: $this->cardinality,
+            settings: $this->settings,
+            targetEntityTypeId: $this->targetEntityTypeId,
+            targetBundle: $this->targetBundle,
+            translatable: $this->translatable,
+            revisionable: $this->revisionable,
+            defaultValue: $this->defaultValue,
+            label: $this->label,
+            description: $this->description,
+            required: $this->required,
+            readOnly: $this->readOnly,
+            constraints: $this->constraints,
+            stored: $this->stored,
+            fieldTypeManager: $this->fieldTypeManager,
+            group: $this->group,
+            promptAliases: $this->promptAliases,
+            backendId: $this->backendId,
+            fieldIndexed: true,
+        );
+    }
+
+    /**
+     * Return whether this field is marked for B-tree indexing.
+     *
+     * @api
+     */
+    public function isIndexed(): bool
+    {
+        return $this->fieldIndexed;
     }
 
     public function offsetExists(mixed $offset): bool

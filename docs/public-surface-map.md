@@ -133,6 +133,39 @@ Machine-readable source: `docs/public-surface-map.php`.
 |---------|------|---------|
 | `EntityStorageDriverInterface` | interface | Low-level persistence SPI: raw row I/O without hydration or event dispatch |
 | `ConnectionResolverInterface` | interface | Resolves named database connections; multi-tenancy seam for entity storage |
+| `FieldStorageBackendInterface` | interface | Contract for pluggable field storage backends (M-001, WP01) |
+| `HasFieldStorageBackendsInterface` | interface | Mix-in for packages that provide custom field storage backends (M-001, WP01) |
+| `IsFrameworkBackendProviderInterface` | interface | Marker for built-in framework backend providers; do not implement in application code (M-001, WP01) |
+| `ReservedBackendIds` | final class | String constants for built-in backend ids: `SQL_BLOB`, `SQL_COLUMN`, `VECTOR` (M-001, WP01) |
+| `BackendRegistrar` | final class | Registers field storage backends by id for an entity type (M-001, WP01) |
+| `BackendRegistrarFactory` | final class | Creates a `BackendRegistrar` bound to a specific entity type (M-001, WP01) |
+| `UnsupportedQueryException` | final class | Thrown when a query operator is unsupported by the active backend (M-001, WP01) |
+| `UnsupportedListingException` | final class | Thrown when listing is unsupported by the active backend (M-001, WP06) |
+| `EntityStorageCoordinator` | final class | Fan-out engine dispatching read/write/delete to all registered backends (M-001, WP02) |
+| `BackendResolver` | final class | Resolves which backend handles a given `FieldDefinition` (M-001, WP02) |
+| `UnknownBackendException` | final class | Thrown when a field references an unregistered backend id (M-001, WP02) |
+| `SqlBlobBackend` | final class | Stores field values in a JSON `_data` blob column; `supportsQuery()` always false (M-001, WP03) |
+| `EntityLifecycleEventInterface` | interface | Marker for all four coordinator lifecycle events (M-001, WP04) |
+| `BeforeSaveEvent` | final class | Dispatched before any backend write; listeners may abort via `AbortOperationException` (M-001, WP04) |
+| `AfterSaveEvent` | final class | Dispatched after all backends commit; not dispatched on partial failure (M-001, WP04) |
+| `BeforeDeleteEvent` | final class | Dispatched before any backend delete (M-001, WP04) |
+| `AfterDeleteEvent` | final class | Dispatched after all backends confirm delete (M-001, WP04) |
+| `AbortOperationException` | final class | Thrown from `BeforeSave`/`BeforeDelete` listener to abort the operation (M-001, WP04) |
+| `PartialSaveException` | final class | Thrown when at least one backend succeeds and one fails; carries `$errorCode` (M-001, WP04) |
+| `SaveContext` | final class | Immutable value object passed to save operations; carries revision flags (M-001, WP04) |
+| `CoordinatorLifecycleDispatcher` | final class | Dispatches lifecycle events from the coordinator (M-001, WP04) |
+| `SqlColumnBackend` | final class | Stores each field in a dedicated SQL column; `supportsQuery()` true for non-vector types (M-001, WP05) |
+| `SqlColumnSchemaBuilder` | final class | Builds SQL column schema for `SqlColumnBackend` (M-001, WP05) |
+| `SqlColumnQueryTranslator` | final class | Translates field-level query predicates to SQL for `SqlColumnBackend` (M-001, WP05) |
+| `TypeMapping` | final class | Maps `FieldDefinition` type strings to DBAL column types (M-001, WP05) |
+| `DefinitionValidator` | final class | Validates `FieldDefinition` objects at registration time; throws `UnsupportedQueryException` (M-001, WP06) |
+| `RevisionableSqlBlobStorage` | final class | Revision-aware storage using sql-blob backend (M-001, WP08) |
+| `RevisionableSqlColumnStorage` | final class | Revision-aware storage using sql-column backend (M-001, WP08) |
+| `RevisionPruner` | final class | Removes old entity revisions according to a pruning policy (M-001, WP08) |
+| `RevisionPruningPolicy` | final class | Immutable value object describing how many revisions to keep (M-001, WP08) |
+| `RevisionPruningReport` | final class | Result of a pruning run: counts of deleted and retained revisions (M-001, WP08) |
+| `RevisionTableBuilder` | final class | Creates the `{entity_type}_revision` schema table (M-001, WP07) |
+| `FieldStorageBackendContractTestCase` | abstract class | Abstract PHPUnit harness; extend to verify any `FieldStorageBackendInterface` implementation (M-001, WP12) |
 
 ### access
 

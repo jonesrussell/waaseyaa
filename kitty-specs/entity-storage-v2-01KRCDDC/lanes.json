@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "mission_slug": "entity-storage-v2-01KRCDDC",
+  "mission_id": "01KRCDDCANY3P1530VBVD1ERP9",
+  "mission_branch": "kitty/mission-entity-storage-v2-01KRCDDC",
+  "target_branch": "kitty/mission-entity-storage-v2-01KRCDDC",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05",
+        "WP06",
+        "WP07",
+        "WP08",
+        "WP09",
+        "WP10",
+        "WP11",
+        "WP12"
+      ],
+      "write_scope": [
+        "docs/public-surface-map.md",
+        "docs/specs/entity-system.md",
+        "docs/specs/field-storage-backends.md",
+        "docs/upgrades/README.md",
+        "docs/upgrades/waaseyaa-alpha-X-to-Y.md",
+        "kitty-specs/entity-storage-v2-01KRCDDC/validation/**",
+        "packages/access/src/Gate/GateInterface.php",
+        "packages/access/src/Gate/Op.php",
+        "packages/access/src/Gate/RevisionAccessRouter.php",
+        "packages/access/tests/Integration/ViewRevision/**",
+        "packages/cli/src/Command/MakeStorageMigrationCommand.php",
+        "packages/cli/src/Command/Migration/BackfillHelper.php",
+        "packages/cli/src/Command/Migration/StorageMigrationEmitter.php",
+        "packages/cli/src/Command/Migration/StorageMigrationTemplate.php",
+        "packages/cli/tests/Integration/MakeStorageMigration/**",
+        "packages/entity-storage/src/Backend/BackendRegistrar.php",
+        "packages/entity-storage/src/Backend/FieldStorageBackendInterface.php",
+        "packages/entity-storage/src/Backend/HasFieldStorageBackendsInterface.php",
+        "packages/entity-storage/src/Backend/ReservedBackendIds.php",
+        "packages/entity-storage/src/Backend/SqlBlobBackend.php",
+        "packages/entity-storage/src/Backend/SqlColumnBackend.php",
+        "packages/entity-storage/src/Backend/SqlColumnQueryTranslator.php",
+        "packages/entity-storage/src/Backend/SqlColumnSchemaBuilder.php",
+        "packages/entity-storage/src/Backend/TypeMapping.php",
+        "packages/entity-storage/src/BackendResolver.php",
+        "packages/entity-storage/src/CoordinatorLifecycleDispatcher.php",
+        "packages/entity-storage/src/EntityStorageCoordinator.php",
+        "packages/entity-storage/src/EntityStorageFactory.php",
+        "packages/entity-storage/src/Event/**",
+        "packages/entity-storage/src/Exception/BackendIdCollisionException.php",
+        "packages/entity-storage/src/Exception/PartialSaveException.php",
+        "packages/entity-storage/src/Exception/UnsupportedListingException.php",
+        "packages/entity-storage/src/Exception/UnsupportedQueryException.php",
+        "packages/entity-storage/src/Query/DefinitionValidator.php",
+        "packages/entity-storage/src/RevisionPruner.php",
+        "packages/entity-storage/src/RevisionPruningPolicy.php",
+        "packages/entity-storage/src/RevisionPruningReport.php",
+        "packages/entity-storage/src/RevisionableEntityStorageInterface.php",
+        "packages/entity-storage/src/RevisionableSqlBlobStorage.php",
+        "packages/entity-storage/src/RevisionableSqlColumnStorage.php",
+        "packages/entity-storage/src/SaveContext.php",
+        "packages/entity-storage/src/Schema/RevisionTableBuilder.php",
+        "packages/entity-storage/src/SqlEntityStorage.php",
+        "packages/entity-storage/src/SqlSchemaHandler.php",
+        "packages/entity-storage/testing/Contract/FieldStorageBackendContractTestCase.php",
+        "packages/entity-storage/tests/Contract/Backend/SqlBlobConformanceTest.php",
+        "packages/entity-storage/tests/Contract/Backend/SqlColumnConformanceTest.php",
+        "packages/entity-storage/tests/Integration/BehaviorIdentity/**",
+        "packages/entity-storage/tests/Integration/Coordinator/**",
+        "packages/entity-storage/tests/Integration/Events/**",
+        "packages/entity-storage/tests/Integration/Query/**",
+        "packages/entity-storage/tests/Integration/RevisionSchema/**",
+        "packages/entity-storage/tests/Integration/Revisions/**",
+        "packages/entity-storage/tests/Integration/SqlColumn/**",
+        "packages/entity-storage/tests/Unit/Backend/**",
+        "packages/entity/src/EntityType.php",
+        "packages/entity/src/RevisionMetadata.php",
+        "packages/entity/src/RevisionableEntityInterface.php",
+        "packages/entity/src/RevisionableEntityTrait.php",
+        "packages/entity/tests/Unit/EntityTypeRevisionableTest.php",
+        "packages/field/src/FieldDefinition.php",
+        "packages/field/tests/Unit/FieldDefinitionStoredInTest.php",
+        "public-surface-map.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "app-shell",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-11T23:32:39.350338+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP01"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP02"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP01"
+      },
+      {
+        "wp_a": "WP06",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP06 depends on WP03"
+      },
+      {
+        "wp_a": "WP07",
+        "wp_b": "WP05",
+        "rule": "dependency",
+        "evidence": "WP07 depends on WP05"
+      },
+      {
+        "wp_a": "WP08",
+        "wp_b": "WP07",
+        "rule": "dependency",
+        "evidence": "WP08 depends on WP07"
+      },
+      {
+        "wp_a": "WP09",
+        "wp_b": "WP08",
+        "rule": "dependency",
+        "evidence": "WP09 depends on WP08"
+      },
+      {
+        "wp_a": "WP10",
+        "wp_b": "WP05",
+        "rule": "dependency",
+        "evidence": "WP10 depends on WP05"
+      },
+      {
+        "wp_a": "WP11",
+        "wp_b": "WP10",
+        "rule": "dependency",
+        "evidence": "WP11 depends on WP10"
+      },
+      {
+        "wp_a": "WP12",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP12 depends on WP04"
+      }
+    ],
+    "total_merges": 11,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 11
+    }
+  }
+}
