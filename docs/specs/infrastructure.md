@@ -1,5 +1,6 @@
 # Infrastructure
 
+<!-- Spec reviewed 2026-05-12 - #1443 AbstractKernel::validateQueryDefinitions() added after discoverAccessPolicies() in boot(); wires DefinitionValidator (entity-storage L1) via BackendRegistrarFactory+BackendResolver for FR-021 fail-fast enforcement. Kernel bootstrapper exemption applies (CLAUDE.md). No infrastructure contract surface changed. -->
 <!-- Spec reviewed 2026-05-11 - M4A-1 (#1428 / umbrella #1414) new kernel-adjacent route registrar `WorkflowDefinitionsApiRouter` in foundation/src/Http/Router/ wired alongside CodifiedContextApiRouter et al. in HttpKernel::$foundationRouters; route entry added to BuiltinRouteRegistrar for `GET /api/workflow-definitions` (admin-role-gated). Pure wiring change; no infrastructure contract surface affected. -->
 <!-- Spec reviewed 2026-05-11 - M4A-4 (#1434 / umbrella #1414) BuiltinRouteRegistrar and WorkflowDefinitionsApiRouter extended to dispatch `POST /api/workflow-definitions/dry-run` to the new WorkflowDryRunController in waaseyaa/api (admin-role-gated). Pure wiring change; no infrastructure contract surface affected. -->
 <!-- Spec reviewed 2026-05-10 - M3A (#1413) SchemaRouter ctor takes optional FieldDefinitionRegistryInterface and forwards to SchemaPresenter; HttpKernel passes $this->fieldRegistry. Pure wiring change; no infrastructure contract surface affected. -->

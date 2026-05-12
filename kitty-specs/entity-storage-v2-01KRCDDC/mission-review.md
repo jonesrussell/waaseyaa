@@ -31,7 +31,7 @@ Everything else (cross-WP edits, byte-identity gate, deferral discipline, autolo
 | FR-008 – FR-010 (sql-blob refactor + behavior identity) | OK | Byte-identity gate is structurally correct: `assertSame` on raw bytes, baseline pinned to literals (`'[]'`, escaped Unicode). Cannot drift to match a buggy refactor. |
 | FR-011 – FR-016 (sql-column) | OK | Backend, schema builder, query translator, type mapping all shipped; conformance suite green. |
 | FR-017 – FR-020 (lifecycle events, coordinator) | OK | `BeforeSaveEvent`, `AfterSaveEvent`, abort/partial-save semantics tested. `SaveContext::withoutNewRevision` correctly gated on `entityType->isRevisionable()` at coordinator line 127. |
-| **FR-021** (DefinitionValidator UnsupportedQueryException at boot) | **WEAK — see H-01** | Class exists, unit tests pass, but no production caller invokes `validateAll()`. The fail-fast contract is unenforced. |
+| **FR-021** (DefinitionValidator UnsupportedQueryException at boot) | **PASS — H-01 RESOLVED** | `AbstractKernel::validateQueryDefinitions()` calls `validateAll()` at boot. Integration tests in `DefinitionValidatorBootTest` confirm boot fails on a rejecting backend. Closes #1443. |
 | FR-022 – FR-045 (revisions: interface, trait, metadata, table builder, sql-blob/sql-column revision storage, pruner) | OK | All shipped; pruner is disabled by default per ADR 016 (a non-goal). |
 | FR-046 (UnsupportedListingException) | OK | |
 | FR-047 – FR-048 (migration CLI + backfill) | OK | `MakeStorageMigrationHandler`, `BackfillHelper` present and unit-tested. |
@@ -48,7 +48,7 @@ Everything else (cross-WP edits, byte-identity gate, deferral discipline, autolo
 | # | Criterion | Status | Notes |
 |---|---|---|---|
 | 1 | All 12 WPs merged | **PASS** | Confirmed in `wps.yaml` and `git log`; mission squash-merged at `509e31fb7`. |
-| 2 | All §3 FRs covered by tests | **PASS** (with H-01 caveat) | 56 FRs covered per acceptance checklist; FR-021 coverage is unit-level only, not end-to-end through boot — see H-01. |
+| 2 | All §3 FRs covered by tests | **PASS** | 56 FRs covered per acceptance checklist; FR-021 now covered end-to-end through kernel boot (H-01 resolved, #1443). |
 | 3 | Conformance suite green for sql-blob and sql-column | **PASS** | 5 inherited tests × 2 backends, full suite 7693 green. |
 | 4 | WP11 Minoo migration 7 days in prod no incident | **DEFERRED** (acknowledged) | `validation/pending-minoo-cycle.md` documents the operator-side T057–T060 exit criteria. The deferral is explicit, not silent. Mission spec §14 criterion 4 is NOT re-defined — it remains an open obligation owed by the Minoo cycle. |
 | 5 | Charter §3.2 criterion 8 ("revisions in production") satisfiable | **PASS** (satisfiable, not satisfied) | The framework now supports revisionable entity types; satisfaction requires the same Minoo cycle as criterion 4. |
@@ -85,21 +85,11 @@ No moderation workflows, no per-field translation, no admin revision-compare UI,
 
 ## 5. Risk Findings
 
-### H-01 — DefinitionValidator has no production caller [HIGH, dead-on-the-vine]
+### H-01 — DefinitionValidator has no production caller [HIGH, dead-on-the-vine] — RESOLVED
 
-Grep of `packages/**/src/` (excluding tests, testing/) for `DefinitionValidator` and `validateAll`:
+~~Grep of `packages/**/src/` (excluding tests, testing/) for `DefinitionValidator` and `validateAll` found only the class itself and a docblock `@see`. No kernel boot, service provider, or `BackendRegistrar` site called `validateAll()`. FR-021 fail-fast guarantee was unenforced.~~
 
-```
-packages/entity-storage/src/Query/DefinitionValidator.php   (class itself)
-packages/entity-storage/src/Exception/UnsupportedQueryException.php  (docblock @see only)
-```
-
-There is no kernel boot, service provider, or `BackendRegistrar` site that calls `$validator->validateAll()`. The class is unreachable from any HTTP/CLI boot. FR-021 specifies that boot MUST fail when a registered entity type declares a query the resolved backend cannot support — this is currently impossible to trigger outside of unit tests.
-
-The WP06 cycle-1 review accepted the WP with this gap explicitly noted as "deferred to a follow-up WP." That deferral was never converted into a follow-up artifact.
-
-**Severity:** High (a documented fail-fast contract that does not fail-fast in production is worse than no contract — it gives false confidence).
-**Disposition:** Open a follow-up WP/issue to wire `DefinitionValidator::validateAll()` into `AbstractKernel::boot()` (after `BackendRegistrar::build()` runs, before `discoverAndRegisterProviders()` returns).
+**RESOLVED** by PR fixing GitHub issue #1443. `AbstractKernel::validateQueryDefinitions()` is now called in `boot()` after `discoverAccessPolicies()` and before `$this->booted = true`. It builds `BackendRegistrar` from `$this->manifest->providers`, wraps it in `BackendResolver`, and calls `DefinitionValidator::validateAll()`. Three integration tests in `packages/foundation/tests/Integration/Kernel/DefinitionValidatorBootTest.php` cover the happy path, the boot-failure path, and the non-indexed-field bypass.
 
 ### R-01 — Cross-WP edits — all verified clean
 
@@ -126,7 +116,7 @@ WP09 added an optional `operations` array (default `[]`) to `PolicyAttribute`. U
 | Candidate | Where | Risk | Mitigation in place? |
 |---|---|---|---|
 | Empty `IN`/`NOT IN` queries return zero results | DBAL pattern, framework-wide (CLAUDE.md) | Not introduced by this mission | N/A |
-| `DefinitionValidator` not invoked at boot | `packages/entity-storage/src/Query/DefinitionValidator.php` | **Yes** — FR-021 fail-fast guarantee silently absent | **No** — see H-01 |
+| `DefinitionValidator` not invoked at boot | `packages/entity-storage/src/Query/DefinitionValidator.php` | ~~**Yes** — FR-021 fail-fast guarantee silently absent~~ **RESOLVED** — wired into `AbstractKernel::validateQueryDefinitions()` (#1443) | **Yes** — see H-01 resolution |
 | Consumer reads `$e->code` per spec/contract | spec.md:317, contracts/partial-save-error.md:33 | Returns inherited `\Exception::$code` int (0) silently | **No** — see H-02 |
 | `SqlColumnBackend::delete()` double-delete | Coordinator deletes the row too | Idempotent: `DELETE` against an already-deleted row is a no-op | Yes — documented in WP12 docblock |
 | Non-revisionable entity touched by `withoutNewRevision=true` | EntityStorageCoordinator:127 | None — gated on `isRevisionable()` | Yes |
@@ -151,10 +141,10 @@ No new public attack surface introduced. No secrets in defaults.
 
 | ID | Item | Type | Suggested follow-up |
 |---|---|---|---|
-| H-01 | Wire `DefinitionValidator::validateAll()` into `AbstractKernel::boot()` | Code | New WP or GitHub issue. ~20-line delta. Required to make FR-021 honest. |
+| H-01 | ~~Wire `DefinitionValidator::validateAll()` into `AbstractKernel::boot()`~~ | Code | **RESOLVED** — `AbstractKernel::validateQueryDefinitions()` added; closes GitHub #1443. |
 | H-02 | Update `spec.md` §6.5 (line 317) and `contracts/partial-save-error.md` (line 33) to declare `$errorCode` not `$code`; add the PHP-constraint footnote that already lives in the class docblock | Docs | Single doc-fix PR. No code change. |
 | O-01 | Convert `validation/pending-minoo-cycle.md` exit criteria into a tracked Minoo-repo issue with a 7-day clock | Operational | Tracks §14 criterion 4 / criterion 5. |
-| O-02 | After H-01 lands, add an integration test that constructs a kernel with a deliberately-misconfigured entity type and asserts boot raises `UnsupportedQueryException` | Test | Locks the fail-fast guarantee. |
+| O-02 | ~~After H-01 lands, add an integration test~~ | Test | **RESOLVED** — three tests in `packages/foundation/tests/Integration/Kernel/DefinitionValidatorBootTest.php` cover happy path, boot-failure path, and non-indexed bypass. |
 | O-03 | After T060 closes, capture any lessons in `docs/upgrades/waaseyaa-alpha-X-to-Y.md` §9 per the deferred-cycle note | Docs | |
 
 ---
@@ -165,6 +155,8 @@ No new public attack surface introduced. No secrets in defaults.
 
 The framework deliverable is sound: the multi-backend architecture is in place, the byte-identity gate is structurally honest, cross-WP edits are narrow and documented, layer rules hold, and the conformance suite genuinely caught a contract violation in WP05 (the `SqlColumnBackend::delete()` no-op). Deferral discipline on §14 criterion 4 is explicit — the obligation is not silently redefined, just shifted to the Minoo cycle with documented exit criteria.
 
-Two follow-ups are owed: (a) wire `DefinitionValidator` into production boot so FR-021's fail-fast guarantee is real, and (b) reconcile spec.md §6.5 and contracts/partial-save-error.md with the `$errorCode` naming that already lives in the class, upgrade guide, and public-surface-map.
+~~Two follow-ups are owed: (a) wire `DefinitionValidator` into production boot so FR-021's fail-fast guarantee is real, and (b) reconcile spec.md §6.5 and contracts/partial-save-error.md with the `$errorCode` naming that already lives in the class, upgrade guide, and public-surface-map.~~
+
+**Update:** (a) resolved by #1443 — `AbstractKernel::validateQueryDefinitions()` now enforces FR-021 at boot. (b) H-02 remains open (doc-only fix, no code change needed).
 
 Neither blocks the mission's release; both should be tracked before the next storage-touching mission begins.
