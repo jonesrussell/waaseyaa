@@ -710,3 +710,15 @@ final class ParentDelegatedAccessPolicy implements AccessPolicyInterface
 
 → See `docs/specs/work-surface.md` F4 for the attachment wire-up.
 → See `docs/specs/field-access.md` for field-level access semantics (open-by-default).
+
+## Per-revision access (mission `entity-storage-v2-01KRCDDC`)
+
+When an entity type opts into revisions (`EntityType::isRevisionable() === true`), the gate gains a `view_revision` operation:
+
+- `GateInterface::VIEW_REVISION = 'view_revision'`.
+- `PolicyAttribute` accepts an `operations: array` parameter. A policy that declares `view_revision` must implement `viewRevision(EntityInterface $entity, AccountInterface $account, RevisionMetadata $revision): AccessResult`. Missing the method while declaring the op fails at boot.
+- `Waaseyaa\Access\Gate\RevisionAccessRouter` resolves the policy for the entity type. If the policy declares `view_revision`, it calls `viewRevision()`. Otherwise it falls back to `view()` and emits a structured log line on the `entity.lifecycle` channel with `outcome=view_revision_fallback` (context: entity_type_id, entity_id, vid, policy_fqcn). **Open-by-default**: absence of an explicit rule does NOT flip to deny — the fallback returns whatever `view()` returned.
+
+Canonical sources: `kitty-specs/entity-storage-v2-01KRCDDC/contracts/revisionable-entity.md` §11.2; mission spec §3.6; `docs/specs/entity-system.md` "Field storage backends" → "Per-revision access fallback rule".
+
+→ See `docs/upgrades/waaseyaa-alpha-X-to-Y.md` for the `view_revision` policy template and migration steps.
