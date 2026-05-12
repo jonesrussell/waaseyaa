@@ -212,3 +212,4 @@ spec-kitty agent action implement WP06 --agent <name>
 ## Activity Log
 
 - 2026-05-12T23:07:20Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=571501 – Started implementation via action command
+- 2026-05-12T23:15:04Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=571501 – FallbackChainResolver + trait fallback wiring; bounded chain (NFR-002); fieldLangcode cache
