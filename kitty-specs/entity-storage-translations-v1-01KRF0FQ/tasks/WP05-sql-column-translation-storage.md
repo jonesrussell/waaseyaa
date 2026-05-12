@@ -184,3 +184,4 @@ spec-kitty agent action implement WP05 --agent <name>
 ## Activity Log
 
 - 2026-05-12T22:48:18Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=542078 – Started implementation via action command
+- 2026-05-12T23:00:57Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=542078 – sql-column translation: __translation sibling table, partition by translatability, LEFT JOIN hydrator, write dispatch, multi-cardinality shapes
