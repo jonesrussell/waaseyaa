@@ -30,7 +30,7 @@ final class PartialSaveException extends \RuntimeException
         public readonly array $committedBackends,
         /** @var list<string> Backend ids that did NOT commit. */
         public readonly array $uncommittedBackends,
-        public readonly string $code = 'PARTIAL_SAVE',
+        public readonly string $errorCode = 'PARTIAL_SAVE',
     ) {
         parent::__construct(
             sprintf(
@@ -46,6 +46,8 @@ final class PartialSaveException extends \RuntimeException
     }
 }
 ```
+
+> The property is named `$errorCode`, not `$code`. PHP refuses to redeclare the inherited `\Exception::$code` (int, non-readonly) as a readonly string in any subclass. Consumers must read `$exception->errorCode`, not `$exception->code` (which still resolves to the inherited int).
 
 ## Coordinator contract (recap of spec §6.5)
 

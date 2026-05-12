@@ -314,10 +314,12 @@ final class PartialSaveException extends \RuntimeException
         public readonly \Throwable $causedBy,
         public readonly array $committedBackends,    // string[]
         public readonly array $uncommittedBackends,  // string[]
-        public readonly string $code = 'PARTIAL_SAVE',
+        public readonly string $errorCode = 'PARTIAL_SAVE',
     );
 }
 ```
+
+> The property is named `$errorCode`, not `$code`. PHP refuses to redeclare the inherited `\Exception::$code` (int, non-readonly) as a readonly string in any subclass. Consumers must read `$exception->errorCode`, not `$exception->code` (which still resolves to the inherited int).
 
 Recovery is operator concern. The framework provides the diagnostic; rollback strategy is per-app.
 
