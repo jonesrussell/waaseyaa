@@ -200,13 +200,13 @@ return [
     // WP09 — revision access (access package)
     'Waaseyaa\Access\Gate\RevisionAccessRouter' => 'public',
     // WP10 — migration CLI (cli package)
-    'Waaseyaa\Cli\Handler\MakeStorageMigrationHandler' => 'public',
-    'Waaseyaa\Cli\Provider\MakeStorageMigrationServiceProvider' => 'public',
-    'Waaseyaa\Cli\Command\Migration\StorageMigrationEmitter' => 'public',
-    'Waaseyaa\Cli\Command\Migration\StorageMigrationTemplate' => 'public',
-    'Waaseyaa\Cli\Command\Migration\BackfillHelper' => 'public',
-    'Waaseyaa\Cli\Command\Migration\UnmappedFieldTypeException' => 'public',
-    'Waaseyaa\Cli\Command\Migration\BackfillRowCountMismatchException' => 'public',
+    'Waaseyaa\CLI\Handler\MakeStorageMigrationHandler' => 'public',
+    'Waaseyaa\CLI\Provider\MakeStorageMigrationServiceProvider' => 'public',
+    'Waaseyaa\CLI\Command\Migration\StorageMigrationEmitter' => 'public',
+    'Waaseyaa\CLI\Command\Migration\StorageMigrationTemplate' => 'public',
+    'Waaseyaa\CLI\Command\Migration\BackfillHelper' => 'public',
+    'Waaseyaa\CLI\Command\Migration\UnmappedFieldTypeException' => 'public',
+    'Waaseyaa\CLI\Command\Migration\BackfillRowCountMismatchException' => 'public',
     // WP12 — conformance test harness (autoload-dev only; still part of stable surface for extenders)
     'Waaseyaa\EntityStorage\Testing\Contract\FieldStorageBackendContractTestCase' => 'public',
     // EntityQuery marker interface
