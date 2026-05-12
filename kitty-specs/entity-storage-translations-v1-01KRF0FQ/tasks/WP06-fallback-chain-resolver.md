@@ -27,6 +27,8 @@ owned_files:
 - packages/entity/src/Exception/InvalidConfigurationException.php
 - packages/entity/tests/Unit/Hydration/FallbackChain*
 tags: []
+agent: "claude:opus:waaseyaa-implementer:implementer"
+shell_pid: "571501"
 ---
 
 # WP06 — FallbackChainResolver + trait fallback wiring
@@ -206,3 +208,7 @@ Test files live under `packages/entity/tests/Unit/Hydration/`.
 ```bash
 spec-kitty agent action implement WP06 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-12T23:07:20Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=571501 – Started implementation via action command
