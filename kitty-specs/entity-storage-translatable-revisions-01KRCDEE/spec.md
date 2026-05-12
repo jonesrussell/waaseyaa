@@ -2,9 +2,20 @@
 <!-- Mission metadata: docs/specs/missions/M-004-entity-storage-translatable-revisions/mission.json -->
 <!-- Mission ID: M-004 | Spec Kitty mission_id below in meta.json -->
 
+> **🛑 BLOCKED — DO NOT PLAN (2026-05-12)**
+>
+> This mission cannot be planned in its current shape. Two hard prerequisites are missing from the shipped codebase:
+>
+> 1. **Single-axis translation substrate.** This spec assumes "entity-storage-v2 single-axis translations" already ship. They don't. M-001 (`entity-storage-v2-01KRCDDC`, squash `509e31fb7`) shipped only the revision axis. Today's translation surface is a tombstone: `EntityTypeInterface::isTranslatable(): bool` exists as an opt-in flag with no `TranslatableEntityInterface`, no `$entity->getTranslation()`, no translation storage.
+> 2. **ADR 015 listing pipeline.** Required for WP07 (per-langcode listing filters, langcode cache tags). Only the ADR exists; no mission specced or shipped.
+>
+> **Unblocker:** a new mission must spec and ship single-axis translations first (parallel to `entity-storage-v2`). Suggested slug `entity-storage-translations-v1` or similar. After it lands, revisit this spec's §3 FRs and §7 WP decomposition against the new substrate — much of the work decomposition may shift.
+>
+> Run `/spec-kitty.specify` to author the prerequisite mission spec.
+
 # Entity Storage — Translatable + Revisionable Two-Axis Interaction
 
-**Status:** Draft mission spec (2026-05-11)
+**Status:** Draft mission spec (2026-05-11), **BLOCKED 2026-05-12** pending single-axis translation prerequisite
 **Audience:** framework maintainers; input for Spec Kitty `specify` → `plan` → `tasks` flow
 **Mission ID:** TBD (to be assigned by `@jonesrussell` on mission creation)
 **Origin:** [ADR 017](../adr/017-per-field-translation.md) §"Revision × translation interaction" (Accepted 2026-05-11).
