@@ -174,3 +174,4 @@ spec-kitty agent action implement WP04 --agent <name>
 ## Activity Log
 
 - 2026-05-12T22:24:10Z – claude:sonnet:waaseyaa-implementer:implementer – shell_pid=534419 – Started implementation via action command
+- 2026-05-12T22:43:44Z – claude:sonnet:waaseyaa-implementer:implementer – shell_pid=534419 – sql-blob translation: PK widening, default_langcode column, per-langcode _data, non-translatable fallback, UUID partial unique index
