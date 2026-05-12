@@ -35,8 +35,8 @@ owned_files:
 - packages/entity-storage/tests/Backend/SqlColumn*
 - packages/entity-storage/tests/Hydration/SqlColumnTranslation*
 tags: []
-agent: "claude:opus:waaseyaa-implementer:implementer"
-shell_pid: "542078"
+agent: "claude:opus:waaseyaa-reviewer:reviewer"
+shell_pid: "557011"
 ---
 
 # WP05 — sql-column backend translation storage
@@ -185,3 +185,4 @@ spec-kitty agent action implement WP05 --agent <name>
 
 - 2026-05-12T22:48:18Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=542078 – Started implementation via action command
 - 2026-05-12T23:00:57Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=542078 – sql-column translation: __translation sibling table, partition by translatability, LEFT JOIN hydrator, write dispatch, multi-cardinality shapes
+- 2026-05-12T23:01:44Z – claude:opus:waaseyaa-reviewer:reviewer – shell_pid=557011 – Started review via action command
