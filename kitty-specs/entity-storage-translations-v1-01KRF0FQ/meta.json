@@ -1,10 +1,12 @@
 {
   "created_at": "2026-05-12T21:11:33.302899+00:00",
-  "friendly_name": "entity storage translations v1",
+  "friendly_name": "Entity Storage: Translations v1",
   "mission_id": "01KRF0FQ0AA42F434JNAA56WFB",
   "mission_number": null,
   "mission_slug": "entity-storage-translations-v1-01KRF0FQ",
   "mission_type": "software-dev",
   "slug": "entity-storage-translations-v1-01KRF0FQ",
-  "target_branch": "main"
+  "source_description": "Canonical doctrine spec at docs/specs/entity-storage-translations-v1.md. Mission metadata at docs/specs/missions/M-006-entity-storage-translations-v1/mission.json. Unblocks single-axis-translation prerequisite for M-004 (entity-storage-translatable-revisions). BETA-GATE per stability-charter §3.2.9; governing ADR 017 (per-field translation, accepted 2026-05-11).",
+  "target_branch": "main",
+  "vcs": "git"
 }

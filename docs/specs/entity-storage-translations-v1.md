@@ -1,27 +1,24 @@
-<!-- Canonical doctrine spec: docs/specs/entity-storage-translations-v1.md -->
-<!-- Mission metadata: docs/specs/missions/M-006-entity-storage-translations-v1/mission.json -->
-<!-- Mission ID: M-006 | Spec Kitty mission_id: 01KRF0FQ0AA42F434JNAA56WFB -->
-
 # Entity Storage — Single-Axis Translations v1
 
-**Status:** Draft mission spec (2026-05-12)
+**Status:** Draft mission spec (2026-05-12), ratification target: stability charter §5.3 update at mission close
 **Audience:** framework maintainers; input for Spec Kitty `specify` → `plan` → `tasks` flow
 **Mission ID:** M-006 (display) / `01KRF0FQ0AA42F434JNAA56WFB` (Spec Kitty)
-**Origin:** [ADR 017](../../docs/adr/017-per-field-translation.md) "Per-field translation: declarative flag + entity translation API" (Accepted 2026-05-11). M-001 (`entity-storage-v2-01KRCDDC`, squash `509e31fb7`) shipped revisions but left `EntityTypeInterface::isTranslatable()` as a tombstone flag with no implementation.
+**Mission slug:** `entity-storage-translations-v1-01KRF0FQ`
+**Origin:** [ADR 017](../adr/017-per-field-translation.md) "Per-field translation: declarative flag + entity translation API" (Accepted 2026-05-11). M-001 (`entity-storage-v2-01KRCDDC`, squash `509e31fb7`) shipped revisions but left `EntityTypeInterface::isTranslatable()` as a tombstone flag with no implementation.
 
-**Governing ADR:** [ADR 017](../../docs/adr/017-per-field-translation.md) — per-field translation, declarative flag, `TranslatableEntityInterface` surface, language fallback chain, sql-blob and sql-column storage shapes.
+**Governing ADR:** [ADR 017](../adr/017-per-field-translation.md) — per-field translation, declarative flag, `TranslatableEntityInterface` surface, language fallback chain, sql-blob and sql-column storage shapes.
 
 **Charter linkage:**
-- [`stability-charter.md`](../../docs/specs/stability-charter.md) §5.3 governs the new entity translation stable surface.
+- [`stability-charter.md`](stability-charter.md) §5.3 governs the new entity translation stable surface.
 - §3.2 criterion 9 (per-field translation surface) gates beta entry on this mission's delivery. **BETA-GATE.**
 
 **Sibling missions:**
-- [`entity-storage-v2.md`](../../docs/specs/entity-storage-v2.md) (M-001) — **shipped 2026-05-11**. Provides the multi-backend coordinator and revision substrate this mission extends with translation.
-- [`entity-storage-translatable-revisions.md`](../../docs/specs/entity-storage-translatable-revisions.md) (M-004) — **BLOCKED, gated on this mission.** Composes single-axis translation with single-axis revisions; cannot be planned until this mission ships.
-- [`migration-platform-v1.md`](../../docs/specs/migration-platform-v1.md) (M-002) — independent. `EntityDestination` writes per-language when target is translatable.
-- [`config-management-v1.md`](../../docs/specs/config-management-v1.md) (M-003) — independent. Config entities are not translatable.
+- [`entity-storage-v2.md`](entity-storage-v2.md) (M-001) — **shipped 2026-05-11**. Provides the multi-backend coordinator and revision substrate this mission extends with translation.
+- [`entity-storage-translatable-revisions.md`](entity-storage-translatable-revisions.md) (M-004) — **BLOCKED, gated on this mission.** Composes single-axis translation with single-axis revisions; cannot be planned until this mission ships AND the ADR 015 listing-pipeline mission ships.
+- [`migration-platform-v1.md`](migration-platform-v1.md) (M-002) — independent. `EntityDestination` writes per-language when target is translatable.
+- [`config-management-v1.md`](config-management-v1.md) (M-003) — independent. Config entities are not translatable.
 
-**Comparable mission:** `entity-storage-v2.md` — shape and rigor template.
+**Comparable mission:** [`entity-storage-v2.md`](entity-storage-v2.md) — shape and rigor template.
 
 ## 0. Origin
 
@@ -94,10 +91,10 @@ Normative requirements use **MUST / SHOULD / MAY** per RFC 2119. Status legend: 
 
 | ID | Status | Requirement |
 |---|---|---|
-| FR-001 | NEW | `EntityType` MUST accept `translatable: true` as a constructor parameter (today the parameter exists at line 75 but produces no runtime effect). When `true`, the entity type's storage backend MUST allocate a translation table. |
-| FR-002 | NEW | When `translatable: true`, the entity type MUST declare `langcode` in `entityKeys`. Boot MUST throw `InvalidEntityTypeException` if `langcode` key is missing. |
-| FR-003 | NEW | When `translatable: true`, the entity type MUST declare `default_langcode` in `entityKeys`. Boot MUST throw `InvalidEntityTypeException` if missing. |
-| FR-004 | NEW | The entity class registered for a `translatable: true` type MUST implement `TranslatableEntityInterface`. Boot MUST throw `InvalidEntityTypeException` if not. |
+| FR-001 | NEW | `EntityType` MUST accept `translatable: true` as a constructor parameter (today the parameter exists at `packages/entity/src/EntityType.php:75` but produces no runtime effect). When `true`, the entity type's storage backend MUST allocate a translation table. |
+| FR-002 | NEW | When `translatable: true`, the entity type MUST declare `langcode` in `entityKeys`. Boot MUST throw `InvalidEntityTypeException::missingLangcodeKey()` if missing. |
+| FR-003 | NEW | When `translatable: true`, the entity type MUST declare `default_langcode` in `entityKeys`. Boot MUST throw `InvalidEntityTypeException::missingDefaultLangcodeKey()` if missing. |
+| FR-004 | NEW | The entity class registered for a `translatable: true` type MUST implement `TranslatableEntityInterface`. Boot MUST throw `InvalidEntityTypeException::translatableEntityClassNotImplementingInterface()` if not. |
 | FR-005 | NEW | A bundle entity type (`bundleEntityType` set) MAY itself be `translatable`; bundles are not auto-translatable, the flag is per-entity-type. |
 
 ### 3.2 TranslatableEntityInterface surface
@@ -105,7 +102,7 @@ Normative requirements use **MUST / SHOULD / MAY** per RFC 2119. Status legend: 
 | ID | Status | Requirement |
 |---|---|---|
 | FR-006 | NEW | Interface `Waaseyaa\Entity\TranslatableEntityInterface extends EntityInterface` MUST be declared in `packages/entity/src/`. |
-| FR-007 | NEW | Method `defaultLangcode(): string` MUST return the entity's `default_langcode` value; MUST throw `EntityTranslationException` if unset (D1: fail-fast). |
+| FR-007 | NEW | Method `defaultLangcode(): string` MUST return the entity's `default_langcode` value; MUST throw `EntityTranslationException::langcodeRequired()` if unset (D1: fail-fast). |
 | FR-008 | NEW | Method `activeLangcode(): string` MUST return the langcode of the loaded translation. For an entity loaded via `find($id)` without a `getTranslation()` call, this MUST equal `defaultLangcode()`. |
 | FR-009 | NEW | Method `hasTranslation(string $langcode): bool` MUST return `true` iff a row exists for `(entity_id, langcode)`. MUST be O(1) on cache hit; backed by translation table on miss. |
 | FR-010 | NEW | Method `getTranslation(string $langcode): static` MUST return a `TranslatableEntityInterface` instance whose `activeLangcode()` equals `$langcode`. MUST throw `EntityTranslationException::translationNotFound()` if `hasTranslation($langcode)` is `false`. |
@@ -478,13 +475,13 @@ None at draft time — all decisions resolved during discovery (D1–D4 below). 
 
 ## 16. References
 
-- [ADR 017](../../docs/adr/017-per-field-translation.md) — governing per-field translation decision.
-- [ADR 010](../../docs/adr/010-multi-backend-field-storage.md) — multi-backend storage, extended here for translation.
-- [ADR 011](../../docs/adr/011-entity-lifecycle-events.md) — lifecycle event contract, extended with translation events.
-- [`stability-charter.md`](../../docs/specs/stability-charter.md) §3.2 criterion 9 — beta gate this mission clears.
-- [`entity-storage-v2.md`](../../docs/specs/entity-storage-v2.md) — shipped sibling mission (M-001); structural template for this spec.
-- [`entity-storage-translatable-revisions.md`](../../docs/specs/entity-storage-translatable-revisions.md) — M-004, BLOCKED on this mission's substrate.
-- [`public-surface-map.md`](../../docs/specs/public-surface-map.md) — updated by this mission per §6.
+- [ADR 017](../adr/017-per-field-translation.md) — governing per-field translation decision.
+- [ADR 010](../adr/010-multi-backend-field-storage.md) — multi-backend storage, extended here for translation.
+- [ADR 011](../adr/011-entity-lifecycle-events.md) — lifecycle event contract, extended with translation events.
+- [`stability-charter.md`](stability-charter.md) §3.2 criterion 9 — beta gate this mission clears.
+- [`entity-storage-v2.md`](entity-storage-v2.md) — shipped sibling mission (M-001); structural template for this spec.
+- [`entity-storage-translatable-revisions.md`](entity-storage-translatable-revisions.md) — M-004, BLOCKED on this mission's substrate.
+- [`public-surface-map.md`](public-surface-map.md) — updated by this mission per §6.
 - [`packages/i18n/README.md`](../../packages/i18n/README.md) — language negotiation surface this mission wires into the read path.
 
 ## 17. Mission metadata for Spec Kitty

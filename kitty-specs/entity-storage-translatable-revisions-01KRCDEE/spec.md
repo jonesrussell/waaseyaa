@@ -4,14 +4,12 @@
 
 > **🛑 BLOCKED — DO NOT PLAN (2026-05-12)**
 >
-> This mission cannot be planned in its current shape. Two hard prerequisites are missing from the shipped codebase:
+> This mission cannot be planned in its current shape. Two hard prerequisites stand between today and a plannable M-004:
 >
-> 1. **Single-axis translation substrate.** This spec assumes "entity-storage-v2 single-axis translations" already ship. They don't. M-001 (`entity-storage-v2-01KRCDDC`, squash `509e31fb7`) shipped only the revision axis. Today's translation surface is a tombstone: `EntityTypeInterface::isTranslatable(): bool` exists as an opt-in flag with no `TranslatableEntityInterface`, no `$entity->getTranslation()`, no translation storage.
+> 1. **Single-axis translation substrate.** **Spec filed 2026-05-12 as [M-006 `entity-storage-translations-v1`](../entity-storage-translations-v1-01KRF0FQ/spec.md)** (canonical doctrine: `docs/specs/entity-storage-translations-v1.md`). Must SHIP — not just be spec'd — before this composition can plan. M-001 (`entity-storage-v2-01KRCDDC`, squash `509e31fb7`) shipped only the revision axis. Today's translation surface is still a tombstone: `EntityTypeInterface::isTranslatable(): bool` exists as an opt-in flag with no `TranslatableEntityInterface`, no `$entity->getTranslation()`, no translation storage.
 > 2. **ADR 015 listing pipeline.** Required for WP07 (per-langcode listing filters, langcode cache tags). Only the ADR exists; no mission specced or shipped.
 >
-> **Unblocker:** a new mission must spec and ship single-axis translations first (parallel to `entity-storage-v2`). Suggested slug `entity-storage-translations-v1` or similar. After it lands, revisit this spec's §3 FRs and §7 WP decomposition against the new substrate — much of the work decomposition may shift.
->
-> Run `/spec-kitty.specify` to author the prerequisite mission spec.
+> **Unblocker:** M-006 must complete and squash-merge; the ADR 015 listing pipeline mission must spec and ship. After both land, revisit this spec's §3 FRs and §7 WP decomposition against the new substrate — much of the work decomposition may shift.
 
 # Entity Storage — Translatable + Revisionable Two-Axis Interaction
 

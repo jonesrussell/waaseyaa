@@ -2,7 +2,7 @@
 
 > **🛑 BLOCKED — DO NOT PLAN (2026-05-12)**
 >
-> Two hard prerequisites missing: (1) single-axis translation substrate (entity-storage-v2 / M-001 shipped only the revision axis; today's translation surface is the tombstone `EntityTypeInterface::isTranslatable()` flag — no `TranslatableEntityInterface`, no `getTranslation()`, no translation storage); (2) ADR 015 listing pipeline (only the ADR exists, no implementation mission). A prerequisite mission for single-axis translations must spec, plan, and ship before this two-axis composition can be planned. See `kitty-specs/entity-storage-translatable-revisions-01KRCDEE/spec.md` for the same banner.
+> Two hard prerequisites missing: (1) single-axis translation substrate — **spec filed 2026-05-12 as [M-006 `entity-storage-translations-v1`](entity-storage-translations-v1.md)**; must SHIP before this composition plans (M-001 shipped only the revision axis; today's translation surface is the tombstone `EntityTypeInterface::isTranslatable()` flag — no `TranslatableEntityInterface`, no `getTranslation()`, no translation storage); (2) ADR 015 listing pipeline (only the ADR exists, no implementation mission). When M-006 ships AND the ADR 015 listing-pipeline mission ships, this banner is removed. See `kitty-specs/entity-storage-translatable-revisions-01KRCDEE/spec.md` for the same banner.
 
 **Status:** Draft mission spec (2026-05-11), **BLOCKED 2026-05-12**
 **Audience:** framework maintainers; input for Spec Kitty `specify` → `plan` → `tasks` flow
