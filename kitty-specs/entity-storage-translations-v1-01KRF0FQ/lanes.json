@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "mission_slug": "entity-storage-translations-v1-01KRF0FQ",
+  "mission_id": "01KRF0FQ0AA42F434JNAA56WFB",
+  "mission_branch": "kitty/mission-entity-storage-translations-v1-01KRF0FQ",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05",
+        "WP06",
+        "WP07",
+        "WP08",
+        "WP09",
+        "WP10",
+        "WP11",
+        "WP12",
+        "WP13",
+        "WP14"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "config/waaseyaa.php",
+        "docs/cookbook/translating-an-entity-type.md",
+        "docs/public-surface-map.php",
+        "docs/specs/entity-storage-translatable-revisions.md",
+        "docs/specs/entity-storage-translations-v1.md",
+        "docs/specs/missions/README.md",
+        "docs/specs/public-surface-map.md",
+        "docs/specs/stability-charter.md",
+        "kitty-specs/entity-storage-translatable-revisions-01KRCDEE/spec.md",
+        "kitty-specs/entity-storage-translations-v1-01KRF0FQ/spec.md",
+        "packages/access/src/Gate/AccessChecker.php",
+        "packages/access/tests/Unit/AccessChecker*",
+        "packages/access/tests/Unit/Translate*",
+        "packages/cli/src/Command/MakeMigration*.php",
+        "packages/cli/src/Command/MakeMigrationCommand.php",
+        "packages/cli/tests/Integration/AddTranslations*",
+        "packages/cli/tests/Unit/MakeMigration*",
+        "packages/entity-storage/src/Backend/SqlBlobBackend*.php",
+        "packages/entity-storage/src/Backend/SqlBlobBackend.php",
+        "packages/entity-storage/src/Backend/SqlColumnBackend*.php",
+        "packages/entity-storage/src/CoordinatorLifecycleDispatcher.php",
+        "packages/entity-storage/src/EntityRepository.php",
+        "packages/entity-storage/src/EntitySchemaSync.php",
+        "packages/entity-storage/src/EntityStorageCoordinator.php",
+        "packages/entity-storage/src/Hydration/SqlColumnTranslationHydrator.php",
+        "packages/entity-storage/src/SaveContext.php",
+        "packages/entity-storage/src/Schema/TranslationSchemaHandler.php",
+        "packages/entity-storage/src/SqlSchemaHandler.php",
+        "packages/entity-storage/tests/Backend/SqlBlob*",
+        "packages/entity-storage/tests/Backend/SqlColumn*",
+        "packages/entity-storage/tests/Contract/SqlBlob*",
+        "packages/entity-storage/tests/Contract/SqlColumn*",
+        "packages/entity-storage/tests/Coordinator/EventDispatch*",
+        "packages/entity-storage/tests/Coordinator/Translation*",
+        "packages/entity-storage/tests/Fixtures/TestTranslatableEntity.php",
+        "packages/entity-storage/tests/Fixtures/test_translatable_entity*",
+        "packages/entity-storage/tests/Hydration/SqlColumnTranslation*",
+        "packages/entity-storage/tests/Repository/FallbackChain*",
+        "packages/entity-storage/tests/Repository/FindTranslations*",
+        "packages/entity-storage/tests/Repository/LanguageManager*",
+        "packages/entity-storage/tests/SaveContext*",
+        "packages/entity/composer.json",
+        "packages/entity/src/ContentEntityBase.php",
+        "packages/entity/src/EntityType.php",
+        "packages/entity/src/Event/EntityEvent.php",
+        "packages/entity/src/Event/EntityEvents.php",
+        "packages/entity/src/Event/TranslationEvent.php",
+        "packages/entity/src/Exception/EntityTranslationException.php",
+        "packages/entity/src/Exception/InvalidConfigurationException.php",
+        "packages/entity/src/Exception/InvalidEntityTypeException.php",
+        "packages/entity/src/Hydration/FallbackChainResolver.php",
+        "packages/entity/src/TranslatableEntityTrait.php",
+        "packages/entity/src/TranslatableInterface.php",
+        "packages/entity/testing/**",
+        "packages/entity/testing/TranslatableEntityContractTest.php",
+        "packages/entity/tests/Event/*",
+        "packages/entity/tests/Unit/EntityType*",
+        "packages/entity/tests/Unit/Exception/EntityTranslationException*",
+        "packages/entity/tests/Unit/Hydration/FallbackChain*",
+        "packages/entity/tests/Unit/Translatable*",
+        "packages/field/src/Exception/InvalidFieldDefinitionException.php",
+        "packages/field/src/FieldDefinition.php",
+        "packages/field/tests/Unit/FieldDefinition*",
+        "tests/Integration/Config/Translation*"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "app-shell",
+        "legacy-cleanup",
+        "tests",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-12T21:51:46.662842+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP01"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP01"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP01"
+      },
+      {
+        "wp_a": "WP06",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP06 depends on WP04"
+      },
+      {
+        "wp_a": "WP07",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP07 depends on WP04"
+      },
+      {
+        "wp_a": "WP08",
+        "wp_b": "WP07",
+        "rule": "dependency",
+        "evidence": "WP08 depends on WP07"
+      },
+      {
+        "wp_a": "WP09",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP09 depends on WP01"
+      },
+      {
+        "wp_a": "WP10",
+        "wp_b": "WP06",
+        "rule": "dependency",
+        "evidence": "WP10 depends on WP06"
+      },
+      {
+        "wp_a": "WP11",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP11 depends on WP04"
+      },
+      {
+        "wp_a": "WP13",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP13 depends on WP01"
+      },
+      {
+        "wp_a": "WP14",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP14 depends on WP01"
+      },
+      {
+        "wp_a": "WP14",
+        "wp_b": "WP12",
+        "rule": "dependency",
+        "evidence": "WP14 depends on WP12"
+      }
+    ],
+    "total_merges": 13,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 13
+    }
+  }
+}
