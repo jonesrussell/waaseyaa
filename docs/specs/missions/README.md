@@ -1,7 +1,7 @@
 # Waaseyaa Mission Manifest
 
 **Generated:** 2026-05-11
-**Updated:** 2026-05-13 — **M-006** (`entity-storage-translations-v1`) shipped (squash `<PENDING-SHA>`), clearing one of two M-004 prerequisites; M-001 remains shipped (squash `509e31fb7`).
+**Updated:** 2026-05-13 — **M-006** (`entity-storage-translations-v1`) shipped (squash `0f7e1809a`), clearing one of two M-004 prerequisites; M-001 remains shipped (squash `509e31fb7`).
 **Status:** Six missions on the manifest. M-001 and M-006 shipped. M-002/M-003 ready. M-004 still blocked on the ADR 015 listing-pipeline prereq; M-005 still blocked on M-002.
 
 Each subdirectory contains a `mission.json` filing-ready metadata file. The canonical spec for each mission lives at the path given in `mission.json:spec_path`.
@@ -15,7 +15,7 @@ Each subdirectory contains a `mission.json` filing-ready metadata file. The cano
 | M-003 | Config Management v1 | `docs/specs/config-management-v1.md` | ready (verify validation pipeline) | `mission.json` |
 | M-004 | Two-Axis Translation × Revisions | `docs/specs/entity-storage-translatable-revisions.md` | blocked (waits on listing-pipeline-v1; single-axis-translation prereq cleared by M-006 on 2026-05-13) | `mission.json` |
 | M-005 | WordPress Source Reader | `docs/specs/waaseyaa-migrate-source-wordpress.md` | blocked (waits on M-002) | `mission.json` |
-| M-006 | Entity Storage — Single-Axis Translations v1 | `docs/specs/entity-storage-translations-v1.md` | **shipped 2026-05-13** (squash `<PENDING-SHA>`); satisfies charter §3.2 beta-entry criterion 9 (per-field translation) | `mission.json` |
+| M-006 | Entity Storage — Single-Axis Translations v1 | `docs/specs/entity-storage-translations-v1.md` | **shipped 2026-05-13** (squash `0f7e1809a`); satisfies charter §3.2 beta-entry criterion 9 (per-field translation) | `mission.json` |
 
 ## Cross-mission dependency graph
 

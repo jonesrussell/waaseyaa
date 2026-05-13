@@ -4,7 +4,7 @@
 >
 > One hard prerequisite remaining: the **ADR 015 listing pipeline** (only the ADR exists today; no implementation mission has been specced). When that mission ships, this banner is removed.
 >
-> The single-axis translation substrate prerequisite was satisfied by **M-006 (`entity-storage-translations-v1`, squash `<PENDING-SHA>`)**, which delivered `TranslatableInterface`, per-field `FieldDefinition::translatable()`, translation storage in both `sql-blob` and `sql-column` backends, the configurable fallback chain, translation lifecycle events, the `'translate'` access-policy operation, and the `make:migration --add-translations` CLI. See [`entity-storage-translations-v1.md`](entity-storage-translations-v1.md).
+> The single-axis translation substrate prerequisite was satisfied by **M-006 (`entity-storage-translations-v1`, squash `0f7e1809a`)**, which delivered `TranslatableInterface`, per-field `FieldDefinition::translatable()`, translation storage in both `sql-blob` and `sql-column` backends, the configurable fallback chain, translation lifecycle events, the `'translate'` access-policy operation, and the `make:migration --add-translations` CLI. See [`entity-storage-translations-v1.md`](entity-storage-translations-v1.md).
 >
 > See `kitty-specs/entity-storage-translatable-revisions-01KRCDEE/spec.md` for the same banner.
 
