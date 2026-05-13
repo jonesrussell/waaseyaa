@@ -101,10 +101,10 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T046  | `ImportRollbackCommand`                                                           | WP08 |          | FR-035, FR-043, FR-044                              | [D] |
 | T047  | `ImportResetCommand`                                                              | WP08 | [P]      | FR-036                                              | [D] |
 | T048  | Integration test: full rollback flow                                              | WP08 |          | FR-035, FR-036, FR-041..FR-044                      | [D] |
-| T049  | `MigrationLock` class                                                             | WP09 |          | FR-061, FR-062                                      |
-| T050  | `MigrationConcurrencyException`                                                   | WP09 | [P]      | FR-061, FR-062, FR-045                              |
-| T051  | Wire lock into CLI commands (WP06+WP07+WP08)                                      | WP09 |          | FR-061                                              |
-| T052  | Integration test: concurrent acquisition + signal handling                        | WP09 |          | FR-061, FR-062                                      |
+| T049  | `MigrationLock` class                                                             | WP09 |          | FR-061, FR-062                                      | [D] |
+| T050  | `MigrationConcurrencyException`                                                   | WP09 | [P]      | FR-061, FR-062, FR-045                              | [D] |
+| T051  | Wire lock into CLI commands (WP06+WP07+WP08)                                      | WP09 |          | FR-061                                              | [D] |
+| T052  | Integration test: concurrent acquisition + signal handling                        | WP09 |          | FR-061, FR-062                                      | [D] |
 | T053  | `CsvSource` reference fixture                                                     | WP10 |          | FR-052                                              |
 | T054  | `SourceConformanceTestCase` abstract base                                         | WP10 | [P]      | FR-049, FR-051                                      |
 | T055  | `DestinationConformanceTestCase` abstract base                                    | WP10 | [P]      | FR-050, FR-051                                      |
@@ -396,10 +396,10 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** Lock file path matches spec §9.3; PID inside the file; pcntl-based graceful release on SIGTERM/SIGINT; stale-lock recovery documented.
 
 **Subtasks**
-- [ ] T049 MigrationLock class (WP09)
-- [ ] T050 MigrationConcurrencyException (WP09)
-- [ ] T051 Wire lock into all mutating CLI commands (WP09)
-- [ ] T052 Integration test: concurrent acquisition + signal handling (WP09)
+- [x] T049 MigrationLock class (WP09)
+- [x] T050 MigrationConcurrencyException (WP09)
+- [x] T051 Wire lock into all mutating CLI commands (WP09)
+- [x] T052 Integration test: concurrent acquisition + signal handling (WP09)
 
 **Implementation sketch:** `flock($handle, LOCK_EX | LOCK_NB)`. Lock dir at `storage/migration-locks/`. `pcntl_signal()` for SIGTERM/SIGINT release when available; `register_shutdown_function` fallback. Windows degrades gracefully. `import:status` does NOT acquire a lock (read-only).
 
