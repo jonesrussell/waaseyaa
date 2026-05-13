@@ -356,3 +356,4 @@ Planning/base branch: `main`. Merge target: `main`. Per-lane worktree. Run `spec
 ## Activity Log
 
 - 2026-05-13T04:36:25Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=662802 – Started implementation via action command
+- 2026-05-13T04:57:47Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=662802 – Ready for review — CLI runner core (MigrationRunner + ProcessChainExecutor + RunOptions/RunReport + MigrationAbortedException) + three import:* commands wired via ImportServiceProvider; EntityDestination gained withRunId() per WP05 forward; MigrationIdMap gained maxLastImportedAt() for status. 284 migration+CLI tests + 8144 full suite green; cs-check/phpstan/layers/composer-policy all clean. Verified bin/waaseyaa import:run --help renders and import:status executes.
