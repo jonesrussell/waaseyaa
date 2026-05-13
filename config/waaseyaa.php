@@ -56,6 +56,24 @@ return [
     // Allowed CORS origins for the admin SPA.
     'cors_origins' => ['http://localhost:3000', 'http://127.0.0.1:3000'],
 
+    // Trusted reverse-proxy IPs/CIDRs for X-Forwarded-* header handling.
+    //
+    // When the app sits behind a TLS-terminating proxy (Caddy, nginx,
+    // a load balancer) that talks HTTP to PHP-FPM, set this to the
+    // proxy's IP, CIDR range, or the Symfony sentinel `REMOTE_ADDR`
+    // (meaning "trust the immediate connecting peer").
+    //
+    // Empty list = no trusted proxies = X-Forwarded-* headers are
+    // ignored (the safe default for setups without a TLS terminator).
+    //
+    // Override with `TRUSTED_PROXIES` env var (comma-separated values,
+    // e.g. `10.0.0.0/8,192.168.0.0/16` or `REMOTE_ADDR`). Config wins
+    // when both are present.
+    //
+    // See packages/foundation/src/Kernel/HttpKernel.php
+    // ::applyTrustedProxiesFromConfig() and issue #1394.
+    'trusted_proxies' => [],
+
     // Locale negotiation defaults used by public SSR path resolution.
     'i18n' => [
         'languages' => [
