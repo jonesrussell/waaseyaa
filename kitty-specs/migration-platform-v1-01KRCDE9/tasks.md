@@ -60,12 +60,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T005  | `HasMigrationPluginsInterface` + `PluginRegistry` + reserved ids + log channel    | WP01 |          | FR-007, FR-008, FR-009                              | [D] |
 | T006  | `MigrationPluginCollisionException`                                               | WP01 | [P]      | FR-008, FR-045                                      | [D] |
 | T007  | Unit tests for plugin contracts + registry                                        | WP01 |          | FR-001..FR-010                                      | [D] |
-| T008  | `MigrationDefinition` value object                                                | WP02 |          | FR-011, FR-012, FR-016                              |
-| T009  | `HasMigrationsInterface` provider capability                                      | WP02 | [P]      | FR-013                                              |
-| T010  | `FilesystemManifestLoader`                                                        | WP02 | [P]      | FR-013                                              |
-| T011  | `MigrationRegistry` + `DependencyGraph` + `CycleDetector`                         | WP02 |          | FR-013, FR-014, FR-015, FR-017                      |
-| T012  | `MigrationCycleException` + `MigrationDependencyMissingException`                 | WP02 | [P]      | FR-014, FR-015, FR-045                              |
-| T013  | Integration test: discovery + ServiceProvider wiring                              | WP02 |          | FR-011..FR-017                                      |
+| T008  | `MigrationDefinition` value object                                                | WP02 |          | FR-011, FR-012, FR-016                              | [D] |
+| T009  | `HasMigrationsInterface` provider capability                                      | WP02 | [P]      | FR-013                                              | [D] |
+| T010  | `FilesystemManifestLoader`                                                        | WP02 | [P]      | FR-013                                              | [D] |
+| T011  | `MigrationRegistry` + `DependencyGraph` + `CycleDetector`                         | WP02 |          | FR-013, FR-014, FR-015, FR-017                      | [D] |
+| T012  | `MigrationCycleException` + `MigrationDependencyMissingException`                 | WP02 | [P]      | FR-014, FR-015, FR-045                              | [D] |
+| T013  | Integration test: discovery + ServiceProvider wiring                              | WP02 |          | FR-011..FR-017                                      | [D] |
 | T014  | `PassThroughProcessor`                                                            | WP03 | [P]      | FR-010                                              |
 | T015  | `HtmlSanitizeProcessor`                                                           | WP03 | [P]      | FR-010                                              |
 | T016  | `LookupProcessor`                                                                 | WP03 | [P]      | FR-010                                              |
@@ -171,12 +171,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** All 7 FRs (FR-011..FR-017) covered; cycle-detection algorithm produces useful error paths; topological order is deterministic across runs.
 
 **Subtasks**
-- [ ] T008 MigrationDefinition value object (WP02)
-- [ ] T009 HasMigrationsInterface provider capability (WP02)
-- [ ] T010 FilesystemManifestLoader (WP02)
-- [ ] T011 MigrationRegistry + DependencyGraph + CycleDetector (WP02)
-- [ ] T012 MigrationCycleException + MigrationDependencyMissingException (WP02)
-- [ ] T013 Integration test: discovery + ServiceProvider wiring (WP02)
+- [x] T008 MigrationDefinition value object (WP02)
+- [x] T009 HasMigrationsInterface provider capability (WP02)
+- [x] T010 FilesystemManifestLoader (WP02)
+- [x] T011 MigrationRegistry + DependencyGraph + CycleDetector (WP02)
+- [x] T012 MigrationCycleException + MigrationDependencyMissingException (WP02)
+- [x] T013 Integration test: discovery + ServiceProvider wiring (WP02)
 
 **Implementation sketch:** `MigrationDefinition` is `final readonly class`. Cycle detection is classical DFS with three-color marking — Kahn's algorithm does not produce cycle paths. The `ServiceProvider` from WP01 grows a second registry binding.
 
