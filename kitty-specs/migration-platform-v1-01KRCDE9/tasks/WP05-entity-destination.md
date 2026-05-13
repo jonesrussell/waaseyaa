@@ -22,8 +22,8 @@ subtasks:
 - T030
 - T031
 - T032
-agent: "claude:opus:waaseyaa-implementer:implementer"
-shell_pid: "657197"
+agent: "claude:opus:waaseyaa-reviewer:reviewer"
+shell_pid: "661500"
 history:
 - timestamp: '2026-05-13T02:27:32Z'
   actor: spec-kitty.tasks
@@ -314,3 +314,4 @@ Planning/base branch: `main`. Merge target: `main`. Per-lane worktree. Run `spec
 
 - 2026-05-13T04:11:44Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=657197 – Started implementation via action command
 - 2026-05-13T04:31:32Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=657197 – WP05 ready for review — EntityDestination + factory + DestinationWriteException + SaveContext::isImport + fixtures + 12 integration tests. cs-check (2 passes), phpstan, layer-check, composer-policy, full phpunit (8101 tests, 20692 assertions) all green.
+- 2026-05-13T04:32:21Z – claude:opus:waaseyaa-reviewer:reviewer – shell_pid=661500 – Started review via action command
