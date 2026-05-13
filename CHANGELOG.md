@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **`PartialSaveException::$code` → `$errorCode` in spec §6.5 and `contracts/partial-save-error.md`** — Doc-drift cleanup from mission-review finding H-02. The runtime class, class docblock, upgrade guide, and public-surface-map already used `$errorCode` (the WP04 cycle-4 alignment commit only updated the class docblock; the two normative source docs were missed). Now consistent across all five surfaces, with the PHP `\Exception::$code` redeclaration constraint noted inline in both spec and contract.
 
+### Removed
+
+- **`packages/bimaaji/mcp/` Node MCP scaffolding removed — bimaaji ships PHP-only (issue #1387)** — The Node-based MCP server under `packages/bimaaji/mcp/` (`server.js`, `package.json`, `package-lock.json`; tools `bimaaji_ping`, `bimaaji_about`) never reached consumers reliably: `vendor/waaseyaa/bimaaji/mcp/server.js` was absent at runtime in the alpha.157+ range, so any downstream `composer bimaaji-mcp-install` script exited 254 and Claude Code sessions could not resolve `mcp__bimaaji__*` tools. No script existed in Waaseyaa's own root `composer.json` (the broken command was Minoo-local). Consumers (e.g., Minoo) that previously wired `mcpServers.bimaaji` in `.claude/settings.json` or ran `composer bimaaji-mcp-install` as a post-install step should drop both — see `packages/bimaaji/README.md` for the cleanup checklist. Restoration tracked in #1463 (deferred from #1387).
+
 ## [0.1.0-alpha.177] - 2026-05-11
 
 ### Fixed
