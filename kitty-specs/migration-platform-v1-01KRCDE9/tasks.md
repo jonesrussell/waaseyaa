@@ -105,11 +105,11 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T050  | `MigrationConcurrencyException`                                                   | WP09 | [P]      | FR-061, FR-062, FR-045                              | [D] |
 | T051  | Wire lock into CLI commands (WP06+WP07+WP08)                                      | WP09 |          | FR-061                                              | [D] |
 | T052  | Integration test: concurrent acquisition + signal handling                        | WP09 |          | FR-061, FR-062                                      | [D] |
-| T053  | `CsvSource` reference fixture                                                     | WP10 |          | FR-052                                              |
-| T054  | `SourceConformanceTestCase` abstract base                                         | WP10 | [P]      | FR-049, FR-051                                      |
-| T055  | `DestinationConformanceTestCase` abstract base                                    | WP10 | [P]      | FR-050, FR-051                                      |
-| T056  | `ReferenceSourceConformanceTest`                                                  | WP10 |          | FR-049, FR-051, FR-052                              |
-| T057  | `ReferenceDestinationConformanceTest`                                             | WP10 |          | FR-050, FR-051                                      |
+| T053  | `CsvSource` reference fixture                                                     | WP10 |          | FR-052                                              | [D] |
+| T054  | `SourceConformanceTestCase` abstract base                                         | WP10 | [P]      | FR-049, FR-051                                      | [D] |
+| T055  | `DestinationConformanceTestCase` abstract base                                    | WP10 | [P]      | FR-050, FR-051                                      | [D] |
+| T056  | `ReferenceSourceConformanceTest`                                                  | WP10 |          | FR-049, FR-051, FR-052                              | [D] |
+| T057  | `ReferenceDestinationConformanceTest`                                             | WP10 |          | FR-050, FR-051                                      | [D] |
 | T058  | `users-1000.csv` fixture                                                          | WP11 | [P]      | FR-053 substrate                                    |
 | T059  | `UsersCsvToWidgetsMigration` definition fixture                                   | WP11 | [P]      | FR-053 substrate                                    |
 | T060  | Integration test: full E2E (import + resume + rollback + idempotency)             | WP11 |          | FR-053, FR-054, FR-055                              |
@@ -426,11 +426,11 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** Both bases are reusable from third-party packages; reference conformance tests green; `composer install --no-dev` does NOT install the test bases.
 
 **Subtasks**
-- [ ] T053 CsvSource reference fixture (WP10)
-- [ ] T054 SourceConformanceTestCase abstract base (WP10)
-- [ ] T055 DestinationConformanceTestCase abstract base (WP10)
-- [ ] T056 ReferenceSourceConformanceTest (WP10)
-- [ ] T057 ReferenceDestinationConformanceTest (WP10)
+- [x] T053 CsvSource reference fixture (WP10)
+- [x] T054 SourceConformanceTestCase abstract base (WP10)
+- [x] T055 DestinationConformanceTestCase abstract base (WP10)
+- [x] T056 ReferenceSourceConformanceTest (WP10)
+- [x] T057 ReferenceDestinationConformanceTest (WP10)
 
 **Implementation sketch:** `testing/` directory is `autoload-dev` only (CLAUDE.md gotcha). Source base has eight gates (C1–C8) covering laziness, determinism, hash stability, memory bounds. Destination base has seven gates (D1–D7). Reference tests subclass and pass.
 
