@@ -1,7 +1,7 @@
 {
-  "event_count": 37,
-  "last_event_id": "01KRFSXFHK2T3MTNVNA7S4CZV5",
-  "materialized_at": "2026-05-13T04:35:57.619176+00:00",
+  "event_count": 39,
+  "last_event_id": "01KRFSYB3VXC3H2SS16BS68D8Z",
+  "materialized_at": "2026-05-13T04:36:25.851066+00:00",
   "mission_number": "",
   "mission_slug": "migration-platform-v1-01KRCDE9",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 7
+    "planned": 6
   },
   "work_packages": {
     "WP01": {
@@ -53,11 +53,11 @@
       "last_transition_at": "2026-05-13T04:35:57.619176+00:00"
     },
     "WP06": {
-      "actor": "finalize-tasks",
+      "actor": "claude:opus:waaseyaa-implementer:implementer",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KRFM2DK9ABTJ4AXNJFYA42KC",
-      "last_transition_at": "2026-05-13T02:53:48.009745+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KRFSYB3VXC3H2SS16BS68D8Z",
+      "last_transition_at": "2026-05-13T04:36:25.851066+00:00"
     },
     "WP07": {
       "actor": "finalize-tasks",
