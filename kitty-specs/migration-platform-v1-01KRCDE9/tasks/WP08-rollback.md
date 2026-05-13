@@ -273,3 +273,4 @@ Planning/base branch: `main`. Merge target: `main`. Per-lane worktree. Run `spec
 ## Activity Log
 
 - 2026-05-13T15:42:02Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=9236 – Started implementation via action command
+- 2026-05-13T15:59:28Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=9236 – Rollback + reset CLI complete; all gates green; 8201 tests pass
