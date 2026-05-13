@@ -14,6 +14,8 @@ subtasks:
 - T050
 - T051
 - T052
+agent: "claude:opus:waaseyaa-implementer:implementer"
+shell_pid: "14193"
 history:
 - timestamp: '2026-05-13T02:27:32Z'
   actor: spec-kitty.tasks
@@ -240,3 +242,7 @@ Planning/base branch: `main`. Merge target: `main`. Per-lane worktree. Run `spec
 - Verify: lock file is removed after a normal exit.
 - Verify: shutdown-function release covers the no-pcntl path.
 - Confirm: stale-lock recovery is documented in the exception message AND will be documented in the WP12 author guide.
+
+## Activity Log
+
+- 2026-05-13T16:04:42Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=14193 – Started implementation via action command
