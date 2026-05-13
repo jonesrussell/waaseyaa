@@ -99,25 +99,17 @@ final class ReferenceDestinationConformanceTest extends DestinationConformanceTe
     }
 
     /**
-     * EntityDestination currently advertises `stability() === 'beta'` while
-     * the canonical pair is `stable|experimental`. Widening the allow-list
-     * here keeps the gate honest for third-party plugin authors (default
-     * behaviour) while documenting the WP05 deviation.
-     *
-     * @return list<string>
-     */
-    protected function allowedStabilityValues(): array
-    {
-        return ['stable', 'experimental', 'beta'];
-    }
-
-    /**
      * WP08's rollback() deletes the destination entity but intentionally
      * retains the id-map row so re-imports flow through the update-path
-     * rather than recreating the entity. Subsequent `lookup()` calls
-     * therefore return the prior WriteResult, not null — opting out of
-     * the strict D3 lookup-null assertion. Tracked as a follow-up against
-     * the WP08 rollback contract.
+     * rather than recreating the entity (FR-042 idempotency, destination-plugin
+     * contract invariant #1). Subsequent `lookup()` calls therefore return
+     * the prior WriteResult, not null — opting out of the strict D3
+     * lookup-null assertion.
+     *
+     * Follow-up: align canonical D3 contract text with FR-042 — either
+     * tighten {@see DestinationConformanceTestCase} D3 to assert retention,
+     * or add an explicit normative statement to `contracts/destination-plugin.md`.
+     * Issue TBD.
      */
     protected function rollbackClearsLookup(): bool
     {

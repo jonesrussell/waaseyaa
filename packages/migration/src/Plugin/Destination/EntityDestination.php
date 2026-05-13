@@ -106,11 +106,13 @@ final class EntityDestination implements DestinationPluginInterface
     private const string DESTINATION_ID = 'entity';
 
     /**
-     * Stability marker exposed via {@see stability()}. The destination is the
-     * canonical persistence surface of the migration platform; bumped to
-     * `stable` once the contract crosses out of v0.1.x.
+     * Stability marker exposed via {@see stability()}. EntityDestination is
+     * the canonical stable destination per `contracts/destination-plugin.md`
+     * ("The framework ships exactly one stable destination — EntityDestination.")
+     * and the DestinationPluginInterface::stability() PHPDoc enum
+     * (`'stable'|'experimental'`).
      */
-    private const string STABILITY = 'beta';
+    private const string STABILITY = 'stable';
 
     private readonly LoggerInterface $logger;
 
