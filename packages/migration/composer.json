@@ -7,10 +7,15 @@
         {
             "type": "path",
             "url": "../foundation"
+        },
+        {
+            "type": "path",
+            "url": "../database-legacy"
         }
     ],
     "require": {
         "php": ">=8.5",
+        "waaseyaa/database-legacy": "^0.1.0-alpha.177",
         "waaseyaa/foundation": "^0.1.0-alpha.177"
     },
     "require-dev": {
@@ -32,7 +37,8 @@
         "waaseyaa": {
             "providers": [
                 "Waaseyaa\\Migration\\ServiceProvider"
-            ]
+            ],
+            "migrations": "migrations"
         },
         "branch-alias": {
             "dev-main": "0.1.x-dev",

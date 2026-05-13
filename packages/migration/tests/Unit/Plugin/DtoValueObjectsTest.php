@@ -97,13 +97,14 @@ final class DtoValueObjectsTest extends TestCase
     }
 
     #[Test]
-    public function source_id_hash_is_a_stub_until_wp04(): void
+    public function source_id_hash_returns_a_sha256_hex_digest(): void
     {
         $id = new SourceId('wp', ['id' => 1]);
 
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('SourceId::hash() not yet implemented — landing in WP04.');
-        $id->hash();
+        // WP04: hash() returns a deterministic 64-char lowercase sha256 hex
+        // digest. The full algorithmic contract is covered by
+        // {@see \Waaseyaa\Migration\Tests\Unit\SourceIdTest}.
+        self::assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $id->hash());
     }
 
     #[Test]
