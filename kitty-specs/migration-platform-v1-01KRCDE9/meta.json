@@ -6,6 +6,8 @@
   "mission_slug": "migration-platform-v1-01KRCDE9",
   "mission_type": "software-dev",
   "slug": "migration-platform-v1-01KRCDE9",
-  "source_description": "Canonical doctrine spec at docs/specs/migration-platform-v1.md (ratified per stability charter \u00a712.4 in commit 370d4163e). Mission metadata at docs/specs/missions/M-002-migration-platform-v1/mission.json.",
-  "target_branch": "main"
+  "source_description": "Canonical doctrine spec at docs/specs/migration-platform-v1.md (ratified per stability charter §12.4 in commit 370d4163e). Mission metadata at docs/specs/missions/M-002-migration-platform-v1/mission.json.",
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-13T02:55:40.940487+00:00"
 }
