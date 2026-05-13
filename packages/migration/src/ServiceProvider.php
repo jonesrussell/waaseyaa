@@ -82,6 +82,17 @@ final class ServiceProvider extends BaseServiceProvider
         $this->singleton(ProcessChainExecutor::class, static fn(): ProcessChainExecutor
             => new ProcessChainExecutor());
 
+        // WP07 — per-record progress + resume checkpoint repository.
+        $this->singleton(MigrationRunState::class, function () {
+            $database = $this->resolve(DatabaseInterface::class);
+            \assert($database instanceof DatabaseInterface);
+
+            return new MigrationRunState(
+                database: $database,
+                logger: $this->resolveLogger(),
+            );
+        });
+
         $this->singleton(MigrationRunner::class, function () {
             $registry = $this->resolve(MigrationRegistry::class);
             \assert($registry instanceof MigrationRegistry);
@@ -89,12 +100,15 @@ final class ServiceProvider extends BaseServiceProvider
             \assert($chain instanceof ProcessChainExecutor);
             $idMap = $this->resolve(MigrationIdMap::class);
             \assert($idMap instanceof MigrationIdMap);
+            $runState = $this->resolve(MigrationRunState::class);
+            \assert($runState instanceof MigrationRunState);
 
             return new MigrationRunner(
                 registry: $registry,
                 chain: $chain,
                 idMap: $idMap,
                 logger: $this->resolveLogger(),
+                runState: $runState,
             );
         });
     }

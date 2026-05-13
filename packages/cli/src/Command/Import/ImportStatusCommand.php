@@ -8,34 +8,41 @@ use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Migration\Discovery\MigrationRegistry;
 use Waaseyaa\Migration\MigrationDefinition;
 use Waaseyaa\Migration\MigrationIdMap;
+use Waaseyaa\Migration\MigrationRunState;
 
 /**
  * `bin/waaseyaa import:status [<migration-id>]` — surface per-migration state.
  *
- * WP06 ships the placeholder rendering described in spec §9.2:
+ * WP06 shipped the placeholder rendering described in spec §9.2 with
+ * zero-valued FAILED / SKIPPED columns; WP07 wires `migration_run_state`
+ * so those columns reflect real per-record outcomes.
  *
  *   - `STATE` is computed from `migration_id_map` row count vs source count.
- *     The richer "running"/"failed" semantics require `migration_run_state`
- *     (WP07); those columns surface as `0` / `'-'` until that ships. The
- *     `TODO(WP07)` comments below mark the wiring points.
+ *     A future WP may extend this with a "running" state once the lock
+ *     (WP09) is in place.
  *
  *   - `TOTAL` is the source plugin's reported `count()` (or `?` if unknown).
  *
  *   - `IMPORTED` is {@see MigrationIdMap::countForMigration()} — the cheapest
  *     row-level signal available without touching the destination storage.
  *
- *   - `LAST RUN` is {@see MigrationIdMap::maxLastImportedAt()} — added on
- *     this WP as the smallest tractable surface (see WP06 tradeoff note).
+ *   - `FAILED` / `SKIPPED` come from {@see MigrationRunState::countByStatus()}
+ *     (WP07). Records that have never been touched do not show up here —
+ *     the columns reflect the LATEST per-record outcome (FR-038).
+ *
+ *   - `LAST RUN` is {@see MigrationIdMap::maxLastImportedAt()}.
  *
  * Exit code is always 0; `import:status` is informational.
  *
  * @spec FR-034 — import:status
+ * @spec FR-038 — populated FAILED / SKIPPED columns
  */
 final class ImportStatusCommand
 {
     public function __construct(
         private readonly MigrationRegistry $registry,
         private readonly MigrationIdMap $idMap,
+        private readonly MigrationRunState $runState,
     ) {}
 
     public function execute(CliIO $io): int
@@ -108,11 +115,16 @@ final class ImportStatusCommand
         $importedCount = $this->idMap->countForMigration($definition->id);
         $lastRun = $this->idMap->maxLastImportedAt($definition->id);
 
+        // FR-038 — populate FAILED / SKIPPED from `migration_run_state`.
+        // Records that have never been touched do not contribute; the counts
+        // reflect the LATEST per-record outcome.
+        $bucket = $this->runState->countByStatus($definition->id);
+
         $state = match (true) {
-            $importedCount === 0 => 'pending',
-            // TODO(WP07): when migration_run_state lands, distinguish 'failed'
-            // (last_run_exit >= 4), 'running' (lock held), and 'aborted' from
-            // the partial/complete dichotomy below.
+            $importedCount === 0 && $bucket['error'] === 0 => 'pending',
+            // A future WP may extend this with a "running" state once the
+            // lock (WP09) is in place; today we stick to the
+            // pending/partial/complete trichotomy.
             $sourceCount !== null && $importedCount >= $sourceCount => 'complete',
             default => 'partial',
         };
@@ -122,12 +134,8 @@ final class ImportStatusCommand
             'state' => $state,
             'total' => $sourceCount === null ? '-' : (string) $sourceCount,
             'imported' => (string) $importedCount,
-            // TODO(WP07): failed/skipped counts come from migration_run_state
-            // aggregates. WP06 reports zero so the column shape is stable now
-            // and downstream tooling (parsers, dashboards) does not need to
-            // change shape between releases.
-            'failed' => '0',
-            'skipped' => '0',
+            'failed' => (string) $bucket['error'],
+            'skipped' => (string) $bucket['skipped'],
             'last_run' => $lastRun ?? '-',
         ];
     }

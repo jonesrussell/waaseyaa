@@ -14,6 +14,7 @@ use Waaseyaa\Migration\Exception\ProcessException;
 use Waaseyaa\Migration\Exception\SourceReadException;
 use Waaseyaa\Migration\MigrationDefinition;
 use Waaseyaa\Migration\MigrationIdMap;
+use Waaseyaa\Migration\MigrationRunState;
 use Waaseyaa\Migration\Plugin\Destination\EntityDestination;
 use Waaseyaa\Migration\Plugin\DestinationPluginInterface;
 use Waaseyaa\Migration\Plugin\DestinationRecord;
@@ -49,6 +50,8 @@ use Waaseyaa\Migration\SourceId;
  * @spec FR-046 — per-record error capture (capped at {@see RunReport::ERROR_CAP})
  * @spec FR-047 — halt-on-error propagation
  * @spec FR-048 — run-level abort surface
+ * @spec FR-037 — resume from the prior run's checkpoint
+ * @spec FR-038 — per-record progress recorded into `migration_run_state`
  */
 final class MigrationRunner
 {
@@ -60,6 +63,7 @@ final class MigrationRunner
      * @param ProcessChainExecutor $chain Runtime collaborator that pipes one source field through its process chain.
      * @param MigrationIdMap $idMap Stable-surface id-map repository, used to inject the `$lookup` closure for process plugins (FR-028).
      * @param ?LoggerInterface $logger Optional structured logger. Defaults to {@see NullLogger}.
+     * @param ?MigrationRunState $runState Optional per-record progress writer (WP07). When `null` the runner skips heartbeat writes — preserves WP06's test scaffolding.
      * @param \Closure|null $clock Test seam returning `\DateTimeImmutable`. Defaults to `now in UTC`.
      */
     public function __construct(
@@ -67,6 +71,7 @@ final class MigrationRunner
         private readonly ProcessChainExecutor $chain,
         private readonly MigrationIdMap $idMap,
         ?LoggerInterface $logger = null,
+        private readonly ?MigrationRunState $runState = null,
         ?\Closure $clock = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
@@ -83,8 +88,83 @@ final class MigrationRunner
      */
     public function run(string $migrationId, RunOptions $options): RunReport
     {
+        return $this->runInternal(
+            migrationId: $migrationId,
+            options: $options,
+            resumeFromPosition: 0,
+            overrideRunId: null,
+        );
+    }
+
+    /**
+     * Resume the most recent run of a migration from its last completed
+     * checkpoint, reusing the prior `run_id` so the second physical
+     * invocation is part of the same logical run.
+     *
+     * Requires {@see MigrationRunState} to be injected — without it there is
+     * no checkpoint to read.
+     *
+     * Source-plugin contract for FR-037: the source's `records()` iteration
+     * order MUST be stable across invocations (deterministic given the same
+     * configuration). The runner skips the first N records (where N is the
+     * prior `MAX(position)`) by ordinal, not by source-id lookup, so a
+     * non-deterministic source would silently re-process or skip records.
+     * Sources that cannot guarantee stable order must not be marked
+     * resume-safe (a `resumeSafe()` capability flag lands with WP10).
+     *
+     * @throws \InvalidArgumentException When no prior run exists for the migration, or {@see MigrationRunState} is not wired.
+     * @throws MigrationAbortedException Same conditions as {@see run()}.
+     *
+     * @spec FR-037 — resume from the prior run's checkpoint
+     */
+    public function runResume(string $migrationId, RunOptions $options): RunReport
+    {
+        if ($this->runState === null) {
+            throw new \InvalidArgumentException(
+                'MigrationRunner::runResume(): MigrationRunState collaborator is required for resume mode '
+                . '(inject it via the constructor).',
+            );
+        }
+
+        $priorRunId = $this->runState->latestRunForMigration($migrationId);
+        if ($priorRunId === null) {
+            throw new \InvalidArgumentException(\sprintf(
+                'MigrationRunner::runResume(): no prior run recorded for migration "%s"; '
+                . 'run `import:run %s` first.',
+                $migrationId,
+                $migrationId,
+            ));
+        }
+
+        $priorPosition = $this->runState->latestPositionForRun($migrationId, $priorRunId) ?? 0;
+
+        return $this->runInternal(
+            migrationId: $migrationId,
+            options: $options,
+            resumeFromPosition: $priorPosition,
+            overrideRunId: $priorRunId,
+        );
+    }
+
+    /**
+     * Shared run body for {@see run()} and {@see runResume()}.
+     *
+     * `$resumeFromPosition`: how many source records to skip from the head of
+     * iteration before any work happens. `0` means "fresh start" — the normal
+     * `run()` path. Non-zero values come from {@see runResume()}.
+     *
+     * `$overrideRunId`: when non-null, suppresses the per-invocation UUIDv7
+     * mint and reuses the prior run's id (FR-037 — single logical run across
+     * physical invocations).
+     */
+    private function runInternal(
+        string $migrationId,
+        RunOptions $options,
+        int $resumeFromPosition,
+        ?string $overrideRunId,
+    ): RunReport {
         $definition = $this->registry->get($migrationId);
-        $runId = $options->runId ?? Uuid::v7()->toRfc4122();
+        $runId = $overrideRunId ?? $options->runId ?? Uuid::v7()->toRfc4122();
         $startedAt = ($this->clock)();
 
         $lookup = $this->buildLookupClosure();
@@ -97,19 +177,35 @@ final class MigrationRunner
 
         $total = $this->safeSourceCount($definition);
         $processed = 0;
+        // FR-038 — `position` is the monotonic per-record counter persisted
+        // into `migration_run_state`. Humans count from 1; on resume we
+        // continue past the prior `MAX(position)`.
+        $position = $resumeFromPosition;
 
         // The outer try/catch handles run-level errors (FR-048 — always halt).
         // The per-record try/catch inside the foreach handles typed per-record
         // exceptions (FR-046 — continue unless halt-on-error).
         try {
+            $iterationIndex = 0;
             foreach ($this->iterateSource($definition) as $record) {
+                // FR-037 — resume skip: discard records before the prior
+                // checkpoint without touching the destination. Counts toward
+                // neither imported/skipped/failed nor the progress table —
+                // the prior run already recorded them.
+                if ($iterationIndex < $resumeFromPosition) {
+                    $iterationIndex++;
+                    continue;
+                }
+                $iterationIndex++;
+
                 if ($options->limit !== null && $processed >= $options->limit) {
                     break;
                 }
                 $processed++;
+                $position++;
 
                 try {
-                    $this->processOne(
+                    [$sourceIdHash, $outcome] = $this->processOne(
                         definition: $definition,
                         record: $record,
                         destination: $destination,
@@ -118,9 +214,36 @@ final class MigrationRunner
                         dryRun: $options->dryRun,
                         counters: $counters,
                     );
+
+                    // FR-038 — heartbeat the per-record outcome. Best-effort:
+                    // a failure here is logged but does NOT escalate the run
+                    // to abort (the primary work — the destination write —
+                    // already committed).
+                    if ($this->runState !== null) {
+                        $this->safeHeartbeat(
+                            migrationId: $definition->id,
+                            sourceIdHash: $sourceIdHash,
+                            runId: $runId,
+                            position: $position,
+                            outcome: $outcome,
+                        );
+                    }
                 } catch (SourceReadException | ProcessException | DestinationWriteException $e) {
                     $counters['failed']++;
                     $this->captureError($errors, $e, $record);
+
+                    // FR-038 — record the failure into `migration_run_state`
+                    // so `import:status` shows a non-zero FAILED column.
+                    if ($this->runState !== null) {
+                        $this->safeRecordError(
+                            migrationId: $definition->id,
+                            record: $record,
+                            runId: $runId,
+                            position: $position,
+                            error: $e,
+                        );
+                    }
+
                     $this->logger->warning('MigrationRunner: per-record failure', [
                         'migration_id' => $definition->id,
                         'run_id' => $runId,
@@ -243,9 +366,16 @@ final class MigrationRunner
     }
 
     /**
-     * Per-record body. Mutates `$counters` in place.
+     * Per-record body. Mutates `$counters` in place. Returns a
+     * `[sourceIdHash, outcome]` tuple on success so the caller can heartbeat
+     * the per-record outcome into `migration_run_state` (FR-038).
+     *
+     * `$outcome` is one of `'imported'` / `'skipped'`; the failure path
+     * raises a typed exception and never returns.
      *
      * @param array{imported:int,skipped:int,failed:int} $counters
+     *
+     * @return array{0: string, 1: string} `[sourceIdHash, outcome]`.
      */
     private function processOne(
         MigrationDefinition $definition,
@@ -255,7 +385,7 @@ final class MigrationRunner
         \Closure $lookup,
         bool $dryRun,
         array &$counters,
-    ): void {
+    ): array {
         try {
             $sourceId = $definition->source->sourceIdFor($record);
         } catch (SourceReadException $e) {
@@ -300,7 +430,7 @@ final class MigrationRunner
                 'source_id_hash' => $sourceId->hash(),
             ]);
 
-            return;
+            return [$sourceId->hash(), 'skipped'];
         }
 
         // FR-031 — pre-read the prior id-map row so we can distinguish the
@@ -319,8 +449,119 @@ final class MigrationRunner
 
         if ($wasSkip) {
             $counters['skipped']++;
-        } else {
-            $counters['imported']++;
+            return [$sourceId->hash(), 'skipped'];
+        }
+
+        $counters['imported']++;
+        return [$sourceId->hash(), 'imported'];
+    }
+
+    /**
+     * Best-effort heartbeat to `migration_run_state` after a successful
+     * `processOne`. The destination write already committed; a failure in
+     * the progress table must not roll back the primary work, so we swallow
+     * + log any throw.
+     *
+     * `$outcome` is the classification returned by {@see processOne()}:
+     *  - `'imported'` — destination write committed; recorded as `success`.
+     *  - `'skipped'` — idempotent hash-match (FR-031) or dry-run (FR-039);
+     *    recorded as `skipped`.
+     */
+    private function safeHeartbeat(
+        string $migrationId,
+        string $sourceIdHash,
+        string $runId,
+        int $position,
+        string $outcome,
+    ): void {
+        \assert($this->runState !== null);
+
+        try {
+            $now = ($this->clock)();
+
+            if ($outcome === 'skipped') {
+                $this->runState->recordSkipped(
+                    migrationId: $migrationId,
+                    sourceIdHash: $sourceIdHash,
+                    runId: $runId,
+                    position: $position,
+                    now: $now,
+                );
+                return;
+            }
+
+            $this->runState->recordSuccess(
+                migrationId: $migrationId,
+                sourceIdHash: $sourceIdHash,
+                runId: $runId,
+                position: $position,
+                now: $now,
+            );
+        } catch (\Throwable $e) {
+            $this->logger->warning(
+                'MigrationRunner: migration_run_state heartbeat failed (non-fatal)',
+                [
+                    'migration_id' => $migrationId,
+                    'run_id' => $runId,
+                    'position' => $position,
+                    'outcome' => $outcome,
+                    'error_class' => $e::class,
+                    'message' => $e->getMessage(),
+                ],
+            );
+        }
+    }
+
+    /**
+     * Best-effort persistence of a per-record failure to `migration_run_state`.
+     *
+     * Wrapped in try/catch so a flaky state store does not turn a per-record
+     * failure into a run-level abort (FR-046 + FR-038 — independent
+     * concerns).
+     */
+    private function safeRecordError(
+        string $migrationId,
+        SourceRecord $record,
+        string $runId,
+        int $position,
+        \Throwable $error,
+    ): void {
+        \assert($this->runState !== null);
+
+        try {
+            // Best-effort source-id hash — when the failure is upstream of
+            // `sourceIdFor()`, fall back to a sentinel so the row is still
+            // typed. This mirrors `captureError()`'s fallback.
+            $sourceIdHash = 'unknown';
+            try {
+                $sourceIdHash = \hash(
+                    'sha256',
+                    \json_encode($record->fields, \JSON_THROW_ON_ERROR),
+                );
+            } catch (\Throwable) {
+                // keep sentinel
+            }
+
+            $this->runState->recordError(
+                migrationId: $migrationId,
+                sourceIdHash: $sourceIdHash,
+                runId: $runId,
+                position: $position,
+                errorCode: $this->codeFor($error),
+                errorMessage: $error->getMessage(),
+                now: ($this->clock)(),
+            );
+        } catch (\Throwable $e) {
+            $this->logger->warning(
+                'MigrationRunner: migration_run_state error-record failed (non-fatal)',
+                [
+                    'migration_id' => $migrationId,
+                    'run_id' => $runId,
+                    'position' => $position,
+                    'error_class' => $e::class,
+                    'message' => $e->getMessage(),
+                ],
+            );
         }
     }
 
