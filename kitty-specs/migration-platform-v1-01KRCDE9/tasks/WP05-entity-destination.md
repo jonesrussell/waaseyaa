@@ -313,3 +313,4 @@ Planning/base branch: `main`. Merge target: `main`. Per-lane worktree. Run `spec
 ## Activity Log
 
 - 2026-05-13T04:11:44Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=657197 – Started implementation via action command
+- 2026-05-13T04:31:32Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=657197 – WP05 ready for review — EntityDestination + factory + DestinationWriteException + SaveContext::isImport + fixtures + 12 integration tests. cs-check (2 passes), phpstan, layer-check, composer-policy, full phpunit (8101 tests, 20692 assertions) all green.
