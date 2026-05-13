@@ -262,6 +262,45 @@ Machine-readable source: `docs/public-surface-map.php`.
 | `NotifiableTrait` | trait | Default `NotifiableInterface` implementation routing by channel for entity classes |
 | `ChannelInterface` | interface | Delivers a notification to a notifiable recipient via one transport |
 
+### migration
+
+Mission `migration-platform-v1-01KRCDE9` (M-002). All entries below are intentional public surface — the plugin SPI, value objects, the framework destination, reference processors, exceptions, schema, log channels, and the conformance harness third-party plugin authors extend.
+
+| Element | Type | Purpose |
+|---------|------|---------|
+| `SourcePluginInterface` | interface | Source plugin SPI: streams `SourceRecord` instances and assigns `SourceId`s (FR-049, WP01) |
+| `ProcessPluginInterface` | interface | Per-field record transformer SPI (FR-005, WP01) |
+| `DestinationPluginInterface` | interface | Destination plugin SPI: `write`, `rollback`, `lookup` per source id (FR-006, WP01) |
+| `HasMigrationPluginsInterface` | interface | Marker for service providers exposing migration plugins via reflection discovery (WP01) |
+| `HasMigrationsInterface` | interface | Marker for service providers contributing migration manifests (FR-003, WP02) |
+| `MigrationDefinition` | final class | Immutable migration definition: id, source, processors, destination, dependencies, stability (WP02) |
+| `SourceId` | final class | Stable composite key identifying a source record across re-runs (WP01) |
+| `SourceRecord` | final class | DTO carrying a raw row from a source plugin: `sourceType`, `fields` (WP01) |
+| `DestinationRecord` | final class | DTO carrying processed fields to a destination plugin: `entityType`, `bundle`, `fields`, `sourceId`, `sourceRecordHash` (WP01) |
+| `WriteResult` | final class | Destination write outcome: `destinationEntityType`, `destinationUuid`, `sourceRecordHash`, `runId`, `writtenAt` (FR-006, WP01) |
+| `ProcessContext` | final class | Per-field processor context carrying current record + run metadata (WP01) |
+| `Destination\EntityDestination` | final class | Built-in destination writing to Waaseyaa entities via `EntityRepository` (FR-018..FR-029, WP05/WP08) |
+| `Destination\EntityDestinationFactory` | final class | Constructs `EntityDestination` instances bound to a migration id (WP05) |
+| `Process\PassThroughProcessor` | final class | Reference processor: emits the input value unchanged (WP03) |
+| `Process\HtmlSanitizeProcessor` | final class | Reference processor: sanitises HTML field values (WP03) |
+| `Process\LookupProcessor` | final class | Reference processor: resolves cross-migration lookups via `MigrationIdMap` (FR-028, WP03) |
+| `Process\ConcatProcessor` | final class | Reference processor: concatenates multiple source fields (WP03) |
+| `Process\TypeCoerceProcessor` | final class | Reference processor: coerces strings to int/float/bool (WP03) |
+| `Process\DefaultValueProcessor` | final class | Reference processor: substitutes a default when the input is null/empty (WP03) |
+| `ReservedPluginIds` | final class | Constants for framework-reserved plugin ids; collision raises `MigrationPluginCollisionException` (WP01) |
+| `Exception\SourceReadException` | final class | Source plugin failed to read a record / opened-file errors (WP01) |
+| `Exception\ProcessException` | final class | Process plugin raised during per-field transformation (WP03) |
+| `Exception\DestinationWriteException` | final class | Destination plugin failed to write; carries `$reason` code (WP05) |
+| `Exception\MigrationAbortedException` | final class | Operator-triggered abort surfaced from runner / signal handler (WP06) |
+| `Exception\MigrationConcurrencyException` | final class | Per-migration lock contention; carries `holdingPid` + `lockPath` (FR-061, WP09) |
+| `Exception\MigrationCycleException` | final class | Dependency-graph cycle detected during discovery (WP02) |
+| `Exception\MigrationDependencyMissingException` | final class | Migration depends on an unknown id (WP02) |
+| `Exception\MigrationPluginCollisionException` | final class | Two plugins claim the same id; reserved-id collisions set `$isReserved=true` (WP01) |
+| `Schema\MigrationIdMapSchema` | final class | DDL builder for the `migration_id_map` table (FR-029, WP04) |
+| `Log\Channels` | final class | Logger channel constants: `MIGRATION_DEPRECATION`, `MIGRATION_DISCOVERY` (WP01) |
+| `Testing\SourceConformanceTestCase` | abstract class | Conformance harness third-party source plugins extend (FR-052, WP10; autoload-dev) |
+| `Testing\DestinationConformanceTestCase` | abstract class | Conformance harness third-party destination plugins extend (FR-050/FR-051, WP10; autoload-dev) |
+
 ---
 
 ## Layer 4: API

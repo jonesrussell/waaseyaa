@@ -86,6 +86,12 @@ final class RollbackWalker
         $definition = $this->registry->get($migrationId);
         $destination = $definition->destination;
 
+        // Pin the start timestamp from the injected clock. The end timestamp
+        // is captured below; we clamp it `>= $startedAt` (see footer) so the
+        // monotonic invariant in {@see RollbackReport::__construct()} holds
+        // even when the system clock jumps backwards mid-walk (NTP skew,
+        // VM suspend/resume, leap-second smear). FR-044's best-effort
+        // semantics make that scenario operationally possible.
         $startedAt = ($this->clock)();
         $visited = 0;
         $rolledBack = 0;
@@ -128,6 +134,14 @@ final class RollbackWalker
         }
 
         $finishedAt = ($this->clock)();
+
+        // Clamp $finishedAt monotonically. On clock regression we advance
+        // the finish stamp by 1µs over the start so the invariant
+        // `finishedAt >= startedAt` in RollbackReport holds without
+        // requiring callers to inspect / repair the clock themselves.
+        if ($finishedAt < $startedAt) {
+            $finishedAt = $startedAt->modify('+1 microsecond');
+        }
 
         $this->logger->info(
             'Migration rollback complete',

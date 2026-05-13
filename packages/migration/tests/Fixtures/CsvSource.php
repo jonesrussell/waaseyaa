@@ -99,7 +99,18 @@ final class CsvSource implements SourcePluginInterface
      */
     public function records(): iterable
     {
-        $handle = @\fopen($this->filePath, 'rb');
+        // Pre-check readability so we can raise the typed exception without
+        // relying on `@` to silence PHP's fopen() warning on missing files
+        // (issue #1454).
+        if (!\is_file($this->filePath) || !\is_readable($this->filePath)) {
+            throw new SourceReadException(
+                sourceId: $this->pluginId,
+                migrationId: 'unknown',
+                reason: \sprintf('Cannot open CSV file %s for reading.', $this->filePath),
+            );
+        }
+
+        $handle = \fopen($this->filePath, 'rb');
         if ($handle === false) {
             throw new SourceReadException(
                 sourceId: $this->pluginId,

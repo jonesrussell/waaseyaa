@@ -13,22 +13,19 @@ use Waaseyaa\Migration\MigrationRunState;
 /**
  * `bin/waaseyaa import:status [<migration-id>]` — surface per-migration state.
  *
- * WP06 shipped the placeholder rendering described in spec §9.2 with
- * zero-valued FAILED / SKIPPED columns; WP07 wires `migration_run_state`
- * so those columns reflect real per-record outcomes.
+ * Columns rendered per spec §9.2:
  *
- *   - `STATE` is computed from `migration_id_map` row count vs source count.
- *     A future WP may extend this with a "running" state once the lock
- *     (WP09) is in place.
+ *   - `STATE` is computed from `migration_id_map` row count vs source count
+ *     (`pending` / `partial` / `complete`).
  *
  *   - `TOTAL` is the source plugin's reported `count()` (or `?` if unknown).
  *
  *   - `IMPORTED` is {@see MigrationIdMap::countForMigration()} — the cheapest
  *     row-level signal available without touching the destination storage.
  *
- *   - `FAILED` / `SKIPPED` come from {@see MigrationRunState::countByStatus()}
- *     (WP07). Records that have never been touched do not show up here —
- *     the columns reflect the LATEST per-record outcome (FR-038).
+ *   - `FAILED` / `SKIPPED` come from {@see MigrationRunState::countByStatus()}.
+ *     Records that have never been touched do not show up here — the columns
+ *     reflect the LATEST per-record outcome (FR-038).
  *
  *   - `LAST RUN` is {@see MigrationIdMap::maxLastImportedAt()}.
  *
@@ -65,8 +62,8 @@ final class ImportStatusCommand
         // Header row matches spec §9.2 column ordering. Widths picked so the
         // common identifiers (e.g. `wp_comments_to_engagement`) fit without
         // wrapping; identifiers longer than 30 chars overflow gracefully (the
-        // table is meant for operators, not for downstream parsers — `--format=json`
-        // for that lands with WP07's `migration_run_state` integration).
+        // table is meant for operators, not downstream parsers — a `--format=json`
+        // mode is tracked as a separate enhancement).
         $io->writeln(\sprintf(
             '%-30s  %-10s  %6s  %8s  %6s  %7s  %s',
             'ID',
@@ -122,9 +119,6 @@ final class ImportStatusCommand
 
         $state = match (true) {
             $importedCount === 0 && $bucket['error'] === 0 => 'pending',
-            // A future WP may extend this with a "running" state once the
-            // lock (WP09) is in place; today we stick to the
-            // pending/partial/complete trichotomy.
             $sourceCount !== null && $importedCount >= $sourceCount => 'complete',
             default => 'partial',
         };

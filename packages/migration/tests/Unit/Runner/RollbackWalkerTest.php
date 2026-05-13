@@ -183,7 +183,54 @@ final class RollbackWalkerTest extends TestCase
         return $written;
     }
 
-    private function makeWalker(DestinationPluginInterface $destination): RollbackWalker
+    /**
+     * Regression for issue #1448 — system clock skew during a rollback walk
+     * MUST NOT raise out of `RollbackReport::__construct()`. The walker
+     * clamps `$finishedAt` to `>= $startedAt`, so even if the injected
+     * clock returns a finish stamp earlier than the start the report
+     * still satisfies its monotonic invariant.
+     */
+    #[Test]
+    public function clock_regression_during_walk_does_not_break_report_construction(): void
+    {
+        $this->seedIdMap(2);
+
+        $destination = new RecordingDestination();
+
+        // Clock returns "now" for the first call (startedAt) and "now - 5s"
+        // for the second call (finishedAt). Without the clamp in
+        // RollbackWalker::rollback(), this would trip
+        // RollbackReport's `finishedAt >= startedAt` invariant.
+        $start = new \DateTimeImmutable('2026-05-13T12:00:00+00:00');
+        $skewed = new \DateTimeImmutable('2026-05-13T11:59:55+00:00');
+        $sequence = [$start, $skewed];
+        $clock = static function () use (&$sequence): \DateTimeImmutable {
+            $next = \array_shift($sequence);
+            \assert($next instanceof \DateTimeImmutable);
+            return $next;
+        };
+
+        $walker = $this->makeWalker($destination, $clock);
+
+        $report = $walker->rollback(self::MIGRATION_ID);
+
+        self::assertSame(2, $report->visited);
+        self::assertSame(2, $report->rolledBack);
+        self::assertSame(0, $report->failed);
+        self::assertTrue(
+            $report->finishedAt >= $report->startedAt,
+            'RollbackReport must satisfy the monotonic timestamp invariant even under clock skew.',
+        );
+        self::assertSame($start, $report->startedAt);
+        // The walker advances finishedAt by exactly 1µs over the start stamp
+        // when the clock regresses.
+        self::assertSame(
+            $start->modify('+1 microsecond')->format('Y-m-d\TH:i:s.uP'),
+            $report->finishedAt->format('Y-m-d\TH:i:s.uP'),
+        );
+    }
+
+    private function makeWalker(DestinationPluginInterface $destination, ?\Closure $clock = null): RollbackWalker
     {
         $definition = new MigrationDefinition(
             id: self::MIGRATION_ID,
@@ -205,6 +252,7 @@ final class RollbackWalkerTest extends TestCase
         return new RollbackWalker(
             registry: $registry,
             idMap: $this->idMap,
+            clock: $clock,
         );
     }
 }

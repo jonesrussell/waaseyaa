@@ -275,6 +275,40 @@ return [
     'Waaseyaa\Migration\Discovery\HasMigrationPluginsInterface' => 'public',
     // Migration platform discovery / dependency graph (mission migration-platform-v1-01KRCDE9 WP02).
     'Waaseyaa\Migration\Discovery\HasMigrationsInterface' => 'public',
+    // Migration platform DTOs / value objects (mission migration-platform-v1-01KRCDE9 WP01..WP04).
+    'Waaseyaa\Migration\MigrationDefinition' => 'public',
+    'Waaseyaa\Migration\SourceId' => 'public',
+    'Waaseyaa\Migration\Plugin\SourceRecord' => 'public',
+    'Waaseyaa\Migration\Plugin\DestinationRecord' => 'public',
+    'Waaseyaa\Migration\Plugin\WriteResult' => 'public',
+    'Waaseyaa\Migration\Plugin\ProcessContext' => 'public',
+    // Migration platform destination (WP05).
+    'Waaseyaa\Migration\Plugin\Destination\EntityDestination' => 'public',
+    'Waaseyaa\Migration\Plugin\Destination\EntityDestinationFactory' => 'public',
+    // Migration platform reference processors (WP03).
+    'Waaseyaa\Migration\Plugin\Process\PassThroughProcessor' => 'public',
+    'Waaseyaa\Migration\Plugin\Process\HtmlSanitizeProcessor' => 'public',
+    'Waaseyaa\Migration\Plugin\Process\LookupProcessor' => 'public',
+    'Waaseyaa\Migration\Plugin\Process\ConcatProcessor' => 'public',
+    'Waaseyaa\Migration\Plugin\Process\TypeCoerceProcessor' => 'public',
+    'Waaseyaa\Migration\Plugin\Process\DefaultValueProcessor' => 'public',
+    // Migration platform plugin meta (WP01).
+    'Waaseyaa\Migration\Plugin\ReservedPluginIds' => 'public',
+    // Migration platform exceptions (WP01..WP09).
+    'Waaseyaa\Migration\Exception\SourceReadException' => 'public',
+    'Waaseyaa\Migration\Exception\ProcessException' => 'public',
+    'Waaseyaa\Migration\Exception\DestinationWriteException' => 'public',
+    'Waaseyaa\Migration\Exception\MigrationAbortedException' => 'public',
+    'Waaseyaa\Migration\Exception\MigrationConcurrencyException' => 'public',
+    'Waaseyaa\Migration\Exception\MigrationCycleException' => 'public',
+    'Waaseyaa\Migration\Exception\MigrationDependencyMissingException' => 'public',
+    'Waaseyaa\Migration\Exception\MigrationPluginCollisionException' => 'public',
+    // Migration platform schema + logging (WP04, WP10).
+    'Waaseyaa\Migration\Schema\MigrationIdMapSchema' => 'public',
+    'Waaseyaa\Migration\Log\Channels' => 'public',
+    // Migration platform conformance bases (WP10, autoload-dev — stable surface for extenders).
+    'Waaseyaa\Migration\Testing\SourceConformanceTestCase' => 'public',
+    'Waaseyaa\Migration\Testing\DestinationConformanceTestCase' => 'public',
 
     // Layer 3: Services — internal
     'Waaseyaa\Billing\StripeClientInterface' => 'internal',

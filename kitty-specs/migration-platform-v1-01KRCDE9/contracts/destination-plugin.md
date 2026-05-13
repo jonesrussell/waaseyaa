@@ -217,7 +217,14 @@ Subscribers that want to skip work during imports (e.g. expensive cache invalida
 | C1 | `write()` returns a `WriteResult` whose `$destinationUuid` is non-empty. | FR-006, §10.2 |
 | C2 | Writing the same `DestinationRecord` twice creates exactly one destination entity (idempotency). | FR-030, §10.2 |
 | C3 | After `write()`, `lookup($sourceId)` returns the same `WriteResult`. | FR-028 |
-| C4 | After `rollback($result)`, `lookup($sourceId)` returns `null`. | FR-041, §10.2 |
+| C4 | After `rollback($result)`, `lookup($sourceId)` returns `null` **for destinations whose `rollback()` clears the id-map row** (framework default). Destinations that intentionally retain id-map rows for audit/replay MAY opt out by overriding `DestinationConformanceTestCase::rollbackClearsLookup()` to `false`; in that mode the harness asserts only that `rollback()` executes without raising. | FR-041, FR-042, §10.2 |
+
+**Reconciliation with FR-042 (issue #1452).** FR-042 ("Re-running an unchanged record MUST NOT create a duplicate destination entity. The id-map row's `last_imported_at` SHOULD update.") governs the **idempotent re-run** code path — a separate scenario from `rollback()`. C4 governs the **rollback** code path. The two paths are operationally distinct: rollback is an entity delete; an unchanged re-run is a skip-or-touch on a still-extant entity. Whether `rollback()` deletes the id-map row alongside the entity is an implementation-defined retention policy:
+
+- **Framework default** (`EntityDestination` and any plugin where `rollbackClearsLookup() === true`): `rollback()` removes the id-map row via `MigrationIdMap::deleteByDestination()`, so subsequent `lookup($sourceId)` returns `null`.
+- **Retain-for-audit destinations** (`rollbackClearsLookup() === false`): `rollback()` deletes the destination entity but leaves the id-map row in place so the audit log can replay the prior import. `lookup($sourceId)` MAY return the prior `WriteResult` even after `rollback()`.
+
+Both modes are conformant. Third-party authors choose by overriding `rollbackClearsLookup()`; the harness gates accordingly. FR-042's id-map retention requirement on unchanged re-run is independent of this choice — both modes still satisfy FR-042.
 | C5 | A simulated access-denial raises `DestinationWriteException` with code `entity_create_denied`. | FR-020 |
 | C6 | The id-map row written by `write()` survives `EntityRepository::save()` success; an injected save failure leaves zero id-map rows (R1). | FR-029 |
 | C7 | `SaveContext::isImport()` returns `true` inside the `BeforeSaveEvent` and `AfterSaveEvent` dispatched during `write()`. | FR-022 |

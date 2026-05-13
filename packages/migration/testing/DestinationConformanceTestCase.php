@@ -118,10 +118,22 @@ abstract class DestinationConformanceTestCase extends TestCase
 
     /**
      * Whether the plugin's `rollback()` MUST remove the id-map row so
-     * subsequent `lookup()` calls return null. Most destinations enforce
-     * this (D3), but some intentionally retain the id-map row for audit /
-     * replay; subclasses with that behaviour MAY override this to `false`
-     * and document the deviation.
+     * subsequent `lookup()` calls return null.
+     *
+     * The framework default (`EntityDestination` and any plugin returning
+     * `true`) deletes the id-map row alongside the destination entity.
+     * Destinations that intentionally retain the row for audit / replay
+     * override this to `false`; the conformance harness then asserts only
+     * that `rollback()` executes without raising.
+     *
+     * This knob is the contract reconciliation between the D3 conformance
+     * gate ("lookup() === null after rollback") and FR-042 (id-map
+     * retention on idempotent re-run). The two requirements govern
+     * different code paths — rollback vs unchanged re-run — and both
+     * `true` and `false` returns here are conformant. See
+     * `kitty-specs/migration-platform-v1-01KRCDE9/contracts/destination-plugin.md`
+     * §"Conformance requirements (WP10)" for the full reconciliation
+     * (issue #1452).
      */
     protected function rollbackClearsLookup(): bool
     {
