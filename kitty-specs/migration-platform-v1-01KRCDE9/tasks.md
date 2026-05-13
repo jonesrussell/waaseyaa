@@ -73,12 +73,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T018  | `TypeCoerceProcessor`                                                             | WP03 | [P]      | FR-010                                              |
 | T019  | `DefaultValueProcessor`                                                           | WP03 | [P]      | FR-010                                              |
 | T020  | `ProcessException` + reserved-id parity test                                      | WP03 |          | FR-010, FR-045                                      |
-| T021  | Real `SourceId` (replaces WP01 stub) + `CanonicalForm`                            | WP04 |          | FR-026, FR-027                                      |
-| T022  | `migration_id_map` schema + migration file                                        | WP04 | [P]      | FR-025                                              |
-| T023  | `MigrationIdMap` repository                                                       | WP04 |          | FR-028, FR-029, FR-030, FR-031                      |
-| T024  | `SourceReadException`                                                             | WP04 | [P]      | FR-045                                              |
-| T025  | Unit tests                                                                        | WP04 |          | FR-025..FR-031                                      |
-| T026  | Integration test: schema portability + transactional safety                       | WP04 |          | FR-029                                              |
+| T021  | Real `SourceId` (replaces WP01 stub) + `CanonicalForm`                            | WP04 |          | FR-026, FR-027                                      | [D] |
+| T022  | `migration_id_map` schema + migration file                                        | WP04 | [P]      | FR-025                                              | [D] |
+| T023  | `MigrationIdMap` repository                                                       | WP04 |          | FR-028, FR-029, FR-030, FR-031                      | [D] |
+| T024  | `SourceReadException`                                                             | WP04 | [P]      | FR-045                                              | [D] |
+| T025  | Unit tests                                                                        | WP04 |          | FR-025..FR-031                                      | [D] |
+| T026  | Integration test: schema portability + transactional safety                       | WP04 |          | FR-029                                              | [D] |
 | T027  | Test-fixture entity type `migration_test_widget` (+ revisionable variant)         | WP05 |          | FR-018..FR-024 substrate                            |
 | T028  | Add `SaveContext::isImport()` (cross-cutting, M-001-owned file)                   | WP05 |          | FR-022                                              |
 | T029  | `EntityDestination` class + factory                                               | WP05 |          | FR-018, FR-019, FR-020, FR-021, FR-023, FR-024      |
@@ -236,12 +236,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** Hash determinism proven; `walkReverseCreation()` orders with `last_run_id` as the tied-timestamp tiebreaker; `transactional()` atomicity verified.
 
 **Subtasks**
-- [ ] T021 Real SourceId (replaces stub) + CanonicalForm (WP04)
-- [ ] T022 migration_id_map schema + migration file (WP04)
-- [ ] T023 MigrationIdMap repository (WP04)
-- [ ] T024 SourceReadException (WP04)
-- [ ] T025 Unit tests (WP04)
-- [ ] T026 Integration test: schema portability + transactional safety (WP04)
+- [x] T021 Real SourceId (replaces stub) + CanonicalForm (WP04)
+- [x] T022 migration_id_map schema + migration file (WP04)
+- [x] T023 MigrationIdMap repository (WP04)
+- [x] T024 SourceReadException (WP04)
+- [x] T025 Unit tests (WP04)
+- [x] T026 Integration test: schema portability + transactional safety (WP04)
 
 **Implementation sketch:** `SourceId::hash()` returns sha256 of `CanonicalForm::encode([sourceType, keys])`. The schema migration uses M-001's `MigrationInterface`. `MigrationIdMap` uses `DatabaseInterface` directly (not raw PDO) — per `.claude/rules/entity-storage-invariant.md`, id-map is a join/supporting table, not an entity.
 
