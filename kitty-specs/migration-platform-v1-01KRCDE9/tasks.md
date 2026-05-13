@@ -96,11 +96,11 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T041  | Extend `MigrationRunner` to write progress + `runResume()`                        | WP07 |          | FR-037, FR-038, FR-046                              | [D] |
 | T042  | `ImportResumeCommand`                                                             | WP07 |          | FR-037                                              | [D] |
 | T043  | Integration test: full resume flow                                                | WP07 |          | FR-037, FR-038                                      | [D] |
-| T044  | `RollbackReport` value object                                                     | WP08 | [P]      | FR-044                                              |
-| T045  | `RollbackWalker`                                                                  | WP08 |          | FR-041, FR-043, FR-044                              |
-| T046  | `ImportRollbackCommand`                                                           | WP08 |          | FR-035, FR-043, FR-044                              |
-| T047  | `ImportResetCommand`                                                              | WP08 | [P]      | FR-036                                              |
-| T048  | Integration test: full rollback flow                                              | WP08 |          | FR-035, FR-036, FR-041..FR-044                      |
+| T044  | `RollbackReport` value object                                                     | WP08 | [P]      | FR-044                                              | [D] |
+| T045  | `RollbackWalker`                                                                  | WP08 |          | FR-041, FR-043, FR-044                              | [D] |
+| T046  | `ImportRollbackCommand`                                                           | WP08 |          | FR-035, FR-043, FR-044                              | [D] |
+| T047  | `ImportResetCommand`                                                              | WP08 | [P]      | FR-036                                              | [D] |
+| T048  | Integration test: full rollback flow                                              | WP08 |          | FR-035, FR-036, FR-041..FR-044                      | [D] |
 | T049  | `MigrationLock` class                                                             | WP09 |          | FR-061, FR-062                                      |
 | T050  | `MigrationConcurrencyException`                                                   | WP09 | [P]      | FR-061, FR-062, FR-045                              |
 | T051  | Wire lock into CLI commands (WP06+WP07+WP08)                                      | WP09 |          | FR-061                                              |
@@ -365,11 +365,11 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** Walker traverses id-map in reverse-creation order; per-record failures logged on `entity.lifecycle` without halting walk; `import:reset` does NOT delete destination entities.
 
 **Subtasks**
-- [ ] T044 RollbackReport value object (WP08)
-- [ ] T045 RollbackWalker (WP08)
-- [ ] T046 ImportRollbackCommand (WP08)
-- [ ] T047 ImportResetCommand (WP08)
-- [ ] T048 Integration test: full rollback flow (WP08)
+- [x] T044 RollbackReport value object (WP08)
+- [x] T045 RollbackWalker (WP08)
+- [x] T046 ImportRollbackCommand (WP08)
+- [x] T047 ImportResetCommand (WP08)
+- [x] T048 Integration test: full rollback flow (WP08)
 
 **Implementation sketch:** `RollbackWalker` consumes `MigrationIdMap::walkReverseCreation()` (the lazy generator from WP04). Both CLI commands require `--confirm` (destructive-op gate). `import:reset` clears id-map + run-state but never touches entities.
 
