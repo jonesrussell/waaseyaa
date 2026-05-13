@@ -71,13 +71,15 @@ use Waaseyaa\Migration\SourceId;
  * migrations of public content do not silently get blocked by per-user
  * policies.
  *
- * ## SaveContext::isImport (FR-022)
+ * ## SaveContext::isImport (FR-022, GitHub #1449)
  *
  * Each save constructs a fresh `SaveContext::default()->asImport()` and
- * dispatches {@see BeforeSaveEvent} / {@see AfterSaveEvent} around the
- * `EntityRepository::save()` call so subscribers wishing to skip non-essential
- * work during bulk imports (cache invalidation, search-index refresh) can
- * branch on `$event->saveContext()->isImport`. The signal is passive — the
+ * threads it through `EntityRepository::save(...$context: ...)`. The
+ * repository is the single dispatch site for {@see BeforeSaveEvent} /
+ * {@see AfterSaveEvent}; this class no longer self-dispatches. Subscribers
+ * wishing to skip non-essential work during bulk imports (cache
+ * invalidation, search-index refresh) branch on
+ * `$event->saveContext()->isImport`. The signal is passive — the
  * repository's own internal `EntityEvents::PRE_SAVE` / `POST_SAVE` events
  * continue to fire unchanged.
  *
@@ -406,14 +408,14 @@ final class EntityDestination implements DestinationPluginInterface
             $entity->setNewRevision(true);
         }
 
-        // FR-022: signal-only flag; subscribers branch on it.
+        // FR-022: signal-only flag; subscribers branch on it. The repository
+        // (GitHub #1449) is the single dispatch site for BeforeSaveEvent /
+        // AfterSaveEvent — `$saveContext` threads through to subscribers via
+        // `EntityRepository::save()`.
         $saveContext = SaveContext::default()->asImport();
 
-        // FR-021: coordinator-level lifecycle events around the EntityRepository::save() call.
-        $this->eventDispatcher->dispatch(new BeforeSaveEvent($entity, $saveContext, $isNewRevision));
-
         try {
-            $this->entityRepository->save($entity, validate: false);
+            $this->entityRepository->save($entity, validate: false, context: $saveContext);
         } catch (\Throwable $e) {
             // The transactional() wrapper will roll back; surface a structured exception.
             throw DestinationWriteException::entitySaveFailed(
@@ -437,7 +439,11 @@ final class EntityDestination implements DestinationPluginInterface
             now: $now,
         );
 
-        $this->eventDispatcher->dispatch(new AfterSaveEvent($entity, $saveContext, $isNewRevision));
+        // GitHub #1449: BeforeSaveEvent/AfterSaveEvent are dispatched by
+        // `EntityRepository::save()` above; `$isNewRevision` flows through
+        // the SaveContext-aware event constructors there. `$isNewRevision`
+        // is no longer used in this method.
+        unset($isNewRevision);
 
         return $writeResult;
     }

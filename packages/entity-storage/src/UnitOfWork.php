@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Waaseyaa\EntityStorage;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 use Waaseyaa\Database\DatabaseInterface;
 
 /**
@@ -18,7 +17,7 @@ use Waaseyaa\Database\DatabaseInterface;
  */
 final class UnitOfWork
 {
-    /** @var array<int, array{0: Event, 1: string}> Buffered events to dispatch after commit. */
+    /** @var array<int, array{0: object, 1: string}> Buffered events to dispatch after commit. */
     private array $bufferedEvents = [];
 
     private bool $inTransaction = false;
@@ -78,11 +77,16 @@ final class UnitOfWork
      * Buffer a domain event for dispatch after commit.
      *
      * If not inside a transaction, the event is dispatched immediately.
+     * Accepts any object — PSR-14 dispatchers route by class hierarchy, not
+     * by a shared base class. (Widened from `Symfony\Contracts\EventDispatcher\Event`
+     * to allow GitHub #1449's lifecycle events — {@see \Waaseyaa\EntityStorage\Event\BeforeSaveEvent}
+     * / {@see \Waaseyaa\EntityStorage\Event\AfterSaveEvent} — which are
+     * plain classes implementing only {@see \Waaseyaa\EntityStorage\Event\EntityLifecycleEventInterface}.)
      *
-     * @param Event $event The event object.
+     * @param object $event The event object.
      * @param string $eventName The event name.
      */
-    public function bufferEvent(Event $event, string $eventName): void
+    public function bufferEvent(object $event, string $eventName): void
     {
         if ($this->inTransaction) {
             $this->bufferedEvents[] = [$event, $eventName];
