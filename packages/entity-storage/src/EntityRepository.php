@@ -22,6 +22,9 @@ use Waaseyaa\Entity\Validation\EntityValidationException;
 use Waaseyaa\Entity\Validation\EntityValidator;
 use Waaseyaa\EntityStorage\Driver\EntityStorageDriverInterface;
 use Waaseyaa\EntityStorage\Driver\RevisionableStorageDriver;
+use Waaseyaa\EntityStorage\Event\AbortOperationException;
+use Waaseyaa\EntityStorage\Event\AfterSaveEvent;
+use Waaseyaa\EntityStorage\Event\BeforeSaveEvent;
 use Waaseyaa\I18n\LanguageManagerInterface;
 
 /**
@@ -199,9 +202,29 @@ final class EntityRepository implements EntityRepositoryInterface
         return $entities;
     }
 
-    public function save(EntityInterface $entity, bool $validate = true): int
+    /**
+     * Save (insert or update) an entity.
+     *
+     * Dispatches {@see BeforeSaveEvent} before the write and
+     * {@see AfterSaveEvent} after the write succeeds. The optional
+     * {@see SaveContext} parameter lets callers thread per-save flags
+     * (e.g. `SaveContext::asImport()` for migration platform writes —
+     * FR-022, GitHub #1449) through to subscribers without a second
+     * dispatch site.
+     *
+     * @param EntityInterface $entity   The entity to save.
+     * @param bool            $validate Whether to run pre-save validation.
+     * @param ?SaveContext    $context  Optional per-save context. `null`
+     *     yields {@see SaveContext::default()} — preserves pre-#1449 behaviour.
+     *
+     * @return int SAVED_NEW or SAVED_UPDATED (see {@see EntityConstants}).
+     *
+     * @throws \Waaseyaa\Entity\Validation\EntityValidationException If validation fails.
+     * @throws AbortOperationException If a BeforeSaveEvent subscriber aborts.
+     */
+    public function save(EntityInterface $entity, bool $validate = true, ?SaveContext $context = null): int
     {
-        return $this->doSave($entity, validate: $validate);
+        return $this->doSave($entity, validate: $validate, saveContext: $context);
     }
 
     public function delete(EntityInterface $entity): void
@@ -252,10 +275,15 @@ final class EntityRepository implements EntityRepositoryInterface
         });
     }
 
-    private function doSave(EntityInterface $entity, ?UnitOfWork $unitOfWork = null, bool $validate = true): int
-    {
+    private function doSave(
+        EntityInterface $entity,
+        ?UnitOfWork $unitOfWork = null,
+        bool $validate = true,
+        ?SaveContext $saveContext = null,
+    ): int {
         $isNew = $entity->isNew();
         $entityTypeId = $this->entityType->id();
+        $resolvedContext = $saveContext ?? SaveContext::default();
 
         if ($validate && $this->validator !== null) {
             $constraints = EntityTypeValidationConstraints::forEntityType($this->entityType);
@@ -283,9 +311,22 @@ final class EntityRepository implements EntityRepositoryInterface
             $unitOfWork,
         );
 
+        $createRevision = $this->shouldCreateRevision($entity, $isNew);
+
+        // GitHub #1449: Coordinator-level lifecycle event. The repository is
+        // now the single dispatch site for BeforeSaveEvent / AfterSaveEvent;
+        // callers (e.g. `\Waaseyaa\Migration\Plugin\Destination\EntityDestination`)
+        // no longer self-dispatch. Subscribers may abort via
+        // AbortOperationException; no write occurs and AfterSaveEvent does
+        // NOT fire.
+        $this->dispatchEvent(
+            new BeforeSaveEvent($entity, $resolvedContext, $createRevision),
+            BeforeSaveEvent::class,
+            $unitOfWork,
+        );
+
         $values = $entity->toArray();
         $id = (string) ($entity->id() ?? '');
-        $createRevision = $this->shouldCreateRevision($entity, $isNew);
 
         // Wrap revision + base table writes in a transaction (invariant #4).
         // Skip if already inside a UnitOfWork transaction.
@@ -338,6 +379,16 @@ final class EntityRepository implements EntityRepositoryInterface
                 $unitOfWork,
             );
         }
+
+        // GitHub #1449: AfterSaveEvent fires after all writes succeed.
+        // Mirrors EntityStorageCoordinator behaviour: AfterSaveEvent does
+        // NOT fire when the transaction rolls back (the throw above exits
+        // before this point).
+        $this->dispatchEvent(
+            new AfterSaveEvent($entity, $resolvedContext, $createRevision),
+            AfterSaveEvent::class,
+            $unitOfWork,
+        );
 
         if ($entity instanceof EntityBase) {
             $entity->postSave($isNew);
