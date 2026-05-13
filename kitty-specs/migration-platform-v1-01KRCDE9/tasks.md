@@ -114,12 +114,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T059  | `UsersCsvToWidgetsMigration` definition fixture                                   | WP11 | [P]      | FR-053 substrate                                    | [D] |
 | T060  | Integration test: full E2E (import + resume + rollback + idempotency)             | WP11 |          | FR-053, FR-054, FR-055                              | [D] |
 | T061  | Operator-path E2E via CommandTester                                               | WP11 |          | FR-053, FR-054, FR-055                              | [D] |
-| T062  | `docs/specs/migration-platform.md` canonical spec                                 | WP12 | [P]      | FR-056                                              |
-| T063  | `docs/extension-authoring/migration-source-readers.md`                            | WP12 | [P]      | FR-057                                              |
-| T064  | `docs/extension-authoring/migration-process-plugins.md`                           | WP12 | [P]      | FR-058                                              |
-| T065  | `docs/cookbook/migration-first-cut.md`                                            | WP12 | [P]      | FR-060                                              |
-| T066  | `docs/upgrades/waaseyaa-alpha-X-to-Y.md`                                          | WP12 | [P]      | FR-059                                              |
-| T067  | Charter §5.8 + CLAUDE.md + public-surface-map                                     | WP12 |          | charter §5.8                                        |
+| T062  | `docs/specs/migration-platform.md` canonical spec                                 | WP12 | [P]      | FR-056                                              | [D] |
+| T063  | `docs/extension-authoring/migration-source-readers.md`                            | WP12 | [P]      | FR-057                                              | [D] |
+| T064  | `docs/extension-authoring/migration-process-plugins.md`                           | WP12 | [P]      | FR-058                                              | [D] |
+| T065  | `docs/cookbook/migration-first-cut.md`                                            | WP12 | [P]      | FR-060                                              | [D] |
+| T066  | `docs/upgrades/waaseyaa-alpha-X-to-Y.md`                                          | WP12 | [P]      | FR-059                                              | [D] |
+| T067  | Charter §5.8 + CLAUDE.md + public-surface-map                                     | WP12 |          | charter §5.8                                        | [D] |
 
 **FR coverage:** 62 unique FRs (FR-001..FR-062 — the spec has gaps at FR-049 through FR-052 being conformance, FR-053..FR-055 validation, FR-056..FR-060 documentation, FR-061..FR-062 concurrency, then nothing beyond FR-062). Each FR appears in exactly one WP's `requirement_refs`.
 
@@ -487,12 +487,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** All five documentation FRs (FR-056..FR-060) land; charter §5.8 covers every spec §4 symbol; CLAUDE.md orchestration table includes `packages/migration/*` row.
 
 **Subtasks**
-- [ ] T062 docs/specs/migration-platform.md canonical spec (WP12)
-- [ ] T063 docs/extension-authoring/migration-source-readers.md (WP12)
-- [ ] T064 docs/extension-authoring/migration-process-plugins.md (WP12)
-- [ ] T065 docs/cookbook/migration-first-cut.md (WP12)
-- [ ] T066 docs/upgrades/waaseyaa-alpha-X-to-Y.md (WP12)
-- [ ] T067 Charter §5.8 + CLAUDE.md + public-surface-map (WP12)
+- [x] T062 docs/specs/migration-platform.md canonical spec (WP12)
+- [x] T063 docs/extension-authoring/migration-source-readers.md (WP12)
+- [x] T064 docs/extension-authoring/migration-process-plugins.md (WP12)
+- [x] T065 docs/cookbook/migration-first-cut.md (WP12)
+- [x] T066 docs/upgrades/waaseyaa-alpha-X-to-Y.md (WP12)
+- [x] T067 Charter §5.8 + CLAUDE.md + public-surface-map (WP12)
 
 **Implementation sketch:** All edits are markdown — `execution_mode: planning_artifact`. No file under `packages/` is modified. Alpha range in T066's filename is determined by `git describe --tags --abbrev=0` at implementation time.
 
