@@ -291,3 +291,4 @@ Planning/base branch: `main`. Merge target: `main`. Per-lane worktree. Run `spec
 ## Activity Log
 
 - 2026-05-13T03:40:28Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=648011 – Started implementation via action command
+- 2026-05-13T03:51:16Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=648011 – Ready for review — id-map + SourceId + idempotency primitives complete; all gates green; full suite Tests: 8004, Assertions: 20495, 0 failures.
