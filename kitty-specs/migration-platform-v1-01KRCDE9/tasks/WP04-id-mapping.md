@@ -21,6 +21,8 @@ subtasks:
 - T024
 - T025
 - T026
+agent: "claude:opus:waaseyaa-implementer:implementer"
+shell_pid: "648011"
 history:
 - timestamp: '2026-05-13T02:27:32Z'
   actor: spec-kitty.tasks
@@ -285,3 +287,7 @@ Planning/base branch: `main`. Merge target: `main`. Per-lane worktree. Run `spec
 - Verify: schema matches spec §8.1 exactly — `migration_id` first in PK, then `source_id_hash`. Both indexes present.
 - Verify: `CanonicalForm::encode()` returns identical bytes when called twice with the same input.
 - Confirm: `.claude/rules/entity-storage-invariant.md` is honoured — `MigrationIdMap` is not an entity, so direct `DatabaseInterface` access is the allowed path.
+
+## Activity Log
+
+- 2026-05-13T03:40:28Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=648011 – Started implementation via action command
