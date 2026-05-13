@@ -320,6 +320,11 @@ The following are deferred and not part of `packages/cli/`:
 - Table renderer (e.g. `SymfonyStyle::table()`) — the current `health:check` and `schema:check` commands implement their own table rendering inline
 - Colour/ANSI escape helper beyond the current `CliOutput` implementation
 
+## Implementation gotchas
+
+- **`MakeMigrationCommand` requires `$projectRoot`**: Constructor is `(string $projectRoot)` (not no-arg). `ConsoleKernel` must pass `$this->projectRoot`. The `--package` flag is not yet implemented (see #464).
+- **Migration CLI commands take `\Closure` providers**: `MigrateCommand`, `MigrateRollbackCommand`, `MigrateStatusCommand` all accept `(Migrator, \Closure $migrationsProvider)`. The closure defers filesystem scanning until the command runs. In `ConsoleKernel`: `fn () => $this->migrationLoader->loadAll()`.
+
 ## Related Specs
 
 - [`docs/specs/operator-diagnostics.md`](./operator-diagnostics.md) — health:check, health:report, schema:check commands

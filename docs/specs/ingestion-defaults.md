@@ -277,3 +277,7 @@ These checks run alongside existing CI gates:
 | `packages/foundation/tests/Unit/Ingestion/` | Unit tests |
 | `bin/check-ingestion-defaults` | CI enforcement script |
 | `storage/framework/ingestion.jsonl` | Runtime log file |
+
+## Implementation gotchas
+
+- **`DefaultsSchemaRegistry` caches on first access**: To test `PAYLOAD_SCHEMA_LOAD_FAILED` in `PayloadValidator`, write a valid schema first so the registry builds a `SchemaEntry`, then corrupt the file before validation. Writing invalid JSON directly yields `PAYLOAD_SCHEMA_NOT_FOUND` (no entry created).

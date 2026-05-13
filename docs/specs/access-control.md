@@ -723,3 +723,8 @@ When an entity type opts into revisions (`EntityType::isRevisionable() === true`
 Canonical sources: `kitty-specs/entity-storage-v2-01KRCDDC/contracts/revisionable-entity.md` §11.2; mission spec §3.6; `docs/specs/entity-system.md` "Field storage backends" → "Per-revision access fallback rule".
 
 → See `docs/upgrades/waaseyaa-alpha-X-to-Y.md` for the `view_revision` policy template and migration steps.
+
+## Implementation gotchas
+
+- **Avoid double `$storage->create()` in access checks**: When checking field access before persisting a new entity, create once and reuse for both the access check and the save. Don't create a throwaway temp entity.
+- **`discoverAccessPolicies()` constructor heuristic**: `ConfigEntityAccessPolicy` takes `array $entityTypeIds` as a required constructor parameter (from `#[PolicyAttribute]`). The reflection-based heuristic in `AbstractKernel::discoverAccessPolicies()` that passes entity types to constructors with required params exists for this reason — do not remove it.

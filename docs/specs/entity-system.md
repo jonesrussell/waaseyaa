@@ -1830,3 +1830,13 @@ kernel boot.
 
 → See `docs/specs/field-storage-backends.md` for the full backend contract and
 type-mapping table.
+
+## Implementation gotchas
+
+- **In-memory test storage** lives at `Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage`. Use it for unit tests; use `DBALDatabase::createSqlite()` for integration tests that exercise SQL behavior.
+- **`EntityTypeManager` constructor signature**: `(EventDispatcherInterface, ?\Closure $storageFactory = null)`. The factory receives `EntityTypeInterface $definition`.
+- **Entity types without a `uuid` key are config entities**: `SqlEntityStorage::save()` requires explicit non-empty string IDs for entities whose `EntityType` keys lack `'uuid' => 'uuid'`. Content entities with auto-increment IDs must include the `uuid` key even if they don't use UUIDs.
+- **`entity_reference` field definitions need `target_entity_type_id`**: `EntityTypeBuilder` looks for `target_entity_type_id` or `targetEntityTypeId`, not `target`. Wrong key causes silent fallback to String type with no reference resolution.
+- **`EntityBase` lifecycle hooks**: `preSave(bool $isNew)`, `postSave(bool $isNew)`, `preDelete()`, `postDelete()` are no-op by default. Override in subclasses. Order: `preSave()` → PRE_SAVE event → persist → POST_SAVE event → `postSave()`.
+- **`EntityRepository` auto-validation**: When `EntityValidator` is injected, `save()` validates against `EntityType::getConstraints()` and throws `EntityValidationException`. Pass `validate: false` to bypass for migrations/bulk imports. `saveMany()` also respects this.
+- **`saveMany()`/`deleteMany()` use UnitOfWork**: Batch operations wrap all writes in a single transaction. Events are buffered and dispatched only after successful commit. Requires `$database` to be non-null (throws `LogicException` otherwise).

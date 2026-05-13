@@ -973,3 +973,11 @@ bin/check-symfony-imports --list-stale # also reports legacy_files entries
 **Refactoring legacy entries.** Replace the import with the Waaseyaa surface, run `bin/check-symfony-imports --list-stale` to confirm the file is reported as stale, and remove the entry from `legacy_files` in the same commit.
 
 **Soft-rot tradeoff.** The historical 90-file `legacy_files` list captures the implicit Symfony coupling that accumulated before mission #1107. The gate's job is to prevent further drift, not to clean up history — that's a slow incremental refactor. Each refactored file is one less entry; the list shrinks over time.
+
+## Implementation gotchas
+
+- **`SchemaPresenter` `x-access-restricted`**: JSON Schema extension marking fields viewable but not editable. The admin SPA reads this to show disabled widgets instead of hiding the field. Distinct from system `readOnly` (id, uuid) which hides the field from forms entirely.
+- **`SchemaController` field definitions**: `SchemaController::show()` passes `$entityType->getFieldDefinitions()` to `SchemaPresenter::present()`. Field definitions are registered per entity type via the `fieldDefinitions:` constructor param on `EntityType`.
+- **`JsonApiResource::toArray()` omits empty keys**: `attributes` and `relationships` are omitted from serialized output when empty, not set to `[]`. Tests should use `assertArrayNotHasKey` for empty fields, not `assertEmpty`.
+- **Sparse fieldsets**: `index()` and `show()` filter both `attributes` and `relationships` via `SparseFieldsetApplicator` when `fields[type]` is present, matching JSON:API (`fields[type]` applies to sparse fieldsets for that resource type).
+- **`toMachineName()` can return empty string**: Labels with only special characters (e.g. `"!!!"`) produce empty machine names after regex replacement and trim. `JsonApiController::store()` guards against this with a 422 response. Any caller of `toMachineName()` must validate the result.

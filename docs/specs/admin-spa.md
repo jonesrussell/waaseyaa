@@ -786,3 +786,14 @@ Backend JSON:API and schema endpoints are tested via PHPUnit integration tests i
 | `packages/admin/app/i18n/en.json` | English translation strings |
 | `packages/admin/app/i18n/fr.json` | French translation strings |
 | `packages/admin/playwright.config.ts` | Playwright E2E test configuration |
+
+## Implementation gotchas
+
+- **Browser `fetch` loses binding when stored**: Passing `fetch` as a default parameter (`private fetchFn = fetch`) detaches it from `window`, causing "illegal invocation" at call time. Wrap in an arrow function: `(...args) => fetch(...args)`.
+- **Nuxt `$fetch` doesn't send cookies by default**: Admin SPA fetch calls to PHP endpoints need `credentials: 'include'` to send the PHPSESSID cookie. Without it, session-based auth fails silently.
+- **Nuxt async plugins can't call composables**: `defineNuxtPlugin(async () => ...)` runs outside the composable lifecycle. Use raw `$fetch` with explicit `baseURL: '/'` and `credentials: 'include'` in plugins. Composables like `useApi()` work only in `<script setup>`, composables, and middleware.
+- **Admin plugin runs on ALL pages including public auth pages**: The async admin plugin (`packages/admin/app/plugins/admin.ts`) fetches `/_surface/session` on every page. It must skip auth check for all public auth paths (`/login`, `/register`, `/forgot-password`, `/reset-password`, `/verify-email`) via the `publicAuthPaths` array, otherwise 401 → redirect → 401 loop. `useRoute()` is unreliable in async plugin context — use `window.location.pathname` on client.
+- **Nuxt `[entityType]` catch-all matches single-segment paths**: In E2E tests, navigating to `/some-path` hits the dynamic `[entityType]/index.vue` route instead of showing a 404. Use multi-segment paths (`/no/such/deep/route`) to test error pages.
+- **Auth config in admin SPA**: `runtimeConfig.public.auth` provides `registration` (admin/open/invite) and `requireVerifiedEmail` (boolean). Cast as `Record<string, unknown>` in TypeScript to safely access nested keys. Controlled by `NUXT_PUBLIC_AUTH_REGISTRATION` and `NUXT_PUBLIC_AUTH_REQUIRE_VERIFIED_EMAIL` env vars.
+- **Nuxt `.env` changes require dev server restart**: HMR picks up source file changes but NOT `.env` changes. Runtime config from `.env` is read at server startup only. Clear `.nuxt/` cache if values seem stale after restart.
+- **Git worktrees can't run Nuxt dev server**: Worktrees share source via symlinks but not `node_modules/.vite/` or `.nuxt/`. Vite module resolution fails with MIME type errors. Run E2E tests against the main repo's dev server, not from worktrees.
