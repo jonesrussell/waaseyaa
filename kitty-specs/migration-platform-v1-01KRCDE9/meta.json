@@ -2,7 +2,7 @@
   "created_at": "2026-05-11T21:00:14.862489+00:00",
   "friendly_name": "Migration Platform v1",
   "mission_id": "01KRCDE9ZXK2JEFPT6THSBVKNY",
-  "mission_number": null,
+  "mission_number": 9,
   "mission_slug": "migration-platform-v1-01KRCDE9",
   "mission_type": "software-dev",
   "slug": "migration-platform-v1-01KRCDE9",
