@@ -273,6 +273,8 @@ return [
     'Waaseyaa\Migration\Plugin\ProcessPluginInterface' => 'public',
     'Waaseyaa\Migration\Plugin\DestinationPluginInterface' => 'public',
     'Waaseyaa\Migration\Discovery\HasMigrationPluginsInterface' => 'public',
+    // Migration platform discovery / dependency graph (mission migration-platform-v1-01KRCDE9 WP02).
+    'Waaseyaa\Migration\Discovery\HasMigrationsInterface' => 'public',
 
     // Layer 3: Services — internal
     'Waaseyaa\Billing\StripeClientInterface' => 'internal',

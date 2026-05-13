@@ -24,6 +24,15 @@ final class Channels
     public const string MIGRATION_DEPRECATION = 'migration.deprecation';
 
     /**
+     * Channel for migration-discovery operator notices.
+     *
+     * Emitted by {@see \Waaseyaa\Migration\Discovery\FilesystemManifestLoader}
+     * when scanning manifest paths (e.g. "path scanned, no .php files found" —
+     * see risk R-discovery-silent in the mission spec).
+     */
+    public const string MIGRATION_DISCOVERY = 'migration.discovery';
+
+    /**
      * Private constructor — constants-only holder.
      */
     private function __construct() {}
