@@ -23,7 +23,11 @@ on:
 jobs:
   surface-parity:
     runs-on: ubuntu-latest
-    name: Public-surface-map parity check
+    # WARN-ONLY: tools/check-surface-parity.php is a SKELETON stub that emits
+    # false positives (real symbols reported as "removed from source"). Marked
+    # warn-only until the real AST scanner lands. Tracked in #1465.
+    name: Public-surface-map parity check (warn-only)
+    continue-on-error: true
     steps:
       - name: Checkout
         uses: actions/checkout@v4
