@@ -236,3 +236,4 @@ spec-kitty agent action implement WP10 --agent <name>
 ## Activity Log
 
 - 2026-05-12T23:54:48Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=599488 – Started implementation via action command
+- 2026-05-13T00:06:59Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=599488 – findTranslations single-query (NFR-005), LanguageManager optional DI (C-004), readActiveLanguage opt-in
