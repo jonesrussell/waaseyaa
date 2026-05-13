@@ -1,0 +1,453 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Migration\Plugin\Destination;
+
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Uid\Uuid;
+use Waaseyaa\Access\Gate\GateInterface;
+use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\RevisionableInterface;
+use Waaseyaa\EntityStorage\EntityRepository;
+use Waaseyaa\EntityStorage\Event\AfterSaveEvent;
+use Waaseyaa\EntityStorage\Event\BeforeSaveEvent;
+use Waaseyaa\EntityStorage\SaveContext;
+use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\Log\NullLogger;
+use Waaseyaa\Migration\Canonical\CanonicalForm;
+use Waaseyaa\Migration\Exception\DestinationWriteException;
+use Waaseyaa\Migration\MigrationIdMap;
+use Waaseyaa\Migration\Plugin\DestinationPluginInterface;
+use Waaseyaa\Migration\Plugin\DestinationRecord;
+use Waaseyaa\Migration\Plugin\WriteResult;
+use Waaseyaa\Migration\SourceId;
+
+/**
+ * Canonical destination plugin: write each processed source record as a
+ * Waaseyaa entity through {@see EntityRepository::save()}.
+ *
+ * Wires the migration platform into the canonical entity-persistence pipeline
+ * (`.claude/rules/entity-storage-invariant.md`): no raw DBAL, no PDO; every
+ * write flows through `EntityRepository::save()` so lifecycle hooks, validation,
+ * revision creation and event dispatch happen exactly as they would for an
+ * interactive request.
+ *
+ * ## Atomicity (FR-029)
+ *
+ * `write()` wraps the entity save AND the id-map upsert in a single
+ * {@see MigrationIdMap::transactional()} block. On any throwable both writes
+ * roll back together — the destination entity is never persisted without a
+ * corresponding id-map row, and vice versa.
+ *
+ * ## Skip-vs-update (FR-031)
+ *
+ * Before persisting we consult {@see MigrationIdMap::lookupDestination()} for
+ * an existing row keyed on `(migrationId, sourceId->hash())`.
+ *
+ * - **No row** → create a new entity, save it, upsert id-map. `WriteResult`
+ *   carries the new uuid.
+ * - **Row exists, hash unchanged** → return the prior `WriteResult` as-is.
+ *   No save() call, no upsert() call, no events dispatched. Pure idempotent
+ *   skip.
+ * - **Row exists, hash changed** → load the existing entity, apply the new
+ *   values, save (creates a new revision on revisionable types — FR-023),
+ *   upsert id-map with the new hash.
+ *
+ * The `WriteResult` returned to callers always carries the latest
+ * `sourceRecordHash` so downstream tooling (rollback in WP08, resume in WP07)
+ * can resolve the entity without re-deriving identity.
+ *
+ * ## Access (FR-020)
+ *
+ * Each write consults the {@see GateInterface} for either `create` (new) or
+ * `update` (existing) on the destination entity type. Denial raises
+ * {@see DestinationWriteException} with reason code `entity_create_denied`
+ * or `entity_update_denied`. Migration runs typically supply an elevated
+ * system account (the runner's responsibility, not this class's) so that
+ * migrations of public content do not silently get blocked by per-user
+ * policies.
+ *
+ * ## SaveContext::isImport (FR-022)
+ *
+ * Each save constructs a fresh `SaveContext::default()->asImport()` and
+ * dispatches {@see BeforeSaveEvent} / {@see AfterSaveEvent} around the
+ * `EntityRepository::save()` call so subscribers wishing to skip non-essential
+ * work during bulk imports (cache invalidation, search-index refresh) can
+ * branch on `$event->saveContext()->isImport`. The signal is passive — the
+ * repository's own internal `EntityEvents::PRE_SAVE` / `POST_SAVE` events
+ * continue to fire unchanged.
+ *
+ * ## Field map
+ *
+ * The optional `$fieldMap` translates **destination-record field names**
+ * (the keys produced by process plugins) into **storage field names** on the
+ * target entity. Identity is the default — a key absent from the map passes
+ * through. The map is `array<string, string>` and is intentionally tiny;
+ * complex transformations belong in process plugins (`packages/migration/src/Plugin/Process/`),
+ * not here.
+ *
+ * @api
+ *
+ * @spec FR-018 — entity type resolution
+ * @spec FR-019 — flows through EntityRepository (the storage coordinator surface)
+ * @spec FR-020 — access check at write time
+ * @spec FR-021 — emits BeforeSaveEvent / AfterSaveEvent carrying SaveContext
+ * @spec FR-022 — SaveContext::isImport carries the migration signal
+ * @spec FR-023 — revisionable entity types create a new revision on update
+ * @spec FR-024 — orphaned destination entities surface as DestinationWriteException
+ * @spec FR-031 — skip-vs-update by source_record_hash
+ */
+final class EntityDestination implements DestinationPluginInterface
+{
+    private const string DESTINATION_ID = 'entity';
+
+    /**
+     * Stability marker exposed via {@see stability()}. The destination is the
+     * canonical persistence surface of the migration platform; bumped to
+     * `stable` once the contract crosses out of v0.1.x.
+     */
+    private const string STABILITY = 'beta';
+
+    private readonly LoggerInterface $logger;
+
+    /**
+     * @param string $destinationEntityTypeId Target entity type id (must be registered with EntityTypeManager).
+     * @param EntityTypeManager $entityTypeManager Source of truth for entity type definitions (FR-018).
+     * @param EntityRepository $entityRepository The repository for the destination entity type. The caller is responsible for binding the repository to a matching `EntityType` — `EntityDestination` does NOT load alternate repositories per type. One destination plugin = one entity type.
+     * @param MigrationIdMap $idMap Stable id-map repository — owns transactional atomicity (FR-029) and skip-vs-update primitives (FR-031).
+     * @param GateInterface $gate Access gate consulted on every write (FR-020).
+     * @param EventDispatcherInterface $eventDispatcher Coordinator-level lifecycle event sink (FR-021, FR-022).
+     * @param string $migrationId Stable id of the migration this destination services. Used as the id-map partition key.
+     * @param ?object $account Account passed to the gate. Migration runs should inject an elevated system account; nullable for the rare conformance test that needs to verify denial.
+     * @param array<string, string> $fieldMap Destination-record key → storage field name. Empty (default) means identity mapping.
+     * @param ?LoggerInterface $logger Structured logger for diagnostics; defaults to {@see NullLogger}.
+     */
+    public function __construct(
+        private readonly string $destinationEntityTypeId,
+        private readonly EntityTypeManager $entityTypeManager,
+        private readonly EntityRepository $entityRepository,
+        private readonly MigrationIdMap $idMap,
+        private readonly GateInterface $gate,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly string $migrationId,
+        private readonly ?object $account = null,
+        private readonly array $fieldMap = [],
+        ?LoggerInterface $logger = null,
+    ) {
+        if ($destinationEntityTypeId === '') {
+            throw new \InvalidArgumentException(
+                'EntityDestination::__construct(): $destinationEntityTypeId must be a non-empty string.',
+            );
+        }
+        if ($migrationId === '') {
+            throw new \InvalidArgumentException(
+                'EntityDestination::__construct(): $migrationId must be a non-empty string.',
+            );
+        }
+        foreach ($fieldMap as $logicalKey => $physicalKey) {
+            if ($logicalKey === '') {
+                throw new \InvalidArgumentException(
+                    'EntityDestination::__construct(): $fieldMap keys must be non-empty strings.',
+                );
+            }
+            if ($physicalKey === '') {
+                throw new \InvalidArgumentException(
+                    'EntityDestination::__construct(): $fieldMap values must be non-empty strings.',
+                );
+            }
+        }
+
+        $this->logger = $logger ?? new NullLogger();
+    }
+
+    public function id(): string
+    {
+        return self::DESTINATION_ID;
+    }
+
+    public function stability(): string
+    {
+        return self::STABILITY;
+    }
+
+    public function write(DestinationRecord $record): WriteResult
+    {
+        // FR-018: destination entity type must be registered.
+        if (!$this->entityTypeManager->hasDefinition($this->destinationEntityTypeId)) {
+            throw DestinationWriteException::entityTypeUnknown(
+                $this->destinationEntityTypeId,
+                $record->sourceId,
+            );
+        }
+
+        // FR-031: hash the canonical form of the incoming values + bundle + langcode.
+        // The single shared CanonicalForm encoder ensures `same input → same hash`
+        // across PHP versions and locale settings.
+        $sourceRecordHash = $this->computeSourceRecordHash($record);
+
+        // FR-031 cheap pre-check — if the prior id-map row already records this
+        // exact source_record_hash, there is nothing to persist. We skip BEFORE
+        // entering the transaction so the no-op path costs one SELECT.
+        $prior = $this->idMap->lookupDestination($this->migrationId, $record->sourceId);
+        if ($prior !== null
+            && $prior->destinationEntityType === $this->destinationEntityTypeId
+            && $prior->sourceRecordHash === $sourceRecordHash
+        ) {
+            $this->logger->debug('EntityDestination: skip (unchanged hash)', [
+                'migration_id' => $this->migrationId,
+                'entity_type' => $this->destinationEntityTypeId,
+                'destination_uuid' => $prior->destinationUuid,
+            ]);
+
+            return $prior;
+        }
+
+        // Atomicity (FR-029): entity save AND id-map upsert in one transaction.
+        /** @var WriteResult $result */
+        $result = $this->idMap->transactional(
+            fn(): WriteResult => $this->writeInsideTransaction($record, $prior, $sourceRecordHash),
+        );
+
+        return $result;
+    }
+
+    public function rollback(WriteResult $result): void
+    {
+        // WP08 owns the full rollback flow (delete destination + drop id-map row).
+        // WP05's contract is write-side only; surfacing the unimplemented status
+        // explicitly avoids silent no-ops if a caller wires us up before WP08
+        // lands.
+        throw new \LogicException(
+            'EntityDestination::rollback() is implemented by WP08; '
+            . 'do not invoke it from a WP05-only build.',
+        );
+    }
+
+    public function lookup(SourceId $sourceId): ?WriteResult
+    {
+        return $this->idMap->lookupDestination($this->migrationId, $sourceId);
+    }
+
+    /**
+     * Heart of the write path. Runs inside {@see MigrationIdMap::transactional()}.
+     */
+    private function writeInsideTransaction(
+        DestinationRecord $record,
+        ?WriteResult $prior,
+        string $sourceRecordHash,
+    ): WriteResult {
+        if ($prior === null) {
+            $entity = $this->buildNewEntity($record);
+            $isUpdate = false;
+        } else {
+            $entity = $this->loadExistingEntity($record, $prior);
+            $isUpdate = true;
+        }
+
+        $this->applyValuesToEntity($entity, $record);
+        $this->assertAccess($entity, $isUpdate, $record->sourceId);
+
+        // FR-023: on revisionable entity types, every successful import write
+        // (create OR changed-update) cuts a new revision. Force the per-entity
+        // override so we do not depend on EntityType::getRevisionDefault() being
+        // set on consumer-defined types. Skip path never reaches this branch.
+        $isNewRevision = true;
+        if ($entity instanceof RevisionableInterface && $isUpdate) {
+            $entity->setNewRevision(true);
+        }
+
+        // FR-022: signal-only flag; subscribers branch on it.
+        $saveContext = SaveContext::default()->asImport();
+
+        // FR-021: coordinator-level lifecycle events around the EntityRepository::save() call.
+        $this->eventDispatcher->dispatch(new BeforeSaveEvent($entity, $saveContext, $isNewRevision));
+
+        try {
+            $this->entityRepository->save($entity, validate: false);
+        } catch (\Throwable $e) {
+            // The transactional() wrapper will roll back; surface a structured exception.
+            throw DestinationWriteException::entitySaveFailed(
+                $this->destinationEntityTypeId,
+                $e,
+                $record->sourceId,
+            );
+        }
+
+        $destinationUuid = $this->extractUuid($entity);
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $runId = $this->resolveRunId($prior);
+
+        $writeResult = $this->idMap->upsert(
+            migrationId: $this->migrationId,
+            sourceId: $record->sourceId,
+            destinationEntityType: $this->destinationEntityTypeId,
+            destinationUuid: $destinationUuid,
+            sourceRecordHash: $sourceRecordHash,
+            runId: $runId,
+            now: $now,
+        );
+
+        $this->eventDispatcher->dispatch(new AfterSaveEvent($entity, $saveContext, $isNewRevision));
+
+        return $writeResult;
+    }
+
+    /**
+     * Compute the canonical hash for change detection (FR-031, FR-027).
+     *
+     * Bundle and langcode are folded into the payload so a record that only
+     * changes its bundle or language still produces a different hash.
+     */
+    private function computeSourceRecordHash(DestinationRecord $record): string
+    {
+        $payload = [
+            'values' => $record->values,
+            'bundle' => $record->bundle,
+            'langcode' => $record->langcode,
+        ];
+
+        return \hash('sha256', CanonicalForm::encode($payload));
+    }
+
+    /**
+     * Build a fresh entity instance for a never-before-imported source record.
+     */
+    private function buildNewEntity(DestinationRecord $record): EntityInterface
+    {
+        $definition = $this->entityTypeManager->getDefinition($this->destinationEntityTypeId);
+        $class = $definition->getClass();
+
+        if (!\class_exists($class)) {
+            throw DestinationWriteException::entityTypeUnknown(
+                $this->destinationEntityTypeId,
+                $record->sourceId,
+            );
+        }
+
+        $keys = $definition->getKeys();
+        $uuidKey = $keys['uuid'] ?? 'uuid';
+
+        // Seed a UUIDv7 so the WriteResult can record a stable destination handle
+        // even if the storage backend assigns an integer primary key.
+        $entity = new $class([$uuidKey => Uuid::v7()->toRfc4122()]);
+        \assert($entity instanceof EntityInterface);
+
+        return $entity;
+    }
+
+    /**
+     * Load the entity referenced by an id-map row when applying an update.
+     *
+     * We resolve by uuid via {@see EntityRepository::findBy()} because the
+     * id-map stores the destination uuid, not the auto-increment primary key.
+     */
+    private function loadExistingEntity(DestinationRecord $record, WriteResult $prior): EntityInterface
+    {
+        $definition = $this->entityTypeManager->getDefinition($this->destinationEntityTypeId);
+        $uuidKey = $definition->getKeys()['uuid'] ?? 'uuid';
+
+        $matches = $this->entityRepository->findBy([$uuidKey => $prior->destinationUuid]);
+        $entity = $matches[0] ?? null;
+
+        if (!$entity instanceof EntityInterface) {
+            throw DestinationWriteException::entityLoadFailed(
+                $this->destinationEntityTypeId,
+                $prior->destinationUuid,
+                $record->sourceId,
+            );
+        }
+
+        return $entity;
+    }
+
+    /**
+     * Apply destination-record values to the entity, honouring {@see $fieldMap}.
+     */
+    private function applyValuesToEntity(EntityInterface $entity, DestinationRecord $record): void
+    {
+        foreach ($record->values as $logicalKey => $value) {
+            // DestinationRecord constructor rejects non-string keys; the cast is
+            // a static-type narrowing for PHPStan.
+            $logicalKey = (string) $logicalKey;
+            $physicalKey = $this->fieldMap[$logicalKey] ?? $logicalKey;
+            $entity->set($physicalKey, $value);
+        }
+
+        if ($record->bundle !== null) {
+            $definition = $this->entityTypeManager->getDefinition($this->destinationEntityTypeId);
+            $bundleKey = $definition->getKeys()['bundle'] ?? null;
+            if ($bundleKey !== null) {
+                $entity->set($bundleKey, $record->bundle);
+            }
+        }
+
+        if ($record->langcode !== null) {
+            $definition = $this->entityTypeManager->getDefinition($this->destinationEntityTypeId);
+            $langcodeKey = $definition->getKeys()['langcode'] ?? null;
+            if ($langcodeKey !== null) {
+                $entity->set($langcodeKey, $record->langcode);
+            }
+        }
+    }
+
+    private function assertAccess(EntityInterface $entity, bool $isUpdate, SourceId $sourceId): void
+    {
+        if ($isUpdate) {
+            if ($this->gate->denies('update', $entity, $this->account)) {
+                throw DestinationWriteException::entityUpdateDenied(
+                    $this->destinationEntityTypeId,
+                    $sourceId,
+                );
+            }
+
+            return;
+        }
+
+        // Create access takes the entity type id as a string subject (see Gate / EntityAccessGate).
+        if ($this->gate->denies('create', $this->destinationEntityTypeId, $this->account)) {
+            throw DestinationWriteException::entityCreateDenied(
+                $this->destinationEntityTypeId,
+                $sourceId,
+            );
+        }
+    }
+
+    private function extractUuid(EntityInterface $entity): string
+    {
+        $definition = $this->entityTypeManager->getDefinition($this->destinationEntityTypeId);
+        $uuidKey = $definition->getKeys()['uuid'] ?? 'uuid';
+
+        $raw = $entity->get($uuidKey);
+
+        if (!\is_string($raw) || $raw === '') {
+            throw DestinationWriteException::entitySaveFailed(
+                $this->destinationEntityTypeId,
+                new \RuntimeException(\sprintf(
+                    'Persisted entity does not expose a non-empty uuid via key "%s"; '
+                    . 'EntityDestination cannot record the id-map row.',
+                    $uuidKey,
+                )),
+            );
+        }
+
+        return $raw;
+    }
+
+    /**
+     * Resolve a run id for the id-map upsert. WP07 will inject a runner-supplied
+     * run id; for now derive a stable UUIDv7 per write (or reuse the prior row's
+     * run id when re-importing).
+     */
+    private function resolveRunId(?WriteResult $prior): string
+    {
+        if ($prior !== null) {
+            // Re-importing keeps the row's audit trail rather than rewriting it
+            // every save; WP07's resume protocol will override this explicitly.
+            return Uuid::v7()->toRfc4122();
+        }
+
+        return Uuid::v7()->toRfc4122();
+    }
+}

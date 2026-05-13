@@ -6,20 +6,38 @@
     "repositories": [
         {
             "type": "path",
-            "url": "../foundation"
+            "url": "../access"
         },
         {
             "type": "path",
             "url": "../database-legacy"
+        },
+        {
+            "type": "path",
+            "url": "../entity"
+        },
+        {
+            "type": "path",
+            "url": "../entity-storage"
+        },
+        {
+            "type": "path",
+            "url": "../foundation"
         }
     ],
     "require": {
         "php": ">=8.5",
+        "psr/event-dispatcher": "^1.0",
+        "symfony/uid": "^7.0",
+        "waaseyaa/access": "^0.1.0-alpha.177",
         "waaseyaa/database-legacy": "^0.1.0-alpha.177",
+        "waaseyaa/entity": "^0.1.0-alpha.177",
+        "waaseyaa/entity-storage": "^0.1.0-alpha.177",
         "waaseyaa/foundation": "^0.1.0-alpha.177"
     },
     "require-dev": {
-        "phpunit/phpunit": "^10.5"
+        "phpunit/phpunit": "^10.5",
+        "symfony/event-dispatcher": "^7.0"
     },
     "autoload": {
         "psr-4": {

@@ -1,0 +1,351 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Migration\Tests\Integration;
+
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\EntityAccessHandler;
+use Waaseyaa\Access\Gate\EntityAccessGate;
+use Waaseyaa\Database\DBALDatabase;
+use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\EntityStorage\Connection\SingleConnectionResolver;
+use Waaseyaa\EntityStorage\Driver\SqlStorageDriver;
+use Waaseyaa\EntityStorage\EntityRepository;
+use Waaseyaa\EntityStorage\Event\AfterSaveEvent;
+use Waaseyaa\EntityStorage\Event\BeforeSaveEvent;
+use Waaseyaa\Migration\Exception\DestinationWriteException;
+use Waaseyaa\Migration\MigrationIdMap;
+use Waaseyaa\Migration\Plugin\Destination\EntityDestination;
+use Waaseyaa\Migration\Plugin\DestinationRecord;
+use Waaseyaa\Migration\Schema\MigrationIdMapSchema;
+use Waaseyaa\Migration\SourceId;
+use Waaseyaa\Migration\Tests\Fixtures\AllowAllPolicy;
+use Waaseyaa\Migration\Tests\Fixtures\ForbidAllPolicy;
+use Waaseyaa\Migration\Tests\Fixtures\MigrationSystemAccount;
+use Waaseyaa\Migration\Tests\Fixtures\MigrationTestWidget;
+use Waaseyaa\Migration\Tests\Fixtures\MigrationTestWidgetType;
+
+/**
+ * Integration coverage for {@see EntityDestination} against the canonical
+ * non-revisionable round-trip path (FR-018..FR-022, FR-024, FR-029, FR-031).
+ *
+ * Uses real implementations end-to-end:
+ *   - Real {@see DBALDatabase} (in-memory SQLite).
+ *   - Real {@see EntityRepository} + {@see SqlStorageDriver}.
+ *   - Real {@see MigrationIdMap}.
+ *   - Real Symfony {@see EventDispatcher}.
+ *   - Real {@see EntityAccessGate}, with inline policy fixtures (allow / deny).
+ *
+ * Nothing is mocked — the spec calls WP05 "the highest-risk WP" because it
+ * wires the migration platform into the canonical entity-persistence pipeline;
+ * mocking the pipeline would defeat the test.
+ */
+#[CoversClass(EntityDestination::class)]
+#[CoversNothing]
+final class EntityDestinationTest extends TestCase
+{
+    private DBALDatabase $db;
+    private EntityTypeManager $typeManager;
+    private EntityRepository $repository;
+    private MigrationIdMap $idMap;
+    private EventDispatcher $dispatcher;
+    private EntityAccessGate $gate;
+    private AccountInterface $systemAccount;
+
+    private const string MIGRATION_ID = 'migration_test_widgets';
+    private const string ENTITY_TYPE_ID = 'migration_test_widget';
+
+    protected function setUp(): void
+    {
+        $this->db = DBALDatabase::createSqlite();
+        $conn = $this->db->getConnection();
+
+        // Destination entity table (non-revisionable): id PK, uuid, title, _data blob.
+        $conn->executeStatement(
+            'CREATE TABLE IF NOT EXISTS "migration_test_widget" ('
+            . '"id" INTEGER PRIMARY KEY AUTOINCREMENT, '
+            . '"uuid" TEXT, '
+            . '"title" TEXT, '
+            . '"_data" TEXT DEFAULT \'{}\''
+            . ')',
+        );
+
+        // Id-map table.
+        $conn->executeStatement(MigrationIdMapSchema::createTableSql());
+
+        $entityType = MigrationTestWidgetType::nonRevisionable();
+        $this->typeManager = new EntityTypeManager(new EventDispatcher());
+        $this->typeManager->registerEntityType($entityType);
+
+        $this->dispatcher = new EventDispatcher();
+
+        $resolver = new SingleConnectionResolver($this->db);
+        $driver = new SqlStorageDriver($resolver, 'id');
+
+        $this->repository = new EntityRepository(
+            entityType: $entityType,
+            driver: $driver,
+            eventDispatcher: $this->dispatcher,
+        );
+
+        $this->idMap = new MigrationIdMap($this->db);
+
+        $this->systemAccount = new MigrationSystemAccount();
+        $this->gate = new EntityAccessGate(new EntityAccessHandler([new AllowAllPolicy(self::ENTITY_TYPE_ID)]));
+    }
+
+    private function makeDestination(?object $account = null, array $fieldMap = []): EntityDestination
+    {
+        return new EntityDestination(
+            destinationEntityTypeId: self::ENTITY_TYPE_ID,
+            entityTypeManager: $this->typeManager,
+            entityRepository: $this->repository,
+            idMap: $this->idMap,
+            gate: $this->gate,
+            eventDispatcher: $this->dispatcher,
+            migrationId: self::MIGRATION_ID,
+            account: $account ?? $this->systemAccount,
+            fieldMap: $fieldMap,
+        );
+    }
+
+    private function makeRecord(string $title, string $sourceKey = 'one'): DestinationRecord
+    {
+        return new DestinationRecord(
+            migrationId: self::MIGRATION_ID,
+            sourceId: new SourceId(sourceType: 'fake_source', keys: ['key' => $sourceKey]),
+            values: ['title' => $title],
+        );
+    }
+
+    #[Test]
+    public function happy_path_writes_entity_creates_id_map_row_and_returns_write_result(): void
+    {
+        $destination = $this->makeDestination();
+        $record = $this->makeRecord('Hello world');
+
+        $result = $destination->write($record);
+
+        self::assertSame(self::ENTITY_TYPE_ID, $result->destinationEntityType);
+        self::assertNotSame('', $result->destinationUuid);
+        self::assertNotSame('', $result->sourceRecordHash);
+        // sha256 of canonical-form JSON is exactly 64 hex chars.
+        self::assertSame(64, \strlen($result->sourceRecordHash));
+
+        // Entity is queryable via the repository (FR-019).
+        $loaded = $this->repository->findBy(['uuid' => $result->destinationUuid]);
+        self::assertCount(1, $loaded);
+        self::assertSame('Hello world', $loaded[0]->get('title'));
+
+        // Id-map row exists (FR-029).
+        $row = $this->idMap->lookupDestination(self::MIGRATION_ID, $record->sourceId);
+        self::assertNotNull($row);
+        self::assertSame($result->destinationUuid, $row->destinationUuid);
+    }
+
+    #[Test]
+    public function update_path_re_runs_with_different_hash_persist_new_values(): void
+    {
+        $destination = $this->makeDestination();
+        $first = $destination->write($this->makeRecord('Original', 'one'));
+
+        $updated = $destination->write($this->makeRecord('Updated', 'one'));
+
+        // Same destination uuid — we updated, not created.
+        self::assertSame($first->destinationUuid, $updated->destinationUuid);
+        self::assertNotSame(
+            $first->sourceRecordHash,
+            $updated->sourceRecordHash,
+            'Update path must advance the stored source_record_hash (FR-031).',
+        );
+
+        $loaded = $this->repository->findBy(['uuid' => $updated->destinationUuid]);
+        self::assertSame('Updated', $loaded[0]->get('title'));
+    }
+
+    #[Test]
+    public function skip_path_unchanged_hash_returns_prior_write_result_without_save_or_upsert(): void
+    {
+        $destination = $this->makeDestination();
+
+        $saveEvents = 0;
+        $this->dispatcher->addListener(BeforeSaveEvent::class, function () use (&$saveEvents): void {
+            ++$saveEvents;
+        });
+        $this->dispatcher->addListener(AfterSaveEvent::class, function () use (&$saveEvents): void {
+            ++$saveEvents;
+        });
+
+        $first = $destination->write($this->makeRecord('Hello', 'one'));
+        self::assertSame(2, $saveEvents, 'First write should fire BeforeSave + AfterSave once each.');
+
+        // Re-run with identical values → identical hash → skip.
+        $skipped = $destination->write($this->makeRecord('Hello', 'one'));
+
+        self::assertSame($first->sourceRecordHash, $skipped->sourceRecordHash);
+        self::assertSame($first->destinationUuid, $skipped->destinationUuid);
+        self::assertSame(2, $saveEvents, 'Skip path must not dispatch lifecycle events (FR-031).');
+    }
+
+    #[Test]
+    public function save_dispatches_before_and_after_with_import_save_context(): void
+    {
+        $destination = $this->makeDestination();
+        /** @var list<BeforeSaveEvent> $before */
+        $before = [];
+        /** @var list<AfterSaveEvent> $after */
+        $after = [];
+        $this->dispatcher->addListener(BeforeSaveEvent::class, function (BeforeSaveEvent $e) use (&$before): void {
+            $before[] = $e;
+        });
+        $this->dispatcher->addListener(AfterSaveEvent::class, function (AfterSaveEvent $e) use (&$after): void {
+            $after[] = $e;
+        });
+
+        $destination->write($this->makeRecord('Hello', 'one'));
+
+        self::assertCount(1, $before);
+        self::assertCount(1, $after);
+        // FR-022: subscribers observe SaveContext::$isImport === true.
+        self::assertTrue($before[0]->saveContext()->isImport);
+        self::assertTrue($after[0]->saveContext()->isImport);
+        self::assertInstanceOf(EntityInterface::class, $before[0]->entity());
+        self::assertInstanceOf(MigrationTestWidget::class, $after[0]->entity());
+    }
+
+    #[Test]
+    public function atomicity_save_failure_rolls_back_id_map_upsert(): void
+    {
+        // Inject a record whose value is unserialisable (a stream resource) so the
+        // EntityRepository's _data JSON encode throws inside the transaction.
+        $destination = $this->makeDestination();
+
+        $record = new DestinationRecord(
+            migrationId: self::MIGRATION_ID,
+            sourceId: new SourceId(sourceType: 'fake_source', keys: ['key' => 'will-fail']),
+            values: ['title' => 'ok', 'unsupported' => \fopen('php://memory', 'r')],
+        );
+
+        try {
+            $destination->write($record);
+            self::fail('Expected exception when persisting an unserialisable value');
+        } catch (\Throwable) {
+            // We do not assert the concrete exception class — different code paths
+            // may surface DestinationWriteException or the underlying driver
+            // exception. The invariant we care about is the rollback.
+        }
+
+        // FR-029 atomicity: no id-map row should exist for the failed write.
+        $row = $this->idMap->lookupDestination(self::MIGRATION_ID, $record->sourceId);
+        self::assertNull($row, 'Atomicity violated: id-map row leaked from a failed save.');
+    }
+
+    #[Test]
+    public function unknown_destination_entity_type_raises_structured_exception(): void
+    {
+        $destination = new EntityDestination(
+            destinationEntityTypeId: 'no_such_type',
+            entityTypeManager: $this->typeManager,
+            entityRepository: $this->repository,
+            idMap: $this->idMap,
+            gate: $this->gate,
+            eventDispatcher: $this->dispatcher,
+            migrationId: self::MIGRATION_ID,
+            account: $this->systemAccount,
+        );
+
+        try {
+            $destination->write($this->makeRecord('Hello'));
+            self::fail('Expected DestinationWriteException for unknown entity type');
+        } catch (DestinationWriteException $e) {
+            self::assertSame('entity_type_unknown', $e->reason);
+            self::assertSame('no_such_type', $e->destinationEntityType);
+        }
+    }
+
+    #[Test]
+    public function field_map_translates_logical_to_physical_keys(): void
+    {
+        // Record exposes `headline` logically; entity stores `title`.
+        $destination = $this->makeDestination(fieldMap: ['headline' => 'title']);
+
+        $record = new DestinationRecord(
+            migrationId: self::MIGRATION_ID,
+            sourceId: new SourceId(sourceType: 'fake_source', keys: ['key' => 'mapped']),
+            values: ['headline' => 'Mapped value'],
+        );
+
+        $result = $destination->write($record);
+
+        $loaded = $this->repository->findBy(['uuid' => $result->destinationUuid]);
+        self::assertSame('Mapped value', $loaded[0]->get('title'));
+    }
+
+    #[Test]
+    public function lookup_returns_prior_write_result_or_null(): void
+    {
+        $destination = $this->makeDestination();
+        $sourceId = new SourceId(sourceType: 'fake_source', keys: ['key' => 'look']);
+
+        self::assertNull($destination->lookup($sourceId));
+
+        $destination->write(new DestinationRecord(
+            migrationId: self::MIGRATION_ID,
+            sourceId: $sourceId,
+            values: ['title' => 'present'],
+        ));
+
+        $hit = $destination->lookup($sourceId);
+        self::assertNotNull($hit);
+        self::assertSame(self::ENTITY_TYPE_ID, $hit->destinationEntityType);
+    }
+
+    #[Test]
+    public function access_denied_create_raises_destination_write_exception_with_reason(): void
+    {
+        $denyingGate = new EntityAccessGate(new EntityAccessHandler([new ForbidAllPolicy(self::ENTITY_TYPE_ID)]));
+
+        $destination = new EntityDestination(
+            destinationEntityTypeId: self::ENTITY_TYPE_ID,
+            entityTypeManager: $this->typeManager,
+            entityRepository: $this->repository,
+            idMap: $this->idMap,
+            gate: $denyingGate,
+            eventDispatcher: $this->dispatcher,
+            migrationId: self::MIGRATION_ID,
+            account: $this->systemAccount,
+        );
+
+        try {
+            $destination->write($this->makeRecord('denied write'));
+            self::fail('Expected DestinationWriteException for denied create');
+        } catch (DestinationWriteException $e) {
+            self::assertSame('entity_create_denied', $e->reason);
+            self::assertSame(self::ENTITY_TYPE_ID, $e->destinationEntityType);
+        }
+
+        // No id-map row should exist after a denied write.
+        $row = $this->idMap->lookupDestination(
+            self::MIGRATION_ID,
+            new SourceId(sourceType: 'fake_source', keys: ['key' => 'one']),
+        );
+        self::assertNull($row);
+    }
+
+    #[Test]
+    public function rollback_is_a_logic_error_in_wp05_only_build(): void
+    {
+        $destination = $this->makeDestination();
+        $result = $destination->write($this->makeRecord('Hello world'));
+
+        $this->expectException(\LogicException::class);
+        $destination->rollback($result);
+    }
+}
