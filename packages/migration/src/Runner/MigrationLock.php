@@ -211,10 +211,15 @@ final class MigrationLock
     /**
      * Release the lock if held; safe to call multiple times.
      *
-     * On Windows, deletion of an open file silently fails; we still
-     * release the OS-level lock via `flock($handle, LOCK_UN)` and close
-     * the handle, leaving the file body. The next `acquire()` will reuse
-     * the path.
+     * Releases the OS-level lock via `flock($handle, LOCK_UN)` and closes
+     * the handle. The lock file itself is intentionally left on disk:
+     *
+     *  - Operators inspect it for the holder PID (see {@see pid()}).
+     *  - The next `acquire()` truncates and overwrites the body on success.
+     *  - Removing the file here would introduce a TOCTOU window — another
+     *    process could `fopen()` a now-stale path between our `unlink()`
+     *    and its own `flock()`, then both holders would believe they own
+     *    distinct locks against the same migration id.
      *
      * @api
      */
@@ -229,7 +234,6 @@ final class MigrationLock
 
         \flock($handle, \LOCK_UN);
         \fclose($handle);
-        @\unlink($this->lockPath);
 
         $this->logger?->debug('MigrationLock: released', [
             'migration_id' => $this->migrationId,

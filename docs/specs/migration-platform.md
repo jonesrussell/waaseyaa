@@ -377,6 +377,16 @@ entity via the storage coordinator. The id-map row is removed by the runner
 destination is empty). If rollback fails, the id-map row is preserved so the
 operator can retry.
 
+**Rollback vs FR-042 idempotent re-run (issue #1452).** FR-042 governs
+re-running an unchanged record — a separate code path from `rollback()`.
+Whether `rollback()` clears the id-map row alongside the entity is an
+implementation-defined retention policy: the framework default clears it,
+audit/replay-oriented destinations may retain it. Both modes are
+conformant; the conformance harness gates on
+`DestinationConformanceTestCase::rollbackClearsLookup()`. See
+`kitty-specs/migration-platform-v1-01KRCDE9/contracts/destination-plugin.md`
+§"Conformance requirements (WP10)" for the normative statement.
+
 ### 7.4 Lookup path
 
 `EntityDestination::lookup(SourceId $sourceId)` returns the `WriteResult`

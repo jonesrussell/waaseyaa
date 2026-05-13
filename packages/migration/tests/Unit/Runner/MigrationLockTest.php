@@ -83,14 +83,22 @@ final class MigrationLockTest extends TestCase
     }
 
     #[Test]
-    public function release_removes_the_lock_file(): void
+    public function release_leaves_the_lock_file_in_place_for_pid_inspection(): void
     {
+        // Issue #1450 — release() intentionally does NOT unlink the lock
+        // file. Removing it would introduce a TOCTOU window between unlink
+        // and the next acquirer's fopen()+flock(). The PID body is the
+        // operator-facing inspection surface; it is overwritten on the
+        // next successful acquire().
         $lock = new MigrationLock(migrationId: 'demo', lockDir: $this->lockDir);
         $lock->acquire();
         self::assertFileExists($lock->lockPath());
 
         $lock->release();
-        self::assertFileDoesNotExist($lock->lockPath());
+        self::assertFileExists(
+            $lock->lockPath(),
+            'release() must leave the lock file on disk so operators can inspect the previous holder PID.',
+        );
     }
 
     #[Test]
@@ -101,7 +109,9 @@ final class MigrationLockTest extends TestCase
         $lock->release();
         $lock->release(); // No throw.
 
-        self::assertFileDoesNotExist($lock->lockPath());
+        // Lock file persists; release() is idempotent on the OS lock and
+        // does not delete the file (issue #1450).
+        self::assertFileExists($lock->lockPath());
     }
 
     #[Test]

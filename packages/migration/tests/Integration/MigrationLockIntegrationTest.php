@@ -118,11 +118,14 @@ final class MigrationLockIntegrationTest extends TestCase
         $exitCode = $this->runChildAcquireRelease('demo', $this->lockDir);
         self::assertSame(0, $exitCode, 'Child must exit 0 after acquiring + releasing the lock.');
 
-        // After child exit, the lock file should be removed.
+        // After child exit, the lock file persists on disk (issue #1450 —
+        // release() leaves the body so operators can inspect the prior
+        // holder's PID; the OS-level flock has been released).
         $lockPath = $this->lockDir . \DIRECTORY_SEPARATOR . 'demo.lock';
-        self::assertFileDoesNotExist($lockPath);
+        self::assertFileExists($lockPath);
 
-        // Parent acquires cleanly — no leftover handle, no exception.
+        // Parent acquires cleanly — flock is free, body gets overwritten
+        // with our PID on acquire().
         $lock = new MigrationLock(migrationId: 'demo', lockDir: $this->lockDir);
         $lock->acquire();
         try {
@@ -145,9 +148,20 @@ final class MigrationLockIntegrationTest extends TestCase
         $exitCode = $this->runChildAcquireThenExit('demo', $this->lockDir);
         self::assertSame(1, $exitCode, 'Child must exit 1 to signal it acquired the lock without explicit release.');
 
-        // shutdown_function ran inside the child — file should be gone.
+        // shutdown_function ran inside the child and released the OS-level
+        // flock. The lock file itself persists (issue #1450); the proof
+        // that the lock came down is that we can acquire it here without
+        // raising MigrationConcurrencyException.
         $lockPath = $this->lockDir . \DIRECTORY_SEPARATOR . 'demo.lock';
-        self::assertFileDoesNotExist($lockPath, 'register_shutdown_function should have released the lock.');
+        self::assertFileExists($lockPath, 'Lock file body persists across release for PID inspection.');
+
+        $lock = new MigrationLock(migrationId: 'demo', lockDir: $this->lockDir);
+        $lock->acquire();
+        try {
+            self::assertSame(\getmypid(), $lock->pid(), 'Acquire must succeed after the child shutdown handler released the OS flock.');
+        } finally {
+            $lock->release();
+        }
     }
 
     #[Test]
@@ -163,12 +177,11 @@ final class MigrationLockIntegrationTest extends TestCase
         self::assertFileExists($lock->lockPath());
 
         $lock->release();
-        // On non-Windows the file is removed; on Windows the body may
-        // persist if the OS refused to unlink an open handle — but we
-        // already closed it, so the assertion is the same.
-        if (\PHP_OS_FAMILY !== 'Windows') {
-            self::assertFileDoesNotExist($lock->lockPath());
-        }
+        // Issue #1450 — the lock file persists after release on every
+        // platform. release() unlocks the OS-level flock and closes the
+        // handle but leaves the body in place for operator PID
+        // inspection. The next acquire() truncates and overwrites it.
+        self::assertFileExists($lock->lockPath());
     }
 
     /**
