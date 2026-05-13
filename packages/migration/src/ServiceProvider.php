@@ -1,0 +1,185 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Migration;
+
+use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\ServiceProvider\ServiceProvider as BaseServiceProvider;
+use Waaseyaa\Migration\Discovery\FilesystemManifestLoader;
+use Waaseyaa\Migration\Discovery\HasMigrationsInterface;
+use Waaseyaa\Migration\Discovery\MigrationRegistry;
+use Waaseyaa\Migration\Runner\MigrationRunner;
+use Waaseyaa\Migration\Runner\ProcessChainExecutor;
+use Waaseyaa\Migration\Runner\RollbackWalker;
+
+/**
+ * Service provider for the migration platform package.
+ *
+ * Discovered via `extra.waaseyaa.providers` in `packages/migration/composer.json`.
+ *
+ * WP01 landed the package scaffold and stable plugin surface. WP02 adds the
+ * boot-time discovery surface:
+ *
+ * - {@see FilesystemManifestLoader} singleton, configured from
+ *   `config.migration.manifest_paths`.
+ * - {@see MigrationRegistry} singleton, eagerly booted from {@see boot()} so
+ *   structural manifest errors (missing dependencies, cycles, id collisions)
+ *   surface at framework startup instead of at first CLI invocation.
+ *
+ * Provider capability dispatch — discovering every sibling provider
+ * implementing {@see HasMigrationsInterface} — lands when the kernel grows a
+ * generic capability bus. Until then this provider exposes a registry
+ * constructed with an empty provider list and the filesystem loader only.
+ * Tests and host applications that need to inject migration providers may
+ * override the binding by constructing {@see MigrationRegistry} directly.
+ *
+ * Concrete bindings for runner / destination / CLI still land in WP05, WP07,
+ * and WP09 respectively.
+ *
+ * @api
+ */
+final class ServiceProvider extends BaseServiceProvider
+{
+    /** @var list<HasMigrationsInterface> Providers injected by tests or future capability-dispatch wiring. */
+    private array $migrationProviders = [];
+
+    public function register(): void
+    {
+        $this->singleton(FilesystemManifestLoader::class, function () {
+            return new FilesystemManifestLoader(
+                manifestPaths: $this->resolveManifestPaths(),
+                logger: $this->resolveLogger(),
+            );
+        });
+
+        $this->singleton(MigrationRegistry::class, function () {
+            $loader = $this->resolve(FilesystemManifestLoader::class);
+            \assert($loader instanceof FilesystemManifestLoader);
+
+            $registry = new MigrationRegistry(
+                providers: $this->migrationProviders,
+                filesystemLoader: $loader,
+            );
+            $registry->boot();
+            return $registry;
+        });
+
+        // WP06 — runtime collaborators for the import:* CLI commands.
+        // `DatabaseInterface` and `MigrationIdMap` resolve through the kernel
+        // service bus when consumers actually run the CLI; the bindings here
+        // describe shape only.
+        $this->singleton(MigrationIdMap::class, function () {
+            $database = $this->resolve(DatabaseInterface::class);
+            \assert($database instanceof DatabaseInterface);
+
+            return new MigrationIdMap(
+                database: $database,
+                logger: $this->resolveLogger(),
+            );
+        });
+
+        $this->singleton(ProcessChainExecutor::class, static fn(): ProcessChainExecutor
+            => new ProcessChainExecutor());
+
+        // WP07 — per-record progress + resume checkpoint repository.
+        $this->singleton(MigrationRunState::class, function () {
+            $database = $this->resolve(DatabaseInterface::class);
+            \assert($database instanceof DatabaseInterface);
+
+            return new MigrationRunState(
+                database: $database,
+                logger: $this->resolveLogger(),
+            );
+        });
+
+        $this->singleton(MigrationRunner::class, function () {
+            $registry = $this->resolve(MigrationRegistry::class);
+            \assert($registry instanceof MigrationRegistry);
+            $chain = $this->resolve(ProcessChainExecutor::class);
+            \assert($chain instanceof ProcessChainExecutor);
+            $idMap = $this->resolve(MigrationIdMap::class);
+            \assert($idMap instanceof MigrationIdMap);
+            $runState = $this->resolve(MigrationRunState::class);
+            \assert($runState instanceof MigrationRunState);
+
+            return new MigrationRunner(
+                registry: $registry,
+                chain: $chain,
+                idMap: $idMap,
+                logger: $this->resolveLogger(),
+                runState: $runState,
+            );
+        });
+
+        // WP08 — rollback orchestrator for `import:rollback`.
+        $this->singleton(RollbackWalker::class, function () {
+            $registry = $this->resolve(MigrationRegistry::class);
+            \assert($registry instanceof MigrationRegistry);
+            $idMap = $this->resolve(MigrationIdMap::class);
+            \assert($idMap instanceof MigrationIdMap);
+
+            return new RollbackWalker(
+                registry: $registry,
+                idMap: $idMap,
+                logger: $this->resolveLogger(),
+            );
+        });
+    }
+
+    public function boot(): void
+    {
+        // Eagerly resolve the registry so dependency cycles and missing
+        // dependencies surface at boot time, not at first CLI invocation
+        // (the framework refuses to boot on structural manifest errors).
+        $this->resolve(MigrationRegistry::class);
+    }
+
+    /**
+     * Inject migration providers prior to {@see register()}.
+     *
+     * Used by the WP02 integration test and by future capability-dispatch
+     * wiring. Once a generic kernel capability bus lands the kernel will
+     * discover providers automatically and this seam can be removed.
+     *
+     * @param list<HasMigrationsInterface> $providers
+     *
+     * @internal
+     */
+    public function withMigrationProviders(array $providers): void
+    {
+        $this->migrationProviders = $providers;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function resolveManifestPaths(): array
+    {
+        $migrationConfig = $this->config['migration'] ?? [];
+        if (!\is_array($migrationConfig)) {
+            return [];
+        }
+        $paths = $migrationConfig['manifest_paths'] ?? [];
+        if (!\is_array($paths)) {
+            return [];
+        }
+        $normalised = [];
+        foreach ($paths as $candidate) {
+            if (\is_string($candidate) && $candidate !== '') {
+                $normalised[] = $candidate;
+            }
+        }
+        return $normalised;
+    }
+
+    private function resolveLogger(): ?LoggerInterface
+    {
+        if ($this->kernelServices === null) {
+            return null;
+        }
+        $logger = $this->kernelServices->get(LoggerInterface::class);
+        return $logger instanceof LoggerInterface ? $logger : null;
+    }
+}

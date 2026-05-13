@@ -22,9 +22,22 @@ namespace Waaseyaa\EntityStorage;
  */
 final class SaveContext
 {
+    /**
+     * @param bool $withoutNewRevision Suppress revision creation on this save.
+     * @param ?string $langcode Pin the save to a specific translation langcode (null = active langcode).
+     * @param bool $isImport Signal that this save is part of a migration platform write
+     *     (see {@see \Waaseyaa\Migration\Plugin\Destination\EntityDestination::write()},
+     *     FR-022 of M-002). Subscribers to {@see \Waaseyaa\EntityStorage\Event\BeforeSaveEvent}
+     *     / {@see \Waaseyaa\EntityStorage\Event\AfterSaveEvent} may read this flag and
+     *     skip expensive non-essential work during bulk imports — e.g. cache
+     *     invalidation, search-index refresh, downstream analytics. This is a
+     *     passive signal: the coordinator does NOT alter its behaviour based on
+     *     this flag; subscribers branch on it themselves.
+     */
     private function __construct(
         public readonly bool $withoutNewRevision = false,
         public readonly ?string $langcode = null,
+        public readonly bool $isImport = false,
     ) {}
 
     /**
@@ -32,7 +45,7 @@ final class SaveContext
      */
     public static function default(): self
     {
-        return new self(withoutNewRevision: false, langcode: null);
+        return new self(withoutNewRevision: false, langcode: null, isImport: false);
     }
 
     /**
@@ -43,7 +56,11 @@ final class SaveContext
      */
     public function withoutNewRevision(): self
     {
-        return new self(withoutNewRevision: true, langcode: $this->langcode);
+        return new self(
+            withoutNewRevision: true,
+            langcode: $this->langcode,
+            isImport: $this->isImport,
+        );
     }
 
     /**
@@ -59,6 +76,28 @@ final class SaveContext
             throw new \InvalidArgumentException('SaveContext::withLangcode requires a non-empty langcode.');
         }
 
-        return new self(withoutNewRevision: $this->withoutNewRevision, langcode: $langcode);
+        return new self(
+            withoutNewRevision: $this->withoutNewRevision,
+            langcode: $langcode,
+            isImport: $this->isImport,
+        );
+    }
+
+    /**
+     * Return a new instance marking the save as a migration platform import (FR-022).
+     *
+     * Set by {@see \Waaseyaa\Migration\Plugin\Destination\EntityDestination::write()}.
+     * Event subscribers reading the resulting {@see BeforeSaveEvent} or
+     * {@see AfterSaveEvent} may inspect `$saveContext->isImport` and branch.
+     *
+     * @api
+     */
+    public function asImport(): self
+    {
+        return new self(
+            withoutNewRevision: $this->withoutNewRevision,
+            langcode: $this->langcode,
+            isImport: true,
+        );
     }
 }

@@ -53,6 +53,7 @@ parameters:
         - packages/mercure/src
         - packages/menu/src
         - packages/messaging/src
+        - packages/migration/src
         - packages/node/src
         - packages/northcloud/src
         - packages/note/src

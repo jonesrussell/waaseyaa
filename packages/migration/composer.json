@@ -1,0 +1,71 @@
+{
+    "name": "waaseyaa/migration",
+    "description": "Plugin-based content migration platform for Waaseyaa (source -> process -> destination pipelines)",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../access"
+        },
+        {
+            "type": "path",
+            "url": "../database-legacy"
+        },
+        {
+            "type": "path",
+            "url": "../entity"
+        },
+        {
+            "type": "path",
+            "url": "../entity-storage"
+        },
+        {
+            "type": "path",
+            "url": "../foundation"
+        }
+    ],
+    "require": {
+        "php": ">=8.5",
+        "psr/event-dispatcher": "^1.0",
+        "symfony/uid": "^7.0",
+        "waaseyaa/access": "^0.1.0-alpha.177",
+        "waaseyaa/database-legacy": "^0.1.0-alpha.177",
+        "waaseyaa/entity": "^0.1.0-alpha.177",
+        "waaseyaa/entity-storage": "^0.1.0-alpha.177",
+        "waaseyaa/foundation": "^0.1.0-alpha.177"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "symfony/event-dispatcher": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Waaseyaa\\Migration\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Waaseyaa\\Migration\\Tests\\": "tests/",
+            "Waaseyaa\\Migration\\Testing\\": "testing/",
+            "Waaseyaa\\Migration\\PluginFixtures\\": "tests/_fixtures/"
+        }
+    },
+    "extra": {
+        "waaseyaa": {
+            "providers": [
+                "Waaseyaa\\Migration\\ServiceProvider"
+            ],
+            "migrations": "migrations"
+        },
+        "branch-alias": {
+            "dev-main": "0.1.x-dev",
+            "dev-develop/v1.1": "0.1.x-dev"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
+}

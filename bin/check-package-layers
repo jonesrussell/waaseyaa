@@ -66,6 +66,7 @@ LAYER_BY_SHORT = {
     "github": 3,
     "northcloud": 3,
     "structured-import": 3,
+    "migration": 3,
     # 4 — API
     "api": 4,
     "routing": 4,
