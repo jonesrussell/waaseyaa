@@ -7,6 +7,8 @@ namespace Waaseyaa\CLI\Command\Import;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Migration\Discovery\MigrationRegistry;
 use Waaseyaa\Migration\Exception\MigrationAbortedException;
+use Waaseyaa\Migration\Exception\MigrationConcurrencyException;
+use Waaseyaa\Migration\Runner\MigrationLock;
 use Waaseyaa\Migration\Runner\MigrationRunner;
 use Waaseyaa\Migration\Runner\RunOptions;
 
@@ -24,17 +26,28 @@ use Waaseyaa\Migration\Runner\RunOptions;
  *     by the runner) DO halt the walk. Subsequent migrations are not
  *     attempted because their inputs cannot be trusted.
  *   - The final exit code is the maximum across per-migration exit codes
- *     (0 ⊕ 1 = 1; 1 ⊕ 5 = 5).
+ *     (0 ⊕ 1 = 1; 1 ⊕ 5 = 5; 0 ⊕ 3 = 3).
+ *
+ * **Concurrency lock (FR-061)**: acquired + released PER MIGRATION inside
+ * the loop. A run-all walk could otherwise hold every migration's lock for
+ * hours, blocking unrelated operators. A lock collision on one migration
+ * surfaces as exit code 3 in the aggregate (max of per-migration codes)
+ * but does NOT halt the walk — the next migration may still be available.
  *
  * Flags are passed through to every migration unchanged.
  *
  * @spec FR-033 — import:run-all
+ * @spec FR-061 — per-migration concurrency lock (acquired in the loop)
  */
 final class ImportRunAllCommand
 {
+    /**
+     * @param \Closure(string): MigrationLock $lockFactory Builds a per-migration {@see MigrationLock}; injected so the lock directory is resolved by the service provider.
+     */
     public function __construct(
         private readonly MigrationRunner $runner,
         private readonly MigrationRegistry $registry,
+        private readonly \Closure $lockFactory,
     ) {}
 
     public function execute(CliIO $io): int
@@ -62,27 +75,48 @@ final class ImportRunAllCommand
         foreach ($ordered as $definition) {
             $migrationCount++;
 
+            // FR-061: acquire per migration, NOT once for the whole walk.
+            // Long-running run-alls would otherwise block operators on
+            // every registered migration for the run's duration.
+            $lock = ($this->lockFactory)($definition->id);
+
             try {
-                $report = $this->runner->run($definition->id, $options);
-            } catch (MigrationAbortedException $e) {
-                $io->writeln($e->report->summaryLine());
-                $io->error(\sprintf('Aborted: %s', $e->getMessage()));
-                $aggImported += $e->report->imported;
-                $aggSkipped += $e->report->skipped;
-                $aggFailed += $e->report->failed;
-                // FR-048: run-level failures DO halt run-all.
-                $worstExit = \max($worstExit, 5);
-                break;
+                $lock->acquire();
+            } catch (MigrationConcurrencyException $e) {
+                $io->error($e->getMessage());
+                // Per-migration contention does NOT halt the walk — record
+                // exit code 3 in the aggregate and continue with the next
+                // migration. Operators may have a concurrent `import:run`
+                // for this migration that should complete cleanly.
+                $worstExit = \max($worstExit, 3);
+                continue;
             }
 
-            $io->writeln($report->summaryLine());
+            try {
+                try {
+                    $report = $this->runner->run($definition->id, $options);
+                } catch (MigrationAbortedException $e) {
+                    $io->writeln($e->report->summaryLine());
+                    $io->error(\sprintf('Aborted: %s', $e->getMessage()));
+                    $aggImported += $e->report->imported;
+                    $aggSkipped += $e->report->skipped;
+                    $aggFailed += $e->report->failed;
+                    // FR-048: run-level failures DO halt run-all.
+                    $worstExit = \max($worstExit, 5);
+                    break;
+                }
 
-            $aggImported += $report->imported;
-            $aggSkipped += $report->skipped;
-            $aggFailed += $report->failed;
+                $io->writeln($report->summaryLine());
 
-            $exit = $report->failed > 0 ? 1 : 0;
-            $worstExit = \max($worstExit, $exit);
+                $aggImported += $report->imported;
+                $aggSkipped += $report->skipped;
+                $aggFailed += $report->failed;
+
+                $exit = $report->failed > 0 ? 1 : 0;
+                $worstExit = \max($worstExit, $exit);
+            } finally {
+                $lock->release();
+            }
         }
 
         $io->writeln('');

@@ -25,6 +25,7 @@ use Waaseyaa\Migration\Plugin\DestinationRecord;
 use Waaseyaa\Migration\Plugin\SourceRecord;
 use Waaseyaa\Migration\Plugin\WriteResult;
 use Waaseyaa\Migration\PluginFixtures\InMemorySource;
+use Waaseyaa\Migration\Runner\MigrationLock;
 use Waaseyaa\Migration\Runner\RollbackWalker;
 use Waaseyaa\Migration\Schema\MigrationIdMapSchema;
 use Waaseyaa\Migration\SourceId;
@@ -117,7 +118,7 @@ final class ImportRollbackCommandTest extends TestCase
 
         $walker = new RollbackWalker(registry: $registry, idMap: $idMap);
 
-        $command = new ImportRollbackCommand($walker, $registry, $idMap);
+        $command = new ImportRollbackCommand($walker, $registry, $idMap, self::makeLockFactory());
 
         return [
             CliTester::for($this->commandDefinition(), $this->makeContainer($command)),
@@ -172,6 +173,21 @@ final class ImportRollbackCommandTest extends TestCase
                 return $id === ImportRollbackCommand::class;
             }
         };
+    }
+
+    /**
+     * @return \Closure(string): MigrationLock
+     */
+    private static function makeLockFactory(): \Closure
+    {
+        $lockDir = \sys_get_temp_dir()
+            . \DIRECTORY_SEPARATOR
+            . 'waaseyaa_test_lock_'
+            . \uniqid('', true);
+        return static fn(string $migrationId): MigrationLock => new MigrationLock(
+            migrationId: $migrationId,
+            lockDir: $lockDir,
+        );
     }
 }
 

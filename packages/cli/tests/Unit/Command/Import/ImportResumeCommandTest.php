@@ -26,6 +26,7 @@ use Waaseyaa\Migration\MigrationRunState;
 use Waaseyaa\Migration\Plugin\SourceRecord;
 use Waaseyaa\Migration\PluginFixtures\InMemoryDestination;
 use Waaseyaa\Migration\PluginFixtures\InMemorySource;
+use Waaseyaa\Migration\Runner\MigrationLock;
 use Waaseyaa\Migration\Runner\MigrationRunner;
 use Waaseyaa\Migration\Runner\ProcessChainExecutor;
 use Waaseyaa\Migration\Runner\RunOptions;
@@ -150,7 +151,7 @@ final class ImportResumeCommandTest extends TestCase
             runState: $runState,
         );
 
-        $command = new ImportResumeCommand($runner, $registry);
+        $command = new ImportResumeCommand($runner, $registry, self::makeLockFactory());
 
         $tester = CliTester::for(
             $this->commandDefinition(),
@@ -193,5 +194,20 @@ final class ImportResumeCommandTest extends TestCase
                 return $id === ImportResumeCommand::class;
             }
         };
+    }
+
+    /**
+     * @return \Closure(string): MigrationLock
+     */
+    private static function makeLockFactory(): \Closure
+    {
+        $lockDir = \sys_get_temp_dir()
+            . \DIRECTORY_SEPARATOR
+            . 'waaseyaa_test_lock_'
+            . \uniqid('', true);
+        return static fn(string $migrationId): MigrationLock => new MigrationLock(
+            migrationId: $migrationId,
+            lockDir: $lockDir,
+        );
     }
 }

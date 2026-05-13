@@ -24,6 +24,7 @@ use Waaseyaa\Migration\Plugin\SourceRecord;
 use Waaseyaa\Migration\PluginFixtures\AlwaysFailingProcessor;
 use Waaseyaa\Migration\PluginFixtures\InMemoryDestination;
 use Waaseyaa\Migration\PluginFixtures\InMemorySource;
+use Waaseyaa\Migration\Runner\MigrationLock;
 use Waaseyaa\Migration\Runner\MigrationRunner;
 use Waaseyaa\Migration\Runner\ProcessChainExecutor;
 use Waaseyaa\Migration\Schema\MigrationIdMapSchema;
@@ -194,7 +195,7 @@ final class ImportRunCommandTest extends TestCase
             idMap: $idMap,
         );
 
-        $command = new ImportRunCommand($runner, $registry);
+        $command = new ImportRunCommand($runner, $registry, self::makeLockFactory());
 
         $definitionCli = $this->commandDefinition($command);
         $container = $this->makeContainer($command);
@@ -235,5 +236,23 @@ final class ImportRunCommandTest extends TestCase
                 return $id === ImportRunCommand::class;
             }
         };
+    }
+
+    /**
+     * Build a per-test lock factory pointing into a freshly-created temp
+     * directory; the directory is cleaned up by PHP's tempnam contract.
+     *
+     * @return \Closure(string): MigrationLock
+     */
+    private static function makeLockFactory(): \Closure
+    {
+        $lockDir = \sys_get_temp_dir()
+            . \DIRECTORY_SEPARATOR
+            . 'waaseyaa_test_lock_'
+            . \uniqid('', true);
+        return static fn(string $migrationId): MigrationLock => new MigrationLock(
+            migrationId: $migrationId,
+            lockDir: $lockDir,
+        );
     }
 }

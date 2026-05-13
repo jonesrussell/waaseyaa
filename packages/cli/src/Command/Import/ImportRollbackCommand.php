@@ -6,7 +6,9 @@ namespace Waaseyaa\CLI\Command\Import;
 
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Migration\Discovery\MigrationRegistry;
+use Waaseyaa\Migration\Exception\MigrationConcurrencyException;
 use Waaseyaa\Migration\MigrationIdMap;
+use Waaseyaa\Migration\Runner\MigrationLock;
 use Waaseyaa\Migration\Runner\RollbackReport;
 use Waaseyaa\Migration\Runner\RollbackWalker;
 
@@ -28,22 +30,29 @@ use Waaseyaa\Migration\Runner\RollbackWalker;
  *  - 1 — at least one per-record failure recorded (the id-map row is
  *    preserved for those entries so the operator can retry).
  *  - 2 — usage error (missing argument, unknown migration id).
+ *  - 3 — concurrency lock contention (FR-061): another `import:*` process
+ *    already holds the per-migration filesystem lock.
  *
  * @api
  *
  * @spec FR-035 — `import:rollback` entry point
  * @spec FR-043 — reverse-creation walk
  * @spec FR-044 — best-effort per-record rollback
+ * @spec FR-061 — per-migration concurrency lock
  */
 final class ImportRollbackCommand
 {
     /** Cap on how many per-record errors render before the "...more" footer. */
     private const int ERROR_RENDER_CAP = 20;
 
+    /**
+     * @param \Closure(string): MigrationLock $lockFactory Builds a per-migration {@see MigrationLock}; injected so the lock directory is resolved by the service provider.
+     */
     public function __construct(
         private readonly RollbackWalker $walker,
         private readonly MigrationRegistry $registry,
         private readonly MigrationIdMap $idMap,
+        private readonly \Closure $lockFactory,
     ) {}
 
     public function execute(CliIO $io): int
@@ -61,6 +70,8 @@ final class ImportRollbackCommand
 
         $confirmed = (bool) $io->option('confirm');
 
+        // The no-confirm preview path is read-only — no lock needed; it
+        // only reads the id-map row count and prints a warning.
         if (!$confirmed) {
             $rowCount = $this->idMap->countForMigration($migrationId);
             $io->writeln(\sprintf(
@@ -73,10 +84,23 @@ final class ImportRollbackCommand
             return 0;
         }
 
-        $report = $this->walker->rollback($migrationId);
-        $this->renderReport($io, $report);
+        $lock = ($this->lockFactory)($migrationId);
 
-        return $report->failed > 0 ? 1 : 0;
+        try {
+            $lock->acquire();
+        } catch (MigrationConcurrencyException $e) {
+            $io->error($e->getMessage());
+            return 3;
+        }
+
+        try {
+            $report = $this->walker->rollback($migrationId);
+            $this->renderReport($io, $report);
+
+            return $report->failed > 0 ? 1 : 0;
+        } finally {
+            $lock->release();
+        }
     }
 
     private function renderReport(CliIO $io, RollbackReport $report): void

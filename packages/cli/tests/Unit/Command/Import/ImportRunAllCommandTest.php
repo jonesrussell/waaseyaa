@@ -22,6 +22,7 @@ use Waaseyaa\Migration\Plugin\SourceRecord;
 use Waaseyaa\Migration\PluginFixtures\AlwaysFailingProcessor;
 use Waaseyaa\Migration\PluginFixtures\InMemoryDestination;
 use Waaseyaa\Migration\PluginFixtures\InMemorySource;
+use Waaseyaa\Migration\Runner\MigrationLock;
 use Waaseyaa\Migration\Runner\MigrationRunner;
 use Waaseyaa\Migration\Runner\ProcessChainExecutor;
 use Waaseyaa\Migration\Schema\MigrationIdMapSchema;
@@ -102,7 +103,7 @@ final class ImportRunAllCommandTest extends TestCase
         $registry->boot();
 
         $runner = new MigrationRunner($registry, new ProcessChainExecutor(), $idMap);
-        $command = new ImportRunAllCommand($runner, $registry);
+        $command = new ImportRunAllCommand($runner, $registry, self::makeLockFactory());
         $tester = CliTester::for(
             $this->commandDefinition(),
             $this->makeContainer($command),
@@ -148,7 +149,7 @@ final class ImportRunAllCommandTest extends TestCase
         $registry->boot();
 
         $runner = new MigrationRunner($registry, new ProcessChainExecutor(), $idMap);
-        $command = new ImportRunAllCommand($runner, $registry);
+        $command = new ImportRunAllCommand($runner, $registry, self::makeLockFactory());
         return CliTester::for($this->commandDefinition(), $this->makeContainer($command));
     }
 
@@ -182,5 +183,20 @@ final class ImportRunAllCommandTest extends TestCase
                 return $id === ImportRunAllCommand::class;
             }
         };
+    }
+
+    /**
+     * @return \Closure(string): MigrationLock
+     */
+    private static function makeLockFactory(): \Closure
+    {
+        $lockDir = \sys_get_temp_dir()
+            . \DIRECTORY_SEPARATOR
+            . 'waaseyaa_test_lock_'
+            . \uniqid('', true);
+        return static fn(string $migrationId): MigrationLock => new MigrationLock(
+            migrationId: $migrationId,
+            lockDir: $lockDir,
+        );
     }
 }

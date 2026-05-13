@@ -6,8 +6,10 @@ namespace Waaseyaa\CLI\Command\Import;
 
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Migration\Discovery\MigrationRegistry;
+use Waaseyaa\Migration\Exception\MigrationConcurrencyException;
 use Waaseyaa\Migration\MigrationIdMap;
 use Waaseyaa\Migration\MigrationRunState;
+use Waaseyaa\Migration\Runner\MigrationLock;
 
 /**
  * `bin/waaseyaa import:reset <migration-id>` — clear the id-map (and
@@ -25,17 +27,24 @@ use Waaseyaa\Migration\MigrationRunState;
  * Exit codes:
  *  - 0 — always (operator-driven destructive op; no per-record failures).
  *  - 2 — usage error (missing argument, unknown migration id).
+ *  - 3 — concurrency lock contention (FR-061): another `import:*` process
+ *    already holds the per-migration filesystem lock.
  *
  * @api
  *
  * @spec FR-036 — `import:reset` clears id-map without touching entities
+ * @spec FR-061 — per-migration concurrency lock
  */
 final class ImportResetCommand
 {
+    /**
+     * @param \Closure(string): MigrationLock $lockFactory Builds a per-migration {@see MigrationLock}; injected so the lock directory is resolved by the service provider.
+     */
     public function __construct(
         private readonly MigrationRegistry $registry,
         private readonly MigrationIdMap $idMap,
         private readonly MigrationRunState $runState,
+        private readonly \Closure $lockFactory,
     ) {}
 
     public function execute(CliIO $io): int
@@ -55,6 +64,8 @@ final class ImportResetCommand
 
         $idMapCount = $this->idMap->countForMigration($migrationId);
 
+        // The no-confirm preview path is read-only — no lock needed; it
+        // only reads the id-map row count and prints a warning.
         if (!$confirmed) {
             $io->writeln(\sprintf(
                 'WARNING: import:reset will delete %d id-map entr%s for migration "%s".',
@@ -68,16 +79,29 @@ final class ImportResetCommand
             return 0;
         }
 
-        $idMapDeleted = $this->idMap->deleteAllForMigration($migrationId);
-        $runStateDeleted = $this->runState->deleteAllForMigration($migrationId);
+        $lock = ($this->lockFactory)($migrationId);
 
-        $io->writeln(\sprintf(
-            '%s: reset complete (%d id-map rows + %d run-state rows deleted)',
-            $migrationId,
-            $idMapDeleted,
-            $runStateDeleted,
-        ));
+        try {
+            $lock->acquire();
+        } catch (MigrationConcurrencyException $e) {
+            $io->error($e->getMessage());
+            return 3;
+        }
 
-        return 0;
+        try {
+            $idMapDeleted = $this->idMap->deleteAllForMigration($migrationId);
+            $runStateDeleted = $this->runState->deleteAllForMigration($migrationId);
+
+            $io->writeln(\sprintf(
+                '%s: reset complete (%d id-map rows + %d run-state rows deleted)',
+                $migrationId,
+                $idMapDeleted,
+                $runStateDeleted,
+            ));
+
+            return 0;
+        } finally {
+            $lock->release();
+        }
     }
 }

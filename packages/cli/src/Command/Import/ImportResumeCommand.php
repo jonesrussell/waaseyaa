@@ -7,6 +7,8 @@ namespace Waaseyaa\CLI\Command\Import;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Migration\Discovery\MigrationRegistry;
 use Waaseyaa\Migration\Exception\MigrationAbortedException;
+use Waaseyaa\Migration\Exception\MigrationConcurrencyException;
+use Waaseyaa\Migration\Runner\MigrationLock;
 use Waaseyaa\Migration\Runner\MigrationRunner;
 use Waaseyaa\Migration\Runner\RecordError;
 use Waaseyaa\Migration\Runner\RunOptions;
@@ -26,6 +28,8 @@ use Waaseyaa\Migration\Runner\RunReport;
  *  - 1 — partial: ≥1 per-record error captured, OR no prior run exists for
  *    the migration (operator-actionable error).
  *  - 2 — usage error (unknown migration id, missing argument, malformed flag).
+ *  - 3 — concurrency lock contention (FR-061): another process already
+ *    holds the per-migration filesystem lock.
  *  - 5 — run-level fatal: source plugin crashed mid-iteration, framework
  *    fault, or `--halt-on-error` short-circuit on a per-record error.
  *
@@ -35,15 +39,20 @@ use Waaseyaa\Migration\Runner\RunReport;
  * the runner.
  *
  * @spec FR-037 — resume from the prior run's checkpoint
+ * @spec FR-061 — per-migration concurrency lock
  */
 final class ImportResumeCommand
 {
     /** Cap on how many per-record errors render before the "...more" footer. */
     private const int ERROR_RENDER_CAP = 20;
 
+    /**
+     * @param \Closure(string): MigrationLock $lockFactory Builds a per-migration {@see MigrationLock}; injected so the lock directory is resolved by the service provider.
+     */
     public function __construct(
         private readonly MigrationRunner $runner,
         private readonly MigrationRegistry $registry,
+        private readonly \Closure $lockFactory,
     ) {}
 
     public function execute(CliIO $io): int
@@ -66,22 +75,35 @@ final class ImportResumeCommand
             return 2;
         }
 
+        $lock = ($this->lockFactory)($migrationId);
+
         try {
-            $report = $this->runner->runResume($migrationId, $options);
-        } catch (\InvalidArgumentException $e) {
-            // No prior run recorded for the migration — operator must run
-            // `import:run <id>` first.
-            $io->error('import:resume: ' . $e->getMessage());
-            return 1;
-        } catch (MigrationAbortedException $e) {
-            $this->renderReport($io, $e->report);
-            $io->error(\sprintf('Aborted: %s', $e->getMessage()));
-            return 5;
+            $lock->acquire();
+        } catch (MigrationConcurrencyException $e) {
+            $io->error($e->getMessage());
+            return 3;
         }
 
-        $this->renderReport($io, $report);
+        try {
+            try {
+                $report = $this->runner->runResume($migrationId, $options);
+            } catch (\InvalidArgumentException $e) {
+                // No prior run recorded for the migration — operator must run
+                // `import:run <id>` first.
+                $io->error('import:resume: ' . $e->getMessage());
+                return 1;
+            } catch (MigrationAbortedException $e) {
+                $this->renderReport($io, $e->report);
+                $io->error(\sprintf('Aborted: %s', $e->getMessage()));
+                return 5;
+            }
 
-        return $report->failed > 0 ? 1 : 0;
+            $this->renderReport($io, $report);
+
+            return $report->failed > 0 ? 1 : 0;
+        } finally {
+            $lock->release();
+        }
     }
 
     /**
