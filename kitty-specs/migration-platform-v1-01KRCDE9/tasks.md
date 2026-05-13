@@ -110,10 +110,10 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T055  | `DestinationConformanceTestCase` abstract base                                    | WP10 | [P]      | FR-050, FR-051                                      | [D] |
 | T056  | `ReferenceSourceConformanceTest`                                                  | WP10 |          | FR-049, FR-051, FR-052                              | [D] |
 | T057  | `ReferenceDestinationConformanceTest`                                             | WP10 |          | FR-050, FR-051                                      | [D] |
-| T058  | `users-1000.csv` fixture                                                          | WP11 | [P]      | FR-053 substrate                                    |
-| T059  | `UsersCsvToWidgetsMigration` definition fixture                                   | WP11 | [P]      | FR-053 substrate                                    |
-| T060  | Integration test: full E2E (import + resume + rollback + idempotency)             | WP11 |          | FR-053, FR-054, FR-055                              |
-| T061  | Operator-path E2E via CommandTester                                               | WP11 |          | FR-053, FR-054, FR-055                              |
+| T058  | `users-1000.csv` fixture                                                          | WP11 | [P]      | FR-053 substrate                                    | [D] |
+| T059  | `UsersCsvToWidgetsMigration` definition fixture                                   | WP11 | [P]      | FR-053 substrate                                    | [D] |
+| T060  | Integration test: full E2E (import + resume + rollback + idempotency)             | WP11 |          | FR-053, FR-054, FR-055                              | [D] |
+| T061  | Operator-path E2E via CommandTester                                               | WP11 |          | FR-053, FR-054, FR-055                              | [D] |
 | T062  | `docs/specs/migration-platform.md` canonical spec                                 | WP12 | [P]      | FR-056                                              |
 | T063  | `docs/extension-authoring/migration-source-readers.md`                            | WP12 | [P]      | FR-057                                              |
 | T064  | `docs/extension-authoring/migration-process-plugins.md`                           | WP12 | [P]      | FR-058                                              |
@@ -457,10 +457,10 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** Full import + resume cycle + rollback + idempotent re-run + operator-path-via-CommandTester all green in one test class.
 
 **Subtasks**
-- [ ] T058 users-1000.csv fixture (WP11)
-- [ ] T059 UsersCsvToWidgetsMigration definition fixture (WP11)
-- [ ] T060 Integration test: full E2E (WP11)
-- [ ] T061 Operator-path E2E via CommandTester (WP11)
+- [x] T058 users-1000.csv fixture (WP11)
+- [x] T059 UsersCsvToWidgetsMigration definition fixture (WP11)
+- [x] T060 Integration test: full E2E (WP11)
+- [x] T061 Operator-path E2E via CommandTester (WP11)
 
 **Implementation sketch:** 1000-row CSV committed (~250 KB). The migration exercises every process-plugin shape: string shorthand, single processor, chain, default value. Five `#[Test]` methods in one class cover FR-053..FR-055 plus idempotency and operator-path.
 
