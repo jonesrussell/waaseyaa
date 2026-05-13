@@ -431,6 +431,106 @@ Per [ADR 014](../adr/014-theme-as-distributable-package.md).
 
 **Forbidden:** silent change to template precedence rules (would silently flip which file renders).
 
+### 5.8 Migration platform
+
+Per [ADR 012a](../adr/012a-migration-substrate-in-core.md). Delivered by mission
+`migration-platform-v1-01KRCDE9` (M-002, 2026-05-13). Subsystem spec:
+[`migration-platform.md`](migration-platform.md).
+
+**Stable surface:**
+
+*Plugin contracts (interfaces):*
+- `Waaseyaa\Migration\Plugin\SourcePluginInterface` — streams `SourceRecord` from an external system.
+- `Waaseyaa\Migration\Plugin\ProcessPluginInterface` — transforms one source value into one destination value.
+- `Waaseyaa\Migration\Plugin\DestinationPluginInterface` — writes a `DestinationRecord` and supports `rollback()` + `lookup()`.
+
+*Provider capabilities:*
+- `Waaseyaa\Migration\Discovery\HasMigrationsInterface` — surfaces concrete `MigrationDefinition` instances.
+- `Waaseyaa\Migration\Discovery\HasMigrationPluginsInterface` — surfaces source / process / destination plugin instances.
+
+*Value objects and DTOs (`final readonly class`):*
+- `Waaseyaa\Migration\MigrationDefinition` — manifest object: id, source, process map, destination, dependencies.
+- `Waaseyaa\Migration\SourceId` — composite primary key with deterministic sha256 hash.
+- `Waaseyaa\Migration\Plugin\SourceRecord` — one record emitted by a source plugin.
+- `Waaseyaa\Migration\Plugin\DestinationRecord` — one record ready to write.
+- `Waaseyaa\Migration\Plugin\WriteResult` — outcome of a successful destination write.
+- `Waaseyaa\Migration\Plugin\ProcessContext` — context threaded into `ProcessPluginInterface::transform()`.
+
+*Concrete destination:*
+- `Waaseyaa\Migration\Plugin\Destination\EntityDestination` — default destination; writes through the entity-storage coordinator (ADR 010).
+- `Waaseyaa\Migration\Plugin\Destination\EntityDestinationFactory` — factory binding entity type + bundle.
+
+*Reserved process plugins (framework-owned ids):*
+- `Waaseyaa\Migration\Plugin\Process\PassThroughProcessor` (`pass_through`).
+- `Waaseyaa\Migration\Plugin\Process\HtmlSanitizeProcessor` (`html_sanitize`).
+- `Waaseyaa\Migration\Plugin\Process\LookupProcessor` (`lookup`).
+- `Waaseyaa\Migration\Plugin\Process\ConcatProcessor` (`concat`).
+- `Waaseyaa\Migration\Plugin\Process\TypeCoerceProcessor` (`type_coerce`).
+- `Waaseyaa\Migration\Plugin\Process\DefaultValueProcessor` (`default_value`).
+
+Reserved-id list canonicalised in `Waaseyaa\Migration\Plugin\ReservedPluginIds`. App-defined process plugins MUST use a non-reserved id; convention `<vendor>_<purpose>`.
+
+*Schema:*
+- `migration_id_map` table layout — frozen stable surface. Future column changes require a charter amendment and a data migration of every existing row. Source-of-truth descriptor: `Waaseyaa\Migration\Schema\MigrationIdMapSchema`.
+
+*Exception types:*
+- `Waaseyaa\Migration\Exception\MigrationCycleException`
+- `Waaseyaa\Migration\Exception\MigrationPluginCollisionException`
+- `Waaseyaa\Migration\Exception\MigrationDependencyMissingException`
+- `Waaseyaa\Migration\Exception\SourceReadException`
+- `Waaseyaa\Migration\Exception\ProcessException`
+- `Waaseyaa\Migration\Exception\DestinationWriteException`
+- `Waaseyaa\Migration\Exception\MigrationAbortedException`
+- `Waaseyaa\Migration\Exception\MigrationConcurrencyException`
+
+*CLI commands:*
+- `bin/waaseyaa import:run <id>` — run one migration end-to-end.
+- `bin/waaseyaa import:run-all` — run every registered migration in dependency order (lock acquired per migration).
+- `bin/waaseyaa import:status [<id>]` — read-only status (no lock).
+- `bin/waaseyaa import:resume <id>` — resume from last committed `migration_run_state` cursor.
+- `bin/waaseyaa import:rollback <id>` — walk id-map in reverse, unwind destination, remove id-map rows on success.
+- `bin/waaseyaa import:reset <id>` — drop id-map rows without rollback (recovery only).
+
+Exit codes: `0` success, `1` generic failure, `2` lock held by another process.
+
+*Conformance test bases (autoload-dev under `packages/migration/testing/`):*
+- `Waaseyaa\Migration\Testing\SourceConformanceTestCase` — eight gates: id format, stability, streaming, determinism, `count()` contract, 50 MB memory budget, etc.
+- `Waaseyaa\Migration\Testing\DestinationConformanceTestCase` — round-trip, idempotency, rollback semantics.
+
+*Log channel:*
+- `migration.deprecation` — emitted once per process when an `'experimental'` plugin is first used. Constant: `Waaseyaa\Migration\Log\Channels::MIGRATION_DEPRECATION`. Listed under §4.4 as a normative channel name.
+
+*Cross-cutting extension to §5.3 (Entity / storage):*
+- `Waaseyaa\EntityStorage\SaveContext::isImport(): bool` — additive method added by M-002. `EntityDestination::write()` constructs the context with `isImport: true`. Default is `false`; existing subscribers behave unchanged. See §5.3.
+
+**Internal (NOT stable surface — mission-internal infrastructure):**
+- `migration_run_state` table (resume cursor storage; runner-internal).
+- `Waaseyaa\Migration\Schema\MigrationRunStateSchema` (mission-internal).
+- `Waaseyaa\Migration\Runner\MigrationRunner` and all classes under `Waaseyaa\Migration\Runner\` (`MigrationLock`, `ProcessChainExecutor`, `RollbackWalker`, `RecordError`, `RollbackError`, `RollbackReport`, `RunOptions`, `RunReport`).
+- `storage/migration-locks/<id>.lock` file format (flock-based; lock-file presence is operator-visible but the format is not a published contract).
+- `Waaseyaa\Migration\Discovery\PluginRegistry`, `MigrationRegistry`, `CycleDetector`, `DependencyGraph`, `FilesystemManifestLoader` (boot-time discovery internals).
+- `Waaseyaa\Migration\MigrationIdMap` PHP gateway class (the **table** is stable; the PHP accessor is mission-internal — apps consult the table through `DestinationPluginInterface::lookup()`).
+- `Waaseyaa\Migration\Canonical\CanonicalForm` (helper backing `SourceId::hash()`; behaviour is stable transitively, but the class is not a public extension point).
+
+**Operator-visible but not contractual:**
+- The `migration_run_state` table is mission-internal — apps and third-party tools MUST NOT query or write to it directly. Use `bin/waaseyaa import:status` and `import:resume` instead.
+- Stale-lock recovery is documented in the spec (`rm storage/migration-locks/<id>.lock`) but is not an SLA — the lock-file location and format may change between alpha trains.
+
+**Allowed under deprecation cycle:** all stable surface above.
+
+**Forbidden:**
+- Silent removal of any listed FQCN (interfaces, value objects, concrete destinations, reserved process plugins, exceptions, conformance bases).
+- Silent change to `migration_id_map` schema (would invalidate every existing import).
+- Silent change to `SourceId::hash()` canonical-form encoding (would silently re-import every record on upgrade — explicitly guarded by the encoding-flag set documented in `migration-platform.md` §6.1).
+- Silent change to CLI command names or exit codes.
+- Silent change to the `migration.deprecation` channel name.
+
+**Cross-references:**
+- [ADR 010](../adr/010-multi-backend-field-storage.md) — entity-storage coordinator that `EntityDestination` writes through.
+- [ADR 011](../adr/011-entity-lifecycle-events.md) — lifecycle events; `SaveContext::isImport()` extends this contract.
+- [ADR 012a](../adr/012a-migration-substrate-in-core.md) — origin ADR.
+- [ADR 016](../adr/016-revisions-first-class.md) — revisionable storage path used by `EntityDestination` when the destination entity type opts in.
+
 ---
 
 ## 6. Consumer obligations
