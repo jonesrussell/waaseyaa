@@ -9,8 +9,6 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Waaseyaa\Database\DBALDatabase;
-use Waaseyaa\Entity\Attribute\ContentEntityKeys;
-use Waaseyaa\Entity\Attribute\ContentEntityType;
 use Waaseyaa\Entity\ContentEntityBase;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
@@ -365,29 +363,5 @@ final class SqlBlobTranslatableTest extends TestCase
     private function countRows(int $entityId): int
     {
         return \count($this->fetchAllRows($entityId));
-    }
-}
-
-/**
- * @internal Test fixture for {@see SqlBlobTranslatableTest}.
- */
-#[ContentEntityType(id: 'translatable_article')]
-#[ContentEntityKeys(
-    id: 'id',
-    uuid: 'uuid',
-    bundle: 'bundle',
-    label: 'label',
-    langcode: 'langcode',
-    default_langcode: 'default_langcode',
-)]
-class TranslatableArticleFixture extends ContentEntityBase
-{
-    public function __construct(
-        array $values = [],
-        string $entityTypeId = '',
-        array $entityKeys = [],
-        array $fieldDefinitions = [],
-    ) {
-        parent::__construct($values, $entityTypeId, $entityKeys, $fieldDefinitions);
     }
 }
