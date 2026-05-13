@@ -271,6 +271,10 @@
         {
             "type": "path",
             "url": "packages/oidc"
+        },
+        {
+            "type": "path",
+            "url": "packages/migration"
         }
     ],
     "require": {
@@ -318,6 +322,7 @@
         "waaseyaa/menu": "self.version",
         "waaseyaa/mercure": "self.version",
         "waaseyaa/messaging": "self.version",
+        "waaseyaa/migration": "self.version",
         "waaseyaa/node": "self.version",
         "waaseyaa/northcloud": "self.version",
         "waaseyaa/note": "self.version",
@@ -397,6 +402,8 @@
             "Waaseyaa\\Menu\\Tests\\": "packages/menu/tests/",
             "Waaseyaa\\Mercure\\Tests\\": "packages/mercure/tests/",
             "Waaseyaa\\Messaging\\Tests\\": "packages/messaging/tests/",
+            "Waaseyaa\\Migration\\Tests\\": "packages/migration/tests/",
+            "Waaseyaa\\Migration\\PluginFixtures\\": "packages/migration/tests/_fixtures/",
             "Waaseyaa\\Node\\Tests\\": "packages/node/tests/",
             "Waaseyaa\\Path\\Tests\\": "packages/path/tests/",
             "Waaseyaa\\Relationship\\Tests\\": "packages/relationship/tests/",

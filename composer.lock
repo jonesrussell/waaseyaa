@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c4c5e480f91aff4088be1a84912ccea1",
+    "content-hash": "eefd7eedfa24021a25231acadbc67ad0",
     "packages": [
         {
             "name": "defuse/php-encryption",
@@ -3950,7 +3950,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "7fc40d2d2c0b70c040aafc401d20ab020696bca9"
+                "reference": "20f01eedbd74321a221dcf68994e4804c68dc40d"
             },
             "require": {
                 "php": ">=8.5",
@@ -3958,6 +3958,7 @@
                 "waaseyaa/cache": "^0.1.0-alpha.177",
                 "waaseyaa/config": "^0.1.0-alpha.177",
                 "waaseyaa/entity": "^0.1.0-alpha.177",
+                "waaseyaa/entity-storage": "^0.1.0-alpha.177",
                 "waaseyaa/northcloud": "^0.1.0-alpha.177",
                 "waaseyaa/queue": "^0.1.0-alpha.177",
                 "waaseyaa/scheduler": "^0.1.0-alpha.177",
@@ -3983,6 +3984,7 @@
                         "Waaseyaa\\CLI\\Provider\\HealthSchemaServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderA",
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderB",
+                        "Waaseyaa\\CLI\\Provider\\MakeStorageMigrationServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\MigrateServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\OptimizeServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\QueueServiceProvider",
@@ -4224,7 +4226,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/entity",
-                "reference": "9dd34cb3a7164f9ffc97565d012d4f1cca11c0ef"
+                "reference": "8e91af58c4b753b4d602cd1541d0d8d8b4bc3757"
             },
             "require": {
                 "php": ">=8.5",
@@ -4260,6 +4262,7 @@
             "autoload-dev": {
                 "psr-4": {
                     "Waaseyaa\\Entity\\PhpStan\\": "testing/PhpStan/",
+                    "Waaseyaa\\Entity\\Testing\\Translation\\": "testing/Translation/",
                     "Waaseyaa\\Entity\\Tests\\": "tests/"
                 }
             },
@@ -4277,7 +4280,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/entity-storage",
-                "reference": "de4fb8895ad429a0c721010327cfd8f904f2af42"
+                "reference": "3431d19033372d9bc23d9895fc9c02d6015a7ab5"
             },
             "require": {
                 "php": ">=8.5",
@@ -4286,7 +4289,8 @@
                 "waaseyaa/database-legacy": "^0.1.0-alpha.177",
                 "waaseyaa/entity": "^0.1.0-alpha.177",
                 "waaseyaa/field": "^0.1.0-alpha.177",
-                "waaseyaa/foundation": "^0.1.0-alpha.177"
+                "waaseyaa/foundation": "^0.1.0-alpha.177",
+                "waaseyaa/i18n": "^0.1.0-alpha.177"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -4305,6 +4309,7 @@
             },
             "autoload-dev": {
                 "psr-4": {
+                    "Waaseyaa\\EntityStorage\\Testing\\Contract\\": "testing/Contract/",
                     "Waaseyaa\\EntityStorage\\Tests\\": "tests/"
                 }
             },
@@ -5147,6 +5152,52 @@
                 "GPL-2.0-or-later"
             ],
             "description": "Direct messaging infrastructure for Waaseyaa: threads, messages, participants",
+            "transport-options": {
+                "relative": true
+            }
+        },
+        {
+            "name": "waaseyaa/migration",
+            "version": "dev-main",
+            "dist": {
+                "type": "path",
+                "url": "packages/migration",
+                "reference": "774437c67e0f05d8f767fdab3263308171759451"
+            },
+            "require": {
+                "php": ">=8.5",
+                "waaseyaa/foundation": "^0.1.0-alpha.177"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^10.5"
+            },
+            "type": "library",
+            "extra": {
+                "waaseyaa": {
+                    "providers": [
+                        "Waaseyaa\\Migration\\ServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-main": "0.1.x-dev",
+                    "dev-develop/v1.1": "0.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waaseyaa\\Migration\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Waaseyaa\\Migration\\Tests\\": "tests/",
+                    "Waaseyaa\\Migration\\Testing\\": "testing/"
+                }
+            },
+            "license": [
+                "GPL-2.0-or-later"
+            ],
+            "description": "Plugin-based content migration platform for Waaseyaa (source -> process -> destination pipelines)",
             "transport-options": {
                 "relative": true
             }
@@ -10705,6 +10756,7 @@
         "waaseyaa/menu": 20,
         "waaseyaa/mercure": 20,
         "waaseyaa/messaging": 20,
+        "waaseyaa/migration": 20,
         "waaseyaa/node": 20,
         "waaseyaa/northcloud": 20,
         "waaseyaa/note": 20,

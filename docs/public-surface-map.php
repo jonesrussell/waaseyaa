@@ -268,6 +268,11 @@ return [
     'Waaseyaa\Notification\NotifiableTrait' => 'public',
     'Waaseyaa\Notification\ChannelInterface' => 'public',
     'Waaseyaa\Billing\PlanTier' => 'public',
+    // Migration platform plugin contracts (mission migration-platform-v1-01KRCDE9 WP01).
+    'Waaseyaa\Migration\Plugin\SourcePluginInterface' => 'public',
+    'Waaseyaa\Migration\Plugin\ProcessPluginInterface' => 'public',
+    'Waaseyaa\Migration\Plugin\DestinationPluginInterface' => 'public',
+    'Waaseyaa\Migration\Discovery\HasMigrationPluginsInterface' => 'public',
 
     // Layer 3: Services — internal
     'Waaseyaa\Billing\StripeClientInterface' => 'internal',
