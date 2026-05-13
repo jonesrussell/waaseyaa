@@ -39,7 +39,7 @@ final class SchemaControllerTest extends TestCase
             id: 'article',
             label: 'Article',
             class: TestEntity::class,
-            keys: TestEntity::definitionKeys(),
+            keys: [...TestEntity::definitionKeys(), 'default_langcode' => 'default_langcode'],
             translatable: true,
         ));
 

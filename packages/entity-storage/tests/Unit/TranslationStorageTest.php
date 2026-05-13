@@ -32,6 +32,7 @@ final class TranslationStorageTest extends TestCase
                 'bundle' => 'bundle',
                 'label' => 'label',
                 'langcode' => 'langcode',
+                'default_langcode' => 'default_langcode',
             ],
         );
     }
@@ -146,14 +147,17 @@ final class TranslationStorageTest extends TestCase
             ],
         ]);
 
-        // Insert base entity.
+        // Insert base entity. (WP04: translatable types use plain int id,
+        // not serial — provide the id explicitly.)
         $this->database->insert('test_entity')
-            ->fields(['uuid', 'label', 'bundle', 'langcode', '_data'])
+            ->fields(['id', 'uuid', 'label', 'bundle', 'langcode', 'default_langcode', '_data'])
             ->values([
+                'id' => 1,
                 'uuid' => 'entity-uuid-1',
                 'label' => 'Hello',
                 'bundle' => 'article',
                 'langcode' => 'en',
+                'default_langcode' => 'en',
                 '_data' => '{}',
             ])
             ->execute();
@@ -224,14 +228,17 @@ final class TranslationStorageTest extends TestCase
         $handler->ensureTable();
         $handler->ensureTranslationTable();
 
-        // Insert base entity.
+        // Insert base entity. (WP04: translatable types use plain int id,
+        // not serial — provide the id explicitly.)
         $this->database->insert('test_entity')
-            ->fields(['uuid', 'label', 'bundle', 'langcode', '_data'])
+            ->fields(['id', 'uuid', 'label', 'bundle', 'langcode', 'default_langcode', '_data'])
             ->values([
+                'id' => 1,
                 'uuid' => 'entity-uuid-1',
                 'label' => 'Hello',
                 'bundle' => 'article',
                 'langcode' => 'en',
+                'default_langcode' => 'en',
                 '_data' => '{}',
             ])
             ->execute();
@@ -274,14 +281,17 @@ final class TranslationStorageTest extends TestCase
         $handler->ensureTable();
         $handler->ensureTranslationTable();
 
-        // Insert base entity.
+        // Insert base entity. (WP04: translatable types use plain int id,
+        // not serial — provide the id explicitly.)
         $this->database->insert('test_entity')
-            ->fields(['uuid', 'label', 'bundle', 'langcode', '_data'])
+            ->fields(['id', 'uuid', 'label', 'bundle', 'langcode', 'default_langcode', '_data'])
             ->values([
+                'id' => 1,
                 'uuid' => 'entity-uuid-1',
                 'label' => 'Hello',
                 'bundle' => 'article',
                 'langcode' => 'en',
+                'default_langcode' => 'en',
                 '_data' => '{}',
             ])
             ->execute();

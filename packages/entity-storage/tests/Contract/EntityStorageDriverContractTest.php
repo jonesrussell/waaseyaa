@@ -215,4 +215,13 @@ abstract class EntityStorageDriverContractTest extends TestCase
 
         self::assertCount(2, $results);
     }
+
+    // ── findTranslations (M-006 WP10) ────────────────────────────────────
+
+    #[Test]
+    public function findTranslationsForUnknownEntityReturnsEmptyArray(): void
+    {
+        // No translation-aware storage shape AND no row for the id → [].
+        self::assertSame([], $this->driver->findTranslations('test_entity', 'nope'));
+    }
 }

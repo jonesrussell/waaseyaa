@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\EntityStorage\Driver;
 
 use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\EntityStorage\Connection\ConnectionResolverInterface;
 use Waaseyaa\EntityStorage\Tenancy\CommunityScope;
 
@@ -266,6 +267,156 @@ final class SqlStorageDriver implements EntityStorageDriverInterface
 
         foreach ($result as $row) {
             $rows[] = $this->mergeFromRead((array) $row);
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Load every translation row for an entity in a single query (FR-041/FR-042).
+     *
+     * Detection rules:
+     *   - sql-column layout: companion table `<entityType>__translation` exists
+     *     → single INNER JOIN of primary + translation, ordered default-first via CASE.
+     *   - sql-blob layout: primary table carries a `default_langcode` column and
+     *     a `(entity_id, langcode)` composite PK is implied by repeated rows
+     *     → single SELECT against the primary table ordered default-first via CASE.
+     *   - Neither shape detected → empty array (the entity type is not
+     *     translation-aware in storage; caller surfaces []).
+     *
+     * @return array<string, array<string, mixed>> langcode → row map.
+     */
+    public function findTranslations(
+        string $entityType,
+        string $id,
+        ?string $defaultLangcode = null,
+    ): array {
+        $db = $this->getDatabase();
+        $schema = $db->schema();
+
+        // sql-column layout: companion table `<entityType>__translation` (WP05).
+        $sqlColumnTable = $entityType . '__translation';
+        if ($schema->tableExists($sqlColumnTable)) {
+            return $this->findTranslationsSqlColumn($db, $entityType, $sqlColumnTable, $id, $defaultLangcode);
+        }
+
+        // sql-blob layout: PK widened on the primary table; `langcode` column
+        // present and `default_langcode` column carried per row (WP04).
+        if ($schema->fieldExists($entityType, 'langcode')
+            && $schema->fieldExists($entityType, 'default_langcode')
+        ) {
+            return $this->findTranslationsSqlBlob($db, $entityType, $id, $defaultLangcode);
+        }
+
+        // No translation-aware storage shape — caller surfaces [].
+        return [];
+    }
+
+    /**
+     * sql-column path: single INNER JOIN of primary + translation table.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function findTranslationsSqlColumn(
+        DatabaseInterface $db,
+        string $primaryTable,
+        string $translationTable,
+        string $id,
+        ?string $defaultLangcode,
+    ): array {
+        $quote = $db instanceof DBALDatabase
+            ? static fn(string $col): string => $db->quoteIdentifier($col)
+            : static fn(string $col): string => '"' . str_replace('"', '""', $col) . '"';
+
+        // ORDER BY: default-first when we know the default langcode (from the
+        // entity), otherwise rely on the row's own `default_langcode` column
+        // matched against `t.langcode`. We pass $defaultLangcode positionally
+        // so the CASE works even when the primary row's default column is
+        // null (e.g. legacy data).
+        $orderClause = $defaultLangcode !== null
+            ? sprintf(
+                'CASE WHEN t.%s = ? THEN 0 ELSE 1 END, t.%s',
+                $quote('langcode'),
+                $quote('langcode'),
+            )
+            : sprintf(
+                'CASE WHEN t.%s = pri.%s THEN 0 ELSE 1 END, t.%s',
+                $quote('langcode'),
+                $quote('default_langcode'),
+                $quote('langcode'),
+            );
+
+        $sql = sprintf(
+            'SELECT pri.*, t.* FROM %s pri INNER JOIN %s t ON t.%s = pri.%s WHERE pri.%s = ? ORDER BY %s',
+            $quote($primaryTable),
+            $quote($translationTable),
+            $quote('entity_id'),
+            $quote($this->idKey),
+            $quote($this->idKey),
+            $orderClause,
+        );
+
+        $args = $defaultLangcode !== null ? [$id, $defaultLangcode] : [$id];
+
+        $rows = [];
+        foreach ($db->query($sql, $args) as $row) {
+            $row = (array) $row;
+            $lc = isset($row['langcode']) ? (string) $row['langcode'] : null;
+            if ($lc === null || $lc === '') {
+                continue;
+            }
+            unset($row['entity_id']);
+            $rows[$lc] = $this->mergeFromRead($row);
+        }
+
+        return $rows;
+    }
+
+    /**
+     * sql-blob path: single SELECT FROM <table> WHERE <idKey> = ?.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    private function findTranslationsSqlBlob(
+        DatabaseInterface $db,
+        string $entityType,
+        string $id,
+        ?string $defaultLangcode,
+    ): array {
+        $quote = $db instanceof DBALDatabase
+            ? static fn(string $col): string => $db->quoteIdentifier($col)
+            : static fn(string $col): string => '"' . str_replace('"', '""', $col) . '"';
+
+        $orderClause = $defaultLangcode !== null
+            ? sprintf(
+                'CASE WHEN %s = ? THEN 0 ELSE 1 END, %s',
+                $quote('langcode'),
+                $quote('langcode'),
+            )
+            : sprintf(
+                'CASE WHEN %s = %s THEN 0 ELSE 1 END, %s',
+                $quote('langcode'),
+                $quote('default_langcode'),
+                $quote('langcode'),
+            );
+
+        $sql = sprintf(
+            'SELECT * FROM %s WHERE %s = ? ORDER BY %s',
+            $quote($entityType),
+            $quote($this->idKey),
+            $orderClause,
+        );
+
+        $args = $defaultLangcode !== null ? [$id, $defaultLangcode] : [$id];
+
+        $rows = [];
+        foreach ($db->query($sql, $args) as $row) {
+            $row = (array) $row;
+            $lc = isset($row['langcode']) ? (string) $row['langcode'] : null;
+            if ($lc === null || $lc === '') {
+                continue;
+            }
+            $rows[$lc] = $this->mergeFromRead($row);
         }
 
         return $rows;

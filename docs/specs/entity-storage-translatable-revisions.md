@@ -1,10 +1,14 @@
 # Entity Storage — Translatable + Revisionable Two-Axis Interaction
 
-> **🛑 BLOCKED — DO NOT PLAN (2026-05-12)**
+> **🛑 BLOCKED — DO NOT PLAN (2026-05-13)**
 >
-> Two hard prerequisites missing: (1) single-axis translation substrate — **spec filed 2026-05-12 as [M-006 `entity-storage-translations-v1`](entity-storage-translations-v1.md)**; must SHIP before this composition plans (M-001 shipped only the revision axis; today's translation surface is the tombstone `EntityTypeInterface::isTranslatable()` flag — no `TranslatableEntityInterface`, no `getTranslation()`, no translation storage); (2) ADR 015 listing pipeline (only the ADR exists, no implementation mission). When M-006 ships AND the ADR 015 listing-pipeline mission ships, this banner is removed. See `kitty-specs/entity-storage-translatable-revisions-01KRCDEE/spec.md` for the same banner.
+> One hard prerequisite remaining: the **ADR 015 listing pipeline** (only the ADR exists today; no implementation mission has been specced). When that mission ships, this banner is removed.
+>
+> The single-axis translation substrate prerequisite was satisfied by **M-006 (`entity-storage-translations-v1`, squash `<PENDING-SHA>`)**, which delivered `TranslatableInterface`, per-field `FieldDefinition::translatable()`, translation storage in both `sql-blob` and `sql-column` backends, the configurable fallback chain, translation lifecycle events, the `'translate'` access-policy operation, and the `make:migration --add-translations` CLI. See [`entity-storage-translations-v1.md`](entity-storage-translations-v1.md).
+>
+> See `kitty-specs/entity-storage-translatable-revisions-01KRCDEE/spec.md` for the same banner.
 
-**Status:** Draft mission spec (2026-05-11), **BLOCKED 2026-05-12**
+**Status:** Draft mission spec (2026-05-11), **BLOCKED 2026-05-13** (one of two original prerequisites cleared by M-006 on 2026-05-13)
 **Audience:** framework maintainers; input for Spec Kitty `specify` → `plan` → `tasks` flow
 **Mission ID:** TBD (to be assigned by `@jonesrussell` on mission creation)
 **Origin:** [ADR 017](../adr/017-per-field-translation.md) §"Revision × translation interaction" (Accepted 2026-05-11).

@@ -233,6 +233,59 @@ final class InMemoryStorageDriver implements EntityStorageDriverInterface
     }
 
     /**
+     * Load all stored translation rows for an entity (FR-041 in-memory mirror).
+     *
+     * Returns each langcode merged onto the base row. The default langcode (when
+     * provided) is the first map entry; remaining langcodes follow in ascending
+     * lexicographic order. Returns an empty array when no translations were
+     * registered via {@see writeTranslation()}.
+     */
+    public function findTranslations(
+        string $entityType,
+        string $id,
+        ?string $defaultLangcode = null,
+    ): array {
+        if (!isset($this->store[$entityType][$id])) {
+            return [];
+        }
+        $translations = $this->translations[$entityType][$id] ?? [];
+        if ($translations === []) {
+            return [];
+        }
+
+        $base = $this->store[$entityType][$id];
+
+        if ($this->communityScope?->isActive()
+            && ($base['community_id'] ?? null) !== $this->communityScope->getCommunityId()
+        ) {
+            return [];
+        }
+
+        $langcodes = array_keys($translations);
+        sort($langcodes);
+
+        // Hoist the default langcode to the front when present.
+        if ($defaultLangcode !== null) {
+            $filtered = [];
+            foreach ($langcodes as $lc) {
+                if ($lc !== $defaultLangcode) {
+                    $filtered[] = $lc;
+                }
+            }
+            $langcodes = array_key_exists($defaultLangcode, $translations)
+                ? array_merge([$defaultLangcode], $filtered)
+                : $filtered;
+        }
+
+        $rows = [];
+        foreach ($langcodes as $lc) {
+            $rows[$lc] = array_merge($base, $translations[$lc]);
+        }
+
+        return $rows;
+    }
+
+    /**
      * Clear all stored data (useful for test teardown).
      */
     public function clear(): void

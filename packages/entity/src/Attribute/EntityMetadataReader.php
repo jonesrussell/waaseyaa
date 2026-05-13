@@ -223,6 +223,9 @@ final class EntityMetadataReader
                 if ($i->langcode !== null) {
                     $keys['langcode'] = $i->langcode;
                 }
+                if ($i->default_langcode !== null) {
+                    $keys['default_langcode'] = $i->default_langcode;
+                }
             }
         }
 
@@ -233,7 +236,7 @@ final class EntityMetadataReader
         }
 
         $ordered = [];
-        foreach (['id', 'uuid', 'label', 'bundle', 'revision', 'langcode'] as $logical) {
+        foreach (['id', 'uuid', 'label', 'bundle', 'revision', 'langcode', 'default_langcode'] as $logical) {
             if (\array_key_exists($logical, $keys)) {
                 $ordered[$logical] = $keys[$logical];
             }

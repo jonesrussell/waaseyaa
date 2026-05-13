@@ -96,6 +96,13 @@ final class SqlSchemaHandler
             } else {
                 $schema->createTable($this->tableName, $this->buildTableSpec());
             }
+
+            // sql-blob translatable types: PK is (entity_id, langcode); UUID
+            // uniqueness must be enforced only on the default-langcode row, so we
+            // materialize a partial UNIQUE INDEX after table creation. (FR-020, FR-025)
+            if ($this->isSqlBlobTranslatable()) {
+                $this->ensureSqlBlobTranslatablePartialUuidIndex();
+            }
         } elseif ($this->primaryBackendId === ReservedBackendIds::SQL_COLUMN
             && $this->database instanceof DBALDatabase
             && $this->entityLevelFields !== []
@@ -362,10 +369,15 @@ final class SqlSchemaHandler
         $fields = [];
 
         // ID column: varchar for config entities, serial for content entities.
+        // Exception (FR-020): sql-blob translatable types widen the PK to
+        // (entity_id, langcode); 'serial' implies autoincrement which on SQLite
+        // also adds a UNIQUE constraint on (id) alone — that would break the
+        // multi-row-per-id model. For those types we emit a plain `int` and
+        // assign ids in SqlEntityStorage's translatable write path.
         $idKey = $keys['id'] ?? 'id';
         if (isset($keys['uuid'])) {
             $fields[$idKey] = [
-                'type' => 'serial',
+                'type' => $this->isSqlBlobTranslatable() ? 'int' : 'serial',
                 'not null' => true,
             ];
         } else {
@@ -413,6 +425,19 @@ final class SqlSchemaHandler
             'default' => 'en',
         ];
 
+        // Default-langcode column for translatable entity types (FR-020, FR-025, FR-027).
+        // sql-blob: lives on every row so a single SELECT identifies the canonical row.
+        // sql-column: lives on the single primary row and pins the default language
+        // (the translation sibling table carries per-langcode overlays).
+        if ($this->entityType->isTranslatable()) {
+            $fields['default_langcode'] = [
+                'type' => 'varchar',
+                'length' => 12,
+                'not null' => true,
+                'default' => 'en',
+            ];
+        }
+
         // Revision pointer column (revisionable entity types only).
         if ($this->entityType->isRevisionable()) {
             $revisionKey = $keys['revision'] ?? 'revision_id';
@@ -437,16 +462,28 @@ final class SqlSchemaHandler
             // No _data column is emitted here (wired in ensureTable() below).
         }
 
+        // FR-020: sql-blob translatable types widen the primary key to
+        // (entity_id, langcode) so each langcode gets its own row.
+        $primaryKey = $this->isSqlBlobTranslatable()
+            ? [$idKey, $langcodeKey]
+            : [$idKey];
+
         $spec = [
             'fields' => $fields,
-            'primary key' => [$idKey],
+            'primary key' => $primaryKey,
             'indexes' => [
                 $this->tableName . '_bundle' => [$bundleKey],
             ],
         ];
 
-        // UUID unique index (content entities only).
-        if (isset($keys['uuid'])) {
+        // UUID uniqueness rules:
+        //   - Non-translatable content entities: a plain UNIQUE KEY on (uuid).
+        //   - Translatable sql-blob types: every translation row shares the
+        //     same uuid as the default-langcode row, so a global UNIQUE on
+        //     (uuid) would block valid inserts. Uniqueness is instead enforced
+        //     by a partial UNIQUE INDEX `<table>_uuid_default` materialized in
+        //     ensureTable() — see ensureSqlBlobTranslatablePartialUuidIndex().
+        if (isset($keys['uuid']) && !$this->isSqlBlobTranslatable()) {
             $spec['unique keys'] = [
                 $this->tableName . '_uuid' => [$keys['uuid']],
             ];
@@ -740,6 +777,111 @@ final class SqlSchemaHandler
             default: $array['default'] ?? null,
             length: isset($array['length']) ? (int) $array['length'] : null,
         );
+    }
+
+    /**
+     * Whether this handler is materializing a translatable sql-blob schema.
+     *
+     * Internal helper centralising the (backend == sql-blob && isTranslatable())
+     * check used by buildTableSpec() and ensureTable() for FR-020..FR-025.
+     */
+    private function isSqlBlobTranslatable(): bool
+    {
+        return $this->primaryBackendId !== ReservedBackendIds::SQL_COLUMN
+            && $this->entityType->isTranslatable();
+    }
+
+    /**
+     * Materialise the partial UNIQUE INDEX guarding UUID uniqueness across
+     * default-langcode rows of translatable sql-blob types (FR-020, FR-025).
+     *
+     *   CREATE UNIQUE INDEX <table>_uuid_default
+     *       ON <table>(uuid) WHERE langcode = default_langcode
+     *
+     * Portability:
+     *   - SQLite (>=3.8) and PostgreSQL (>=9.0) support partial indexes natively.
+     *   - MySQL/MariaDB do not. For those platforms we degrade to a regular
+     *     index on (uuid) and emit an operator warning; uniqueness across
+     *     default-langcode rows must be enforced at the application layer.
+     */
+    private function ensureSqlBlobTranslatablePartialUuidIndex(): void
+    {
+        $keys = $this->entityType->getKeys();
+        if (!isset($keys['uuid'])) {
+            return;
+        }
+
+        $uuidColumn = $keys['uuid'];
+        $langcodeColumn = $keys['langcode'] ?? 'langcode';
+        $indexName = $this->tableName . '_uuid_default';
+
+        $quote = $this->database instanceof DBALDatabase
+            ? fn(string $id): string => $this->database->quoteIdentifier($id)
+            : static fn(string $id): string => '"' . str_replace('"', '""', $id) . '"';
+
+        $platform = $this->detectDatabasePlatform();
+
+        if ($platform === 'mysql' || $platform === 'mariadb') {
+            $this->logger->warning(\sprintf(
+                'SqlSchemaHandler: MySQL/MariaDB does not support partial unique '
+                . 'indexes; degrading translatable UUID guard on "%s" to a non-unique '
+                . 'index. Default-langcode UUID uniqueness must be enforced by the '
+                . 'application layer for translatable sql-blob entity types.',
+                $this->tableName,
+            ));
+            $sql = \sprintf(
+                'CREATE INDEX IF NOT EXISTS %s ON %s (%s)',
+                $quote($indexName),
+                $quote($this->tableName),
+                $quote($uuidColumn),
+            );
+            $this->database->query($sql);
+            return;
+        }
+
+        $sql = \sprintf(
+            'CREATE UNIQUE INDEX IF NOT EXISTS %s ON %s (%s) WHERE %s = %s',
+            $quote($indexName),
+            $quote($this->tableName),
+            $quote($uuidColumn),
+            $quote($langcodeColumn),
+            $quote('default_langcode'),
+        );
+        $this->database->query($sql);
+    }
+
+    /**
+     * Best-effort platform discovery for partial-index emission.
+     *
+     * Returns 'sqlite', 'postgresql', 'mysql', 'mariadb', or 'unknown'.
+     * When the database is not a DBALDatabase (e.g. a test stub), returns
+     * 'sqlite' which yields the standards-compliant partial index syntax.
+     */
+    private function detectDatabasePlatform(): string
+    {
+        $db = $this->database;
+        if (!$db instanceof DBALDatabase) {
+            return 'sqlite';
+        }
+        try {
+            $platform = $db->getConnection()->getDatabasePlatform();
+            $platformClass = strtolower($platform::class);
+        } catch (\Throwable) {
+            return 'unknown';
+        }
+        if (str_contains($platformClass, 'sqlite')) {
+            return 'sqlite';
+        }
+        if (str_contains($platformClass, 'postgres')) {
+            return 'postgresql';
+        }
+        if (str_contains($platformClass, 'mariadb')) {
+            return 'mariadb';
+        }
+        if (str_contains($platformClass, 'mysql')) {
+            return 'mysql';
+        }
+        return 'unknown';
     }
 
     /**

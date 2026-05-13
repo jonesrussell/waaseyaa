@@ -19,5 +19,6 @@ final readonly class ContentEntityKeys
         public ?string $bundle = null,
         public ?string $revision = null,
         public ?string $langcode = null,
+        public ?string $default_langcode = null,
     ) {}
 }

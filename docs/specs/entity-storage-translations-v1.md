@@ -454,6 +454,20 @@ This mission validates against a framework-internal fixture, not a consumer enti
 
 Consumer-app migration (e.g., Minoo `teaching`) is a follow-up PR after this mission ships, not part of mission validation. (D4)
 
+## 13a. Mission-close reconciliation (2026-05-13)
+
+Implementation deviated from the original spec in a handful of intentional ways. Each delta below is honest about what shipped vs. what the spec text says, so future readers can read FRs in §3 without confusion.
+
+- **`TranslatableInterface` (not `TranslatableEntityInterface`).** The spec FRs originally referred to `TranslatableEntityInterface` as a new interface to introduce. Shipped reality: the existing minimal `Waaseyaa\Entity\TranslatableInterface` stub was *expanded in place* rather than replaced. Affected FRs that name `TranslatableEntityInterface`: FR-006, FR-010, FR-014 — read those with `TranslatableEntityInterface` → `TranslatableInterface` mentally substituted.
+- **`EntityEvent` is no longer `final`.** The spec listed `EntityEvent` as `final class`. Shipped reality removed `final` so `Waaseyaa\Entity\Event\TranslationEvent` can extend it. This is a documented, intentional minor public-surface change with no consumer breakage at the framework level (no first-party code extended `EntityEvent`; behavior is unchanged for users that did not extend). Surface map and charter §5.3 both record the change.
+- **`language()` retained as a deprecated alias for `activeLangcode()`.** Not in the original FR list. Per research note R1, the prior single-method `language()` accessor remains on `TranslatableInterface` as a deprecated alias delegating to `activeLangcode()`. Removal is deferred to a future deprecation cycle per the stability charter.
+- **`ContextAwareAccessPolicyInterface` companion (not signature change).** FR-049 originally implied extending `AccessPolicyInterface::access()` with a `$context` parameter. Shipped reality introduces `Waaseyaa\Access\ContextAwareAccessPolicyInterface` as a companion interface — existing policies stay binary-compatible; policies that need langcode context implement the companion. Pattern mirrors the existing `FieldAccessPolicyInterface` companion split.
+- **`EntityRepository::__construct` gains two optional params.** Beyond what §6 spelled out, the constructor accepts two new optional parameters (a language manager and a fallback-chain resolver). Both default to `null` and the repo behaves identically to alpha.177 when omitted — no consumer-breaking change.
+- **Scope expansion — `ContentEntityKeys` + `EntityMetadataReader`.** `default_langcode` plumbing required threading through the attribute-driven entity metadata path (`Waaseyaa\Entity\ContentEntityKeys`, `Waaseyaa\Entity\Metadata\EntityMetadataReader`) that the original spec did not list under "files changed". Both are internal-tier; no public surface impact.
+- **`findTranslations()` lifted to interface level on storage SPI too.** The spec sketched `findTranslations()` only on `EntityRepository`. Shipped reality also declares it on `EntityRepositoryInterface` and on `EntityStorageDriverInterface` so alternative driver implementations carry the contract. Stable surface in both places.
+
+These deltas were caught and documented in WP14 (mission close). No FR's *behavior* changed — the renames and structural splits do not loosen any acceptance criterion.
+
 ## 14. Open questions
 
 None at draft time — all decisions resolved during discovery (D1–D4 below). New open questions discovered during `/spec-kitty.plan` will be logged here.

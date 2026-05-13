@@ -6,6 +6,7 @@ namespace Waaseyaa\Entity;
 
 use Waaseyaa\Entity\Attribute\EntityMetadataReader;
 use Waaseyaa\Entity\Exception\EntityMetadataException;
+use Waaseyaa\Entity\Exception\InvalidEntityTypeException;
 use Waaseyaa\Field\FieldDefinition;
 use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\FieldStorage;
@@ -90,6 +91,24 @@ final readonly class EntityType implements EntityTypeInterface
                     . 'or empty. Add a revision key, e.g. keys: [\'revision\' => \'vid\'].',
                     $this->id,
                 ));
+            }
+        }
+
+        // FR-005: `translatable` is independent per entity type. A bundleEntityType (e.g.
+        // 'node_type' for 'node') does NOT inherit translatability from the content type it
+        // provides bundles for. Each entity type declares its own translatable flag.
+        if ($this->translatable) {
+            if (!isset($this->keys['langcode'])) {
+                throw InvalidEntityTypeException::missingLangcodeKey($this->id);
+            }
+            if (!isset($this->keys['default_langcode'])) {
+                throw InvalidEntityTypeException::missingDefaultLangcodeKey($this->id);
+            }
+            if (!is_subclass_of($this->class, 'Waaseyaa\\Entity\\TranslatableInterface')) {
+                throw InvalidEntityTypeException::translatableEntityClassNotImplementingInterface(
+                    $this->id,
+                    $this->class,
+                );
             }
         }
 
@@ -332,6 +351,9 @@ final readonly class EntityType implements EntityTypeInterface
         $normalized = [];
         foreach ($this->_fieldDefinitions as $name => $definition) {
             if ($definition instanceof FieldDefinitionInterface) {
+                if ($definition instanceof FieldDefinition) {
+                    $definition->validate($this);
+                }
                 $normalized[$name] = $definition;
                 continue;
             }
@@ -353,7 +375,7 @@ final readonly class EntityType implements EntityTypeInterface
             if (!$stored instanceof FieldStorage) {
                 $stored = FieldStorage::Column;
             }
-            $normalized[$name] = new FieldDefinition(
+            $fieldDef = new FieldDefinition(
                 name: $name,
                 type: (string) ($meta['type'] ?? 'string'),
                 cardinality: (int) ($meta['cardinality'] ?? 1),
@@ -370,6 +392,8 @@ final readonly class EntityType implements EntityTypeInterface
                 constraints: is_array($meta['constraints'] ?? null) ? $meta['constraints'] : [],
                 stored: $stored,
             );
+            $fieldDef->validate($this);
+            $normalized[$name] = $fieldDef;
         }
 
         return $normalized;

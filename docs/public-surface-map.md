@@ -84,6 +84,8 @@ Machine-readable source: `docs/public-surface-map.php`.
 |---------|------|---------|
 | `LanguageManagerInterface` | interface | Manages the set of available languages and their default |
 | `TranslatorInterface` | interface | Translates keys with optional parameter substitution and locale override |
+| Config key `translation.fallback_chain` | config | Array of langcodes (M-006, WP06 / ADR 017). Read by `FallbackChainResolver` when a translatable field has no value for the requested langcode |
+| Config key `translation.read_active_language` | config | Bool (M-006, WP06). When `true`, `EntityRepository::find()` consults the `LanguageManager` and returns the entity in the active language instead of the default langcode |
 
 ### queue
 
@@ -119,9 +121,14 @@ Machine-readable source: `docs/public-surface-map.php`.
 | `EntityTypeManagerInterface` | interface | Registers entity types and provides storage instances for each |
 | `FieldableInterface` | interface | Marks an entity as supporting named field access and definition retrieval |
 | `RevisionableInterface` | interface | Adds revision ID tracking and new-revision control to an entity |
-| `TranslatableInterface` | interface | Provides per-language translation access and language code introspection |
+| `TranslatableInterface` | interface | Per-language translation access for a translatable entity (M-006 / ADR 017): `getTranslation`, `hasTranslation`, `addTranslation`, `removeTranslation`, `translations`, `defaultLangcode`, `activeLangcode`, `fieldLangcode`. `language()` retained as deprecated alias for `activeLangcode()` |
+| `EntityTranslationException` | final class | Translation persistence error with named-constructor factories `langcodeRequired`, `cannotRemoveDefault`, `translationAlreadyExists`, `translationNotFound` (M-006, WP01) |
+| `TranslationEvent` | class | Translation lifecycle event extending `EntityEvent`; carries entity, target langcode, and (for updates/deletes) prior values (M-006, WP08). Event-name constants: `PRE_TRANSLATION_INSERT`, `POST_TRANSLATION_INSERT`, `PRE_TRANSLATION_UPDATE`, `POST_TRANSLATION_UPDATE`, `PRE_TRANSLATION_DELETE`, `POST_TRANSLATION_DELETE` |
+| `EntityEvent` | class | Lifecycle event base; non-`final` so `TranslationEvent` may extend it (M-006, WP08 — public-surface change documented in mission reconciliation note) |
+| `EntityType::__construct(...translatable: bool = false, ...)` | constructor arg | Marks an entity type as translatable; load-bearing — enforced by boot validation (M-006, WP02) |
+| Entity key string `'default_langcode'` | key | Required entry in `EntityType::$keys` for translatable types; identifies the column carrying the canonical (default) langcode (M-006, WP02) |
 | `RevisionableEntityTrait` | trait | Default implementation of `RevisionableInterface` using `$values` and `$entityKeys` |
-| `EntityRepositoryInterface` | interface | High-level CRUD API handling hydration, event dispatch, and language fallback |
+| `EntityRepositoryInterface` | interface | High-level CRUD API handling hydration, event dispatch, and language fallback. Adds `findTranslations(EntityInterface): array<string, EntityInterface>` (M-006, WP10) |
 | `EntityEventFactoryInterface` | interface | Creates `EntityEvent` instances with optional before/after snapshots |
 | `EntityStorageInterface` | interface | Lower-level storage operations: load, save, delete, query |
 | `RevisionableStorageInterface` | interface | Extends entity storage with load, delete, and list operations for specific revisions |
@@ -131,7 +138,7 @@ Machine-readable source: `docs/public-surface-map.php`.
 
 | Element | Type | Purpose |
 |---------|------|---------|
-| `EntityStorageDriverInterface` | interface | Low-level persistence SPI: raw row I/O without hydration or event dispatch |
+| `EntityStorageDriverInterface` | interface | Low-level persistence SPI: raw row I/O without hydration or event dispatch. Adds `findTranslations(EntityInterface): array<string, EntityInterface>` (M-006, WP10) |
 | `ConnectionResolverInterface` | interface | Resolves named database connections; multi-tenancy seam for entity storage |
 | `FieldStorageBackendInterface` | interface | Contract for pluggable field storage backends (M-001, WP01) |
 | `HasFieldStorageBackendsInterface` | interface | Mix-in for packages that provide custom field storage backends (M-001, WP01) |
@@ -152,7 +159,8 @@ Machine-readable source: `docs/public-surface-map.php`.
 | `AfterDeleteEvent` | final class | Dispatched after all backends confirm delete (M-001, WP04) |
 | `AbortOperationException` | final class | Thrown from `BeforeSave`/`BeforeDelete` listener to abort the operation (M-001, WP04) |
 | `PartialSaveException` | final class | Thrown when at least one backend succeeds and one fails; carries `$errorCode` (M-001, WP04) |
-| `SaveContext` | final class | Immutable value object passed to save operations; carries revision flags (M-001, WP04) |
+| `SaveContext` | final class | Immutable value object passed to save operations; carries revision flags and translation langcode. `withLangcode(string $langcode): self` returns an immutable copy targeting a translation write (M-001, WP04 + M-006, WP07) |
+| `EntityRepository::findTranslations(EntityInterface): array<string, EntityInterface>` | method | Returns every translation of the given entity, keyed by langcode, default-langcode first; single SQL query (M-006, WP10) |
 | `CoordinatorLifecycleDispatcher` | final class | Dispatches lifecycle events from the coordinator (M-001, WP04) |
 | `SqlColumnBackend` | final class | Stores each field in a dedicated SQL column; `supportsQuery()` true for non-vector types (M-001, WP05) |
 | `SqlColumnSchemaBuilder` | final class | Builds SQL column schema for `SqlColumnBackend` (M-001, WP05) |
@@ -172,7 +180,9 @@ Machine-readable source: `docs/public-surface-map.php`.
 | Element | Type | Purpose |
 |---------|------|---------|
 | `AccountInterface` | interface | Represents a user account for access checking: ID, roles, and permission checks |
-| `AccessPolicyInterface` | interface | Checks entity-level access for view, update, and delete operations |
+| `AccessPolicyInterface` | interface | Checks entity-level access for view, update, delete, and (M-006 / ADR 017) `'translate'` operations |
+| `ContextAwareAccessPolicyInterface` | interface | Companion to `AccessPolicyInterface` accepting a `$context` array (carries `langcode` for the `'translate'` operation and read-time langcode for `view`/`update`) (M-006, WP09) |
+| `'translate'` access-policy operation | operation literal | Used by translation writes; resolves via `ContextAwareAccessPolicyInterface::access($operation, $entity, $account, ['langcode' => $lc])` (M-006, WP09) |
 | `FieldAccessPolicyInterface` | interface | Checks field-level access on an entity; open-by-default (Forbidden restricts, Neutral allows) |
 | `PermissionHandlerInterface` | interface | Manages the registry of available permissions and their metadata |
 | `GateInterface` | interface | Resolves the policy for a subject and checks whether a user has a given ability |
@@ -194,6 +204,8 @@ Machine-readable source: `docs/public-surface-map.php`.
 | `FieldItemInterface` | interface | A single typed value within a field list, with property accessors and emptiness check |
 | `FieldItemListInterface` | interface | An ordered list of `FieldItemInterface` values for one field on one entity |
 | `FieldDefinitionInterface` | interface | Describes a field: type, label, cardinality, settings, and constraints |
+| `FieldDefinition::translatable(bool $translatable = true): self` | builder method | Marks a field as translatable (per-langcode value). Calling on a non-translatable `EntityType`'s field fails at boot (M-006, WP03) |
+| `FieldDefinition::isTranslatable(): bool` | reader | Returns whether the field carries per-language values (M-006, WP03) |
 | `FieldTypeInterface` | interface | Plugin interface for field type implementations providing column and property schemas |
 | `FieldFormatterInterface` | interface | Plugin interface for rendering a field item list for display |
 | `FieldTypeManagerInterface` | interface | Discovers field type plugins and provides their default settings and column definitions |

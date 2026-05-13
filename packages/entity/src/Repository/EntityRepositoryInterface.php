@@ -131,4 +131,27 @@ interface EntityRepositoryInterface
      * @throws \LogicException If no database connection is available for transactions.
      */
     public function deleteMany(array $entities): int;
+
+    /**
+     * Load all translations of a translatable entity in a single query (FR-040, NFR-005).
+     *
+     * Returns a `langcode => EntityInterface` map. The default langcode is the
+     * first entry; remaining langcodes follow in ascending lexicographic order.
+     *
+     * Behaviour:
+     *   - Non-translatable entity types → empty array (cheap exit).
+     *   - Translatable entity with no stored translations → empty array.
+     *   - Translatable entity with N translations → N instances; each instance's
+     *     `activeLangcode()` matches its map key and its translation-data payload
+     *     contains every loaded langcode (shared via PHP copy-on-write so the map
+     *     is not duplicated per instance — NFR-003).
+     *
+     * Implementations MUST issue at most one driver-level query for the row
+     * fetch (sql-blob: SELECT FROM the primary table; sql-column: INNER JOIN of
+     * primary + translation sibling). Per-langcode round-trips are forbidden.
+     *
+     * @param EntityInterface $entity Source entity (only its id + entity-type id are read).
+     * @return array<string, EntityInterface>
+     */
+    public function findTranslations(EntityInterface $entity): array;
 }

@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Waaseyaa\EntityStorage;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as SymfonyEventDispatcherInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Entity\Event\EntityEvents;
+use Waaseyaa\Entity\Event\TranslationEvent;
 use Waaseyaa\EntityStorage\Backend\BackendRegistrar;
 use Waaseyaa\EntityStorage\Backend\FieldStorageBackendInterface;
 use Waaseyaa\EntityStorage\Event\AbortOperationException;
@@ -66,6 +69,22 @@ final class CoordinatorLifecycleDispatcher
      * @throws PartialSaveException      When one or more backends fail mid-fan-out.
      * @throws UnknownBackendException   When a field references an unregistered backend.
      */
+    /**
+     * Execute a save fan-out with lifecycle event dispatch.
+     *
+     * @param array<string, list<FieldDefinition>> $groups          Backend id → fields.
+     * @param string                               $primaryId       Primary backend id (written first).
+     * @param array<string, string>                $translationOps  Map of langcode → operation
+     *                                                              ('insert'|'update'|'delete'). Each
+     *                                                              entry triggers a paired
+     *                                                              PRE_TRANSLATION_* / POST_TRANSLATION_*
+     *                                                              dispatch wrapped around the backend
+     *                                                              fan-out, ordered as supplied.
+     *
+     * @throws AbortOperationException   When a BeforeSaveEvent subscriber aborts.
+     * @throws PartialSaveException      When one or more backends fail mid-fan-out.
+     * @throws UnknownBackendException   When a field references an unregistered backend.
+     */
     public function save(
         EntityInterface $entity,
         EntityTypeInterface $entityType,
@@ -73,12 +92,19 @@ final class CoordinatorLifecycleDispatcher
         string $primaryId,
         SaveContext $saveContext,
         bool $isNewRevision,
+        array $translationOps = [],
     ): void {
+        $this->assertTranslationOps($translationOps);
+
         $startMs = (int) (microtime(true) * 1000);
 
         if ($this->dispatcher !== null) {
             $this->dispatcher->dispatch(new BeforeSaveEvent($entity, $saveContext, $isNewRevision));
         }
+
+        // Pre-translation dispatches: emit before the backend fan-out so listeners
+        // can observe per-language pre-state alongside the entity-level pre-save.
+        $this->dispatchTranslationsPre($entity, $translationOps);
 
         /** @var string[] $committed */
         $committed = [];
@@ -119,6 +145,13 @@ final class CoordinatorLifecycleDispatcher
             );
         }
 
+        // Post-translation dispatches: emit AFTER fan-out succeeds, in reverse
+        // order so listeners see a LIFO nesting around their pre-counterpart
+        // (canonical save flow: PRE_UPDATE → PRE_TRANSLATION_UPDATE('en') →
+        // PRE_TRANSLATION_INSERT('fr') → persist → POST_TRANSLATION_INSERT('fr')
+        // → POST_TRANSLATION_UPDATE('en') → POST_UPDATE).
+        $this->dispatchTranslationsPost($entity, $translationOps);
+
         if ($this->dispatcher !== null) {
             $this->dispatcher->dispatch(new AfterSaveEvent($entity, $saveContext, $isNewRevision));
         }
@@ -141,16 +174,35 @@ final class CoordinatorLifecycleDispatcher
      * @throws PartialSaveException     When one or more backends fail mid-fan-out.
      * @throws UnknownBackendException  When a field references an unregistered backend.
      */
+    /**
+     * Execute a delete fan-out with lifecycle event dispatch.
+     *
+     * @param array<string, list<FieldDefinition>> $groups          Backend id → fields.
+     * @param list<string>                         $translationLangcodes Langcodes whose translation
+     *                                                              rows are being deleted as part of
+     *                                                              this entity delete. Each entry
+     *                                                              triggers a paired
+     *                                                              PRE_TRANSLATION_DELETE /
+     *                                                              POST_TRANSLATION_DELETE around
+     *                                                              the backend fan-out.
+     *
+     * @throws AbortOperationException  When a BeforeDeleteEvent subscriber aborts.
+     * @throws PartialSaveException     When one or more backends fail mid-fan-out.
+     * @throws UnknownBackendException  When a field references an unregistered backend.
+     */
     public function delete(
         EntityInterface $entity,
         EntityTypeInterface $entityType,
         array $groups,
+        array $translationLangcodes = [],
     ): void {
         $startMs = (int) (microtime(true) * 1000);
 
         if ($this->dispatcher !== null) {
             $this->dispatcher->dispatch(new BeforeDeleteEvent($entity));
         }
+
+        $this->dispatchDeleteTranslationsPre($entity, $translationLangcodes);
 
         /** @var string[] $committed */
         $committed = [];
@@ -186,6 +238,8 @@ final class CoordinatorLifecycleDispatcher
             );
         }
 
+        $this->dispatchDeleteTranslationsPost($entity, $translationLangcodes);
+
         if ($this->dispatcher !== null) {
             $this->dispatcher->dispatch(new AfterDeleteEvent($entity));
         }
@@ -197,6 +251,157 @@ final class CoordinatorLifecycleDispatcher
             outcome: 'ok',
             startMs: $startMs,
         );
+    }
+
+    /**
+     * Validate that every entry in $translationOps is one of the supported ops.
+     *
+     * @param array<string, string> $translationOps
+     *
+     * @throws \InvalidArgumentException When an op is not 'insert'|'update'|'delete'
+     *                                   or a langcode is the empty string.
+     */
+    private function assertTranslationOps(array $translationOps): void
+    {
+        foreach ($translationOps as $langcode => $op) {
+            if ($langcode === '') {
+                throw new \InvalidArgumentException(
+                    'CoordinatorLifecycleDispatcher: translation op langcodes must be non-empty strings.',
+                );
+            }
+
+            if (!in_array($op, ['insert', 'update', 'delete'], strict: true)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'CoordinatorLifecycleDispatcher: translation op "%s" for langcode "%s" is not supported; expected insert|update|delete.',
+                    $op,
+                    $langcode,
+                ));
+            }
+        }
+    }
+
+    /**
+     * @param array<string, string> $translationOps
+     */
+    private function dispatchTranslationsPre(EntityInterface $entity, array $translationOps): void
+    {
+        if ($translationOps === []) {
+            return;
+        }
+
+        $symfony = $this->resolveSymfonyDispatcher();
+        if ($symfony === null) {
+            return;
+        }
+
+        foreach ($translationOps as $langcode => $op) {
+            $eventName = match ($op) {
+                'insert' => EntityEvents::PRE_TRANSLATION_INSERT->value,
+                'update' => EntityEvents::PRE_TRANSLATION_UPDATE->value,
+                'delete' => EntityEvents::PRE_TRANSLATION_DELETE->value,
+                default => throw new \LogicException(sprintf(
+                    'Unexpected translation op "%s" reached dispatch site (assertTranslationOps should have rejected it).',
+                    $op,
+                )),
+            };
+
+            $symfony->dispatch(new TranslationEvent($entity, $langcode), $eventName);
+        }
+    }
+
+    /**
+     * @param array<string, string> $translationOps
+     */
+    private function dispatchTranslationsPost(EntityInterface $entity, array $translationOps): void
+    {
+        if ($translationOps === []) {
+            return;
+        }
+
+        $symfony = $this->resolveSymfonyDispatcher();
+        if ($symfony === null) {
+            return;
+        }
+
+        // Reverse order so post events nest LIFO around their pre-counterparts.
+        foreach (array_reverse($translationOps, preserve_keys: true) as $langcode => $op) {
+            $eventName = match ($op) {
+                'insert' => EntityEvents::POST_TRANSLATION_INSERT->value,
+                'update' => EntityEvents::POST_TRANSLATION_UPDATE->value,
+                'delete' => EntityEvents::POST_TRANSLATION_DELETE->value,
+                default => throw new \LogicException(sprintf(
+                    'Unexpected translation op "%s" reached dispatch site (assertTranslationOps should have rejected it).',
+                    $op,
+                )),
+            };
+
+            $symfony->dispatch(new TranslationEvent($entity, $langcode), $eventName);
+        }
+    }
+
+    /**
+     * @param list<string> $langcodes
+     */
+    private function dispatchDeleteTranslationsPre(EntityInterface $entity, array $langcodes): void
+    {
+        if ($langcodes === []) {
+            return;
+        }
+
+        $symfony = $this->resolveSymfonyDispatcher();
+        if ($symfony === null) {
+            return;
+        }
+
+        foreach ($langcodes as $langcode) {
+            if ($langcode === '') {
+                throw new \InvalidArgumentException(
+                    'CoordinatorLifecycleDispatcher: delete translation langcodes must be non-empty strings.',
+                );
+            }
+            $symfony->dispatch(
+                new TranslationEvent($entity, $langcode),
+                EntityEvents::PRE_TRANSLATION_DELETE->value,
+            );
+        }
+    }
+
+    /**
+     * @param list<string> $langcodes
+     */
+    private function dispatchDeleteTranslationsPost(EntityInterface $entity, array $langcodes): void
+    {
+        if ($langcodes === []) {
+            return;
+        }
+
+        $symfony = $this->resolveSymfonyDispatcher();
+        if ($symfony === null) {
+            return;
+        }
+
+        foreach (array_reverse($langcodes) as $langcode) {
+            $symfony->dispatch(
+                new TranslationEvent($entity, $langcode),
+                EntityEvents::POST_TRANSLATION_DELETE->value,
+            );
+        }
+    }
+
+    /**
+     * Resolve the dispatcher to a Symfony contract instance for named-event
+     * dispatch. Returns null when no dispatcher is configured or when the
+     * injected dispatcher is PSR-14-only (which has no event-name concept).
+     * In the PSR-14-only case, translation listeners would need to subscribe
+     * by class name on the application side.
+     */
+    private function resolveSymfonyDispatcher(): ?SymfonyEventDispatcherInterface
+    {
+        if (!$this->dispatcher instanceof SymfonyEventDispatcherInterface) {
+            return null;
+        }
+
+        return $this->dispatcher;
     }
 
     /**

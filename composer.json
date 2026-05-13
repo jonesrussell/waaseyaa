@@ -368,6 +368,7 @@
             "Waaseyaa\\Plugin\\Tests\\": "packages/plugin/tests/",
             "Waaseyaa\\TypedData\\Tests\\": "packages/typed-data/tests/",
             "Waaseyaa\\Entity\\PhpStan\\": "packages/entity/testing/PhpStan/",
+            "Waaseyaa\\Entity\\Testing\\Translation\\": "packages/entity/testing/Translation/",
             "Waaseyaa\\Entity\\Tests\\": "packages/entity/tests/",
             "Waaseyaa\\Field\\Tests\\": "packages/field/tests/",
             "Waaseyaa\\Foundation\\Tests\\": "packages/foundation/tests/",

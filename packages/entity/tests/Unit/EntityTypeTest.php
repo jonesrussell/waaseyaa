@@ -59,13 +59,16 @@ class EntityTypeTest extends TestCase
 
     public function testAllProperties(): void
     {
-        $keys = ['id' => 'nid', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type', 'revision' => 'vid'];
+        // T007 (WP02): translatable:true requires langcode + default_langcode keys and a
+        // TranslatableInterface entity class. TestContentEntity extends ContentEntityBase
+        // which implements TranslatableInterface.
+        $keys = ['id' => 'nid', 'uuid' => 'uuid', 'label' => 'title', 'bundle' => 'type', 'revision' => 'vid', 'langcode' => 'langcode', 'default_langcode' => 'default_langcode'];
         $constraints = ['UniqueField' => ['field' => 'title']];
 
         $type = new EntityType(
             id: 'node',
             label: 'Content',
-            class: 'Waaseyaa\\Entity\\Tests\\Unit\\TestEntity',
+            class: TestContentEntity::class,
             storageClass: 'Some\\Storage\\Class',
             keys: $keys,
             revisionable: true,
@@ -76,7 +79,7 @@ class EntityTypeTest extends TestCase
 
         $this->assertSame('node', $type->id());
         $this->assertSame('Content', $type->getLabel());
-        $this->assertSame('Waaseyaa\\Entity\\Tests\\Unit\\TestEntity', $type->getClass());
+        $this->assertSame(TestContentEntity::class, $type->getClass());
         $this->assertSame('Some\\Storage\\Class', $type->getStorageClass());
         $this->assertSame($keys, $type->getKeys());
         $this->assertTrue($type->isRevisionable());

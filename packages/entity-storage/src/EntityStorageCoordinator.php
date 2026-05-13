@@ -7,6 +7,8 @@ namespace Waaseyaa\EntityStorage;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Entity\Exception\EntityTranslationException;
+use Waaseyaa\Entity\TranslatableInterface;
 use Waaseyaa\EntityStorage\Backend\BackendRegistrar;
 use Waaseyaa\EntityStorage\Backend\FieldStorageBackendInterface;
 use Waaseyaa\EntityStorage\Event\AbortOperationException;
@@ -116,6 +118,20 @@ final class EntityStorageCoordinator
         bool $isNewRevision = true,
     ): void {
         $resolvedContext = $saveContext ?? SaveContext::default();
+
+        // T036 / FR-033..FR-036: enforce translation invariants and resolve the
+        // langcode for this save before fanning out to backends.
+        //
+        // - Translatable types with no default_langcode set on the entity reject
+        //   the save with EntityTranslationException::langcodeRequired() (matrix
+        //   Case 8). The guard runs before backend fan-out so partial writes are
+        //   impossible.
+        // - When SaveContext::langcode is set the coordinator switches the entity
+        //   handle to that translation so backend.write() observes the correct
+        //   per-langcode field values. When unset the entity's activeLangcode()
+        //   is the canonical target (FR-036 default).
+        $entity = $this->resolveSaveLangcodeTarget($entity, $entityType, $resolvedContext);
+
         $groups = $this->groupFieldsByBackend($entityType);
         $primaryId = $this->resolvePrimaryBackendId($entityType);
 
@@ -136,6 +152,54 @@ final class EntityStorageCoordinator
             saveContext: $resolvedContext,
             isNewRevision: $effectiveIsNewRevision,
         );
+    }
+
+    /**
+     * Resolve the entity handle that should receive backend writes for this save.
+     *
+     * Implements the write-semantics matrix (spec §7.3, FR-033..FR-036):
+     *
+     *   - Non-translatable types are returned unchanged.
+     *   - Translatable types without `default_langcode` set raise
+     *     {@see EntityTranslationException::langcodeRequired()} (Case 8).
+     *   - When {@see SaveContext::$langcode} is set the entity is switched to
+     *     that translation via {@see TranslatableInterface::getTranslation()}
+     *     (Cases 5/6). When the translation does not exist on the entity yet
+     *     the handle is unchanged and the storage layer is expected to INSERT
+     *     a new translation row keyed by the requested langcode.
+     *   - When the context carries no langcode the entity's
+     *     {@see TranslatableInterface::activeLangcode()} is used as-is
+     *     (Cases 2/3/4).
+     *
+     * @throws EntityTranslationException When a translatable entity is saved
+     *                                    without a default_langcode value.
+     */
+    private function resolveSaveLangcodeTarget(
+        EntityInterface $entity,
+        EntityTypeInterface $entityType,
+        SaveContext $context,
+    ): EntityInterface {
+        if (!$entityType->isTranslatable() || !$entity instanceof TranslatableInterface) {
+            return $entity;
+        }
+
+        if ($entity->defaultLangcode() === '') {
+            throw EntityTranslationException::langcodeRequired();
+        }
+
+        $effective = $context->langcode ?? $entity->activeLangcode();
+        if ($effective === '' || $effective === $entity->activeLangcode()) {
+            return $entity;
+        }
+
+        if ($entity->hasTranslation($effective)) {
+            return $entity->getTranslation($effective);
+        }
+
+        // Translation row does not exist yet — the storage layer (sql-blob /
+        // sql-column translatable save paths) will INSERT it keyed by the
+        // requested langcode (matrix Case 6). The entity handle is unchanged.
+        return $entity;
     }
 
     /**

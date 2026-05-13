@@ -25,8 +25,10 @@ use Waaseyaa\Field\FieldDefinitionInterface;
  *
  * @phpstan-consistent-constructor
  */
-abstract class ContentEntityBase extends EntityBase implements ContentEntityInterface, HydratableFromStorageInterface
+abstract class ContentEntityBase extends EntityBase implements ContentEntityInterface, HydratableFromStorageInterface, TranslatableInterface
 {
+    use TranslatableEntityTrait;
+
     /**
      * Process-wide field registry consulted by {@see getFieldDefinitions()}.
      *
@@ -37,6 +39,15 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
      * this must reset it in tearDown() to avoid bleed between cases.
      */
     private static ?FieldDefinitionRegistryInterface $fieldRegistry = null;
+
+    /**
+     * Process-wide EntityTypeManager consulted by {@see getEntityType()}.
+     *
+     * AbstractKernel wires this at boot. When null, getEntityType() falls back to
+     * constructing a minimal EntityType from the entity's own metadata (translatable: false).
+     * Tests that wire this must reset it in tearDown() to avoid bleed between cases.
+     */
+    private static ?EntityTypeManager $entityTypeManager = null;
 
     /**
      * Field definitions passed into the entity constructor (legacy path).
@@ -81,6 +92,39 @@ abstract class ContentEntityBase extends EntityBase implements ContentEntityInte
     public static function setFieldRegistry(?FieldDefinitionRegistryInterface $registry): void
     {
         self::$fieldRegistry = $registry;
+    }
+
+    /**
+     * Wires the process-wide EntityTypeManager used by {@see getEntityType()}.
+     *
+     * Called by AbstractKernel at boot alongside {@see setFieldRegistry()}.
+     * Pass null to reset (e.g., in test tearDown()).
+     */
+    public static function setEntityTypeManager(?EntityTypeManager $manager): void
+    {
+        self::$entityTypeManager = $manager;
+    }
+
+    /**
+     * Returns the EntityTypeInterface definition for this entity.
+     *
+     * Satisfies the abstract contract declared in {@see TranslatableEntityTrait}.
+     * When the process-wide EntityTypeManager is not wired (e.g., isolated unit tests),
+     * this falls back to a minimal EntityType built from the entity's own metadata.
+     */
+    public function getEntityType(): EntityTypeInterface
+    {
+        if (self::$entityTypeManager !== null && self::$entityTypeManager->hasDefinition($this->entityTypeId)) {
+            return self::$entityTypeManager->getDefinition($this->entityTypeId);
+        }
+
+        // Fallback for tests and environments where the manager is not wired.
+        // Non-translatable by default — callers can override by wiring the manager.
+        return new EntityType(
+            id: $this->entityTypeId,
+            label: $this->entityTypeId,
+            class: static::class,
+        );
     }
 
     public function hasField(string $name): bool

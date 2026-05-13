@@ -6,6 +6,7 @@ namespace Waaseyaa\CLI\Handler;
 
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\CLI\Command\Make\AbstractMakeHandler;
+use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 
 final class MakeMigrationHandler extends AbstractMakeHandler
@@ -13,10 +14,17 @@ final class MakeMigrationHandler extends AbstractMakeHandler
     public function __construct(
         private readonly string $projectRoot,
         private readonly ?PackageManifest $manifest = null,
+        private readonly ?EntityTypeManagerInterface $entityTypeManager = null,
+        private readonly ?AddTranslationsMigrationGenerator $translationsGenerator = null,
     ) {}
 
     public function execute(CliIO $io): int
     {
+        $addTranslations = $io->option('add-translations');
+        if ($addTranslations !== null && $addTranslations !== '' && $addTranslations !== false) {
+            return $this->executeAddTranslations((string) $addTranslations, $io);
+        }
+
         $name = (string) $io->argument('name');
         $createTable = $io->option('create');
         $modifyTable = $io->option('table');
@@ -50,6 +58,91 @@ final class MakeMigrationHandler extends AbstractMakeHandler
             ? substr($targetDir, strlen($this->projectRoot) + 1) . '/' . $filename
             : $targetPath;
         $io->writeln("Created: {$relativePath}");
+
+        return 0;
+    }
+
+    /**
+     * Generate an "add translations" migration for an existing entity type.
+     *
+     * FR-050..FR-053. Six failure modes (see contracts/migration-generator.md):
+     *  1. --default-langcode missing.
+     *  2. EntityTypeManager unavailable (handler constructed standalone).
+     *  3. Entity type not registered.
+     *  4. Entity type is a config entity (no uuid key in entityKeys).
+     *  5. No fields marked translatable.
+     *  6. (Runtime) primary table missing langcode column -> MissingLangcodeColumnException
+     *     surfaces on apply, not generation. Generation-time we cannot inspect schema
+     *     without a live connection; the exception class is shipped so consumers and
+     *     future hooks can wrap the apply step.
+     */
+    private function executeAddTranslations(string $entityTypeId, CliIO $io): int
+    {
+        $defaultLangcode = $io->option('default-langcode');
+        if ($defaultLangcode === null || $defaultLangcode === '' || $defaultLangcode === false) {
+            $io->error('The --default-langcode option is required when using --add-translations.');
+            return 1;
+        }
+        $defaultLangcode = (string) $defaultLangcode;
+
+        if ($this->entityTypeManager === null) {
+            $io->error('EntityTypeManager is not available. Run inside a booted Waaseyaa application.');
+            return 1;
+        }
+
+        if (!$this->entityTypeManager->hasDefinition($entityTypeId)) {
+            $io->error(sprintf('Entity type "%s" is not registered. Boot the application and try again.', $entityTypeId));
+            return 1;
+        }
+
+        $entityType = $this->entityTypeManager->getDefinition($entityTypeId);
+
+        // A config entity has no "uuid" key (#entity-types-without-uuid-are-config-entities).
+        $keys = $entityType->getKeys();
+        if (!isset($keys['uuid'])) {
+            $io->error(sprintf('Entity type "%s" appears to be a config entity (no uuid key). --add-translations is only valid for content entities.', $entityTypeId));
+            return 1;
+        }
+
+        $generator = $this->translationsGenerator ?? new AddTranslationsMigrationGenerator();
+        $translatableColumns = $generator->translatableColumns($entityType);
+
+        // sql-blob lives entirely in _data; sql-column splits translatable fields into
+        // schema columns. The brief allows --backend to be inferred from the entity type
+        // primary backend; when unset, sql-blob is the framework default.
+        $backend = $entityType->getPrimaryStorageBackend() ?? 'sql-blob';
+        if ($backend !== 'sql-blob' && $backend !== 'sql-column') {
+            $io->error(sprintf('Unsupported primary storage backend "%s" for --add-translations. Expected sql-blob or sql-column.', $backend));
+            return 1;
+        }
+
+        if ($backend === 'sql-column' && $translatableColumns === []) {
+            $io->error('No fields are marked translatable. Mark at least one field with FieldDefinition::translatable() before regenerating.');
+            return 1;
+        }
+
+        $rendered = $generator->render($entityType, $defaultLangcode, $backend, $translatableColumns);
+
+        $timestamp = date('Ymd_His');
+        $name = "add_translations_to_{$entityTypeId}";
+        $filename = "{$timestamp}_{$name}.php";
+
+        $targetDir = $this->projectRoot . '/migrations';
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0o755, true);
+        }
+        $targetPath = $targetDir . '/' . $filename;
+        file_put_contents($targetPath, $rendered);
+
+        $relativePath = str_starts_with($targetDir, $this->projectRoot)
+            ? substr($targetDir, strlen($this->projectRoot) + 1) . '/' . $filename
+            : $targetPath;
+        $io->writeln("Created: {$relativePath}");
+        $io->writeln(sprintf('Backend: %s; default langcode: %s', $backend, $defaultLangcode));
+        if ($backend === 'sql-column') {
+            $io->writeln(sprintf('Translatable columns: %s', implode(', ', $translatableColumns)));
+        }
+        $io->writeln('NOTE: The reverse migration drops non-default-langcode rows. Back up multilingual content before running `migrate:rollback`.');
 
         return 0;
     }

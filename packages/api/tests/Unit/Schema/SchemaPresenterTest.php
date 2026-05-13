@@ -76,6 +76,7 @@ final class SchemaPresenterTest extends TestCase
             'label' => 'title',
             'bundle' => 'type',
             'langcode' => 'langcode',
+            'default_langcode' => 'default_langcode',
         ]);
 
         $schema = $this->presenter->present($entityType);
@@ -492,6 +493,16 @@ final class SchemaPresenterTest extends TestCase
     ): EntityType {
         if ($keys === []) {
             $keys = TestEntity::definitionKeys();
+        }
+
+        // M-006: translatable EntityType requires both 'langcode' and 'default_langcode' keys.
+        if ($translatable) {
+            if (!isset($keys['langcode'])) {
+                $keys['langcode'] = 'langcode';
+            }
+            if (!isset($keys['default_langcode'])) {
+                $keys['default_langcode'] = 'default_langcode';
+            }
         }
 
         return new EntityType(

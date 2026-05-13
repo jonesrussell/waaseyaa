@@ -421,6 +421,7 @@ final class SqlStorageDriverTest extends TestCase
                 'bundle' => 'bundle',
                 'label' => 'label',
                 'langcode' => 'langcode',
+                'default_langcode' => 'default_langcode',
             ],
         );
 
@@ -478,6 +479,7 @@ final class SqlStorageDriverTest extends TestCase
                 'bundle' => 'bundle',
                 'label' => 'label',
                 'langcode' => 'langcode',
+                'default_langcode' => 'default_langcode',
             ],
         );
 
@@ -513,6 +515,7 @@ final class SqlStorageDriverTest extends TestCase
                 'bundle' => 'bundle',
                 'label' => 'label',
                 'langcode' => 'langcode',
+                'default_langcode' => 'default_langcode',
             ],
         );
 

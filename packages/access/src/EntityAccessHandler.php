@@ -15,10 +15,21 @@ use Waaseyaa\Entity\EntityInterface;
  * logic (any Allowed grants access), but Forbidden always wins. If no policy
  * grants access, the result is Neutral (effectively denied).
  *
+ * Recognized operations: 'view', 'update', 'delete', 'translate'. The 'translate'
+ * operation falls through to 'update' when no policy expresses an opinion
+ * (translate ⊆ update); explicit Forbidden on 'translate' is honored without
+ * fallthrough. Policies that implement {@see ContextAwareAccessPolicyInterface}
+ * receive a context bag (for 'translate' this carries the target 'langcode').
+ *
  * See docs/specs/bundle-scoped-fields.md §Access for the bundle filter contract.
  */
 class EntityAccessHandler
 {
+    /**
+     * Operations recognized by the handler. 'translate' is the M-006 addition
+     * that falls through to 'update' when no policy opines.
+     */
+    public const array RECOGNIZED_OPERATIONS = ['view', 'update', 'delete', 'translate'];
     /**
      * @var AccessPolicyInterface[]
      */
@@ -53,12 +64,26 @@ class EntityAccessHandler
     /**
      * Check access for an existing entity.
      *
+     * For the 'translate' operation, when the aggregated result is Neutral (no
+     * policy opined), the handler re-invokes itself with 'update' — translate
+     * is treated as a subset of update by default. An explicit Forbidden on
+     * 'translate' is honored and does NOT fall through to update.
+     *
+     * Policies implementing {@see ContextAwareAccessPolicyInterface} receive the
+     * $context bag; others use the standard {@see AccessPolicyInterface::access()}.
+     *
      * @param EntityInterface  $entity    The entity being accessed.
-     * @param string           $operation The operation: 'view', 'update', or 'delete'.
+     * @param string           $operation The operation: 'view', 'update', 'delete', or 'translate'.
      * @param AccountInterface $account   The account requesting access.
+     * @param array<string, mixed> $context Optional extra context. For 'translate':
+     *                                       ['langcode' => string].
      */
-    public function check(EntityInterface $entity, string $operation, AccountInterface $account): AccessResult
-    {
+    public function check(
+        EntityInterface $entity,
+        string $operation,
+        AccountInterface $account,
+        array $context = [],
+    ): AccessResult {
         $result = AccessResult::neutral('No policy provided an opinion.');
         $entityTypeId = $entity->getEntityTypeId();
         $bundle = $entity->bundle();
@@ -71,13 +96,23 @@ class EntityAccessHandler
                 continue;
             }
 
-            $policyResult = $policy->access($entity, $operation, $account);
+            $policyResult = $policy instanceof ContextAwareAccessPolicyInterface
+                ? $policy->accessWithContext($entity, $operation, $account, $context)
+                : $policy->access($entity, $operation, $account);
             $result = $result->orIf($policyResult);
 
             // Short-circuit on Forbidden — nothing can override it.
             if ($result->isForbidden()) {
                 return $result;
             }
+        }
+
+        // 'translate' fallthrough: if no policy opined (aggregate Neutral) and the
+        // operation is 'translate', re-check 'update'. translate ⊆ update by default.
+        // Explicit Forbidden on translate is already short-circuited above and never
+        // reaches this branch, so it is honored over the update fallback.
+        if ($operation === 'translate' && $result->isNeutral()) {
+            return $this->check($entity, 'update', $account, $context);
         }
 
         return $result;

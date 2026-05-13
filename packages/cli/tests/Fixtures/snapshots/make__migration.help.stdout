@@ -5,16 +5,18 @@ Usage:
   make:migration [options] [--] <name>
 
 Arguments:
-  name                   The migration name (e.g. "create_comments_table")
+  name                                     The migration name (e.g. "create_comments_table")
 
 Options:
-      --create=CREATE    Table name to create
-      --table=TABLE      Existing table name to modify
-      --package=PACKAGE  Package name to write migration to (e.g. "waaseyaa/node")
-  -h, --help             Display help for the given command. When no command is given display help for the list command
-      --silent           Do not output any message
-  -q, --quiet            Only errors are displayed. All other output is suppressed
-  -V, --version          Display this application version
-      --ansi|--no-ansi   Force (or disable --no-ansi) ANSI output
-  -n, --no-interaction   Do not ask any interactive question
-  -v|vv|vvv, --verbose   Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
+      --create=CREATE                      Table name to create
+      --table=TABLE                        Existing table name to modify
+      --package=PACKAGE                    Package name to write migration to (e.g. "waaseyaa/node")
+      --add-translations=ADD-TRANSLATIONS  Generate a translation-promotion migration for the given entity type id (FR-050)
+      --default-langcode=DEFAULT-LANGCODE  Default langcode for the translation-promotion migration. Required when --add-translations is used (FR-051)
+  -h, --help                               Display help for the given command. When no command is given display help for the list command
+      --silent                             Do not output any message
+  -q, --quiet                              Only errors are displayed. All other output is suppressed
+  -V, --version                            Display this application version
+      --ansi|--no-ansi                     Force (or disable --no-ansi) ANSI output
+  -n, --no-interaction                     Do not ask any interactive question
+  -v|vv|vvv, --verbose                     Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug

@@ -57,7 +57,7 @@ final class EntityTypeListHandlerTest extends TestCase
             id: 'node',
             label: 'Content',
             class: 'Waaseyaa\\Node\\Node',
-            keys: ['id' => 'nid', 'uuid' => 'uuid', 'revision' => 'vid'],
+            keys: ['id' => 'nid', 'uuid' => 'uuid', 'revision' => 'vid', 'langcode' => 'langcode', 'default_langcode' => 'default_langcode'],
             revisionable: true,
             translatable: true,
         );

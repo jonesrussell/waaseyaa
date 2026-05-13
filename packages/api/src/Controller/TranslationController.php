@@ -240,12 +240,10 @@ final class TranslationController
             );
         }
 
-        // Remove the translation via removeTranslation if available.
-        if (method_exists($entity, 'removeTranslation')) {
-            $entity->removeTranslation($langcode);
-            $storage = $this->entityTypeManager->getStorage($entityTypeId);
-            $storage->save($entity);
-        }
+        // removeTranslation is now part of TranslatableInterface — call it directly.
+        $entity->removeTranslation($langcode);
+        $storage = $this->entityTypeManager->getStorage($entityTypeId);
+        $storage->save($entity);
 
         return JsonApiDocument::empty(
             meta: ['deleted' => true, 'langcode' => $langcode],

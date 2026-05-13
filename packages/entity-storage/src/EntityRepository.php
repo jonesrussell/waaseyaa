@@ -16,11 +16,13 @@ use Waaseyaa\Entity\Event\EntityEventFactoryInterface;
 use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 use Waaseyaa\Entity\RevisionableInterface;
+use Waaseyaa\Entity\TranslatableInterface;
 use Waaseyaa\Entity\Validation\EntityTypeValidationConstraints;
 use Waaseyaa\Entity\Validation\EntityValidationException;
 use Waaseyaa\Entity\Validation\EntityValidator;
 use Waaseyaa\EntityStorage\Driver\EntityStorageDriverInterface;
 use Waaseyaa\EntityStorage\Driver\RevisionableStorageDriver;
+use Waaseyaa\I18n\LanguageManagerInterface;
 
 /**
  * Entity repository implementation.
@@ -47,6 +49,13 @@ final class EntityRepository implements EntityRepositoryInterface
         // Null until WP10 activates per-field routing; WP04 wires lifecycle events.
         // Must remain the last parameter to avoid breaking existing call sites.
         private readonly ?EntityStorageCoordinator $coordinator = null,
+        // M-006 WP10 — optional language manager wire-up (C-004 optional DI).
+        // When supplied AND $readActiveLanguage is true, find() walks the
+        // active-language → defaultLangcode handoff after hydrating the
+        // default-language entity. Absence yields default-langcode reads
+        // always (CLI / queue / non-HTTP contexts).
+        private readonly ?LanguageManagerInterface $languageManager = null,
+        private readonly bool $readActiveLanguage = false,
     ) {
         $this->eventFactory = $eventFactory ?? new DefaultEntityEventFactory();
     }
@@ -99,7 +108,36 @@ final class EntityRepository implements EntityRepositoryInterface
             return null;
         }
 
-        return $this->hydrate($row);
+        $entity = $this->hydrate($row);
+
+        // M-006 WP10 — LanguageManager handoff (FR-040, C-004).
+        //
+        // When a language manager is wired AND opt-in is enabled AND the
+        // caller did not pin an explicit $langcode, swap the active
+        // translation to the LanguageManager's current language whenever the
+        // entity carries a translation for it. We materialise the full
+        // translation map via `findTranslations()` so the in-memory entity
+        // knows which langcodes are available. Default-language reads (and
+        // all opt-out paths) skip this branch so CLI / queue / non-HTTP
+        // contexts remain deterministic.
+        if (
+            $langcode === null
+            && $this->readActiveLanguage
+            && $this->languageManager !== null
+            && $entity instanceof TranslatableInterface
+            && $this->entityType->isTranslatable()
+        ) {
+            $active = $this->languageManager->getCurrentLanguage()->id;
+            $defaultLc = $entity->defaultLangcode();
+            if ($active !== $defaultLc) {
+                $allTranslations = $this->findTranslations($entity);
+                if (isset($allTranslations[$active])) {
+                    return $allTranslations[$active];
+                }
+            }
+        }
+
+        return $entity;
     }
 
     public function findMany(array $ids, ?string $langcode = null, bool $fallback = false): array
@@ -466,6 +504,63 @@ final class EntityRepository implements EntityRepositoryInterface
 
         // Fall back to entity type default.
         return $this->entityType->getRevisionDefault();
+    }
+
+    /**
+     * Load every translation of $entity in a single driver round-trip (FR-041, NFR-005).
+     *
+     * Non-translatable types short-circuit to an empty array — the driver is
+     * not consulted (no wasted query). Translatable types dispatch to the
+     * driver, then materialise one entity per langcode. The translation-data
+     * map is built once and shared across every returned instance: each entity
+     * receives the same map via `_setTranslationData()` so PHP copy-on-write
+     * keeps the payload single-copy in memory until a caller mutates it
+     * (NFR-003).
+     */
+    public function findTranslations(EntityInterface $entity): array
+    {
+        if (!$this->entityType->isTranslatable()) {
+            return [];
+        }
+        if (!$entity instanceof TranslatableInterface) {
+            return [];
+        }
+
+        $id = (string) ($entity->id() ?? '');
+        if ($id === '') {
+            return [];
+        }
+
+        $defaultLc = $entity->defaultLangcode();
+        $rows = $this->driver->findTranslations($this->entityType->id(), $id, $defaultLc);
+
+        if ($rows === []) {
+            return [];
+        }
+
+        // Build the shared translation-data map (langcode → field values).
+        // Copy-on-write keeps it single-copy until a caller mutates it.
+        $translationData = $rows;
+
+        $result = [];
+        foreach ($rows as $lc => $row) {
+            $instance = $this->hydrate($row);
+            if ($instance instanceof TranslatableInterface
+                && \method_exists($instance, '_setTranslationData')
+            ) {
+                $instance->_setTranslationData($translationData, $defaultLc);
+                // Stamp the active langcode per row. _setTranslationData clears
+                // activeLangcode to null (so it falls back to defaultLangcode);
+                // we restore the per-row langcode via getTranslation() which
+                // returns a clone with the active langcode set.
+                if ($lc !== $defaultLc && $instance->hasTranslation($lc)) {
+                    $instance = $instance->getTranslation($lc);
+                }
+            }
+            $result[$lc] = $instance;
+        }
+
+        return $result;
     }
 
     /**

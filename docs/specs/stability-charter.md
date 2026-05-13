@@ -155,7 +155,7 @@ Pre-v1 beta trains (`0.x-beta.N`).
 6. **Owner authorization.** `@jonesrussell` opens a PR creating `release-approvals/beta.approved`, mirroring the `VERSIONING.md` §6 pattern.
 7. **Listing pipeline in production.** Per [ADR 015](../adr/015-listing-pipeline-views-equivalent.md), `ListingDefinition` and the listing resolver are stable surface, and at least one consumer app uses them for production listings. Reason: declaring beta without this misleads Drupal-migration consumers about what the framework covers.
 8. **Revisions in production.** Per [ADR 016](../adr/016-revisions-first-class.md), `RevisionableEntityInterface` is stable surface, and at least one revisionable entity type ships in a consumer app. Reason: editorial CMSs cannot rely on "alpha" semantics for revision history.
-9. **No unresolved critical mission gaps.** No `❌` entries in [`drupal-comparison-matrix.md`](drupal-comparison-matrix.md) §3 ("Mission-critical gaps") remain in `unknown` or `unresolved` state. `intentional-gap` decisions documented via ADR are acceptable; undecided gaps are not. As of charter draft: §3.2 (per-field translation) and §3.5 (CMI config sync) are unresolved and will block beta entry until ADR'd.
+9. **No unresolved critical mission gaps.** No `❌` entries in [`drupal-comparison-matrix.md`](drupal-comparison-matrix.md) §3 ("Mission-critical gaps") remain in `unknown` or `unresolved` state. `intentional-gap` decisions documented via ADR are acceptable; undecided gaps are not. **Per-field translation (matrix §3.2) — SATISFIED** by M-006 (`entity-storage-translations-v1`) shipping the single-axis translation substrate per ADR 017; see §5.3 for the stable surface. CMI config sync (matrix §3.5) remains ADR'd (ADR 018) but unshipped.
 
 **Beta rules:**
 - Stable-surface breaks require a full deprecation cycle (§4) — no abbreviated path.
@@ -313,8 +313,20 @@ This section enumerates the major contract families and the per-phase rules for 
 - `FieldDefinition` API, including `storedIn(string $backendId)` (per ADR 010).
 - Access-policy attribute system (`PolicyAttribute`, `GateInterface`), including the `view_revision` operation (per ADR 016).
 - **Field storage backend contract** — `FieldStorageBackendInterface` and the backend id namespace; ids `sql-blob`, `sql-column`, `vector` are reserved (per ADR 010).
-- **Entity lifecycle events** — `BeforeSaveEvent`, `AfterSaveEvent`, `BeforeDeleteEvent`, `AfterDeleteEvent`, marker interface `EntityLifecycleEventInterface`, and `AbortOperationException` (per ADR 011).
+- **Entity lifecycle events** — `BeforeSaveEvent`, `AfterSaveEvent`, `BeforeDeleteEvent`, `AfterDeleteEvent`, marker interface `EntityLifecycleEventInterface`, and `AbortOperationException` (per ADR 011). `EntityEvent` is non-`final` so the `TranslationEvent` sibling family may extend it (per M-006 / ADR 017).
 - **Revisionable surface** — `RevisionableEntityInterface`, `RevisionableEntityStorageInterface` (per ADR 016).
+- **Translatable surface (M-006 / ADR 017):**
+  - `Waaseyaa\Entity\TranslatableInterface` — `getTranslation`, `hasTranslation`, `addTranslation`, `removeTranslation`, `translations`, `defaultLangcode`, `activeLangcode`, `fieldLangcode`. `language()` is retained as a deprecated alias for `activeLangcode()`.
+  - `Waaseyaa\Entity\Exception\EntityTranslationException` with named-constructor factories `langcodeRequired`, `cannotRemoveDefault`, `translationAlreadyExists`, `translationNotFound`.
+  - `Waaseyaa\Entity\EntityType::__construct(...translatable: bool = false, ...)` — load-bearing flag enforced by boot validation.
+  - `Waaseyaa\Field\FieldDefinition::translatable(bool $translatable = true): self` builder and `isTranslatable(): bool` reader.
+  - `Waaseyaa\EntityStorage\SaveContext::withLangcode(string $langcode): self` immutable copy carrying the target langcode for translation writes.
+  - `Waaseyaa\EntityStorage\EntityRepository::findTranslations(EntityInterface): array<string, EntityInterface>` and the matching method on `EntityRepositoryInterface` and `EntityStorageDriverInterface`.
+  - `Waaseyaa\Access\ContextAwareAccessPolicyInterface` — companion to `AccessPolicyInterface` that accepts a `$context` array carrying langcode for the `'translate'` operation.
+  - Access-policy operation literal `'translate'`.
+  - `Waaseyaa\Entity\Event\TranslationEvent` and its six event-name constants: `PRE_TRANSLATION_INSERT`, `POST_TRANSLATION_INSERT`, `PRE_TRANSLATION_UPDATE`, `POST_TRANSLATION_UPDATE`, `PRE_TRANSLATION_DELETE`, `POST_TRANSLATION_DELETE`.
+  - Entity key string `'default_langcode'` — required key in the `keys` array for translatable types.
+  - Config keys `translation.fallback_chain` (array of langcodes) and `translation.read_active_language` (bool) — both documented in shipped `config/*.php`.
 
 **Internal:**
 - Concrete storage classes (`SqlEntityStorage`, future column-backed variants, vector-backend implementations).

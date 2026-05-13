@@ -28,9 +28,10 @@ final class SimpleFixture extends ContentEntityBase
 /**
  * Revisionable entity fixture — carries a revision key so that
  * EntityType::fromClass(RevisionableFixture::class, revisionable: true) passes T036.
+ * Also carries langcode + default_langcode keys so that translatable: true passes T007 (WP02).
  */
 #[ContentEntityType(id: 'revisionable_fixture', label: 'Revisionable Fixture')]
-#[ContentEntityKeys(id: 'id', uuid: 'uuid', revision: 'vid')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', revision: 'vid', langcode: 'langcode', default_langcode: 'default_langcode')]
 final class RevisionableFixture extends ContentEntityBase
 {
     #[Field(label: 'Title')]
@@ -128,7 +129,7 @@ final class BenchmarkFixture extends ContentEntityBase
     #[Field]
     public string $slug = '';
 
-    #[Field(translatable: true)]
+    #[Field]
     public string $summary = '';
 
     #[Field(revisionable: true)]

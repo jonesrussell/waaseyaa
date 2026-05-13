@@ -127,6 +127,7 @@ return [
     'Waaseyaa\Entity\FieldableInterface' => 'public',
     'Waaseyaa\Entity\RevisionableInterface' => 'public',
     'Waaseyaa\Entity\TranslatableInterface' => 'public',
+    'Waaseyaa\Entity\TranslatableEntityTrait' => 'public',
     'Waaseyaa\Entity\RevisionableEntityTrait' => 'public',
     'Waaseyaa\Entity\Community\HasCommunityInterface' => 'public',
     'Waaseyaa\Entity\Community\HasCommunityTrait' => 'public',
@@ -211,8 +212,17 @@ return [
     'Waaseyaa\EntityStorage\Testing\Contract\FieldStorageBackendContractTestCase' => 'public',
     // EntityQuery marker interface
     'Waaseyaa\EntityStorage\Query\EntityQuery' => 'public',
+    // entity-storage-translations-v1 mission public surface (M-006, ADR 017)
+    // `TranslatableInterface` (already listed above) is the stable contract; `language()` retained as deprecated alias for `activeLangcode()`.
+    'Waaseyaa\Entity\Exception\EntityTranslationException' => 'public',
+    'Waaseyaa\Entity\Event\EntityEvent' => 'public',
+    'Waaseyaa\Entity\Event\TranslationEvent' => 'public',
+    'Waaseyaa\Entity\Hydration\FallbackChainResolver' => 'public',
+    // Conformance test harness for `TranslatableInterface` implementations.
+    'Waaseyaa\Entity\Testing\Translation\TranslatableEntityContractTest' => 'public',
     'Waaseyaa\Access\AccountInterface' => 'public',
     'Waaseyaa\Access\AccessPolicyInterface' => 'public',
+    'Waaseyaa\Access\ContextAwareAccessPolicyInterface' => 'public',
     'Waaseyaa\Access\FieldAccessPolicyInterface' => 'public',
     'Waaseyaa\Access\PermissionHandlerInterface' => 'public',
     'Waaseyaa\Access\Gate\GateInterface' => 'public',

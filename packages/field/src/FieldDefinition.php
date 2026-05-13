@@ -5,9 +5,18 @@ declare(strict_types=1);
 namespace Waaseyaa\Field;
 
 use Symfony\Component\Validator\Constraint;
+use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Field\Exception\InvalidFieldDefinitionException;
 
 final readonly class FieldDefinition implements FieldDefinitionInterface, \ArrayAccess
 {
+    /**
+     * Field names that are shared across all translations and must never be marked translatable.
+     *
+     * @api
+     */
+    public const array SYSTEM_KEYS = ['id', 'uuid', 'langcode', 'default_langcode', 'revision'];
+
     /**
      * @param array<string, mixed> $settings
      * @param Constraint[] $constraints
@@ -283,6 +292,63 @@ final readonly class FieldDefinition implements FieldDefinitionInterface, \Array
     public function isIndexed(): bool
     {
         return $this->fieldIndexed;
+    }
+
+    /**
+     * Return a new instance with the translatable flag set to the given value.
+     *
+     * Defaults to true so callers can write `->translatable()` without an argument.
+     *
+     * @api
+     */
+    public function translatable(bool $value = true): self
+    {
+        return new self(
+            name: $this->name,
+            type: $this->type,
+            cardinality: $this->cardinality,
+            settings: $this->settings,
+            targetEntityTypeId: $this->targetEntityTypeId,
+            targetBundle: $this->targetBundle,
+            translatable: $value,
+            revisionable: $this->revisionable,
+            defaultValue: $this->defaultValue,
+            label: $this->label,
+            description: $this->description,
+            required: $this->required,
+            readOnly: $this->readOnly,
+            constraints: $this->constraints,
+            stored: $this->stored,
+            fieldTypeManager: $this->fieldTypeManager,
+            group: $this->group,
+            promptAliases: $this->promptAliases,
+            backendId: $this->backendId,
+            fieldIndexed: $this->fieldIndexed,
+        );
+    }
+
+    /**
+     * Validate this field definition against the given entity type.
+     *
+     * Called at boot when field definitions are registered on an entity type.
+     * Enforces FR-016 (translatable field on non-translatable entity type) and
+     * FR-017 (system key fields must not be translatable).
+     *
+     * @throws InvalidFieldDefinitionException If a structural invariant is violated.
+     * @api
+     */
+    public function validate(EntityTypeInterface $entityType): void
+    {
+        if ($this->translatable && in_array($this->name, self::SYSTEM_KEYS, true)) {
+            throw InvalidFieldDefinitionException::systemKeyMarkedTranslatable($this->name);
+        }
+
+        if ($this->translatable && !$entityType->isTranslatable()) {
+            throw InvalidFieldDefinitionException::translatableOnNonTranslatableEntityType(
+                $this->name,
+                $entityType->id(),
+            );
+        }
     }
 
     public function offsetExists(mixed $offset): bool

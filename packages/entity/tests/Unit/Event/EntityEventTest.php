@@ -67,7 +67,8 @@ class EntityEventTest extends TestCase
     {
         $cases = EntityEvents::cases();
 
-        $this->assertCount(8, $cases);
+        // 8 entity-level cases + 6 translation-scoped cases (M-006 WP08).
+        $this->assertCount(14, $cases);
     }
 
     public function testEntityEventPropertiesAreReadonly(): void

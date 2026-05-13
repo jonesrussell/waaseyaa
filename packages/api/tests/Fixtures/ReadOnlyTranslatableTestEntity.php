@@ -17,7 +17,7 @@ use Waaseyaa\Entity\TranslatableInterface;
  * reading translations, not creating them.
  */
 #[ContentEntityType(id: 'readonly')]
-#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode', default_langcode: 'default_langcode')]
 class ReadOnlyTranslatableTestEntity extends ContentEntityBase implements TranslatableInterface
 {
     public function __construct(

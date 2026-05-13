@@ -867,7 +867,7 @@ parameters:
 		-
 			message: '#^Method Psr\\EventDispatcher\\EventDispatcherInterface\:\:dispatch\(\) invoked with 2 parameters, 1 required\.$#'
 			identifier: arguments.count
-			count: 4
+			count: 5
 			path: packages/entity-storage/src/SqlEntityStorage.php
 
 		-

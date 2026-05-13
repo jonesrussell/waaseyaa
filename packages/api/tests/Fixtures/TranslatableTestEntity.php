@@ -17,7 +17,7 @@ use Waaseyaa\Entity\ContentEntityBase;
  * are stored as separate entity objects tracked by the original entity.
  */
 #[ContentEntityType(id: 'article')]
-#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode')]
+#[ContentEntityKeys(id: 'id', uuid: 'uuid', label: 'title', bundle: 'type', langcode: 'langcode', default_langcode: 'default_langcode')]
 class TranslatableTestEntity extends ContentEntityBase implements MutableTranslatableInterface
 {
     /**

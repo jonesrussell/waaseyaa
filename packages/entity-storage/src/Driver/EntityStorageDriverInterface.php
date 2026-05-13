@@ -88,4 +88,31 @@ interface EntityStorageDriverInterface
         ?array $orderBy = null,
         ?int $limit = null,
     ): array;
+
+    /**
+     * Load every stored translation row for a single entity in one query.
+     *
+     * Returns a `langcode => row` map. The default langcode (when known and
+     * present) MUST be the first entry; remaining langcodes follow in ascending
+     * lexicographic order. Returns an empty array when no translation storage
+     * is available for the given entity type.
+     *
+     * Backend semantics:
+     *   - `sql-blob`: a single SELECT against the primary table on entity id
+     *     across the composite `(entity_id, langcode)` PK (WP04 layout).
+     *   - `sql-column`: a single INNER JOIN of primary + `<table>__translation`
+     *     keyed by the entity id (WP05 layout).
+     *   - In-memory driver: walks its translation store.
+     *
+     * @param string      $entityType       Primary table / entity-type id.
+     * @param string      $id               Entity id.
+     * @param string|null $defaultLangcode  Default langcode of the entity, when known.
+     *                                      Used to order the result so the default appears first.
+     * @return array<string, array<string, mixed>> Translation rows keyed by langcode.
+     */
+    public function findTranslations(
+        string $entityType,
+        string $id,
+        ?string $defaultLangcode = null,
+    ): array;
 }

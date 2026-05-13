@@ -19,6 +19,10 @@ use Waaseyaa\Entity\Event\EntityEvents;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
+use Waaseyaa\Entity\TranslatableInterface;
+use Waaseyaa\EntityStorage\Backend\ReservedBackendIds;
+use Waaseyaa\EntityStorage\Hydration\SqlColumnTranslationHydrator;
+use Waaseyaa\EntityStorage\Schema\TranslationSchemaHandler;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
@@ -106,6 +110,13 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     public function load(int|string $id): ?EntityInterface
     {
+        if ($this->entityType->isTranslatable()) {
+            if ($this->isSqlColumnBackend()) {
+                return $this->loadSqlColumnTranslatable($id);
+            }
+            return $this->loadTranslatable($id);
+        }
+
         $result = $this->database->select($this->tableName)
             ->fields($this->tableName)
             ->condition($this->idKey, $id)
@@ -124,6 +135,91 @@ final class SqlEntityStorage implements EntityStorageInterface
         $this->mergeBundleSubtableRow($row);
 
         return $this->mapRowToEntity($row);
+    }
+
+    /**
+     * Load a translatable entity: collect every (id, langcode) row, identify
+     * the default-langcode row as canonical, hydrate from that row, and hand
+     * the per-langcode `_data` map to the entity via _setTranslationData().
+     *
+     * Implements FR-020..FR-023 read path for sql-blob.
+     */
+    private function loadTranslatable(int|string $id): ?EntityInterface
+    {
+        $result = $this->database->select($this->tableName)
+            ->fields($this->tableName)
+            ->condition($this->idKey, $id)
+            ->execute();
+
+        $rows = [];
+        foreach ($result as $r) {
+            $rows[] = (array) $r;
+        }
+        if ($rows === []) {
+            return null;
+        }
+
+        // Pick canonical (default-langcode) row.
+        $defaultLangcode = null;
+        $defaultRow = null;
+        $translationData = [];
+        $langcodeKey = $this->entityKeys['langcode'] ?? 'langcode';
+        foreach ($rows as $row) {
+            $rowLc = isset($row[$langcodeKey]) ? (string) $row[$langcodeKey] : '';
+            $rowDefault = isset($row['default_langcode']) ? (string) $row['default_langcode'] : $rowLc;
+            $extra = $this->decodeRowData($row);
+            $translationData[$rowLc] = $extra;
+            if ($defaultLangcode === null) {
+                $defaultLangcode = $rowDefault;
+            }
+            if ($rowLc === $rowDefault) {
+                $defaultRow = $row;
+            }
+        }
+
+        // Fall back to first row when no row's langcode equals default_langcode
+        // (shouldn't happen in healthy data; defensive).
+        if ($defaultRow === null) {
+            $defaultRow = $rows[0];
+            $defaultLangcode = isset($defaultRow[$langcodeKey]) ? (string) $defaultRow[$langcodeKey] : 'en';
+        }
+
+        $this->mergeBundleSubtableRow($defaultRow);
+        $entity = $this->mapRowToEntity($defaultRow);
+
+        // Hand the langcode -> values map to the trait so getTranslation()
+        // works without an extra round-trip.
+        if ($entity instanceof TranslatableInterface && \method_exists($entity, '_setTranslationData')) {
+            $entity->_setTranslationData($translationData, $defaultLangcode);
+        }
+
+        return $entity;
+    }
+
+    /**
+     * Decode a row's `_data` blob into an associative array; returns [] on
+     * corrupt JSON (logged via the standard load-path warning).
+     *
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function decodeRowData(array $row): array
+    {
+        if (!isset($row['_data'])) {
+            return [];
+        }
+        try {
+            $decoded = json_decode((string) $row['_data'], associative: true, flags: \JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            $this->logger->warning(\sprintf(
+                'Corrupt _data JSON for %s entity %s: %s',
+                $this->tableName,
+                isset($row[$this->idKey]) ? (string) $row[$this->idKey] : '?',
+                $e->getMessage(),
+            ));
+            return [];
+        }
+        return \is_array($decoded) ? $decoded : [];
     }
 
     public function loadByKey(string $key, mixed $value): ?EntityInterface
@@ -190,6 +286,22 @@ final class SqlEntityStorage implements EntityStorageInterface
             $this->eventFactory->create($entity),
             EntityEvents::PRE_SAVE->value,
         );
+
+        if ($this->entityType->isTranslatable() && $entity instanceof TranslatableInterface) {
+            // T035 (matrix Case 8): translatable types require a non-empty
+            // default_langcode. Without it the per-langcode storage layout
+            // (composite PK on sql-blob, primary+translation rows on sql-column)
+            // has no canonical row to write. Reject before any side effects.
+            if ($entity->defaultLangcode() === '') {
+                throw \Waaseyaa\Entity\Exception\EntityTranslationException::langcodeRequired();
+            }
+            $result = $this->isSqlColumnBackend()
+                ? $this->saveSqlColumnTranslatable($entity, $isNew)
+                : $this->saveTranslatable($entity, $isNew);
+            $this->queryResultCache->invalidate($this->tableName);
+            $this->dispatchPostSave($entity);
+            return $result;
+        }
 
         // Snapshot entity values AFTER PRE_SAVE so listener mutations are persisted.
         $values = $entity->toArray();
@@ -302,6 +414,704 @@ final class SqlEntityStorage implements EntityStorageInterface
             ->execute();
 
         return EntityConstants::SAVED_UPDATED;
+    }
+
+    /**
+     * Helper: dispatch POST_SAVE through the shared factory + dispatcher.
+     *
+     * Centralising the dispatch keeps phpstan's baseline count for the
+     * EventDispatcherInterface::dispatch arguments.count signature stable.
+     */
+    private function dispatchPostSave(EntityInterface $entity): void
+    {
+        $this->eventDispatcher->dispatch(
+            $this->eventFactory->create($entity),
+            EntityEvents::POST_SAVE->value,
+        );
+    }
+
+    /**
+     * Save a translatable entity by writing per-langcode rows.
+     *
+     * Translatable fields land on the active-langcode row's `_data` blob.
+     * Non-translatable fields land on the default-langcode row's `_data` blob
+     * (FR-021, FR-024). Drains pending translation deletions from the trait.
+     */
+    private function saveTranslatable(EntityInterface $entity, bool $isNew): int
+    {
+        \assert($entity instanceof TranslatableInterface);
+
+        $values = $entity->toArray();
+        $defaultLc = $entity->defaultLangcode();
+        $activeLc = $entity->activeLangcode();
+        $langcodeKey = $this->entityKeys['langcode'] ?? 'langcode';
+
+        // Field-by-field dispatch by translatability.
+        $translatableFieldNames = $this->getTranslatableFieldNames();
+        $nonTranslatableData = [];
+        $translatableData = [];
+
+        // System / identity / schema columns that live on every row.
+        $systemKeys = [
+            $this->idKey => true,
+            ($this->entityKeys['uuid'] ?? 'uuid') => true,
+            ($this->entityKeys['bundle'] ?? 'bundle') => true,
+            ($this->entityKeys['label'] ?? 'label') => true,
+            $langcodeKey => true,
+            'default_langcode' => true,
+        ];
+
+        $rowColumns = [];
+        foreach ($values as $key => $value) {
+            if ($key === '_data') {
+                continue;
+            }
+            if (isset($systemKeys[$key])) {
+                $rowColumns[$key] = $value;
+                continue;
+            }
+            if (isset($translatableFieldNames[$key])) {
+                $translatableData[$key] = $value;
+            } else {
+                $nonTranslatableData[$key] = $value;
+            }
+        }
+
+        $rowColumns['default_langcode'] = $defaultLc;
+
+        $txn = $this->database->transaction();
+        try {
+            if ($isNew) {
+                $resultCode = $this->insertTranslatableEntity(
+                    $entity,
+                    $rowColumns,
+                    $defaultLc,
+                    $activeLc,
+                    $translatableData,
+                    $nonTranslatableData,
+                    $langcodeKey,
+                );
+            } else {
+                $resultCode = $this->updateTranslatableEntity(
+                    $entity,
+                    $rowColumns,
+                    $defaultLc,
+                    $activeLc,
+                    $translatableData,
+                    $nonTranslatableData,
+                    $langcodeKey,
+                );
+            }
+
+            // Drain pending translation deletions (T trait helper from WP01).
+            if (\method_exists($entity, '_takePendingTranslationDeletions')) {
+                $pending = $entity->_takePendingTranslationDeletions();
+                foreach ($pending as $lcToDelete) {
+                    if ($lcToDelete === $defaultLc) {
+                        continue;
+                    }
+                    $this->database->delete($this->tableName)
+                        ->condition($this->idKey, $entity->id())
+                        ->condition($langcodeKey, $lcToDelete)
+                        ->execute();
+                }
+            }
+
+            $txn->commit();
+        } catch (\Throwable $e) {
+            $txn->rollBack();
+            throw $e;
+        }
+
+        return $resultCode;
+    }
+
+    /**
+     * Whether this entity type is using the sql-column primary backend.
+     *
+     * Centralises the dispatch predicate used by load/save translatable
+     * branches. Falls back to false (= sql-blob) when no explicit backend is
+     * declared, preserving NFR-001 for legacy non-translatable types.
+     */
+    private function isSqlColumnBackend(): bool
+    {
+        return $this->entityType->getPrimaryStorageBackend() === ReservedBackendIds::SQL_COLUMN;
+    }
+
+    /**
+     * Load a translatable entity stored under the sql-column backend (FR-028).
+     *
+     * Delegates to {@see SqlColumnTranslationHydrator} which issues a single
+     * LEFT JOIN against `<table>` + `<table>__translation` and returns the
+     * fully-hydrated entity with its translationData map populated.
+     */
+    private function loadSqlColumnTranslatable(int|string $id): ?EntityInterface
+    {
+        $hydrator = new SqlColumnTranslationHydrator(
+            database: $this->database,
+            entityType: $this->entityType,
+            instantiator: new Hydration\EntityInstantiator($this->entityType),
+        );
+        return $hydrator->load($id);
+    }
+
+    /**
+     * Save a translatable entity stored under the sql-column backend
+     * (FR-026..FR-031). Routes writes by `FieldDefinition::isTranslatable()`:
+     *
+     *   - Translatable fields → `<table>__translation` keyed by
+     *     (entity_id, langcode).
+     *   - Non-translatable fields → `<table>` keyed by entity_id.
+     *
+     * INSERT path (FR-029): atomic primary-row + default-langcode translation
+     * row in a single transaction; an additional active-langcode translation
+     * row is inserted when the caller pre-staged `addTranslation()` before
+     * first save.
+     */
+    private function saveSqlColumnTranslatable(EntityInterface $entity, bool $isNew): int
+    {
+        \assert($entity instanceof TranslatableInterface);
+
+        $values = $entity->toArray();
+        $defaultLc = $entity->defaultLangcode();
+        $activeLc = $entity->activeLangcode();
+        $langcodeKey = $this->entityKeys['langcode'] ?? 'langcode';
+
+        $translatableFieldNames = $this->getTranslatableFieldNames();
+
+        // System / identity / schema columns that live on the primary row.
+        $systemKeys = [
+            $this->idKey                                => true,
+            ($this->entityKeys['uuid'] ?? 'uuid')       => true,
+            ($this->entityKeys['bundle'] ?? 'bundle')   => true,
+            ($this->entityKeys['label'] ?? 'label')     => true,
+            $langcodeKey                                => true,
+            'default_langcode'                          => true,
+        ];
+
+        $primaryColumns = [];
+        $translatableData = [];
+        foreach ($values as $key => $value) {
+            if ($key === '_data') {
+                continue;
+            }
+            if (isset($systemKeys[$key])) {
+                $primaryColumns[$key] = $value;
+                continue;
+            }
+            if (isset($translatableFieldNames[$key])) {
+                $translatableData[$key] = $value;
+            } else {
+                // Non-translatable field column on the primary table.
+                $primaryColumns[$key] = $value;
+            }
+        }
+
+        $primaryColumns['default_langcode'] = $defaultLc;
+        $primaryColumns[$langcodeKey] = $defaultLc;
+
+        $translationTable = new TranslationSchemaHandler($this->database)
+            ->translationTableName($this->tableName);
+
+        $txn = $this->database->transaction();
+        try {
+            if ($isNew) {
+                $resultCode = $this->insertSqlColumnTranslatable(
+                    $entity,
+                    $primaryColumns,
+                    $translationTable,
+                    $defaultLc,
+                    $activeLc,
+                    $translatableData,
+                );
+            } else {
+                $resultCode = $this->updateSqlColumnTranslatable(
+                    $entity,
+                    $primaryColumns,
+                    $translationTable,
+                    $defaultLc,
+                    $activeLc,
+                    $translatableData,
+                );
+            }
+
+            // Drain pending translation deletions: DELETE only the matching
+            // (entity_id, langcode) row on the translation table. Primary row
+            // is untouched.
+            if (\method_exists($entity, '_takePendingTranslationDeletions')) {
+                $pending = $entity->_takePendingTranslationDeletions();
+                foreach ($pending as $lcToDelete) {
+                    if ($lcToDelete === $defaultLc) {
+                        continue;
+                    }
+                    $this->database->delete($translationTable)
+                        ->condition('entity_id', $entity->id())
+                        ->condition('langcode', $lcToDelete)
+                        ->execute();
+                }
+            }
+
+            $txn->commit();
+        } catch (\Throwable $e) {
+            $txn->rollBack();
+            throw $e;
+        }
+
+        return $resultCode;
+    }
+
+    /**
+     * INSERT path for sql-column translatable entities.
+     *
+     * Writes one primary row, one default-langcode translation row, and (when
+     * `activeLc !== defaultLc`) an additional active-langcode translation
+     * row. The active row covers the `addTranslation()` pre-stage case.
+     *
+     * @param array<string, mixed> $primaryColumns
+     * @param array<string, mixed> $translatableData
+     */
+    private function insertSqlColumnTranslatable(
+        EntityInterface $entity,
+        array $primaryColumns,
+        string $translationTable,
+        string $defaultLc,
+        string $activeLc,
+        array $translatableData,
+    ): int {
+        // Allocate or accept a caller-supplied entity id. sql-column uses a
+        // plain int id (no serial) so a single id sits on the primary row.
+        if (($primaryColumns[$this->idKey] ?? null) === null || $primaryColumns[$this->idKey] === '') {
+            unset($primaryColumns[$this->idKey]);
+        }
+
+        // Filter primary columns to those that actually exist on the table
+        // (defensive — sql-column tables can carry per-field non-translatable
+        // columns added at registration time).
+        $primaryFiltered = $this->filterToExistingColumns($this->tableName, $primaryColumns);
+
+        $id = $this->database->insert($this->tableName)
+            ->fields(\array_keys($primaryFiltered))
+            ->values($primaryFiltered)
+            ->execute();
+
+        // When the id wasn't pre-set, the driver-allocated id flows back to
+        // the entity so subsequent translation rows reference it.
+        if (!isset($primaryColumns[$this->idKey])) {
+            $entityId = $id;
+            $entity->set($this->idKey, $entityId);
+        } else {
+            $entityId = $primaryColumns[$this->idKey];
+        }
+
+        // INSERT default-langcode translation row carrying translatable values.
+        $this->insertSqlColumnTranslationRow(
+            $translationTable,
+            (string) $entityId,
+            $defaultLc,
+            $activeLc === $defaultLc ? $translatableData : [],
+        );
+
+        // INSERT an additional active-langcode translation row when the caller
+        // pre-staged addTranslation() before first save.
+        if ($activeLc !== $defaultLc) {
+            $this->insertSqlColumnTranslationRow(
+                $translationTable,
+                (string) $entityId,
+                $activeLc,
+                $translatableData,
+            );
+        }
+
+        if (\method_exists($entity, 'enforceIsNew')) {
+            $entity->enforceIsNew(false);
+        }
+
+        return EntityConstants::SAVED_NEW;
+    }
+
+    /**
+     * UPDATE path for sql-column translatable entities.
+     *
+     * Dispatches updates by translatability:
+     *   - Non-translatable column writes target the primary row only.
+     *   - Translatable column writes target the active-langcode translation
+     *     row only — never the primary row (FR-030).
+     *
+     * If the active translation row is missing (post-addTranslation save
+     * before WP05 wired the write path), it is INSERTED.
+     *
+     * @param array<string, mixed> $primaryColumns
+     * @param array<string, mixed> $translatableData
+     */
+    private function updateSqlColumnTranslatable(
+        EntityInterface $entity,
+        array $primaryColumns,
+        string $translationTable,
+        string $defaultLc,
+        string $activeLc,
+        array $translatableData,
+    ): int {
+        $entityId = $entity->id();
+
+        // Primary table UPDATE: carries non-translatable column deltas. The
+        // langcode column on the primary row pins to the default langcode.
+        $primaryUpdate = $primaryColumns;
+        unset($primaryUpdate[$this->idKey]);
+        // Filter to columns that exist on the primary table to avoid pushing
+        // translatable field names into it (they have no column there).
+        $primaryUpdate = $this->filterToExistingColumns($this->tableName, $primaryUpdate);
+        if ($primaryUpdate !== []) {
+            $this->database->update($this->tableName)
+                ->fields($primaryUpdate)
+                ->condition($this->idKey, $entityId)
+                ->execute();
+        }
+
+        // Translation table write at the active langcode.
+        $existing = $this->fetchSqlColumnTranslationRow($translationTable, (string) $entityId, $activeLc);
+        if ($existing === null) {
+            // Active row missing — INSERT it. Carries translatable fields when
+            // active != default; carries them too when active == default
+            // (covers a backfill scenario for the default row).
+            $this->insertSqlColumnTranslationRow(
+                $translationTable,
+                (string) $entityId,
+                $activeLc,
+                $translatableData,
+            );
+        } elseif ($translatableData !== []) {
+            $update = $this->filterToExistingColumns($translationTable, $translatableData);
+            if ($update !== []) {
+                $this->database->update($translationTable)
+                    ->fields($update)
+                    ->condition('entity_id', $entityId)
+                    ->condition('langcode', $activeLc)
+                    ->execute();
+            }
+        }
+
+        // Defensive: when active != default, ensure the default-langcode row
+        // exists (it would be present from initial INSERT in healthy data).
+        if ($activeLc !== $defaultLc) {
+            $defaultExisting = $this->fetchSqlColumnTranslationRow($translationTable, (string) $entityId, $defaultLc);
+            if ($defaultExisting === null) {
+                $this->insertSqlColumnTranslationRow(
+                    $translationTable,
+                    (string) $entityId,
+                    $defaultLc,
+                    [],
+                );
+            }
+        }
+
+        return EntityConstants::SAVED_UPDATED;
+    }
+
+    /**
+     * INSERT one row into `<table>__translation`.
+     *
+     * @param array<string, mixed> $translatableData
+     */
+    private function insertSqlColumnTranslationRow(
+        string $translationTable,
+        string $entityId,
+        string $langcode,
+        array $translatableData,
+    ): void {
+        $row = [
+            'entity_id' => $entityId,
+            'langcode'  => $langcode,
+        ];
+        foreach ($translatableData as $name => $value) {
+            $row[$name] = $value;
+        }
+        $row = $this->filterToExistingColumns($translationTable, $row);
+        $this->database->insert($translationTable)
+            ->fields(\array_keys($row))
+            ->values($row)
+            ->execute();
+    }
+
+    /**
+     * Probe for an existing translation row at (entity_id, langcode).
+     *
+     * @return array<string, mixed>|null
+     */
+    private function fetchSqlColumnTranslationRow(string $translationTable, string $entityId, string $langcode): ?array
+    {
+        $result = $this->database->select($translationTable)
+            ->fields($translationTable)
+            ->condition('entity_id', $entityId)
+            ->condition('langcode', $langcode)
+            ->execute();
+        foreach ($result as $row) {
+            return (array) $row;
+        }
+        return null;
+    }
+
+    /**
+     * Filter a value bag to keys that actually correspond to columns on the
+     * given table. Caches per-table column existence checks via the schema
+     * helper to avoid repeated INFORMATION_SCHEMA round-trips.
+     *
+     * @param array<string, mixed> $values
+     * @return array<string, mixed>
+     */
+    private function filterToExistingColumns(string $table, array $values): array
+    {
+        $schema = $this->database->schema();
+        $filtered = [];
+        foreach ($values as $key => $value) {
+            $cacheKey = $table . '::' . $key;
+            if (!isset($this->columnCache[$cacheKey])) {
+                $this->columnCache[$cacheKey] = $schema->fieldExists($table, $key);
+            }
+            if ($this->columnCache[$cacheKey]) {
+                $filtered[$key] = $value;
+            }
+        }
+        return $filtered;
+    }
+
+    /**
+     * INSERT a brand-new translatable entity: at minimum one default-langcode
+     * row. If the active langcode differs from the default the caller is
+     * mid-`addTranslation()`; we insert two rows in that pass.
+     *
+     * @param array<string, mixed> $rowColumns
+     * @param array<string, mixed> $translatableData
+     * @param array<string, mixed> $nonTranslatableData
+     */
+    private function insertTranslatableEntity(
+        EntityInterface $entity,
+        array $rowColumns,
+        string $defaultLc,
+        string $activeLc,
+        array $translatableData,
+        array $nonTranslatableData,
+        string $langcodeKey,
+    ): int {
+        // Default-langcode row carries non-translatable values + (if active==default)
+        // the translatable values too.
+        $defaultData = $nonTranslatableData;
+        if ($activeLc === $defaultLc) {
+            $defaultData = \array_merge($defaultData, $translatableData);
+        }
+
+        $defaultRow = $rowColumns;
+        $defaultRow[$langcodeKey] = $defaultLc;
+        $defaultRow['_data'] = json_encode($defaultData, \JSON_THROW_ON_ERROR);
+
+        // sql-blob translatable types use a plain int id (no serial), so we
+        // allocate the next id explicitly under the transaction the caller
+        // already opened — autoincrement on (id) alone would conflict with
+        // the composite (id, langcode) primary key.
+        if (($defaultRow[$this->idKey] ?? null) === null) {
+            $defaultRow[$this->idKey] = $this->allocateTranslatableEntityId();
+        }
+        if ($entity instanceof EntityBase) {
+            $entity->set($this->idKey, $defaultRow[$this->idKey]);
+        }
+
+        $this->database->insert($this->tableName)
+            ->fields(\array_keys($defaultRow))
+            ->values($defaultRow)
+            ->execute();
+
+        // If the active translation is not the default, INSERT the active row too.
+        if ($activeLc !== $defaultLc) {
+            $activeRow = $rowColumns;
+            $activeRow[$this->idKey] = $entity->id();
+            $activeRow[$langcodeKey] = $activeLc;
+            $activeRow['_data'] = json_encode($translatableData, \JSON_THROW_ON_ERROR);
+            $this->database->insert($this->tableName)
+                ->fields(\array_keys($activeRow))
+                ->values($activeRow)
+                ->execute();
+        }
+
+        if ($entity instanceof EntityBase) {
+            $entity->enforceIsNew(false);
+        }
+
+        return EntityConstants::SAVED_NEW;
+    }
+
+    /**
+     * UPDATE an existing translatable entity. Routes non-translatable deltas
+     * to the default-langcode row and translatable deltas to the active row,
+     * inserting the active row if missing (post-addTranslation save).
+     *
+     * @param array<string, mixed> $rowColumns
+     * @param array<string, mixed> $translatableData
+     * @param array<string, mixed> $nonTranslatableData
+     */
+    private function updateTranslatableEntity(
+        EntityInterface $entity,
+        array $rowColumns,
+        string $defaultLc,
+        string $activeLc,
+        array $translatableData,
+        array $nonTranslatableData,
+        string $langcodeKey,
+    ): int {
+        $entityId = $entity->id();
+
+        // ---- Default-langcode row: merge non-translatable deltas onto existing _data ----
+        $defaultExisting = $this->fetchTranslationRowData($entityId, $defaultLc, $langcodeKey);
+        $defaultData = $defaultExisting === null ? [] : $defaultExisting;
+        foreach ($nonTranslatableData as $k => $v) {
+            $defaultData[$k] = $v;
+        }
+        if ($activeLc === $defaultLc) {
+            // Translatable writes target the default row in this case.
+            foreach ($translatableData as $k => $v) {
+                $defaultData[$k] = $v;
+            }
+        }
+
+        // Always write the default-langcode columns + data blob.
+        $defaultRowCols = $rowColumns;
+        $defaultRowCols[$langcodeKey] = $defaultLc;
+        $defaultRowCols['_data'] = json_encode($defaultData, \JSON_THROW_ON_ERROR);
+        unset($defaultRowCols[$this->idKey]);
+
+        if ($defaultExisting === null) {
+            // Default row missing (e.g. after a partial schema migration); INSERT it.
+            $insertRow = $defaultRowCols;
+            $insertRow[$this->idKey] = $entityId;
+            $this->database->insert($this->tableName)
+                ->fields(\array_keys($insertRow))
+                ->values($insertRow)
+                ->execute();
+        } else {
+            $this->database->update($this->tableName)
+                ->fields($defaultRowCols)
+                ->condition($this->idKey, $entityId)
+                ->condition($langcodeKey, $defaultLc)
+                ->execute();
+        }
+
+        // ---- Active-langcode row (if different): write translatable deltas ----
+        if ($activeLc !== $defaultLc) {
+            $activeExisting = $this->fetchTranslationRowData($entityId, $activeLc, $langcodeKey);
+            if ($activeExisting === null) {
+                // Post-addTranslation save: INSERT the new translation row.
+                $activeRow = $rowColumns;
+                $activeRow[$this->idKey] = $entityId;
+                $activeRow[$langcodeKey] = $activeLc;
+                $activeRow['_data'] = json_encode($translatableData, \JSON_THROW_ON_ERROR);
+                $this->database->insert($this->tableName)
+                    ->fields(\array_keys($activeRow))
+                    ->values($activeRow)
+                    ->execute();
+            } else {
+                $merged = $activeExisting;
+                foreach ($translatableData as $k => $v) {
+                    $merged[$k] = $v;
+                }
+                $activeRowCols = $rowColumns;
+                $activeRowCols[$langcodeKey] = $activeLc;
+                $activeRowCols['_data'] = json_encode($merged, \JSON_THROW_ON_ERROR);
+                unset($activeRowCols[$this->idKey]);
+                $this->database->update($this->tableName)
+                    ->fields($activeRowCols)
+                    ->condition($this->idKey, $entityId)
+                    ->condition($langcodeKey, $activeLc)
+                    ->execute();
+            }
+        }
+
+        return EntityConstants::SAVED_UPDATED;
+    }
+
+    /**
+     * Read the existing `_data` blob for a (entity_id, langcode) row.
+     *
+     * Returns `null` when the row does not exist. Returns `[]` when the row
+     * exists but its blob is corrupt or empty (a deliberate "exists with no
+     * fields" sentinel distinct from "missing").
+     *
+     * @return array<string, mixed>|null
+     */
+    private function fetchTranslationRowData(int|string|null $entityId, string $langcode, string $langcodeKey): ?array
+    {
+        if ($entityId === null) {
+            return null;
+        }
+        $result = $this->database->select($this->tableName)
+            ->fields($this->tableName, ['_data'])
+            ->condition($this->idKey, $entityId)
+            ->condition($langcodeKey, $langcode)
+            ->execute();
+        foreach ($result as $row) {
+            $rowArr = (array) $row;
+            if (!isset($rowArr['_data'])) {
+                return [];
+            }
+            try {
+                $decoded = json_decode((string) $rowArr['_data'], associative: true, flags: \JSON_THROW_ON_ERROR);
+            } catch (\JsonException) {
+                return [];
+            }
+            return \is_array($decoded) ? $decoded : [];
+        }
+        return null;
+    }
+
+    /**
+     * Allocate the next entity id for a translatable sql-blob type.
+     *
+     * sql-blob translatable types emit a plain `int` id column (no serial)
+     * because SQLite would otherwise impose a UNIQUE constraint on (id) that
+     * conflicts with the composite (id, langcode) primary key. Allocation is
+     * scoped to the surrounding save transaction so concurrent writers can't
+     * race on the MAX(id) probe.
+     */
+    private function allocateTranslatableEntityId(): int
+    {
+        $sql = \sprintf(
+            'SELECT COALESCE(MAX(%s), 0) AS max_id FROM %s',
+            $this->database->quoteIdentifier($this->idKey),
+            $this->database->quoteIdentifier($this->tableName),
+        );
+        foreach ($this->database->query($sql) as $row) {
+            $arr = (array) $row;
+            return (int) ($arr['max_id'] ?? 0) + 1;
+        }
+        return 1;
+    }
+
+    /** @var array<string, true>|null Cache of field names whose definition is translatable. */
+    private ?array $translatableFieldCache = null;
+
+    /**
+     * Returns the set of translatable field names for this entity type,
+     * keyed by name for O(1) lookup.
+     *
+     * @return array<string, true>
+     */
+    private function getTranslatableFieldNames(): array
+    {
+        if ($this->translatableFieldCache !== null) {
+            return $this->translatableFieldCache;
+        }
+        $names = [];
+        foreach ($this->entityType->getFieldDefinitions() as $name => $def) {
+            if ($def->isTranslatable()) {
+                $names[$name] = true;
+            }
+        }
+        if ($this->fieldRegistry !== null) {
+            foreach ($this->fieldRegistry->coreFieldsFor($this->entityType->id()) as $name => $def) {
+                if ($def->isTranslatable()) {
+                    $names[$name] = true;
+                }
+            }
+        }
+        $this->translatableFieldCache = $names;
+        return $names;
     }
 
     /**

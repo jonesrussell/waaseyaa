@@ -101,6 +101,16 @@ final class MakeServiceProviderA extends ServiceProvider implements HasNativeCom
                     mode: OptionMode::Required,
                     description: 'Package name to write migration to (e.g. "waaseyaa/node")',
                 ),
+                new OptionDefinition(
+                    name: 'add-translations',
+                    mode: OptionMode::Required,
+                    description: 'Generate a translation-promotion migration for the given entity type id (FR-050)',
+                ),
+                new OptionDefinition(
+                    name: 'default-langcode',
+                    mode: OptionMode::Required,
+                    description: 'Default langcode for the translation-promotion migration. Required when --add-translations is used (FR-051)',
+                ),
             ],
             handler: [MakeMigrationHandler::class, 'execute'],
         );

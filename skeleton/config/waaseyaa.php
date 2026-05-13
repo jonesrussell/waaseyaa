@@ -63,6 +63,23 @@ return [
         ],
     ],
 
+    // Translation behaviour for content entities. (M-006 / FR-037, FR-041, C-004)
+    //
+    // - read_active_language (bool, default false): when true, read paths resolve the
+    //   active language translation via EntityTranslationManager. Default false keeps
+    //   the legacy behaviour (read the base entity row) so existing installs are
+    //   unaffected until they opt in. Override with WAASEYAA_TRANSLATION_READ_ACTIVE_LANGUAGE.
+    // - fallback_chain (?array, default null): null means "use the i18n default language
+    //   list order as the fallback chain". Set an explicit list of language ids
+    //   (e.g. ['oj', 'en']) to override per-site.
+    'translation' => [
+        'read_active_language' => filter_var(
+            getenv('WAASEYAA_TRANSLATION_READ_ACTIVE_LANGUAGE') ?: false,
+            FILTER_VALIDATE_BOOLEAN,
+        ),
+        'fallback_chain' => null,
+    ],
+
     // SSR theme id discovered from Composer package metadata.
     // Theme packages expose extra.waaseyaa.theme in composer.json.
     'ssr' => [
