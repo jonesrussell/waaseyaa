@@ -66,13 +66,13 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T011  | `MigrationRegistry` + `DependencyGraph` + `CycleDetector`                         | WP02 |          | FR-013, FR-014, FR-015, FR-017                      | [D] |
 | T012  | `MigrationCycleException` + `MigrationDependencyMissingException`                 | WP02 | [P]      | FR-014, FR-015, FR-045                              | [D] |
 | T013  | Integration test: discovery + ServiceProvider wiring                              | WP02 |          | FR-011..FR-017                                      | [D] |
-| T014  | `PassThroughProcessor`                                                            | WP03 | [P]      | FR-010                                              |
-| T015  | `HtmlSanitizeProcessor`                                                           | WP03 | [P]      | FR-010                                              |
-| T016  | `LookupProcessor`                                                                 | WP03 | [P]      | FR-010                                              |
-| T017  | `ConcatProcessor`                                                                 | WP03 | [P]      | FR-010                                              |
-| T018  | `TypeCoerceProcessor`                                                             | WP03 | [P]      | FR-010                                              |
-| T019  | `DefaultValueProcessor`                                                           | WP03 | [P]      | FR-010                                              |
-| T020  | `ProcessException` + reserved-id parity test                                      | WP03 |          | FR-010, FR-045                                      |
+| T014  | `PassThroughProcessor`                                                            | WP03 | [P]      | FR-010                                              | [D] |
+| T015  | `HtmlSanitizeProcessor`                                                           | WP03 | [P]      | FR-010                                              | [D] |
+| T016  | `LookupProcessor`                                                                 | WP03 | [P]      | FR-010                                              | [D] |
+| T017  | `ConcatProcessor`                                                                 | WP03 | [P]      | FR-010                                              | [D] |
+| T018  | `TypeCoerceProcessor`                                                             | WP03 | [P]      | FR-010                                              | [D] |
+| T019  | `DefaultValueProcessor`                                                           | WP03 | [P]      | FR-010                                              | [D] |
+| T020  | `ProcessException` + reserved-id parity test                                      | WP03 |          | FR-010, FR-045                                      | [D] |
 | T021  | Real `SourceId` (replaces WP01 stub) + `CanonicalForm`                            | WP04 |          | FR-026, FR-027                                      | [D] |
 | T022  | `migration_id_map` schema + migration file                                        | WP04 | [P]      | FR-025                                              | [D] |
 | T023  | `MigrationIdMap` repository                                                       | WP04 |          | FR-028, FR-029, FR-030, FR-031                      | [D] |
@@ -203,13 +203,13 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** Each plugin's `id()` equals its `ReservedPluginIds` constant; HtmlSanitize handles XSS attempts; chain composition is delivered by WP06 — this WP ships only the units.
 
 **Subtasks**
-- [ ] T014 PassThroughProcessor (WP03)
-- [ ] T015 HtmlSanitizeProcessor (WP03)
-- [ ] T016 LookupProcessor (WP03)
-- [ ] T017 ConcatProcessor (WP03)
-- [ ] T018 TypeCoerceProcessor (WP03)
-- [ ] T019 DefaultValueProcessor (WP03)
-- [ ] T020 ProcessException + reserved-id parity test (WP03)
+- [x] T014 PassThroughProcessor (WP03)
+- [x] T015 HtmlSanitizeProcessor (WP03)
+- [x] T016 LookupProcessor (WP03)
+- [x] T017 ConcatProcessor (WP03)
+- [x] T018 TypeCoerceProcessor (WP03)
+- [x] T019 DefaultValueProcessor (WP03)
+- [x] T020 ProcessException + reserved-id parity test (WP03)
 
 **Implementation sketch:** Each plugin is `final readonly class`. HtmlSanitize prefers `ezyang/htmlpurifier` (if in vendor); falls back to a DOMDocument allowlist. The parity test in T020 asserts `ReservedPluginIds::ALL` matches the shipped set exactly.
 
