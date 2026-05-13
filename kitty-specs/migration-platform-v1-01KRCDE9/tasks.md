@@ -85,12 +85,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T030  | `DestinationWriteException`                                                       | WP05 | [P]      | FR-045                                              | [D] |
 | T031  | Integration test: non-revisionable round-trip                                     | WP05 |          | FR-018..FR-022, FR-029..FR-031                      | [D] |
 | T032  | Integration test: revisionable variant                                            | WP05 |          | FR-023                                              | [D] |
-| T033  | `RunOptions` + `RunReport` value objects                                          | WP06 | [P]      | FR-039, FR-040, FR-047                              |
-| T034  | `ProcessChainExecutor`                                                            | WP06 | [P]      | FR-010                                              |
-| T035  | `MigrationRunner` + `MigrationAbortedException`                                   | WP06 |          | FR-032, FR-039, FR-040, FR-046, FR-047, FR-048      |
-| T036  | `ImportRunCommand`                                                                | WP06 |          | FR-032, FR-039, FR-040, FR-047                      |
-| T037  | `ImportRunAllCommand`                                                             | WP06 | [P]      | FR-033                                              |
-| T038  | `ImportStatusCommand`                                                             | WP06 | [P]      | FR-034                                              |
+| T033  | `RunOptions` + `RunReport` value objects                                          | WP06 | [P]      | FR-039, FR-040, FR-047                              | [D] |
+| T034  | `ProcessChainExecutor`                                                            | WP06 | [P]      | FR-010                                              | [D] |
+| T035  | `MigrationRunner` + `MigrationAbortedException`                                   | WP06 |          | FR-032, FR-039, FR-040, FR-046, FR-047, FR-048      | [D] |
+| T036  | `ImportRunCommand`                                                                | WP06 |          | FR-032, FR-039, FR-040, FR-047                      | [D] |
+| T037  | `ImportRunAllCommand`                                                             | WP06 | [P]      | FR-033                                              | [D] |
+| T038  | `ImportStatusCommand`                                                             | WP06 | [P]      | FR-034                                              | [D] |
 | T039  | `migration_run_state` schema + migration file                                     | WP07 |          | FR-038                                              |
 | T040  | `MigrationRunState` repository                                                    | WP07 |          | FR-037, FR-038                                      |
 | T041  | Extend `MigrationRunner` to write progress + `runResume()`                        | WP07 |          | FR-037, FR-038, FR-046                              |
@@ -302,12 +302,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** Exit codes match spec §9.1; dry-run does not write; per-record errors captured in `RunReport.errors` (capped at 100); run-level errors halt regardless of `--halt-on-error`.
 
 **Subtasks**
-- [ ] T033 RunOptions + RunReport value objects (WP06)
-- [ ] T034 ProcessChainExecutor (WP06)
-- [ ] T035 MigrationRunner + MigrationAbortedException (WP06)
-- [ ] T036 ImportRunCommand (WP06)
-- [ ] T037 ImportRunAllCommand (WP06)
-- [ ] T038 ImportStatusCommand (WP06)
+- [x] T033 RunOptions + RunReport value objects (WP06)
+- [x] T034 ProcessChainExecutor (WP06)
+- [x] T035 MigrationRunner + MigrationAbortedException (WP06)
+- [x] T036 ImportRunCommand (WP06)
+- [x] T037 ImportRunAllCommand (WP06)
+- [x] T038 ImportStatusCommand (WP06)
 
 **Implementation sketch:** `MigrationRunner` is constructor-injected with `MigrationRegistry`, `ProcessChainExecutor`, `MigrationIdMap`, `LoggerInterface`. Per-record errors use a separate `try/catch` from run-level errors (FR-046 vs FR-048). `ImportStatusCommand` shows `0` for failed/skipped until WP07 wires in the run-state.
 
