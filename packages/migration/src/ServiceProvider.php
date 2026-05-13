@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Migration;
 
+use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider as BaseServiceProvider;
 use Waaseyaa\Migration\Discovery\FilesystemManifestLoader;
 use Waaseyaa\Migration\Discovery\HasMigrationsInterface;
 use Waaseyaa\Migration\Discovery\MigrationRegistry;
+use Waaseyaa\Migration\Runner\MigrationRunner;
+use Waaseyaa\Migration\Runner\ProcessChainExecutor;
 
 /**
  * Service provider for the migration platform package.
@@ -60,6 +63,39 @@ final class ServiceProvider extends BaseServiceProvider
             );
             $registry->boot();
             return $registry;
+        });
+
+        // WP06 — runtime collaborators for the import:* CLI commands.
+        // `DatabaseInterface` and `MigrationIdMap` resolve through the kernel
+        // service bus when consumers actually run the CLI; the bindings here
+        // describe shape only.
+        $this->singleton(MigrationIdMap::class, function () {
+            $database = $this->resolve(DatabaseInterface::class);
+            \assert($database instanceof DatabaseInterface);
+
+            return new MigrationIdMap(
+                database: $database,
+                logger: $this->resolveLogger(),
+            );
+        });
+
+        $this->singleton(ProcessChainExecutor::class, static fn(): ProcessChainExecutor
+            => new ProcessChainExecutor());
+
+        $this->singleton(MigrationRunner::class, function () {
+            $registry = $this->resolve(MigrationRegistry::class);
+            \assert($registry instanceof MigrationRegistry);
+            $chain = $this->resolve(ProcessChainExecutor::class);
+            \assert($chain instanceof ProcessChainExecutor);
+            $idMap = $this->resolve(MigrationIdMap::class);
+            \assert($idMap instanceof MigrationIdMap);
+
+            return new MigrationRunner(
+                registry: $registry,
+                chain: $chain,
+                idMap: $idMap,
+                logger: $this->resolveLogger(),
+            );
         });
     }
 

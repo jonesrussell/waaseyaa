@@ -316,6 +316,43 @@ final class MigrationIdMap
     }
 
     /**
+     * Most recent `last_imported_at` value across rows for one migration, or
+     * `null` when the migration has no id-map rows yet.
+     *
+     * Used by `bin/waaseyaa import:status` (WP06) to surface the LAST RUN
+     * column without loading rows. The full per-record audit trail
+     * (`migration_run_state`) is WP07's surface; for WP06 the id-map row
+     * timestamp is the cheapest, freshness-correct signal available.
+     *
+     * @spec FR-034 — `import:status` LAST RUN surface
+     */
+    public function maxLastImportedAt(string $migrationId): ?string
+    {
+        if ($migrationId === '') {
+            throw new \InvalidArgumentException(
+                'MigrationIdMap::maxLastImportedAt(): $migrationId must be a non-empty string.',
+            );
+        }
+
+        $rows = $this->database->select(self::TABLE, 't')
+            ->fields('t', ['last_imported_at'])
+            ->condition('migration_id', $migrationId)
+            ->orderBy('last_imported_at', 'DESC')
+            ->range(0, 1)
+            ->execute();
+
+        foreach ($rows as $row) {
+            \assert(\is_array($row));
+            $value = $row['last_imported_at'] ?? null;
+            if (\is_string($value) && $value !== '') {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Count of id-map rows for one migration. Used by `import:status`
      * (WP06) for a cheap progress signal without loading rows.
      */

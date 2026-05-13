@@ -3950,7 +3950,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "20f01eedbd74321a221dcf68994e4804c68dc40d"
+                "reference": "4043ab9ec44d01c8b5a025b6710cb68e8b2f34d2"
             },
             "require": {
                 "php": ">=8.5",
@@ -3959,6 +3959,7 @@
                 "waaseyaa/config": "^0.1.0-alpha.177",
                 "waaseyaa/entity": "^0.1.0-alpha.177",
                 "waaseyaa/entity-storage": "^0.1.0-alpha.177",
+                "waaseyaa/migration": "^0.1.0-alpha.177",
                 "waaseyaa/northcloud": "^0.1.0-alpha.177",
                 "waaseyaa/queue": "^0.1.0-alpha.177",
                 "waaseyaa/scheduler": "^0.1.0-alpha.177",
@@ -3982,6 +3983,7 @@
                         "Waaseyaa\\CLI\\Provider\\BundleFixtureServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\EntityTypeServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\HealthSchemaServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\ImportServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderA",
                         "Waaseyaa\\CLI\\Provider\\MakeServiceProviderB",
                         "Waaseyaa\\CLI\\Provider\\MakeStorageMigrationServiceProvider",
@@ -5162,21 +5164,29 @@
             "dist": {
                 "type": "path",
                 "url": "packages/migration",
-                "reference": "774437c67e0f05d8f767fdab3263308171759451"
+                "reference": "49f9655df8d79299b901ef711a339e48f9fb3884"
             },
             "require": {
                 "php": ">=8.5",
+                "psr/event-dispatcher": "^1.0",
+                "symfony/uid": "^7.0",
+                "waaseyaa/access": "^0.1.0-alpha.177",
+                "waaseyaa/database-legacy": "^0.1.0-alpha.177",
+                "waaseyaa/entity": "^0.1.0-alpha.177",
+                "waaseyaa/entity-storage": "^0.1.0-alpha.177",
                 "waaseyaa/foundation": "^0.1.0-alpha.177"
             },
             "require-dev": {
-                "phpunit/phpunit": "^10.5"
+                "phpunit/phpunit": "^10.5",
+                "symfony/event-dispatcher": "^7.0"
             },
             "type": "library",
             "extra": {
                 "waaseyaa": {
                     "providers": [
                         "Waaseyaa\\Migration\\ServiceProvider"
-                    ]
+                    ],
+                    "migrations": "migrations"
                 },
                 "branch-alias": {
                     "dev-main": "0.1.x-dev",
@@ -5191,7 +5201,8 @@
             "autoload-dev": {
                 "psr-4": {
                     "Waaseyaa\\Migration\\Tests\\": "tests/",
-                    "Waaseyaa\\Migration\\Testing\\": "testing/"
+                    "Waaseyaa\\Migration\\Testing\\": "testing/",
+                    "Waaseyaa\\Migration\\PluginFixtures\\": "tests/_fixtures/"
                 }
             },
             "license": [

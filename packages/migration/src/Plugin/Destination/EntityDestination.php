@@ -113,6 +113,18 @@ final class EntityDestination implements DestinationPluginInterface
     private readonly LoggerInterface $logger;
 
     /**
+     * Runner-supplied run id (UUIDv7) used for every {@see write()} call.
+     *
+     * When set (via {@see withRunId()}), {@see resolveRunId()} returns this
+     * value verbatim instead of minting a per-write UUIDv7. Set by
+     * {@see \Waaseyaa\Migration\Runner\MigrationRunner} so every id-map row
+     * produced by one `import:run` invocation shares one run id (FR-046
+     * audit trail prerequisite). `null` preserves the WP05 default (per-write
+     * UUID) for callers that have not migrated to the runner surface.
+     */
+    private readonly ?string $runIdOverride;
+
+    /**
      * @param string $destinationEntityTypeId Target entity type id (must be registered with EntityTypeManager).
      * @param EntityTypeManager $entityTypeManager Source of truth for entity type definitions (FR-018).
      * @param EntityRepository $entityRepository The repository for the destination entity type. The caller is responsible for binding the repository to a matching `EntityType` — `EntityDestination` does NOT load alternate repositories per type. One destination plugin = one entity type.
@@ -123,6 +135,7 @@ final class EntityDestination implements DestinationPluginInterface
      * @param ?object $account Account passed to the gate. Migration runs should inject an elevated system account; nullable for the rare conformance test that needs to verify denial.
      * @param array<string, string> $fieldMap Destination-record key → storage field name. Empty (default) means identity mapping.
      * @param ?LoggerInterface $logger Structured logger for diagnostics; defaults to {@see NullLogger}.
+     * @param ?string $runIdOverride Runner-supplied UUIDv7 used by every write produced by this instance. `null` (default) preserves the WP05 per-write UUID behavior. Prefer {@see withRunId()} for cloning purposes.
      */
     public function __construct(
         private readonly string $destinationEntityTypeId,
@@ -135,6 +148,7 @@ final class EntityDestination implements DestinationPluginInterface
         private readonly ?object $account = null,
         private readonly array $fieldMap = [],
         ?LoggerInterface $logger = null,
+        ?string $runIdOverride = null,
     ) {
         if ($destinationEntityTypeId === '') {
             throw new \InvalidArgumentException(
@@ -159,7 +173,51 @@ final class EntityDestination implements DestinationPluginInterface
             }
         }
 
+        if ($runIdOverride !== null && $runIdOverride === '') {
+            throw new \InvalidArgumentException(
+                'EntityDestination::__construct(): $runIdOverride must be a non-empty UUIDv7 string when supplied.',
+            );
+        }
+
         $this->logger = $logger ?? new NullLogger();
+        $this->runIdOverride = $runIdOverride;
+    }
+
+    /**
+     * Return a cloned destination that stamps every {@see write()} call with
+     * `$runId` instead of minting a per-write UUIDv7.
+     *
+     * {@see \Waaseyaa\Migration\Runner\MigrationRunner} invokes this once at
+     * the top of every `run()` so the entire migration's id-map rows share a
+     * single run id — preconditions for resume (WP07) and rollback (WP08).
+     *
+     * @param string $runId UUIDv7 run id minted by the runner. Non-empty.
+     *
+     * @throws \InvalidArgumentException When `$runId` is empty.
+     *
+     * @api
+     */
+    public function withRunId(string $runId): self
+    {
+        if ($runId === '') {
+            throw new \InvalidArgumentException(
+                'EntityDestination::withRunId(): $runId must be a non-empty string.',
+            );
+        }
+
+        return new self(
+            destinationEntityTypeId: $this->destinationEntityTypeId,
+            entityTypeManager: $this->entityTypeManager,
+            entityRepository: $this->entityRepository,
+            idMap: $this->idMap,
+            gate: $this->gate,
+            eventDispatcher: $this->eventDispatcher,
+            migrationId: $this->migrationId,
+            account: $this->account,
+            fieldMap: $this->fieldMap,
+            logger: $this->logger,
+            runIdOverride: $runId,
+        );
     }
 
     public function id(): string
@@ -436,17 +494,30 @@ final class EntityDestination implements DestinationPluginInterface
     }
 
     /**
-     * Resolve a run id for the id-map upsert. WP07 will inject a runner-supplied
-     * run id; for now derive a stable UUIDv7 per write (or reuse the prior row's
-     * run id when re-importing).
+     * Resolve a run id for the id-map upsert.
+     *
+     * Three paths:
+     *   1. {@see $runIdOverride} set (via {@see withRunId()}) — the runner
+     *      has minted one UUIDv7 for the entire `import:run` invocation and
+     *      every id-map row stamped here shares it. This is the canonical
+     *      runtime path (WP06 forward).
+     *   2. No override + no prior row — mint a fresh UUIDv7 per write. The
+     *      WP05 legacy fallback for callers that bypass the runner.
+     *   3. No override + prior row exists — still mint a fresh UUIDv7 per
+     *      write. The `$prior` parameter is retained for the future-eyed
+     *      "preserve prior run id on hash-match skip" optimization; today
+     *      the skip path short-circuits in {@see write()} and never reaches
+     *      this method, so the value is unused.
      */
     private function resolveRunId(?WriteResult $prior): string
     {
-        if ($prior !== null) {
-            // Re-importing keeps the row's audit trail rather than rewriting it
-            // every save; WP07's resume protocol will override this explicitly.
-            return Uuid::v7()->toRfc4122();
+        if ($this->runIdOverride !== null) {
+            return $this->runIdOverride;
         }
+
+        // `$prior` reserved for future symmetry with hash-match skip semantics;
+        // see the method PHPDoc.
+        unset($prior);
 
         return Uuid::v7()->toRfc4122();
     }
