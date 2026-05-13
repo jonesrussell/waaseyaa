@@ -79,12 +79,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T024  | `SourceReadException`                                                             | WP04 | [P]      | FR-045                                              | [D] |
 | T025  | Unit tests                                                                        | WP04 |          | FR-025..FR-031                                      | [D] |
 | T026  | Integration test: schema portability + transactional safety                       | WP04 |          | FR-029                                              | [D] |
-| T027  | Test-fixture entity type `migration_test_widget` (+ revisionable variant)         | WP05 |          | FR-018..FR-024 substrate                            |
-| T028  | Add `SaveContext::isImport()` (cross-cutting, M-001-owned file)                   | WP05 |          | FR-022                                              |
-| T029  | `EntityDestination` class + factory                                               | WP05 |          | FR-018, FR-019, FR-020, FR-021, FR-023, FR-024      |
-| T030  | `DestinationWriteException`                                                       | WP05 | [P]      | FR-045                                              |
-| T031  | Integration test: non-revisionable round-trip                                     | WP05 |          | FR-018..FR-022, FR-029..FR-031                      |
-| T032  | Integration test: revisionable variant                                            | WP05 |          | FR-023                                              |
+| T027  | Test-fixture entity type `migration_test_widget` (+ revisionable variant)         | WP05 |          | FR-018..FR-024 substrate                            | [D] |
+| T028  | Add `SaveContext::isImport()` (cross-cutting, M-001-owned file)                   | WP05 |          | FR-022                                              | [D] |
+| T029  | `EntityDestination` class + factory                                               | WP05 |          | FR-018, FR-019, FR-020, FR-021, FR-023, FR-024      | [D] |
+| T030  | `DestinationWriteException`                                                       | WP05 | [P]      | FR-045                                              | [D] |
+| T031  | Integration test: non-revisionable round-trip                                     | WP05 |          | FR-018..FR-022, FR-029..FR-031                      | [D] |
+| T032  | Integration test: revisionable variant                                            | WP05 |          | FR-023                                              | [D] |
 | T033  | `RunOptions` + `RunReport` value objects                                          | WP06 | [P]      | FR-039, FR-040, FR-047                              |
 | T034  | `ProcessChainExecutor`                                                            | WP06 | [P]      | FR-010                                              |
 | T035  | `MigrationRunner` + `MigrationAbortedException`                                   | WP06 |          | FR-032, FR-039, FR-040, FR-046, FR-047, FR-048      |
@@ -268,12 +268,12 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** All 7 FRs (FR-018..FR-024) covered; `BeforeSaveEvent` + `AfterSaveEvent` carry `SaveContext::isImport === true` during imports; revisionable variant creates a new revision on changed re-run only.
 
 **Subtasks**
-- [ ] T027 Test-fixture entity type migration_test_widget (+ revisionable variant) (WP05)
-- [ ] T028 Add SaveContext::isImport() — cross-cutting, M-001-owned file (WP05)
-- [ ] T029 EntityDestination class + factory (WP05)
-- [ ] T030 DestinationWriteException (WP05)
-- [ ] T031 Integration test: non-revisionable round-trip (WP05)
-- [ ] T032 Integration test: revisionable variant (WP05)
+- [x] T027 Test-fixture entity type migration_test_widget (+ revisionable variant) (WP05)
+- [x] T028 Add SaveContext::isImport() — cross-cutting, M-001-owned file (WP05)
+- [x] T029 EntityDestination class + factory (WP05)
+- [x] T030 DestinationWriteException (WP05)
+- [x] T031 Integration test: non-revisionable round-trip (WP05)
+- [x] T032 Integration test: revisionable variant (WP05)
 
 **Implementation sketch:** `EntityDestination::write()` flows through `EntityRepository::save()` exclusively (no raw PDO per `.claude/rules/entity-storage-invariant.md`). Write + id-map upsert wrapped in `DBALDatabase::transactional()`. The `SaveContext::isImport()` extension is additive (default `false`); preserves existing call sites.
 
