@@ -119,3 +119,4 @@ spec-kitty agent action implement WP12 --agent <name>
 ## Activity Log
 
 - 2026-05-13T00:26:54Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=610035 – Started implementation via action command
+- 2026-05-13T00:31:17Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=610035 – Translation config: fallback_chain (null=default) + read_active_language (env-driven, default false)
