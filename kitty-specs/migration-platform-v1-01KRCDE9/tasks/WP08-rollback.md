@@ -20,6 +20,8 @@ subtasks:
 - T046
 - T047
 - T048
+agent: "claude:opus:waaseyaa-implementer:implementer"
+shell_pid: "9236"
 history:
 - timestamp: '2026-05-13T02:27:32Z'
   actor: spec-kitty.tasks
@@ -267,3 +269,7 @@ Planning/base branch: `main`. Merge target: `main`. Per-lane worktree. Run `spec
 - Verify: T048 Test 3 (access-denied) shows id-map rows are NOT cleared on rollback failure — the next operator action can be a retry.
 - Verify: `entity.lifecycle` log channel is the destination for rollback failure logs.
 - Confirm: `import:reset` also clears the run-state table for the migration (T047 step 2).
+
+## Activity Log
+
+- 2026-05-13T15:42:02Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=9236 – Started implementation via action command
