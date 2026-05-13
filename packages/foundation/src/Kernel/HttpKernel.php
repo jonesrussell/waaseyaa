@@ -252,6 +252,13 @@ final class HttpKernel extends AbstractKernel
      */
     private function serveHttpRequest(): HttpResponse
     {
+        // Configure trusted reverse proxies BEFORE any code reads
+        // $request->isSecure() or other forwarded-header derived values.
+        // Required so that $request->isSecure() honors X-Forwarded-Proto
+        // when the framework runs behind a TLS-terminating proxy (Caddy,
+        // nginx). See #1394 and contracts/csrf-token-cookie.md §1.
+        $this->applyTrustedProxiesFromConfig();
+
         $corsResponse = $this->handleCors();
         if ($corsResponse !== null) {
             return $corsResponse;
@@ -548,6 +555,77 @@ final class HttpKernel extends AbstractKernel
         }
 
         return null;
+    }
+
+    /**
+     * Apply the configured trusted-proxy list to Symfony's Request.
+     *
+     * Resolution order:
+     *  1. `$this->config['trusted_proxies']` (array of strings)
+     *  2. `getenv('TRUSTED_PROXIES')` — comma-separated CIDRs / IPs / the
+     *     Symfony sentinel `REMOTE_ADDR` (meaning "trust the connecting
+     *     peer, resolved at request time by Symfony").
+     *
+     * When the resolved list is empty, no call is made and Symfony's
+     * default behavior (ignore all X-Forwarded-* headers) is preserved —
+     * the safe default for setups without a TLS terminator.
+     *
+     * The standard X-Forwarded-* header set is enabled when proxies are
+     * configured. `TRUSTED_HEADER_SET` is intentionally undocumented
+     * (advanced operators only) and is not surfaced as an env knob here.
+     */
+    private function applyTrustedProxiesFromConfig(): void
+    {
+        $trustedProxies = $this->resolveTrustedProxies();
+        if ($trustedProxies === []) {
+            return;
+        }
+
+        HttpRequest::setTrustedProxies(
+            $trustedProxies,
+            HttpRequest::HEADER_X_FORWARDED_FOR
+            | HttpRequest::HEADER_X_FORWARDED_HOST
+            | HttpRequest::HEADER_X_FORWARDED_PROTO
+            | HttpRequest::HEADER_X_FORWARDED_PORT,
+        );
+    }
+
+    /**
+     * Resolve the effective trusted-proxy list from config + env.
+     *
+     * Config wins when set; env var is the fallback. Whitespace around
+     * comma-separated env entries is trimmed; empty entries are dropped.
+     * The Symfony `REMOTE_ADDR` sentinel is passed through verbatim —
+     * Symfony resolves it at request time, not at setTrustedProxies time.
+     *
+     * @return list<string>
+     */
+    private function resolveTrustedProxies(): array
+    {
+        $configured = $this->config['trusted_proxies'] ?? null;
+        if (is_array($configured) && $configured !== []) {
+            $normalized = [];
+            foreach ($configured as $entry) {
+                if (!is_string($entry)) {
+                    continue;
+                }
+                $trimmed = trim($entry);
+                if ($trimmed !== '') {
+                    $normalized[] = $trimmed;
+                }
+            }
+
+            return $normalized;
+        }
+
+        $envValue = getenv('TRUSTED_PROXIES');
+        if (!is_string($envValue) || $envValue === '') {
+            return [];
+        }
+
+        $entries = array_map('trim', explode(',', $envValue));
+
+        return array_values(array_filter($entries, static fn(string $e): bool => $e !== ''));
     }
 
     private function shouldUseDevFallbackAccount(?string $sapi = null): bool
