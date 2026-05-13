@@ -91,11 +91,11 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 | T036  | `ImportRunCommand`                                                                | WP06 |          | FR-032, FR-039, FR-040, FR-047                      | [D] |
 | T037  | `ImportRunAllCommand`                                                             | WP06 | [P]      | FR-033                                              | [D] |
 | T038  | `ImportStatusCommand`                                                             | WP06 | [P]      | FR-034                                              | [D] |
-| T039  | `migration_run_state` schema + migration file                                     | WP07 |          | FR-038                                              |
-| T040  | `MigrationRunState` repository                                                    | WP07 |          | FR-037, FR-038                                      |
-| T041  | Extend `MigrationRunner` to write progress + `runResume()`                        | WP07 |          | FR-037, FR-038, FR-046                              |
-| T042  | `ImportResumeCommand`                                                             | WP07 |          | FR-037                                              |
-| T043  | Integration test: full resume flow                                                | WP07 |          | FR-037, FR-038                                      |
+| T039  | `migration_run_state` schema + migration file                                     | WP07 |          | FR-038                                              | [D] |
+| T040  | `MigrationRunState` repository                                                    | WP07 |          | FR-037, FR-038                                      | [D] |
+| T041  | Extend `MigrationRunner` to write progress + `runResume()`                        | WP07 |          | FR-037, FR-038, FR-046                              | [D] |
+| T042  | `ImportResumeCommand`                                                             | WP07 |          | FR-037                                              | [D] |
+| T043  | Integration test: full resume flow                                                | WP07 |          | FR-037, FR-038                                      | [D] |
 | T044  | `RollbackReport` value object                                                     | WP08 | [P]      | FR-044                                              |
 | T045  | `RollbackWalker`                                                                  | WP08 |          | FR-041, FR-043, FR-044                              |
 | T046  | `ImportRollbackCommand`                                                           | WP08 |          | FR-035, FR-043, FR-044                              |
@@ -334,11 +334,11 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** Interrupt-then-resume reuses the same `run_id`; full resume cycle round-trips against a 100-record fixture; `migration_run_state` is documented as mission-internal (not §5.8 stable surface).
 
 **Subtasks**
-- [ ] T039 migration_run_state schema + migration file (WP07)
-- [ ] T040 MigrationRunState repository (WP07)
-- [ ] T041 Extend MigrationRunner with progress + runResume() (WP07)
-- [ ] T042 ImportResumeCommand (WP07)
-- [ ] T043 Integration test: full resume flow (WP07)
+- [x] T039 migration_run_state schema + migration file (WP07)
+- [x] T040 MigrationRunState repository (WP07)
+- [x] T041 Extend MigrationRunner with progress + runResume() (WP07)
+- [x] T042 ImportResumeCommand (WP07)
+- [x] T043 Integration test: full resume flow (WP07)
 
 **Implementation sketch:** Column is `item_status` (not `status`) per the data-model.md §4.2 note on reserved identifiers. `MigrationRunner` accepts a nullable `MigrationRunState` to preserve WP06's test scaffolding. Per-record commit by default; batch mode (≤ 100 records) deferred to a future flag.
 
