@@ -53,13 +53,13 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 
 | ID    | Description                                                                       | WP   | Parallel | FRs                                                |
 |-------|-----------------------------------------------------------------------------------|------|----------|----------------------------------------------------|
-| T001  | Scaffold `packages/migration/` composer.json + ServiceProvider + workspace wiring | WP01 |          | FR-007                                              |
-| T002  | `SourcePluginInterface` + `SourceRecord` DTO + `SourceId` stub                    | WP01 | [P]      | FR-001, FR-002                                      |
-| T003  | `ProcessPluginInterface` + `ProcessContext` DTO                                   | WP01 | [P]      | FR-003, FR-004, FR-010                              |
-| T004  | `DestinationPluginInterface` + `DestinationRecord` + `WriteResult` DTOs           | WP01 | [P]      | FR-005, FR-006                                      |
-| T005  | `HasMigrationPluginsInterface` + `PluginRegistry` + reserved ids + log channel    | WP01 |          | FR-007, FR-008, FR-009                              |
-| T006  | `MigrationPluginCollisionException`                                               | WP01 | [P]      | FR-008, FR-045                                      |
-| T007  | Unit tests for plugin contracts + registry                                        | WP01 |          | FR-001..FR-010                                      |
+| T001  | Scaffold `packages/migration/` composer.json + ServiceProvider + workspace wiring | WP01 |          | FR-007                                              | [D] |
+| T002  | `SourcePluginInterface` + `SourceRecord` DTO + `SourceId` stub                    | WP01 | [P]      | FR-001, FR-002                                      | [D] |
+| T003  | `ProcessPluginInterface` + `ProcessContext` DTO                                   | WP01 | [P]      | FR-003, FR-004, FR-010                              | [D] |
+| T004  | `DestinationPluginInterface` + `DestinationRecord` + `WriteResult` DTOs           | WP01 | [P]      | FR-005, FR-006                                      | [D] |
+| T005  | `HasMigrationPluginsInterface` + `PluginRegistry` + reserved ids + log channel    | WP01 |          | FR-007, FR-008, FR-009                              | [D] |
+| T006  | `MigrationPluginCollisionException`                                               | WP01 | [P]      | FR-008, FR-045                                      | [D] |
+| T007  | Unit tests for plugin contracts + registry                                        | WP01 |          | FR-001..FR-010                                      | [D] |
 | T008  | `MigrationDefinition` value object                                                | WP02 |          | FR-011, FR-012, FR-016                              |
 | T009  | `HasMigrationsInterface` provider capability                                      | WP02 | [P]      | FR-013                                              |
 | T010  | `FilesystemManifestLoader`                                                        | WP02 | [P]      | FR-013                                              |
@@ -138,13 +138,13 @@ After WP01 lands, **WP02, WP03, WP04, WP10 can run in parallel**. After WP04+WP0
 **Success criteria:** All 10 FRs (FR-001..FR-010) covered; new public symbols all carry `@api`; `bin/check-package-layers` green; full PHPUnit suite green; `composer dump-autoload --optimize` clean.
 
 **Subtasks**
-- [ ] T001 Scaffold composer.json + ServiceProvider + workspace wiring (WP01)
-- [ ] T002 SourcePluginInterface + SourceRecord + SourceId stub (WP01)
-- [ ] T003 ProcessPluginInterface + ProcessContext (WP01)
-- [ ] T004 DestinationPluginInterface + DestinationRecord + WriteResult (WP01)
-- [ ] T005 HasMigrationPluginsInterface + PluginRegistry + reserved ids (WP01)
-- [ ] T006 MigrationPluginCollisionException (WP01)
-- [ ] T007 Unit tests for contracts + registry (WP01)
+- [x] T001 Scaffold composer.json + ServiceProvider + workspace wiring (WP01)
+- [x] T002 SourcePluginInterface + SourceRecord + SourceId stub (WP01)
+- [x] T003 ProcessPluginInterface + ProcessContext (WP01)
+- [x] T004 DestinationPluginInterface + DestinationRecord + WriteResult (WP01)
+- [x] T005 HasMigrationPluginsInterface + PluginRegistry + reserved ids (WP01)
+- [x] T006 MigrationPluginCollisionException (WP01)
+- [x] T007 Unit tests for contracts + registry (WP01)
 
 **Implementation sketch:** Pattern after `packages/seo/composer.json` for the manifest. Establish the `Waaseyaa\Migration\Testing\` autoload-dev namespace now so WP10 can populate `testing/` later. The `SourceId` stub in T002 is a stop-gap; WP04 replaces it with the real implementation.
 
