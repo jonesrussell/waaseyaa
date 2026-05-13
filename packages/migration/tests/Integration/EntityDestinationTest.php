@@ -340,12 +340,86 @@ final class EntityDestinationTest extends TestCase
     }
 
     #[Test]
-    public function rollback_is_a_logic_error_in_wp05_only_build(): void
+    public function rollback_deletes_destination_entity_and_dispatches_lifecycle_events(): void
     {
+        // WP08 implemented rollback() in place of WP05's LogicException
+        // stub. End-to-end: write -> assert entity exists -> rollback ->
+        // assert entity is gone + lifecycle events fired.
         $destination = $this->makeDestination();
         $result = $destination->write($this->makeRecord('Hello world'));
 
-        $this->expectException(\LogicException::class);
+        // Confirm pre-rollback state.
+        self::assertCount(1, $this->repository->findBy(['uuid' => $result->destinationUuid]));
+
+        $beforeDeleteCount = 0;
+        $afterDeleteCount = 0;
+        $this->dispatcher->addListener(
+            \Waaseyaa\EntityStorage\Event\BeforeDeleteEvent::class,
+            function () use (&$beforeDeleteCount): void {
+                $beforeDeleteCount++;
+            },
+        );
+        $this->dispatcher->addListener(
+            \Waaseyaa\EntityStorage\Event\AfterDeleteEvent::class,
+            function () use (&$afterDeleteCount): void {
+                $afterDeleteCount++;
+            },
+        );
+
         $destination->rollback($result);
+
+        // Entity removed via EntityRepository::delete() (FR-019/FR-041).
+        self::assertCount(0, $this->repository->findBy(['uuid' => $result->destinationUuid]));
+        // Lifecycle events fired (the destination's explicit dispatch
+        // PLUS EntityRepository::delete's internal dispatch).
+        self::assertGreaterThanOrEqual(1, $beforeDeleteCount);
+        self::assertGreaterThanOrEqual(1, $afterDeleteCount);
+    }
+
+    #[Test]
+    public function rollback_of_missing_entity_is_a_silent_no_op(): void
+    {
+        // FR-042: idempotent.
+        $destination = $this->makeDestination();
+        $result = $destination->write($this->makeRecord('Hello'));
+
+        // Manually delete the entity (simulating drift).
+        $entities = $this->repository->findBy(['uuid' => $result->destinationUuid]);
+        $this->repository->delete($entities[0]);
+
+        // Rollback must succeed silently.
+        $destination->rollback($result);
+
+        $this->addToAssertionCount(1);
+    }
+
+    #[Test]
+    public function rollback_respects_access_gate(): void
+    {
+        // Write with allow-all, then attempt rollback with forbid-all.
+        $allowDestination = $this->makeDestination();
+        $result = $allowDestination->write($this->makeRecord('Denied rollback'));
+
+        $denyingGate = new EntityAccessGate(new EntityAccessHandler([new ForbidAllPolicy(self::ENTITY_TYPE_ID)]));
+        $denyDestination = new EntityDestination(
+            destinationEntityTypeId: self::ENTITY_TYPE_ID,
+            entityTypeManager: $this->typeManager,
+            entityRepository: $this->repository,
+            idMap: $this->idMap,
+            gate: $denyingGate,
+            eventDispatcher: $this->dispatcher,
+            migrationId: self::MIGRATION_ID,
+            account: $this->systemAccount,
+        );
+
+        try {
+            $denyDestination->rollback($result);
+            self::fail('Expected DestinationWriteException for denied delete');
+        } catch (DestinationWriteException $e) {
+            self::assertSame('entity_delete_denied', $e->reason);
+        }
+
+        // Entity is still present.
+        self::assertCount(1, $this->repository->findBy(['uuid' => $result->destinationUuid]));
     }
 }

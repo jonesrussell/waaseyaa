@@ -6,7 +6,9 @@ namespace Waaseyaa\CLI\Provider;
 
 use Waaseyaa\CLI\ArgumentDefinition;
 use Waaseyaa\CLI\ArgumentMode;
+use Waaseyaa\CLI\Command\Import\ImportResetCommand;
 use Waaseyaa\CLI\Command\Import\ImportResumeCommand;
+use Waaseyaa\CLI\Command\Import\ImportRollbackCommand;
 use Waaseyaa\CLI\Command\Import\ImportRunAllCommand;
 use Waaseyaa\CLI\Command\Import\ImportRunCommand;
 use Waaseyaa\CLI\Command\Import\ImportStatusCommand;
@@ -19,19 +21,22 @@ use Waaseyaa\Migration\Discovery\MigrationRegistry;
 use Waaseyaa\Migration\MigrationIdMap;
 use Waaseyaa\Migration\MigrationRunState;
 use Waaseyaa\Migration\Runner\MigrationRunner;
+use Waaseyaa\Migration\Runner\RollbackWalker;
 
 /**
- * Registers the four `import:*` commands.
+ * Registers the `import:*` commands.
  *
  * - `import:run` / `import:run-all` / `import:status` ship with WP06.
  * - `import:resume` (FR-037) lands with WP07.
+ * - `import:rollback` (FR-035) + `import:reset` (FR-036) land with WP08.
  *
- * Collaborator bindings ({@see MigrationRunner}, {@see MigrationRegistry},
- * {@see MigrationIdMap}, {@see MigrationRunState}) live in the migration
- * package's own {@see \Waaseyaa\Migration\ServiceProvider}; this provider
- * only binds the thin command handler classes (which the CLI kernel
- * container resolves via `[Class, method]` handler references) and yields
- * the {@see CommandDefinition}s.
+ * Collaborator bindings ({@see MigrationRunner}, {@see RollbackWalker},
+ * {@see MigrationRegistry}, {@see MigrationIdMap}, {@see MigrationRunState})
+ * live in the migration package's own
+ * {@see \Waaseyaa\Migration\ServiceProvider}; this provider only binds the
+ * thin command handler classes (which the CLI kernel container resolves
+ * via `[Class, method]` handler references) and yields the
+ * {@see CommandDefinition}s.
  */
 final class ImportServiceProvider extends ServiceProvider implements HasNativeCommandsInterface
 {
@@ -73,6 +78,28 @@ final class ImportServiceProvider extends ServiceProvider implements HasNativeCo
             \assert($registry instanceof MigrationRegistry);
 
             return new ImportResumeCommand($runner, $registry);
+        });
+
+        $this->singleton(ImportRollbackCommand::class, function (): ImportRollbackCommand {
+            $walker = $this->resolve(RollbackWalker::class);
+            \assert($walker instanceof RollbackWalker);
+            $registry = $this->resolve(MigrationRegistry::class);
+            \assert($registry instanceof MigrationRegistry);
+            $idMap = $this->resolve(MigrationIdMap::class);
+            \assert($idMap instanceof MigrationIdMap);
+
+            return new ImportRollbackCommand($walker, $registry, $idMap);
+        });
+
+        $this->singleton(ImportResetCommand::class, function (): ImportResetCommand {
+            $registry = $this->resolve(MigrationRegistry::class);
+            \assert($registry instanceof MigrationRegistry);
+            $idMap = $this->resolve(MigrationIdMap::class);
+            \assert($idMap instanceof MigrationIdMap);
+            $runState = $this->resolve(MigrationRunState::class);
+            \assert($runState instanceof MigrationRunState);
+
+            return new ImportResetCommand($registry, $idMap, $runState);
         });
     }
 
@@ -177,6 +204,46 @@ final class ImportServiceProvider extends ServiceProvider implements HasNativeCo
                 ),
             ],
             handler: [ImportResumeCommand::class, 'execute'],
+        );
+
+        yield new CommandDefinition(
+            name: 'import:rollback',
+            description: 'Undo every previously-written record for one migration (FR-035).',
+            arguments: [
+                new ArgumentDefinition(
+                    name: 'migration_id',
+                    mode: ArgumentMode::Required,
+                    description: 'Id of the migration to roll back.',
+                ),
+            ],
+            options: [
+                new OptionDefinition(
+                    name: 'confirm',
+                    mode: OptionMode::None,
+                    description: 'Required to proceed; destructive operation gate.',
+                ),
+            ],
+            handler: [ImportRollbackCommand::class, 'execute'],
+        );
+
+        yield new CommandDefinition(
+            name: 'import:reset',
+            description: 'Clear the id-map and run-state without touching destination entities (FR-036).',
+            arguments: [
+                new ArgumentDefinition(
+                    name: 'migration_id',
+                    mode: ArgumentMode::Required,
+                    description: 'Id of the migration whose import history will be cleared.',
+                ),
+            ],
+            options: [
+                new OptionDefinition(
+                    name: 'confirm',
+                    mode: OptionMode::None,
+                    description: 'Required to proceed; destructive operation gate.',
+                ),
+            ],
+            handler: [ImportResetCommand::class, 'execute'],
         );
     }
 }

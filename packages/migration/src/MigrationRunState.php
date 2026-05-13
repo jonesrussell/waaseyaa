@@ -382,6 +382,23 @@ final class MigrationRunState
     }
 
     /**
+     * Public alias for {@see clearForMigration()} consumed by
+     * {@see \Waaseyaa\CLI\Command\Import\ImportResetCommand} (WP08).
+     *
+     * The internal `clearForMigration()` is `@internal`; the reset CLI
+     * surface needs a stable `@api` method to call. Behaviour is
+     * identical — same SQL, same return shape.
+     *
+     * @api
+     *
+     * @spec FR-036 — `import:reset` clears progress alongside the id-map
+     */
+    public function deleteAllForMigration(string $migrationId): int
+    {
+        return $this->clearForMigration($migrationId);
+    }
+
+    /**
      * Emit the `INSERT ... ON CONFLICT DO UPDATE` for one row.
      *
      * SQLite + Postgres both support `ON CONFLICT (a, b) DO UPDATE` natively;

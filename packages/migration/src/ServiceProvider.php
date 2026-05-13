@@ -12,6 +12,7 @@ use Waaseyaa\Migration\Discovery\HasMigrationsInterface;
 use Waaseyaa\Migration\Discovery\MigrationRegistry;
 use Waaseyaa\Migration\Runner\MigrationRunner;
 use Waaseyaa\Migration\Runner\ProcessChainExecutor;
+use Waaseyaa\Migration\Runner\RollbackWalker;
 
 /**
  * Service provider for the migration platform package.
@@ -109,6 +110,20 @@ final class ServiceProvider extends BaseServiceProvider
                 idMap: $idMap,
                 logger: $this->resolveLogger(),
                 runState: $runState,
+            );
+        });
+
+        // WP08 — rollback orchestrator for `import:rollback`.
+        $this->singleton(RollbackWalker::class, function () {
+            $registry = $this->resolve(MigrationRegistry::class);
+            \assert($registry instanceof MigrationRegistry);
+            $idMap = $this->resolve(MigrationIdMap::class);
+            \assert($idMap instanceof MigrationIdMap);
+
+            return new RollbackWalker(
+                registry: $registry,
+                idMap: $idMap,
+                logger: $this->resolveLogger(),
             );
         });
     }

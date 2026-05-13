@@ -240,6 +240,60 @@ final class MigrationIdMap
     }
 
     /**
+     * Delete one id-map row by `(migration_id, source_id_hash)` using the
+     * raw hash string — useful when the caller is iterating
+     * {@see walkReverseCreationWithKeys()} and never reconstitutes a
+     * {@see SourceId} (the original keys are not retained on the row).
+     *
+     * Symmetric to {@see delete()}; the only difference is the input
+     * shape (raw hash vs full SourceId). Returns `true` when a row was
+     * removed; `false` when no matching row existed (idempotent).
+     *
+     * @spec FR-043 — rollback walk uses the id-map's deletion primitive
+     *   keyed by `source_id_hash`
+     */
+    public function deleteByHash(string $migrationId, string $sourceIdHash): bool
+    {
+        if ($migrationId === '') {
+            throw new \InvalidArgumentException(
+                'MigrationIdMap::deleteByHash(): $migrationId must be a non-empty string.',
+            );
+        }
+        if ($sourceIdHash === '') {
+            throw new \InvalidArgumentException(
+                'MigrationIdMap::deleteByHash(): $sourceIdHash must be a non-empty string.',
+            );
+        }
+
+        // Pre-check existence so the boolean return value is meaningful —
+        // the query builder does not expose affected-row counts.
+        $rows = $this->database->select(self::TABLE, 't')
+            ->fields('t', ['source_id_hash'])
+            ->condition('migration_id', $migrationId)
+            ->condition('source_id_hash', $sourceIdHash)
+            ->range(0, 1)
+            ->execute();
+
+        $found = false;
+        foreach ($rows as $row) {
+            \assert(\is_array($row));
+            $found = true;
+            break;
+        }
+
+        if (!$found) {
+            return false;
+        }
+
+        $this->database->delete(self::TABLE)
+            ->condition('migration_id', $migrationId)
+            ->condition('source_id_hash', $sourceIdHash)
+            ->execute();
+
+        return true;
+    }
+
+    /**
      * Delete every id-map row for one migration. Used by the rollback /
      * teardown path (FR-036 — landed in WP08).
      *
@@ -312,6 +366,61 @@ final class MigrationIdMap
                 runId: (string) $row['last_run_id'],
                 writtenAt: (string) $row['last_imported_at'],
             );
+        }
+    }
+
+    /**
+     * Yield `[source_id_hash, WriteResult]` tuples for one migration in
+     * reverse creation order.
+     *
+     * Sibling of {@see walkReverseCreation()} for the rollback walker
+     * (WP08): the walker needs both the {@see WriteResult} (to hand to
+     * `DestinationPluginInterface::rollback()`) and the
+     * `source_id_hash` (to delete the corresponding id-map row after a
+     * successful rollback). The base method intentionally hides
+     * `source_id_hash` because callers reaching for the prior write
+     * already know the {@see SourceId}; the rollback walk doesn't.
+     *
+     * **Lazy.** Same generator shape as {@see walkReverseCreation()}.
+     *
+     * @return \Generator<int, array{0: string, 1: WriteResult}>
+     *
+     * @spec FR-043 — reverse-creation walk order with deletion key
+     */
+    public function walkReverseCreationWithKeys(string $migrationId): \Generator
+    {
+        if ($migrationId === '') {
+            throw new \InvalidArgumentException(
+                'MigrationIdMap::walkReverseCreationWithKeys(): $migrationId must be a non-empty string.',
+            );
+        }
+
+        $rows = $this->database->select(self::TABLE, 't')
+            ->fields('t', [
+                'source_id_hash',
+                'destination_entity_type',
+                'destination_uuid',
+                'source_record_hash',
+                'last_run_id',
+                'last_imported_at',
+            ])
+            ->condition('migration_id', $migrationId)
+            ->orderBy('last_imported_at', 'DESC')
+            ->orderBy('last_run_id', 'DESC')
+            ->execute();
+
+        foreach ($rows as $row) {
+            \assert(\is_array($row));
+            yield [
+                (string) $row['source_id_hash'],
+                new WriteResult(
+                    destinationEntityType: (string) $row['destination_entity_type'],
+                    destinationUuid: (string) $row['destination_uuid'],
+                    sourceRecordHash: (string) $row['source_record_hash'],
+                    runId: (string) $row['last_run_id'],
+                    writtenAt: (string) $row['last_imported_at'],
+                ),
+            ];
         }
     }
 

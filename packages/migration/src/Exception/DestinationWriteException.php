@@ -150,4 +150,48 @@ final class DestinationWriteException extends \RuntimeException
             previous: $previous,
         );
     }
+
+    /**
+     * Convenience factory: rollback (FR-041) — gate denied `delete` on the
+     * destination entity. Mirrors {@see entityUpdateDenied()}.
+     *
+     * @spec FR-020 — access gate decisions surface as typed exceptions
+     * @spec FR-041 — rollback respects entity access policies
+     */
+    public static function entityDeleteDenied(
+        string $entityTypeId,
+        string $destinationUuid,
+    ): self {
+        return new self(
+            message: \sprintf(
+                'EntityDestination cannot roll back a "%s" (uuid=%s): access gate returned delete=denied (FR-020/FR-041).',
+                $entityTypeId,
+                $destinationUuid,
+            ),
+            reason: 'entity_delete_denied',
+            destinationEntityType: $entityTypeId,
+        );
+    }
+
+    /**
+     * Convenience factory: rollback (FR-041) — underlying
+     * {@see \Waaseyaa\EntityStorage\EntityRepository::delete()} threw.
+     */
+    public static function entityDeleteFailed(
+        string $entityTypeId,
+        string $destinationUuid,
+        \Throwable $previous,
+    ): self {
+        return new self(
+            message: \sprintf(
+                'EntityDestination failed to delete a "%s" (uuid=%s) during rollback: %s',
+                $entityTypeId,
+                $destinationUuid,
+                $previous->getMessage(),
+            ),
+            reason: 'entity_delete_failed',
+            destinationEntityType: $entityTypeId,
+            previous: $previous,
+        );
+    }
 }

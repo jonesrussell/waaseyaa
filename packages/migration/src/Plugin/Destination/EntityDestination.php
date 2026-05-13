@@ -11,7 +11,9 @@ use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\RevisionableInterface;
 use Waaseyaa\EntityStorage\EntityRepository;
+use Waaseyaa\EntityStorage\Event\AfterDeleteEvent;
 use Waaseyaa\EntityStorage\Event\AfterSaveEvent;
+use Waaseyaa\EntityStorage\Event\BeforeDeleteEvent;
 use Waaseyaa\EntityStorage\Event\BeforeSaveEvent;
 use Waaseyaa\EntityStorage\SaveContext;
 use Waaseyaa\Foundation\Log\LoggerInterface;
@@ -271,15 +273,101 @@ final class EntityDestination implements DestinationPluginInterface
         return $result;
     }
 
+    /**
+     * Reverse a previous {@see write()} call.
+     *
+     * Implements `DestinationPluginInterface::rollback()` for the entity
+     * destination (FR-041). The flow mirrors {@see write()} on the
+     * delete side:
+     *
+     *  1. Look up the entity by `destinationUuid` via
+     *     {@see EntityRepository::findBy()}. If the entity is missing
+     *     (already deleted by an operator or another tool), return
+     *     silently — the contract is best-effort + idempotent (FR-042
+     *     "missing target ... no-op + warn").
+     *  2. Ask the gate for `delete` permission (FR-020 symmetry with
+     *     write). A deny raises {@see DestinationWriteException} with
+     *     reason `entity_delete_denied`. The id-map row is NOT removed
+     *     so the operator can retry after fixing access.
+     *  3. Dispatch {@see BeforeDeleteEvent} → call
+     *     {@see EntityRepository::delete()} (which itself dispatches
+     *     the same canonical events but also performs the storage
+     *     remove) → dispatch {@see AfterDeleteEvent}. Mirrors WP05's
+     *     write-side double-event pattern.
+     *
+     * The walker ({@see \Waaseyaa\Migration\Runner\RollbackWalker}) is
+     * responsible for removing the id-map row on success — keeping the
+     * id-map mutation in the orchestrator (not the plugin) preserves
+     * the "destination plugins know nothing about the id-map" boundary
+     * for non-entity destinations.
+     *
+     * @throws DestinationWriteException When the gate denies `delete`
+     *         (reason `entity_delete_denied`) or the underlying
+     *         {@see EntityRepository::delete()} throws (reason
+     *         `entity_delete_failed`).
+     *
+     * @spec FR-041 — per-record rollback
+     * @spec FR-042 — missing target is a no-op + warn
+     * @spec FR-020 — access-check at rollback time
+     */
     public function rollback(WriteResult $result): void
     {
-        // WP08 owns the full rollback flow (delete destination + drop id-map row).
-        // WP05's contract is write-side only; surfacing the unimplemented status
-        // explicitly avoids silent no-ops if a caller wires us up before WP08
-        // lands.
-        throw new \LogicException(
-            'EntityDestination::rollback() is implemented by WP08; '
-            . 'do not invoke it from a WP05-only build.',
+        $definition = $this->entityTypeManager->getDefinition($this->destinationEntityTypeId);
+        $uuidKey = $definition->getKeys()['uuid'] ?? 'uuid';
+
+        $matches = $this->entityRepository->findBy([$uuidKey => $result->destinationUuid]);
+        $entity = $matches[0] ?? null;
+
+        if (!$entity instanceof EntityInterface) {
+            // FR-042: idempotent — the entity is already gone. Warn so
+            // operators can correlate manual cleanup with rollback
+            // output, but do not raise.
+            $this->logger->warning(
+                'EntityDestination::rollback(): destination entity already absent — treating as no-op (FR-042).',
+                [
+                    'migration_id' => $this->migrationId,
+                    'entity_type' => $this->destinationEntityTypeId,
+                    'destination_uuid' => $result->destinationUuid,
+                ],
+            );
+
+            return;
+        }
+
+        if ($this->gate->denies('delete', $entity, $this->account)) {
+            throw DestinationWriteException::entityDeleteDenied(
+                $this->destinationEntityTypeId,
+                $result->destinationUuid,
+            );
+        }
+
+        // FR-021 symmetry: dispatch the canonical lifecycle events around
+        // the delete. EntityRepository::delete() ALSO dispatches these
+        // events from inside its own pipeline; the explicit dispatch here
+        // mirrors WP05's write-side pattern for subscribers that want a
+        // signal scoped to the destination plugin (e.g. structured
+        // import audit log).
+        $this->eventDispatcher->dispatch(new BeforeDeleteEvent($entity));
+
+        try {
+            $this->entityRepository->delete($entity);
+        } catch (\Throwable $e) {
+            throw DestinationWriteException::entityDeleteFailed(
+                $this->destinationEntityTypeId,
+                $result->destinationUuid,
+                $e,
+            );
+        }
+
+        $this->eventDispatcher->dispatch(new AfterDeleteEvent($entity));
+
+        $this->logger->debug(
+            'EntityDestination: rolled back (entity deleted)',
+            [
+                'migration_id' => $this->migrationId,
+                'entity_type' => $this->destinationEntityTypeId,
+                'destination_uuid' => $result->destinationUuid,
+            ],
         );
     }
 
