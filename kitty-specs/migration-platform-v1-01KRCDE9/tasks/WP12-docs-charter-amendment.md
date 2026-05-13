@@ -5,6 +5,7 @@ dependencies:
 - WP04
 - WP06
 - WP09
+- WP11
 requirement_refs:
 - FR-056
 - FR-057
@@ -13,7 +14,7 @@ requirement_refs:
 - FR-060
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: lane
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T062
 - T063

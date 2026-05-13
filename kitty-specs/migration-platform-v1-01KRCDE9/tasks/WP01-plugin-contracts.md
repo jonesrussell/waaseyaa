@@ -14,7 +14,7 @@ requirement_refs:
 - FR-009
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: lane
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T001
 - T002
@@ -47,7 +47,9 @@ owned_files:
 - packages/migration/src/Plugin/DestinationRecord.php
 - packages/migration/src/Plugin/WriteResult.php
 - packages/migration/src/Plugin/ProcessContext.php
-- packages/migration/tests/Unit/Plugin/**
+- packages/migration/tests/Unit/Plugin/PluginInterfacesContractTest.php
+- packages/migration/tests/Unit/Plugin/DtoValueObjectsTest.php
+- packages/migration/tests/Unit/Plugin/ReservedPluginIdsTest.php
 - packages/migration/tests/Unit/Discovery/PluginRegistryTest.php
 - composer.json
 priority: p1

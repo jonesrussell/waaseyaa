@@ -1,0 +1,230 @@
+{
+  "version": 1,
+  "mission_slug": "migration-platform-v1-01KRCDE9",
+  "mission_id": "01KRCDE9ZXK2JEFPT6THSBVKNY",
+  "mission_branch": "kitty/mission-migration-platform-v1-01KRCDE9",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05",
+        "WP06",
+        "WP07",
+        "WP08",
+        "WP09",
+        "WP10",
+        "WP11"
+      ],
+      "write_scope": [
+        "composer.json",
+        "packages/cli/src/Command/Import/ImportResetCommand.php",
+        "packages/cli/src/Command/Import/ImportResumeCommand.php",
+        "packages/cli/src/Command/Import/ImportRollbackCommand.php",
+        "packages/cli/src/Command/Import/ImportRunAllCommand.php",
+        "packages/cli/src/Command/Import/ImportRunCommand.php",
+        "packages/cli/src/Command/Import/ImportStatusCommand.php",
+        "packages/cli/tests/Unit/Command/Import/ImportResetCommandTest.php",
+        "packages/cli/tests/Unit/Command/Import/ImportResumeCommandTest.php",
+        "packages/cli/tests/Unit/Command/Import/ImportRollbackCommandTest.php",
+        "packages/cli/tests/Unit/Command/Import/ImportRunAllCommandTest.php",
+        "packages/cli/tests/Unit/Command/Import/ImportRunCommandTest.php",
+        "packages/cli/tests/Unit/Command/Import/ImportStatusCommandTest.php",
+        "packages/migration/composer.json",
+        "packages/migration/migrations/2026_05_13_000001_create_migration_id_map.php",
+        "packages/migration/migrations/2026_05_13_000002_create_migration_run_state.php",
+        "packages/migration/src/Canonical/CanonicalForm.php",
+        "packages/migration/src/Discovery/CycleDetector.php",
+        "packages/migration/src/Discovery/DependencyGraph.php",
+        "packages/migration/src/Discovery/FilesystemManifestLoader.php",
+        "packages/migration/src/Discovery/HasMigrationPluginsInterface.php",
+        "packages/migration/src/Discovery/HasMigrationsInterface.php",
+        "packages/migration/src/Discovery/MigrationRegistry.php",
+        "packages/migration/src/Discovery/PluginRegistry.php",
+        "packages/migration/src/Exception/DestinationWriteException.php",
+        "packages/migration/src/Exception/MigrationAbortedException.php",
+        "packages/migration/src/Exception/MigrationConcurrencyException.php",
+        "packages/migration/src/Exception/MigrationCycleException.php",
+        "packages/migration/src/Exception/MigrationDependencyMissingException.php",
+        "packages/migration/src/Exception/MigrationPluginCollisionException.php",
+        "packages/migration/src/Exception/ProcessException.php",
+        "packages/migration/src/Exception/SourceReadException.php",
+        "packages/migration/src/Log/Channels.php",
+        "packages/migration/src/MigrationDefinition.php",
+        "packages/migration/src/MigrationIdMap.php",
+        "packages/migration/src/MigrationRunState.php",
+        "packages/migration/src/Plugin/Destination/EntityDestination.php",
+        "packages/migration/src/Plugin/Destination/EntityDestinationFactory.php",
+        "packages/migration/src/Plugin/DestinationPluginInterface.php",
+        "packages/migration/src/Plugin/DestinationRecord.php",
+        "packages/migration/src/Plugin/Process/ConcatProcessor.php",
+        "packages/migration/src/Plugin/Process/DefaultValueProcessor.php",
+        "packages/migration/src/Plugin/Process/HtmlSanitizeProcessor.php",
+        "packages/migration/src/Plugin/Process/LookupProcessor.php",
+        "packages/migration/src/Plugin/Process/PassThroughProcessor.php",
+        "packages/migration/src/Plugin/Process/TypeCoerceProcessor.php",
+        "packages/migration/src/Plugin/ProcessContext.php",
+        "packages/migration/src/Plugin/ProcessPluginInterface.php",
+        "packages/migration/src/Plugin/ReservedPluginIds.php",
+        "packages/migration/src/Plugin/SourcePluginInterface.php",
+        "packages/migration/src/Plugin/SourceRecord.php",
+        "packages/migration/src/Plugin/WriteResult.php",
+        "packages/migration/src/Runner/MigrationLock.php",
+        "packages/migration/src/Runner/MigrationRunner.php",
+        "packages/migration/src/Runner/ProcessChainExecutor.php",
+        "packages/migration/src/Runner/RollbackReport.php",
+        "packages/migration/src/Runner/RollbackWalker.php",
+        "packages/migration/src/Runner/RunOptions.php",
+        "packages/migration/src/Runner/RunReport.php",
+        "packages/migration/src/Schema/MigrationIdMapSchema.php",
+        "packages/migration/src/Schema/MigrationRunStateSchema.php",
+        "packages/migration/src/ServiceProvider.php",
+        "packages/migration/src/SourceId.php",
+        "packages/migration/testing/DestinationConformanceTestCase.php",
+        "packages/migration/testing/SourceConformanceTestCase.php",
+        "packages/migration/tests/Contract/ReferenceDestinationConformanceTest.php",
+        "packages/migration/tests/Contract/ReferenceSourceConformanceTest.php",
+        "packages/migration/tests/Fixtures/CsvSource.php",
+        "packages/migration/tests/Fixtures/EntityType/MigrationTestWidgetType.php",
+        "packages/migration/tests/Fixtures/MigrationTestWidget.php",
+        "packages/migration/tests/Fixtures/Migrations/UsersCsvToWidgetsMigration.php",
+        "packages/migration/tests/Fixtures/data/conformance-large.csv",
+        "packages/migration/tests/Fixtures/data/conformance-small.csv",
+        "packages/migration/tests/Fixtures/data/users-1000.csv",
+        "packages/migration/tests/Integration/EndToEndCsvImportTest.php",
+        "packages/migration/tests/Integration/EntityDestinationRevisionsTest.php",
+        "packages/migration/tests/Integration/EntityDestinationTest.php",
+        "packages/migration/tests/Integration/MigrationIdMapIntegrationTest.php",
+        "packages/migration/tests/Integration/MigrationLockIntegrationTest.php",
+        "packages/migration/tests/Integration/ResumeFlowTest.php",
+        "packages/migration/tests/Integration/RollbackTest.php",
+        "packages/migration/tests/Unit/Canonical/CanonicalFormTest.php",
+        "packages/migration/tests/Unit/Discovery/DependencyGraphTest.php",
+        "packages/migration/tests/Unit/Discovery/FilesystemManifestLoaderTest.php",
+        "packages/migration/tests/Unit/Discovery/MigrationRegistryTest.php",
+        "packages/migration/tests/Unit/Discovery/PluginRegistryTest.php",
+        "packages/migration/tests/Unit/MigrationDefinitionTest.php",
+        "packages/migration/tests/Unit/MigrationIdMapTest.php",
+        "packages/migration/tests/Unit/MigrationRunStateTest.php",
+        "packages/migration/tests/Unit/Plugin/DtoValueObjectsTest.php",
+        "packages/migration/tests/Unit/Plugin/PluginInterfacesContractTest.php",
+        "packages/migration/tests/Unit/Plugin/Process/**",
+        "packages/migration/tests/Unit/Plugin/ReservedPluginIdsTest.php",
+        "packages/migration/tests/Unit/Runner/MigrationLockTest.php",
+        "packages/migration/tests/Unit/Runner/MigrationRunnerTest.php",
+        "packages/migration/tests/Unit/Runner/ProcessChainExecutorTest.php",
+        "packages/migration/tests/Unit/Runner/RollbackWalkerTest.php",
+        "packages/migration/tests/Unit/SourceIdTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests",
+        "tracker-integration",
+        "workspace"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP12"
+      ],
+      "write_scope": [
+        "CLAUDE.md",
+        "docs/cookbook/migration-first-cut.md",
+        "docs/extension-authoring/migration-process-plugins.md",
+        "docs/extension-authoring/migration-source-readers.md",
+        "docs/specs/migration-platform.md",
+        "docs/specs/public-surface-map.md",
+        "docs/specs/stability-charter.md",
+        "docs/upgrades/waaseyaa-alpha-X-to-Y.md"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-13T02:53:48.925003+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP12"
+  ],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP01"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP01"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP01"
+      },
+      {
+        "wp_a": "WP06",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP06 depends on WP01"
+      },
+      {
+        "wp_a": "WP07",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP07 depends on WP04"
+      },
+      {
+        "wp_a": "WP08",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP08 depends on WP04"
+      },
+      {
+        "wp_a": "WP09",
+        "wp_b": "WP06",
+        "rule": "dependency",
+        "evidence": "WP09 depends on WP06"
+      },
+      {
+        "wp_a": "WP10",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP10 depends on WP01"
+      },
+      {
+        "wp_a": "WP11",
+        "wp_b": "WP06",
+        "rule": "dependency",
+        "evidence": "WP11 depends on WP06"
+      }
+    ],
+    "total_merges": 10,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 10
+    }
+  }
+}
