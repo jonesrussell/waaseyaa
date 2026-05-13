@@ -86,9 +86,17 @@ final class NoKernelSubclassesInTestsTest extends TestCase
         );
 
         foreach ($iterator as $file) {
-            if ($file->isFile() && $file->getExtension() === 'php') {
-                yield $file->getPathname();
+            if (!$file->isFile() || $file->getExtension() !== 'php') {
+                continue;
             }
+            // Skip third-party code installed under tests/ (e.g. the packaged-form
+            // skeleton fixture installs the published framework into its own vendor/).
+            // The architecture rule applies to first-party tests only.
+            $pathname = $file->getPathname();
+            if (str_contains($pathname, DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR)) {
+                continue;
+            }
+            yield $pathname;
         }
     }
 }

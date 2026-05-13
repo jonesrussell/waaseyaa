@@ -4,9 +4,9 @@
     "type": "project",
     "license": "GPL-2.0-or-later",
     "require": {
-        "php": ">=8.4",
-        "waaseyaa/core": "v0.1.0-alpha.151",
-        "waaseyaa/groups": "v0.1.0-alpha.151"
+        "php": ">=8.5",
+        "waaseyaa/core": "^v0.1.0-alpha.177",
+        "waaseyaa/groups": "^v0.1.0-alpha.177"
     },
     "autoload": {
         "psr-4": {
