@@ -22,6 +22,8 @@ subtasks:
 - T030
 - T031
 - T032
+agent: "claude:opus:waaseyaa-implementer:implementer"
+shell_pid: "657197"
 history:
 - timestamp: '2026-05-13T02:27:32Z'
   actor: spec-kitty.tasks
@@ -307,3 +309,7 @@ Planning/base branch: `main`. Merge target: `main`. Per-lane worktree. Run `spec
 - Verify: the revisionable variant is exercised against M-006's `RevisionableEntityStorageInterface` — not a mock.
 - Confirm: `EntityDestinationFactory` is constructor-injected, not service-located.
 - Confirm: `WriteResult::sourceIdHash` (if added) is also updated in WP01's prompt amendment, OR the implementation uses `SourceId` recompute on rollback instead of storing the hash — pick one and document.
+
+## Activity Log
+
+- 2026-05-13T04:11:44Z – claude:opus:waaseyaa-implementer:implementer – shell_pid=657197 – Started implementation via action command
