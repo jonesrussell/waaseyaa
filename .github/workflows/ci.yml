@@ -222,7 +222,6 @@ jobs:
   packaged-form:
     name: packaged-form
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v6
 
