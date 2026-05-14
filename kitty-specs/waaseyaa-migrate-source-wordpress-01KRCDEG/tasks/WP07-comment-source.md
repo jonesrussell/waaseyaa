@@ -118,3 +118,4 @@ Small-site fixture has 4 comments (1 thread of 2 replies + 2 standalone). Confor
 ## Activity Log
 
 - 2026-05-14T22:21:17Z – claude – shell_pid=145812 – Started implementation via action command
+- 2026-05-14T22:23:01Z – claude – shell_pid=145812 – Out-of-tree WP: deliverables at standalone-repo commit 6121800. Files: src/Source/WordPressCommentSource.php (filters WxrReader to type=comment, ISO 8601 normalization, preserves threading verbatim), tests/Unit/Source/WordPressCommentSourceTest.php (14 tests covering threading, approved-state mapping for 1/0/spam/trash, pingbacks, user_login cross-ref), tests/Conformance/CommentSourceConformanceTest.php (8 C1-C8 gates green). pest: 128 passed (25343 assertions). phpstan --level=5: clean.
