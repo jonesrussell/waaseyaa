@@ -99,3 +99,4 @@ Mirror WP03's pattern. Extends `SourceConformanceTestCase` against the small-sit
 ## Activity Log
 
 - 2026-05-14T21:34:41Z – claude – shell_pid=140720 – Started implementation via action command
+- 2026-05-14T21:36:28Z – claude – shell_pid=140720 – Out-of-tree WP: deliverables at standalone-repo commit fbf234f. Files: src/Source/WordPressTaxonomySource.php, tests/Unit/Source/WordPressTaxonomySourceTest.php (12 Pest tests covering all 3 WXR element variants + legacy implicit-id determinism), tests/Conformance/TaxonomySourceConformanceTest.php (8 C1-C8 gates green with 5000-term large fixture). pest: 51 passed (10149 assertions). phpstan --level=5 src+tests: clean.
