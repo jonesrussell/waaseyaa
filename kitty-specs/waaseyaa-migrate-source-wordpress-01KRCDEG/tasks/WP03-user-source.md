@@ -152,3 +152,4 @@ final class UserSourceConformanceTest extends SourceConformanceTestCase
 ## Activity Log
 
 - 2026-05-14T20:55:33Z – claude – shell_pid=137727 – Started implementation via action command
+- 2026-05-14T21:00:32Z – claude – shell_pid=137727 – Out-of-tree WP: deliverables at standalone-repo commit f1878f7. Files: src/Source/WordPressUserSource.php (impl), tests/Unit/Source/WordPressUserSourceTest.php (10 Pest unit tests), tests/Conformance/UserSourceConformanceTest.php (extends M-002 SourceConformanceTestCase, all 8 C1-C8 gates green). composer.json also registers Waaseyaa\Migration\Testing\ under autoload-dev so substrate's conformance base is reachable. vendor/bin/pest: 31 passed (5085 assertions). phpstan --level=5 on src+tests: clean.
