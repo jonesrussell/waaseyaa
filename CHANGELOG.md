@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Release infrastructure (`release-cut.yml` + `split.yml`)** — Two bugs surfaced during the alpha.178 cut and are fixed here so the alpha.179 cut and beyond produce consistent artifacts:
+  - `release-cut.yml` now stages `packages/*/composer.json` alongside `CHANGELOG.md` in its commit step. Before this fix, `bin/sync-internal-versions` ran on the runner but its output was never committed, so the released tag captured stale internal `waaseyaa/*` constraints.
+  - `split.yml` matrix gains `{ local: 'packages/migration', remote: 'migration' }`. The new `waaseyaa/migration` package was added in the alpha.178 cycle but never reached split.yml's fan-out matrix; the GitHub repo for it (`github.com/waaseyaa/migration`) is now provisioned, and Packagist registration is the remaining manual one-time step. (#1476, #1477)
+
 ## [0.1.0-alpha.178] - 2026-05-14
+
+> **RETRACTED.** alpha.178 was tagged and the per-package split tags were pushed, but the release is not consumable in this state:
+> - All 67 split package manifests on Packagist for alpha.178 have internal `waaseyaa/*` constraints pointing at `^0.1.0-alpha.177` instead of `^0.1.0-alpha.178` — the `bin/sync-internal-versions` output was discarded by a bug in `release-cut.yml` (only `CHANGELOG.md` was staged in the commit step).
+> - `waaseyaa/migration` (Migration Platform v1, listed below under Added) was not in `split.yml`'s matrix and the per-package GitHub repo did not exist, so it never reached Packagist.
+> - No GitHub Release was published — `verify-tag-parity` failed on the missing migration mirror, so `publish-github-release` was skipped.
+>
+> Both bugs are fixed in alpha.179 (#1477). **Pin to `^0.1.0-alpha.179` or later, not alpha.178.** The alpha.178 tag and per-package mirror tags are left in place for forensic continuity; do not depend on them.
 
 ### Added
 

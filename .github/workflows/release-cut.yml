@@ -162,7 +162,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add CHANGELOG.md
+          # CRITICAL: also stage the packages/*/composer.json files mutated by the
+          # earlier "Sync internal waaseyaa/* version constraints" step. Forgetting
+          # this leaves the synced files dirty in the runner and they're discarded
+          # on shutdown — the resulting tag commit only promotes CHANGELOG, every
+          # internal `waaseyaa/*` constraint still points at the prior version,
+          # and the next pre-push composer-policy gate fails with 200+ CP-NEW
+          # violations. See incident: alpha.178 cut on 2026-05-14.
+          git add CHANGELOG.md packages/*/composer.json
           git commit -m "chore: release ${VERSION}"
           git tag -a "$VERSION" -m "Release ${VERSION}
 
