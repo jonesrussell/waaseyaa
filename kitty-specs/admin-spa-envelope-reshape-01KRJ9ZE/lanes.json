@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "mission_slug": "admin-spa-envelope-reshape-01KRJ9ZE",
+  "mission_id": "01KRJ9ZE3KW2KHH5J1442AAH12",
+  "mission_branch": "kitty/mission-admin-spa-envelope-reshape-01KRJ9ZE",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "docs/audits/admin-spa-modernization-2026-05-10.md",
+        "docs/specs/admin-spa.md"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tracker-integration",
+        "workspace"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-14T04:07:27.817175+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": []
+}
