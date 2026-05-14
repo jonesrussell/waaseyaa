@@ -40,6 +40,8 @@ owned_files:
 - testing/Fixtures/edge-cases/unicode.xml
 - testing/Fixtures/edge-cases/plugin-namespaces.xml
 tags: []
+agent: "claude"
+shell_pid: "123052"
 ---
 
 # WP02 — WXR streaming parser (`WxrReader`)
@@ -216,3 +218,7 @@ Verify:
 - Generator yields (no array buffering) — `iterable<array>` return type honoured
 - All exception factory methods return `self` (named-constructor pattern per CLAUDE.md)
 - Test assertions check both record COUNT and field VALUES, not just structural shape
+
+## Activity Log
+
+- 2026-05-14T19:24:39Z – claude – shell_pid=123052 – Started implementation via action command
