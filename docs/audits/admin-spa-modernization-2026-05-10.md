@@ -43,7 +43,7 @@ Ranked by `(blast_radius_desc, prerequisites_first, size_asc_at_tie)` per the me
 | Rank | Mission name | Size | Blast radius | Track | Depends on | Issue |
 |------|---|---|---|---|---|---|
 | **M1** | [Admin SPA dependency + tooling bump (2026-Q3)](#m1) | S | 12 entries | Track 1 | — | [#1411](https://github.com/waaseyaa/framework/issues/1411) |
-| **M2** | [Admin SPA envelope re-shape & build pipeline](#m2) | M | 9 entries | Track 1 | — | [#1412](https://github.com/waaseyaa/framework/issues/1412) |
+| **M2** | [Admin SPA envelope re-shape & build pipeline](#m2) | M | 9 entries | Track 1 | — | [#1412](https://github.com/waaseyaa/framework/issues/1412) M2 status (2026-05-14): M2A (PR #1422) shipped envelope + README on 2026-05-11; M2 wrap-up (PR <wrap-up-PR>) lands doc-sync + audit closure + PR #1350 reconciliation. |
 | **M3** | [Bundle + tenancy awareness in admin SPA](#m3) | M | 8 entries | Track 1 | — | [#1413](https://github.com/waaseyaa/framework/issues/1413) |
 | **M4** | [Admin SPA coverage Phase 1 — operator subsystems](#m4) | L | 14 entries | Track 1 | M1 | [#1414](https://github.com/waaseyaa/framework/issues/1414) |
 | **M5** | [Admin SPA coverage Phase 2 — AI/agentic surfaces](#m5) | L | 11 entries | Track 2 | M1, M4 | [#1415](https://github.com/waaseyaa/framework/issues/1415) |
@@ -409,23 +409,23 @@ Eight of the deltas are already proposed as dependabot PRs. M1 picks all of them
 
 | Finding | Class | Size | Notes |
 |---|---|---|---|
-| <a name="E-Pkg-01"></a>E-Pkg-01 `exports` map references missing `dist/contracts/` | envelope-defect | S | `package.json` exports `./` → `dist/contracts/index.{d.ts,js}` and `./adapters` → `dist/adapters/index.{d.ts,js}`. No `dist/` directory exists on disk. Either: (a) commit the built artifacts (visible to consumers without local build step), or (b) drop the export promise. Folded into M2. |
-| <a name="E-Pkg-02"></a>E-Pkg-02 No `engines` constraint | envelope-defect | XS | `package.json` has no `engines` field. Node version is implicit. Add `"engines": { "node": ">=22.0.0" }`. Folded into M2. |
-| E-Pkg-03 No `publishConfig`, no `private: true` | informational | XS | If the package is genuinely meant to be installable (`@waaseyaa/admin`), add `publishConfig.access`. If it's not published, mark `"private": true`. Folded into M2. |
-| E-Pkg-04 No peerDependencies | informational | XS | Consumers needing the contracts only would benefit from peerDeps on `vue`, `nuxt`. Folded into M2. |
+| <a name="E-Pkg-01"></a>E-Pkg-01 ~~`exports` map references missing `dist/contracts/`~~ | envelope-defect | S | ~~`package.json` exports `./` → `dist/contracts/index.{d.ts,js}` and `./adapters` → `dist/adapters/index.{d.ts,js}`. No `dist/` directory exists on disk. Either: (a) commit the built artifacts (visible to consumers without local build step), or (b) drop the export promise. Folded into M2.~~ **CLOSED — `exports` map removed; package now declares `private: true`. (closed by M2A — commit `fe5f48fd1`, PR #1422; M2 wrap-up — PR <wrap-up-PR>)** |
+| <a name="E-Pkg-02"></a>E-Pkg-02 ~~No `engines` constraint~~ | envelope-defect | XS | ~~`package.json` has no `engines` field. Node version is implicit. Add `"engines": { "node": ">=22.0.0" }`. Folded into M2.~~ **CLOSED — `engines.node = >=22.12.0` declared (stricter than audit-suggested >=22.0.0, matches Nuxt 4.4.4 constraint). (closed by M2A — commit `fe5f48fd1`, PR #1422; M2 wrap-up — PR <wrap-up-PR>)** |
+| E-Pkg-03 ~~No `publishConfig`, no `private: true`~~ | informational | XS | ~~If the package is genuinely meant to be installable (`@waaseyaa/admin`), add `publishConfig.access`. If it's not published, mark `"private": true`. Folded into M2.~~ **CLOSED — `"private": true` declared; package is monorepo-internal, not published. No `publishConfig` needed. (closed by M2A — commit `fe5f48fd1`, PR #1422; M2 wrap-up — PR <wrap-up-PR>)** |
+| E-Pkg-04 ~~No peerDependencies~~ | informational | XS | ~~Consumers needing the contracts only would benefit from peerDeps on `vue`, `nuxt`. Folded into M2.~~ **CLOSED — No `peerDependencies` added by M2 wrap-up decision (2026-05-13). Package is private and has zero published consumers (see E-Pkg-06). (closed by M2A — commit `fe5f48fd1`, PR #1422; M2 wrap-up — PR <wrap-up-PR>)** |
 
 ## 4.2 build:contracts pipeline
 
 | Finding | Class | Size | Notes |
 |---|---|---|---|
 | <a name="E-Pkg-05"></a>E-Pkg-05 ~~No CI step verifies `build:contracts` output~~ **CLOSED — finding was stale** | envelope-defect | S | **Resolved by M2B-build-pipeline investigation (#1411 umbrella context, 2026-05-11).** The CI gate already exists: `.github/workflows/admin.yml:22-78` defines the `admin/contracts` job which (1) runs `nuxi typecheck`, (2) runs `npm run build:contracts` and uploads `dist/` as a 14-day artifact, (3) validates `contracts/bootstrap.schema.json` against a reference payload via `ajv-cli`, (4) runs `vitest`. The job triggers on every push/PR touching `packages/admin/**`. `packages/admin/.gitignore` correctly excludes `dist/` (verification artifact, not shipped — confirmed zero downstream consumers in M2A and E-Pkg-06). `build:contracts` remains valuable beyond `typecheck` because it verifies contracts/adapters can be *emitted* as standalone `.d.ts` (catches accidental dependency on Nuxt auto-imports or non-published transitive types). No code change needed; this finding was authored before the gate was added. |
-| <a name="E-Pkg-06"></a>E-Pkg-06 No known downstream consumer of `@waaseyaa/admin` imports | envelope-defect (informational) | XS | Grep across this workspace and `~/dev/waaseyaa.org` found zero `@waaseyaa/admin` import statements. The exports map exists but is consumed by **nothing in the visible workspace**. Decide in M2 whether to keep the contracts/adapters export shape or remove it as YAGNI. |
+| <a name="E-Pkg-06"></a>E-Pkg-06 ~~No known downstream consumer of `@waaseyaa/admin` imports~~ | envelope-defect (informational) | XS | ~~Grep across this workspace and `~/dev/waaseyaa.org` found zero `@waaseyaa/admin` import statements. The exports map exists but is consumed by **nothing in the visible workspace**. Decide in M2 whether to keep the contracts/adapters export shape or remove it as YAGNI.~~ **CLOSED — YAGNI confirmed by M2A and M2 wrap-up verification grep. Zero `@waaseyaa/admin` import statements across `waaseyaa/framework` and `waaseyaa.org`. Private-app shape adopted. (closed by M2A — commit `fe5f48fd1`, PR #1422; M2 wrap-up — PR <wrap-up-PR>)** |
 
 ## 4.3 README freshness
 
 | Finding | Class | Size | Notes |
 |---|---|---|---|
-| <a name="E-Docs-01"></a>E-Docs-01 README is 21 lines, comprehensive spec is in `docs/specs/admin-spa.md` | envelope-defect | XS | Bring README to a 50–80 line publishable summary including: bootstrap contract, AdminSurface, codified-context telemetry, auth phase 2, build commands, deployment notes. Folded into M2. |
+| <a name="E-Docs-01"></a>E-Docs-01 ~~README is 21 lines, comprehensive spec is in `docs/specs/admin-spa.md`~~ | envelope-defect | XS | ~~Bring README to a 50–80 line publishable summary including: bootstrap contract, AdminSurface, codified-context telemetry, auth phase 2, build commands, deployment notes. Folded into M2.~~ **CLOSED — README expanded from 21 lines to ~63 lines covering stack, develop/test/build commands, `build:contracts` verification gate, i18n, and modernization-audit pointer. M2 wrap-up verifies (63 lines confirmed). (closed by M2A — commit `fe5f48fd1`, PR #1422; M2 wrap-up — PR <wrap-up-PR>)** |
 
 ## 4.4 Directory structure
 
@@ -444,6 +444,8 @@ The admin SPA is the **only JS-only package in a PHP monorepo**, and the only on
 3. **Relocate to sibling repo** — if multiple PHP apps want to consume the SPA, lifting it to its own repo enables independent versioning. Probably premature without ≥2 known consumers.
 
 **Recommendation**: keep status quo but tighten contracts (M2). Adopt option 2 as a hardening step **only if** an external Waaseyaa app appears that doesn't want Node in its build chain.
+
+**Decision (2026-05-13, M2 wrap-up)**: Option 1 (status quo) adopted. The admin SPA remains the only JS-only package in a PHP monorepo. The `exports` map and `dist/` references were removed by M2A (commit `fe5f48fd1`, PR #1422). PR #1350 (the manual dist-rebuild PR) is closed as obsolete in the same window. The pre-built tarball model (option 2) and the sibling-repo model (option 3) remain documented as escape hatches if a future external Waaseyaa app justifies them. (M2 wrap-up: PR <wrap-up-PR>.)
 
 ---
 
