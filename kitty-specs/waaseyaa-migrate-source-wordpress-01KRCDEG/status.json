@@ -1,7 +1,7 @@
 {
-  "event_count": 57,
-  "last_event_id": "01KRMAB3N1C5X781K64YF3APYV",
-  "materialized_at": "2026-05-14T22:39:59.137024+00:00",
+  "event_count": 58,
+  "last_event_id": "01KRMAQGHJFBH24RWB9Z6HWV94",
+  "materialized_at": "2026-05-14T22:46:45.554449+00:00",
   "mission_number": "",
   "mission_slug": "waaseyaa-migrate-source-wordpress-01KRCDEG",
   "mission_type": "software-dev",
@@ -11,8 +11,8 @@
     "canceled": 0,
     "claimed": 0,
     "done": 9,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 0
   },
@@ -81,11 +81,11 @@
       "last_transition_at": "2026-05-14T22:39:50.210870+00:00"
     },
     "WP10": {
-      "actor": "claude",
-      "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KRMAB3N1C5X781K64YF3APYV",
-      "last_transition_at": "2026-05-14T22:39:59.137024+00:00"
+      "actor": "user",
+      "force_count": 2,
+      "lane": "for_review",
+      "last_event_id": "01KRMAQGHJFBH24RWB9Z6HWV94",
+      "last_transition_at": "2026-05-14T22:46:45.554449+00:00"
     }
   }
 }

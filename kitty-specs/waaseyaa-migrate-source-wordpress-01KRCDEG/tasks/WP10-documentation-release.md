@@ -172,3 +172,4 @@ Document the procedure in README.md.
 ## Activity Log
 
 - 2026-05-14T22:39:59Z – claude – shell_pid=149314 – Started implementation via action command
+- 2026-05-14T22:46:46Z – claude – shell_pid=149314 – Out-of-tree WP: deliverables at standalone-repo commit efd6d6d. docs/migrating-from-wordpress.md (operator) + docs/customization.md (developer) + docs/upgrades/.gitkeep + README polished (30-sec quick start, clean-install verification) + public-surface-map flipped to present:true for all entries with full error-code + SOURCE_TYPE + MIGRATION_ID constant tables + CHANGELOG entry under [Unreleased]. No tag cut this cycle — Waaseyaa ecosystem is still on 0.1.0-alpha.x; consumers pin dev-main. Packagist registration confirmed by user.
