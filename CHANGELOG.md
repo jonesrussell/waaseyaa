@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Close out admin-spa M3 mission (Bundle + tenancy awareness, #1413): bundle awareness shipped end-to-end via M3A (PR #1423, `SchemaList.vue` bundle filter via `x-bundle-key`/`enum` from `SchemaPresenter` + `FieldDefinitionRegistry`) and M3B (PR #1424, `SchemaForm.vue` bundle picker via `x-widget=select` flip on the bundle property — no SPA code change). The tenancy half of the audit triplet was pre-existing as of the audit date (`useAdmin().tenant` + `scopingStrategy: 'server'` resolves tenant server-side); no SPA absorption was required. D-Field-02 (single-entity work-surface UX) is deferred to its own mission. Audit annotations in `docs/audits/admin-spa-modernization-2026-05-10.md` mark D-Entity-01..03, D-EntityStorage-01, D-Field-01, D-Field-03 as **CLOSED** and D-Field-02 as **DEFERRED**, mirroring the M2 wrap-up idiom. The published `docs/specs/admin-spa.md` was already updated by the M3A/M3B PRs and needed no further edit. (#1413)
 - Close out admin-spa M2 mission: doc sync in `docs/specs/admin-spa.md` (verified already accurate — no edit needed), audit annotations marking E-Pkg-01..04, E-Pkg-06, E-Docs-01 as closed in `docs/audits/admin-spa-modernization-2026-05-10.md`, and status-quo monorepo-shape decision recorded in §4.6. PR #1350 closed as obsolete. M2A (PR #1422) shipped the envelope reshape + README on 2026-05-11. (#1412)
 
 ### Fixed
