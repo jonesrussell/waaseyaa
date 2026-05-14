@@ -242,3 +242,4 @@ Verify:
 ## Activity Log
 
 - 2026-05-14T19:18:32Z – claude – shell_pid=121911 – Assigned agent via action command
+- 2026-05-14T19:23:26Z – claude – shell_pid=121911 – Out-of-tree WP: deliverables landed in standalone repo github.com/waaseyaa/migrate-source-wordpress at commit 40205ae (initial scaffold per WP01 spec). Lane worktree intentionally has no in-monorepo changes — WP01 owns files in a SEPARATE composer package per spec.md §0.
