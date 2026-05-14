@@ -28,6 +28,8 @@ owned_files:
 - tests/Unit/Source/WordPressCommentSourceTest.php
 - tests/Conformance/CommentSourceConformanceTest.php
 tags: []
+agent: "claude"
+shell_pid: "145812"
 ---
 
 # WP07 — Source plugin: `WordPressCommentSource`
@@ -112,3 +114,7 @@ Small-site fixture has 4 comments (1 thread of 2 replies + 2 standalone). Confor
 
 - WP07 is the only source plugin with NESTED parent context (`post_id` from enclosing `<item>`). Verify WxrReader actually emits this — if not, this WP needs to handle it itself by re-iterating.
 - The user_login cross-reference (T056) is informational at this stage — actual lookup happens in WP09's WpCommentsToEngagement migration.
+
+## Activity Log
+
+- 2026-05-14T22:21:17Z – claude – shell_pid=145812 – Started implementation via action command
