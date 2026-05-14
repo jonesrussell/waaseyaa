@@ -7,6 +7,9 @@ requirement_refs:
 planning_base_branch: kitty/mission-waaseyaa-migrate-source-wordpress-01KRCDEG
 merge_target_branch: kitty/mission-waaseyaa-migrate-source-wordpress-01KRCDEG
 branch_strategy: Planning artifacts for this feature were generated on kitty/mission-waaseyaa-migrate-source-wordpress-01KRCDEG. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into kitty/mission-waaseyaa-migrate-source-wordpress-01KRCDEG unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-waaseyaa-migrate-source-wordpress-01KRCDEG
+base_commit: 189475bd1b5d98357e8168d0e89bf74c6586827a
+created_at: '2026-05-14T19:18:30.894225+00:00'
 subtasks:
 - T001
 - T002
@@ -18,6 +21,7 @@ subtasks:
 - T008
 - T009
 - T010
+shell_pid: '121911'
 history: []
 authoritative_surface: src/ServiceProvider.php
 execution_mode: code_change
