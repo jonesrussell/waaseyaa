@@ -27,6 +27,8 @@ owned_files:
 - tests/Unit/Source/WordPressTaxonomySourceTest.php
 - tests/Conformance/TaxonomySourceConformanceTest.php
 tags: []
+agent: "claude"
+shell_pid: "140720"
 ---
 
 # WP04 — Source plugin: `WordPressTaxonomySource`
@@ -93,3 +95,7 @@ Mirror WP03's pattern. Extends `SourceConformanceTestCase` against the small-sit
 
 - The 3-element-variant handling is the trap — easy to special-case the dispatch wrong. Verify exhaustive coverage in tests.
 - Implicit-id synthesis MUST be deterministic (same fixture twice → same SourceId).
+
+## Activity Log
+
+- 2026-05-14T21:34:41Z – claude – shell_pid=140720 – Started implementation via action command
