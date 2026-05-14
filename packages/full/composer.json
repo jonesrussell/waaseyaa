@@ -4,15 +4,15 @@
     "type": "metapackage",
     "license": "GPL-2.0-or-later",
     "require": {
-        "waaseyaa/ai-agent": "^0.1.0-alpha.178",
-        "waaseyaa/ai-pipeline": "^0.1.0-alpha.178",
-        "waaseyaa/ai-schema": "^0.1.0-alpha.178",
-        "waaseyaa/ai-vector": "^0.1.0-alpha.178",
-        "waaseyaa/attachment": "^0.1.0-alpha.178",
-        "waaseyaa/cms": "^0.1.0-alpha.178",
-        "waaseyaa/mcp": "^0.1.0-alpha.178",
-        "waaseyaa/ssr": "^0.1.0-alpha.178",
-        "waaseyaa/structured-import": "^0.1.0-alpha.178"
+        "waaseyaa/ai-agent": "^0.1.0-alpha.179",
+        "waaseyaa/ai-pipeline": "^0.1.0-alpha.179",
+        "waaseyaa/ai-schema": "^0.1.0-alpha.179",
+        "waaseyaa/ai-vector": "^0.1.0-alpha.179",
+        "waaseyaa/attachment": "^0.1.0-alpha.179",
+        "waaseyaa/cms": "^0.1.0-alpha.179",
+        "waaseyaa/mcp": "^0.1.0-alpha.179",
+        "waaseyaa/ssr": "^0.1.0-alpha.179",
+        "waaseyaa/structured-import": "^0.1.0-alpha.179"
     },
     "minimum-stability": "stable",
     "extra": {

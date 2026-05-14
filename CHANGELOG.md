@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.179] - 2026-05-14
+
 ### Fixed
 
 - **Release infrastructure (`release-cut.yml` + `split.yml`)** — Two bugs surfaced during the alpha.178 cut and are fixed here so the alpha.179 cut and beyond produce consistent artifacts:
