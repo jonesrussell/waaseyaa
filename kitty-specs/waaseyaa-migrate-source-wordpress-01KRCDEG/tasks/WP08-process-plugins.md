@@ -36,6 +36,8 @@ owned_files:
 - tests/Unit/Process/WordPressOembedExpandTest.php
 - tests/Unit/Process/WordPressMediaRewriteUrlTest.php
 tags: []
+agent: "claude"
+shell_pid: "146569"
 ---
 
 # WP08 — Process plugins: shortcode strip, oEmbed expand, media URL rewrite
@@ -193,3 +195,7 @@ test('all three process plugins chain together cleanly', function () {
 - The composability test (T063) is the integration check — verify it actually runs all three in sequence with realistic content.
 - Watch for case-sensitivity issues in URL host matching (CDN allowlist).
 - Verify oEmbed remote resolution caches per-run — re-fetching the same URL N times across N posts would explode network usage.
+
+## Activity Log
+
+- 2026-05-14T22:26:44Z – claude – shell_pid=146569 – Started implementation via action command
