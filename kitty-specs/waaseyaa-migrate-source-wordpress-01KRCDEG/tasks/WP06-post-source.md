@@ -123,3 +123,4 @@ Mirror WP03's pattern. Small-site fixture has 5 posts (mix of `post` and `page` 
 ## Activity Log
 
 - 2026-05-14T22:03:23Z – claude – shell_pid=144520 – Started implementation via action command
+- 2026-05-14T22:05:16Z – claude – shell_pid=144520 – Out-of-tree WP: deliverables at standalone-repo commit 2314910. Files: src/Source/WordPressPostSource.php (filters WxrReader to type=post incl. CPTs, ISO 8601 date normalization), tests/Unit/Source/WordPressPostSourceTest.php (16 tests covering field extraction, CPT, multi-category terms, sentinel fallback, password-protected, child pages, SourceId determinism), tests/Conformance/PostSourceConformanceTest.php (8 C1-C8 gates green). pest: 106 passed (20283 assertions). phpstan --level=5: clean.
