@@ -1,0 +1,15 @@
+{
+  "created_at": "2026-05-14T03:55:08.628415+00:00",
+  "friendly_name": "Admin SPA Envelope Re-shape & Build Pipeline",
+  "mission_id": "01KRJ9ZE3KW2KHH5J1442AAH12",
+  "mission_number": null,
+  "mission_slug": "admin-spa-envelope-reshape-01KRJ9ZE",
+  "mission_type": "software-dev",
+  "slug": "admin-spa-envelope-reshape-01KRJ9ZE",
+  "target_branch": "main",
+  "vcs": "git",
+  "source_description": "admin-spa M2 (issue #1412): private-app envelope reshape — remove exports map, mark private, add engines, rewrite README to 50-80 lines, sync admin-spa.md spec, annotate audit doc, reconcile PR #1350. Source: docs/audits/admin-spa-modernization-2026-05-10.md#m2. Maintainer decisions confirmed 2026-05-13.",
+  "tracking_issue": "https://github.com/waaseyaa/framework/issues/1412",
+  "audit_source": "docs/audits/admin-spa-modernization-2026-05-10.md#m2",
+  "change_mode": "feature"
+}
