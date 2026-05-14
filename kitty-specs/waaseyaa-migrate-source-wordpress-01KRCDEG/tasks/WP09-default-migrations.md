@@ -55,6 +55,8 @@ owned_files:
 - testing/Fixtures/edge-cases/large-entries.xml
 - testing/Fixtures/edge-cases/rtl-language.xml
 tags: []
+agent: "claude"
+shell_pid: "148044"
 ---
 
 # WP09 — Default migrations + cross-migration ID resolution + end-to-end validation
@@ -235,3 +237,7 @@ Run medium-site import with `memory_get_peak_usage()` instrumentation. Assert pe
 - Verify `dependencies()` arrays match the canonical order in FR-024 (users → terms → media → posts → comments).
 - The example name `wp_posts_to_articles` is intentional — DON'T rename it to something more generic. The example status is the point.
 - Check the password-discard implementation (T065) — both `must_reset_password: true` AND `password_hash: null` need to be present.
+
+## Activity Log
+
+- 2026-05-14T22:32:57Z – claude – shell_pid=148044 – Started implementation via action command
