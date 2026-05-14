@@ -40,6 +40,8 @@ owned_files:
 - tests/Unit/Media/MediaCopierTest.php
 - tests/Conformance/MediaSourceConformanceTest.php
 tags: []
+agent: "claude"
+shell_pid: "141979"
 ---
 
 # WP05 — Source plugin: `WordPressMediaSource` + media copy primitive
@@ -154,3 +156,7 @@ final class WordPressMediaCopyException extends \RuntimeException {
 - The WP05 surface is bigger than other source-plugin WPs. Watch for sloppy error-code coverage in `WordPressMediaCopyException`.
 - Verify the HTTP retry logic uses streaming (not in-memory buffering) — large attachments would OOM otherwise.
 - Test the postmeta-from-two-locations extraction (T036) against a fixture variant where it appears in only one location.
+
+## Activity Log
+
+- 2026-05-14T21:37:33Z – claude – shell_pid=141979 – Started implementation via action command
