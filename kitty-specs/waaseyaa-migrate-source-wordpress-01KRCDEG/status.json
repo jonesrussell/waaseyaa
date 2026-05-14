@@ -1,7 +1,7 @@
 {
-  "event_count": 16,
-  "last_event_id": "01KRM3VD0742T5HCJ569C1A5YW",
-  "materialized_at": "2026-05-14T20:46:32.967182+00:00",
+  "event_count": 22,
+  "last_event_id": "01KRM4BWEEV6KJ560J2628SMDE",
+  "materialized_at": "2026-05-14T20:55:33.070707+00:00",
   "mission_number": "",
   "mission_slug": "waaseyaa-migrate-source-wordpress-01KRCDEG",
   "mission_type": "software-dev",
@@ -10,33 +10,33 @@
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 0,
-    "for_review": 2,
-    "in_progress": 0,
+    "done": 2,
+    "for_review": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 8
+    "planned": 7
   },
   "work_packages": {
     "WP01": {
-      "actor": "user",
-      "force_count": 2,
-      "lane": "for_review",
-      "last_event_id": "01KRKZ378QTYW1SH00E919TNSE",
-      "last_transition_at": "2026-05-14T19:23:26.359148+00:00"
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM4AQSA0CY374CQ87CW3CEH",
+      "last_transition_at": "2026-05-14T20:54:55.530862+00:00"
     },
     "WP02": {
-      "actor": "user",
-      "force_count": 2,
-      "lane": "for_review",
-      "last_event_id": "01KRM3VD0742T5HCJ569C1A5YW",
-      "last_transition_at": "2026-05-14T20:46:32.967182+00:00"
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM4ASREZNR06Q3C2KT7XQ5B",
+      "last_transition_at": "2026-05-14T20:54:57.550702+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
+      "actor": "claude",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KRKY3V657SYN2GA9NB9Q4DEZ",
-      "last_transition_at": "2026-05-14T19:06:18.181232+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KRM4BWEEV6KJ560J2628SMDE",
+      "last_transition_at": "2026-05-14T20:55:33.070707+00:00"
     },
     "WP04": {
       "actor": "finalize-tasks",
