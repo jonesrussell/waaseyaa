@@ -9,8 +9,8 @@
         "psr/simple-cache": "^3.0"
     },
     "suggest": {
-        "waaseyaa/entity": "^0.1.0-alpha.177",
-        "waaseyaa/config": "^0.1.0-alpha.177"
+        "waaseyaa/entity": "^0.1.0-alpha.178",
+        "waaseyaa/config": "^0.1.0-alpha.178"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
