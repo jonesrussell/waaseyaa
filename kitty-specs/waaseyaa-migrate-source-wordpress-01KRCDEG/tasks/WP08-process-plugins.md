@@ -199,3 +199,4 @@ test('all three process plugins chain together cleanly', function () {
 ## Activity Log
 
 - 2026-05-14T22:26:44Z – claude – shell_pid=146569 – Started implementation via action command
+- 2026-05-14T22:32:29Z – claude – shell_pid=146569 – Out-of-tree WP: deliverables at standalone-repo commit a2b0853. Files: src/Process/WordPressShortcodeStrip.php + WordPressOembedExpand.php + WordPressMediaRewriteUrl.php + OembedFetcherInterface.php + src/Exception/WordPressOembedResolutionException.php (3 stable codes). Tests: 29 unit tests including 3-plugin composition (T063). pest: 157 passed (25384 assertions). phpstan --level=5: clean. Design note: MediaRewriteUrl takes a Closure(string $relativePath): ?string instead of LookupProcessor — operator wires whatever path→URL strategy fits, since the path→wp_id mapping is operator-specific and out of scope for a generic process plugin.
