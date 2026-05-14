@@ -3,8 +3,8 @@
 **Mission:** M-001 — Multi-Backend Storage with Revisions
 **Merge commit:** `509e31fb7` (squash to `main`)
 **Reviewer:** Opus 4.7 (post-merge adversarial audit)
-**Date:** 2026-05-12
-**Verdict:** **PASS WITH NOTES**
+**Date:** 2026-05-12 (audit) · 2026-05-14 (close-out)
+**Verdict:** **PASS** — both high-severity findings landed before close-out; only the deferred Minoo-cycle obligation (criterion 4) remains, tracked in `validation/pending-minoo-cycle.md`.
 
 ---
 
@@ -12,10 +12,10 @@
 
 All 12 WPs are merged; the multi-backend coordinator, sql-blob/sql-column backends, revision plumbing, lifecycle events, query validator, migration helper, conformance suite, and upgrade guide all landed. Layer rules hold (`bin/check-package-layers` green). The full suite reports 7693 tests / 18682 assertions passing.
 
-Two high-severity findings are documented below. Neither blocks the verdict, but each requires a follow-up WP/issue:
+Both high-severity findings raised in the 2026-05-12 audit are now resolved (see §6 / §4 below):
 
-- **H-01** — `DefinitionValidator::validateAll()` is not invoked from any production boot path. FR-021's fail-fast guarantee is aspirational, not enforced.
-- **H-02** — `spec.md §6.5` (line 317) and `contracts/partial-save-error.md` (line 33) still declare `public readonly string $code = 'PARTIAL_SAVE'`. The cycle-3 reconciliation reached the class, the upgrade guide, and the public-surface-map, but the two normative source documents were not updated. Callers reading the spec or contract will write `$e->code` and hit `Undefined property` (or read the inherited `\Exception::$code` int).
+- ~~**H-01** — `DefinitionValidator::validateAll()` is not invoked from any production boot path.~~ **RESOLVED** — wired into `AbstractKernel::validateQueryDefinitions()` (`packages/foundation/src/Kernel/AbstractKernel.php:156`, `:391`); integration tests in `DefinitionValidatorBootTest` cover happy / boot-failure / non-indexed-bypass paths.
+- ~~**H-02** — `spec.md §6.5` and `contracts/partial-save-error.md` still declare `public readonly string $code = 'PARTIAL_SAVE'`.~~ **RESOLVED** in commit `a4f674b60` — both source documents now declare `$errorCode`, matching the class + upgrade guide + public-surface-map.
 
 Everything else (cross-WP edits, byte-identity gate, deferral discipline, autoload-dev placement, layer rules, BC notes) is in good shape.
 
