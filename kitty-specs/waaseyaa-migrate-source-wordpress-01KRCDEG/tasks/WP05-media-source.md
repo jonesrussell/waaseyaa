@@ -160,3 +160,4 @@ final class WordPressMediaCopyException extends \RuntimeException {
 ## Activity Log
 
 - 2026-05-14T21:37:33Z – claude – shell_pid=141979 – Started implementation via action command
+- 2026-05-14T21:43:22Z – claude – shell_pid=141979 – Out-of-tree WP: deliverables at standalone-repo commit f28649d. Files: src/Source/WordPressMediaSource.php, src/Media/MediaCopier.php, src/Media/MediaCopyResult.php, src/Media/MediaCopyOperation.php, src/Media/MediaFetcherInterface.php (pluggable HTTP plug — no PSR-18 dep), src/Exception/WordPressMediaCopyException.php (5 stable codes). Tests: 12 unit source + 11 unit copier + 8 conformance gates. pest: 82 passed (15217 assertions). phpstan --level=5: clean. Note: added MediaFetcherInterface to public surface so consumers can wire any HTTP client; package ships no default to avoid dep churn.
