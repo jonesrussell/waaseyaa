@@ -30,6 +30,8 @@ owned_files:
 - docs/upgrades/.gitkeep
 - public-surface-map.md
 tags: []
+agent: "claude"
+shell_pid: "149314"
 ---
 
 # WP10 — Operator + developer documentation, README polish, first stable release
@@ -166,3 +168,7 @@ Document the procedure in README.md.
 - Verify CHANGELOG entry covers EVERY stable-surface symbol.
 - Check that the v0.1.0 tag matches the public-surface-map's documented surface (no missing or extra symbols).
 - Verify the install procedure works — actually run it in a Docker container before approving.
+
+## Activity Log
+
+- 2026-05-14T22:39:59Z – claude – shell_pid=149314 – Started implementation via action command
