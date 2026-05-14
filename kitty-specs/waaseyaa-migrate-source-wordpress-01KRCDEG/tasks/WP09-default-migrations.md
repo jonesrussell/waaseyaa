@@ -241,3 +241,4 @@ Run medium-site import with `memory_get_peak_usage()` instrumentation. Assert pe
 ## Activity Log
 
 - 2026-05-14T22:32:57Z – claude – shell_pid=148044 – Started implementation via action command
+- 2026-05-14T22:39:47Z – claude – shell_pid=148044 – Out-of-tree WP: deliverables at standalone-repo commit 65ff7ba. 5 MigrationDefinition factories + InMemoryDestination test fixture + RTL/large-entries edge-case fixtures + EndToEndImportTest + EdgeCaseFixturesTest. pest: 165 passed (25446 assertions). phpstan --level=5: clean. SCOPE NOTE: kernel-boot end-to-end import (real EntityDestination + sqlite MigrationIdMap + MigrationRunner) is out-of-package — that layer is consumer-specific. Package ships building blocks + structural test.
