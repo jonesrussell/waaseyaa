@@ -21,7 +21,7 @@ subtasks:
 - T008
 - T009
 - T010
-shell_pid: '121911'
+shell_pid: "121911"
 history: []
 authoritative_surface: src/ServiceProvider.php
 execution_mode: code_change
@@ -35,6 +35,7 @@ owned_files:
 - src/.gitkeep
 - tests/.gitkeep
 tags: []
+agent: "claude"
 ---
 
 # WP01 — Package scaffold, composer config, CI skeleton
@@ -237,3 +238,7 @@ Verify:
 - ServiceProvider implements both required interfaces (even if methods return empty arrays)
 - CI workflow file syntax is valid (`actionlint` if available)
 - Repo settings: branch protection enabled, default branch is main
+
+## Activity Log
+
+- 2026-05-14T19:18:32Z – claude – shell_pid=121911 – Assigned agent via action command
