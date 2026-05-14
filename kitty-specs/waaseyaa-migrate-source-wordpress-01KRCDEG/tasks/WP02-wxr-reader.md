@@ -222,3 +222,4 @@ Verify:
 ## Activity Log
 
 - 2026-05-14T19:24:39Z – claude – shell_pid=123052 – Started implementation via action command
+- 2026-05-14T20:46:33Z – claude – shell_pid=123052 – Out-of-tree WP: deliverables landed in standalone repo at commit f9778c0 — WxrReader (streaming XMLReader pull-parser), WxrVersion enum, WxrParseException, 4 fixtures (small-site + 3 edge-cases), 13 Pest tests (41 assertions, all green), PHPStan level-5 clean. WP03..WP07 are now unblocked.
