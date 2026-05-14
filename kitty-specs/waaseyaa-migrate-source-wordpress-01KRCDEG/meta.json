@@ -1,4 +1,16 @@
 {
+  "acceptance_history": [
+    {
+      "acceptance_mode": "pr",
+      "accepted_at": "2026-05-14T22:55:17.564995+00:00",
+      "accepted_by": "claude",
+      "accepted_from_commit": "23e58a4e1568649cecc3aa7175ddfcdcc935073b"
+    }
+  ],
+  "acceptance_mode": "pr",
+  "accepted_at": "2026-05-14T22:55:17.564995+00:00",
+  "accepted_by": "claude",
+  "accepted_from_commit": "23e58a4e1568649cecc3aa7175ddfcdcc935073b",
   "created_at": "2026-05-11T21:00:21.785495+00:00",
   "friendly_name": "WordPress Migration Source Reader",
   "mission_id": "01KRCDEGS973ZVMQHAWZW368J4",
