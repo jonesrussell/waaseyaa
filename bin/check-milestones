@@ -19,18 +19,18 @@ if ! gh auth status &>/dev/null 2>&1; then
   exit 0
 fi
 
-# Open issues with no milestone (paginate: REST issue list caps at 100 per call)
+# Open issues with no milestone — use REST list, not Search API. The Search
+# index lags real state by minutes for newly-created issues, so freshly-filed
+# untriaged issues silently passed the gate (#1445/1446/1447 on 2026-05-14).
 echo ""
 echo "--- Open issues with no milestone ---"
 NO_MILESTONE='[]'
 if command -v jq &>/dev/null; then
   PAGE=1
   while true; do
-    CHUNK=$(gh api "GET /search/issues" \
-      -f q="repo:$REPO is:issue is:open no:milestone" \
-      -f per_page=100 \
-      -f page="$PAGE" \
-      --jq '.items | map({number: .number, title: .title})' 2>/dev/null) || CHUNK='[]'
+    # /repos/{}/issues includes pull requests by default — filter via .pull_request absence.
+    CHUNK=$(gh api "repos/$REPO/issues?state=open&milestone=none&per_page=100&page=$PAGE" \
+      --jq 'map(select(.pull_request | not) | {number: .number, title: .title})' 2>/dev/null) || CHUNK='[]'
     N=$(echo "$CHUNK" | jq 'length')
     [[ "${N:-0}" -eq 0 ]] && break
     NO_MILESTONE=$(jq -n --argjson acc "$NO_MILESTONE" --argjson c "$CHUNK" '$acc + $c')
@@ -39,7 +39,7 @@ if command -v jq &>/dev/null; then
   done
   COUNT=$(echo "$NO_MILESTONE" | jq 'length')
 else
-  NO_MILESTONE=$(gh issue list --repo "$REPO" --state open --search "no:milestone" --limit 500 --json number,title 2>/dev/null || echo "[]")
+  NO_MILESTONE=$(gh issue list --repo "$REPO" --state open --milestone none --limit 500 --json number,title 2>/dev/null || echo "[]")
   COUNT=$(echo "$NO_MILESTONE" | grep -o '"number":' | wc -l | tr -d ' ')
 fi
 
