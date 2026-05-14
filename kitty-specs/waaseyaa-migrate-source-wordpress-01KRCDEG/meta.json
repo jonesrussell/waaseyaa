@@ -1,6 +1,8 @@
 {
+  "accept_commit": "694d64d1a27852853ce51cf1ec389a2fc8d5053b",
   "acceptance_history": [
     {
+      "accept_commit": "694d64d1a27852853ce51cf1ec389a2fc8d5053b",
       "acceptance_mode": "pr",
       "accepted_at": "2026-05-14T22:55:17.564995+00:00",
       "accepted_by": "claude",
