@@ -3,7 +3,7 @@
 **Mission slug:** `migration-platform-v1-01KRCDE9`
 **Mission ID:** `01KRCDE9ZXK2JEFPT6THSBVKNY`
 **Reviewer:** claude:opus:mission-reviewer (spec-kitty-mission-review skill)
-**Review date:** 2026-05-13
+**Review date:** 2026-05-13 (audit) · 2026-05-14 (close-out)
 **Squash-merge commit on `main`:** `d92f82f4a37108818424d323ae70594277c3d614`
 **Mission merge commit (true merge):** `03aabb9e8b8571fef7f16e5e3f2ce18abe485376` (mission branch `kitty/mission-migration-platform-v1-01KRCDE9`)
 **Pre-merge `main`:** `09686c43b`
@@ -15,11 +15,19 @@
 
 ## Verdict
 
-**PASS WITH NOTES.**
+**PASS** — all five 2026-05-13 audit findings landed via commits `8267072a1` ("six follow-up fixes from post-merge mission review", PR #1455) and `f55d1ea6a` (PR #1456, widens `EntityRepository::save()` to accept `SaveContext`). No CRITICAL or HIGH risks remain; the substrate is unblocked.
 
-All 12 WPs are `approved`. The 62 FRs are covered. Stable-surface charter §5.8 lands. The end-to-end CSV→entity round-trip (WP11) is green. No CRITICAL or HIGH risks blocking the release of the substrate.
+All 12 WPs are `done` as of 2026-05-14 close-out. The 62 FRs are covered. Stable-surface charter §5.8 lands. The end-to-end CSV→entity round-trip (WP11) is green.
 
-Five **MEDIUM** findings warrant post-merge follow-up (none of them re-implementation work; all are deltas in tests, docs, or contract clarification). Documented below with file:line evidence.
+### Resolution summary
+
+- ~~**D-MED-1** — `public-surface-map.php` under-registers §5.8 stable symbols.~~ **RESOLVED** (`8267072a1` / #1451). ~25 symbols added to `docs/public-surface-map.{php,md}`; the map now matches charter §5.8.
+- ~~**D-MED-2** — D3-vs-FR-042 contract ambiguity.~~ **RESOLVED** (`8267072a1` / #1452). `contracts/destination-plugin.md` reconciled — id-map retention is implementation-defined.
+- ~~**R-MED-1** — `RollbackReport` clock-skew constructor guard / WSL flake.~~ **RESOLVED** (`8267072a1` / #1448). `RollbackWalker` now pins timestamps monotonically.
+- ~~**R-MED-2** — Cross-WP `BeforeSave`/`AfterSave` double-dispatch on revisionable entities.~~ **RESOLVED** (`f55d1ea6a` / #1456 widens `EntityRepository::save()` to accept `?SaveContext`, eliminating the second dispatch site).
+- ~~**R-MED-3** — `MigrationLock::release()` `@unlink` TOCTOU.~~ **RESOLVED** (`8267072a1` / #1450). `@unlink` removed from `release()`; lock file is treated as a stable synchronisation primitive.
+- ~~**D-LOW-1** — Stale "WP07 will wire run-state" comment in `ImportStatusCommand`.~~ **RESOLVED** (`8267072a1` / #1453).
+- ~~**R-LOW-1** — Reference `CsvSource` `@fopen()` suppresses the warning.~~ **RESOLVED** (`8267072a1` / #1454).
 
 ---
 
