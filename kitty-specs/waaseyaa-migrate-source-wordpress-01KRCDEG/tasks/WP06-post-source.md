@@ -28,6 +28,8 @@ owned_files:
 - tests/Unit/Source/WordPressPostSourceTest.php
 - tests/Conformance/PostSourceConformanceTest.php
 tags: []
+agent: "claude"
+shell_pid: "144520"
 ---
 
 # WP06 — Source plugin: `WordPressPostSource`
@@ -117,3 +119,7 @@ Mirror WP03's pattern. Small-site fixture has 5 posts (mix of `post` and `page` 
 - Watch for the `dc:creator` namespace handling — needs explicit XPath registration in some libxml versions
 - Verify CPT support isn't accidentally filtered out (the discriminator is "not attachment", not "is post")
 - The `terms` array shape is a downstream interface — must match what WP09's WpPostsToArticles expects
+
+## Activity Log
+
+- 2026-05-14T22:03:23Z – claude – shell_pid=144520 – Started implementation via action command
