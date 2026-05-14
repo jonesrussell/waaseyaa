@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "mission_slug": "waaseyaa-migrate-source-wordpress-01KRCDEG",
+  "mission_id": "01KRCDEGS973ZVMQHAWZW368J4",
+  "mission_branch": "kitty/mission-waaseyaa-migrate-source-wordpress-01KRCDEG",
+  "target_branch": "kitty/mission-waaseyaa-migrate-source-wordpress-01KRCDEG",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05",
+        "WP06",
+        "WP07",
+        "WP08",
+        "WP09",
+        "WP10"
+      ],
+      "write_scope": [
+        ".github/workflows/ci.yml",
+        ".github/workflows/release.yml",
+        ".gitignore",
+        "CHANGELOG.md",
+        "README.md",
+        "composer.json",
+        "docs/customization.md",
+        "docs/migrating-from-wordpress.md",
+        "docs/upgrades/.gitkeep",
+        "phpunit.xml",
+        "public-surface-map.md",
+        "src/.gitkeep",
+        "src/Exception/WordPressMediaCopyException.php",
+        "src/Exception/WordPressOembedResolutionException.php",
+        "src/Exception/WxrParseException.php",
+        "src/Media/MediaCopier.php",
+        "src/Media/MediaCopyResult.php",
+        "src/Migration/WpCommentsToEngagement.php",
+        "src/Migration/WpMediaToEntities.php",
+        "src/Migration/WpPostsToArticles.php",
+        "src/Migration/WpTermsToTaxonomy.php",
+        "src/Migration/WpUsersToAccounts.php",
+        "src/Process/WordPressMediaRewriteUrl.php",
+        "src/Process/WordPressOembedExpand.php",
+        "src/Process/WordPressShortcodeStrip.php",
+        "src/ServiceProvider.php",
+        "src/Source/WordPressCommentSource.php",
+        "src/Source/WordPressMediaSource.php",
+        "src/Source/WordPressPostSource.php",
+        "src/Source/WordPressTaxonomySource.php",
+        "src/Source/WordPressUserSource.php",
+        "src/Wxr/WxrReader.php",
+        "src/Wxr/WxrVersion.php",
+        "testing/Fixtures/edge-cases/large-entries.xml",
+        "testing/Fixtures/edge-cases/malformed-entries.xml",
+        "testing/Fixtures/edge-cases/plugin-namespaces.xml",
+        "testing/Fixtures/edge-cases/rtl-language.xml",
+        "testing/Fixtures/edge-cases/unicode.xml",
+        "testing/Fixtures/medium-site.xml",
+        "testing/Fixtures/small-site.xml",
+        "tests/.gitkeep",
+        "tests/Conformance/CommentSourceConformanceTest.php",
+        "tests/Conformance/MediaSourceConformanceTest.php",
+        "tests/Conformance/PostSourceConformanceTest.php",
+        "tests/Conformance/TaxonomySourceConformanceTest.php",
+        "tests/Conformance/UserSourceConformanceTest.php",
+        "tests/Integration/EndToEndImportTest.php",
+        "tests/Unit/Media/MediaCopierTest.php",
+        "tests/Unit/Process/WordPressMediaRewriteUrlTest.php",
+        "tests/Unit/Process/WordPressOembedExpandTest.php",
+        "tests/Unit/Process/WordPressShortcodeStripTest.php",
+        "tests/Unit/Source/WordPressCommentSourceTest.php",
+        "tests/Unit/Source/WordPressMediaSourceTest.php",
+        "tests/Unit/Source/WordPressPostSourceTest.php",
+        "tests/Unit/Source/WordPressTaxonomySourceTest.php",
+        "tests/Unit/Source/WordPressUserSourceTest.php",
+        "tests/Unit/Wxr/WxrReaderTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "app-shell",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-14T19:06:18.422517+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP02"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP02"
+      },
+      {
+        "wp_a": "WP06",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP06 depends on WP02"
+      },
+      {
+        "wp_a": "WP07",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP07 depends on WP02"
+      },
+      {
+        "wp_a": "WP08",
+        "wp_b": "WP05",
+        "rule": "dependency",
+        "evidence": "WP08 depends on WP05"
+      },
+      {
+        "wp_a": "WP09",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP09 depends on WP03"
+      },
+      {
+        "wp_a": "WP10",
+        "wp_b": "WP09",
+        "rule": "dependency",
+        "evidence": "WP10 depends on WP09"
+      }
+    ],
+    "total_merges": 9,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 9
+    }
+  }
+}

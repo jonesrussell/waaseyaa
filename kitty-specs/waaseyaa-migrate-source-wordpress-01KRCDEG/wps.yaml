@@ -1,0 +1,311 @@
+# Work package manifest for M-005 (waaseyaa-migrate-source-wordpress).
+# tasks.md is auto-generated from this file by `spec-kitty tasks`.
+# All file paths are relative to the standalone repo root
+# (github.com/waaseyaa/migrate-source-wordpress), NOT to waaseyaa/framework.
+
+work_packages:
+  - id: WP01
+    title: "Package scaffold, composer config, CI skeleton"
+    dependencies: []
+    owned_files:
+      - "composer.json"
+      - "phpunit.xml"
+      - ".github/workflows/ci.yml"
+      - ".github/workflows/release.yml"
+      - ".gitignore"
+      - "src/ServiceProvider.php"
+      - "src/.gitkeep"
+      - "tests/.gitkeep"
+    requirement_refs:
+      - FR-018  # ServiceProvider scaffold (full registration in WP09)
+      - FR-018  # ServiceProvider scaffold (full registration in WP09)
+    subtasks:
+      - T001  # Provision github.com/waaseyaa/migrate-source-wordpress (public, default branch main)
+      - T002  # Author composer.json (name, license GPL-2.0-or-later, autoload PSR-4 Waaseyaa\Migrate\Source\WordPress\, require waaseyaa/migration ^0.1.0-alpha.179, sort-packages true)
+      - T003  # Author README.md skeleton (install, basic usage, links to operator + developer guides)
+      - T004  # Author CHANGELOG.md per Keep a Changelog format with [Unreleased] section
+      - T005  # Add Pest v4 dev dep + phpunit.xml (or pest.config) — decide implementation in WP01
+      - T006  # Add CI workflow (PHP 8.5 matrix; lint via Pint or PHP-CS-Fixer; static analysis PHPStan level 5; dead-code audit warn-only)
+      - T007  # Add release.yml stub (tag → Packagist webhook; manual one-time submission noted in WP01 acceptance)
+      - T008  # Author empty src/ServiceProvider.php registering HasMigrationsInterface + HasMigrationPluginsInterface (no migrations yet — follow-up WPs add them)
+      - T009  # Author public-surface-map.md scaffold listing the planned stable surface from spec §4
+      - T010  # Verify: composer install works, empty test suite passes, CI green on a no-op commit
+    prompt_file: "tasks/WP01-package-scaffold.md"
+
+  - id: WP02
+    title: "WXR streaming parser (WxrReader)"
+    dependencies:
+      - WP01
+    owned_files:
+      - "src/Wxr/WxrReader.php"
+      - "src/Wxr/WxrVersion.php"
+      - "src/Exception/WxrParseException.php"
+      - "tests/Unit/Wxr/WxrReaderTest.php"
+      - "testing/Fixtures/small-site.xml"
+      - "testing/Fixtures/edge-cases/malformed-entries.xml"
+      - "testing/Fixtures/edge-cases/unicode.xml"
+      - "testing/Fixtures/edge-cases/plugin-namespaces.xml"
+    requirement_refs:
+      - FR-001  # Streaming reader, no eager-load
+      - FR-002  # WXR 1.0/1.1/1.2 support
+      - FR-003  # Skip-with-warning recovery; --strict opt-in
+      - FR-004  # Per-record type discriminator
+      - FR-034  # WxrParseException on stable surface
+      - FR-035  # Stable string `code` field
+      - FR-036  # WxrParseException extends SourceReadException (substrate exception type)
+      - FR-038  # WXR fixture corpus (small-site + edge-case here; medium in WP09)
+      - FR-036  # WxrParseException extends SourceReadException (substrate exception type)
+      - FR-038  # WXR fixture corpus (small-site + edge-case here; medium in WP09)
+    subtasks:
+      - T011  # Implement WxrVersion enum (V_1_0, V_1_1, V_1_2)
+      - T012  # Implement WxrReader using PHP XMLReader (pull-parser); yields raw record arrays per <item>/<wp:author>/<wp:term>
+      - T013  # Implement version detection on document open (reject pre-1.0/post-1.2 with stable code)
+      - T014  # Implement libxml_use_internal_errors-based recovery; per-record skip + warn unless --strict
+      - T015  # Implement type discriminator (post/user/comment/attachment/term)
+      - T016  # Implement opaque pass-through for unknown XML namespaces (preserve in _extra)
+      - T017  # Add periodic gc_collect_cycles() in record loop (memory safety per research §3 risk 2)
+      - T018  # Author WxrParseException with stable code field (charter §4.4)
+      - T019  # Build small-site fixture (5 posts, 2 users, 3 attachments, 4 comments, 6 terms)
+      - T020  # Build edge-case fixtures (malformed entries, unicode/RTL, plugin namespaces)
+      - T021  # Unit tests covering FR-001..FR-004 + recovery semantics + version rejection + edge fixtures
+    prompt_file: "tasks/WP02-wxr-reader.md"
+
+  - id: WP03
+    title: "Source plugin: WordPressUserSource"
+    dependencies:
+      - WP02
+    owned_files:
+      - "src/Source/WordPressUserSource.php"
+      - "tests/Unit/Source/WordPressUserSourceTest.php"
+      - "tests/Conformance/UserSourceConformanceTest.php"
+    requirement_refs:
+      - FR-006  # User source emits per-user record
+      - FR-010  # Deterministic SourceId (hash: type + WP id)
+      - FR-011  # supportsQuery() returns false
+      - FR-012  # Passes M-002 SourceConformanceTestCase
+      - FR-037  # Conformance gate
+    subtasks:
+      - T022  # Implement WordPressUserSource extending SourcePluginInterface; iterates WxrReader filtering type=user
+      - T023  # Implement record shape per data-model.md §1.1 (id/login/email/display_name/first_name/last_name/registered/role/_extra)
+      - T024  # Implement sourceIdFor() returning sha256(canonical_json({type:"wp_user", id:<wp_id>}))
+      - T025  # Override supportsQuery() returning false
+      - T026  # Conformance test extending M-002's SourceConformanceTestCase
+      - T027  # Unit tests covering record-shape extraction + edge cases (empty email, missing optional fields)
+    prompt_file: "tasks/WP03-user-source.md"
+
+  - id: WP04
+    title: "Source plugin: WordPressTaxonomySource"
+    dependencies:
+      - WP02
+    owned_files:
+      - "src/Source/WordPressTaxonomySource.php"
+      - "tests/Unit/Source/WordPressTaxonomySourceTest.php"
+      - "tests/Conformance/TaxonomySourceConformanceTest.php"
+    requirement_refs:
+      - FR-009  # Taxonomy source emits per-term record
+      - FR-010
+      - FR-011
+      - FR-012
+      - FR-037
+    subtasks:
+      - T028  # Implement WordPressTaxonomySource (handles wp:category, wp:tag, wp:term)
+      - T029  # Implement record shape per data-model.md §1.2 (id/taxonomy_name/name/slug/description/parent_slug/_extra)
+      - T030  # Handle WXR 1.0/1.1 legacy implicit term ids
+      - T031  # Implement sourceIdFor()
+      - T032  # Conformance test
+      - T033  # Unit tests covering all three element variants + hierarchical parent_slug extraction
+    prompt_file: "tasks/WP04-taxonomy-source.md"
+
+  - id: WP05
+    title: "Source plugin: WordPressMediaSource + media copy primitive"
+    dependencies:
+      - WP02
+    owned_files:
+      - "src/Source/WordPressMediaSource.php"
+      - "src/Media/MediaCopier.php"
+      - "src/Media/MediaCopyResult.php"
+      - "src/Exception/WordPressMediaCopyException.php"
+      - "tests/Unit/Source/WordPressMediaSourceTest.php"
+      - "tests/Unit/Media/MediaCopierTest.php"
+      - "tests/Conformance/MediaSourceConformanceTest.php"
+    requirement_refs:
+      - FR-008  # Media source per-attachment record
+      - FR-010
+      - FR-011
+      - FR-012
+      - FR-026  # Idempotent copy (size-match no-op)
+      - FR-027  # Local + HTTP source paths
+      - FR-028  # Per-record errors, no halt unless --halt-on-error
+      - FR-029  # Optional hash verification
+      - FR-034  # WordPressMediaCopyException on stable surface
+      - FR-046  # Cross-reference to M-002 FR-046 (per-record error model) — local satisfaction via MediaCopyException + per-record warnings
+      - FR-046  # Cross-reference to M-002 FR-046 (per-record errors); local satisfaction via MediaCopyException
+    subtasks:
+      - T034  # Implement WordPressMediaSource filtering wp:post_type=attachment
+      - T035  # Implement record shape per data-model.md §1.3 (id/file_path/mime_type/alt_text/caption/description/parent_post_id/original_url/size_bytes/_extra)
+      - T036  # Extract postmeta keys (_wp_attached_file, _wp_attachment_image_alt) — handle both <wp:meta> and inline
+      - T037  # Implement MediaCopier with target-existence + size-match idempotency
+      - T038  # Local-filesystem source path support
+      - T039  # HTTP source path support with streaming download + retry
+      - T040  # Optional hash verification when WXR exposes it
+      - T041  # Author WordPressMediaCopyException with stable code field
+      - T042  # Conformance test + unit tests for all source/copy paths
+    prompt_file: "tasks/WP05-media-source.md"
+
+  - id: WP06
+    title: "Source plugin: WordPressPostSource"
+    dependencies:
+      - WP02
+    owned_files:
+      - "src/Source/WordPressPostSource.php"
+      - "tests/Unit/Source/WordPressPostSourceTest.php"
+      - "tests/Conformance/PostSourceConformanceTest.php"
+    requirement_refs:
+      - FR-005  # Post source emits per-post record (all post_types; consumers filter)
+      - FR-010
+      - FR-011
+      - FR-012
+      - FR-037
+    subtasks:
+      - T043  # Implement WordPressPostSource filtering wp:post_type != attachment
+      - T044  # Implement record shape per data-model.md §1.4 (id/post_type/title/slug/content/excerpt/status/published_at/modified_at/author_login/parent_id/terms/comment_status/password/_extra)
+      - T045  # Extract <category> elements with domain+nicename into terms array
+      - T046  # Handle published_at fallback chain: post_date_gmt → post_date
+      - T047  # Implement sourceIdFor()
+      - T048  # Conformance test
+      - T049  # Unit tests covering all post_types + custom post types + edge cases (empty content, password-protected)
+    prompt_file: "tasks/WP06-post-source.md"
+
+  - id: WP07
+    title: "Source plugin: WordPressCommentSource"
+    dependencies:
+      - WP02
+    owned_files:
+      - "src/Source/WordPressCommentSource.php"
+      - "tests/Unit/Source/WordPressCommentSourceTest.php"
+      - "tests/Conformance/CommentSourceConformanceTest.php"
+    requirement_refs:
+      - FR-007  # Comment source per-comment record
+      - FR-010
+      - FR-011
+      - FR-012
+      - FR-037
+    subtasks:
+      - T050  # Implement WordPressCommentSource iterating nested wp:comment under each item
+      - T051  # Implement record shape per data-model.md §1.5 (id/post_id/parent_id/author/author_email/author_url/author_ip/content/published_at/approved/comment_type/user_login/_extra)
+      - T052  # Map approved field 1/0/spam/trash to bool + moderation state
+      - T053  # Preserve raw comment_parent (no flattening per research §1.12)
+      - T054  # Implement sourceIdFor()
+      - T055  # Conformance test
+      - T056  # Unit tests covering comments + pingbacks + trackbacks + nested threading
+    prompt_file: "tasks/WP07-comment-source.md"
+
+  - id: WP08
+    title: "Process plugins: shortcode strip, oEmbed expand, media URL rewrite"
+    dependencies:
+      - WP05
+      - WP06
+    owned_files:
+      - "src/Process/WordPressShortcodeStrip.php"
+      - "src/Process/WordPressOembedExpand.php"
+      - "src/Process/WordPressMediaRewriteUrl.php"
+      - "src/Exception/WordPressOembedResolutionException.php"
+      - "tests/Unit/Process/WordPressShortcodeStripTest.php"
+      - "tests/Unit/Process/WordPressOembedExpandTest.php"
+      - "tests/Unit/Process/WordPressMediaRewriteUrlTest.php"
+    requirement_refs:
+      - FR-013  # ShortcodeStrip removes unknown shortcodes; rewrites known via callbacks
+      - FR-014  # OembedExpand resolves YouTube/Vimeo/Twitter/Instagram patterns
+      - FR-015  # MediaRewriteUrl rewrites wp-content/uploads to imported media UUIDs
+      - FR-016  # Composable in chains
+      - FR-017  # Plugin id naming (wordpress_*)
+      - FR-034  # WordPressOembedResolutionException on stable surface
+    subtasks:
+      - T057  # Implement WordPressShortcodeStrip (constructor takes optional known-shortcode rewriter callbacks; default strips silently)
+      - T058  # Implement WordPressOembedExpand with YouTube/Vimeo/Twitter/Instagram URL pattern detection
+      - T059  # Add resolve_remote: true opt-in for OembedExpand (default false; opt-in HTTP resolution)
+      - T060  # Implement WordPressMediaRewriteUrl consulting wp_media_to_entities id-map for URL rewrite
+      - T061  # Author WordPressOembedResolutionException
+      - T062  # Handle CDN-prefixed wp-content/uploads URLs via configurable host-allowlist (research Q2)
+      - T063  # Composability tests proving all three chain together (FR-016)
+      - T064  # Unit tests covering each plugin's edge cases (nested shortcodes, malformed oEmbed URLs, missing media in id-map)
+    prompt_file: "tasks/WP08-process-plugins.md"
+
+  - id: WP09
+    title: "Default migrations + cross-migration ID resolution + end-to-end validation"
+    dependencies:
+      - WP03
+      - WP04
+      - WP05
+      - WP06
+      - WP07
+      - WP08
+    owned_files:
+      - "src/Migration/WpUsersToAccounts.php"
+      - "src/Migration/WpTermsToTaxonomy.php"
+      - "src/Migration/WpMediaToEntities.php"
+      - "src/Migration/WpPostsToArticles.php"
+      - "src/Migration/WpCommentsToEngagement.php"
+      - "tests/Integration/EndToEndImportTest.php"
+      - "testing/Fixtures/medium-site.xml"
+      - "testing/Fixtures/edge-cases/large-entries.xml"
+      - "testing/Fixtures/edge-cases/rtl-language.xml"
+    requirement_refs:
+      - FR-018  # HasMigrationsInterface provider returning 5 default migrations
+      - FR-019  # wp_users_to_accounts (no password preservation)
+      - FR-020  # wp_terms_to_taxonomy (hierarchical via LookupProcessor self-reference)
+      - FR-021  # wp_media_to_entities (configurable source.media_path)
+      - FR-022  # wp_posts_to_<entity_type> template; ship wp_posts_to_articles example
+      - FR-023  # wp_comments_to_engagement
+      - FR-024  # Migration dependencies declared (users → terms → media → posts → comments)
+      - FR-025  # All overridable
+      - FR-030  # post_author → user lookup
+      - FR-031  # comment_post_ID + comment_parent lookups
+      - FR-032  # post_parent → post lookup (for media)
+      - FR-033  # Missing lookups → per-record warnings, null/zero default
+      - FR-040  # Real-site (or fabricated-realistic) end-to-end import validation
+      - FR-041  # ≥100 records/sec posts (informational)
+      - FR-038  # WXR fixture corpus (medium-site + RTL/large-entries edge cases here)
+      - FR-039  # Integration tests run full small-site through all 5 migrations end-to-end
+      - FR-038  # WXR fixture corpus (medium-site + RTL/large-entries edge cases)
+      - FR-039  # Integration tests run full small-site through all 5 migrations end-to-end
+    subtasks:
+      - T065  # Implement WpUsersToAccounts MigrationDefinition (no dependencies; password discarded; first-login reset flag)
+      - T066  # Implement WpTermsToTaxonomy with LookupProcessor self-reference for parent_slug
+      - T067  # Implement WpMediaToEntities (source.media_path config; LookupProcessor for parent_post_id)
+      - T068  # Implement WpPostsToArticles example (LookupProcessor for author_login + terms; depends on users + terms + media)
+      - T069  # Implement WpCommentsToEngagement (LookupProcessor for post_id, parent_id, user_login)
+      - T070  # Wire ServiceProvider to expose all 5 migrations via HasMigrationsInterface
+      - T071  # Build medium-site fixture (50 posts, 5 users, 30 attachments, 200 comments, 20 terms)
+      - T072  # Build edge-case fixtures (large entries, RTL language)
+      - T073  # Implement EndToEndImportTest: small-site fixture → import:run-all → entity counts + key field assertions
+      - T074  # Idempotency proof: re-run import, assert no duplicates and unchanged state
+      - T075  # Performance smoke: instrument records/sec on small-site fixture (informational; document result)
+      - T076  # Memory profile: instrument peak memory; assert under reasonable bound for medium fixture
+    prompt_file: "tasks/WP09-default-migrations.md"
+
+  - id: WP10
+    title: "Operator + developer documentation, README polish, first stable release"
+    dependencies:
+      - WP09
+    owned_files:
+      - "docs/migrating-from-wordpress.md"
+      - "docs/customization.md"
+      - "README.md"
+      - "CHANGELOG.md"
+      - "docs/upgrades/.gitkeep"
+      - "public-surface-map.md"
+    requirement_refs:
+      - FR-042  # Operator guide (marketing-grade)
+      - FR-043  # Developer guide (override patterns)
+      - FR-044  # README install + basic usage + links
+      - FR-045  # Upgrade-guide entries on breaking changes (post-1.0)
+    subtasks:
+      - T077  # Author docs/migrating-from-wordpress.md (operator-facing; marketing-grade walkthrough)
+      - T078  # Author docs/customization.md (developer-facing; override migrations, custom shortcode handlers, parameterize for non-default consumer entities)
+      - T079  # Polish README.md with verified install + basic usage + links to operator + developer guides
+      - T080  # Update CHANGELOG.md [Unreleased] → [0.1.0] entry summarizing the package surface
+      - T081  # Update public-surface-map.md with final stable surface (spec §4)
+      - T082  # Cut v0.1.0 release on the standalone repo (tag, GitHub release, Packagist auto-update)
+      - T083  # Verify install on a clean machine (Docker scratch container or fresh VM); document procedure in README
+    prompt_file: "tasks/WP10-documentation-release.md"

@@ -1,0 +1,11 @@
+id,kind,citation,url_or_path,first_referenced_in,notes
+S001,spec,WordPress WXR file format documentation,https://wordpress.org/documentation/article/wxr-files/,research.md §1.2,Canonical WXR documentation; covers 1.0/1.1/1.2 element structure
+S002,spec,WXR community schema (XSD-style),https://github.com/pfefferle/wordpress-export-xml-schema,research.md §1.2,Community-maintained schema; useful for namespace enumeration
+S003,internal,M-002 migration-platform-v1 spec,kitty-specs/migration-platform-v1-01KRCDE9/spec.md,research.md §1.4,Substrate FRs that this mission consumes (especially FR-001..FR-014 source contract and FR-027..FR-035 id-map)
+S004,internal,ADR 012a — migration substrate in core,docs/adr/012a-migration-substrate-in-core.md,research.md §1.9,Governing decision; names WordPress as first first-party source reader
+S005,prior-art,Drupal contrib migrate_source_wordpress,https://www.drupal.org/project/migrate_source_wordpress,research.md §1.4,Architectural prior art; design heavily influenced by per-source-per-WP-entity-type pattern
+S006,implementation,WordPress core importer (WXR_Parser),https://core.trac.wordpress.org/browser/branches/6.0/src/wp-admin/includes/class-wp-importer.php,research.md §1.1,XMLReader usage patterns and per-record recovery patterns
+S007,internal,alpha.179 release notes (M-002 substrate ship),CHANGELOG.md §[0.1.0-alpha.179],research.md §5,"Confirms substrate availability; ships waaseyaa/migration with EntityDestination, MigrationDefinition, conformance suite"
+S008,internal,Charter §5.8 — migration-platform stable surface,docs/specs/stability-charter.md,research.md §1.10,Defines stable-surface obligations for downstream packages including this one
+S009,internal,Memory: new package release checklist,/home/jones/.claude/projects/-home-jones-dev-waaseyaa/memory/feedback_new_package_release_checklist.md,research.md §1.9,Lessons from alpha.178 incident; informs standalone-repo provisioning
+S010,reference,RFC 2119 — MUST/SHOULD/MAY,https://datatracker.ietf.org/doc/html/rfc2119,spec.md §3,Normative keyword conventions used in spec FRs

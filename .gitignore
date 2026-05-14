@@ -60,6 +60,10 @@ packages/admin/test-results/
 
 # Smoke test screenshots
 smoke-*.png
+admin-login-smoke-*.png
+
+# PHPStan cache when run from repo root (CI variant — tmp/phpstan/ is already ignored)
+/phpstan/
 
 # Node/Vitest temp artifacts
 node-compile-cache/

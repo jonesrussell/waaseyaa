@@ -1,0 +1,91 @@
+{
+  "event_count": 60,
+  "last_event_id": "01KRMAQKTB5CSFGHCRET7AMW7Y",
+  "materialized_at": "2026-05-14T22:46:48.907655+00:00",
+  "mission_number": "",
+  "mission_slug": "waaseyaa-migrate-source-wordpress-01KRCDEG",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 10,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 0
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM4AQSA0CY374CQ87CW3CEH",
+      "last_transition_at": "2026-05-14T20:54:55.530862+00:00"
+    },
+    "WP02": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM4ASREZNR06Q3C2KT7XQ5B",
+      "last_transition_at": "2026-05-14T20:54:57.550702+00:00"
+    },
+    "WP03": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM9XQPFWHH8JAWGJFM32D5D",
+      "last_transition_at": "2026-05-14T22:32:40.911241+00:00"
+    },
+    "WP04": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM9XSQFVCCF1JFTFV8CSN6V",
+      "last_transition_at": "2026-05-14T22:32:42.991495+00:00"
+    },
+    "WP05": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM9XVSDCW6RH48K772Z4NP3",
+      "last_transition_at": "2026-05-14T22:32:45.101959+00:00"
+    },
+    "WP06": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM9XXWCPFD37MEHW1GMY8N9",
+      "last_transition_at": "2026-05-14T22:32:47.244272+00:00"
+    },
+    "WP07": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM9XZYB2KMVJ18FN4V0TDD2",
+      "last_transition_at": "2026-05-14T22:32:49.355979+00:00"
+    },
+    "WP08": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRM9Y185VZHQMJKSFGBBBK0F",
+      "last_transition_at": "2026-05-14T22:32:50.693276+00:00"
+    },
+    "WP09": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRMAATY2CDS91KBEEDZRGFTB",
+      "last_transition_at": "2026-05-14T22:39:50.210870+00:00"
+    },
+    "WP10": {
+      "actor": "claude",
+      "force_count": 4,
+      "lane": "done",
+      "last_event_id": "01KRMAQKTB5CSFGHCRET7AMW7Y",
+      "last_transition_at": "2026-05-14T22:46:48.907655+00:00"
+    }
+  }
+}
