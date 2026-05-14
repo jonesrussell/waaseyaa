@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-14T03:55:08.628415+00:00",
+  "friendly_name": "admin spa envelope reshape",
+  "mission_id": "01KRJ9ZE3KW2KHH5J1442AAH12",
+  "mission_number": null,
+  "mission_slug": "admin-spa-envelope-reshape-01KRJ9ZE",
+  "mission_type": "software-dev",
+  "slug": "admin-spa-envelope-reshape-01KRJ9ZE",
+  "target_branch": "main"
+}
