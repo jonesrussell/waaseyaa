@@ -45,7 +45,7 @@ Ranked by `(blast_radius_desc, prerequisites_first, size_asc_at_tie)` per the me
 | **M1** | [Admin SPA dependency + tooling bump (2026-Q3)](#m1) | S | 12 entries | Track 1 | — | [#1411](https://github.com/waaseyaa/framework/issues/1411) |
 | **M2** | [Admin SPA envelope re-shape & build pipeline](#m2) | M | 9 entries | Track 1 | — | [#1412](https://github.com/waaseyaa/framework/issues/1412) M2 status (2026-05-14): M2A (PR #1422) shipped envelope + README on 2026-05-11; M2 wrap-up (PR #1468) lands doc-sync + audit closure + PR #1350 reconciliation. |
 | **M3** | [Bundle + tenancy awareness in admin SPA](#m3) | M | 8 entries | Track 1 | — | [#1413](https://github.com/waaseyaa/framework/issues/1413) M3 status (2026-05-14): M3A (PR #1423) shipped bundle filter on entity lists on 2026-05-11; M3B (PR #1424) shipped bundle picker on create form on 2026-05-11; tenancy slot was pre-existing (`useAdmin().tenant` + `scopingStrategy: 'server'`); D-Field-02 work-surface deferred to its own mission. M3 wrap-up (PR #1469) lands audit closure + CHANGELOG entry. |
-| **M4** | [Admin SPA coverage Phase 1 — operator subsystems](#m4) | L | 14 entries | Track 1 | M1 | [#1414](https://github.com/waaseyaa/framework/issues/1414) |
+| **M4** | [Admin SPA coverage Phase 1 — operator subsystems](#m4) | L | 14 entries | Track 1 | M1 | [#1414](https://github.com/waaseyaa/framework/issues/1414) M4 status (2026-05-14): M4A workflows admin partially shipped — M4A-1 (PR #1429), M4A-2 (PR #1431), M4A-3 (PR #1433), M4A-4 (PR #1438) all merged 2026-05-11; M4A-5 guard editing tracked at #1470. M4B queue + scheduler dashboard tracked at #1471. M4C notification rules admin tracked at #1472. Umbrella remains open until M4A-5 + M4B + M4C land. |
 | **M5** | [Admin SPA coverage Phase 2 — AI/agentic surfaces](#m5) | L | 11 entries | Track 2 | M1, M4 | [#1415](https://github.com/waaseyaa/framework/issues/1415) |
 
 ### <a name="m1"></a>M1 — Admin SPA dependency + tooling bump (2026-Q3)
@@ -261,9 +261,9 @@ Walked the `CLAUDE.md` orchestration table and listed every package present in `
 | error-handler | no-UI | no SPA refs | error log feed (likely covered by telescope) | XS |
 | foundation | n/a | implicit | infrastructure layer, no direct UI | — |
 | <a name="C-L0-04"></a>**mercure** | no-UI | no SPA refs | live broadcast monitor: channels, subs, msg rate — closes part of M5 | S |
-| <a name="C-L0-01"></a>**queue** | no-UI | no SPA refs | queue dashboard: jobs, retries, dead-letter, manual trigger — closes part of M4 | M |
-| <a name="C-L0-02"></a>**scheduler** | no-UI | no SPA refs | cron table + manual-run + history — closes part of M4 | S |
-| <a name="C-L0-03"></a>**notification** | no-UI | no SPA refs | channel config + delivery log — closes part of M4 | S |
+| <a name="C-L0-01"></a>**queue** | no-UI | no SPA refs | queue dashboard: jobs, retries, dead-letter, manual trigger — closes part of M4. **TRACKED — M4B child issue #1471 (Phase 1).** | M |
+| <a name="C-L0-02"></a>**scheduler** | no-UI | no SPA refs | cron table + manual-run + history — closes part of M4. **TRACKED — M4B child issue #1471 (Phase 2).** | S |
+| <a name="C-L0-03"></a>**notification** | no-UI | no SPA refs | channel config + delivery log — closes part of M4. **TRACKED — M4C child issue #1472.** | S |
 | typed-data | n/a | infrastructure | no direct UI | — |
 | validation | n/a | infrastructure | no direct UI | — |
 | i18n | minimal-UI | `useLanguage.ts` reads locale | language-picker exists; missing translation-editing UI | M (deferred) |
@@ -303,10 +303,10 @@ Walked the `CLAUDE.md` orchestration table and listed every package present in `
 
 | Subsystem | Class | Evidence | Notes | Size |
 |---|---|---|---|---|
-| <a name="C-L3-01"></a>**workflows** | no-UI | no SPA refs | M4 sub-mission: definitions, transitions, dry-run, guards | M |
+| <a name="C-L3-01"></a>**workflows** | no-UI | no SPA refs | M4 sub-mission: definitions, transitions, dry-run, guards. **PARTIAL — list page (M4A-1, PR #1429), detail page (M4A-2, PR #1431), per-entity transition-history widget (M4A-3, PR #1433), and dry-run state transitions (M4A-4, PR #1438) all merged 2026-05-11. Guard editing (M4A-5) tracked at #1470 — remaining slice for full closure.** | M |
 | search | minimal-UI | no admin admin, but FTS5 powers some lookups | search admin: index health, reindex, query test | S |
 | seo | no-UI | no SPA refs | meta-tag preview + sitemap status | S |
-| <a name="C-L3-02"></a>**notification** | — | (already L0 row) | M4 sub-mission | — |
+| <a name="C-L3-02"></a>**notification** | — | (already L0 row) | M4 sub-mission. **TRACKED — M4C child issue #1472 (sibling to C-L0-03).** | — |
 | billing | no-UI | no SPA refs | subscription admin: plans, invoices, dunning | L |
 | github | no-UI | no SPA refs | repo binding admin | XS |
 | northcloud | minimal-UI | `/api/staff/nc-sync-status` | dedicated NC sync status (partial), missing manual-trigger UI | XS |
