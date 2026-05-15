@@ -1,0 +1,105 @@
+{
+  "event_count": 12,
+  "last_event_id": "01KRMTVYWXYT5CTPDP8QGWRV95",
+  "materialized_at": "2026-05-15T03:28:48.541757+00:00",
+  "mission_number": "9",
+  "mission_slug": "listing-pipeline-v1-01KRMN0B",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 12
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVXW7WY80MJ2F2W6A8Z03",
+      "last_transition_at": "2026-05-15T03:28:47.495429+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYEKXBZ79PYP7ZD6STS8",
+      "last_transition_at": "2026-05-15T03:28:48.083706+00:00"
+    },
+    "WP03": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYFS3G30AZKGXQQ869W9",
+      "last_transition_at": "2026-05-15T03:28:48.121538+00:00"
+    },
+    "WP04": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYH3MZ1SCAGKDZTKSED5",
+      "last_transition_at": "2026-05-15T03:28:48.163787+00:00"
+    },
+    "WP05": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYJS102AAAZHYV5P2ZNN",
+      "last_transition_at": "2026-05-15T03:28:48.217178+00:00"
+    },
+    "WP06": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYM1E3YDSGG6T7N284DN",
+      "last_transition_at": "2026-05-15T03:28:48.257102+00:00"
+    },
+    "WP07": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYNBKHT4XCKTGQG9X1TT",
+      "last_transition_at": "2026-05-15T03:28:48.299729+00:00"
+    },
+    "WP08": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYPND7Q1VG5G87ZY82N5",
+      "last_transition_at": "2026-05-15T03:28:48.341575+00:00"
+    },
+    "WP09": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYR41HARCQHQ1MC1W48V",
+      "last_transition_at": "2026-05-15T03:28:48.388446+00:00"
+    },
+    "WP10": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYSZK44D90Z679ZZ647Z",
+      "last_transition_at": "2026-05-15T03:28:48.447545+00:00"
+    },
+    "WP11": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYVED8S1X949ED5Q3YJH",
+      "last_transition_at": "2026-05-15T03:28:48.494109+00:00"
+    },
+    "WP12": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRMTVYWXYT5CTPDP8QGWRV95",
+      "last_transition_at": "2026-05-15T03:28:48.541757+00:00"
+    }
+  }
+}

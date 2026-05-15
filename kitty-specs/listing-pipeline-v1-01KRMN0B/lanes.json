@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "mission_slug": "listing-pipeline-v1-01KRMN0B",
+  "mission_id": "01KRMN0B4FWX9PK80RPSYDX1QM",
+  "mission_branch": "kitty/mission-listing-pipeline-v1-01KRMN0B",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05",
+        "WP06",
+        "WP07",
+        "WP08",
+        "WP09",
+        "WP10",
+        "WP11"
+      ],
+      "write_scope": [
+        "composer.json",
+        "kitty-specs/listing-pipeline-v1-01KRMN0B/contracts/conformance-matrix.md",
+        "packages/cache/src/ContextNames.php",
+        "packages/cache/src/ContextRegistry.php",
+        "packages/cache/src/ContextResolver.php",
+        "packages/cache/src/Exception/InvalidCacheTagException.php",
+        "packages/cache/src/MemoryBackend.php",
+        "packages/cache/src/TaggedCacheInterface.php",
+        "packages/cache/tests/Unit/ContextRegistryTest.php",
+        "packages/cache/tests/Unit/ContextResolverTest.php",
+        "packages/cache/tests/Unit/MemoryBackendTaggedTest.php",
+        "packages/cache/tests/Unit/TaggedCacheInterfaceContractTest.php",
+        "packages/entity-storage/src/SqlStorageDriver.php",
+        "packages/entity-storage/tests/Unit/SqlStorageDriverAffectedLangcodesTest.php",
+        "packages/foundation/src/Event/AfterDeleteEvent.php",
+        "packages/foundation/src/Event/AfterSaveEvent.php",
+        "packages/foundation/tests/Unit/Event/AfterDeleteEventAffectedLangcodesTest.php",
+        "packages/foundation/tests/Unit/Event/AfterSaveEventAffectedLangcodesTest.php",
+        "packages/listing/composer.json",
+        "packages/listing/src/Exception/ListingCoercionException.php",
+        "packages/listing/src/Exception/UnknownListingException.php",
+        "packages/listing/src/Exception/UnsupportedListingException.php",
+        "packages/listing/src/ExposedFilterCoercer.php",
+        "packages/listing/src/ExposedFilterParser.php",
+        "packages/listing/src/ExposedFilterValues.php",
+        "packages/listing/src/Filter.php",
+        "packages/listing/src/FilterDefinition.php",
+        "packages/listing/src/HasListingsInterface.php",
+        "packages/listing/src/ListingCacheInvalidator.php",
+        "packages/listing/src/ListingCacheKeyBuilder.php",
+        "packages/listing/src/ListingDefinition.php",
+        "packages/listing/src/ListingDefinitionRegistry.php",
+        "packages/listing/src/ListingDefinitionValidator.php",
+        "packages/listing/src/ListingDiscoverer.php",
+        "packages/listing/src/ListingResolver.php",
+        "packages/listing/src/ListingResult.php",
+        "packages/listing/src/Operator.php",
+        "packages/listing/src/Pagination.php",
+        "packages/listing/src/ServiceProvider.php",
+        "packages/listing/src/Sort.php",
+        "packages/listing/src/SortDefinition.php",
+        "packages/listing/src/SortDirection.php",
+        "packages/listing/tests/Backend/NonTranslatableListingTest.php",
+        "packages/listing/tests/Backend/SqlBlobTranslatableListingTest.php",
+        "packages/listing/tests/Backend/SqlColumnTranslatableListingTest.php",
+        "packages/listing/tests/Contract/InMemoryListingResolverTest.php",
+        "packages/listing/tests/Contract/ListingResolverContract.php",
+        "packages/listing/tests/Contract/SqliteListingResolverTest.php",
+        "packages/listing/tests/Fixtures/EventEntity.php",
+        "packages/listing/tests/Fixtures/UpcomingEventsListing.php",
+        "packages/listing/tests/Integration/CacheIntegrationTest.php",
+        "packages/listing/tests/Unit/Discovery/**",
+        "packages/listing/tests/Unit/Exception/UnknownListingExceptionTest.php",
+        "packages/listing/tests/Unit/Exception/UnsupportedListingExceptionTest.php",
+        "packages/listing/tests/Unit/ExposedFilterCoercerTest.php",
+        "packages/listing/tests/Unit/ExposedFilterParserTest.php",
+        "packages/listing/tests/Unit/ExposedFilterValuesTest.php",
+        "packages/listing/tests/Unit/FilterDefinitionTest.php",
+        "packages/listing/tests/Unit/FilterTest.php",
+        "packages/listing/tests/Unit/ListingCacheInvalidatorTest.php",
+        "packages/listing/tests/Unit/ListingCacheKeyBuilderTest.php",
+        "packages/listing/tests/Unit/ListingDefinitionTest.php",
+        "packages/listing/tests/Unit/ListingDefinitionValidatorTest.php",
+        "packages/listing/tests/Unit/ListingResultTest.php",
+        "packages/listing/tests/Unit/OperatorTest.php",
+        "packages/listing/tests/Unit/PaginationTest.php",
+        "packages/listing/tests/Unit/SortDefinitionTest.php",
+        "packages/listing/tests/Unit/SortDirectionTest.php",
+        "packages/listing/tests/Unit/SortTest.php",
+        "tests/Integration/Phase14/BootValidationFailureTest.php",
+        "tests/Integration/Phase14/ListingCacheInvalidationIntegrationTest.php",
+        "tests/Integration/Phase14/ListingPipelineIntegrationTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP12"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "docs/conventions/cache-tags-and-contexts.md",
+        "docs/cookbook/listing-first-cut.md",
+        "docs/public-surface-map.php",
+        "docs/specs/listing-pipeline-v1.md",
+        "docs/specs/public-surface-map.md",
+        "docs/specs/stability-charter.md"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-15T03:28:48.591567+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP12"
+  ],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP01"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP04"
+      },
+      {
+        "wp_a": "WP06",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP06 depends on WP03"
+      },
+      {
+        "wp_a": "WP06",
+        "wp_b": "WP05",
+        "rule": "dependency",
+        "evidence": "WP06 depends on WP05"
+      },
+      {
+        "wp_a": "WP07",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP07 depends on WP03"
+      },
+      {
+        "wp_a": "WP08",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP08 depends on WP01"
+      },
+      {
+        "wp_a": "WP09",
+        "wp_b": "WP05",
+        "rule": "dependency",
+        "evidence": "WP09 depends on WP05"
+      },
+      {
+        "wp_a": "WP10",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP10 depends on WP02"
+      },
+      {
+        "wp_a": "WP11",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP11 depends on WP01"
+      }
+    ],
+    "total_merges": 10,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 10
+    }
+  }
+}
