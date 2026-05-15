@@ -7,12 +7,12 @@
 > Original 2026-05-12 BLOCKED stamp identified two hard prerequisites. Status today:
 >
 > 1. ~~**Single-axis translation substrate.**~~ ✅ **SATISFIED** by M-006 (`entity-storage-translations-v1-01KRF0FQ`, squash `0f7e1809a` on 2026-05-13, mission closed in PR #1485 / `a7840a36a` on 2026-05-14). The translation tombstone is gone: `TranslatableInterface` (`packages/entity/src/TranslatableInterface.php`) and `TranslatableEntityTrait` are in place; per-field `FieldDefinition::translatable()` works in both `sql-blob` and `sql-column` backends via `TranslationSchemaHandler`; `SaveContext::langcode` + `withLangcode()` carry per-langcode save semantics.
-> 2. **ADR 015 listing pipeline.** ❌ Still pending. Required for WP07 (per-langcode listing filters, langcode cache tags). Only `docs/adr/015-listing-pipeline-views-equivalent.md` exists; no `listing-pipeline-v1` mission specced, no implementation in `packages/`.
+> 2. **ADR 015 listing pipeline.** ⏳ **SPEC FILED**, implementation pending. Spec filed 2026-05-15 as **M-007 (`listing-pipeline-v1-01KRMN0B`)**; canonical doctrine at [`listing-pipeline-v1.md`](listing-pipeline-v1.md). Required for WP07 (per-langcode listing filters, langcode cache tags). M-007 §3.12 (FR-046..FR-049) explicitly carries the langcode-aware deliverables this mission's WP07 depends on. Implementation still has to ship — until then, WP07 remains gated.
 >
 > **Plannable today:** WP01..WP06 (per §7.2 below, after WP01+WP02 the parallel branch WP03/WP04/WP05/WP06 has no listing-pipeline dependency).
 > **Still gated:** WP07 (needs `listing-pipeline-v1` to spec and ship) and WP08 (closes the mission; transitively gated).
 >
-> **Unblocker (full):** Spec and ship `listing-pipeline-v1` as a separate mission. Before *any* planning begins, the original author's caveat still holds — revisit §3 FRs and §7 WP decomposition against the M-006 substrate that actually shipped; the decomposition may shift now that translation deliverables are concrete code instead of a planned shape.
+> **Unblocker (full):** Ship M-007 (`listing-pipeline-v1`, spec filed 2026-05-15). Before *any* planning of M-004 begins, the original author's caveat still holds — revisit §3 FRs and §7 WP decomposition against the M-006 + M-007 substrates that actually shipped; the decomposition may shift now that translation and listing deliverables become concrete code instead of a planned shape.
 
 # Entity Storage — Translatable + Revisionable Two-Axis Interaction
 

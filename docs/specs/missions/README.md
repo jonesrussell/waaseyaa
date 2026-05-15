@@ -1,8 +1,8 @@
 # Waaseyaa Mission Manifest
 
 **Generated:** 2026-05-11
-**Updated:** 2026-05-13 — **M-006** (`entity-storage-translations-v1`) shipped (squash `0f7e1809a`), clearing one of two M-004 prerequisites; M-001 remains shipped (squash `509e31fb7`).
-**Status:** Six missions on the manifest. M-001 and M-006 shipped. M-002/M-003 ready. M-004 still blocked on the ADR 015 listing-pipeline prereq; M-005 still blocked on M-002.
+**Updated:** 2026-05-15 — **M-007** (`listing-pipeline-v1`) filed as ready (Spec Kitty mission `01KRMN0B`). Files the second of M-004's two prerequisites, in spec form. M-005 (`waaseyaa/migrate-source-wordpress`) shipped 2026-05-14 (squash `8da18d163`). M-002 close-out 2026-05-14 (#1481). M-006 remains shipped (squash `0f7e1809a`); M-001 remains shipped (squash `509e31fb7`).
+**Status:** Seven missions on the manifest. M-001, M-002, M-005, M-006 shipped. M-003 ready. M-004 PARTIALLY UNBLOCKED (waits on M-007 to ship + spec revalidation). M-007 ready for filing — implement-review loop can start once charter §3.2/§5 amendments are sequenced.
 
 Each subdirectory contains a `mission.json` filing-ready metadata file. The canonical spec for each mission lives at the path given in `mission.json:spec_path`.
 
@@ -16,6 +16,7 @@ Each subdirectory contains a `mission.json` filing-ready metadata file. The cano
 | M-004 | Two-Axis Translation × Revisions | `docs/specs/entity-storage-translatable-revisions.md` | blocked (waits on listing-pipeline-v1; single-axis-translation prereq cleared by M-006 on 2026-05-13) | `mission.json` |
 | M-005 | WordPress Source Reader | `docs/specs/waaseyaa-migrate-source-wordpress.md` | blocked (waits on M-002) | `mission.json` |
 | M-006 | Entity Storage — Single-Axis Translations v1 | `docs/specs/entity-storage-translations-v1.md` | **shipped 2026-05-13** (squash `0f7e1809a`); satisfies charter §3.2 beta-entry criterion 9 (per-field translation) | `mission.json` |
+| M-007 | Listing Pipeline v1 — Views-equivalent surface | `docs/specs/listing-pipeline-v1.md` | ready-for-filing 2026-05-15; Spec Kitty mission `listing-pipeline-v1-01KRMN0B`; adds charter §3.2 criterion 10 + new §5.X (listing) + §5.Y (cache tag/context). Clears M-004's second prerequisite when shipped. | `mission.json` |
 
 ## Cross-mission dependency graph
 
@@ -55,13 +56,13 @@ Each subdirectory contains a `mission.json` filing-ready metadata file. The cano
             ▼
    M-006 shipped 2026-05-13 (single-axis translations — BETA-GATE cleared)
             │
-            │   ┌── listing-pipeline-v1 (TBD spec, ADR 015) ── remaining M-004 prereq
+            │   ┌── M-007 listing-pipeline-v1 (spec filed 2026-05-15; impl pending)
             │   │
             ▼   ▼
-       both prereqs satisfied (translation: done; listing-pipeline: pending)
+       prereq 1 satisfied (M-006 translation: shipped); prereq 2 spec-only (M-007: ready)
             │
             ▼
-         M-004 starts (waits on listing-pipeline-v1 only)
+         M-004 PARTIALLY UNBLOCKED (waits on M-007 ship + §3/§7 revalidation)
 ```
 
 ## Filing order (recommended)
@@ -70,7 +71,8 @@ Each subdirectory contains a `mission.json` filing-ready metadata file. The cano
 2. **M-003** — Config Management v1. Standalone after verifying `FieldDefinition::validators()` is shipped. Can run fully in parallel with M-001.
 3. **M-002** — Migration Platform v1. WPs 01–04, 09, 10 can start in parallel with M-001 / M-003. WP05 waits on M-001 WP04+WP08.
 4. **M-005** — WordPress Source Reader. Starts after M-002 acceptance criterion 8 satisfied. Lives in a separate composer package + separate repo.
-5. **M-004** — Two-Axis Translation × Revisions. Most dependency-blocked; files now for visibility but does not start work until M-001 complete and `listing-pipeline-v1.md` (TBD) ships to WP07-ready state.
+5. **M-007** — Listing Pipeline v1. Largest single feature post-charter; owns cache tag/context architecture alongside Views-equivalent listings. Spec filed 2026-05-15; ready for `spec-kitty plan`. Charter §3.2 criterion 10 + new §5.X + §5.Y amendments land in the mission's documentation WP12.
+6. **M-004** — Two-Axis Translation × Revisions. Most dependency-blocked; files now for visibility but does not start work until M-007 ships AND §3 FRs + §7 WP decomposition are revalidated against the M-006 + M-007 substrates that actually shipped.
 
 ## Agent assignments (uniform across all missions)
 

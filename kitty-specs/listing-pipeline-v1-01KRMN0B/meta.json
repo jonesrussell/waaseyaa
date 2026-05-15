@@ -1,10 +1,12 @@
 {
   "created_at": "2026-05-15T01:46:21.790773+00:00",
-  "friendly_name": "listing pipeline v1",
+  "friendly_name": "Listing Pipeline v1",
   "mission_id": "01KRMN0B4FWX9PK80RPSYDX1QM",
-  "mission_number": null,
+  "mission_number": 9,
   "mission_slug": "listing-pipeline-v1-01KRMN0B",
   "mission_type": "software-dev",
   "slug": "listing-pipeline-v1-01KRMN0B",
-  "target_branch": "main"
+  "source_description": "Canonical doctrine spec at docs/specs/listing-pipeline-v1.md. Mission metadata at docs/specs/missions/M-007-listing-pipeline-v1/mission.json. Implements the ADR 015 listing pipeline (Views-equivalent surface for entity listings) and the cache tag/context architecture it requires. BETA-GATE addition: adds charter §3.2 criterion 10 ('ListingDefinition contract is stable and at least one consumer app uses it for production listings'); creates new charter §5.X (listing package public surface) and §5.Y (cache tag-aware ops + context registry). Unblocks the second of two M-004 (entity-storage-translatable-revisions) prerequisites — the first (M-006 single-axis translation substrate) shipped 2026-05-13. Governing ADRs: 015 (decision), 010 (storage backends gate query support), 011 (lifecycle events drive cache invalidation), 013 (display stays in app land), 014 (themes can ship listing templates).",
+  "target_branch": "main",
+  "vcs": "git"
 }

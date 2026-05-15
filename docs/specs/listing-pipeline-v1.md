@@ -1,29 +1,25 @@
-<!-- Canonical doctrine spec: docs/specs/listing-pipeline-v1.md -->
-<!-- Mission metadata: docs/specs/missions/M-007-listing-pipeline-v1/mission.json -->
-<!-- Mission ID: M-007 | Spec Kitty mission_id: 01KRMN0B4FWX9PK80RPSYDX1QM -->
-
 # Listing Pipeline v1 — Views-equivalent surface for entity listings
 
 **Status:** Draft mission spec (2026-05-15), ratification target: stability charter §3.2 beta entry criterion addition + new §5.X listing surface at mission close
 **Audience:** framework maintainers; input for Spec Kitty `specify` → `plan` → `tasks` flow
 **Mission ID:** M-007 (display) / `01KRMN0B4FWX9PK80RPSYDX1QM` (Spec Kitty)
 **Mission slug:** `listing-pipeline-v1-01KRMN0B`
-**Origin:** [ADR 015](../../docs/adr/015-listing-pipeline-views-equivalent.md) "Listing pipeline (Views equivalent, integrate-not-build)" (Accepted 2026-05-11).
+**Origin:** [ADR 015](../adr/015-listing-pipeline-views-equivalent.md) "Listing pipeline (Views equivalent, integrate-not-build)" (Accepted 2026-05-11).
 
-**Governing ADRs:** [ADR 015](../../docs/adr/015-listing-pipeline-views-equivalent.md) — listing pipeline contract (`ListingDefinition`, `HasListingsInterface`, `ListingResolver`, `ListingResult`, cache tag/context contract). [ADR 010](../../docs/adr/010-storage-backends-gate-query-support.md) — `supportsQuery()` contract that filters/sorts honor. [ADR 011](../../docs/adr/011-lifecycle-events.md) — `AfterSaveEvent`/`AfterDeleteEvent` that drive cache invalidation. [ADR 013](../../docs/adr/013-display-stays-in-app-land.md) — display rendering is app concern. [ADR 014](../../docs/adr/014-themes-can-ship-listing-templates.md) — theme-shippable listing partials.
+**Governing ADRs:** [ADR 015](../adr/015-listing-pipeline-views-equivalent.md) — listing pipeline contract (`ListingDefinition`, `HasListingsInterface`, `ListingResolver`, `ListingResult`, cache tag/context contract). [ADR 010](../adr/010-storage-backends-gate-query-support.md) — `supportsQuery()` contract that filters/sorts honor. [ADR 011](../adr/011-lifecycle-events.md) — `AfterSaveEvent`/`AfterDeleteEvent` that drive cache invalidation. [ADR 013](../adr/013-display-stays-in-app-land.md) — display rendering is app concern. [ADR 014](../adr/014-themes-can-ship-listing-templates.md) — theme-shippable listing partials.
 
 **Charter linkage:**
-- [`stability-charter.md`](../../docs/specs/stability-charter.md) §3.2 beta entry criteria gain a new bullet (per ADR 015 §Consequences): *"ListingDefinition contract is stable and at least one consumer app uses it for production listings."* The charter amendment lands in this mission's documentation WP. **BETA-GATE.**
+- [`stability-charter.md`](stability-charter.md) §3.2 beta entry criteria gain a new bullet (per ADR 015 §Consequences): *"ListingDefinition contract is stable and at least one consumer app uses it for production listings."* The charter amendment lands in this mission's documentation WP. **BETA-GATE.**
 - A new charter §5.X (number to be assigned at amendment time, in line with §5.8 for migration) governs the `listing` package public surface. The `cache` package gains a new §5.Y stable-surface section for tag-aware operations and the context registry.
 
 **Sibling missions:**
-- [`entity-storage-v2.md`](../../docs/specs/entity-storage-v2.md) (M-001) — **shipped 2026-05-11**. Provides `EntityQuery::supportsQuery()` and `UnsupportedQueryException` that listing pipeline consumes for definition validation.
-- [`entity-storage-translations-v1.md`](../../docs/specs/entity-storage-translations-v1.md) (M-006) — **shipped 2026-05-13**. C-002 explicitly assigns per-langcode filters and langcode-in-cache-tags to this mission's surface. M-006 ships `TranslatableInterface` + `SaveContext::langcode`; this mission ships the listing-layer integration.
-- [`entity-storage-translatable-revisions.md`](../../docs/specs/entity-storage-translatable-revisions.md) (M-004) — **BLOCKED on this mission.** Composes single-axis translation with single-axis revisions. M-004 WP07 (per-langcode listing filters, langcode cache tags) is the downstream consumer of FR-019..FR-022 below.
-- [`migration-platform-v1.md`](../../docs/specs/migration-platform-v1.md) (M-002) — independent. Migrations do not write listings; listings are read paths.
-- [`config-management-v1.md`](../../docs/specs/config-management-v1.md) (M-003) — independent. Config entities are not listing subjects.
+- [`entity-storage-v2.md`](entity-storage-v2.md) (M-001) — **shipped 2026-05-11**. Provides `EntityQuery::supportsQuery()` and `UnsupportedQueryException` that listing pipeline consumes for definition validation.
+- [`entity-storage-translations-v1.md`](entity-storage-translations-v1.md) (M-006) — **shipped 2026-05-13**. C-002 explicitly assigns per-langcode filters and langcode-in-cache-tags to this mission's surface. M-006 ships `TranslatableInterface` + `SaveContext::langcode`; this mission ships the listing-layer integration.
+- [`entity-storage-translatable-revisions.md`](entity-storage-translatable-revisions.md) (M-004) — **BLOCKED on this mission.** Composes single-axis translation with single-axis revisions. M-004 WP07 (per-langcode listing filters, langcode cache tags) is the downstream consumer of FR-019..FR-022 below.
+- [`migration-platform-v1.md`](migration-platform-v1.md) (M-002) — independent. Migrations do not write listings; listings are read paths.
+- [`config-management-v1.md`](config-management-v1.md) (M-003) — independent. Config entities are not listing subjects.
 
-**Comparable mission:** [`entity-storage-translations-v1.md`](../../docs/specs/entity-storage-translations-v1.md) — shape and rigor template (14 WPs, contract-suite + backend-conformance + integration tests, charter amendment, beta-gate).
+**Comparable mission:** [`entity-storage-translations-v1.md`](entity-storage-translations-v1.md) — shape and rigor template (14 WPs, contract-suite + backend-conformance + integration tests, charter amendment, beta-gate).
 
 ---
 
@@ -416,11 +412,11 @@ These items are deliberately not pinned in §3; they're for the `plan` phase to 
 
 ## 12. References
 
-- [ADR 015](../../docs/adr/015-listing-pipeline-views-equivalent.md) — the governing decision.
-- [ADR 010](../../docs/adr/010-storage-backends-gate-query-support.md), [ADR 011](../../docs/adr/011-lifecycle-events.md), [ADR 013](../../docs/adr/013-display-stays-in-app-land.md), [ADR 014](../../docs/adr/014-themes-can-ship-listing-templates.md).
-- [`entity-storage-v2.md`](../../docs/specs/entity-storage-v2.md) — M-001, provides `supportsQuery()` and `EntityQuery` substrate.
-- [`entity-storage-translations-v1.md`](../../docs/specs/entity-storage-translations-v1.md) — M-006, provides `TranslatableInterface` + `SaveContext::langcode`; C-002 carved langcode-in-listing-pipeline as this mission's surface.
-- [`entity-storage-translatable-revisions.md`](../../docs/specs/entity-storage-translatable-revisions.md) — M-004, the downstream consumer (WP07 specifically) that unblocks fully when this mission ships.
-- [`stability-charter.md`](../../docs/specs/stability-charter.md) §3.2 (beta entry criteria — to be amended), §5 (stable surface — new §5.X + §5.Y).
-- [`drupal-comparison-matrix.md`](../../docs/specs/drupal-comparison-matrix.md) §1.4, §3.4, §6.6 — origin of the gap.
-- [`public-surface-map.md`](../../docs/specs/public-surface-map.md) — adds `Waaseyaa\Listing\*` + new `Waaseyaa\Cache\TaggedCacheInterface` + `ContextResolver` + `ContextRegistry` at mission close.
+- [ADR 015](../adr/015-listing-pipeline-views-equivalent.md) — the governing decision.
+- [ADR 010](../adr/010-storage-backends-gate-query-support.md), [ADR 011](../adr/011-lifecycle-events.md), [ADR 013](../adr/013-display-stays-in-app-land.md), [ADR 014](../adr/014-themes-can-ship-listing-templates.md).
+- [`entity-storage-v2.md`](entity-storage-v2.md) — M-001, provides `supportsQuery()` and `EntityQuery` substrate.
+- [`entity-storage-translations-v1.md`](entity-storage-translations-v1.md) — M-006, provides `TranslatableInterface` + `SaveContext::langcode`; C-002 carved langcode-in-listing-pipeline as this mission's surface.
+- [`entity-storage-translatable-revisions.md`](entity-storage-translatable-revisions.md) — M-004, the downstream consumer (WP07 specifically) that unblocks fully when this mission ships.
+- [`stability-charter.md`](stability-charter.md) §3.2 (beta entry criteria — to be amended), §5 (stable surface — new §5.X + §5.Y).
+- [`drupal-comparison-matrix.md`](drupal-comparison-matrix.md) §1.4, §3.4, §6.6 — origin of the gap.
+- [`public-surface-map.md`](public-surface-map.md) — adds `Waaseyaa\Listing\*` + new `Waaseyaa\Cache\TaggedCacheInterface` + `ContextResolver` + `ContextRegistry` at mission close.

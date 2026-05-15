@@ -2,11 +2,11 @@
 
 > **⚠️ PARTIALLY UNBLOCKED — DO NOT PLAN YET (2026-05-14, updated post-M-006 close-out)**
 >
-> One hard prerequisite remaining: the **ADR 015 listing pipeline** (only the ADR exists today; no implementation mission has been specced). Gates WP07 (per-langcode listing filters, langcode cache tags). Per §7.2 of the mission spec, WP01..WP06 are technically plannable without it; WP07 and WP08 (close) are not. When `listing-pipeline-v1` ships, this banner downgrades fully.
+> One hard prerequisite remaining: ship **M-007 (`listing-pipeline-v1`, spec filed 2026-05-15, canonical doctrine at [`listing-pipeline-v1.md`](listing-pipeline-v1.md))**. M-007 §3.12 (FR-046..FR-049) explicitly carries the langcode-aware listing surface (per-langcode filters, langcode in cache tags, implicit language.content context) that this mission's WP07 consumes. Per §7.2 of this mission's spec, WP01..WP06 are technically plannable without it; WP07 and WP08 (close) are not. When M-007 ships, this banner downgrades fully.
 >
 > The single-axis translation substrate prerequisite was satisfied by **M-006 (`entity-storage-translations-v1`, squash `0f7e1809a` on 2026-05-13, mission closed in PR #1485 / `a7840a36a` on 2026-05-14)**, which delivered `TranslatableInterface`, per-field `FieldDefinition::translatable()`, translation storage in both `sql-blob` and `sql-column` backends, the configurable fallback chain, translation lifecycle events, the `'translate'` access-policy operation, and the `make:migration --add-translations` CLI. See [`entity-storage-translations-v1.md`](entity-storage-translations-v1.md).
 >
-> **Before planning even the unblocked WPs**, revisit §3 FRs and §7 WP decomposition against the M-006 substrate that actually shipped (per the original BLOCKED stamp's "Unblocker" note); the decomposition may shift now that translation deliverables are concrete code instead of a planned shape.
+> **Before planning even the unblocked WPs**, revisit §3 FRs and §7 WP decomposition against the M-006 + M-007 substrates (per the original BLOCKED stamp's "Unblocker" note); the decomposition may shift now that translation deliverables are concrete code and the listing-pipeline surface is filed.
 >
 > See `kitty-specs/entity-storage-translatable-revisions-01KRCDEE/spec.md` for the same banner.
 
