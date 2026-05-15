@@ -1,10 +1,10 @@
 # Mission Review Report: inertia-file-upload-csrf-01KQZJQJ
 
 **Reviewer**: mission-reviewer (Opus, post-merge audit)
-**Date**: 2026-05-06
+**Date**: 2026-05-06 (audit) · 2026-05-14 (close-out)
 **Mission**: `inertia-file-upload-csrf-01KQZJQJ` — CSRF for Inertia File Uploads
 **Baseline commit**: `c4a2845155df2dc6305bede3323454ba1a88f22b` (parent of WP01 `f02c30aab`)
-**HEAD at review**: `0edb89ca4` (squash merge to main)
+**HEAD at review**: `0edb89ca4` (squash merge to main); both substantive findings resolved by `222765fed` (#1407) and `f63696a80` (#1459).
 **WPs reviewed**: WP01 (middleware + cookie writer) · WP02 (HttpKernel architectural fix + integration test) · WP03 (convention docs) · WP04 (Giiken cross-repo smoke)
 **Cycle history**: All four WPs approved cycle 1/3, no rejections, no arbiter overrides (verified `status.events.jsonl`).
 
@@ -46,6 +46,8 @@
 
 ### DRIFT-2: `attachXsrfCookie` instance method is now dead-on-the-hot-path
 
+**Status (2026-05-14 close-out)**: ~~LATENT~~ **RESOLVED** — `222765fed` (issue #1395, PR #1407) removed the dead instance method and its `process()` call sites; the static helper called from `HttpKernel` is now the sole writer.
+
 **Type**: DEAD CODE (latent)
 **Severity**: LOW
 **Spec reference**: contract §1 (cookie write contract)
@@ -58,6 +60,8 @@
 **Analysis**: The instance method's logic is byte-for-byte identical to the static method (cookie name, urlencoded value, Path, Secure detection, HttpOnly, SameSite, idempotency check), so the unit-test coverage transitively validates the static helper's logic. The integration test at WP02 then exercises the static helper end-to-end through HttpKernel. So the matrix is *covered*, but the instance method is now production-dead. A future cleanup mission should either delete the in-pipeline `attachXsrfCookie` call and method (lines 33, 61, 163-187) or refactor the instance method to delegate to the static helper. Not blocking — both helpers have identical behavior and are individually safe.
 
 ### DRIFT-3: Contract §1 "trusted-proxy honored" claim is aspirational
+
+**Status (2026-05-14 close-out)**: ~~ASPIRATIONAL~~ **RESOLVED** — `f63696a80` (issue #1394, PR #1459) wires trusted-proxy registration in `HttpKernel`. `Request::setTrustedProxies()` is now applied at boot from configuration, so `$request->isSecure()` honors `X-Forwarded-Proto` behind TLS-terminating reverse proxies; contract §1 wording is no longer aspirational.
 
 **Type**: LOCKED-DECISION VIOLATION (mild)
 **Severity**: MEDIUM
@@ -149,22 +153,21 @@
 
 ## Final Verdict
 
-**PASS WITH NOTES**
+**PASS** — both substantive 2026-05-06 audit findings landed on main via `f63696a80` (PR #1459, DRIFT-3 trusted-proxy boot step) and `222765fed` (PR #1407, DRIFT-2 dead instance helper). All four WPs are `done` as of 2026-05-14 close-out.
+
+### Resolution summary
+
+- ~~**DRIFT-2** — `CsrfMiddleware::attachXsrfCookie` instance helper dead on the production hot path.~~ **RESOLVED** (`222765fed` / #1407 / issue #1395). Instance method and in-pipeline call sites removed; the static `attachCookieIfHtml` called from `HttpKernel` is now the sole writer.
+- ~~**DRIFT-3** — Contract §1 "trusted-proxy honored" claim aspirational; `Request::setTrustedProxies()` never called.~~ **RESOLVED** (`f63696a80` / #1459 / issue #1394). `HttpKernel` now wires trusted-proxy registration at boot from configuration; `$request->isSecure()` honors `X-Forwarded-Proto` behind TLS-terminating proxies, so the cookie's `Secure` flag is set correctly on HTTPS production deployments.
 
 ### Verdict rationale
 
 All eight FRs and five NFRs have adequate test coverage, the contract's nine clauses are pinned by tests, the 10-row Content-Type × token-source matrix is exhaustively covered, and the security pass found no `hash_equals` gaps, no double-decoding, no JSON-exemption broadening, and no CSRF bypasses. WP02's cross-WP modification (HttpKernel + CsrfMiddleware) is justified by an architectural defect the integration test exposed; the fix is tight and reviewed. The Giiken cross-repo smoke proves the gate is closed in production-shape via stack-frame and cookie evidence, even though a downstream Giiken dev-env tooling gap (MarkItDown) prevented row-creation proof. The mission is releasable as a `waaseyaa/*` alpha tag for downstream consumption (Giiken and others).
 
-The **NOTES** are three non-blocking items recommended for follow-up missions:
+### Open items (non-blocking, accepted)
 
-1. **DRIFT-3 / TLS-downgrade risk**: The framework lacks a `Request::setTrustedProxies()` boot step, so behind a TLS-terminating proxy the cookie's `Secure` flag is omitted on production HTTPS deployments. Recommend a follow-up framework issue to wire trusted proxies at boot from configuration. The contract §1 wording overstates current capability.
-2. **DRIFT-2 / dead instance method**: After WP02's fix, `CsrfMiddleware::attachXsrfCookie` (instance, line 163) runs on a discarded response and is effectively dead. Recommend cleanup — either delete the in-pipeline call (lines 33, 61) or have the instance helper delegate to the static one. Identical logic today, but two copies will drift.
-3. **NFR-005 / smoke completeness**: Track Giiken-side `bin/setup-markitdown.sh` install so future cross-repo smokes can assert `knowledge_item` row creation end-to-end.
-
-### Open items (non-blocking)
-
-- Trusted-proxy boot step in `packages/foundation` (DRIFT-3).
-- Dead-code cleanup of `CsrfMiddleware::attachXsrfCookie` instance helper (DRIFT-2).
-- Rotation-roundtrip test (RISK-3).
-- Giiken MarkItDown setup follow-up (NFR-005 completeness).
-- Performance benchmark for NFR-001 (cosmetic — overhead is two cookie/header operations on the response path, structurally negligible).
+- ~~Trusted-proxy boot step in `packages/foundation` (DRIFT-3).~~ **RESOLVED** — `f63696a80` (#1459).
+- ~~Dead-code cleanup of `CsrfMiddleware::attachXsrfCookie` instance helper (DRIFT-2).~~ **RESOLVED** — `222765fed` (#1407).
+- Rotation-roundtrip test (RISK-3) — non-blocking nice-to-have; cookie writer reads `$_SESSION` live so rotation propagation is structurally correct.
+- Giiken MarkItDown setup follow-up (NFR-005 completeness) — out of framework scope; Giiken-side dev tooling.
+- Performance benchmark for NFR-001 — cosmetic; overhead is two cookie/header operations on the response path, structurally negligible.
