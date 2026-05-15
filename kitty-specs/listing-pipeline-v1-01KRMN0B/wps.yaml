@@ -1,0 +1,355 @@
+# Work Package Manifest: M-007 listing-pipeline-v1
+# Derived from spec.md §9 + plan.md "Project Structure" + research.md decisions
+# Subtask count: 61 across 12 WPs (target 3-7 per WP, max 10)
+#
+# Owned-files discipline: no two WPs claim the same file path. Where a downstream
+# WP needs to integrate with an earlier WP's class (e.g., WP06's ListingCacheKeyBuilder
+# consumed by WP05's ListingResolver), the earlier WP ships nullable DI parameters
+# that the later WP fills via the ServiceProvider (WP11). No mid-mission modification
+# of ListingResolver.php after WP05 lands.
+
+work_packages:
+  - id: WP01
+    title: "Listing package scaffold + value objects + factories"
+    dependencies: []
+    owned_files:
+      - "packages/listing/composer.json"
+      - "packages/listing/src/Operator.php"
+      - "packages/listing/src/SortDirection.php"
+      - "packages/listing/src/FilterDefinition.php"
+      - "packages/listing/src/SortDefinition.php"
+      - "packages/listing/src/Filter.php"
+      - "packages/listing/src/Sort.php"
+      - "packages/listing/src/Pagination.php"
+      - "packages/listing/src/ListingResult.php"
+      - "packages/listing/src/ListingDefinition.php"
+      - "packages/listing/src/Exception/UnsupportedListingException.php"
+      - "packages/listing/src/Exception/UnknownListingException.php"
+      - "packages/listing/tests/Unit/OperatorTest.php"
+      - "packages/listing/tests/Unit/SortDirectionTest.php"
+      - "packages/listing/tests/Unit/FilterDefinitionTest.php"
+      - "packages/listing/tests/Unit/SortDefinitionTest.php"
+      - "packages/listing/tests/Unit/FilterTest.php"
+      - "packages/listing/tests/Unit/SortTest.php"
+      - "packages/listing/tests/Unit/PaginationTest.php"
+      - "packages/listing/tests/Unit/ListingResultTest.php"
+      - "packages/listing/tests/Unit/ListingDefinitionTest.php"
+      - "packages/listing/tests/Unit/Exception/UnsupportedListingExceptionTest.php"
+      - "packages/listing/tests/Unit/Exception/UnknownListingExceptionTest.php"
+      - "composer.json"  # root: add path repository for waaseyaa/listing
+    requirement_refs:
+      - FR-001
+      - FR-002
+      - FR-003
+      - FR-004
+      - FR-005
+      - FR-006
+      - FR-007
+      - FR-008
+      - FR-009
+      - FR-010
+      - FR-011
+      - FR-012
+      - FR-013
+      - FR-014
+      - FR-054
+      - FR-055
+      - FR-056
+    subtasks:
+      - T001
+      - T002
+      - T003
+      - T004
+      - T005
+      - T006
+    prompt_file: "tasks/WP01-scaffold-value-objects.md"
+
+  - id: WP02
+    title: "HasListingsInterface + ListingDiscoverer + ListingDefinitionRegistry"
+    dependencies:
+      - WP01
+    owned_files:
+      - "packages/listing/src/HasListingsInterface.php"
+      - "packages/listing/src/ListingDiscoverer.php"
+      - "packages/listing/src/ListingDefinitionRegistry.php"
+      - "packages/listing/tests/Unit/Discovery/**"
+    requirement_refs:
+      - FR-015
+      - FR-016
+      - FR-017
+    subtasks:
+      - T007
+      - T008
+      - T009
+      - T010
+    prompt_file: "tasks/WP02-discovery-registry.md"
+
+  - id: WP03
+    title: "TaggedCacheInterface + MemoryBackend tag indexing + exception"
+    dependencies: []
+    owned_files:
+      - "packages/cache/src/TaggedCacheInterface.php"
+      - "packages/cache/src/MemoryBackend.php"
+      - "packages/cache/src/Exception/InvalidCacheTagException.php"
+      - "packages/cache/tests/Unit/TaggedCacheInterfaceContractTest.php"
+      - "packages/cache/tests/Unit/MemoryBackendTaggedTest.php"
+    requirement_refs:
+      - FR-033
+      - FR-034
+    subtasks:
+      - T011
+      - T012
+      - T013
+      - T014
+      - T015
+    prompt_file: "tasks/WP03-tagged-cache.md"
+
+  - id: WP04
+    title: "ContextRegistry + ContextResolver + canonical ContextNames"
+    dependencies: []
+    owned_files:
+      - "packages/cache/src/ContextRegistry.php"
+      - "packages/cache/src/ContextResolver.php"
+      - "packages/cache/src/ContextNames.php"
+      - "packages/cache/tests/Unit/ContextRegistryTest.php"
+      - "packages/cache/tests/Unit/ContextResolverTest.php"
+    requirement_refs:
+      - FR-035
+      - FR-036
+    subtasks:
+      - T016
+      - T017
+      - T018
+      - T019
+      - T020
+    prompt_file: "tasks/WP04-context-architecture.md"
+
+  - id: WP05
+    title: "ListingResolver — query build, access policy, pagination, result construction, langcode-aware"
+    dependencies:
+      - WP01
+      - WP02
+      - WP04
+    owned_files:
+      - "packages/listing/src/ListingResolver.php"
+      - "packages/listing/tests/Contract/ListingResolverContract.php"
+      - "packages/listing/tests/Contract/InMemoryListingResolverTest.php"
+      - "packages/listing/tests/Contract/SqliteListingResolverTest.php"
+    requirement_refs:
+      - FR-018
+      - FR-019
+      - FR-020
+      - FR-021
+      - FR-022
+      - FR-023
+      - FR-024
+      - FR-025
+      - FR-026
+      - FR-027
+      - FR-028
+      - FR-029
+      - FR-030
+      - FR-031
+      - FR-032
+      - FR-046
+      - FR-047
+      - FR-048
+      - FR-049
+      - NFR-001
+      - NFR-002
+      - FR-057
+      - FR-058
+    subtasks:
+      - T021
+      - T022
+      - T023
+      - T024
+      - T025
+      - T026
+      - T027
+      - T028
+    prompt_file: "tasks/WP05-listing-resolver.md"
+
+  - id: WP06
+    title: "ListingCacheKeyBuilder + cache integration tests"
+    dependencies:
+      - WP03
+      - WP05
+    owned_files:
+      - "packages/listing/src/ListingCacheKeyBuilder.php"
+      - "packages/listing/tests/Unit/ListingCacheKeyBuilderTest.php"
+      - "packages/listing/tests/Integration/CacheIntegrationTest.php"
+    requirement_refs:
+      - FR-037
+      - NFR-003
+    subtasks:
+      - T029
+      - T030
+      - T031
+      - T032
+    prompt_file: "tasks/WP06-cache-key-builder.md"
+
+  - id: WP07
+    title: "ListingCacheInvalidator + AfterSaveEvent/AfterDeleteEvent patch + SqlStorageDriver backfill"
+    dependencies:
+      - WP03
+      - WP06
+    owned_files:
+      - "packages/listing/src/ListingCacheInvalidator.php"
+      - "packages/foundation/src/Event/AfterSaveEvent.php"
+      - "packages/foundation/src/Event/AfterDeleteEvent.php"
+      - "packages/foundation/tests/Unit/Event/AfterSaveEventAffectedLangcodesTest.php"
+      - "packages/foundation/tests/Unit/Event/AfterDeleteEventAffectedLangcodesTest.php"
+      - "packages/entity-storage/src/SqlStorageDriver.php"
+      - "packages/entity-storage/tests/Unit/SqlStorageDriverAffectedLangcodesTest.php"
+      - "packages/listing/tests/Unit/ListingCacheInvalidatorTest.php"
+    requirement_refs:
+      - FR-038
+      - FR-039
+      - FR-040
+      - FR-041
+    subtasks:
+      - T033
+      - T034
+      - T035
+      - T036
+      - T037
+    prompt_file: "tasks/WP07-cache-invalidator-event-patch.md"
+
+  - id: WP08
+    title: "ExposedFilterParser + ExposedFilterValues + ExposedFilterCoercer + permissive/strict modes"
+    dependencies:
+      - WP01
+    owned_files:
+      - "packages/listing/src/ExposedFilterValues.php"
+      - "packages/listing/src/ExposedFilterCoercer.php"
+      - "packages/listing/src/ExposedFilterParser.php"
+      - "packages/listing/src/Exception/ListingCoercionException.php"
+      - "packages/listing/tests/Unit/ExposedFilterValuesTest.php"
+      - "packages/listing/tests/Unit/ExposedFilterCoercerTest.php"
+      - "packages/listing/tests/Unit/ExposedFilterParserTest.php"
+    requirement_refs:
+      - FR-042
+      - FR-043
+      - FR-044
+      - FR-045
+    subtasks:
+      - T038
+      - T039
+      - T040
+      - T041
+      - T042
+    prompt_file: "tasks/WP08-exposed-filters.md"
+
+  - id: WP09
+    title: "Backend conformance tests — SqlColumn / SqlBlob / non-translatable listing scenarios"
+    dependencies:
+      - WP05
+      - WP07
+    owned_files:
+      - "packages/listing/tests/Backend/SqlColumnTranslatableListingTest.php"
+      - "packages/listing/tests/Backend/SqlBlobTranslatableListingTest.php"
+      - "packages/listing/tests/Backend/NonTranslatableListingTest.php"
+      - "kitty-specs/listing-pipeline-v1-01KRMN0B/contracts/conformance-matrix.md"
+    requirement_refs:
+      - FR-023
+      - FR-046
+      - FR-047
+      - FR-048
+      - NFR-005
+    subtasks:
+      - T043
+      - T044
+      - T045
+      - T046
+    prompt_file: "tasks/WP09-backend-conformance.md"
+
+  - id: WP10
+    title: "ListingDefinitionValidator + UnsupportedListingException raise paths + boot failure integration test"
+    dependencies:
+      - WP02
+      - WP05
+    owned_files:
+      - "packages/listing/src/ListingDefinitionValidator.php"
+      - "packages/listing/tests/Unit/ListingDefinitionValidatorTest.php"
+      - "tests/Integration/Phase14/BootValidationFailureTest.php"
+    requirement_refs:
+      - FR-050
+      - FR-051
+      - FR-052
+      - FR-053
+    subtasks:
+      - T047
+      - T048
+      - T049
+      - T050
+    prompt_file: "tasks/WP10-definition-validator.md"
+
+  - id: WP11
+    title: "ServiceProvider DI wiring + reference consumer fixture + Phase14 integration tests"
+    dependencies:
+      - WP01
+      - WP02
+      - WP03
+      - WP04
+      - WP05
+      - WP06
+      - WP07
+      - WP08
+      - WP09
+      - WP10
+    owned_files:
+      - "packages/listing/src/ServiceProvider.php"
+      - "packages/listing/tests/Fixtures/UpcomingEventsListing.php"
+      - "packages/listing/tests/Fixtures/EventEntity.php"
+      - "tests/Integration/Phase14/ListingPipelineIntegrationTest.php"
+      - "tests/Integration/Phase14/ListingCacheInvalidationIntegrationTest.php"
+    requirement_refs:
+      - FR-052
+      - FR-053
+      - NFR-005
+    subtasks:
+      - T051
+      - T052
+      - T053
+      - T054
+      - T055
+    prompt_file: "tasks/WP11-service-provider-integration.md"
+
+  - id: WP12
+    title: "Charter amendments (§3.2.10 + §5.X + §5.Y) + cookbook + conventions + CLAUDE.md + CHANGELOG + public-surface-map + closure stamp"
+    dependencies:
+      - WP01
+      - WP02
+      - WP03
+      - WP04
+      - WP05
+      - WP06
+      - WP07
+      - WP08
+      - WP09
+      - WP10
+      - WP11
+    owned_files:
+      - "docs/specs/stability-charter.md"
+      - "docs/cookbook/listing-first-cut.md"
+      - "docs/conventions/cache-tags-and-contexts.md"
+      - "docs/specs/listing-pipeline-v1.md"           # post-mortem stamp (close-out)
+      - "docs/specs/public-surface-map.md"
+      - "docs/public-surface-map.php"
+      - "CLAUDE.md"
+      - "CHANGELOG.md"
+    requirement_refs:
+      - FR-059
+      - FR-060
+      - FR-061
+      - FR-062
+      - FR-063
+    subtasks:
+      - T056
+      - T057
+      - T058
+      - T059
+      - T060
+      - T061
+    prompt_file: "tasks/WP12-charter-docs-closure.md"
