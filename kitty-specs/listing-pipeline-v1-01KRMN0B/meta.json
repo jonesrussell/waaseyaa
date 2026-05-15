@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-15T01:46:21.790773+00:00",
+  "friendly_name": "listing pipeline v1",
+  "mission_id": "01KRMN0B4FWX9PK80RPSYDX1QM",
+  "mission_number": null,
+  "mission_slug": "listing-pipeline-v1-01KRMN0B",
+  "mission_type": "software-dev",
+  "slug": "listing-pipeline-v1-01KRMN0B",
+  "target_branch": "main"
+}
