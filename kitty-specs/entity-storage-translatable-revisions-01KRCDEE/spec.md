@@ -2,18 +2,21 @@
 <!-- Mission metadata: docs/specs/missions/M-004-entity-storage-translatable-revisions/mission.json -->
 <!-- Mission ID: M-004 | Spec Kitty mission_id below in meta.json -->
 
-> **🛑 BLOCKED — DO NOT PLAN (2026-05-12)**
+> **⚠️ PARTIALLY UNBLOCKED — DO NOT PLAN YET (2026-05-14, updated post-M-006 close-out)**
 >
-> This mission cannot be planned in its current shape. Two hard prerequisites stand between today and a plannable M-004:
+> Original 2026-05-12 BLOCKED stamp identified two hard prerequisites. Status today:
 >
-> 1. **Single-axis translation substrate.** **Spec filed 2026-05-12 as [M-006 `entity-storage-translations-v1`](../entity-storage-translations-v1-01KRF0FQ/spec.md)** (canonical doctrine: `docs/specs/entity-storage-translations-v1.md`). Must SHIP — not just be spec'd — before this composition can plan. M-001 (`entity-storage-v2-01KRCDDC`, squash `509e31fb7`) shipped only the revision axis. Today's translation surface is still a tombstone: `EntityTypeInterface::isTranslatable(): bool` exists as an opt-in flag with no `TranslatableEntityInterface`, no `$entity->getTranslation()`, no translation storage.
-> 2. **ADR 015 listing pipeline.** Required for WP07 (per-langcode listing filters, langcode cache tags). Only the ADR exists; no mission specced or shipped.
+> 1. ~~**Single-axis translation substrate.**~~ ✅ **SATISFIED** by M-006 (`entity-storage-translations-v1-01KRF0FQ`, squash `0f7e1809a` on 2026-05-13, mission closed in PR #1485 / `a7840a36a` on 2026-05-14). The translation tombstone is gone: `TranslatableInterface` (`packages/entity/src/TranslatableInterface.php`) and `TranslatableEntityTrait` are in place; per-field `FieldDefinition::translatable()` works in both `sql-blob` and `sql-column` backends via `TranslationSchemaHandler`; `SaveContext::langcode` + `withLangcode()` carry per-langcode save semantics.
+> 2. **ADR 015 listing pipeline.** ❌ Still pending. Required for WP07 (per-langcode listing filters, langcode cache tags). Only `docs/adr/015-listing-pipeline-views-equivalent.md` exists; no `listing-pipeline-v1` mission specced, no implementation in `packages/`.
 >
-> **Unblocker:** M-006 must complete and squash-merge; the ADR 015 listing pipeline mission must spec and ship. After both land, revisit this spec's §3 FRs and §7 WP decomposition against the new substrate — much of the work decomposition may shift.
+> **Plannable today:** WP01..WP06 (per §7.2 below, after WP01+WP02 the parallel branch WP03/WP04/WP05/WP06 has no listing-pipeline dependency).
+> **Still gated:** WP07 (needs `listing-pipeline-v1` to spec and ship) and WP08 (closes the mission; transitively gated).
+>
+> **Unblocker (full):** Spec and ship `listing-pipeline-v1` as a separate mission. Before *any* planning begins, the original author's caveat still holds — revisit §3 FRs and §7 WP decomposition against the M-006 substrate that actually shipped; the decomposition may shift now that translation deliverables are concrete code instead of a planned shape.
 
 # Entity Storage — Translatable + Revisionable Two-Axis Interaction
 
-**Status:** Draft mission spec (2026-05-11), **BLOCKED 2026-05-12** pending single-axis translation prerequisite
+**Status:** Draft mission spec (2026-05-11), **PARTIALLY UNBLOCKED 2026-05-14** (prereq 1 M-006 satisfied 2026-05-13 squash / 2026-05-14 close-out; prereq 2 `listing-pipeline-v1` still pending; spec still needs revalidation against the M-006 substrate before planning)
 **Audience:** framework maintainers; input for Spec Kitty `specify` → `plan` → `tasks` flow
 **Mission ID:** TBD (to be assigned by `@jonesrussell` on mission creation)
 **Origin:** [ADR 017](../adr/017-per-field-translation.md) §"Revision × translation interaction" (Accepted 2026-05-11).

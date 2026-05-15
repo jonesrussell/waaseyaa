@@ -1,14 +1,16 @@
 # Entity Storage — Translatable + Revisionable Two-Axis Interaction
 
-> **🛑 BLOCKED — DO NOT PLAN (2026-05-13)**
+> **⚠️ PARTIALLY UNBLOCKED — DO NOT PLAN YET (2026-05-14, updated post-M-006 close-out)**
 >
-> One hard prerequisite remaining: the **ADR 015 listing pipeline** (only the ADR exists today; no implementation mission has been specced). When that mission ships, this banner is removed.
+> One hard prerequisite remaining: the **ADR 015 listing pipeline** (only the ADR exists today; no implementation mission has been specced). Gates WP07 (per-langcode listing filters, langcode cache tags). Per §7.2 of the mission spec, WP01..WP06 are technically plannable without it; WP07 and WP08 (close) are not. When `listing-pipeline-v1` ships, this banner downgrades fully.
 >
-> The single-axis translation substrate prerequisite was satisfied by **M-006 (`entity-storage-translations-v1`, squash `0f7e1809a`)**, which delivered `TranslatableInterface`, per-field `FieldDefinition::translatable()`, translation storage in both `sql-blob` and `sql-column` backends, the configurable fallback chain, translation lifecycle events, the `'translate'` access-policy operation, and the `make:migration --add-translations` CLI. See [`entity-storage-translations-v1.md`](entity-storage-translations-v1.md).
+> The single-axis translation substrate prerequisite was satisfied by **M-006 (`entity-storage-translations-v1`, squash `0f7e1809a` on 2026-05-13, mission closed in PR #1485 / `a7840a36a` on 2026-05-14)**, which delivered `TranslatableInterface`, per-field `FieldDefinition::translatable()`, translation storage in both `sql-blob` and `sql-column` backends, the configurable fallback chain, translation lifecycle events, the `'translate'` access-policy operation, and the `make:migration --add-translations` CLI. See [`entity-storage-translations-v1.md`](entity-storage-translations-v1.md).
+>
+> **Before planning even the unblocked WPs**, revisit §3 FRs and §7 WP decomposition against the M-006 substrate that actually shipped (per the original BLOCKED stamp's "Unblocker" note); the decomposition may shift now that translation deliverables are concrete code instead of a planned shape.
 >
 > See `kitty-specs/entity-storage-translatable-revisions-01KRCDEE/spec.md` for the same banner.
 
-**Status:** Draft mission spec (2026-05-11), **BLOCKED 2026-05-13** (one of two original prerequisites cleared by M-006 on 2026-05-13)
+**Status:** Draft mission spec (2026-05-11), **PARTIALLY UNBLOCKED 2026-05-14** (prereq 1 M-006 satisfied 2026-05-13 squash / 2026-05-14 close-out; prereq 2 `listing-pipeline-v1` still pending; spec still needs revalidation against the M-006 substrate before planning)
 **Audience:** framework maintainers; input for Spec Kitty `specify` → `plan` → `tasks` flow
 **Mission ID:** TBD (to be assigned by `@jonesrussell` on mission creation)
 **Origin:** [ADR 017](../adr/017-per-field-translation.md) §"Revision × translation interaction" (Accepted 2026-05-11).
