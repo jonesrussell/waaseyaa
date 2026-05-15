@@ -1,16 +1,16 @@
 {
-  "event_count": 48,
-  "last_event_id": "01KQWF9XW0AEQR2KJ3KGN5XA4M",
-  "materialized_at": "2026-05-05T16:24:56.960281+00:00",
-  "mission_number": "",
+  "event_count": 51,
+  "last_event_id": "01KRMHJ4CPWQETZDPM0M11XFS4",
+  "materialized_at": "2026-05-15T00:46:09.302574+00:00",
+  "mission_number": "3",
   "mission_slug": "post-1390-dispatcher-reconciliation-01KQTTJS",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 3,
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 1,
+    "done": 4,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
@@ -25,25 +25,25 @@
       "last_transition_at": "2026-05-05T02:01:04.776717+00:00"
     },
     "WP02": {
-      "actor": "user",
-      "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KQWCXG24SN942NEFZAB7D85E",
-      "last_transition_at": "2026-05-05T15:43:12.452948+00:00"
+      "actor": "claude",
+      "force_count": 3,
+      "lane": "done",
+      "last_event_id": "01KRMHHY54AQZW068EXTSWS732",
+      "last_transition_at": "2026-05-15T00:46:02.916563+00:00"
     },
     "WP03": {
-      "actor": "user",
-      "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KQWE7C856JRAY4FMH99BRG55",
-      "last_transition_at": "2026-05-05T16:06:04.805137+00:00"
+      "actor": "claude",
+      "force_count": 3,
+      "lane": "done",
+      "last_event_id": "01KRMHJ09T85XE75GBRKQSK9ZN",
+      "last_transition_at": "2026-05-15T00:46:05.114083+00:00"
     },
     "WP04": {
-      "actor": "user",
-      "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KQWF9XW0AEQR2KJ3KGN5XA4M",
-      "last_transition_at": "2026-05-05T16:24:56.960281+00:00"
+      "actor": "claude",
+      "force_count": 3,
+      "lane": "done",
+      "last_event_id": "01KRMHJ4CPWQETZDPM0M11XFS4",
+      "last_transition_at": "2026-05-15T00:46:09.302574+00:00"
     }
   }
 }
