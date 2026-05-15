@@ -1,16 +1,16 @@
 {
-  "event_count": 24,
-  "last_event_id": "01KQZR124XG64STEK4GEHC3SGZ",
-  "materialized_at": "2026-05-06T22:55:06.909304+00:00",
-  "mission_number": "",
+  "event_count": 28,
+  "last_event_id": "01KRMHQQ3N1TBYG89K25SMS2GZ",
+  "materialized_at": "2026-05-15T00:49:12.309529+00:00",
+  "mission_number": "4",
   "mission_slug": "inertia-file-upload-csrf-01KQZJQJ",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 4,
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 0,
+    "done": 4,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
@@ -18,32 +18,32 @@
   },
   "work_packages": {
     "WP01": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KQZNRRGQ9TZDV03H6J43NV7R",
-      "last_transition_at": "2026-05-06T22:15:37.751284+00:00"
+      "actor": "claude",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRMHQKPJBR4ZACD6WJD8604B",
+      "last_transition_at": "2026-05-15T00:49:08.818642+00:00"
     },
     "WP02": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KQZPWJMTK0YZATYRAJ8BN1MV",
-      "last_transition_at": "2026-05-06T22:35:11.386164+00:00"
+      "actor": "claude",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRMHQMZ11B9C60WGP150QT8A",
+      "last_transition_at": "2026-05-15T00:49:10.114012+00:00"
     },
     "WP03": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KQZP3QBQV1GSS9FB0P3C165Q",
-      "last_transition_at": "2026-05-06T22:21:37.015583+00:00"
+      "actor": "claude",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRMHQP0XE8W138GGNCH7Z7T6",
+      "last_transition_at": "2026-05-15T00:49:11.197238+00:00"
     },
     "WP04": {
-      "actor": "user",
-      "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KQZR124XG64STEK4GEHC3SGZ",
-      "last_transition_at": "2026-05-06T22:55:06.909304+00:00"
+      "actor": "claude",
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRMHQQ3N1TBYG89K25SMS2GZ",
+      "last_transition_at": "2026-05-15T00:49:12.309529+00:00"
     }
   }
 }
