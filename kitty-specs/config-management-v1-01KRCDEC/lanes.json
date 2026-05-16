@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "mission_slug": "config-management-v1-01KRCDEC",
+  "mission_id": "01KRCDEC7V1843QZ61CY0PH842",
+  "mission_branch": "kitty/mission-config-management-v1-01KRCDEC",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05",
+        "WP06",
+        "WP07",
+        "WP09",
+        "WP10",
+        "WP11"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "docs/cookbook/config-sync.md",
+        "docs/public-surface-map.php",
+        "docs/specs/config-management.md",
+        "docs/specs/public-surface-map.md",
+        "docs/specs/stability-charter.md",
+        "docs/upgrade-notes/config-management-v1.md",
+        "packages/cli/src/Command/Config/ConfigCommand.php",
+        "packages/cli/src/Command/Config/ConfigDiffCommand.php",
+        "packages/cli/src/Command/Config/ConfigExportCommand.php",
+        "packages/cli/src/Command/Config/ConfigImportCommand.php",
+        "packages/cli/src/Command/Config/ConfigResetCommand.php",
+        "packages/cli/src/Command/Config/ConfigStatusCommand.php",
+        "packages/cli/src/Command/Config/ConfigValidateCommand.php",
+        "packages/cli/tests/Unit/Command/Config/ConfigCommandTest.php",
+        "packages/cli/tests/Unit/Command/Config/ConfigDiffCommandTest.php",
+        "packages/cli/tests/Unit/Command/Config/ConfigExportCommandTest.php",
+        "packages/cli/tests/Unit/Command/Config/ConfigImportCommandTest.php",
+        "packages/cli/tests/Unit/Command/Config/ConfigResetCommandTest.php",
+        "packages/cli/tests/Unit/Command/Config/ConfigStatusCommandTest.php",
+        "packages/cli/tests/Unit/Command/Config/ConfigValidateCommandTest.php",
+        "packages/config/src/Audit/ConfigAuditChannel.php",
+        "packages/config/src/Audit/ConfigAuditEvent.php",
+        "packages/config/src/Dependency/ConfigDependencyInterface.php",
+        "packages/config/src/Dependency/DependencyGraph.php",
+        "packages/config/src/Dependency/DependencyResolver.php",
+        "packages/config/src/Dependency/Exception/ConfigDependencyCycleException.php",
+        "packages/config/src/Dependency/Exception/ConfigDependencyMissingException.php",
+        "packages/config/src/Exception/ConfigCommandCollisionException.php",
+        "packages/config/src/Exception/ConfigImportFailedException.php",
+        "packages/config/src/Exception/ConfigSerializationException.php",
+        "packages/config/src/Sync/ConfigDiffer.php",
+        "packages/config/src/Sync/ConfigExporter.php",
+        "packages/config/src/Sync/ConfigImporter.php",
+        "packages/config/src/Sync/ConfigManifestEntry.php",
+        "packages/config/src/Sync/ConfigResetter.php",
+        "packages/config/src/Sync/ConfigStatusReporter.php",
+        "packages/config/src/Sync/ConfigSyncDeserializer.php",
+        "packages/config/src/Sync/ConfigSyncFile.php",
+        "packages/config/src/Sync/ConfigSyncRepository.php",
+        "packages/config/src/Sync/ConfigSyncSerializer.php",
+        "packages/config/src/Sync/ConfigSyncValidator.php",
+        "packages/config/src/Sync/FieldValueMapper.php",
+        "packages/config/tests/Contract/ConfigDependencyInterfaceContractTest.php",
+        "packages/config/tests/Contract/ConfigImporterContractTest.php",
+        "packages/config/tests/Contract/ConfigSyncRepositoryContractTest.php",
+        "packages/config/tests/Fixtures/CycleFixture.php",
+        "packages/config/tests/Fixtures/MinooRoundTripFixture.php",
+        "packages/config/tests/Unit/Audit/ConfigAuditChannelTest.php",
+        "packages/config/tests/Unit/Audit/ConfigAuditEventTest.php",
+        "packages/config/tests/Unit/Dependency/DependencyGraphTest.php",
+        "packages/config/tests/Unit/Dependency/DependencyResolverTest.php",
+        "packages/config/tests/Unit/Dependency/Exception/ConfigDependencyCycleExceptionTest.php",
+        "packages/config/tests/Unit/Dependency/Exception/ConfigDependencyMissingExceptionTest.php",
+        "packages/config/tests/Unit/Exception/ConfigCommandCollisionExceptionTest.php",
+        "packages/config/tests/Unit/Exception/ConfigImportFailedExceptionTest.php",
+        "packages/config/tests/Unit/Exception/ConfigSerializationExceptionTest.php",
+        "packages/config/tests/Unit/Sync/ConfigDifferTest.php",
+        "packages/config/tests/Unit/Sync/ConfigExporterTest.php",
+        "packages/config/tests/Unit/Sync/ConfigImporterTest.php",
+        "packages/config/tests/Unit/Sync/ConfigManifestEntryTest.php",
+        "packages/config/tests/Unit/Sync/ConfigResetterTest.php",
+        "packages/config/tests/Unit/Sync/ConfigStatusReporterTest.php",
+        "packages/config/tests/Unit/Sync/ConfigSyncDeserializerTest.php",
+        "packages/config/tests/Unit/Sync/ConfigSyncFileTest.php",
+        "packages/config/tests/Unit/Sync/ConfigSyncSerializerTest.php",
+        "packages/config/tests/Unit/Sync/ConfigSyncValidatorTest.php",
+        "packages/config/tests/Unit/Sync/FieldValueMapperTest.php",
+        "tests/Integration/Phase28/ConfigCommandCollisionBootTest.php",
+        "tests/Integration/Phase28/ConfigImportDependencyOrderingTest.php",
+        "tests/Integration/Phase28/ConfigSyncCycleDetectionTest.php",
+        "tests/Integration/Phase28/ConfigSyncRoundTripIntegrationTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "tests",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-b",
+      "wp_ids": [
+        "WP08"
+      ],
+      "write_scope": [
+        "packages/config/src/Backend/BackendRestrictionEnforcer.php",
+        "packages/config/src/Exception/InvalidConfigBackendException.php",
+        "packages/config/tests/Unit/Backend/BackendRestrictionEnforcerTest.php",
+        "packages/config/tests/Unit/Exception/InvalidConfigBackendExceptionTest.php",
+        "packages/entity-storage/src/StorageBackendRegistry.php",
+        "packages/entity-storage/tests/Unit/StorageBackendRegistryConfigRestrictionTest.php"
+      ],
+      "predicted_surfaces": [
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-16T23:35:04.827404+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP01"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP02"
+      },
+      {
+        "wp_a": "WP06",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP06 depends on WP02"
+      },
+      {
+        "wp_a": "WP07",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP07 depends on WP04"
+      },
+      {
+        "wp_a": "WP10",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP10 depends on WP03"
+      },
+      {
+        "wp_a": "WP11",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP11 depends on WP04"
+      },
+      {
+        "wp_a": "WP11",
+        "wp_b": "WP09",
+        "rule": "dependency",
+        "evidence": "WP11 depends on WP09"
+      }
+    ],
+    "total_merges": 9,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 9
+    }
+  }
+}
