@@ -30,7 +30,7 @@ subtasks:
 - T013
 - T014
 - T015
-shell_pid: ''
+shell_pid: "70271"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -49,6 +49,7 @@ owned_files:
 - packages/config/tests/Unit/Sync/FieldValueMapperTest.php
 - packages/config/tests/Unit/Sync/ConfigManifestEntryTest.php
 - packages/config/tests/Unit/Exception/ConfigSerializationExceptionTest.php
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP02 — Sync-store YAML format + serializer/deserializer + repository
@@ -113,3 +114,7 @@ This WP depends on: WP01.
 - `composer phpstan` (level 5) green; `composer cs-check` clean.
 - `bin/check-package-layers` green (no upward `waaseyaa/*` edges introduced).
 - No modifications outside `owned_files` (other than rerun-of-generators where charter explicitly permits).
+
+## Activity Log
+
+- 2026-05-16T23:47:22Z – claude:sonnet:python-implementer:implementer – shell_pid=70271 – Started implementation via action command
