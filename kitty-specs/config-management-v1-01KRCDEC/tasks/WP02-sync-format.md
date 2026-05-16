@@ -118,3 +118,4 @@ This WP depends on: WP01.
 ## Activity Log
 
 - 2026-05-16T23:47:22Z – claude:sonnet:python-implementer:implementer – shell_pid=70271 – Started implementation via action command
+- 2026-05-16T23:59:16Z – claude:sonnet:python-implementer:implementer – shell_pid=70271 – WP02 ready: ConfigSyncFile + ConfigSyncSerializer + ConfigSyncDeserializer + FieldValueMapper + ConfigSyncRepository + ConfigManifestEntry + ConfigSerializationException. Snapshot test on canonical role.coordinator fixture is byte-stable; round-trip through serializer+deserializer preserves content hash. Symfony Yaml options pinned (DUMP_MULTI_LINE_LITERAL_BLOCK, indent=2). Deterministic UUID v5 via sha-256(entity_type.entity_id). All FRs FR-009..FR-016 covered. 306 config tests pass; phpstan, cs-check, composer-policy, package-layers all green.
