@@ -23,6 +23,8 @@ owned_files:
 - packages/cache/src/ContextNames.php
 - packages/cache/tests/Unit/ContextRegistryTest.php
 - packages/cache/tests/Unit/ContextResolverTest.php
+- packages/foundation/src/Http/RequestContext.php
+- packages/foundation/tests/Unit/Http/RequestContextTest.php
 tags: []
 agent: "claude:sonnet:python-implementer:implementer"
 shell_pid: "21827"
