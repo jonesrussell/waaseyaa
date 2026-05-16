@@ -50,8 +50,8 @@ owned_files:
 - packages/listing/tests/Contract/InMemoryListingResolverTest.php
 - packages/listing/tests/Contract/SqliteListingResolverTest.php
 tags: []
-agent: "claude:sonnet:python-implementer:implementer"
-shell_pid: "24445"
+agent: "claude:opus:python-reviewer:reviewer"
+shell_pid: "28882"
 ---
 
 ## Objective
@@ -269,3 +269,4 @@ spec-kitty agent action implement WP05 --agent <name>
 
 - 2026-05-16T19:49:01Z – claude:sonnet:python-implementer:implementer – shell_pid=24445 – Started implementation via action command
 - 2026-05-16T20:08:22Z – claude:sonnet:python-implementer:implementer – shell_pid=24445 – WP05 ready: ListingResolver per spec §7.1. EntityRepositoryRegistry + ExposedFilterValues + ListingCacheKeyBuilder companions inside packages/listing/. 27 contract tests x 2 backends (InMemory + Sqlite) pass. Cache-null path works. All quality gates green. Commit cad9407c1. NOTE: kitty-specs/WP04 artifact left on lane branch is pre-existing from WP04 cycle-1, not WP05.
+- 2026-05-16T20:10:04Z – claude:opus:python-reviewer:reviewer – shell_pid=28882 – Started review via action command
