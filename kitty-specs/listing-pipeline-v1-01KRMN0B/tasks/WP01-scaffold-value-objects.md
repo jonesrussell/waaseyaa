@@ -267,3 +267,4 @@ spec-kitty agent action implement WP01 --agent <name>
 ## Activity Log
 
 - 2026-05-16T18:46:27Z – claude:sonnet:python-implementer:implementer – shell_pid=6895 – Assigned agent via action command
+- 2026-05-16T19:00:31Z – claude:sonnet:python-implementer:implementer – shell_pid=6895 – WP01 ready: 23 owned files + 4 companion registrations (bin/check-package-layers, composer.lock, phpstan.neon, root composer.json). 115 tests, 202 assertions, all green. All gates pass: phpunit, cs-check, phpstan, check-composer-policy, check-package-layers, composer validate, dump-autoload. Forced past pre-flight: the only uncommitted entry (kitty-specs/.../WP12-charter-docs-closure/) is a directory tracked under the WP12 prompt's lifecycle, untouched by WP01.
