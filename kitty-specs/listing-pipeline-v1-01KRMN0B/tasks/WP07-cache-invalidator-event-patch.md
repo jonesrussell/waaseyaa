@@ -31,8 +31,8 @@ owned_files:
 - packages/entity-storage/tests/Unit/SqlStorageDriverAffectedLangcodesTest.php
 - packages/listing/tests/Unit/ListingCacheInvalidatorTest.php
 tags: []
-agent: "claude:sonnet:python-implementer:implementer"
-shell_pid: "32441"
+agent: "claude:opus:python-reviewer:reviewer"
+shell_pid: "34786"
 ---
 
 ## Objective
@@ -203,3 +203,4 @@ spec-kitty agent action implement WP07 --agent <name>
 
 - 2026-05-16T20:25:18Z – claude:sonnet:python-implementer:implementer – shell_pid=32441 – Started implementation via action command
 - 2026-05-16T20:35:49Z – claude:sonnet:python-implementer:implementer – shell_pid=32441 – WP07 ready: cache invalidation wired via lifecycle events. 8 files / 5 subtasks T033-T037. AfterSaveEvent + AfterDeleteEvent gain additive affectedLangcodes property (backwards compatible — all existing dispatch sites compile unchanged). Backfill landed in CoordinatorLifecycleDispatcher (M-006 translatable write path); WP07 owned_files listed SqlStorageDriver but that's a pure I/O layer that does not dispatch events — deviation documented in commit body. Test gates: entity-storage 558, listing 216, cache 172, foundation 969 (all passing). cs-check, phpstan, check-composer-policy, check-package-layers all green. Commit: d81b32781.
+- 2026-05-16T20:37:36Z – claude:opus:python-reviewer:reviewer – shell_pid=34786 – Started review via action command
