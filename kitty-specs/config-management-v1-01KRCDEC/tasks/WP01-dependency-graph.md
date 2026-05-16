@@ -110,3 +110,4 @@ No prerequisite WPs — may dispatch immediately on mission start.
 ## Activity Log
 
 - 2026-05-16T23:35:54Z – claude:sonnet:python-implementer:implementer – shell_pid=66861 – Assigned agent via action command
+- 2026-05-16T23:44:08Z – claude:sonnet:python-implementer:implementer – shell_pid=66861 – WP01 ready: ConfigDependencyInterface + DependencyGraph + DependencyResolver + cycle/missing exceptions. 38 new tests + all 222 config tests pass; phpstan/cs/composer-policy/package-layers all green. NOTE: $code property renamed to $errorCode (with $code virtual alias via __get) because \Exception::$code cannot be redeclared readonly — spec follow-up flagged in commit message.
