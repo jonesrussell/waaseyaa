@@ -50,6 +50,8 @@ owned_files:
 - packages/listing/tests/Contract/InMemoryListingResolverTest.php
 - packages/listing/tests/Contract/SqliteListingResolverTest.php
 tags: []
+agent: "claude:sonnet:python-implementer:implementer"
+shell_pid: "24445"
 ---
 
 ## Objective
@@ -262,3 +264,7 @@ Contract test pattern from M-006. Both concrete subclasses run the same case set
 ```bash
 spec-kitty agent action implement WP05 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-16T19:49:01Z – claude:sonnet:python-implementer:implementer – shell_pid=24445 – Started implementation via action command
