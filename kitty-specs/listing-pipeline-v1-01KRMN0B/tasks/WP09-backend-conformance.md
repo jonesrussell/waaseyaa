@@ -143,3 +143,4 @@ spec-kitty agent action implement WP09 --agent <name>
 ## Activity Log
 
 - 2026-05-16T20:49:52Z – claude:sonnet:python-implementer:implementer – shell_pid=37781 – Started implementation via action command
+- 2026-05-16T20:57:49Z – claude:sonnet:python-implementer:implementer – shell_pid=37781 – WP09 ready: backend conformance matrix + tests. SqlColumn / SqlBlob / non-translatable scenarios covered. 16 tests passing. All gates green. conformance-matrix.md will be filed to planning branch separately.
