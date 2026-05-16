@@ -42,8 +42,8 @@ owned_files:
 - CLAUDE.md
 - CHANGELOG.md
 tags: []
-agent: "claude:sonnet:python-implementer:implementer"
-shell_pid: "52097"
+agent: "claude:opus:python-reviewer:reviewer"
+shell_pid: "54055"
 ---
 
 ## Objective
@@ -204,3 +204,4 @@ spec-kitty agent action implement WP12 --agent <name>
 - 2026-05-16T18:47:22Z – claude:sonnet:python-implementer:implementer – shell_pid=7245 – Moved to planned
 - 2026-05-16T21:38:16Z – claude:sonnet:python-implementer:implementer – shell_pid=52097 – Started implementation via action command
 - 2026-05-16T21:47:43Z – claude:sonnet:python-implementer:implementer – shell_pid=52097 – WP12 ready: charter 5.6 + 5.9, cookbook, conventions, public-surface-map, CHANGELOG, CLAUDE.md. Closes M-007 doc surface.
+- 2026-05-16T21:48:27Z – claude:opus:python-reviewer:reviewer – shell_pid=54055 – Started review via action command
