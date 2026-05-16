@@ -27,6 +27,8 @@ owned_files:
 - packages/listing/tests/Backend/NonTranslatableListingTest.php
 - kitty-specs/listing-pipeline-v1-01KRMN0B/contracts/conformance-matrix.md
 tags: []
+agent: "claude:sonnet:python-implementer:implementer"
+shell_pid: "37781"
 ---
 
 ## Objective
@@ -137,3 +139,7 @@ Backend-specific tests use real SQLite + real fixture entity types. No mocking o
 ```bash
 spec-kitty agent action implement WP09 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-16T20:49:52Z – claude:sonnet:python-implementer:implementer – shell_pid=37781 – Started implementation via action command
