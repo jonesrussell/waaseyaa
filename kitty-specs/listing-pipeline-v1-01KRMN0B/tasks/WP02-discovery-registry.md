@@ -24,8 +24,8 @@ owned_files:
 - packages/listing/src/ListingDefinitionRegistry.php
 - packages/listing/tests/Unit/Discovery/**
 tags: []
-agent: "claude:sonnet:python-implementer:implementer"
-shell_pid: "11757"
+agent: "claude:opus:python-reviewer:reviewer"
+shell_pid: "14027"
 ---
 
 ## Objective
@@ -155,3 +155,4 @@ spec-kitty agent action implement WP02 --agent <name>
 
 - 2026-05-16T19:04:31Z – claude:sonnet:python-implementer:implementer – shell_pid=11757 – Started implementation via action command
 - 2026-05-16T19:11:13Z – claude:sonnet:python-implementer:implementer – shell_pid=11757 – WP02 ready: discovery + registry surface. Tests, cs-check, phpstan, composer policy, layer check all clean.
+- 2026-05-16T19:11:43Z – claude:opus:python-reviewer:reviewer – shell_pid=14027 – Started review via action command
