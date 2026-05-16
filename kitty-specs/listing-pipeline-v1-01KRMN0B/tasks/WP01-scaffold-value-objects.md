@@ -33,7 +33,7 @@ subtasks:
 - T004
 - T005
 - T006
-shell_pid: '6895'
+shell_pid: "6895"
 history: []
 authoritative_surface: packages/listing/
 execution_mode: code_change
@@ -63,6 +63,7 @@ owned_files:
 - packages/listing/tests/Unit/Exception/UnknownListingExceptionTest.php
 - composer.json
 tags: []
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 ## Objective
@@ -262,3 +263,7 @@ Unit tests only at this layer. Contract tests + integration tests live in WP05 a
 ```bash
 spec-kitty agent action implement WP01 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-16T18:46:27Z – claude:sonnet:python-implementer:implementer – shell_pid=6895 – Assigned agent via action command
