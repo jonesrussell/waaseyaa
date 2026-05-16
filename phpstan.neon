@@ -47,6 +47,7 @@ parameters:
         - packages/http-client/src
         - packages/inertia/src
         - packages/ingestion/src
+        - packages/listing/src
         - packages/mail/src
         - packages/mcp/src
         - packages/media/src

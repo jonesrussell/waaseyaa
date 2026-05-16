@@ -20,10 +20,18 @@ use Waaseyaa\EntityStorage\SaveContext;
  */
 final class AfterSaveEvent implements EntityLifecycleEventInterface
 {
+    /**
+     * @param list<string>|null $affectedLangcodes List of langcodes touched in this save.
+     *                                              Null = inferred via $entity->activeLangcode()
+     *                                              by consumers. Backfilled by the M-006
+     *                                              translatable write path
+     *                                              ({@see \Waaseyaa\EntityStorage\CoordinatorLifecycleDispatcher}).
+     */
     public function __construct(
         private readonly EntityInterface $entityValue,
         private readonly SaveContext $saveContextValue,
         private readonly bool $newRevision,
+        private readonly ?array $affectedLangcodes = null,
     ) {}
 
     public function entity(): EntityInterface
@@ -45,5 +53,20 @@ final class AfterSaveEvent implements EntityLifecycleEventInterface
     public function isNewRevision(): bool
     {
         return $this->newRevision;
+    }
+
+    /**
+     * List of langcodes touched in this save.
+     *
+     * Null = no per-langcode information available; consumers infer via
+     * $entity->activeLangcode(). Non-null = a sorted, unique list of the
+     * langcodes actually written. Used by listing-cache invalidation to
+     * emit per-langcode tag invalidations on multi-language saves.
+     *
+     * @return list<string>|null
+     */
+    public function affectedLangcodes(): ?array
+    {
+        return $this->affectedLangcodes;
     }
 }

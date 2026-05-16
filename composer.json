@@ -275,6 +275,10 @@
         {
             "type": "path",
             "url": "packages/migration"
+        },
+        {
+            "type": "path",
+            "url": "packages/listing"
         }
     ],
     "require": {
@@ -316,6 +320,7 @@
         "waaseyaa/i18n": "self.version",
         "waaseyaa/inertia": "self.version",
         "waaseyaa/ingestion": "self.version",
+        "waaseyaa/listing": "self.version",
         "waaseyaa/mail": "self.version",
         "waaseyaa/mcp": "self.version",
         "waaseyaa/media": "self.version",
@@ -381,6 +386,7 @@
             "Waaseyaa\\Genealogy\\Tests\\": "packages/genealogy/tests/",
             "Waaseyaa\\GitHub\\Tests\\": "packages/github/tests/",
             "Waaseyaa\\I18n\\Tests\\": "packages/i18n/tests/",
+            "Waaseyaa\\Listing\\Tests\\": "packages/listing/tests/",
             "Waaseyaa\\Database\\Tests\\": "packages/database-legacy/tests/",
             "Waaseyaa\\Debug\\Tests\\": "packages/debug/tests/",
             "Waaseyaa\\EntityStorage\\Testing\\Contract\\": "packages/entity-storage/testing/Contract/",

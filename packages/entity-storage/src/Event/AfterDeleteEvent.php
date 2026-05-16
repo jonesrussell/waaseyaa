@@ -19,12 +19,37 @@ use Waaseyaa\Entity\EntityInterface;
  */
 final class AfterDeleteEvent implements EntityLifecycleEventInterface
 {
+    /**
+     * @param list<string>|null $affectedLangcodes List of langcodes whose translation
+     *                                              rows were removed by this delete.
+     *                                              Null = inferred via
+     *                                              $entity->activeLangcode() by consumers.
+     *                                              Backfilled by the M-006 translatable
+     *                                              write path
+     *                                              ({@see \Waaseyaa\EntityStorage\CoordinatorLifecycleDispatcher}).
+     */
     public function __construct(
         private readonly EntityInterface $entityValue,
+        private readonly ?array $affectedLangcodes = null,
     ) {}
 
     public function entity(): EntityInterface
     {
         return $this->entityValue;
+    }
+
+    /**
+     * List of langcodes whose translation rows were removed by this delete.
+     *
+     * Null = no per-langcode information available; consumers infer via
+     * $entity->activeLangcode(). Non-null = a sorted, unique list of the
+     * langcodes whose translation rows existed before the delete. Used by
+     * listing-cache invalidation to emit per-langcode tag invalidations.
+     *
+     * @return list<string>|null
+     */
+    public function affectedLangcodes(): ?array
+    {
+        return $this->affectedLangcodes;
     }
 }

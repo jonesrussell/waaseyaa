@@ -153,7 +153,15 @@ final class CoordinatorLifecycleDispatcher
         $this->dispatchTranslationsPost($entity, $translationOps);
 
         if ($this->dispatcher !== null) {
-            $this->dispatcher->dispatch(new AfterSaveEvent($entity, $saveContext, $isNewRevision));
+            // WP07 / FR-039: backfill $affectedLangcodes from the translatable
+            // write path's translation ops. Keys of $translationOps are the
+            // langcodes actually written in this save (insert/update). When
+            // $translationOps is empty (non-translatable entity), leave null
+            // so consumers fall back to $entity->activeLangcode().
+            $affectedLangcodes = $this->computeAffectedLangcodes($translationOps);
+            $this->dispatcher->dispatch(
+                new AfterSaveEvent($entity, $saveContext, $isNewRevision, $affectedLangcodes),
+            );
         }
 
         $this->logLifecycle(
@@ -241,7 +249,14 @@ final class CoordinatorLifecycleDispatcher
         $this->dispatchDeleteTranslationsPost($entity, $translationLangcodes);
 
         if ($this->dispatcher !== null) {
-            $this->dispatcher->dispatch(new AfterDeleteEvent($entity));
+            // WP07 / FR-039: backfill $affectedLangcodes from the explicit
+            // translation langcodes captured before the delete fan-out. Empty
+            // list (non-translatable entity) maps to null so consumers fall
+            // back to $entity->activeLangcode().
+            $affectedLangcodes = $translationLangcodes === []
+                ? null
+                : $this->normaliseLangcodes($translationLangcodes);
+            $this->dispatcher->dispatch(new AfterDeleteEvent($entity, $affectedLangcodes));
         }
 
         $this->logLifecycle(
@@ -491,5 +506,46 @@ final class CoordinatorLifecycleDispatcher
             'entity_id' => $entity->id(),
             'duration_ms' => $durationMs,
         ]);
+    }
+
+    /**
+     * Compute the {@see AfterSaveEvent::affectedLangcodes()} payload from the
+     * translation ops driving this save.
+     *
+     * WP07 / FR-039. The keys of {@see $translationOps} are the langcodes
+     * actually written (insert/update) in this save. Returns a sorted, unique
+     * list when at least one translation op fired; returns null when there were
+     * none (non-translatable entity), so consumers fall back to
+     * {@see \Waaseyaa\Entity\TranslatableInterface::activeLangcode()}.
+     *
+     * @param array<string, string> $translationOps
+     *
+     * @return list<string>|null
+     */
+    private function computeAffectedLangcodes(array $translationOps): ?array
+    {
+        if ($translationOps === []) {
+            return null;
+        }
+
+        return $this->normaliseLangcodes(array_keys($translationOps));
+    }
+
+    /**
+     * Normalise a list of langcodes for emission via the lifecycle event surface.
+     *
+     * Returns a sorted, unique list. Used by both save and delete backfill paths
+     * to guarantee deterministic ordering for cache-tag invalidation consumers.
+     *
+     * @param list<string> $langcodes
+     *
+     * @return list<string>
+     */
+    private function normaliseLangcodes(array $langcodes): array
+    {
+        $unique = array_values(array_unique($langcodes));
+        sort($unique);
+
+        return $unique;
     }
 }
