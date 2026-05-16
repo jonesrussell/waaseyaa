@@ -30,7 +30,7 @@ subtasks:
 - T013
 - T014
 - T015
-shell_pid: "70271"
+shell_pid: "73695"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -49,7 +49,7 @@ owned_files:
 - packages/config/tests/Unit/Sync/FieldValueMapperTest.php
 - packages/config/tests/Unit/Sync/ConfigManifestEntryTest.php
 - packages/config/tests/Unit/Exception/ConfigSerializationExceptionTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP02 — Sync-store YAML format + serializer/deserializer + repository
@@ -119,3 +119,4 @@ This WP depends on: WP01.
 
 - 2026-05-16T23:47:22Z – claude:sonnet:python-implementer:implementer – shell_pid=70271 – Started implementation via action command
 - 2026-05-16T23:59:16Z – claude:sonnet:python-implementer:implementer – shell_pid=70271 – WP02 ready: ConfigSyncFile + ConfigSyncSerializer + ConfigSyncDeserializer + FieldValueMapper + ConfigSyncRepository + ConfigManifestEntry + ConfigSerializationException. Snapshot test on canonical role.coordinator fixture is byte-stable; round-trip through serializer+deserializer preserves content hash. Symfony Yaml options pinned (DUMP_MULTI_LINE_LITERAL_BLOCK, indent=2). Deterministic UUID v5 via sha-256(entity_type.entity_id). All FRs FR-009..FR-016 covered. 306 config tests pass; phpstan, cs-check, composer-policy, package-layers all green.
+- 2026-05-16T23:59:58Z – claude:opus:python-reviewer:reviewer – shell_pid=73695 – Started review via action command
