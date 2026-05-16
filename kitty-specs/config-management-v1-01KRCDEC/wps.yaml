@@ -1,0 +1,322 @@
+# Work Package Manifest: M-003 config-management-v1
+# Derived from spec.md §8 + plan.md "Project Structure" + research.md decisions
+# Subtask count: 64 across 11 WPs (target 4-10 per WP)
+#
+# Owned-files discipline: no two WPs claim the same file path. Downstream WPs
+# that integrate with earlier WP outputs do so by depending on the earlier WP's
+# stable surface; WP11 (docs+closure) owns charter/cookbook/CHANGELOG only.
+#
+# Sequencing (spec §8.1):
+#   WP01 → WP02 → {WP03, WP04, WP05, WP06}
+#   WP04 → WP07
+#   WP08, WP09 independent
+#   {WP03..WP06} → WP10 → WP11
+
+work_packages:
+  - id: WP01
+    title: "ConfigDependencyInterface + DAG + cycle/missing detection"
+    dependencies: []
+    owned_files:
+      - "packages/config/src/Dependency/ConfigDependencyInterface.php"
+      - "packages/config/src/Dependency/DependencyGraph.php"
+      - "packages/config/src/Dependency/DependencyResolver.php"
+      - "packages/config/src/Dependency/Exception/ConfigDependencyCycleException.php"
+      - "packages/config/src/Dependency/Exception/ConfigDependencyMissingException.php"
+      - "packages/config/tests/Contract/ConfigDependencyInterfaceContractTest.php"
+      - "packages/config/tests/Unit/Dependency/DependencyGraphTest.php"
+      - "packages/config/tests/Unit/Dependency/DependencyResolverTest.php"
+      - "packages/config/tests/Unit/Dependency/Exception/ConfigDependencyCycleExceptionTest.php"
+      - "packages/config/tests/Unit/Dependency/Exception/ConfigDependencyMissingExceptionTest.php"
+    requirement_refs:
+      - FR-001
+      - FR-002
+      - FR-003
+      - FR-004
+      - FR-005
+      - FR-006
+      - FR-007
+      - FR-008
+      - FR-050
+      - FR-051
+      - FR-052
+    subtasks:
+      - T001
+      - T002
+      - T003
+      - T004
+      - T005
+      - T006
+      - T007
+    prompt_file: "tasks/WP01-dependency-graph.md"
+
+  - id: WP02
+    title: "Sync-store YAML format + serializer/deserializer + repository"
+    dependencies:
+      - WP01
+    owned_files:
+      - "packages/config/src/Sync/ConfigSyncFile.php"
+      - "packages/config/src/Sync/ConfigSyncRepository.php"
+      - "packages/config/src/Sync/ConfigSyncSerializer.php"
+      - "packages/config/src/Sync/ConfigSyncDeserializer.php"
+      - "packages/config/src/Sync/FieldValueMapper.php"
+      - "packages/config/src/Sync/ConfigManifestEntry.php"
+      - "packages/config/src/Exception/ConfigSerializationException.php"
+      - "packages/config/tests/Contract/ConfigSyncRepositoryContractTest.php"
+      - "packages/config/tests/Unit/Sync/ConfigSyncFileTest.php"
+      - "packages/config/tests/Unit/Sync/ConfigSyncSerializerTest.php"
+      - "packages/config/tests/Unit/Sync/ConfigSyncDeserializerTest.php"
+      - "packages/config/tests/Unit/Sync/FieldValueMapperTest.php"
+      - "packages/config/tests/Unit/Sync/ConfigManifestEntryTest.php"
+      - "packages/config/tests/Unit/Exception/ConfigSerializationExceptionTest.php"
+    requirement_refs:
+      - FR-009
+      - FR-010
+      - FR-011
+      - FR-012
+      - FR-013
+      - FR-014
+      - FR-015
+      - FR-016
+    subtasks:
+      - T008
+      - T009
+      - T010
+      - T011
+      - T012
+      - T013
+      - T014
+      - T015
+    prompt_file: "tasks/WP02-sync-format.md"
+
+  - id: WP03
+    title: "config:export command + ConfigExporter orchestrator"
+    dependencies:
+      - WP02
+    owned_files:
+      - "packages/config/src/Sync/ConfigExporter.php"
+      - "packages/cli/src/Command/Config/ConfigExportCommand.php"
+      - "packages/config/tests/Unit/Sync/ConfigExporterTest.php"
+      - "packages/cli/tests/Unit/Command/Config/ConfigExportCommandTest.php"
+    requirement_refs:
+      - FR-017
+      - FR-018
+      - FR-019
+      - FR-020
+      - FR-021
+    subtasks:
+      - T016
+      - T017
+      - T018
+      - T019
+      - T020
+    prompt_file: "tasks/WP03-config-export.md"
+
+  - id: WP04
+    title: "config:import command + ConfigImporter (DAG order, per-entity tx, orphan-warn)"
+    dependencies:
+      - WP01
+      - WP02
+    owned_files:
+      - "packages/config/src/Sync/ConfigImporter.php"
+      - "packages/config/src/Exception/ConfigImportFailedException.php"
+      - "packages/cli/src/Command/Config/ConfigImportCommand.php"
+      - "packages/config/tests/Contract/ConfigImporterContractTest.php"
+      - "packages/config/tests/Unit/Sync/ConfigImporterTest.php"
+      - "packages/config/tests/Unit/Exception/ConfigImportFailedExceptionTest.php"
+      - "packages/cli/tests/Unit/Command/Config/ConfigImportCommandTest.php"
+    requirement_refs:
+      - FR-022
+      - FR-023
+      - FR-024
+      - FR-025
+      - FR-026
+      - FR-027
+      - FR-028
+      - FR-029
+    subtasks:
+      - T021
+      - T022
+      - T023
+      - T024
+      - T025
+      - T026
+      - T027
+    prompt_file: "tasks/WP04-config-import.md"
+
+  - id: WP05
+    title: "config:diff + config:status + shared diff renderer + UUID rename detection"
+    dependencies:
+      - WP02
+    owned_files:
+      - "packages/config/src/Sync/ConfigDiffer.php"
+      - "packages/config/src/Sync/ConfigStatusReporter.php"
+      - "packages/cli/src/Command/Config/ConfigDiffCommand.php"
+      - "packages/cli/src/Command/Config/ConfigStatusCommand.php"
+      - "packages/config/tests/Unit/Sync/ConfigDifferTest.php"
+      - "packages/config/tests/Unit/Sync/ConfigStatusReporterTest.php"
+      - "packages/cli/tests/Unit/Command/Config/ConfigDiffCommandTest.php"
+      - "packages/cli/tests/Unit/Command/Config/ConfigStatusCommandTest.php"
+    requirement_refs:
+      - FR-030
+      - FR-031
+      - FR-032
+      - FR-033
+      - FR-034
+      - FR-035
+      - FR-036
+    subtasks:
+      - T028
+      - T029
+      - T030
+      - T031
+      - T032
+      - T033
+    prompt_file: "tasks/WP05-diff-status.md"
+
+  - id: WP06
+    title: "config:validate + ConfigSyncValidator (reuses FieldDefinition::validators())"
+    dependencies:
+      - WP02
+    owned_files:
+      - "packages/config/src/Sync/ConfigSyncValidator.php"
+      - "packages/cli/src/Command/Config/ConfigValidateCommand.php"
+      - "packages/config/tests/Unit/Sync/ConfigSyncValidatorTest.php"
+      - "packages/cli/tests/Unit/Command/Config/ConfigValidateCommandTest.php"
+    requirement_refs:
+      - FR-037
+      - FR-038
+      - FR-039
+      - FR-040
+    subtasks:
+      - T034
+      - T035
+      - T036
+      - T037
+    prompt_file: "tasks/WP06-config-validate.md"
+
+  - id: WP07
+    title: "config:reset + ConfigResetter + config.audit log channel"
+    dependencies:
+      - WP04
+    owned_files:
+      - "packages/config/src/Sync/ConfigResetter.php"
+      - "packages/config/src/Audit/ConfigAuditChannel.php"
+      - "packages/config/src/Audit/ConfigAuditEvent.php"
+      - "packages/cli/src/Command/Config/ConfigResetCommand.php"
+      - "packages/config/tests/Unit/Sync/ConfigResetterTest.php"
+      - "packages/config/tests/Unit/Audit/ConfigAuditChannelTest.php"
+      - "packages/config/tests/Unit/Audit/ConfigAuditEventTest.php"
+      - "packages/cli/tests/Unit/Command/Config/ConfigResetCommandTest.php"
+    requirement_refs:
+      - FR-041
+      - FR-042
+      - FR-043
+      - FR-053
+    subtasks:
+      - T038
+      - T039
+      - T040
+      - T041
+      - T042
+    prompt_file: "tasks/WP07-config-reset-audit.md"
+
+  - id: WP08
+    title: "Backend restriction enforcement (sql-blob/sql-column only; boot-time exception)"
+    dependencies: []
+    owned_files:
+      - "packages/config/src/Backend/BackendRestrictionEnforcer.php"
+      - "packages/config/src/Exception/InvalidConfigBackendException.php"
+      - "packages/entity-storage/src/StorageBackendRegistry.php"
+      - "packages/config/tests/Unit/Backend/BackendRestrictionEnforcerTest.php"
+      - "packages/config/tests/Unit/Exception/InvalidConfigBackendExceptionTest.php"
+      - "packages/entity-storage/tests/Unit/StorageBackendRegistryConfigRestrictionTest.php"
+    requirement_refs:
+      - FR-044
+      - FR-045
+      - FR-046
+    subtasks:
+      - T043
+      - T044
+      - T045
+      - T046
+    prompt_file: "tasks/WP08-backend-restriction.md"
+
+  - id: WP09
+    title: "config:* CLI namespace reservation + collision-check + ConfigCommand base"
+    dependencies: []
+    owned_files:
+      - "packages/cli/src/Command/Config/ConfigCommand.php"
+      - "packages/config/src/Exception/ConfigCommandCollisionException.php"
+      - "packages/cli/tests/Unit/Command/Config/ConfigCommandTest.php"
+      - "packages/config/tests/Unit/Exception/ConfigCommandCollisionExceptionTest.php"
+      - "tests/Integration/Phase28/ConfigCommandCollisionBootTest.php"
+    requirement_refs:
+      - FR-047
+      - FR-048
+      - FR-049
+    subtasks:
+      - T047
+      - T048
+      - T049
+      - T050
+    prompt_file: "tasks/WP09-cli-namespace-reservation.md"
+
+  - id: WP10
+    title: "Validation: Minoo round-trip integration test + cycle fixture + dependency-ordering test"
+    dependencies:
+      - WP03
+      - WP04
+      - WP05
+      - WP06
+    owned_files:
+      - "packages/config/tests/Fixtures/CycleFixture.php"
+      - "packages/config/tests/Fixtures/MinooRoundTripFixture.php"
+      - "tests/Integration/Phase28/ConfigSyncRoundTripIntegrationTest.php"
+      - "tests/Integration/Phase28/ConfigImportDependencyOrderingTest.php"
+      - "tests/Integration/Phase28/ConfigSyncCycleDetectionTest.php"
+    requirement_refs:
+      - FR-054
+      - FR-055
+      - FR-056
+    subtasks:
+      - T051
+      - T052
+      - T053
+      - T054
+      - T055
+    prompt_file: "tasks/WP10-validation-roundtrip.md"
+
+  - id: WP11
+    title: "Docs closure: spec, cookbook, upgrade-guide, charter §5.5 amendment, CHANGELOG, public-surface-map"
+    dependencies:
+      - WP04
+      - WP05
+      - WP07
+      - WP09
+      - WP10
+    owned_files:
+      - "docs/specs/config-management.md"
+      - "docs/cookbook/config-sync.md"
+      - "docs/upgrade-notes/config-management-v1.md"
+      - "docs/specs/stability-charter.md"
+      - "docs/specs/public-surface-map.md"
+      - "docs/public-surface-map.php"
+      - "CLAUDE.md"
+      - "CHANGELOG.md"
+    requirement_refs:
+      - FR-057
+      - FR-058
+      - FR-059
+      - FR-060
+      - FR-061
+    subtasks:
+      - T056
+      - T057
+      - T058
+      - T059
+      - T060
+      - T061
+      - T062
+      - T063
+      - T064
+    prompt_file: "tasks/WP11-docs-closure.md"
