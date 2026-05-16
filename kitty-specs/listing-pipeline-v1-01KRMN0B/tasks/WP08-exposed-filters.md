@@ -29,8 +29,8 @@ owned_files:
 - packages/listing/tests/Unit/ExposedFilterCoercerTest.php
 - packages/listing/tests/Unit/ExposedFilterParserTest.php
 tags: []
-agent: "claude:sonnet:python-implementer:implementer"
-shell_pid: "35620"
+agent: "claude:opus:python-reviewer:reviewer"
+shell_pid: "36929"
 ---
 
 ## Objective
@@ -220,3 +220,4 @@ spec-kitty agent action implement WP08 --agent <name>
 
 - 2026-05-16T20:40:38Z – claude:sonnet:python-implementer:implementer – shell_pid=35620 – Started implementation via action command
 - 2026-05-16T20:46:17Z – claude:sonnet:python-implementer:implementer – shell_pid=35620 – WP08 ready: ExposedFilterParser + Coercer + permissive/strict modes. All gates green.
+- 2026-05-16T20:46:49Z – claude:opus:python-reviewer:reviewer – shell_pid=36929 – Started review via action command
