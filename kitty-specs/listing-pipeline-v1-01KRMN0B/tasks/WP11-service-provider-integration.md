@@ -35,8 +35,8 @@ owned_files:
 - tests/Integration/Phase14/ListingPipelineIntegrationTest.php
 - tests/Integration/Phase14/ListingCacheInvalidationIntegrationTest.php
 tags: []
-agent: "claude:sonnet:python-implementer:implementer"
-shell_pid: "46117"
+agent: "claude:opus:python-reviewer:reviewer"
+shell_pid: "50974"
 ---
 
 ## Objective
@@ -185,3 +185,4 @@ spec-kitty agent action implement WP11 --agent <name>
 
 - 2026-05-16T21:16:34Z – claude:sonnet:python-implementer:implementer – shell_pid=46117 – Started implementation via action command
 - 2026-05-16T21:34:19Z – claude:sonnet:python-implementer:implementer – shell_pid=46117 – WP11 ready: ServiceProvider DI wiring + EventEntity/UpcomingEventsListing reference consumer + Phase14 integration tests. WP10 validator wired at boot via ServiceProvider::boot() hook. Listener registration via dispatcher->addListener() at priority=100. All quality gates green: cs-check, phpstan, check-composer-policy, check-package-layers. 316 listing tests + 24 Phase14 tests pass.
+- 2026-05-16T21:35:12Z – claude:opus:python-reviewer:reviewer – shell_pid=50974 – Started review via action command
