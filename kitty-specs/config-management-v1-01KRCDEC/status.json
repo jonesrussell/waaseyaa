@@ -1,7 +1,7 @@
 {
-  "event_count": 11,
-  "last_event_id": "01KRSJ9DXZ9D8FN093RKHPMTV4",
-  "materialized_at": "2026-05-16T23:35:04.895673+00:00",
+  "event_count": 13,
+  "last_event_id": "01KRSJAXJMG6W9ZP0AG57X6STV",
+  "materialized_at": "2026-05-16T23:35:53.684292+00:00",
   "mission_number": "",
   "mission_slug": "config-management-v1-01KRCDEC",
   "mission_type": "software-dev",
@@ -12,17 +12,17 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 11
+    "planned": 10
   },
   "work_packages": {
     "WP01": {
-      "actor": "finalize-tasks",
+      "actor": "implement-command",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KRSJ9D8QRPFPGKB4T3QHB6QV",
-      "last_transition_at": "2026-05-16T23:35:04.215777+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KRSJAXJMG6W9ZP0AG57X6STV",
+      "last_transition_at": "2026-05-16T23:35:53.684292+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",

@@ -6,6 +6,8 @@
   "mission_slug": "config-management-v1-01KRCDEC",
   "mission_type": "software-dev",
   "slug": "config-management-v1-01KRCDEC",
-  "source_description": "Canonical doctrine spec at docs/specs/config-management-v1.md (ratified per stability charter \u00a712.4 in commit 370d4163e). Mission metadata at docs/specs/missions/M-003-config-management-v1/mission.json.",
-  "target_branch": "main"
+  "source_description": "Canonical doctrine spec at docs/specs/config-management-v1.md (ratified per stability charter §12.4 in commit 370d4163e). Mission metadata at docs/specs/missions/M-003-config-management-v1/mission.json.",
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-16T23:35:52.210740+00:00"
 }
