@@ -29,6 +29,8 @@ owned_files:
 - packages/listing/tests/Unit/ExposedFilterCoercerTest.php
 - packages/listing/tests/Unit/ExposedFilterParserTest.php
 tags: []
+agent: "claude:sonnet:python-implementer:implementer"
+shell_pid: "35620"
 ---
 
 ## Objective
@@ -213,3 +215,7 @@ Unit tests only at this layer. Integration with `ListingResolver` (passing parse
 ```bash
 spec-kitty agent action implement WP08 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-16T20:40:38Z – claude:sonnet:python-implementer:implementer – shell_pid=35620 – Started implementation via action command
