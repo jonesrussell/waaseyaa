@@ -1,16 +1,16 @@
 {
-  "event_count": 92,
-  "last_event_id": "01KRSCERA3Q0DWPQJGB80B9ZQY",
-  "materialized_at": "2026-05-16T21:53:07.907886+00:00",
+  "event_count": 93,
+  "last_event_id": "01KRSCET6826XWH3EKDPACC8E3",
+  "materialized_at": "2026-05-16T21:53:09.832500+00:00",
   "mission_number": "9",
   "mission_slug": "listing-pipeline-v1-01KRMN0B",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 1,
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 11,
+    "done": 12,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
@@ -96,10 +96,10 @@
     },
     "WP12": {
       "actor": "user",
-      "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KRSCAH5EN031HGAN4N5XD1N4",
-      "last_transition_at": "2026-05-16T21:50:49.518305+00:00"
+      "force_count": 3,
+      "lane": "done",
+      "last_event_id": "01KRSCET6826XWH3EKDPACC8E3",
+      "last_transition_at": "2026-05-16T21:53:09.832500+00:00"
     }
   }
 }
