@@ -23,6 +23,9 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-listing-pipeline-v1-01KRMN0B
+base_commit: 0f2e833e6d7ae47815e77728e32046e878adc97c
+created_at: '2026-05-16T18:46:26.446858+00:00'
 subtasks:
 - T001
 - T002
@@ -30,6 +33,7 @@ subtasks:
 - T004
 - T005
 - T006
+shell_pid: '6895'
 history: []
 authoritative_surface: packages/listing/
 execution_mode: code_change
