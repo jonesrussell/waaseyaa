@@ -1,7 +1,7 @@
 {
-  "event_count": 78,
-  "last_event_id": "01KRSBKHG39SPXSM5ZE0XX832S",
-  "materialized_at": "2026-05-16T21:38:16.195964+00:00",
+  "event_count": 79,
+  "last_event_id": "01KRSC4TPWF3N2Q58X3MV9KM8Z",
+  "materialized_at": "2026-05-16T21:47:42.684711+00:00",
   "mission_number": "9",
   "mission_slug": "listing-pipeline-v1-01KRMN0B",
   "mission_type": "software-dev",
@@ -11,8 +11,8 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 0
   },
@@ -95,11 +95,11 @@
       "last_transition_at": "2026-05-16T21:37:34.353431+00:00"
     },
     "WP12": {
-      "actor": "claude:sonnet:python-implementer:implementer",
+      "actor": "user",
       "force_count": 2,
-      "lane": "in_progress",
-      "last_event_id": "01KRSBKHG39SPXSM5ZE0XX832S",
-      "last_transition_at": "2026-05-16T21:38:16.195964+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KRSC4TPWF3N2Q58X3MV9KM8Z",
+      "last_transition_at": "2026-05-16T21:47:42.684711+00:00"
     }
   }
 }
