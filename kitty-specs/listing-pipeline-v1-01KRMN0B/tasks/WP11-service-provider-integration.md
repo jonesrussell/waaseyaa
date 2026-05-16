@@ -184,3 +184,4 @@ spec-kitty agent action implement WP11 --agent <name>
 ## Activity Log
 
 - 2026-05-16T21:16:34Z – claude:sonnet:python-implementer:implementer – shell_pid=46117 – Started implementation via action command
+- 2026-05-16T21:34:19Z – claude:sonnet:python-implementer:implementer – shell_pid=46117 – WP11 ready: ServiceProvider DI wiring + EventEntity/UpcomingEventsListing reference consumer + Phase14 integration tests. WP10 validator wired at boot via ServiceProvider::boot() hook. Listener registration via dispatcher->addListener() at priority=100. All quality gates green: cs-check, phpstan, check-composer-policy, check-package-layers. 316 listing tests + 24 Phase14 tests pass.
