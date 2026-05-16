@@ -175,3 +175,4 @@ spec-kitty agent action implement WP03 --agent <name>
 ## Activity Log
 
 - 2026-05-16T19:14:39Z – claude:sonnet:python-implementer:implementer – shell_pid=14947 – Started implementation via action command
+- 2026-05-16T19:20:20Z – claude:sonnet:python-implementer:implementer – shell_pid=14947 – T011-T015 implemented; mark-status fallback (tasks.md format issue, same as WP01/WP02). Files: src/TaggedCacheInterface.php, src/Exception/InvalidCacheTagException.php, src/Backend/MemoryBackend.php (extended), tests/Unit/TaggedCacheInterfaceContractTest.php, tests/Unit/MemoryBackendTaggedTest.php. Cache suite 144/144 green (104 baseline + 40 new). Listing suite 135/135 green. cs-check + phpstan + check-composer-policy + check-package-layers all clean.
