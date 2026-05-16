@@ -150,3 +150,4 @@ spec-kitty agent action implement WP06 --agent <name>
 ## Activity Log
 
 - 2026-05-16T20:13:42Z – claude:sonnet:python-implementer:implementer – shell_pid=29961 – Started implementation via action command
+- 2026-05-16T20:22:16Z – claude:sonnet:python-implementer:implementer – shell_pid=29961 – WP06 ready: ListingCacheKeyBuilder + cache integration tests. 9 unit tests + 10 integration tests prove FR-037 key composition and end-to-end resolver+TaggedCache flow (miss/store/hit, tag invalidation, TTL, request-context parity, FR-058 error tolerance, NFR-003 sentinel). Source stub from WP05 was already canonical per spec — no source change required.
