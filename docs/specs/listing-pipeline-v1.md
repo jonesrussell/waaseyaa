@@ -1,6 +1,15 @@
 # Listing Pipeline v1 — Views-equivalent surface for entity listings
 
-**Status:** Draft mission spec (2026-05-15), ratification target: stability charter §3.2 beta entry criterion addition + new §5.X listing surface at mission close
+<!-- Spec reviewed 2026-05-16 — WP12 mission close-out; charter §5.6 + §5.9 ratified; doctrine spec frozen pending squash-merge SHA stamp. -->
+
+**Status:** **SHIPPED** at mission close (2026-05-16). Charter §5.6 (listing surface) and §5.9 (cache tag-aware ops + context registry) ratified by WP12 — see [`stability-charter.md`](stability-charter.md).
+**Post-mortem stamp:**
+- **Mission close date:** 2026-05-16
+- **Squash-merge SHA:** `<SHA TBD at merge>` (M-007 squash to `main`; filled in by the mission close-out commit after the lane-a → main merge lands)
+- **Shipped:** WP01..WP12 — all 63 FRs + 5 NFRs satisfied. New package `packages/listing/` at Layer 3. Cache package gains `TaggedCacheInterface` + `ContextRegistry` + `ContextResolver` + `ContextNames`. Foundation gains `Http\RequestContext`. Reference consumer (`EventEntity` + `upcoming_events` listing) exercises the full pipeline end-to-end against `InMemoryEntityStorage` + `MemoryBackend`.
+- **Open follow-ups:** beta-gate criterion 7 in [`stability-charter.md`](stability-charter.md) §3.2 (production-consumer demonstration); M-004 (translatable revisions) is now unblocked — its WP07 consumes FR-046..FR-049 from this mission.
+- **No retracted artifacts.** All public surface listed in §6 is enumerated in [`public-surface-map.md`](public-surface-map.md) and [`../public-surface-map.php`](../public-surface-map.php).
+
 **Audience:** framework maintainers; input for Spec Kitty `specify` → `plan` → `tasks` flow
 **Mission ID:** M-007 (display) / `01KRMN0B4FWX9PK80RPSYDX1QM` (Spec Kitty)
 **Mission slug:** `listing-pipeline-v1-01KRMN0B`

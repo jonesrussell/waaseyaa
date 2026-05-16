@@ -54,6 +54,8 @@ return [
     'Waaseyaa\Foundation\Http\LanguagePathStripperInterface' => 'public',
     'Waaseyaa\Foundation\Http\Inertia\InertiaFullPageRendererInterface' => 'public',
     'Waaseyaa\Foundation\Http\Inertia\InertiaPageResultInterface' => 'public',
+    // Listing pipeline request-context bridge (mission listing-pipeline-v1-01KRMN0B, charter §5.9).
+    'Waaseyaa\Foundation\Http\RequestContext' => 'public',
     'Waaseyaa\Foundation\Migration\Migration' => 'public',
     // Schema-evolution v2 ledger verify surface (mission #529 / WP09).
     'Waaseyaa\Foundation\Migration\VerifyResult' => 'public',
@@ -64,6 +66,12 @@ return [
     'Waaseyaa\Cache\CacheFactoryInterface' => 'public',
     'Waaseyaa\Cache\CacheTagsInvalidatorInterface' => 'public',
     'Waaseyaa\Cache\TagAwareCacheInterface' => 'public',
+    // Listing pipeline cache tag/context surface (mission listing-pipeline-v1-01KRMN0B, charter §5.9).
+    'Waaseyaa\Cache\TaggedCacheInterface' => 'public',
+    'Waaseyaa\Cache\ContextRegistry' => 'public',
+    'Waaseyaa\Cache\ContextResolver' => 'public',
+    'Waaseyaa\Cache\ContextNames' => 'public',
+    'Waaseyaa\Cache\Exception\InvalidCacheTagException' => 'public',
     'Waaseyaa\Database\DatabaseInterface' => 'public',
     'Waaseyaa\Database\SelectInterface' => 'public',
     'Waaseyaa\Database\InsertInterface' => 'public',
@@ -309,9 +317,37 @@ return [
     // Migration platform conformance bases (WP10, autoload-dev — stable surface for extenders).
     'Waaseyaa\Migration\Testing\SourceConformanceTestCase' => 'public',
     'Waaseyaa\Migration\Testing\DestinationConformanceTestCase' => 'public',
+    // Listing pipeline value objects (mission listing-pipeline-v1-01KRMN0B WP01; charter §5.6).
+    'Waaseyaa\Listing\ListingDefinition' => 'public',
+    'Waaseyaa\Listing\FilterDefinition' => 'public',
+    'Waaseyaa\Listing\SortDefinition' => 'public',
+    'Waaseyaa\Listing\Pagination' => 'public',
+    'Waaseyaa\Listing\ListingResult' => 'public',
+    'Waaseyaa\Listing\ExposedFilterValues' => 'public',
+    // Listing pipeline factories + enums (WP01).
+    'Waaseyaa\Listing\Filter' => 'public',
+    'Waaseyaa\Listing\Sort' => 'public',
+    'Waaseyaa\Listing\Operator' => 'public',
+    'Waaseyaa\Listing\SortDirection' => 'public',
+    // Listing pipeline capability + services (WP02, WP05, WP09).
+    'Waaseyaa\Listing\HasListingsInterface' => 'public',
+    'Waaseyaa\Listing\ListingResolver' => 'public',
+    'Waaseyaa\Listing\ListingDefinitionRegistry' => 'public',
+    'Waaseyaa\Listing\ExposedFilterParser' => 'public',
+    // Listing pipeline exceptions (WP11, WP02).
+    'Waaseyaa\Listing\Exception\UnsupportedListingException' => 'public',
+    'Waaseyaa\Listing\Exception\UnknownListingException' => 'public',
 
     // Layer 3: Services — internal
     'Waaseyaa\Billing\StripeClientInterface' => 'internal',
+    // Listing pipeline internals (mission listing-pipeline-v1-01KRMN0B; NOT stable surface).
+    'Waaseyaa\Listing\ListingCacheKeyBuilder' => 'internal',
+    'Waaseyaa\Listing\ListingCacheInvalidator' => 'internal',
+    'Waaseyaa\Listing\ListingDiscoverer' => 'internal',
+    'Waaseyaa\Listing\ListingDefinitionValidator' => 'internal',
+    'Waaseyaa\Listing\ExposedFilterCoercer' => 'internal',
+    'Waaseyaa\Listing\Exception\ListingCoercionException' => 'internal',
+    'Waaseyaa\Listing\EntityRepositoryRegistry' => 'internal',
 
     // Layer 4: API — public
     'Waaseyaa\Api\CodifiedContext\CodifiedContextSessionStoreInterface' => 'public',

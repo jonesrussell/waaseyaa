@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **M-007 listing-pipeline-v1: Views-equivalent declarative listing surface.** New `packages/listing/` at Layer 3 (services). Stable public surface:
+  - Value objects: `ListingDefinition`, `FilterDefinition`, `SortDefinition`, `Pagination`, `ListingResult`, `ExposedFilterValues`.
+  - Factories + enums: `Filter`, `Sort`, `Operator`, `SortDirection`.
+  - Services + capability: `ListingResolver`, `ListingDefinitionRegistry`, `ExposedFilterParser`, `HasListingsInterface`.
+  - Exceptions: `UnsupportedListingException`, `UnknownListingException`.
+  - Langcode-aware filtering (M-006 obligation), per-row access policy application, offset+limit pagination with silent clamping, exposed-filter URL parsing with permissive type coercion, boot-time `ListingDefinitionValidator` (fail-fast on invalid bindings).
+  - New charter `§5.6` stable surface (post-mission ratification of the placeholder).
+- **M-007 cache tag/context architecture.** Additions to `packages/cache/`:
+  - `TaggedCacheInterface` (`setWithTags` + `invalidateByTag` + `getTagsFor`) with strict tag-string format `[a-z][a-z0-9_:.-]*`.
+  - `ContextRegistry` + `ContextResolver` for deterministic cache-key segmentation.
+  - `ContextNames` constants: `USER_ROLES`, `USER_ID`, `LANGUAGE_CONTENT`, `LANGUAGE_INTERFACE`, `URL_QUERY_PREFIX`.
+  - `Exception\InvalidCacheTagException` for malformed tags.
+  - Canonical tag vocabulary `entity:<type>[:<id>[:<langcode>]]` is now load-bearing stable surface (charter `§5.9`).
+- **M-007 foundation HTTP additions.** `Waaseyaa\Foundation\Http\RequestContext` — interface exposing the active request's roles, user id, languages, and query parameters to `ContextResolver` without leaking the underlying HTTP stack.
+- **M-007 lifecycle event additive surface patch.** `AfterSaveEvent` + `AfterDeleteEvent` gain an optional `affectedLangcodes` property (null default; backwards-compatible). `SqlStorageDriver` backfills the array on translatable saves so per-langcode cache tags invalidate precisely. M-004 (translatable revisions) is now unblocked — its WP07 consumes the same surface.
+- **M-007 documentation.** New cookbook `docs/cookbook/listing-first-cut.md` walks through declaring a `HasListingsInterface` provider and resolving via `ListingResolver`. New conventions doc `docs/conventions/cache-tags-and-contexts.md` codifies the tag vocabulary and context-name registry. Doctrine spec [`docs/specs/listing-pipeline-v1.md`](docs/specs/listing-pipeline-v1.md) carries the mission's post-mortem stamp. Charter `§5.6` + `§5.9` ratified.
+
 ## [0.1.0-alpha.179] - 2026-05-14
 
 ### Fixed

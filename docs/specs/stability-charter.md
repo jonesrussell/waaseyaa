@@ -153,7 +153,7 @@ Pre-v1 beta trains (`0.x-beta.N`).
 4. **Deprecation budget under threshold.** Active deprecations carrying shim debt do not exceed 10. (Forcing function: if the list grows, the framework must spend a cycle paying it down before entering beta.)
 5. **CI enforcement live.** The checks in §8 are wired and green on `main`.
 6. **Owner authorization.** `@jonesrussell` opens a PR creating `release-approvals/beta.approved`, mirroring the `VERSIONING.md` §6 pattern.
-7. **Listing pipeline in production.** Per [ADR 015](../adr/015-listing-pipeline-views-equivalent.md), `ListingDefinition` and the listing resolver are stable surface, and at least one consumer app uses them for production listings. Reason: declaring beta without this misleads Drupal-migration consumers about what the framework covers.
+7. **Listing pipeline in production.** Per [ADR 015](../adr/015-listing-pipeline-views-equivalent.md) and ratified by mission `listing-pipeline-v1-01KRMN0B` (M-007, 2026-05-16): the `Waaseyaa\Listing\ListingDefinition` contract and the `ListingResolver` service are stable surface (see §5.6), the cache tag-aware operations and context registry are stable surface (see §5.9), and at least one consumer app uses them for production listings. The mission shipped the contract; remaining beta-gate work is the production-consumer demonstration. Reason: declaring beta without this misleads Drupal-migration consumers about what the framework covers.
 8. **Revisions in production.** Per [ADR 016](../adr/016-revisions-first-class.md), `RevisionableEntityInterface` is stable surface, and at least one revisionable entity type ships in a consumer app. Reason: editorial CMSs cannot rely on "alpha" semantics for revision history.
 9. **No unresolved critical mission gaps.** No `❌` entries in [`drupal-comparison-matrix.md`](drupal-comparison-matrix.md) §3 ("Mission-critical gaps") remain in `unknown` or `unresolved` state. `intentional-gap` decisions documented via ADR are acceptable; undecided gaps are not. **Per-field translation (matrix §3.2) — SATISFIED** by M-006 (`entity-storage-translations-v1`) shipping the single-axis translation substrate per ADR 017; see §5.3 for the stable surface. CMI config sync (matrix §3.5) remains ADR'd (ADR 018) but unshipped.
 
@@ -382,27 +382,58 @@ The "until usage reaches zero" grant from the previous draft applies specificall
 
 ### 5.6 Listing pipeline
 
-Per [ADR 015](../adr/015-listing-pipeline-views-equivalent.md).
+Per [ADR 015](../adr/015-listing-pipeline-views-equivalent.md). Delivered by mission
+`listing-pipeline-v1-01KRMN0B` (M-007, 2026-05-16). Subsystem spec:
+[`listing-pipeline-v1.md`](listing-pipeline-v1.md).
 
-**Stable surface:**
-- `ListingDefinition` value object shape and constructor parameters.
-- `FilterDefinition` and `SortDefinition` (or whatever concrete value-object names the implementation lands on — the names ratify with the ADR).
-- `ListingResolver` service interface — `resolve(ListingDefinition): ListingResult`.
-- `ListingResult` accessors — `rows()`, `pagination()`, `cacheTags()`, `cacheContexts()`.
-- `HasListingsInterface` provider capability (parallel to `HasNativeCommandsInterface`).
-- The `UnsupportedListingException` and `UnsupportedQueryException` types.
-- Exposed-filter URL parameter parsing rules.
+**Stable surface (FQCNs in `Waaseyaa\Listing\` unless noted):**
 
-**Internal:**
-- Query AST construction within the resolver.
-- Cache key derivation.
-- Per-backend dispatch logic (uses ADR 010's `supportsQuery`).
+*Value objects (`final readonly class`):*
+- `Waaseyaa\Listing\ListingDefinition` — constructor signature + accessors.
+- `Waaseyaa\Listing\FilterDefinition` — constructor + `exposedParam` clone semantics.
+- `Waaseyaa\Listing\SortDefinition` — constructor + direction.
+- `Waaseyaa\Listing\Pagination` — `$page`, `$pageSize`, `$totalRows`, `$totalPages`, `$hasPrev`, `$hasNext`.
+- `Waaseyaa\Listing\ListingResult` — `rows()`, `pagination()`, `cacheTags()`, `cacheContexts()`.
+- `Waaseyaa\Listing\ExposedFilterValues` — typed view over parsed `$_GET` slice.
+
+*Factories (sibling sugar):*
+- `Waaseyaa\Listing\Filter` — `eq()`, `neq()`, `lt()`, `lte()`, `gt()`, `gte()`, `in()`, `notIn()`, `isNull()`, `isNotNull()`, `between()`, `startsWith()`, `contains()`, `langcode()`, `exposed()`.
+- `Waaseyaa\Listing\Sort` — `asc()`, `desc()`.
+
+*Enums:*
+- `Waaseyaa\Listing\Operator` — backed enum (`EQ`, `NEQ`, `LT`, `LTE`, `GT`, `GTE`, `IN`, `NOT_IN`, `IS_NULL`, `IS_NOT_NULL`, `BETWEEN`, `STARTS_WITH`, `CONTAINS`). Future additions are additive only.
+- `Waaseyaa\Listing\SortDirection` — `ASC` | `DESC`.
+
+*Services:*
+- `Waaseyaa\Listing\ListingResolver` — `resolve(ListingDefinition, ?ExposedFilterValues): ListingResult`.
+- `Waaseyaa\Listing\ListingDefinitionRegistry` — `get(string $id): ListingDefinition` (throws `UnknownListingException` on miss).
+- `Waaseyaa\Listing\ExposedFilterParser` — `parse(array $queryParams, ListingDefinition): ExposedFilterValues`.
+
+*Capabilities:*
+- `Waaseyaa\Listing\HasListingsInterface` — `public function listings(): array` returning `ListingDefinition[]`. Mirrors `HasNativeCommandsInterface` / `HasMigrationsInterface`.
+
+*Exceptions:*
+- `Waaseyaa\Listing\Exception\UnsupportedListingException` — definition-time validation failure (carries `listingId`, `fieldName`, `reason`).
+- `Waaseyaa\Listing\Exception\UnknownListingException` — registry miss (carries `listingId`).
+
+**Internal (NOT stable surface — implementation detail):**
+- `Waaseyaa\Listing\ListingCacheKeyBuilder` — key format may change without notice.
+- `Waaseyaa\Listing\ListingCacheInvalidator` — event-listener wiring; refactorable.
+- `Waaseyaa\Listing\ListingDiscoverer` — boot-time discovery helper.
+- `Waaseyaa\Listing\ListingDefinitionValidator` — boot-time validator.
+- `Waaseyaa\Listing\ExposedFilterCoercer` — type-coercion implementation.
+- `Waaseyaa\Listing\Exception\ListingCoercionException` — internal control-flow signal in the coercer.
+- `Waaseyaa\Listing\EntityRepositoryRegistry` — bridge to entity-repository lookup; mission-internal.
 
 **Allowed under deprecation cycle:** all stable surface above.
 
-**Cross-cutting note — cache tags and contexts:** the listing pipeline forces cache tags + contexts to become stable surface in the `cache` package. Tag string format (`entity:<type>`, `entity:<type>:<id>`) and context names (`user.roles`, `url.query.<param>`) are part of this section's stable surface even though they live in the cache package — the listing contract makes them load-bearing.
+**Cross-cutting note — cache tags and contexts:** the listing pipeline forces cache tags + contexts to become stable surface in the `cache` package and a `RequestContext` to surface in `foundation`. See §5.9 (cache tag/context surface). Tag string format (`entity:<type>`, `entity:<type>:<id>`, `entity:<type>:<id>:<langcode>`) and canonical context names (`user.roles`, `user.id`, `language.content`, `language.interface`, `url.query.<param>`) are load-bearing strings — every consumer relies on them, so they are doc-level stable surface even though they are not PHP types.
 
-**Forbidden:** silent removal of pagination metadata, silent change to filter parameter parsing (would break bookmarked URLs).
+**Forbidden:**
+- Silent removal of pagination metadata (`Pagination` accessors).
+- Silent change to filter parameter parsing rules (would break bookmarked URLs).
+- Silent change to the `entity:*` tag vocabulary (would break every listing's cache-invalidation contract).
+- Silent change to the `Operator` enum vocabulary (would break exposed-filter URLs and JSON-serialised definitions).
 
 **Admin-composability** is explicitly *not* on stable surface in v0.x; a future ADR addresses the in-browser listing builder.
 
@@ -530,6 +561,62 @@ Exit codes: `0` success, `1` generic failure, `2` lock held by another process.
 - [ADR 011](../adr/011-entity-lifecycle-events.md) — lifecycle events; `SaveContext::isImport()` extends this contract.
 - [ADR 012a](../adr/012a-migration-substrate-in-core.md) — origin ADR.
 - [ADR 016](../adr/016-revisions-first-class.md) — revisionable storage path used by `EntityDestination` when the destination entity type opts in.
+
+### 5.9 Cache tag-aware operations and context registry
+
+Per [ADR 015](../adr/015-listing-pipeline-views-equivalent.md) §Consequences. Surface ratified by mission
+`listing-pipeline-v1-01KRMN0B` (M-007, 2026-05-16). The listing pipeline (§5.6) is the first
+load-bearing consumer; cache tags + context names are doctrinal vocabulary shared by every future
+listing, render-cache, and HTTP-cache surrogate.
+
+Subsystem references: [`listing-pipeline-v1.md`](listing-pipeline-v1.md),
+[`../conventions/cache-tags-and-contexts.md`](../conventions/cache-tags-and-contexts.md).
+
+**Stable surface:**
+
+*Interfaces and exceptions (`Waaseyaa\Cache\`):*
+- `Waaseyaa\Cache\TaggedCacheInterface` — extends `Waaseyaa\Cache\CacheBackendInterface` with `setWithTags(string $key, mixed $value, array $tags, ?int $ttl = null): void`, `invalidateByTag(string $tag): int`, `getTagsFor(string $key): array`.
+- `Waaseyaa\Cache\Exception\InvalidCacheTagException` — thrown by `setWithTags()` on malformed tag strings (no silent normalisation).
+
+*Services and registry (`Waaseyaa\Cache\`):*
+- `Waaseyaa\Cache\ContextRegistry` — whitelist of context names. `register(string $name): void`, `has(string $name): bool`, `all(): array`.
+- `Waaseyaa\Cache\ContextResolver` — `resolve(string $context, RequestContext $request): string`. Deterministic short-string resolution for a context name in the active request.
+
+*Canonical context names (`Waaseyaa\Cache\ContextNames` constants):*
+- `ContextNames::USER_ROLES` = `'user.roles'`
+- `ContextNames::USER_ID` = `'user.id'`
+- `ContextNames::LANGUAGE_CONTENT` = `'language.content'`
+- `ContextNames::LANGUAGE_INTERFACE` = `'language.interface'`
+- `ContextNames::URL_QUERY_PREFIX` = `'url.query.'` (concatenate the query-param name; e.g. `ContextNames::URL_QUERY_PREFIX . 'page'` → `'url.query.page'`).
+
+*Request-context bridge (`Waaseyaa\Foundation\Http\`):*
+- `Waaseyaa\Foundation\Http\RequestContext` — interface exposing the current request's roles, user id, active language, and query parameters to `ContextResolver` without leaking the underlying HTTP stack. Stable signature; the concrete request implementation may vary by host (PSR-7, native, CLI fixture).
+
+*Doc-level rules (load-bearing strings — strings, not types, but covered by the deprecation policy):*
+- Tag-string format regex: `^[a-z][a-z0-9_:.-]*$`. Enforced by `TaggedCacheInterface::setWithTags()`.
+- Context-name format regex: `^[a-z][a-z0-9_.]*$`.
+- Canonical tag vocabulary:
+  - `entity:<type>` — invalidates every cached entry for an entity type.
+  - `entity:<type>:<id>` — invalidates entries scoped to a single entity.
+  - `entity:<type>:<id>:<langcode>` — invalidates per-translation entries on translatable entity types.
+
+**Internal (NOT stable surface):**
+- Tag-index storage layout inside any individual `TaggedCacheInterface` implementation (e.g. `MemoryBackend`'s reverse index format is internal).
+- The integer return value of `invalidateByTag()` is best-effort; consumers MUST NOT branch on the exact count.
+
+**Allowed under deprecation cycle:**
+- Adding new constants to `ContextNames` (additive).
+- Adding new methods to `ContextRegistry` (additive).
+
+**Forbidden:**
+- Silent removal of any canonical tag vocabulary line above (would silently break cache-invalidation invariants for every listing consumer).
+- Silent renaming of any `ContextNames` constant (constants are exported by FQCN — apps reference them directly).
+- Silent change to the tag-string regex (would retroactively reject previously-accepted tags).
+- Silent removal of `setWithTags`, `invalidateByTag`, or `getTagsFor` from `TaggedCacheInterface`.
+
+**Cross-references:**
+- §5.6 — the listing pipeline is the first stable consumer.
+- [ADR 015](../adr/015-listing-pipeline-views-equivalent.md) §Consequences — names this section as the forcing function that committed the framework to a cache-tags-and-contexts architecture.
 
 ---
 

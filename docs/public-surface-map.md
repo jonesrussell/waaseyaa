@@ -33,6 +33,7 @@ Machine-readable source: `docs/public-surface-map.php`.
 | `DomainEvent` | abstract class | Base class for all domain events carrying aggregate identity and actor context |
 | `WaaseyaaException` | abstract class | Base exception for all framework errors, with HTTP status code and problem type |
 | `JsonApiResponseTrait` | trait | Builds JSON:API responses with correct content type and encoding options |
+| `Http\RequestContext` | interface | Exposes the active request's roles, user id, languages, and query params to `ContextResolver` (charter §5.9) |
 | `Migration` | abstract class | Base class for database migrations with optional rollback and ordering |
 
 ### cache
@@ -43,6 +44,11 @@ Machine-readable source: `docs/public-surface-map.php`.
 | `CacheFactoryInterface` | interface | Creates or retrieves cache backend instances by bin name |
 | `CacheTagsInvalidatorInterface` | interface | Invalidates all cache items associated with a set of tags |
 | `TagAwareCacheInterface` | interface | Cache backend that supports tag-based invalidation |
+| `TaggedCacheInterface` | interface | Listing-pipeline tag-aware ops (`setWithTags`, `invalidateByTag`, `getTagsFor`) — charter §5.9 |
+| `ContextRegistry` | service | Whitelist of canonical context names for cache-key segmentation (charter §5.9) |
+| `ContextResolver` | service | Resolves a context name against a `RequestContext` into a deterministic short string |
+| `ContextNames` | constants class | Canonical context-name constants (`USER_ROLES`, `USER_ID`, `LANGUAGE_CONTENT`, `LANGUAGE_INTERFACE`, `URL_QUERY_PREFIX`) |
+| `Exception\InvalidCacheTagException` | exception | Thrown by `setWithTags()` on malformed tag strings (no silent normalisation) |
 
 ### database-legacy
 
@@ -300,6 +306,29 @@ Mission `migration-platform-v1-01KRCDE9` (M-002). All entries below are intentio
 | `Log\Channels` | final class | Logger channel constants: `MIGRATION_DEPRECATION`, `MIGRATION_DISCOVERY` (WP01) |
 | `Testing\SourceConformanceTestCase` | abstract class | Conformance harness third-party source plugins extend (FR-052, WP10; autoload-dev) |
 | `Testing\DestinationConformanceTestCase` | abstract class | Conformance harness third-party destination plugins extend (FR-050/FR-051, WP10; autoload-dev) |
+
+### listing
+
+Charter §5.6 — listing-pipeline-v1 (M-007). Namespace `Waaseyaa\Listing\`.
+
+| Element | Type | Purpose |
+|---------|------|---------|
+| `ListingDefinition` | final readonly class | Immutable listing manifest: id, entity type, filters, sorts, page size, access ops |
+| `FilterDefinition` | final readonly class | Field + operator + value; optional `exposedParam` for URL-driven filters |
+| `SortDefinition` | final readonly class | Field + direction; resolver appends an implicit id tie-break sort |
+| `Pagination` | final readonly class | Page metadata: page, page size, total rows, total pages, hasPrev, hasNext |
+| `ListingResult` | final readonly class | Resolution result: rows + pagination + cache tags + cache contexts |
+| `ExposedFilterValues` | final readonly class | Typed view over parsed `$_GET` slice passed to `ListingResolver::resolve()` |
+| `Operator` | backed enum | Filter vocabulary: EQ, NEQ, LT, LTE, GT, GTE, IN, NOT_IN, IS_NULL, IS_NOT_NULL, BETWEEN, STARTS_WITH, CONTAINS |
+| `SortDirection` | enum | ASC, DESC |
+| `Filter` | factory class | Sugar factories: `eq()`, `gte()`, `in()`, `isNull()`, `langcode()`, `exposed()`, etc. |
+| `Sort` | factory class | Sugar factories: `asc()`, `desc()` |
+| `HasListingsInterface` | capability interface | ServiceProviders implement to declare listings; mirrors `HasMigrationsInterface` |
+| `ListingResolver` | final class | Single public method `resolve(ListingDefinition, ?ExposedFilterValues): ListingResult` |
+| `ListingDefinitionRegistry` | final class | `get(string $id): ListingDefinition` — throws `UnknownListingException` on miss |
+| `ExposedFilterParser` | final class | Parses query params into `ExposedFilterValues`; never throws on user input |
+| `Exception\UnsupportedListingException` | final class | Definition-time validation failure (carries listing id, field name, reason) |
+| `Exception\UnknownListingException` | final class | Registry miss (carries listing id) |
 
 ---
 
