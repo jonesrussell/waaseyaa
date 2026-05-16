@@ -1,7 +1,7 @@
 {
-  "event_count": 33,
-  "last_event_id": "01KRS4C998377WY71NP4NMS1X5",
-  "materialized_at": "2026-05-16T19:31:58.376303+00:00",
+  "event_count": 34,
+  "last_event_id": "01KRS4DB5TV0SXP488CW8A54V4",
+  "materialized_at": "2026-05-16T19:32:33.082469+00:00",
   "mission_number": "9",
   "mission_slug": "listing-pipeline-v1-01KRMN0B",
   "mission_type": "software-dev",
@@ -11,9 +11,9 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 1,
+    "for_review": 0,
     "in_progress": 0,
-    "in_review": 0,
+    "in_review": 1,
     "planned": 8
   },
   "work_packages": {
@@ -39,11 +39,11 @@
       "last_transition_at": "2026-05-16T19:23:46.043789+00:00"
     },
     "WP04": {
-      "actor": "user",
+      "actor": "claude:opus:python-reviewer:reviewer",
       "force_count": 2,
-      "lane": "for_review",
-      "last_event_id": "01KRS4C998377WY71NP4NMS1X5",
-      "last_transition_at": "2026-05-16T19:31:58.376303+00:00"
+      "lane": "in_review",
+      "last_event_id": "01KRS4DB5TV0SXP488CW8A54V4",
+      "last_transition_at": "2026-05-16T19:32:33.082469+00:00"
     },
     "WP05": {
       "actor": "finalize-tasks",
