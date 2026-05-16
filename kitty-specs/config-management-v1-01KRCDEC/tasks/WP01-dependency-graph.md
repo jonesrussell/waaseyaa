@@ -28,7 +28,7 @@ subtasks:
 - T005
 - T006
 - T007
-shell_pid: '66861'
+shell_pid: "66861"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -43,6 +43,7 @@ owned_files:
 - packages/config/tests/Unit/Dependency/DependencyResolverTest.php
 - packages/config/tests/Unit/Dependency/Exception/ConfigDependencyCycleExceptionTest.php
 - packages/config/tests/Unit/Dependency/Exception/ConfigDependencyMissingExceptionTest.php
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP01 — ConfigDependencyInterface + DAG + cycle/missing detection
@@ -105,3 +106,7 @@ No prerequisite WPs — may dispatch immediately on mission start.
 - `composer phpstan` (level 5) green; `composer cs-check` clean.
 - `bin/check-package-layers` green (no upward `waaseyaa/*` edges introduced).
 - No modifications outside `owned_files` (other than rerun-of-generators where charter explicitly permits).
+
+## Activity Log
+
+- 2026-05-16T23:35:54Z – claude:sonnet:python-implementer:implementer – shell_pid=66861 – Assigned agent via action command
