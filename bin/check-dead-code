@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+# Hard-gate dead-code check (Phase 4). Exits non-zero on any finding not already
+# in phpstan-dead-code-baseline.neon. Pre-existing entries are suppressed by the
+# baseline — only NEW dead-code introduced by the current change set fails CI.
+#
+# Detection: PHPStan + shipmonk/dead-code-detector with phpstan-dead-code.neon,
+# which layers on the project's standard phpstan.neon and registers the
+# WaaseyaaEntrypointProvider for our discovery patterns (policy attribute,
+# middleware attribute, extra.waaseyaa.providers, Ingestion/EntityMapper/*,
+# RouteProviderInterface implementors, EntityBase/ContentEntityBase subclasses
+# and their traits, and class-level @api PHPDoc).
+#
+# Run locally:  bin/check-dead-code
+# Auto-remove:  bin/check-dead-code -- --error-format=removeDeadCode
+# Regen baseline (only when intentionally accepting a new finding):
+#   vendor/bin/phpstan analyse -c phpstan-dead-code.neon \
+#     --generate-baseline=phpstan-dead-code-baseline.neon --allow-empty-baseline
+#
+# History: was bin/audit-dead-code (warn-only) through PR #1503. Phase 4 of the
+# dead-code cleanup audit (docs/audits/2026-05-17-dead-code-baseline-audit.md)
+# flipped this to a hard gate after the baseline dropped from 1,341 → 66 entries.
+set -uo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$ROOT_DIR"
+
+if [[ ! -x vendor/bin/phpstan ]]; then
+    echo "WARN: vendor/bin/phpstan not found; run 'composer install' before check-dead-code." >&2
+    exit 0
+fi
+
+mkdir -p tmp/phpstan-dead-code
+
+echo "Running dead-code check via phpstan-dead-code.neon..."
+echo
+
+set +e
+vendor/bin/phpstan analyse --configuration=phpstan-dead-code.neon --no-progress --memory-limit=2G "$@"
+exit_status=$?
+set -e
+
+echo
+if [[ "$exit_status" -eq 0 ]]; then
+    echo "OK — dead-code check found no new unused members beyond the baseline."
+else
+    echo "Dead-code check FAILED (exit=$exit_status)."
+    echo
+    echo "If this finding is intentional (e.g. a forthcoming extension point), add"
+    echo "a class-level '@api' PHPDoc tag. If you must accept it as known-dead,"
+    echo "regenerate the baseline:"
+    echo "  vendor/bin/phpstan analyse -c phpstan-dead-code.neon \\"
+    echo "    --generate-baseline=phpstan-dead-code-baseline.neon --allow-empty-baseline"
+    echo "and explain in the PR description why."
+fi
+exit "$exit_status"

@@ -460,6 +460,7 @@
             "PHP_CLI_SERVER_WORKERS=4 bin/waaseyaa serve"
         ],
         "phpstan": "phpstan analyse --memory-limit=512M",
+        "check-dead-code": "bash bin/check-dead-code",
         "test": "phpunit --no-coverage",
         "verify": [
             "@cs-check",
@@ -469,15 +470,17 @@
             "@check-no-secrets",
             "@check-ingestion-defaults",
             "@check-symfony-imports",
+            "@check-dead-code",
             "@test"
         ]
     },
     "scripts-descriptions": {
+        "check-dead-code": "Fail-on-new dead-code gate (Phase 4 of the dead-code cleanup audit). Runs phpstan-dead-code.neon with shipmonk's detector; pre-existing baseline entries are suppressed, only NEW findings fail. See docs/audits/2026-05-17-dead-code-baseline-audit.md and bin/check-dead-code header for how to handle a new finding.",
         "check-symfony-imports": "Enforce the Path R-narrow Symfony-import boundary (mission #1107 C-005 (b)). Fails when `use Symfony\\…` appears outside the framework allowlist. Allowlist lives in .symfony-import-allowlist.json — see docs/specs/api-layer.md §Symfony Import Boundary.",
         "dev": "Start the PHP dev server (delegates to dev:php). For the admin SPA, run `composer dev:admin` in a second terminal — see docs/specs/operations-playbooks.md.",
         "dev:admin": "Start the Nuxt admin SPA dev server. NUXT_BACKEND_URL points at the PHP server (default :8080); set APP_PORT to override.",
         "dev:php": "Start the PHP built-in dev server via bin/waaseyaa serve. Single typed long-running process with no shell forking.",
-        "verify": "Run all repo-wide gates: cs-check, phpstan, composer-policy, package-layers, no-secrets, ingestion-defaults, symfony-imports, and the test suite. Canonical CI entry point — see docs/specs/operations-playbooks.md."
+        "verify": "Run all repo-wide gates: cs-check, phpstan, composer-policy, package-layers, no-secrets, ingestion-defaults, symfony-imports, dead-code (fail-on-new), and the test suite. Canonical CI entry point — see docs/specs/operations-playbooks.md."
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
