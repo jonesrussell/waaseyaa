@@ -23,7 +23,7 @@ subtasks:
 - T040
 - T041
 - T042
-shell_pid: "92656"
+shell_pid: "94896"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -36,7 +36,7 @@ owned_files:
 - packages/config/tests/Unit/Audit/ConfigAuditChannelTest.php
 - packages/config/tests/Unit/Audit/ConfigAuditEventTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigResetCommandTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP07 — config:reset + ConfigResetter + config.audit log channel
@@ -93,3 +93,4 @@ This WP depends on: WP04.
 
 - 2026-05-17T00:57:08Z – claude:sonnet:python-implementer:implementer – shell_pid=92656 – Started implementation via action command
 - 2026-05-17T01:04:38Z – claude:sonnet:python-implementer:implementer – shell_pid=92656 – WP07 ready: config:reset + audit channel
+- 2026-05-17T01:05:08Z – claude:opus:python-reviewer:reviewer – shell_pid=94896 – Started review via action command
