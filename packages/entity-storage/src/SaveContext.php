@@ -33,11 +33,20 @@ final class SaveContext
      *     invalidation, search-index refresh, downstream analytics. This is a
      *     passive signal: the coordinator does NOT alter its behaviour based on
      *     this flag; subscribers branch on it themselves.
+     * @param ?list<non-empty-string> $translations Pin the save to a list of langcodes for
+     *     atomic multi-language write (M-004 / WP03, FR-013). When non-null, the
+     *     storage coordinator iterates the list inside a single transaction and
+     *     rolls the whole set back with {@see \Waaseyaa\EntityStorage\Exception\PartialSaveException}
+     *     on partial failure. Precedence: when both `$translations` and `$langcode`
+     *     are set, `$translations` wins and `$langcode` is ignored for the save
+     *     (per contracts/save-context-translations.md §3). Null = single-language
+     *     save (M-006 unchanged path).
      */
     private function __construct(
         public readonly bool $withoutNewRevision = false,
         public readonly ?string $langcode = null,
         public readonly bool $isImport = false,
+        public readonly ?array $translations = null,
     ) {}
 
     /**
@@ -45,7 +54,7 @@ final class SaveContext
      */
     public static function default(): self
     {
-        return new self(withoutNewRevision: false, langcode: null, isImport: false);
+        return new self(withoutNewRevision: false, langcode: null, isImport: false, translations: null);
     }
 
     /**
@@ -60,6 +69,7 @@ final class SaveContext
             withoutNewRevision: true,
             langcode: $this->langcode,
             isImport: $this->isImport,
+            translations: $this->translations,
         );
     }
 
@@ -80,6 +90,7 @@ final class SaveContext
             withoutNewRevision: $this->withoutNewRevision,
             langcode: $langcode,
             isImport: $this->isImport,
+            translations: $this->translations,
         );
     }
 
@@ -98,6 +109,68 @@ final class SaveContext
             withoutNewRevision: $this->withoutNewRevision,
             langcode: $this->langcode,
             isImport: true,
+            translations: $this->translations,
+        );
+    }
+
+    /**
+     * Pin the save to a list of langcodes for atomic multi-language write
+     * (M-004 / WP03, FR-013).
+     *
+     * The storage coordinator opens a single transaction, iterates the list,
+     * fires {@see \Waaseyaa\EntityStorage\Event\BeforeSaveEvent} per langcode,
+     * applies each per-langcode write, and on commit fires a single
+     * {@see \Waaseyaa\EntityStorage\Event\AfterSaveEvent} with
+     * `affectedLangcodes()` carrying the full list. On any per-langcode failure
+     * the whole transaction rolls back and {@see \Waaseyaa\EntityStorage\Exception\PartialSaveException}
+     * is raised (no AfterSaveEvent).
+     *
+     * Precedence: when both `withTranslations()` and `withLangcode()` have been
+     * set on the same chain, the multi-language save wins; `$langcode` is
+     * preserved on the value object (callers may layer the builders fluently)
+     * but ignored by the save coordinator. See
+     * contracts/save-context-translations.md §3.
+     *
+     * Builder rejects:
+     * - empty arrays (`InvalidArgumentException`);
+     * - any non-string or empty-string element (`InvalidArgumentException`).
+     *
+     * Duplicate langcodes are accepted by the builder (PHP arrays are not sets);
+     * deduplication is the coordinator's responsibility per
+     * contracts/save-context-translations.md §5.
+     *
+     * @param array<int|string, mixed> $langcodes Expected shape:
+     *     `list<non-empty-string>`. Runtime validators reject any deviation so
+     *     non-typed call sites still hit the documented contract.
+     *
+     * @throws \InvalidArgumentException When `$langcodes` is empty or contains
+     *                                   any non-string / empty-string element.
+     *
+     * @api
+     */
+    public function withTranslations(array $langcodes): self
+    {
+        if ($langcodes === []) {
+            throw new \InvalidArgumentException(
+                'SaveContext::withTranslations requires a non-empty list of langcodes.',
+            );
+        }
+
+        $normalised = [];
+        foreach ($langcodes as $candidate) {
+            if (!\is_string($candidate) || $candidate === '') {
+                throw new \InvalidArgumentException(
+                    'SaveContext::withTranslations requires non-empty string langcodes.',
+                );
+            }
+            $normalised[] = $candidate;
+        }
+
+        return new self(
+            withoutNewRevision: $this->withoutNewRevision,
+            langcode: $this->langcode,
+            isImport: $this->isImport,
+            translations: $normalised,
         );
     }
 }

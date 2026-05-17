@@ -13,53 +13,71 @@ use Waaseyaa\EntityStorage\Connection\ConnectionResolverInterface;
  *
  * Handles raw read/write against the {entity_table}_revision table.
  * Does not handle entity hydration or event dispatch — that's EntityRepository's job.
+ *
+ * ## Two-axis (M-004 / WP03)
+ *
+ * When the entity type is BOTH revisionable AND translatable, callers may pass
+ * an optional `?string $langcode` to {@see writeRevision()}, which routes the
+ * write through the per-`(tid, langcode)` translation-revision path. The
+ * single-axis path is preserved unchanged when `$langcode === null`
+ * (regression gate, FR-009..FR-011).
+ *
+ * Per-`(entity_id, langcode)` current-revision pointer tracking is owned by
+ * this driver via the in-process map exposed through
+ * {@see currentLangcodeRevision()} / {@see setCurrentLangcodeRevision()}.
+ * Other-language pointers are NEVER touched by a per-langcode write
+ * (FR-010 — invariant verified in `RevisionableStorageDriverTwoAxisTest`).
  */
 final class RevisionableStorageDriver
 {
     private readonly string $revisionTable;
+
+    private readonly string $translationRevisionTable;
+
+    /**
+     * In-process per-`(entity_id, langcode)` current-revision pointer (FR-007).
+     *
+     * Persistence of this pointer in `<entity>__translation` is owned by
+     * higher-level storage classes (RevisionableSqlBlobStorage /
+     * RevisionableSqlColumnStorage); this driver tracks the in-flight pointer
+     * for the duration of a save so the coordinator can update other tables
+     * without re-querying.
+     *
+     * @var array<string, array<string, int>>  entityId -> langcode -> revisionId
+     */
+    private array $currentLangcodePointers = [];
 
     public function __construct(
         private readonly ConnectionResolverInterface $connectionResolver,
         private readonly EntityTypeInterface $entityType,
     ) {
         $this->revisionTable = $this->entityType->id() . '_revision';
+        $this->translationRevisionTable = $this->entityType->id() . '__translation__revision';
     }
 
     /**
      * Write a new revision row.
      *
-     * @param array<string, mixed> $values Field values to snapshot.
+     * When `$langcode` is non-null AND the entity type is two-axis (revisionable
+     * + translatable), the write is dispatched to the per-`(tid, langcode)`
+     * translation-revision path (FR-007, FR-009). The per-language current
+     * pointer is updated for `(entityId, langcode)`; other-language pointers
+     * are untouched (FR-010).
+     *
+     * When `$langcode` is null OR the entity type is single-axis, the single-
+     * axis path is preserved unchanged (M-006 regression gate).
+     *
+     * @param array<string, mixed> $values   Field values to snapshot.
+     * @param ?string              $langcode Optional per-langcode pin. Two-axis only.
      * @return int The new revision ID.
      */
-    public function writeRevision(string $entityId, array $values, ?string $log): int
+    public function writeRevision(string $entityId, array $values, ?string $log, ?string $langcode = null): int
     {
-        $db = $this->getDatabase();
-
-        $revisionId = $this->getNextRevisionId($entityId);
-
-        $row = [
-            'entity_id' => $entityId,
-            'revision_id' => $revisionId,
-            'revision_created' => date('Y-m-d H:i:s'),
-            'revision_log' => $log,
-        ];
-
-        // Add field values, excluding keys that don't belong in revision table.
-        $keys = $this->entityType->getKeys();
-        $idKey = $keys['id'] ?? 'id';
-        foreach ($values as $key => $value) {
-            if ($key === $idKey || $key === 'revision_id' || $key === 'is_default_revision' || $key === 'is_latest_revision') {
-                continue;
-            }
-            $row[$key] = $value;
+        if ($langcode !== null && $this->isTwoAxis()) {
+            return $this->writePerLangcodeRevision($entityId, $values, $log, $langcode);
         }
 
-        $db->insert($this->revisionTable)
-            ->fields(array_keys($row))
-            ->values($row)
-            ->execute();
-
-        return $revisionId;
+        return $this->writeDefaultRevision($entityId, $values, $log);
     }
 
     /**
@@ -217,6 +235,183 @@ final class RevisionableStorageDriver
         $latest = $this->getLatestRevisionId($entityId);
 
         return ($latest ?? 0) + 1;
+    }
+
+    /**
+     * Whether the entity type for this driver participates in the two-axis
+     * (revisionable + translatable) storage shape.
+     *
+     * The base interface
+     * {@see \Waaseyaa\Entity\EntityTypeInterface} exposes both
+     * {@see EntityTypeInterface::isRevisionable()} and
+     * {@see EntityTypeInterface::isTranslatable()}; this driver is only
+     * instantiated for revisionable types, so the additional translatable
+     * check is what flips into the two-axis path.
+     */
+    private function isTwoAxis(): bool
+    {
+        return $this->entityType->isRevisionable() && $this->entityType->isTranslatable();
+    }
+
+    /**
+     * Single-axis (or two-axis default-langcode) revision write.
+     *
+     * Mirrors the M-006 behaviour byte-for-byte so the regression gate at the
+     * top of this class (R-A: single-axis preserved) holds. Extracted so the
+     * two-axis branch can be reasoned about in isolation (FR-011: non-
+     * translatable mutations still allocate a default-langcode revision via
+     * this path).
+     *
+     * @param array<string, mixed> $values
+     */
+    private function writeDefaultRevision(string $entityId, array $values, ?string $log): int
+    {
+        $db = $this->getDatabase();
+
+        $revisionId = $this->getNextRevisionId($entityId);
+
+        $row = [
+            'entity_id'        => $entityId,
+            'revision_id'      => $revisionId,
+            'revision_created' => date('Y-m-d H:i:s'),
+            'revision_log'     => $log,
+        ];
+
+        $keys = $this->entityType->getKeys();
+        $idKey = $keys['id'] ?? 'id';
+        foreach ($values as $key => $value) {
+            if ($key === $idKey || $key === 'revision_id' || $key === 'is_default_revision' || $key === 'is_latest_revision') {
+                continue;
+            }
+            $row[$key] = $value;
+        }
+
+        $db->insert($this->revisionTable)
+            ->fields(array_keys($row))
+            ->values($row)
+            ->execute();
+
+        return $revisionId;
+    }
+
+    /**
+     * Per-`(entity_id, langcode)` translation-revision write (FR-007, FR-009).
+     *
+     * Allocates an independent revision id per `(entity_id, langcode)` pair —
+     * saving a French translation does not advance the English sequence
+     * (FR-010 invariant: other-language pointers unchanged).
+     *
+     * Updates {@see $currentLangcodePointers} so the coordinator can read the
+     * just-written revision id for the per-`(entity, langcode)` pointer write
+     * in the same transaction without an extra `MAX()` query.
+     *
+     * @param array<string, mixed> $values
+     */
+    private function writePerLangcodeRevision(
+        string $entityId,
+        array $values,
+        ?string $log,
+        string $langcode,
+    ): int {
+        $db = $this->getDatabase();
+
+        $revisionId = $this->getNextLangcodeRevisionId($entityId, $langcode);
+
+        $row = [
+            'entity_id'        => $entityId,
+            'langcode'         => $langcode,
+            'revision_id'      => $revisionId,
+            'revision_created' => date('Y-m-d H:i:s'),
+            'revision_log'     => $log,
+        ];
+
+        $keys = $this->entityType->getKeys();
+        $idKey = $keys['id'] ?? 'id';
+        foreach ($values as $key => $value) {
+            if (
+                $key === $idKey
+                || $key === 'revision_id'
+                || $key === 'langcode'
+                || $key === 'is_default_revision'
+                || $key === 'is_latest_revision'
+            ) {
+                continue;
+            }
+            $row[$key] = $value;
+        }
+
+        $db->insert($this->translationRevisionTable)
+            ->fields(array_keys($row))
+            ->values($row)
+            ->execute();
+
+        $this->currentLangcodePointers[$entityId][$langcode] = $revisionId;
+
+        return $revisionId;
+    }
+
+    /**
+     * Independent per-`(entity, langcode)` monotonic id allocator.
+     *
+     * Reads `MAX(revision_id)` for the pair (NOT for the entity overall) so
+     * the en/oj sequences advance independently — saving French does not push
+     * English forward (FR-007, FR-010).
+     */
+    private function getNextLangcodeRevisionId(string $entityId, string $langcode): int
+    {
+        $db = $this->getDatabase();
+
+        $result = $db->query(
+            'SELECT MAX(revision_id) AS max_rev FROM ' . $this->translationRevisionTable
+            . ' WHERE entity_id = ? AND langcode = ?',
+            [$entityId, $langcode],
+        );
+
+        foreach ($result as $row) {
+            $row = (array) $row;
+            return ((int) ($row['max_rev'] ?? 0)) + 1;
+        }
+
+        return 1;
+    }
+
+    /**
+     * Read the in-process per-`(entity, langcode)` current-revision pointer
+     * tracked since the last per-langcode write in this driver instance.
+     *
+     * Returns `null` when no per-langcode write has occurred (the coordinator
+     * MUST fall back to the persisted pointer in `<entity>__translation`).
+     *
+     * @api
+     */
+    public function currentLangcodeRevision(string $entityId, string $langcode): ?int
+    {
+        return $this->currentLangcodePointers[$entityId][$langcode] ?? null;
+    }
+
+    /**
+     * Seed the in-process per-`(entity, langcode)` pointer without writing.
+     *
+     * Used by the coordinator when it has loaded the persisted pointer from
+     * `<entity>__translation` and wants subsequent reads in the same save
+     * transaction to be cache-coherent with the in-process map.
+     *
+     * @api
+     */
+    public function setCurrentLangcodeRevision(string $entityId, string $langcode, int $revisionId): void
+    {
+        $this->currentLangcodePointers[$entityId][$langcode] = $revisionId;
+    }
+
+    /**
+     * Whether the driver currently tracks an in-process per-language pointer
+     * for `(entityId, langcode)`. Diagnostic; not on the stable surface.
+     *
+     * @internal
+     */
+    public function hasCurrentLangcodeRevision(string $entityId, string $langcode): bool
+    {
+        return isset($this->currentLangcodePointers[$entityId][$langcode]);
     }
 
     private function getDatabase(): DatabaseInterface

@@ -180,6 +180,14 @@ Machine-readable source: `docs/public-surface-map.php`.
 | `RevisionPruningReport` | final class | Result of a pruning run: counts of deleted and retained revisions (M-001, WP08) |
 | `RevisionTableBuilder` | final class | Creates the `{entity_type}_revision` schema table (M-001, WP07) |
 | `FieldStorageBackendContractTestCase` | abstract class | Abstract PHPUnit harness; extend to verify any `FieldStorageBackendInterface` implementation (M-001, WP12) |
+| `Waaseyaa\EntityStorage\Exception\StorageMigrationException` | final class | Typed exception for storage-migration / two-axis schema failures during kernel boot, schema sync, or migration generator runs. Stable `errorCode` strings: `no_op_promotion`, `unsupported_two_axis_field` (M-004, WP04) |
+| `Waaseyaa\EntityStorage\Driver\RevisionableStorageDriver` | final class | Driver-level two-axis save/load orchestration: composes `RevisionTableBuilder` + `TranslationSchemaHandler` and honours `SaveContext::withTranslations()` for atomic multi-language revision writes (M-004, WP03 + WP04) |
+| `Waaseyaa\EntityStorage\Schema\TranslationSchemaHandler` | final class | Emits the `<entity>__translation__revision` table for two-axis entities; pairs with `RevisionTableBuilder::buildTwoAxis()` (M-004, WP02) |
+| `Waaseyaa\EntityStorage\Listing\TwoAxisFilterResolver` | final class | Resolves listing filters against two-axis storage: joins `<entity>__revision` to `<entity>__translation__revision` and applies langcode + revision-window selection (M-004, WP07) |
+| `Waaseyaa\EntityStorage\Revision\RevisionPruningPolicy` | final class | Two-axis pruning policy value object; keeps the M-001 `RevisionPruningPolicy` surface intact while extending semantics to per-langcode revision counts (M-004, WP05) |
+| `SaveContext::withTranslations(array $langcodes): self` | method | Immutable copy carrying a `[langcode => values]` map for atomic multi-language revision writes; rejected if empty. Pairs with `withLangcode()` for single-language writes (M-004, WP03) |
+| `RevisionableEntityStorageInterface::listRevisions(RevisionableEntityInterface $entity): iterable` | method | Lists revisions for the entity. For two-axis types, yields revisions across all languages in monotonic `vid` order with independent per-language sequencing preserved in `langcode` metadata (M-004, WP04) |
+| `EntityTranslationException::historicalRevisionWrite(int $vid, string $langcode): self` | factory | Raised when a write targets a historical (non-tip) revision in a two-axis entity; stable `errorCode` `historical_revision_write` (M-004, WP04) |
 
 ### access
 

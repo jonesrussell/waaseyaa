@@ -52,6 +52,15 @@ final class TranslationSchemaHandler
 {
     public const TRANSLATION_SUFFIX = '__translation';
 
+    /**
+     * Suffix for the two-axis per-revision blob table.
+     *
+     * Mirrors {@see RevisionTableBuilder::TRANSLATION_REVISION_SUFFIX}; duplicated
+     * here so this handler does not have to import the builder for a single
+     * constant lookup.
+     */
+    public const TRANSLATION_REVISION_SUFFIX = '__translation__revision';
+
     private readonly LoggerInterface $logger;
 
     public function __construct(
@@ -106,6 +115,81 @@ final class TranslationSchemaHandler
                     $builder->addFieldColumn($translationTable, $field);
                 }
             }
+        }
+    }
+
+    /**
+     * Allocate the two-axis revision schema for entity types that are BOTH
+     * revisionable AND translatable (M-004 / WP02).
+     *
+     * Emits the per-revision blob row table `<entity>__translation__revision`
+     * (and its sibling `<entity>__revision`) by delegating to
+     * {@see RevisionTableBuilder::buildTwoAxis()}. The shape is identical
+     * across `sql-column` and `sql-blob` primary backends; the per-row
+     * payload differs (one column per translatable field vs. a single
+     * `_data` JSON blob).
+     *
+     * Single-axis types are no-ops here — the M-006 single-axis blob and
+     * column paths are preserved unchanged (R-A regression gate, spec §12.3).
+     *
+     * Idempotent: skips tables that already exist.
+     *
+     * @param array<int|string, FieldDefinitionInterface>|null $fields Explicit
+     *   field-definition list to drive partitioning. Defaults to the entity
+     *   type's registered field definitions. Callers (e.g. {@see
+     *   \Waaseyaa\EntityStorage\EntitySchemaSync}) MAY pass a subset that has
+     *   already been filtered by backend (FR-006 boot-time guard).
+     *
+     * @throws \InvalidArgumentException When the entity type is not two-axis.
+     * @throws \RuntimeException         When a translatable field is routed to
+     *                                   a forbidden backend (FR-006, surfaced
+     *                                   from `buildTwoAxis`).
+     *
+     * @api
+     */
+    public function syncTwoAxis(EntityTypeInterface $entityType, ?array $fields = null): void
+    {
+        if (!$entityType->isTranslatable() || !$entityType->isRevisionable()) {
+            // Single-axis paths are owned by {@see self::sync()} (translatable
+            // sql-column primary table) and {@see RevisionTableBuilder::build()}
+            // (revisionable single-axis). This method is two-axis only.
+            return;
+        }
+
+        if (!$this->database instanceof DBALDatabase) {
+            // RevisionTableBuilder requires DBALDatabase. Foundation-level
+            // DatabaseInterface implementations not wired to DBAL skip silently
+            // — they are not the target deployment substrate for two-axis types.
+            return;
+        }
+
+        $backend = $entityType->getPrimaryStorageBackend();
+        if ($backend !== ReservedBackendIds::SQL_COLUMN && $backend !== ReservedBackendIds::SQL_BLOB) {
+            // Vector/remote primary backends cannot host two-axis revisions.
+            return;
+        }
+
+        $effectiveFields = $fields !== null
+            ? array_values(array_filter(
+                $fields,
+                static fn($f): bool => $f instanceof FieldDefinition,
+            ))
+            : array_values(array_filter(
+                iterator_to_array($this->collectFieldDefinitions($entityType)),
+                static fn($f): bool => $f instanceof FieldDefinition,
+            ));
+
+        $builder = new RevisionTableBuilder($this->database);
+        $builder->buildTwoAxis($entityType, $backend, $effectiveFields);
+    }
+
+    /**
+     * @return \Generator<int|string, FieldDefinitionInterface>
+     */
+    private function collectFieldDefinitions(EntityTypeInterface $entityType): \Generator
+    {
+        foreach ($entityType->getFieldDefinitions() as $name => $definition) {
+            yield $name => $definition;
         }
     }
 

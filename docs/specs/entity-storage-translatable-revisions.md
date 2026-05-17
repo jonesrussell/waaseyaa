@@ -1,5 +1,28 @@
-<!-- Spec reviewed 2026-05-17 - revalidated against shipped M-006 + M-007 substrates -->
+<!-- Spec reviewed 2026-05-17 - post-mission stamp: M-004 shipped; canonical doctrine moved to entity-storage-two-axis.md -->
 # Entity Storage — Translatable + Revisionable Two-Axis Interaction
+
+> **✅ SHIPPED — M-004 closed 2026-05-17 (canonical spec moved).**
+>
+> This mission spec captured the **plannable** state of two-axis storage between
+> ADR 017 (per-field translation, Accepted 2026-05-11) and the M-004 implement-review
+> loop. M-004 (`entity-storage-translatable-revisions-01KRCDEE`) shipped all eight
+> work packages: WP01 (sql-column two-axis schema), WP02 (sql-blob two-axis schema),
+> WP03 (`SaveContext::withTranslations()` + atomic multi-language save),
+> WP04 (two-axis load + deletion + `StorageMigrationException` + `EntityTranslationException::historicalRevisionWrite()`),
+> WP05 (two-axis access policy composition via `RevisionPolicyComposition`),
+> WP06 (`make:storage-migration --add-revisions` flag), WP07 (`TwoAxisFilterResolver`
+> listing-pipeline integration), WP08 (this docs closure).
+>
+> **For canonical doctrine** — schema shapes, save/load algorithms, exception
+> surface, listing integration, performance notes, operator cookbook — see
+> [`entity-storage-two-axis.md`](entity-storage-two-axis.md). The cookbook lives at
+> [`../cookbook/translatable-revisionable-entities.md`](../cookbook/translatable-revisionable-entities.md);
+> the upgrade guide for the introducing alpha train is at
+> [`../upgrade-notes/two-axis-storage.md`](../upgrade-notes/two-axis-storage.md).
+>
+> The rest of this document is preserved as the **planning artefact** —
+> spec, plan input, and audit trail. Day-to-day operator and integrator questions
+> should be answered against the canonical spec, not this mission spec.
 
 > **✅ FULLY UNBLOCKED — PLANNABLE (revalidated 2026-05-17 against shipped substrates)**
 >

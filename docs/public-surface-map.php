@@ -228,6 +228,14 @@ return [
     'Waaseyaa\Entity\Hydration\FallbackChainResolver' => 'public',
     // Conformance test harness for `TranslatableInterface` implementations.
     'Waaseyaa\Entity\Testing\Translation\TranslatableEntityContractTest' => 'public',
+    // M-004 (entity-storage-translatable-revisions) — two-axis storage stable surface.
+    // Charter §5.3 amendment; spec docs/specs/entity-storage-two-axis.md.
+    'Waaseyaa\EntityStorage\Exception\StorageMigrationException' => 'public',
+    'Waaseyaa\EntityStorage\Driver\RevisionableStorageDriver' => 'public',
+    'Waaseyaa\EntityStorage\Schema\TranslationSchemaHandler' => 'public',
+    'Waaseyaa\EntityStorage\Listing\TwoAxisFilterResolver' => 'public',
+    'Waaseyaa\EntityStorage\Revision\RevisionPruningPolicy' => 'public',
+    'Waaseyaa\Access\Policy\RevisionPolicyComposition' => 'public',
     'Waaseyaa\Access\AccountInterface' => 'public',
     'Waaseyaa\Access\AccessPolicyInterface' => 'public',
     'Waaseyaa\Access\ContextAwareAccessPolicyInterface' => 'public',

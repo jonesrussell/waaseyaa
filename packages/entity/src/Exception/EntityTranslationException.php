@@ -59,4 +59,30 @@ final class EntityTranslationException extends \DomainException
     {
         return new self(\sprintf('A translation for langcode "%s" already exists.', $langcode));
     }
+
+    /**
+     * A historical revision was loaded via `getTranslation($langcode)->loadRevision($vid)`
+     * and the caller attempted to save it. Historical revisions are read-only;
+     * the caller must load the current revision and save that instead.
+     *
+     * Stable error code: `'historical_revision_write'` (FR-040, FR-041).
+     *
+     * @see https://kitty-specs/entity-storage-translatable-revisions-01KRCDEE/contracts/exception-surface.md §3.2
+     */
+    public static function historicalRevisionWrite(int $vid, string $langcode): self
+    {
+        $message = \sprintf(
+            'Cannot save a historical revision (vid=%d, langcode=%s); load the current revision and save that.',
+            $vid,
+            $langcode,
+        );
+
+        $instance = new self($message);
+        // \DomainException's code is int by default; expose the stable string code
+        // by reflecting it onto the protected `code` property (PHP allows int or string).
+        $reflection = new \ReflectionProperty(\Exception::class, 'code');
+        $reflection->setValue($instance, 'historical_revision_write');
+
+        return $instance;
+    }
 }

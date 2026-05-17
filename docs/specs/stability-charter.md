@@ -327,12 +327,26 @@ This section enumerates the major contract families and the per-phase rules for 
   - `Waaseyaa\Entity\Event\TranslationEvent` and its six event-name constants: `PRE_TRANSLATION_INSERT`, `POST_TRANSLATION_INSERT`, `PRE_TRANSLATION_UPDATE`, `POST_TRANSLATION_UPDATE`, `PRE_TRANSLATION_DELETE`, `POST_TRANSLATION_DELETE`.
   - Entity key string `'default_langcode'` — required key in the `keys` array for translatable types.
   - Config keys `translation.fallback_chain` (array of langcodes) and `translation.read_active_language` (bool) — both documented in shipped `config/*.php`.
+- **Two-axis (revisionable × translatable) surface (M-004 / ADRs 016 + 017):**
+  - `EntityType::__construct(..., revisionable: bool = false, translatable: bool = false, ...)` — when **both** flags are `true`, storage emits two coordinated tables (`<entity>__revision` non-translatable + `<entity>__translation__revision` translatable, per-`(entity_id, langcode, vid)` row). Single-axis output is byte-for-byte unchanged (spec §12.3 R-A).
+  - `Waaseyaa\EntityStorage\SaveContext::withTranslations(array $langcodes): self` — immutable copy carrying a `[langcode => values]` map for **atomic multi-language revision writes**. Empty map is rejected.
+  - `Waaseyaa\EntityStorage\Schema\TranslationSchemaHandler` — emits the `<entity>__translation__revision` table. Pairs with `RevisionTableBuilder::buildTwoAxis()`.
+  - `Waaseyaa\EntityStorage\Driver\RevisionableStorageDriver` — driver-level orchestrator composing `RevisionTableBuilder` + `TranslationSchemaHandler` for two-axis save/load.
+  - `Waaseyaa\EntityStorage\Listing\TwoAxisFilterResolver` — listing-pipeline resolver that joins the two tables and applies langcode + revision-window selection.
+  - `Waaseyaa\EntityStorage\Revision\RevisionPruningPolicy` — two-axis pruning policy value object (distinct from the M-001 `Waaseyaa\EntityStorage\RevisionPruningPolicy` single-axis policy; two-axis preserves per-language revision counts).
+  - `Waaseyaa\Access\Policy\RevisionPolicyComposition` — composes entity-level and revision-level access policies for two-axis types; allows entity types to reuse their `view`/`update` policy across the new `view_revision` operation.
+  - `Waaseyaa\EntityStorage\Exception\StorageMigrationException` — typed `\RuntimeException` subclass for storage-migration / two-axis schema failures. Closed factory surface; stable string `errorCode` values: `'no_op_promotion'`, `'unsupported_two_axis_field'`.
+  - `Waaseyaa\Entity\Exception\EntityTranslationException::historicalRevisionWrite(int $vid, string $langcode): self` — raised when a write targets a historical (non-tip) revision in a two-axis entity; stable `errorCode` `'historical_revision_write'`.
+  - **Composite PK semantics.** The `<entity>__translation__revision` table carries a surrogate `vid PRIMARY KEY` for ergonomic `loadRevision($vid)` plus a composite `UNIQUE (entity_id, langcode, vid)` index expressing the logical primary key (R-01, `contracts/composite-pk.md`).
+  - **Forbidden-backend guard.** Translatable fields routed to non-`sql-column` / non-`sql-blob` backends (`vector`, `remote`, etc.) raise `StorageMigrationException::unsupportedTwoAxisField()` at boot (FR-006).
+  - **Independent per-language sequencing.** Revisions in different languages do not block each other: editing English produces only an English revision, editing Anishinaabemowin produces only an Anishinaabemowin revision. Non-translatable field changes propagate via fallback to all languages on read.
 
 **Internal:**
 - Concrete storage classes (`SqlEntityStorage`, future column-backed variants, vector-backend implementations).
 - On-disk schema (SQLite/Postgres table shape, `_data` blob layout, column layouts, revision-table layout).
 - Manifest cache file format.
 - Storage coordinator fan-out logic across backends.
+- Two-axis migration generator handlers (`Waaseyaa\CLI\Handler\AddTranslationsMigrationGenerator`, `Waaseyaa\CLI\Handler\AddRevisionsMigrationGenerator`) — invoked through stable `make:storage-migration` CLI surface; their class shapes are not stable.
 
 **Special case — multi-backend storage migration (audit F1 / mission M3, ADRs 010 + 016):**
 
