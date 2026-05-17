@@ -107,3 +107,4 @@ This WP depends on: WP04, WP05, WP07, WP09, WP10.
 ## Activity Log
 
 - 2026-05-17T01:44:30Z – claude:sonnet:python-implementer:implementer – shell_pid=106003 – Started implementation via action command
+- 2026-05-17T01:56:17Z – claude:sonnet:python-implementer:implementer – shell_pid=106003 – WP11 ready: M-003 doc closure — charter §5.5 + §3.2 criterion 9 amended, canonical spec (docs/specs/config-management.md) + cookbook (docs/cookbook/config-sync.md) + conventions (docs/conventions/cmi-sync-format.md) + upgrade-guide (docs/upgrades/waaseyaa-alpha-179-to-180.md) shipped; CHANGELOG [Unreleased] + public-surface-map (MD + PHP) updated; CLAUDE.md orchestration row split for CMI subsystems. All gates green (cs-check, phpstan, composer-policy, package-layers); packages/config + packages/cli tests pass.
