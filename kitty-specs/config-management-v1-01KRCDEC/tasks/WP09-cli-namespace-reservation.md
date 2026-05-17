@@ -20,7 +20,7 @@ subtasks:
 - T048
 - T049
 - T050
-shell_pid: ''
+shell_pid: "100148"
 history: []
 authoritative_surface: packages/cli/
 execution_mode: code_change
@@ -30,6 +30,7 @@ owned_files:
 - packages/cli/tests/Unit/Command/Config/ConfigCommandTest.php
 - packages/config/tests/Unit/Exception/ConfigCommandCollisionExceptionTest.php
 - tests/Integration/Phase28/ConfigCommandCollisionBootTest.php
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP09 — config:* CLI namespace reservation + collision-check + ConfigCommand base
@@ -76,3 +77,7 @@ No prerequisite WPs — may dispatch immediately on mission start.
 - `composer phpstan` (level 5) green; `composer cs-check` clean.
 - `bin/check-package-layers` green (no upward `waaseyaa/*` edges introduced).
 - No modifications outside `owned_files` (other than rerun-of-generators where charter explicitly permits).
+
+## Activity Log
+
+- 2026-05-17T01:27:26Z – claude:sonnet:python-implementer:implementer – shell_pid=100148 – Started implementation via action command
