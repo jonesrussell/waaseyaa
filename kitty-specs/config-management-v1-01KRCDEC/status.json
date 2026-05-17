@@ -1,16 +1,16 @@
 {
-  "event_count": 80,
-  "last_event_id": "01KRSTMSCVTG4ZE8BE2BGWNCDR",
-  "materialized_at": "2026-05-17T02:01:05.691177+00:00",
+  "event_count": 81,
+  "last_event_id": "01KRSTMV6TJJ73E2NE0BS2EGC8",
+  "materialized_at": "2026-05-17T02:01:07.546822+00:00",
   "mission_number": "10",
   "mission_slug": "config-management-v1-01KRCDEC",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 2,
+    "approved": 1,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
-    "done": 9,
+    "done": 10,
     "for_review": 0,
     "in_progress": 0,
     "in_review": 0,
@@ -82,10 +82,10 @@
     },
     "WP10": {
       "actor": "user",
-      "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KRSSNNWS7ENNNBV3RVK5BX9R",
-      "last_transition_at": "2026-05-17T01:44:06.297164+00:00"
+      "force_count": 2,
+      "lane": "done",
+      "last_event_id": "01KRSTMV6TJJ73E2NE0BS2EGC8",
+      "last_transition_at": "2026-05-17T02:01:07.546822+00:00"
     },
     "WP11": {
       "actor": "user",

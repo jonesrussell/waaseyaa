@@ -91,3 +91,4 @@ This WP depends on: WP03, WP04, WP05, WP06.
 - 2026-05-17T01:42:14Z – claude:sonnet:python-implementer:implementer – shell_pid=102803 – WP10 ready: integration tests for FR-054/055/056 (round-trip, dep ordering, cycle detection)
 - 2026-05-17T01:42:54Z – claude:opus:python-reviewer:reviewer – shell_pid=105155 – Started review via action command
 - 2026-05-17T01:44:06Z – claude:opus:python-reviewer:reviewer – shell_pid=105155 – WP10 review passed: gates clean (cs-check, PHPStan, layers), 15/88 Phase28 green, 996/2570 config+cli regression green. Round-trip proves byte-stability + dep ordering, cycle detection raises ConfigDependencyCycleException with full path, --no-dependency-check bypass emits warning. Minoo-shaped fixtures (role/taxonomy_vocabulary/menu) with cross-type dep. Scope limited to owned files.
+- 2026-05-17T02:01:07Z – claude:opus:python-reviewer:reviewer – shell_pid=105155 – Done override: M-003 merged to main as e71b0a093
