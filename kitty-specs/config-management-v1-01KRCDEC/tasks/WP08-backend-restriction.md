@@ -8,19 +8,16 @@ requirement_refs:
 - FR-046
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: Planning artifacts for this feature were generated on main. During
-  /spec-kitty.implement this WP may branch from a dependency-specific base, but completed
-  changes must merge back into main unless the human explicitly redirects the landing
-  branch.
-base_branch: main
-base_commit: 8f2f2c483d1819983bb56e654278d41bc2c76d57
-created_at: '2026-05-16T00:00:00+00:00'
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-config-management-v1-01KRCDEC
+base_commit: 89d4e4f83f962d94bdcf29735a683f7a49b704b1
+created_at: '2026-05-17T01:06:58.166547+00:00'
 subtasks:
 - T043
 - T044
 - T045
 - T046
-shell_pid: ''
+shell_pid: '95813'
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
