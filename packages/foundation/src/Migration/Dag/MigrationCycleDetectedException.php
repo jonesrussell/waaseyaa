@@ -12,6 +12,7 @@ namespace Waaseyaa\Foundation\Migration\Dag;
  * reports the first one it walks; there may be more in the residual
  * graph). The diagnostic code `MIGRATION_CYCLE` is part of the operator
  * surface — runbooks and CI greps match on the string.
+ * @api
  */
 final class MigrationCycleDetectedException extends \RuntimeException
 {

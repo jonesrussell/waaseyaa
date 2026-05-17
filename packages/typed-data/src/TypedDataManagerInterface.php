@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\TypedData;
 
+/**
+ * @api
+ */
 interface TypedDataManagerInterface
 {
     public function createDataDefinition(string $dataType): DataDefinitionInterface;

@@ -6,6 +6,9 @@ namespace Waaseyaa\CLI\Handler;
 
 use Waaseyaa\CLI\CliIO;
 
+/**
+ * @api
+ */
 final class TelescopePruneHandler
 {
     private const int DEFAULT_HOURS = 24;

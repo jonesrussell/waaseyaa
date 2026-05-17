@@ -9,6 +9,7 @@ namespace Waaseyaa\Notification;
  *
  * Expects the using class to have get() and id() methods
  * (as provided by EntityBase/ContentEntityBase).
+ * @api
  */
 trait NotifiableTrait
 {

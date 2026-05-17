@@ -6,6 +6,9 @@ namespace Waaseyaa\Entity\Storage;
 
 use Waaseyaa\Entity\EntityInterface;
 
+/**
+ * @api
+ */
 interface RevisionableStorageInterface extends EntityStorageInterface
 {
     public function loadRevision(int|string $entityId, int $revisionId): ?EntityInterface;

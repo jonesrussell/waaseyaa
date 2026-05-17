@@ -9,6 +9,7 @@ use Waaseyaa\Telescope\TelescopeEntry;
 
 /**
  * SQLite-based storage backend for codified context entries.
+ * @api
  */
 final class SqliteCodifiedContextStore implements CodifiedContextStoreInterface
 {

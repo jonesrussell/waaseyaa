@@ -9,6 +9,7 @@ namespace Waaseyaa\Path;
  *
  * Stores aliases in a simple array for testing and lightweight usage.
  * Only published (active) aliases are considered for lookups.
+ * @api
  */
 final class InMemoryPathAliasManager implements PathAliasManagerInterface
 {

@@ -10,6 +10,9 @@ use Waaseyaa\Cache\Exception\InvalidCacheTagException;
 use Waaseyaa\Cache\TagAwareCacheInterface;
 use Waaseyaa\Cache\TaggedCacheInterface;
 
+/**
+ * @api
+ */
 final class MemoryBackend implements TagAwareCacheInterface, TaggedCacheInterface
 {
     /** @var array<string, CacheItem> */

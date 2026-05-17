@@ -11,6 +11,7 @@ namespace Waaseyaa\Testing\Traits;
  * dispatched to a router or controller. This does not make real
  * HTTP calls; instead it builds structured request data that
  * test infrastructure can interpret.
+ * @api
  */
 trait InteractsWithApi
 {

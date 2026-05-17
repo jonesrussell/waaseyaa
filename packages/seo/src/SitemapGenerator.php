@@ -6,6 +6,9 @@ namespace Waaseyaa\Seo;
 
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 
+/**
+ * @api
+ */
 final class SitemapGenerator
 {
     /**

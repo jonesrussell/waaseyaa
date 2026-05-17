@@ -8,6 +8,9 @@ use Waaseyaa\Bimaaji\Mutation\MutationRequest;
 use Waaseyaa\Bimaaji\Mutation\MutationResult;
 use Waaseyaa\Foundation\Sovereignty\SovereigntyProfile;
 
+/**
+ * @api
+ */
 final class SovereigntyGuardrails
 {
     /** @param list<GuardrailRule> $rules */

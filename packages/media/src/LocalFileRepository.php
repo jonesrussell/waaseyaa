@@ -10,6 +10,7 @@ namespace Waaseyaa\Media;
  * Persists file metadata as JSON sidecar files under a configurable root.
  * Paths are derived from file URIs, so storage is organized into URI-based
  * subdirectories (for example: public://images/photo.jpg).
+ * @api
  */
 final class LocalFileRepository implements FileRepositoryInterface
 {

@@ -32,6 +32,7 @@ use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
  * body is read. When Content-Length is absent (e.g. chunked transfer), the
  * guard falls through to post-read validation — callers in production should
  * always send Content-Length for early rejection.
+ * @api
  */
 final class FieldAutoSaveController
 {

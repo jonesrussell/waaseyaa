@@ -10,6 +10,9 @@ use Waaseyaa\Plugin\Definition\PluginDefinition;
 use Waaseyaa\Plugin\PluginBase;
 use Waaseyaa\TypedData\DataDefinitionInterface;
 
+/**
+ * @api
+ */
 abstract class FieldItemBase extends PluginBase implements FieldItemInterface, FieldTypeInterface, \IteratorAggregate
 {
     /** @var array<string, mixed> */

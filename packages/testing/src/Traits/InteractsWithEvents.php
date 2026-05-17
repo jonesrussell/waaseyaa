@@ -9,6 +9,7 @@ namespace Waaseyaa\Testing\Traits;
  *
  * Allows tests to set up expected events and to "fake" events
  * by capturing dispatched events without executing real listeners.
+ * @api
  */
 trait InteractsWithEvents
 {

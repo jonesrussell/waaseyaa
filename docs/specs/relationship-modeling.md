@@ -190,3 +190,5 @@ v0.9 adds shared framework fixtures in `tests/Support/WorkflowFixturePack.php`:
 Downstream integration suites consume this shared corpus directly (SSR/search/MCP/discovery) to avoid drift across package-level tests.
 
 <!-- Last reviewed: 2026-03-30 — test file reorganization only, no spec changes needed -->
+
+<!-- Spec reviewed 2026-05-17 - dead-code baseline reduction (#1493 / PR TBD): @api PHPDoc sweep on extension-point classes + WaaseyaaEntrypointProvider extended to recognize EntityBase/ContentEntityBase subclasses and their traits. No behavioural change. -->

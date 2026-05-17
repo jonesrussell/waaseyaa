@@ -12,6 +12,7 @@ namespace Waaseyaa\Entity\Community;
  * native SQL condition rather than a JSON-extract expression.
  *
  * @see HasCommunityInterface
+ * @api
  */
 trait HasCommunityTrait
 {

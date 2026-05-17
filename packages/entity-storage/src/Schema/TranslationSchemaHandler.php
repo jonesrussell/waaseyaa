@@ -47,6 +47,7 @@ use Waaseyaa\Foundation\Log\NullLogger;
  *   Materialised lazily by {@see ensureMultiCardinalityTable()} — the
  *   handler exposes the shape contract for upstream callers (storage backend
  *   writers, schema diff factories) that own the per-field write path.
+ * @api
  */
 final class TranslationSchemaHandler
 {

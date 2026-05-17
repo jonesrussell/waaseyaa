@@ -19,6 +19,7 @@ use Waaseyaa\Foundation\Schema\Diff\ColumnSpec;
  * Shape: `tables` maps `tableName => (columnName => ColumnSpec)`.
  * Empty `tables` (or missing-table entries) means "table has no
  * materialised columns we know about" — equivalent to a fresh install.
+ * @api
  */
 final readonly class SchemaSnapshot
 {

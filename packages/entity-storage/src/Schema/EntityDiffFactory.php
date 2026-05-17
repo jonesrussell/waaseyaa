@@ -54,6 +54,7 @@ use Waaseyaa\Foundation\Schema\Diff\SchemaDiffOp;
  * **Layer:** entity-storage (Layer 1) → foundation (Layer 0). The
  * factory is the only place that translates between the entity-storage
  * field shape and the foundation diff value types.
+ * @api
  */
 final readonly class EntityDiffFactory
 {

@@ -11,6 +11,7 @@ use Waaseyaa\EntityStorage\Tenancy\CommunityScope;
  *
  * Stores all data in PHP arrays. No database required.
  * Supports translation data via a separate translations store.
+ * @api
  */
 final class InMemoryStorageDriver implements EntityStorageDriverInterface
 {

@@ -6,6 +6,9 @@ namespace Waaseyaa\Bimaaji\Policy;
 
 use Waaseyaa\Foundation\Sovereignty\SovereigntyProfile;
 
+/**
+ * @api
+ */
 final readonly class GuardrailRule
 {
     public function __construct(

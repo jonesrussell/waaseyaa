@@ -6,6 +6,7 @@ namespace Waaseyaa\Scheduler;
 
 /**
  * Fluent API for defining scheduled tasks.
+ * @api
  */
 final class ScheduleBuilder
 {

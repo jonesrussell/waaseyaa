@@ -12,6 +12,7 @@ use Waaseyaa\Cache\CacheTagsInvalidatorInterface;
  * Provides methods to invalidate caches when translation strings or
  * language configuration changes. Can be wired to events or invoked
  * directly.
+ * @api
  */
 final class TranslationCacheInvalidator
 {

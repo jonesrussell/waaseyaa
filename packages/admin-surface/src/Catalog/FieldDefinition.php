@@ -8,6 +8,7 @@ namespace Waaseyaa\AdminSurface\Catalog;
  * Value object for a field in the admin catalog.
  *
  * Maps to AdminSurfaceField in contract/types.ts.
+ * @api
  */
 final class FieldDefinition
 {

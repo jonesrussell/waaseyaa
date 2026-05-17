@@ -32,6 +32,7 @@ use Waaseyaa\I18n\LanguageManagerInterface;
  *
  * High-level layer that handles entity hydration, event dispatch,
  * and language fallback. Delegates raw I/O to a storage driver.
+ * @api
  */
 final class EntityRepository implements EntityRepositoryInterface
 {

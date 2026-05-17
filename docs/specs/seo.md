@@ -34,3 +34,5 @@ Per-type options support optional `changefreq`, `priority` (numeric string or fl
 ## Change log
 
 - **2026-04-08** — Initial package and spec (#613).
+
+<!-- Spec reviewed 2026-05-17 - dead-code baseline reduction (#1493 / PR TBD): @api PHPDoc sweep on extension-point classes + WaaseyaaEntrypointProvider extended to recognize EntityBase/ContentEntityBase subclasses and their traits. No behavioural change. -->

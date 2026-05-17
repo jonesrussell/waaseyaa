@@ -6,6 +6,7 @@ namespace Waaseyaa\TypedData\Coercion;
 
 /**
  * Thrown when a value cannot be coerced for entity-compatible primitive/array casts (#1185).
+ * @api
  */
 final class CoercionException extends \InvalidArgumentException
 {

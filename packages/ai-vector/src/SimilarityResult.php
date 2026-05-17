@@ -6,6 +6,7 @@ namespace Waaseyaa\AI\Vector;
 
 /**
  * Value object representing a similarity search result.
+ * @api
  */
 final readonly class SimilarityResult
 {

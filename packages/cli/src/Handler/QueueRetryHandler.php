@@ -8,6 +8,9 @@ use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Queue\FailedJobRepositoryInterface;
 use Waaseyaa\Queue\QueueInterface;
 
+/**
+ * @api
+ */
 final class QueueRetryHandler
 {
     public function __construct(

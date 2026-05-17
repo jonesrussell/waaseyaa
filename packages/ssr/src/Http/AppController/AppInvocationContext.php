@@ -11,6 +11,9 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Foundation\Http\HttpServiceResolverInterface;
 
+/**
+ * @api
+ */
 final readonly class AppInvocationContext
 {
     /**

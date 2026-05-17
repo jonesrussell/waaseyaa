@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\GitHub;
 
+/**
+ * @api
+ */
 final readonly class Milestone
 {
     public function __construct(

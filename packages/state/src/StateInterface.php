@@ -6,6 +6,7 @@ namespace Waaseyaa\State;
 
 /**
  * @internal
+ * @api
  */
 interface StateInterface
 {

@@ -8,6 +8,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Types\Types;
 
+/**
+ * @api
+ */
 final class SchemaBuilder
 {
     private const TYPE_MAP = [

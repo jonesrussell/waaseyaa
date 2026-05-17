@@ -9,6 +9,7 @@ namespace Waaseyaa\AI\Agent;
  *
  * Records the agent ID, user account, action type, success status,
  * and any associated data for each agent operation.
+ * @api
  */
 final readonly class AgentAuditLog
 {

@@ -22,6 +22,7 @@ use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
  * readOnly=true, regardless of the field definition's own isReadOnly() flag.
  * Neutral and Allowed results leave the definition's readOnly setting intact
  * (open-by-default field access semantics).
+ * @api
  */
 final class FormDescriptorBuilder
 {

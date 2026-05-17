@@ -9,6 +9,9 @@ use Waaseyaa\CLI\Command\Make\AbstractMakeHandler;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 
+/**
+ * @api
+ */
 final class MakeMigrationHandler extends AbstractMakeHandler
 {
     public function __construct(

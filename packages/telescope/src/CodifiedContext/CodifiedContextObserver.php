@@ -13,6 +13,7 @@ use Waaseyaa\Telescope\Storage\TelescopeStoreInterface;
  * Facade over the three codified-context recorders.
  *
  * Callers interact with a single object instead of three separate recorders.
+ * @api
  */
 final class CodifiedContextObserver
 {

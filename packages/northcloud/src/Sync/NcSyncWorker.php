@@ -9,6 +9,7 @@ namespace Waaseyaa\NorthCloud\Sync;
  *
  * Writes a JSON status file after each cycle. Intended to be supervised (systemd,
  * supervisord, docker restart policy) — the loop itself has no daemonization logic.
+ * @api
  */
 final class NcSyncWorker
 {

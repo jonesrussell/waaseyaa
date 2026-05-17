@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\TypedData;
 
+/**
+ * @api
+ */
 interface ListInterface extends TypedDataInterface, \Countable, \Traversable
 {
     public function get(int $index): TypedDataInterface;

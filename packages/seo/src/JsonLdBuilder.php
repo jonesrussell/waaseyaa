@@ -6,6 +6,7 @@ namespace Waaseyaa\Seo;
 
 /**
  * JSON-LD array shapes compatible with schema.org (WebSite, Organization, BreadcrumbList).
+ * @api
  */
 final class JsonLdBuilder
 {

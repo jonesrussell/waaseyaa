@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Route;
  *       ->requirePermission('access content')
  *       ->methods('GET')
  *       ->build();
+ * @api
  */
 final class RouteBuilder
 {

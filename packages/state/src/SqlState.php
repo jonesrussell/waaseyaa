@@ -6,6 +6,9 @@ namespace Waaseyaa\State;
 
 use Waaseyaa\Database\DatabaseInterface;
 
+/**
+ * @api
+ */
 final class SqlState implements StateInterface
 {
     /** @var array<string, mixed> */

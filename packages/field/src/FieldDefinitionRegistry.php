@@ -12,6 +12,7 @@ use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
  * Stores FieldDefinition objects keyed by (entityTypeId, targetBundle).
  * Core fields may still be authored as metadata arrays during the alpha
  * transition; they are normalized to FieldDefinition objects at registration.
+ * @api
  */
 final class FieldDefinitionRegistry implements FieldDefinitionRegistryInterface
 {

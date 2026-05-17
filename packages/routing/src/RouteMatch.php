@@ -8,6 +8,7 @@ use Symfony\Component\Routing\Route;
 
 /**
  * Value object holding the result of matching a route.
+ * @api
  */
 final readonly class RouteMatch
 {

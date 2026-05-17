@@ -10,6 +10,7 @@ namespace Waaseyaa\AI\Agent;
  * Contains whether the execution succeeded, a human-readable message,
  * structured result data, and the list of actions taken (or proposed
  * in dry-run mode).
+ * @api
  */
 final readonly class AgentResult
 {

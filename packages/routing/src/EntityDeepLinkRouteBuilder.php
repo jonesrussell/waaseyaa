@@ -18,6 +18,7 @@ namespace Waaseyaa\Routing;
  *
  *   // Produces: GET /edit/node/{id}
  *   // with parameters option: ['id' => ['type' => 'entity:node']]
+ * @api
  */
 final readonly class EntityDeepLinkRouteBuilder
 {

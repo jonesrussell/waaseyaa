@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\HttpClient;
 
+/**
+ * @api
+ */
 final class HttpRequestException extends \RuntimeException
 {
     public function __construct(

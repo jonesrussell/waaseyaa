@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Exception;
 
+/**
+ * @api
+ */
 abstract class WaaseyaaException extends \RuntimeException
 {
     public function __construct(

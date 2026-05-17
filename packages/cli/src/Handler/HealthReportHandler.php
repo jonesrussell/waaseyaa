@@ -11,6 +11,9 @@ use Waaseyaa\Foundation\Ingestion\IngestionLogger;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
+/**
+ * @api
+ */
 final class HealthReportHandler
 {
     private readonly LoggerInterface $logger;

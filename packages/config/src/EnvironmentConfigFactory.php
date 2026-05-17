@@ -23,6 +23,7 @@ namespace Waaseyaa\Config;
  * - The config name and property path are separated by double underscore "__"
  *
  * Example: WAASEYAA_CONFIG_SYSTEM_SITE__SITE_NAME overrides system.site -> site_name
+ * @api
  */
 final class EnvironmentConfigFactory implements ConfigFactoryInterface
 {

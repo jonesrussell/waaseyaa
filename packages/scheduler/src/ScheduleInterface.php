@@ -6,6 +6,7 @@ namespace Waaseyaa\Scheduler;
 
 /**
  * @internal
+ * @api
  */
 interface ScheduleInterface
 {

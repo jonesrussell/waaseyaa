@@ -13,6 +13,7 @@ use Waaseyaa\Config\Event\ConfigEvent;
  * Invalidates a specific config tag (config:{name}) and the general
  * config list tag (config) to ensure both individual lookups and
  * listing queries are properly cache-busted.
+ * @api
  */
 final class ConfigCacheInvalidator
 {

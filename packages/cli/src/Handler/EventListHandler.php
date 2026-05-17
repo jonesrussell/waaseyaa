@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\CLI\CliIO;
 
+/**
+ * @api
+ */
 final class EventListHandler
 {
     public function __construct(

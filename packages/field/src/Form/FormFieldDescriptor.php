@@ -14,6 +14,7 @@ namespace Waaseyaa\Field\Form;
  * scalar values from the field item list; this object is markup-free.
  *
  * @phpstan-type FieldErrors list<string>
+ * @api
  */
 final readonly class FormFieldDescriptor
 {

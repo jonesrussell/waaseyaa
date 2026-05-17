@@ -10,6 +10,7 @@ namespace Waaseyaa\Testing\Traits;
  * Tracks the "current user" during a test so that tests can
  * simulate acting as a specific user without depending on
  * a full auth subsystem.
+ * @api
  */
 trait InteractsWithAuth
 {

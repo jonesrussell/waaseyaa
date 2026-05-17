@@ -17,6 +17,7 @@ namespace Waaseyaa\Routing\Attribute;
  *
  * When used on a route, the AccessChecker reads this attribute and calls
  * the Gate to verify the current user is authorized for the declared ability.
+ * @api
  */
 #[\Attribute(\Attribute::TARGET_METHOD | \Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 final class GateAttribute

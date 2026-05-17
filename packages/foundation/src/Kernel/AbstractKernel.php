@@ -48,6 +48,7 @@ use Waaseyaa\Plugin\Extension\KnowledgeToolingExtensionRunner;
 
 /**
  * @internal
+ * @api
  */
 abstract class AbstractKernel
 {

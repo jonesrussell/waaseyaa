@@ -14,6 +14,7 @@ use Waaseyaa\AI\Schema\Mcp\McpToolGenerator;
  *
  * Provides a unified API for accessing entity schemas and tool definitions,
  * making it easy for AI agents to discover the full CMS surface area.
+ * @api
  */
 final class SchemaRegistry
 {

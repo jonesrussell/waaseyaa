@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Billing;
 
+/**
+ * @api
+ */
 final class BillingManager
 {
     /** @var array<string, int> tier priority (higher = better) */

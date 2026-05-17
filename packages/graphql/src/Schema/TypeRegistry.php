@@ -13,6 +13,7 @@ use GraphQL\Type\Definition\Type;
  * requests. This handles circular references: ObjectType A is stored before its
  * lazy fields thunk runs, so when type B's fields reference A, getOrCreate()
  * returns the existing instance.
+ * @api
  */
 final class TypeRegistry
 {

@@ -10,6 +10,7 @@ namespace Waaseyaa\AI\Pipeline;
  * Each step in a pipeline implements this interface. Steps receive input data
  * (from the previous step or the pipeline trigger) and return a StepResult
  * containing output data for the next step.
+ * @api
  */
 interface PipelineStepInterface
 {

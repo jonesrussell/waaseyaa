@@ -6,6 +6,9 @@ namespace Waaseyaa\Scheduler\Storage;
 
 use Waaseyaa\Database\DatabaseInterface;
 
+/**
+ * @api
+ */
 final class ScheduleStateRepository
 {
     private const TABLE = 'waaseyaa_schedule_state';

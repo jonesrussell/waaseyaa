@@ -6,6 +6,7 @@ namespace Waaseyaa\ErrorHandler;
 
 /**
  * Chooses between developer HTML and structured production payloads.
+ * @api
  */
 final class ExceptionRenderer
 {

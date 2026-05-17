@@ -16,6 +16,7 @@ use Waaseyaa\Validation\Constraint\UniqueField;
  *
  * Provides a fluent, readable API for constructing constraints
  * without needing to import individual constraint classes.
+ * @api
  */
 final class ConstraintFactory
 {

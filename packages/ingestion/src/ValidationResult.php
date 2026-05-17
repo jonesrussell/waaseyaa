@@ -8,6 +8,7 @@ namespace Waaseyaa\Ingestion;
  * Immutable result of a payload validation.
  *
  * Contains a list of error messages (empty = valid).
+ * @api
  */
 final readonly class ValidationResult
 {

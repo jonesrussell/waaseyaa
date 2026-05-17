@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Ingestion;
 
+/**
+ * @api
+ */
 final class CrossSourceIdentityResolver
 {
     private const OWNERSHIP_PRIORITY = [

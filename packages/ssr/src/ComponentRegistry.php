@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\SSR;
 
+/**
+ * @api
+ */
 final class ComponentRegistry
 {
     /** @var array<string, ComponentMetadata> */

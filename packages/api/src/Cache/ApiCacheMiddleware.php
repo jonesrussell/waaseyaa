@@ -18,6 +18,7 @@ use Waaseyaa\Api\JsonApiDocument;
  * This is a plain PHP middleware that operates on JsonApiDocument objects
  * and request headers, returning header arrays. It is not tied to any
  * HTTP framework.
+ * @api
  */
 final class ApiCacheMiddleware
 {

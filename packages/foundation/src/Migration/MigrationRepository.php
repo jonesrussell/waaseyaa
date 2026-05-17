@@ -27,6 +27,7 @@ use Doctrine\DBAL\Connection;
  *
  * `migration` remains the sole canonical key — Q1 ratified that there
  * is no parallel `migration_id` column.
+ * @api
  */
 final class MigrationRepository
 {

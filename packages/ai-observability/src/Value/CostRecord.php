@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AI\Observability\Value;
 
+/**
+ * @api
+ */
 final readonly class CostRecord
 {
     public function __construct(

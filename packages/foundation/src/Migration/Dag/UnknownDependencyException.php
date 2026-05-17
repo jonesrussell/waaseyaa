@@ -16,6 +16,7 @@ namespace Waaseyaa\Foundation\Migration\Dag;
  *
  * The diagnostic code `UNKNOWN_DEPENDENCY` is part of the operator
  * surface.
+ * @api
  */
 final class UnknownDependencyException extends \RuntimeException
 {

@@ -1914,3 +1914,5 @@ The canonical JSON:API response trait is `Waaseyaa\Foundation\Http\JsonApiRespon
 - **Migration system boot order**: `bootMigrations()` runs after `compileManifest()` (requires `PackageManifest`) and before `discoverAndRegisterProviders()`. It reuses the DBAL `Connection` from `DBALDatabase` (via `getConnection()`) — single connection, no duplication.
 - **`ServiceProvider` has no `$dispatcher` property**: Event subscriber registration must resolve the dispatcher via `$this->resolve(\Symfony\Contracts\EventDispatcher\EventDispatcherInterface::class)` and check `instanceof Symfony\Component\EventDispatcher\EventDispatcherInterface` before calling `addSubscriber()`.
 - **`RateLimiter`: check before hit**: Always call `tooManyAttempts()` BEFORE `hit()`. Calling `hit()` first counts the current request before checking, reducing the effective limit by 1.
+
+<!-- Spec reviewed 2026-05-17 - dead-code baseline reduction (#1493 / PR TBD): @api PHPDoc sweep on extension-point classes + WaaseyaaEntrypointProvider extended to recognize EntityBase/ContentEntityBase subclasses and their traits. No behavioural change. -->

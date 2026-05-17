@@ -9,6 +9,7 @@ namespace Waaseyaa\AI\Pipeline;
  *
  * Contains all the information needed to execute a pipeline asynchronously:
  * the pipeline ID and the initial input data.
+ * @api
  */
 final readonly class PipelineQueueMessage
 {

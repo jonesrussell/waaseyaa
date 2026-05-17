@@ -9,6 +9,9 @@ use Waaseyaa\Config\ConfigFactoryInterface;
 use Waaseyaa\Config\ConfigInterface;
 use Waaseyaa\Config\Storage\MemoryStorage;
 
+/**
+ * @api
+ */
 final class CachedConfigFactory implements ConfigFactoryInterface
 {
     /** @var array<string, array<string, mixed>>|null */

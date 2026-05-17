@@ -6,6 +6,7 @@ namespace Waaseyaa\Access;
 
 /**
  * Manages the registry of available permissions.
+ * @api
  */
 interface PermissionHandlerInterface
 {

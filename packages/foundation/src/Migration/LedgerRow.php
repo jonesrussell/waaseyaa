@@ -14,6 +14,7 @@ namespace Waaseyaa\Foundation\Migration;
  * Pre-WP09 rows have `checksum === null` and `diffHash === null`. Post-
  * WP09 v2 rows have both populated. Post-WP09 legacy rows still have
  * both null — legacy migrations do not produce a canonical form.
+ * @api
  */
 final readonly class LedgerRow
 {

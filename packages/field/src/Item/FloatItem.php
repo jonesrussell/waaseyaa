@@ -14,6 +14,9 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'general',
     defaultCardinality: 1,
 )]
+/**
+ * @api
+ */
 final class FloatItem extends FieldItemBase
 {
     public static function propertyDefinitions(): array

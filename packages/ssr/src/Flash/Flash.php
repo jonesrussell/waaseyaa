@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\SSR\Flash;
 
+/**
+ * @api
+ */
 final class Flash
 {
     private static ?FlashMessageService $service = null;

@@ -252,3 +252,5 @@ No other new external dependencies. Error pages, toolbar, and logging are all bu
 - **Vue debug panel** — SPA debugging uses `X-Debug-*` headers + Telescope. A dedicated Vue component is future scope.
 - **Dump server** — Trap/Buggregator integration is architecturally supported but not in v1.
 - **Xdebug/Blackfire integration** — Those work independently via PHP extensions. No framework coupling needed.
+
+<!-- Spec reviewed 2026-05-17 - dead-code baseline reduction (#1493 / PR TBD): @api PHPDoc sweep on extension-point classes + WaaseyaaEntrypointProvider extended to recognize EntityBase/ContentEntityBase subclasses and their traits. No behavioural change. -->

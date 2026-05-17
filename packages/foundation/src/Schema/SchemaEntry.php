@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Schema;
 
+/**
+ * @api
+ */
 final readonly class SchemaEntry
 {
     public function __construct(

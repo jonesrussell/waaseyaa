@@ -16,6 +16,7 @@ use Waaseyaa\Entity\Exception\EntityMetadataException;
  * EntityTypeManager. All errors are reported via {@see EntityMetadataException}
  * and include the offending class FQN, property name, and a remediation hint
  * (NFR-004).
+ * @api
  */
 final class FieldTypeInferrer
 {

@@ -6,6 +6,7 @@ namespace Waaseyaa\AI\Vector;
 
 /**
  * Interface for embedding providers that generate vector representations of text.
+ * @api
  */
 interface EmbeddingInterface extends EmbeddingProviderInterface
 {

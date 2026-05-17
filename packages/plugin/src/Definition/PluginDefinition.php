@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Plugin\Definition;
 
+/**
+ * @api
+ */
 final readonly class PluginDefinition
 {
     public function __construct(

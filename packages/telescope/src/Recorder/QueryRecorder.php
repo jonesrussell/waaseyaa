@@ -8,6 +8,7 @@ use Waaseyaa\Telescope\Storage\TelescopeStoreInterface;
 
 /**
  * Records database queries with SQL, bindings, duration, and connection name.
+ * @api
  */
 final class QueryRecorder
 {

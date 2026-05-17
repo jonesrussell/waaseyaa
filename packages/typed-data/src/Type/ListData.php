@@ -11,6 +11,9 @@ use Waaseyaa\TypedData\ListInterface;
 use Waaseyaa\TypedData\TypedDataInterface;
 use Waaseyaa\TypedData\TypedDataManagerInterface;
 
+/**
+ * @api
+ */
 final class ListData implements ListInterface, \IteratorAggregate
 {
     /** @var TypedDataInterface[] */

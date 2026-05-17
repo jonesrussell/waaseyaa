@@ -6,6 +6,9 @@ namespace Waaseyaa\Bimaaji\Graph;
 
 use Waaseyaa\Foundation\Log\LoggerInterface;
 
+/**
+ * @api
+ */
 final class ApplicationGraphGenerator
 {
     private const string GRAPH_VERSION = '1.0';

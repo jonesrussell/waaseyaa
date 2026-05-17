@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Exception;
 
+/**
+ * @api
+ */
 final class ExceptionHandler
 {
     /** @var list<class-string<\Throwable>> */

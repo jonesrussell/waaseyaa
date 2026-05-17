@@ -16,6 +16,7 @@ use Waaseyaa\Entity\Hydration\HydrationContext;
  * To obtain a mutable entity, use {@see \Waaseyaa\Entity\EntityBase::duplicate()} or storage hydration.
  *
  * @see docs/specs/entity-system.md — Branching and snapshots (P3)
+ * @api
  */
 final readonly class EntityValuesSnapshot
 {

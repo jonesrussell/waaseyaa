@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request as HttpRequest;
  *
  * Construct via {@see self::fromSymfonyRequest()} at the controller boundary; type-hint
  * {@see InboundHttpRequestInterface} for dependents.
+ * @api
  */
 final readonly class InboundHttpRequest implements InboundHttpRequestInterface
 {

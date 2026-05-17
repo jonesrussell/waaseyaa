@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Telescope\CodifiedContext\Event;
 
+/**
+ * @api
+ */
 final class SessionEnded
 {
     public readonly \DateTimeImmutable $occurredAt;

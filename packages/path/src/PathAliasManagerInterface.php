@@ -9,6 +9,7 @@ namespace Waaseyaa\Path;
  *
  * Implementations map between internal system paths and clean URL aliases,
  * with support for language-specific lookups.
+ * @api
  */
 interface PathAliasManagerInterface
 {

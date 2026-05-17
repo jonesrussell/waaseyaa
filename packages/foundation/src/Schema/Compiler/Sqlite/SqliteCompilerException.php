@@ -16,6 +16,7 @@ namespace Waaseyaa\Foundation\Schema\Compiler\Sqlite;
  * paths or other host-specific data (see spec §7.3). Pass only the op
  * kind, table/column names from the diff, and version strings. The
  * compiler is platform-pure — it never sees a filesystem.
+ * @api
  */
 final class SqliteCompilerException extends \RuntimeException
 {

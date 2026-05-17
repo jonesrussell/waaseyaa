@@ -6,6 +6,7 @@ namespace Waaseyaa\HttpClient;
 
 /**
  * @internal
+ * @api
  */
 interface HttpClientInterface
 {

@@ -6,6 +6,9 @@ namespace Waaseyaa\Config\Cache;
 
 use Waaseyaa\Config\StorageInterface;
 
+/**
+ * @api
+ */
 final class ConfigCacheCompiler
 {
     public function __construct(

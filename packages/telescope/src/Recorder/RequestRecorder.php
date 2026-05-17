@@ -8,6 +8,7 @@ use Waaseyaa\Telescope\Storage\TelescopeStoreInterface;
 
 /**
  * Records HTTP requests with method, URI, status code, duration, controller, and middleware.
+ * @api
  */
 final class RequestRecorder
 {

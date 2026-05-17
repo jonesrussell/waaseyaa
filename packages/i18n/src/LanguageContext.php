@@ -12,6 +12,7 @@ namespace Waaseyaa\I18n;
  * They can differ -- e.g. a French editor managing English content.
  *
  * Immutable: with* methods return new instances.
+ * @api
  */
 final readonly class LanguageContext
 {

@@ -8,6 +8,7 @@ use Waaseyaa\Queue\Storage\InMemoryFailedJobRepository;
 
 /**
  * @deprecated Use FailedJobRepositoryInterface with InMemoryFailedJobRepository or DatabaseFailedJobRepository instead.
+ * @api
  */
 final class FailedJobRepository implements FailedJobRepositoryInterface
 {

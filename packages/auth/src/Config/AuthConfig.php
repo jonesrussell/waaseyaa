@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Auth\Config;
 
+/**
+ * @api
+ */
 final readonly class AuthConfig
 {
     private const array DEFAULT_TOKEN_TTLS = [

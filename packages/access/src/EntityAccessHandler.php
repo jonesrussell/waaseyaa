@@ -22,6 +22,7 @@ use Waaseyaa\Entity\EntityInterface;
  * receive a context bag (for 'translate' this carries the target 'langcode').
  *
  * See docs/specs/bundle-scoped-fields.md §Access for the bundle filter contract.
+ * @api
  */
 class EntityAccessHandler
 {

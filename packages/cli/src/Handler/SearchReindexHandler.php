@@ -9,6 +9,9 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Search\SearchIndexableInterface;
 use Waaseyaa\Search\SearchIndexerInterface;
 
+/**
+ * @api
+ */
 final class SearchReindexHandler
 {
     private const BATCH_SIZE = 100;

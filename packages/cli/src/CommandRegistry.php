@@ -6,6 +6,9 @@ namespace Waaseyaa\CLI;
 
 use Waaseyaa\CLI\Exception\DuplicateCommandException;
 
+/**
+ * @api
+ */
 final class CommandRegistry
 {
     /** @var array<string, CommandDefinition> */

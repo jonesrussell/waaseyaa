@@ -7,6 +7,7 @@ namespace Waaseyaa\Routing\Exception;
 /**
  * Thrown when no route matches the request path (replaces exposing
  * {@see \Symfony\Component\Routing\Exception\ResourceNotFoundException} to callers).
+ * @api
  */
 final class RouteNotFoundException extends \RuntimeException
 {

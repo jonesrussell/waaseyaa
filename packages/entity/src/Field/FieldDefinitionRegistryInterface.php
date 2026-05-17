@@ -14,6 +14,7 @@ namespace Waaseyaa\Entity\Field;
  * The interface lives in packages/entity to keep EntityTypeManager free of
  * dependencies on packages/field. The concrete implementation lives in
  * packages/field as Waaseyaa\Field\FieldDefinitionRegistry.
+ * @api
  */
 interface FieldDefinitionRegistryInterface
 {

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Plugin;
 
+/**
+ * @api
+ */
 abstract class PluginBase implements PluginInspectionInterface
 {
     public function __construct(

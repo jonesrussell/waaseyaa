@@ -6,6 +6,9 @@ namespace Waaseyaa\CLI\Handler;
 
 use Waaseyaa\CLI\CliIO;
 
+/**
+ * @api
+ */
 final class TelescopeValidateHandler
 {
     public function execute(CliIO $io): int

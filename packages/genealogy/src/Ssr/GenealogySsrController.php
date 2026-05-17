@@ -17,6 +17,9 @@ use Waaseyaa\Genealogy\Service\GenealogyPedigreeService;
 use Waaseyaa\User\DevAdminAccount;
 use Waaseyaa\User\User;
 
+/**
+ * @api
+ */
 final class GenealogySsrController
 {
     public function __construct(

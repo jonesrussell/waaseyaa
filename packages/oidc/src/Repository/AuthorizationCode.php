@@ -11,6 +11,7 @@ namespace Waaseyaa\Oidc\Repository;
  * Per OAuth 2.1, codes live for 60 seconds and may be consumed exactly once. Binding
  * fields (clientId, redirectUri, codeChallenge) are validated at exchange time — the
  * repository stores them verbatim; it does not enforce them.
+ * @api
  */
 final readonly class AuthorizationCode
 {

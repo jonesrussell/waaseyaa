@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\OAuthProvider;
 
+/**
+ * @api
+ */
 final class OAuthStateManager
 {
     private const SESSION_KEY = 'oauth_state';

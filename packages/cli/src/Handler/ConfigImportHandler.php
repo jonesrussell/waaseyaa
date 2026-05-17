@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Config\ConfigManagerInterface;
 
+/**
+ * @api
+ */
 final class ConfigImportHandler
 {
     public function __construct(

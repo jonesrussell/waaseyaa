@@ -12,6 +12,7 @@ namespace Waaseyaa\NorthCloud\Client;
  *
  * Pass an optional callable $httpClient for testing; the default uses file_get_contents
  * with a stream context so the package has no external HTTP client dependency.
+ * @api
  */
 final class NorthCloudClient
 {

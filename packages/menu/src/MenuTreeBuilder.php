@@ -9,6 +9,7 @@ namespace Waaseyaa\Menu;
  *
  * Links are sorted by weight, then organized into a parent-child
  * hierarchy based on each link's parentId.
+ * @api
  */
 final class MenuTreeBuilder
 {

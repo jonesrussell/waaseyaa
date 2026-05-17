@@ -12,6 +12,9 @@ use Waaseyaa\Entity\EntityValues;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
+/**
+ * @api
+ */
 final class EmbeddingPipeline
 {
     private readonly LoggerInterface $logger;

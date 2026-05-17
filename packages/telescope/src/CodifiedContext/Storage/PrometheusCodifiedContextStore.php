@@ -11,6 +11,7 @@ use Waaseyaa\Telescope\Storage\TelescopeStoreInterface;
  *
  * Optionally delegates storage to an inner TelescopeStoreInterface for dual-write.
  * Does not persist entries itself — use alongside a real store for durable storage.
+ * @api
  */
 final class PrometheusCodifiedContextStore implements CodifiedContextStoreInterface
 {

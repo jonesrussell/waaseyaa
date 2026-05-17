@@ -8,6 +8,9 @@ use Waaseyaa\Cache\CacheFactoryInterface;
 use Waaseyaa\Cache\TagAwareCacheInterface;
 use Waaseyaa\CLI\CliIO;
 
+/**
+ * @api
+ */
 final class CacheClearHandler
 {
     private const array DEFAULT_BINS = ['default', 'render', 'discovery', 'config'];

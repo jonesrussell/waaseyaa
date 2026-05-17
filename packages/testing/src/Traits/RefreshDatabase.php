@@ -13,6 +13,7 @@ namespace Waaseyaa\Testing\Traits;
  * Requires a PDO connection to be provided via the getDatabasePdo()
  * method. Override this method in your test class to return the
  * PDO instance used by your test infrastructure.
+ * @api
  */
 trait RefreshDatabase
 {

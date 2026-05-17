@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Billing;
 
+/**
+ * @api
+ */
 final class FakeStripeClient implements StripeClientInterface
 {
     private CheckoutSession $nextCheckoutSession;

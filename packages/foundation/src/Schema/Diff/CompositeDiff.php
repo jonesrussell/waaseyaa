@@ -24,6 +24,7 @@ namespace Waaseyaa\Foundation\Schema\Diff;
  * - Reordering ops produces a different checksum **on purpose**. Order
  *   matters for application (e.g. `add_column` then `add_index` on that
  *   column has different semantics from the reverse).
+ * @api
  */
 final readonly class CompositeDiff
 {

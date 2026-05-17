@@ -10,6 +10,7 @@ namespace Waaseyaa\NorthCloud\Sync;
  * Apps register their concrete mappers here (typically from a service provider).
  * NcSyncService iterates all registered mappers for each hit and invokes the ones
  * whose supports() returns true.
+ * @api
  */
 final class MapperRegistry
 {

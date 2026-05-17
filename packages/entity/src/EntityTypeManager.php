@@ -19,6 +19,7 @@ use Waaseyaa\Foundation\Log\NullLogger;
  * Entity types are registered explicitly by service providers; optional
  * attribute-driven registration runs when {@code entity_auto_register} is enabled
  * in application config (see {@see \Waaseyaa\Foundation\Kernel\Bootstrap\ProviderRegistry}).
+ * @api
  */
 class EntityTypeManager implements EntityTypeManagerInterface
 {

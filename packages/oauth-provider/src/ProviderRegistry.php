@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\OAuthProvider;
 
+/**
+ * @api
+ */
 final class ProviderRegistry
 {
     /** @var array<string, OAuthProviderInterface> */

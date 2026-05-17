@@ -6,6 +6,7 @@ namespace Waaseyaa\AI\Vector;
 
 /**
  * Supported distance/similarity metrics for vector comparison.
+ * @api
  */
 enum DistanceMetric: string
 {

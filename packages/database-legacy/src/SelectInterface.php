@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Database;
 
+/**
+ * @api
+ */
 interface SelectInterface
 {
     public function fields(string $tableAlias, array $fields = []): static;

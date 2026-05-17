@@ -9,6 +9,7 @@ namespace Waaseyaa\Analytics;
  *
  * Uses the same file_get_contents + stream_context pattern as NorthCloudClient.
  * Calls are synchronous with a short timeout — no-op when not configured.
+ * @api
  */
 final class UmamiClient
 {

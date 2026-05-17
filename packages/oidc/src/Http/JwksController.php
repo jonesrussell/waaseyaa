@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Waaseyaa\Oidc\Keys\OidcKeyLoaderInterface;
 use Waaseyaa\Oidc\Keys\SigningKey;
 
+/**
+ * @api
+ */
 final readonly class JwksController
 {
     public function __construct(private OidcKeyLoaderInterface $keyLoader) {}

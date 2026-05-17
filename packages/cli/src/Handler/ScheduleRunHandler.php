@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Scheduler\ScheduleRunner;
 
+/**
+ * @api
+ */
 final class ScheduleRunHandler
 {
     public function __construct(

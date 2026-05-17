@@ -8,6 +8,9 @@ use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
+/**
+ * @api
+ */
 final class UploadHandler
 {
     public const int DEFAULT_MAX_SIZE = 5_242_880; // 5MB

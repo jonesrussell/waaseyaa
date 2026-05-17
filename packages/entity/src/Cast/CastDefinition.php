@@ -12,6 +12,7 @@ namespace Waaseyaa\Entity\Cast;
  * - Array form supports `['type' => 'json']` as an alias for the `array` built-in (JSON in storage).
  * - Value object array form: `['type' => 'value_object', 'class' => SomeVo::class]` when `SomeVo` implements
  *   {@see FromArrayEntityValueInterface}.
+ * @api
  */
 final readonly class CastDefinition
 {

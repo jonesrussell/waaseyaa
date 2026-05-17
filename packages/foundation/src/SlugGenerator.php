@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation;
 
+/**
+ * @api
+ */
 final class SlugGenerator
 {
     public static function generate(string $value): string

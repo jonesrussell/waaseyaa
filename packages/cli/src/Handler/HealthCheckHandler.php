@@ -8,6 +8,9 @@ use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Foundation\Diagnostic\HealthCheckerInterface;
 use Waaseyaa\Foundation\Diagnostic\HealthCheckResult;
 
+/**
+ * @api
+ */
 final class HealthCheckHandler
 {
     public function __construct(

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Mcp;
 
+/**
+ * @api
+ */
 final readonly class McpResponse
 {
     public function __construct(

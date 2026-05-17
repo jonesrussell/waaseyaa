@@ -9,6 +9,7 @@ use Waaseyaa\Entity\EntityValues;
 
 /**
  * Service that generates and manages embeddings for entities.
+ * @api
  */
 final class EntityEmbedder
 {
