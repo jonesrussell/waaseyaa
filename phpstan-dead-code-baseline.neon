@@ -859,24 +859,6 @@ parameters:
 			path: packages/telescope/src/CodifiedContext/Validator/ValidationReport.php
 
 		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\CreatesApplication\:\:getService$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/CreatesApplication.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\CreatesApplication\:\:hasService$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/CreatesApplication.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\CreatesApplication\:\:registerService$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/CreatesApplication.php
-
-		-
 			message: '#^Property Waaseyaa\\Testing\\Traits\\InteractsWithApi\:\:\$requestHeaders is never read$#'
 			identifier: shipmonk.deadProperty.neverRead
 			count: 1
@@ -929,78 +911,6 @@ parameters:
 			identifier: shipmonk.deadMethod
 			count: 1
 			path: packages/testing/src/Traits/InteractsWithApi.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithAuth\:\:actingAs$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithAuth.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithAuth\:\:actingAsGuest$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithAuth.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithAuth\:\:assertAuthenticated$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithAuth.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithAuth\:\:assertGuest$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithAuth.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithAuth\:\:getCurrentUser$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithAuth.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithEvents\:\:assertEventNotDispatched$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithEvents.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithEvents\:\:assertExpectedEventsDispatched$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithEvents.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithEvents\:\:expectsEvents$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithEvents.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithEvents\:\:fakeEvents$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithEvents.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithEvents\:\:getDispatchedEvents$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithEvents.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithEvents\:\:isEventsFaked$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithEvents.php
-
-		-
-			message: '#^Unused Waaseyaa\\Testing\\Traits\\InteractsWithEvents\:\:recordEvent$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/testing/src/Traits/InteractsWithEvents.php
 
 		-
 			message: '#^Property Waaseyaa\\Testing\\Traits\\RefreshDatabase\:\:\$databaseTransactionActive is never read$#'
