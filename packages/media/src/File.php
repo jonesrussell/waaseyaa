@@ -10,6 +10,7 @@ namespace Waaseyaa\Media;
  * Files are immutable data objects that describe a file resource by its URI,
  * filename, MIME type, and other metadata. File objects do not perform I/O;
  * they are pure data carriers used by file repositories and media entities.
+ * @api
  */
 final readonly class File
 {

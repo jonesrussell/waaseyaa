@@ -6,6 +6,7 @@ namespace Waaseyaa\Queue\Transport;
 
 /**
  * In-memory transport for testing.
+ * @api
  */
 final class InMemoryTransport implements TransportInterface
 {

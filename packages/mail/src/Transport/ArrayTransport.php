@@ -6,6 +6,9 @@ namespace Waaseyaa\Mail\Transport;
 
 use Waaseyaa\Mail\Envelope;
 
+/**
+ * @api
+ */
 final class ArrayTransport implements TransportInterface
 {
     /** @var list<Envelope> */

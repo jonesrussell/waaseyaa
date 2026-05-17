@@ -11,6 +11,7 @@ use Waaseyaa\Entity\EntityTypeInterface;
  *
  * Contains registered types, disabled type IDs, and per-type compatibility
  * information derived from the type's manifest (when available).
+ * @api
  */
 final class BootDiagnosticReport
 {

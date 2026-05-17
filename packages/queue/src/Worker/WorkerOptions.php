@@ -9,6 +9,7 @@ namespace Waaseyaa\Queue\Worker;
  *
  * {@see memoryLimit}: Maximum **additional** memory (in MiB) this {@see Worker::run} loop may
  * allocate relative to usage at the start of that call — not total PHP process RSS.
+ * @api
  */
 final class WorkerOptions
 {

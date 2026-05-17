@@ -283,3 +283,5 @@ These checks run alongside existing CI gates:
 - **`DefaultsSchemaRegistry` caches on first access**: To test `PAYLOAD_SCHEMA_LOAD_FAILED` in `PayloadValidator`, write a valid schema first so the registry builds a `SchemaEntry`, then corrupt the file before validation. Writing invalid JSON directly yields `PAYLOAD_SCHEMA_NOT_FOUND` (no entry created).
 
 <!-- Spec reviewed 2026-05-17 - dead-code baseline reduction (#1493 / PR TBD): @api PHPDoc sweep on extension-point classes + WaaseyaaEntrypointProvider extended to recognize EntityBase/ContentEntityBase subclasses and their traits. No behavioural change. -->
+
+<!-- Spec reviewed 2026-05-17 - dead-code Phase 3 Bucket 4: @api PHPDoc sweep on additional public-API classes. No behavioural change. -->

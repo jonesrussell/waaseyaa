@@ -14,6 +14,7 @@ use Waaseyaa\Database\DatabaseInterface;
  * buffered during the transaction and dispatched only after a
  * successful commit. On failure, events are discarded and the
  * transaction is rolled back.
+ * @api
  */
 final class UnitOfWork
 {

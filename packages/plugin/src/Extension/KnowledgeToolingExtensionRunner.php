@@ -6,6 +6,9 @@ namespace Waaseyaa\Plugin\Extension;
 
 use Waaseyaa\Plugin\PluginManagerInterface;
 
+/**
+ * @api
+ */
 final class KnowledgeToolingExtensionRunner
 {
     /** @var array<string, KnowledgeToolingExtensionInterface> */

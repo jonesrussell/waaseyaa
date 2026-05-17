@@ -17,6 +17,7 @@ use Waaseyaa\CLI\Io\CliOutput;
  * The Testing\CliTester harness is delivered in WP05.
  *
  * Full behavioural contract: kitty-specs/native-cli-kernel-01KR2NR7/contracts/cli-io.md
+ * @api
  */
 interface CliIO extends CliOutput
 {

@@ -9,6 +9,7 @@ namespace Waaseyaa\Queue;
  *
  * If any job in the chain throws an exception, subsequent jobs
  * are not executed and the exception propagates to the caller.
+ * @api
  */
 final class ChainedJobs
 {

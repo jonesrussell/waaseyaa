@@ -10,6 +10,9 @@ use Waaseyaa\Mcp\Auth\McpAuthInterface;
 use Waaseyaa\Mcp\Bridge\ToolExecutorInterface;
 use Waaseyaa\Mcp\Bridge\ToolRegistryInterface;
 
+/**
+ * @api
+ */
 final readonly class McpEndpoint
 {
     public function __construct(

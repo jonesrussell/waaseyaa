@@ -40,6 +40,7 @@ use Waaseyaa\Migration\Runner\RunReport;
  *
  * @spec FR-037 — resume from the prior run's checkpoint
  * @spec FR-061 — per-migration concurrency lock
+ * @api
  */
 final class ImportResumeCommand
 {

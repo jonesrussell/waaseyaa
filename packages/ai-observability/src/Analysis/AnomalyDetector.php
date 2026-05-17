@@ -6,6 +6,9 @@ namespace Waaseyaa\AI\Observability\Analysis;
 
 use Waaseyaa\AI\Observability\Value\Anomaly;
 
+/**
+ * @api
+ */
 final class AnomalyDetector
 {
     private const TOOL_LOOP_THRESHOLD = 10;

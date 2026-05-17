@@ -23,6 +23,7 @@ use Waaseyaa\Access\Gate\GateInterface;
  *
  * Multiple requirements are combined with AND logic (all must pass).
  * If no access requirements are present, returns AccessResult::neutral().
+ * @api
  */
 final class AccessChecker
 {

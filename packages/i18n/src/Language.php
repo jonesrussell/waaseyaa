@@ -8,6 +8,7 @@ namespace Waaseyaa\I18n;
  * Value object representing a language in the system.
  *
  * Immutable. Direction is 'ltr' (left-to-right) or 'rtl' (right-to-left).
+ * @api
  */
 final readonly class Language
 {

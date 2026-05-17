@@ -10,6 +10,7 @@ namespace Waaseyaa\User;
  * Roles group permissions together and can be assigned to users.
  * Each role has a unique machine-name ID, a human-readable label,
  * an array of permission strings, and a weight for ordering.
+ * @api
  */
 final readonly class Role
 {

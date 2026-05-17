@@ -11,6 +11,7 @@ namespace Waaseyaa\Workflows;
  * states (draft, review, published, archived) and 6 transitions.
  * Also provides editorial-specific utility methods for legacy status
  * mapping and state normalization.
+ * @api
  */
 final class EditorialWorkflowPreset
 {

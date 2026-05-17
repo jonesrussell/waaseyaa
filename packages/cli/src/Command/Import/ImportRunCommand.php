@@ -43,6 +43,7 @@ use Waaseyaa\Migration\Runner\RunReport;
  * @spec FR-040 — --limit
  * @spec FR-047 — --halt-on-error
  * @spec FR-061 — per-migration concurrency lock
+ * @api
  */
 final class ImportRunCommand
 {

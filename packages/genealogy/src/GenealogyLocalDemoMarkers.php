@@ -7,6 +7,7 @@ namespace Waaseyaa\Genealogy;
 /**
  * Display names used by local demo seed flows so SSR landing pages can link
  * to the same fixture without duplicating string literals across apps.
+ * @api
  */
 final class GenealogyLocalDemoMarkers
 {

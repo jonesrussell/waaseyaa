@@ -12,6 +12,7 @@ namespace Waaseyaa\CLI\Command\Migrate;
  * is true — that is, when *any* mismatch or orphan is present.
  * Unknowns are tolerated (they are pre-WP09 / legacy rows; see
  * `docs/adr/008-ledger-checksum-backfill.md`).
+ * @api
  */
 final readonly class VerifySummary
 {

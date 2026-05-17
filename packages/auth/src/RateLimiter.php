@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Auth;
 
+/**
+ * @api
+ */
 final class RateLimiter implements RateLimiterInterface
 {
     /** @var array<string, array{count: int, resetAt: int}> */

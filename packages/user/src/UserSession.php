@@ -10,6 +10,7 @@ use Waaseyaa\Access\AccountInterface;
  * Wraps an AccountInterface as the "current user" for the request.
  *
  * Defaults to an AnonymousUser when no account is provided.
+ * @api
  */
 final class UserSession
 {

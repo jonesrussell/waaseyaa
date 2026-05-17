@@ -33,6 +33,7 @@ use Waaseyaa\Migration\MigrationRunState;
  *
  * @spec FR-034 — import:status
  * @spec FR-038 — populated FAILED / SKIPPED columns
+ * @api
  */
 final class ImportStatusCommand
 {

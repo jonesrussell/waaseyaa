@@ -9,6 +9,7 @@ namespace Waaseyaa\AI\Pipeline;
  *
  * Runs each step in weight order, passing the output of each step as input
  * to the next. Stops execution on failure or if a step requests a halt.
+ * @api
  */
 final class PipelineExecutor
 {

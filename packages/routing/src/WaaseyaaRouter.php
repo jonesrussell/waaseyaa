@@ -19,6 +19,7 @@ use Waaseyaa\Routing\Exception\RouteNotFoundException;
  *
  * Provides route matching (URL -> parameters) and URL generation
  * (route name + parameters -> URL).
+ * @api
  */
 final class WaaseyaaRouter
 {
