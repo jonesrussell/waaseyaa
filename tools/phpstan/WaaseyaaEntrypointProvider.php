@@ -121,7 +121,28 @@ final class WaaseyaaEntrypointProvider extends ReflectionBasedMemberUsageProvide
             return true;
         }
 
+        if (self::hasApiPhpDoc($reflection)) {
+            return true;
+        }
+
         return false;
+    }
+
+    /**
+     * Treat any class whose own docblock carries an `@api` tag as a fully-public
+     * entrypoint — i.e. mark every method, property, and constant on it as
+     * used. This duplicates shipmonk's ApiPhpDocUsageProvider intent but extends
+     * coverage to declaration shapes shipmonk's built-in misses in this checkout
+     * (notably trait member-level findings, where `@api` on the trait's own
+     * docblock should logically propagate to its members but does not).
+     */
+    private static function hasApiPhpDoc(\ReflectionClass $reflection): bool
+    {
+        $docComment = $reflection->getDocComment();
+        if ($docComment === false) {
+            return false;
+        }
+        return str_contains($docComment, '@api');
     }
 
     private static function isEntitySubclass(\ReflectionClass $reflection): bool
