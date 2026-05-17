@@ -1,0 +1,267 @@
+# Work Package Manifest: M-004 entity-storage-translatable-revisions
+# Derived from spec.md §7 + §12.5/§12.6 + plan.md "Project Structure" + research.md R-01..R-09
+# Subtask count: 53 across 8 WPs (target 4-10 per WP)
+#
+# Owned-files discipline: no two WPs claim the same file path. WP01 + WP02 are
+# the independent schema-substrate entry points (parallel after M-006 + M-007
+# already shipped); WP03 + WP04 + WP06 fan out after both schema WPs land; WP05
+# depends on WP04 load-semantics; WP07 depends on WP03+WP04; WP08 closes.
+#
+# Sequencing (spec §7.1 / §12.6):
+#   {WP01, WP02} → {WP03, WP04, WP06}
+#   WP04 → WP05
+#   {WP03, WP04} → WP07
+#   {WP03..WP07} → WP08
+#
+# FR coverage: every FR in §3 (FR-001..FR-048 plus FR-033a = 49 FRs) appears in
+# at least one WP's requirement_refs. FRs shared across schema backends
+# (FR-001, FR-005, FR-008) appear in both WP01 and WP02; this is intentional —
+# the contract holds against either backend, and contract tests live in both WPs.
+
+work_packages:
+  - id: WP01
+    title: "sql-column two-axis schema: composite (tid, langcode, vid) PK in RevisionTableBuilder"
+    dependencies: []
+    execution_mode: code_change
+    authoritative_surface: "packages/entity-storage/src/Schema/RevisionTableBuilder.php"
+    owned_files:
+      - "packages/entity-storage/src/Schema/RevisionTableBuilder.php"
+      - "packages/entity-storage/tests/Contract/TwoAxisStorageContract.php"
+      - "packages/entity-storage/tests/Contract/SqlColumnTwoAxisStorageTest.php"
+      - "packages/entity-storage/tests/Unit/Schema/RevisionTableBuilderTwoAxisTest.php"
+      - "tests/Integration/Phase29/TwoAxisSchemaIntegrationTest.php"
+    requirement_refs:
+      - FR-001
+      - FR-002
+      - FR-004
+      - FR-005
+      - FR-006
+      - FR-008
+    subtasks:
+      - T001
+      - T002
+      - T003
+      - T004
+      - T005
+      - T006
+      - T007
+    prompt_file: "tasks/WP01-sql-column-schema.md"
+
+  - id: WP02
+    title: "sql-blob two-axis schema: per-revision blob rows via TranslationSchemaHandler extension"
+    dependencies: []
+    execution_mode: code_change
+    authoritative_surface: "packages/entity-storage/src/Schema/TranslationSchemaHandler.php"
+    owned_files:
+      - "packages/entity-storage/src/Schema/TranslationSchemaHandler.php"
+      - "packages/entity-storage/src/RevisionableSqlBlobStorage.php"
+      - "packages/entity-storage/tests/Contract/SqlBlobTwoAxisStorageTest.php"
+      - "packages/entity-storage/tests/Unit/Schema/TranslationSchemaHandlerTwoAxisTest.php"
+      - "packages/entity-storage/tests/Unit/RevisionableSqlBlobStorageTwoAxisTest.php"
+    requirement_refs:
+      - FR-001
+      - FR-003
+      - FR-005
+      - FR-008
+    subtasks:
+      - T008
+      - T009
+      - T010
+      - T011
+      - T012
+      - T013
+    prompt_file: "tasks/WP02-sql-blob-schema.md"
+
+  - id: WP03
+    title: "SaveContext::withTranslations(array) builder + langcode-pinned writeRevision; pruning extension"
+    dependencies:
+      - WP01
+      - WP02
+    execution_mode: code_change
+    authoritative_surface: "packages/entity-storage/src/SaveContext.php"
+    owned_files:
+      - "packages/entity-storage/src/SaveContext.php"
+      - "packages/entity-storage/src/Driver/RevisionableStorageDriver.php"
+      - "packages/entity-storage/src/Revision/RevisionPruningPolicy.php"
+      - "packages/entity-storage/tests/Unit/SaveContextTranslationsTest.php"
+      - "packages/entity-storage/tests/Unit/Driver/RevisionableStorageDriverTwoAxisTest.php"
+      - "packages/entity-storage/tests/Unit/Revision/RevisionPruningPolicyTwoAxisTest.php"
+      - "tests/Integration/Phase29/TwoAxisSaveLifecycleIntegrationTest.php"
+    requirement_refs:
+      - FR-007
+      - FR-009
+      - FR-010
+      - FR-011
+      - FR-012
+      - FR-013
+      - FR-014
+      - FR-037
+      - FR-038
+      - FR-039
+    subtasks:
+      - T014
+      - T015
+      - T016
+      - T017
+      - T018
+      - T019
+      - T020
+      - T021
+    prompt_file: "tasks/WP03-save-semantics.md"
+
+  - id: WP04
+    title: "Load semantics (getTranslation->loadRevision) + StorageMigrationException + historicalRevisionWrite factory + translation deletion"
+    dependencies:
+      - WP01
+      - WP02
+    execution_mode: code_change
+    authoritative_surface: "packages/entity-storage/src/Exception/StorageMigrationException.php"
+    owned_files:
+      - "packages/entity-storage/src/Exception/StorageMigrationException.php"
+      - "packages/entity/src/Exception/EntityTranslationException.php"
+      - "packages/entity-storage/tests/Unit/Exception/StorageMigrationExceptionTest.php"
+      - "packages/entity/tests/Unit/Exception/EntityTranslationExceptionHistoricalRevisionWriteTest.php"
+      - "packages/entity-storage/tests/Unit/HistoricalRevisionWriteTest.php"
+      - "packages/entity-storage/tests/Unit/TwoAxisLoadSemanticsTest.php"
+      - "packages/entity-storage/tests/Unit/TwoAxisTranslationDeletionTest.php"
+      - "tests/Integration/Phase29/TwoAxisSaveLoadIntegrationTest.php"
+    requirement_refs:
+      - FR-015
+      - FR-016
+      - FR-017
+      - FR-018
+      - FR-019
+      - FR-034
+      - FR-035
+      - FR-036
+      - FR-040
+      - FR-041
+      - FR-042
+    subtasks:
+      - T022
+      - T023
+      - T024
+      - T025
+      - T026
+      - T027
+      - T028
+      - T029
+    prompt_file: "tasks/WP04-load-semantics-exceptions.md"
+
+  - id: WP05
+    title: "Access policy composition: view_revision + translate operations on translation instance (with ?RevisionableEntityInterface $revision)"
+    dependencies:
+      - WP04
+    execution_mode: code_change
+    authoritative_surface: "packages/access/src/Policy/RevisionPolicyComposition.php"
+    owned_files:
+      - "packages/access/src/Policy/RevisionPolicyComposition.php"
+      - "packages/access/tests/Unit/Policy/RevisionPolicyCompositionTest.php"
+      - "packages/access/tests/Unit/Policy/TwoAxisPolicyFallbackTest.php"
+      - "tests/Integration/Phase29/TwoAxisAccessPolicyIntegrationTest.php"
+    requirement_refs:
+      - FR-020
+      - FR-021
+      - FR-022
+      - FR-023
+      - FR-024
+    subtasks:
+      - T030
+      - T031
+      - T032
+      - T033
+      - T034
+    prompt_file: "tasks/WP05-access-policy-composition.md"
+
+  - id: WP06
+    title: "Migration generator: extend AddTranslationsMigrationGenerator for two-axis + new AddRevisionsMigrationGenerator (--add-revisions)"
+    dependencies:
+      - WP01
+      - WP02
+    execution_mode: code_change
+    authoritative_surface: "packages/cli/src/Handler/AddRevisionsMigrationGenerator.php"
+    owned_files:
+      - "packages/cli/src/Handler/AddTranslationsMigrationGenerator.php"
+      - "packages/cli/src/Handler/AddRevisionsMigrationGenerator.php"
+      - "packages/cli/tests/Handler/AddTranslationsMigrationGeneratorTwoAxisTest.php"
+      - "packages/cli/tests/Handler/AddRevisionsMigrationGeneratorTest.php"
+      - "tests/Integration/Phase29/TwoAxisMigrationGeneratorIntegrationTest.php"
+    requirement_refs:
+      - FR-025
+      - FR-026
+      - FR-027
+      - FR-028
+      - FR-029
+    subtasks:
+      - T035
+      - T036
+      - T037
+      - T038
+      - T039
+      - T040
+    prompt_file: "tasks/WP06-migration-generator.md"
+
+  - id: WP07
+    title: "Listing integration: TwoAxisFilterResolver routes Filter::langcode() through per-(entity, langcode) current-revision pointer; verify M-007 cache-tag emission"
+    dependencies:
+      - WP03
+      - WP04
+    execution_mode: code_change
+    authoritative_surface: "packages/entity-storage/src/Listing/TwoAxisFilterResolver.php"
+    owned_files:
+      - "packages/entity-storage/src/Listing/TwoAxisFilterResolver.php"
+      - "packages/entity-storage/tests/Unit/Listing/TwoAxisFilterResolverTest.php"
+      - "tests/Integration/Phase29/TwoAxisListingInvalidationIntegrationTest.php"
+      - "tests/Integration/Phase29/TwoAxisListingFilterIntegrationTest.php"
+    requirement_refs:
+      - FR-030
+      - FR-031
+      - FR-032
+      - FR-033
+      - FR-033a
+    subtasks:
+      - T041
+      - T042
+      - T043
+      - T044
+      - T045
+    prompt_file: "tasks/WP07-listing-integration.md"
+
+  - id: WP08
+    title: "Validation + docs closure: Minoo teaching E2E, canonical doctrine spec, cookbook, upgrade guide, charter §5.3 amendment, surface-map sync, CHANGELOG"
+    dependencies:
+      - WP03
+      - WP04
+      - WP05
+      - WP06
+      - WP07
+    execution_mode: code_change
+    authoritative_surface: "docs/specs/entity-storage-two-axis.md"
+    owned_files:
+      - "tests/Integration/Phase29/MinooTeachingTwoAxisE2ETest.php"
+      - "docs/specs/entity-storage-two-axis.md"
+      - "docs/specs/entity-storage-translatable-revisions.md"
+      - "docs/specs/stability-charter.md"
+      - "docs/specs/public-surface-map.md"
+      - "docs/public-surface-map.php"
+      - "docs/cookbook/translatable-revisionable-entities.md"
+      - "docs/upgrade-notes/two-axis-storage.md"
+      - "CLAUDE.md"
+      - "CHANGELOG.md"
+    requirement_refs:
+      - FR-043
+      - FR-044
+      - FR-045
+      - FR-046
+      - FR-047
+      - FR-048
+    subtasks:
+      - T046
+      - T047
+      - T048
+      - T049
+      - T050
+      - T051
+      - T052
+      - T053
+    prompt_file: "tasks/WP08-docs-closure.md"
