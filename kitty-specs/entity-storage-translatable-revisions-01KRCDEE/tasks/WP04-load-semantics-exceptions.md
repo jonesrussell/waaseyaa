@@ -31,7 +31,7 @@ subtasks:
 - T027
 - T028
 - T029
-shell_pid: ""
+shell_pid: "128157"
 history: []
 authoritative_surface: packages/entity-storage/src/Exception/StorageMigrationException.php
 execution_mode: code_change
@@ -44,7 +44,7 @@ owned_files:
 - packages/entity-storage/tests/Unit/TwoAxisLoadSemanticsTest.php
 - packages/entity-storage/tests/Unit/TwoAxisTranslationDeletionTest.php
 - tests/Integration/Phase29/TwoAxisSaveLoadIntegrationTest.php
-agent: ""
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP04 — Load semantics + exception surface + translation deletion
@@ -111,3 +111,4 @@ This WP depends on: WP01, WP02 (schema substrate must land first).
 ## Activity Log
 
 (populated by implement-review loop)
+- 2026-05-17T03:16:21Z – claude:sonnet:python-implementer:implementer – shell_pid=128157 – Started implementation via action command
