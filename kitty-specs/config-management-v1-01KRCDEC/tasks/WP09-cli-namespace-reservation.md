@@ -81,3 +81,4 @@ No prerequisite WPs — may dispatch immediately on mission start.
 ## Activity Log
 
 - 2026-05-17T01:27:26Z – claude:sonnet:python-implementer:implementer – shell_pid=100148 – Started implementation via action command
+- 2026-05-17T01:33:10Z – claude:sonnet:python-implementer:implementer – shell_pid=100148 – WP09 ready: config:* namespace reservation + collision-check + ConfigCommand base. 33 new tests (unit+integration), gates green.
