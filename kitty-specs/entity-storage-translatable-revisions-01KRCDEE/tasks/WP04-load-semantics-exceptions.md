@@ -112,3 +112,4 @@ This WP depends on: WP01, WP02 (schema substrate must land first).
 
 (populated by implement-review loop)
 - 2026-05-17T03:16:21Z – claude:sonnet:python-implementer:implementer – shell_pid=128157 – Started implementation via action command
+- 2026-05-17T03:24:27Z – claude:sonnet:python-implementer:implementer – shell_pid=128157 – WP04 ready: exception surface (EntityTranslationException::historicalRevisionWrite + new StorageMigrationException) + load/delete semantics tests + Phase29 integration. 1149 tests pass; cs/phpstan/policy/layers green.
