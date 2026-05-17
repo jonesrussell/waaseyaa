@@ -27,7 +27,7 @@ subtasks:
 - T031
 - T032
 - T033
-shell_pid: "86583"
+shell_pid: "88580"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -40,7 +40,7 @@ owned_files:
 - packages/config/tests/Unit/Sync/ConfigStatusReporterTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigDiffCommandTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigStatusCommandTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP05 — config:diff + config:status + shared diff renderer + UUID rename detection
@@ -101,3 +101,4 @@ This WP depends on: WP02.
 
 - 2026-05-17T00:37:33Z – claude:sonnet:python-implementer:implementer – shell_pid=86583 – Started implementation via action command
 - 2026-05-17T00:45:58Z – claude:sonnet:python-implementer:implementer – shell_pid=86583 – WP05 ready: ConfigDiffer + ConfigStatusReporter + config:diff/config:status CLIs (T028-T033, FR-030..FR-036). 356 config + 578 cli tests green; phpstan/cs/composer-policy/package-layers clean. Commit a501c737a.
+- 2026-05-17T00:46:30Z – claude:opus:python-reviewer:reviewer – shell_pid=88580 – Started review via action command
