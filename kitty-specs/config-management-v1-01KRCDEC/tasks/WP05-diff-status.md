@@ -100,3 +100,4 @@ This WP depends on: WP02.
 ## Activity Log
 
 - 2026-05-17T00:37:33Z – claude:sonnet:python-implementer:implementer – shell_pid=86583 – Started implementation via action command
+- 2026-05-17T00:45:58Z – claude:sonnet:python-implementer:implementer – shell_pid=86583 – WP05 ready: ConfigDiffer + ConfigStatusReporter + config:diff/config:status CLIs (T028-T033, FR-030..FR-036). 356 config + 578 cli tests green; phpstan/cs/composer-policy/package-layers clean. Commit a501c737a.
