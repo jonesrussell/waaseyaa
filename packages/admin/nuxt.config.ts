@@ -30,7 +30,10 @@ export default defineNuxtConfig({
   app: {
     baseURL: '/admin/',
     head: {
-      title: 'Waaseyaa',
+      // Parameterized via NUXT_PUBLIC_APP_NAME so the static prerendered title
+      // (visible before JS hydrates) matches the runtime brand for downstream
+      // apps like Minoo. Same fallback as runtimeConfig.public.appName below.
+      title: process.env.NUXT_PUBLIC_APP_NAME ?? 'Waaseyaa',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
