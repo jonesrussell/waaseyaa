@@ -1,7 +1,7 @@
 {
-  "event_count": 13,
-  "last_event_id": "01KRSX9CE2TFBJTKS8S3VWKCA4",
-  "materialized_at": "2026-05-17T02:47:17.698159+00:00",
+  "event_count": 15,
+  "last_event_id": "01KRSXAYEHXAMF2KRC4X733P6Q",
+  "materialized_at": "2026-05-17T02:48:08.913038+00:00",
   "mission_number": "",
   "mission_slug": "entity-storage-translatable-revisions-01KRCDEE",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 7
+    "planned": 6
   },
   "work_packages": {
     "WP01": {
@@ -25,11 +25,11 @@
       "last_transition_at": "2026-05-17T02:47:17.698159+00:00"
     },
     "WP02": {
-      "actor": "finalize-tasks",
+      "actor": "claude:sonnet:python-implementer:implementer",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KRSWA3PCJXH98S0Y6STXBT47",
-      "last_transition_at": "2026-05-17T02:30:12.940935+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KRSXAYEHXAMF2KRC4X733P6Q",
+      "last_transition_at": "2026-05-17T02:48:08.913038+00:00"
     },
     "WP03": {
       "actor": "finalize-tasks",
