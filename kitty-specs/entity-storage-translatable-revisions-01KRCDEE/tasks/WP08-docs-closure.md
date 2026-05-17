@@ -110,3 +110,4 @@ This WP depends on: WP03, WP04, WP05, WP06, WP07 (closes the mission).
 
 (populated by implement-review loop)
 - 2026-05-17T03:59:34Z – claude:sonnet:python-implementer:implementer – shell_pid=140368 – Started implementation via action command
+- 2026-05-17T04:16:20Z – claude:sonnet:python-implementer:implementer – shell_pid=140368 – WP08 ready: M-004 doc closure + WP01 marker swap
