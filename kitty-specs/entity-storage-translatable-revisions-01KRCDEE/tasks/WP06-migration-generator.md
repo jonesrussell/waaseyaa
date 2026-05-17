@@ -23,7 +23,7 @@ subtasks:
 - T038
 - T039
 - T040
-shell_pid: "133699"
+shell_pid: "135930"
 history: []
 authoritative_surface: packages/cli/src/Handler/AddRevisionsMigrationGenerator.php
 execution_mode: code_change
@@ -33,7 +33,7 @@ owned_files:
 - packages/cli/tests/Handler/AddTranslationsMigrationGeneratorTwoAxisTest.php
 - packages/cli/tests/Handler/AddRevisionsMigrationGeneratorTest.php
 - tests/Integration/Phase29/TwoAxisMigrationGeneratorIntegrationTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP06 — Migration generator (two-axis promotion + --add-revisions)
@@ -91,3 +91,4 @@ This WP depends on: WP01, WP02 (schema substrate). Implementation-time dependenc
 (populated by implement-review loop)
 - 2026-05-17T03:36:35Z – claude:sonnet:python-implementer:implementer – shell_pid=133699 – Started implementation via action command
 - 2026-05-17T03:45:52Z – claude:sonnet:python-implementer:implementer – shell_pid=133699 – WP06 ready: migration --add-revisions flag
+- 2026-05-17T03:46:26Z – claude:opus:python-reviewer:reviewer – shell_pid=135930 – Started review via action command
