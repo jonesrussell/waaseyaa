@@ -31,7 +31,7 @@ subtasks:
 - T027
 - T028
 - T029
-shell_pid: "128157"
+shell_pid: "130062"
 history: []
 authoritative_surface: packages/entity-storage/src/Exception/StorageMigrationException.php
 execution_mode: code_change
@@ -44,7 +44,7 @@ owned_files:
 - packages/entity-storage/tests/Unit/TwoAxisLoadSemanticsTest.php
 - packages/entity-storage/tests/Unit/TwoAxisTranslationDeletionTest.php
 - tests/Integration/Phase29/TwoAxisSaveLoadIntegrationTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP04 — Load semantics + exception surface + translation deletion
@@ -113,3 +113,4 @@ This WP depends on: WP01, WP02 (schema substrate must land first).
 (populated by implement-review loop)
 - 2026-05-17T03:16:21Z – claude:sonnet:python-implementer:implementer – shell_pid=128157 – Started implementation via action command
 - 2026-05-17T03:24:27Z – claude:sonnet:python-implementer:implementer – shell_pid=128157 – WP04 ready: exception surface (EntityTranslationException::historicalRevisionWrite + new StorageMigrationException) + load/delete semantics tests + Phase29 integration. 1149 tests pass; cs/phpstan/policy/layers green.
+- 2026-05-17T03:25:00Z – claude:opus:python-reviewer:reviewer – shell_pid=130062 – Started review via action command
