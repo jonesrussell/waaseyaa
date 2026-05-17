@@ -1,6 +1,6 @@
 ---
 work_package_id: WP01
-title: "sql-column two-axis schema: composite (tid, langcode, vid) PK in RevisionTableBuilder"
+title: 'sql-column two-axis schema: composite (tid, langcode, vid) PK in RevisionTableBuilder'
 dependencies: []
 requirement_refs:
 - FR-001
@@ -12,9 +12,9 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
-base_branch: main
-base_commit: 3b2af0d9aacac8436de314a5a402e1ba24b73cc0
-created_at: '2026-05-16T00:00:00+00:00'
+base_branch: kitty/mission-entity-storage-translatable-revisions-01KRCDEE
+base_commit: e20d3fea886b2b5a74c7d7020047e65e9529e377
+created_at: '2026-05-17T02:31:39.468774+00:00'
 subtasks:
 - T001
 - T002
@@ -23,7 +23,8 @@ subtasks:
 - T005
 - T006
 - T007
-shell_pid: ""
+agent: ''
+shell_pid: '116371'
 history: []
 authoritative_surface: packages/entity-storage/src/Schema/RevisionTableBuilder.php
 execution_mode: code_change
@@ -33,7 +34,6 @@ owned_files:
 - packages/entity-storage/tests/Contract/SqlColumnTwoAxisStorageTest.php
 - packages/entity-storage/tests/Unit/Schema/RevisionTableBuilderTwoAxisTest.php
 - tests/Integration/Phase29/TwoAxisSchemaIntegrationTest.php
-agent: ""
 ---
 
 # Work Package Prompt: WP01 — sql-column two-axis schema (composite PK)

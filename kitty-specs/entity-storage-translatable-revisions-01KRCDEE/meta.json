@@ -6,6 +6,8 @@
   "mission_slug": "entity-storage-translatable-revisions-01KRCDEE",
   "mission_type": "software-dev",
   "slug": "entity-storage-translatable-revisions-01KRCDEE",
-  "source_description": "Canonical doctrine spec at docs/specs/entity-storage-translatable-revisions.md (ratified per stability charter \u00a712.4 in commit 370d4163e). Mission metadata at docs/specs/missions/M-004-entity-storage-translatable-revisions/mission.json.",
-  "target_branch": "main"
+  "source_description": "Canonical doctrine spec at docs/specs/entity-storage-translatable-revisions.md (ratified per stability charter §12.4 in commit 370d4163e). Mission metadata at docs/specs/missions/M-004-entity-storage-translatable-revisions/mission.json.",
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-17T02:31:38.687720+00:00"
 }
