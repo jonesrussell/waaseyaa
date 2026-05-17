@@ -22,7 +22,7 @@ subtasks:
 - T035
 - T036
 - T037
-shell_pid: "89608"
+shell_pid: "91738"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -31,7 +31,7 @@ owned_files:
 - packages/cli/src/Command/Config/ConfigValidateCommand.php
 - packages/config/tests/Unit/Sync/ConfigSyncValidatorTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigValidateCommandTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP06 — config:validate + ConfigSyncValidator (reuses FieldDefinition::validators())
@@ -83,3 +83,4 @@ This WP depends on: WP02.
 
 - 2026-05-17T00:48:31Z – claude:sonnet:python-implementer:implementer – shell_pid=89608 – Started implementation via action command
 - 2026-05-17T00:54:40Z – claude:sonnet:python-implementer:implementer – shell_pid=89608 – WP06 ready: config:validate + ConfigValidator
+- 2026-05-17T00:55:09Z – claude:opus:python-reviewer:reviewer – shell_pid=91738 – Started review via action command
