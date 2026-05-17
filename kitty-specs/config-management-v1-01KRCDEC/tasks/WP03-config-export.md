@@ -24,7 +24,7 @@ subtasks:
 - T018
 - T019
 - T020
-shell_pid: ''
+shell_pid: "75093"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -33,6 +33,7 @@ owned_files:
 - packages/cli/src/Command/Config/ConfigExportCommand.php
 - packages/config/tests/Unit/Sync/ConfigExporterTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigExportCommandTest.php
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP03 — config:export command + ConfigExporter orchestrator
@@ -81,3 +82,7 @@ This WP depends on: WP02.
 - `composer phpstan` (level 5) green; `composer cs-check` clean.
 - `bin/check-package-layers` green (no upward `waaseyaa/*` edges introduced).
 - No modifications outside `owned_files` (other than rerun-of-generators where charter explicitly permits).
+
+## Activity Log
+
+- 2026-05-17T00:03:41Z – claude:sonnet:python-implementer:implementer – shell_pid=75093 – Started implementation via action command
