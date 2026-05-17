@@ -22,7 +22,7 @@ subtasks:
 - T043
 - T044
 - T045
-agent: ''
+agent: "claude:sonnet:python-implementer:implementer"
 history: []
 authoritative_surface: packages/entity-storage/src/Listing/TwoAxisFilterResolver.php
 execution_mode: code_change
@@ -32,6 +32,7 @@ owned_files:
 - tests/Integration/Phase29/TwoAxisListingInvalidationIntegrationTest.php
 - tests/Integration/Phase29/TwoAxisListingFilterIntegrationTest.php
 tags: []
+shell_pid: "136822"
 ---
 
 # Work Package Prompt: WP07 — Listing integration (TwoAxisFilterResolver + M-007 cache-tag verification)
@@ -84,3 +85,4 @@ This WP depends on: WP03 (save events for cache-tag emission), WP04 (read-at-lan
 ## Activity Log
 
 (populated by implement-review loop)
+- 2026-05-17T03:48:20Z – claude:sonnet:python-implementer:implementer – shell_pid=136822 – Started implementation via action command
