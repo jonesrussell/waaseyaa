@@ -33,7 +33,7 @@ subtasks:
 - T062
 - T063
 - T064
-shell_pid: "106003"
+shell_pid: "108541"
 history: []
 authoritative_surface: docs/
 execution_mode: code_change
@@ -46,7 +46,7 @@ owned_files:
 - docs/public-surface-map.php
 - CLAUDE.md
 - CHANGELOG.md
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP11 — Docs closure: spec, cookbook, upgrade-guide, charter §5.5 amendment, CHANGELOG, public-surface-map
@@ -108,3 +108,4 @@ This WP depends on: WP04, WP05, WP07, WP09, WP10.
 
 - 2026-05-17T01:44:30Z – claude:sonnet:python-implementer:implementer – shell_pid=106003 – Started implementation via action command
 - 2026-05-17T01:56:17Z – claude:sonnet:python-implementer:implementer – shell_pid=106003 – WP11 ready: M-003 doc closure — charter §5.5 + §3.2 criterion 9 amended, canonical spec (docs/specs/config-management.md) + cookbook (docs/cookbook/config-sync.md) + conventions (docs/conventions/cmi-sync-format.md) + upgrade-guide (docs/upgrades/waaseyaa-alpha-179-to-180.md) shipped; CHANGELOG [Unreleased] + public-surface-map (MD + PHP) updated; CLAUDE.md orchestration row split for CMI subsystems. All gates green (cs-check, phpstan, composer-policy, package-layers); packages/config + packages/cli tests pass.
+- 2026-05-17T01:56:54Z – claude:opus:python-reviewer:reviewer – shell_pid=108541 – Started review via action command
