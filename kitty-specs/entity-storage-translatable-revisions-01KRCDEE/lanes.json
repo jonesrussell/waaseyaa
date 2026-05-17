@@ -1,0 +1,134 @@
+{
+  "version": 1,
+  "mission_slug": "entity-storage-translatable-revisions-01KRCDEE",
+  "mission_id": "01KRCDEEF3BV6E30VC13EP800K",
+  "mission_branch": "kitty/mission-entity-storage-translatable-revisions-01KRCDEE",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05",
+        "WP06",
+        "WP07",
+        "WP08"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "docs/cookbook/translatable-revisionable-entities.md",
+        "docs/public-surface-map.php",
+        "docs/specs/entity-storage-translatable-revisions.md",
+        "docs/specs/entity-storage-two-axis.md",
+        "docs/specs/public-surface-map.md",
+        "docs/specs/stability-charter.md",
+        "docs/upgrade-notes/two-axis-storage.md",
+        "packages/access/src/Policy/RevisionPolicyComposition.php",
+        "packages/access/tests/Unit/Policy/RevisionPolicyCompositionTest.php",
+        "packages/access/tests/Unit/Policy/TwoAxisPolicyFallbackTest.php",
+        "packages/cli/src/Handler/AddRevisionsMigrationGenerator.php",
+        "packages/cli/src/Handler/AddTranslationsMigrationGenerator.php",
+        "packages/cli/tests/Handler/AddRevisionsMigrationGeneratorTest.php",
+        "packages/cli/tests/Handler/AddTranslationsMigrationGeneratorTwoAxisTest.php",
+        "packages/entity-storage/src/Driver/RevisionableStorageDriver.php",
+        "packages/entity-storage/src/Exception/StorageMigrationException.php",
+        "packages/entity-storage/src/Listing/TwoAxisFilterResolver.php",
+        "packages/entity-storage/src/Revision/RevisionPruningPolicy.php",
+        "packages/entity-storage/src/RevisionableSqlBlobStorage.php",
+        "packages/entity-storage/src/SaveContext.php",
+        "packages/entity-storage/src/Schema/RevisionTableBuilder.php",
+        "packages/entity-storage/src/Schema/TranslationSchemaHandler.php",
+        "packages/entity-storage/tests/Contract/SqlBlobTwoAxisStorageTest.php",
+        "packages/entity-storage/tests/Contract/SqlColumnTwoAxisStorageTest.php",
+        "packages/entity-storage/tests/Contract/TwoAxisStorageContract.php",
+        "packages/entity-storage/tests/Unit/Driver/RevisionableStorageDriverTwoAxisTest.php",
+        "packages/entity-storage/tests/Unit/Exception/StorageMigrationExceptionTest.php",
+        "packages/entity-storage/tests/Unit/HistoricalRevisionWriteTest.php",
+        "packages/entity-storage/tests/Unit/Listing/TwoAxisFilterResolverTest.php",
+        "packages/entity-storage/tests/Unit/Revision/RevisionPruningPolicyTwoAxisTest.php",
+        "packages/entity-storage/tests/Unit/RevisionableSqlBlobStorageTwoAxisTest.php",
+        "packages/entity-storage/tests/Unit/SaveContextTranslationsTest.php",
+        "packages/entity-storage/tests/Unit/Schema/RevisionTableBuilderTwoAxisTest.php",
+        "packages/entity-storage/tests/Unit/Schema/TranslationSchemaHandlerTwoAxisTest.php",
+        "packages/entity-storage/tests/Unit/TwoAxisLoadSemanticsTest.php",
+        "packages/entity-storage/tests/Unit/TwoAxisTranslationDeletionTest.php",
+        "packages/entity/src/Exception/EntityTranslationException.php",
+        "packages/entity/tests/Unit/Exception/EntityTranslationExceptionHistoricalRevisionWriteTest.php",
+        "tests/Integration/Phase29/MinooTeachingTwoAxisE2ETest.php",
+        "tests/Integration/Phase29/TwoAxisAccessPolicyIntegrationTest.php",
+        "tests/Integration/Phase29/TwoAxisListingFilterIntegrationTest.php",
+        "tests/Integration/Phase29/TwoAxisListingInvalidationIntegrationTest.php",
+        "tests/Integration/Phase29/TwoAxisMigrationGeneratorIntegrationTest.php",
+        "tests/Integration/Phase29/TwoAxisSaveLifecycleIntegrationTest.php",
+        "tests/Integration/Phase29/TwoAxisSaveLoadIntegrationTest.php",
+        "tests/Integration/Phase29/TwoAxisSchemaIntegrationTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "app-shell",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-17T02:30:13.272742+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP01"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP04"
+      },
+      {
+        "wp_a": "WP06",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP06 depends on WP01"
+      },
+      {
+        "wp_a": "WP07",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP07 depends on WP03"
+      },
+      {
+        "wp_a": "WP08",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP08 depends on WP03"
+      }
+    ],
+    "total_merges": 7,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 7
+    }
+  }
+}
