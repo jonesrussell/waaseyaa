@@ -85,3 +85,4 @@ This WP depends on: none (entry point alongside WP01).
 
 (populated by implement-review loop)
 - 2026-05-17T02:48:08Z – claude:sonnet:python-implementer:implementer – shell_pid=120671 – Started implementation via action command
+- 2026-05-17T02:59:32Z – claude:sonnet:python-implementer:implementer – shell_pid=120671 – WP02 ready: two-axis sql-blob schema; TranslationSchemaHandler::syncTwoAxis + RevisionableSqlBlobStorage write/load entry points; 25 new tests; gates green
