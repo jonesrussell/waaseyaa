@@ -20,7 +20,7 @@ subtasks:
 - T011
 - T012
 - T013
-shell_pid: "120671"
+shell_pid: "123531"
 history: []
 authoritative_surface: packages/entity-storage/src/Schema/TranslationSchemaHandler.php
 execution_mode: code_change
@@ -30,7 +30,7 @@ owned_files:
 - packages/entity-storage/tests/Contract/SqlBlobTwoAxisStorageTest.php
 - packages/entity-storage/tests/Unit/Schema/TranslationSchemaHandlerTwoAxisTest.php
 - packages/entity-storage/tests/Unit/RevisionableSqlBlobStorageTwoAxisTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP02 — sql-blob two-axis schema (per-revision blob rows)
@@ -86,3 +86,4 @@ This WP depends on: none (entry point alongside WP01).
 (populated by implement-review loop)
 - 2026-05-17T02:48:08Z – claude:sonnet:python-implementer:implementer – shell_pid=120671 – Started implementation via action command
 - 2026-05-17T02:59:32Z – claude:sonnet:python-implementer:implementer – shell_pid=120671 – WP02 ready: two-axis sql-blob schema; TranslationSchemaHandler::syncTwoAxis + RevisionableSqlBlobStorage write/load entry points; 25 new tests; gates green
+- 2026-05-17T03:00:12Z – claude:opus:python-reviewer:reviewer – shell_pid=123531 – Started review via action command
