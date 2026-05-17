@@ -30,7 +30,7 @@ subtasks:
 - T025
 - T026
 - T027
-shell_pid: ''
+shell_pid: "82402"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -42,6 +42,7 @@ owned_files:
 - packages/config/tests/Unit/Sync/ConfigImporterTest.php
 - packages/config/tests/Unit/Exception/ConfigImportFailedExceptionTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigImportCommandTest.php
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP04 — config:import command + ConfigImporter (DAG order, per-entity tx, orphan-warn)
@@ -98,3 +99,7 @@ This WP depends on: WP01, WP02.
 - `composer phpstan` (level 5) green; `composer cs-check` clean.
 - `bin/check-package-layers` green (no upward `waaseyaa/*` edges introduced).
 - No modifications outside `owned_files` (other than rerun-of-generators where charter explicitly permits).
+
+## Activity Log
+
+- 2026-05-17T00:25:01Z – claude:sonnet:python-implementer:implementer – shell_pid=82402 – Started implementation via action command
