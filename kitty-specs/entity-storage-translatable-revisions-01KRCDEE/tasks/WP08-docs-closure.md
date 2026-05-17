@@ -29,7 +29,7 @@ subtasks:
 - T051
 - T052
 - T053
-shell_pid: ""
+shell_pid: "140368"
 history: []
 authoritative_surface: docs/specs/entity-storage-two-axis.md
 execution_mode: code_change
@@ -44,7 +44,7 @@ owned_files:
 - docs/upgrade-notes/two-axis-storage.md
 - CLAUDE.md
 - CHANGELOG.md
-agent: ""
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP08 — Validation + docs closure (Minoo teaching E2E + canonical doctrine + cookbook + surface-map)
@@ -109,3 +109,4 @@ This WP depends on: WP03, WP04, WP05, WP06, WP07 (closes the mission).
 ## Activity Log
 
 (populated by implement-review loop)
+- 2026-05-17T03:59:34Z – claude:sonnet:python-implementer:implementer – shell_pid=140368 – Started implementation via action command
