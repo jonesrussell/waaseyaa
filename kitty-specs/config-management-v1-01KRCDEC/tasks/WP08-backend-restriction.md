@@ -80,3 +80,4 @@ No prerequisite WPs — may dispatch immediately on mission start.
 ## Activity Log
 
 - 2026-05-17T01:06:59Z – claude:sonnet:python-implementer:implementer – shell_pid=95813 – Assigned agent via action command
+- 2026-05-17T01:25:13Z – claude:sonnet:python-implementer:implementer – shell_pid=95813 – WP08 ready: backend restriction (recovered from stalled agent)
