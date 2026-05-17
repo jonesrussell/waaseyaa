@@ -85,3 +85,4 @@ This WP depends on: WP04 (load semantics — composition consumes `getTranslatio
 
 (populated by implement-review loop)
 - 2026-05-17T03:26:43Z – claude:sonnet:python-implementer:implementer – shell_pid=130869 – Started implementation via action command
+- 2026-05-17T03:34:17Z – claude:sonnet:python-implementer:implementer – shell_pid=130869 – WP05 ready: access policy composition (T030-T034 covered by RevisionPolicyComposition + 3 tests; all gates green)
