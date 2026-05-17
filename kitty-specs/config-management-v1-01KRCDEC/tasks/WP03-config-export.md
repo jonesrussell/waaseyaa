@@ -30,6 +30,9 @@ authoritative_surface: packages/config/
 execution_mode: code_change
 owned_files:
 - packages/config/src/Sync/ConfigExporter.php
+- packages/config/src/Sync/ConfigExportFileResult.php
+- packages/config/src/Sync/ConfigExportResult.php
+- packages/config/src/Sync/ConfigSyncFileSourceInterface.php
 - packages/cli/src/Command/Config/ConfigExportCommand.php
 - packages/config/tests/Unit/Sync/ConfigExporterTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigExportCommandTest.php
@@ -72,6 +75,9 @@ This WP depends on: WP02.
 ## Owned files
 
 - `packages/config/src/Sync/ConfigExporter.php`
+- `packages/config/src/Sync/ConfigExportFileResult.php`
+- `packages/config/src/Sync/ConfigExportResult.php`
+- `packages/config/src/Sync/ConfigSyncFileSourceInterface.php`
 - `packages/cli/src/Command/Config/ConfigExportCommand.php`
 - `packages/config/tests/Unit/Sync/ConfigExporterTest.php`
 - `packages/cli/tests/Unit/Command/Config/ConfigExportCommandTest.php`
@@ -89,3 +95,4 @@ This WP depends on: WP02.
 - 2026-05-17T00:13:01Z – claude:sonnet:python-implementer:implementer – shell_pid=75093 – WP03 ready: config:export CLI command + ConfigExporter orchestrator. 15 tests, 54 assertions; all gates green (phpunit + cs-check + phpstan + composer-policy + package-layers). Subtasks T016-T020 covered (mark-status skipped: tasks.md lists subtasks inline in WP block, not as discrete entries; spec-kitty parser only sees them aggregated).
 - 2026-05-17T00:13:45Z – claude:opus:python-reviewer:reviewer – shell_pid=77917 – Started review via action command
 - 2026-05-17T00:19:44Z – claude:sonnet:python-implementer:implementer – shell_pid=80062 – Started implementation via action command
+- 2026-05-17T00:22:18Z – claude:sonnet:python-implementer:implementer – shell_pid=80062 – WP03 cycle 1/3 fix: inline types split to PSR-4 files. Isolation test passes.
