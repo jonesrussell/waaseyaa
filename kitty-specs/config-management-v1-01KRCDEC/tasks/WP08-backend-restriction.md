@@ -17,7 +17,7 @@ subtasks:
 - T044
 - T045
 - T046
-shell_pid: "95813"
+shell_pid: "99288"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -28,7 +28,7 @@ owned_files:
 - packages/config/tests/Unit/Backend/BackendRestrictionEnforcerTest.php
 - packages/config/tests/Unit/Exception/InvalidConfigBackendExceptionTest.php
 - packages/entity-storage/tests/Unit/StorageBackendRegistryConfigRestrictionTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP08 — Backend restriction enforcement (sql-blob/sql-column only; boot-time exception)
@@ -81,3 +81,4 @@ No prerequisite WPs — may dispatch immediately on mission start.
 
 - 2026-05-17T01:06:59Z – claude:sonnet:python-implementer:implementer – shell_pid=95813 – Assigned agent via action command
 - 2026-05-17T01:25:13Z – claude:sonnet:python-implementer:implementer – shell_pid=95813 – WP08 ready: backend restriction (recovered from stalled agent)
+- 2026-05-17T01:25:42Z – claude:opus:python-reviewer:reviewer – shell_pid=99288 – Started review via action command
