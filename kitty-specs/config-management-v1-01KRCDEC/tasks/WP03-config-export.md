@@ -86,3 +86,4 @@ This WP depends on: WP02.
 ## Activity Log
 
 - 2026-05-17T00:03:41Z – claude:sonnet:python-implementer:implementer – shell_pid=75093 – Started implementation via action command
+- 2026-05-17T00:13:01Z – claude:sonnet:python-implementer:implementer – shell_pid=75093 – WP03 ready: config:export CLI command + ConfigExporter orchestrator. 15 tests, 54 assertions; all gates green (phpunit + cs-check + phpstan + composer-policy + package-layers). Subtasks T016-T020 covered (mark-status skipped: tasks.md lists subtasks inline in WP block, not as discrete entries; spec-kitty parser only sees them aggregated).
