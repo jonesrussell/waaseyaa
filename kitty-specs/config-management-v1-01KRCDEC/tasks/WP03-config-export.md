@@ -24,7 +24,7 @@ subtasks:
 - T018
 - T019
 - T020
-shell_pid: "75093"
+shell_pid: "77917"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -33,7 +33,7 @@ owned_files:
 - packages/cli/src/Command/Config/ConfigExportCommand.php
 - packages/config/tests/Unit/Sync/ConfigExporterTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigExportCommandTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP03 — config:export command + ConfigExporter orchestrator
@@ -87,3 +87,4 @@ This WP depends on: WP02.
 
 - 2026-05-17T00:03:41Z – claude:sonnet:python-implementer:implementer – shell_pid=75093 – Started implementation via action command
 - 2026-05-17T00:13:01Z – claude:sonnet:python-implementer:implementer – shell_pid=75093 – WP03 ready: config:export CLI command + ConfigExporter orchestrator. 15 tests, 54 assertions; all gates green (phpunit + cs-check + phpstan + composer-policy + package-layers). Subtasks T016-T020 covered (mark-status skipped: tasks.md lists subtasks inline in WP block, not as discrete entries; spec-kitty parser only sees them aggregated).
+- 2026-05-17T00:13:45Z – claude:opus:python-reviewer:reviewer – shell_pid=77917 – Started review via action command
