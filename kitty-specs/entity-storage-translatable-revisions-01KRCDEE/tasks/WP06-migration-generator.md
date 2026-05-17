@@ -90,3 +90,4 @@ This WP depends on: WP01, WP02 (schema substrate). Implementation-time dependenc
 
 (populated by implement-review loop)
 - 2026-05-17T03:36:35Z – claude:sonnet:python-implementer:implementer – shell_pid=133699 – Started implementation via action command
+- 2026-05-17T03:45:52Z – claude:sonnet:python-implementer:implementer – shell_pid=133699 – WP06 ready: migration --add-revisions flag
