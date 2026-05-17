@@ -35,6 +35,7 @@ use Waaseyaa\Config\Sync\ConfigExportFileResult;
  * @spec FR-019 — --dry-run (no filesystem effects)
  * @spec FR-020 — summary line
  * @spec FR-021 — exit-code policy + command registration
+ * @api
  */
 final class ConfigExportCommand
 {

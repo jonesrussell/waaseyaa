@@ -11,6 +11,7 @@ use Waaseyaa\Entity\Storage\EntityQueryInterface;
  *
  * Translates parsed filter, sort, and pagination parameters into
  * entity query method calls.
+ * @api
  */
 final class QueryApplier
 {

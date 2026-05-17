@@ -9,6 +9,7 @@ namespace Waaseyaa\Foundation\Ingestion;
  *
  * Construct only via EnvelopeValidator — the validator guarantees all
  * required fields are present and normalized before this object is created.
+ * @api
  */
 final readonly class Envelope
 {

@@ -6,6 +6,9 @@ namespace Waaseyaa\Auth;
 
 use Waaseyaa\Database\DatabaseInterface;
 
+/**
+ * @api
+ */
 final class DatabaseRateLimiter implements RateLimiterInterface
 {
     private const TABLE = 'rate_limits';

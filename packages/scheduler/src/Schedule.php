@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Scheduler;
 
+/**
+ * @api
+ */
 final class Schedule implements ScheduleInterface
 {
     /** @var list<ScheduledTask> */

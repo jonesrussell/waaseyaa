@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Queue;
 
+/**
+ * @api
+ */
 final class InMemoryQueue implements QueueInterface
 {
     /** @var object[] */

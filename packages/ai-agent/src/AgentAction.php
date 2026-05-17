@@ -9,6 +9,7 @@ namespace Waaseyaa\AI\Agent;
  *
  * Actions represent operations like create, update, delete, or tool_call
  * that an agent has performed (or proposes during dry-run).
+ * @api
  */
 final readonly class AgentAction
 {

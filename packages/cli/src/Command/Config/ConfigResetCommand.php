@@ -33,6 +33,7 @@ use Waaseyaa\Config\Sync\ConfigResetter;
  * @spec FR-041 — single-entity reset (inverse of import)
  * @spec FR-042 — confirmation prompt + `--yes` bypass
  * @spec FR-043 — every reset logs to `config.audit`
+ * @api
  */
 final class ConfigResetCommand
 {

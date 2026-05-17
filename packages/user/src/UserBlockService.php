@@ -6,6 +6,9 @@ namespace Waaseyaa\User;
 
 use Waaseyaa\Entity\EntityTypeManager;
 
+/**
+ * @api
+ */
 final class UserBlockService
 {
     public function __construct(

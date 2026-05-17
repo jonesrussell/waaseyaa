@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Bimaaji\Graph;
 
+/**
+ * @api
+ */
 final readonly class ApplicationGraph
 {
     /** @var array<string, GraphSection> */

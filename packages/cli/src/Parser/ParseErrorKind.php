@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\CLI\Parser;
 
+/**
+ * @api
+ */
 enum ParseErrorKind
 {
     case UnknownCommand;

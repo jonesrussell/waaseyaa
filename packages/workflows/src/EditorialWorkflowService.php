@@ -7,6 +7,9 @@ namespace Waaseyaa\Workflows;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\FieldableInterface;
 
+/**
+ * @api
+ */
 final class EditorialWorkflowService
 {
     private readonly Workflow $workflow;

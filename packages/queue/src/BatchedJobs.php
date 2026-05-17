@@ -8,6 +8,7 @@ namespace Waaseyaa\Queue;
  * Groups multiple jobs as a batch with completion callbacks.
  *
  * Supports then/catch/finally semantics and optional failure tolerance.
+ * @api
  */
 final class BatchedJobs
 {

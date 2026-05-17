@@ -10,6 +10,7 @@ namespace Waaseyaa\Note\Ingestion;
  * Construct only via IngestionEnvelope::fromValidated() after running
  * IngestionEnvelopeValidator — the validator guarantees all fields are present
  * and non-empty before this object is created.
+ * @api
  */
 final class IngestionEnvelope
 {

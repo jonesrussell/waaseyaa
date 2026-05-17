@@ -37,6 +37,7 @@ use Waaseyaa\Config\Sync\ConfigValidateEntry;
  *                importer; this command is the standalone CI gate)
  * @spec FR-039 — per-entity / per-field output detail
  * @spec FR-040 — independent CI-runnable gate, exit 0/1
+ * @api
  */
 final class ConfigValidateCommand
 {

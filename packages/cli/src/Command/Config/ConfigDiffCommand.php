@@ -29,6 +29,7 @@ use Waaseyaa\Config\Sync\DiffResult;
  * @spec FR-031 — unified diff of identically-serialized YAML
  * @spec FR-032 — exit-code policy
  * @spec FR-033 — UUID-tracked rename annotation
+ * @api
  */
 final class ConfigDiffCommand
 {

@@ -25,6 +25,7 @@ use Waaseyaa\Field\FieldDefinition;
  *   - `sql-column` translatable types (WP05) keep a `<table>__translation`
  *     side-table for translatable columns; non-translatable columns stay on
  *     the base table. WP05 wires that branch.
+ * @api
  */
 final class EntitySchemaSync
 {

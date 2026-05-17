@@ -9,6 +9,7 @@ namespace Waaseyaa\Menu;
  *
  * Wraps a MenuLink and holds references to child elements,
  * forming a hierarchical tree structure.
+ * @api
  */
 final class MenuTreeElement
 {

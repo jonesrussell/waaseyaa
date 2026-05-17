@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AdminSurface\Query;
 
+/**
+ * @api
+ */
 enum SurfaceFilterOperator: string
 {
     case EQUALS = 'EQUALS';

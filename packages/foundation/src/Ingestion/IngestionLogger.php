@@ -10,6 +10,7 @@ namespace Waaseyaa\Foundation\Ingestion;
  * Entries are stored at storage/framework/ingestion.jsonl.
  * Atomic append via FILE_APPEND | LOCK_EX prevents interleaving.
  * Default retention is 90 days — call prune() periodically to enforce it.
+ * @api
  */
 final class IngestionLogger
 {

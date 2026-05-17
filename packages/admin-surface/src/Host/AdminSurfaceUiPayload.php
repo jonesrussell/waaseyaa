@@ -9,6 +9,7 @@ namespace Waaseyaa\AdminSurface\Host;
  *
  * Hosts build this via {@see GenericAdminSurfaceHost::buildAdminUi()} and attach it to
  * {@see AdminSurfaceSessionData}. Invalid entries are dropped during normalization.
+ * @api
  */
 final readonly class AdminSurfaceUiPayload
 {

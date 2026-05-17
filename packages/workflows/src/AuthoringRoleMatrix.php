@@ -23,6 +23,7 @@ namespace Waaseyaa\Workflows;
  *           'edit own {bundle} content',
  *       ],
  *   ]
+ * @api
  */
 final class AuthoringRoleMatrix
 {

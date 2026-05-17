@@ -11,6 +11,7 @@ use InvalidArgumentException;
  *
  * Single source for route registration and URL generation on the PHP side.
  * The admin SPA mirrors relative segments in packages/admin/app/runtime/adminSurfaceRoutes.ts.
+ * @api
  */
 final class AdminSurfaceRoutePaths
 {

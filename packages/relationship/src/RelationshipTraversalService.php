@@ -8,6 +8,9 @@ use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\EntityValues;
 
+/**
+ * @api
+ */
 final class RelationshipTraversalService
 {
     public function __construct(

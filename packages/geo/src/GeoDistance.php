@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Geo;
 
+/**
+ * @api
+ */
 final class GeoDistance
 {
     private const float EARTH_RADIUS_KM = 6371.0;

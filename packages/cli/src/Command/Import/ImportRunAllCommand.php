@@ -38,6 +38,7 @@ use Waaseyaa\Migration\Runner\RunOptions;
  *
  * @spec FR-033 — import:run-all
  * @spec FR-061 — per-migration concurrency lock (acquired in the loop)
+ * @api
  */
 final class ImportRunAllCommand
 {

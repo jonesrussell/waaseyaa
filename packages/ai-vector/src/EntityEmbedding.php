@@ -6,6 +6,7 @@ namespace Waaseyaa\AI\Vector;
 
 /**
  * Value object representing a stored embedding for an entity.
+ * @api
  */
 final readonly class EntityEmbedding
 {

@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
  * Unlike Symfony's Session class which uses namespaced "bags",
  * this reads and writes $_SESSION keys directly, preserving
  * compatibility with code that uses raw $_SESSION (e.g. AuthManager).
+ * @api
  */
 final class NativeSession implements SessionInterface
 {

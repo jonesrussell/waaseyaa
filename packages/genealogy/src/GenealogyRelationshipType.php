@@ -8,6 +8,7 @@ namespace Waaseyaa\Genealogy;
  * `relationship_type` values for genealogy edges.
  *
  * @see docs/specs/genealogy.md
+ * @api
  */
 final class GenealogyRelationshipType
 {

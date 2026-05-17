@@ -9,6 +9,7 @@ use Waaseyaa\CLI\Io\StreamCliOutput;
 
 /**
  * Inspects composer.json / composer.lock for waaseyaa/* provenance (path SHA, versions, drift).
+ * @api
  */
 final class ComposerProvenanceReporter
 {

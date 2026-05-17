@@ -25,6 +25,7 @@ use Waaseyaa\Foundation\Log\NullLogger;
  * The `run()` variant returns the exit code for testability (no exit).
  *
  * Full contract: kitty-specs/native-cli-kernel-01KR2NR7/contracts/cli-kernel.md
+ * @api
  */
 final class CliApplication
 {

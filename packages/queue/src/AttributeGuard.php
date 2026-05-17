@@ -18,6 +18,7 @@ use Waaseyaa\Queue\Attribute\UniqueJob;
  *
  * - RateLimited: counts dispatches within the decaySeconds window and skips
  *   any dispatch that would exceed maxAttempts.
+ * @api
  */
 final class AttributeGuard
 {

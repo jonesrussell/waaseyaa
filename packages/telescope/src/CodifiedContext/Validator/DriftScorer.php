@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Telescope\CodifiedContext\Validator;
 
+/**
+ * @api
+ */
 final class DriftScorer
 {
     public function __construct(

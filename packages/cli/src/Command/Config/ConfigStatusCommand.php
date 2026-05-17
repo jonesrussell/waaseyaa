@@ -26,6 +26,7 @@ use Waaseyaa\Config\Sync\StatusReport;
  * @spec FR-034 — counts + per-entity table
  * @spec FR-035 — `--format=json`
  * @spec FR-036 — read-only contract
+ * @api
  */
 final class ConfigStatusCommand
 {

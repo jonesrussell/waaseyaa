@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraint;
  *
  * Checks for script tags, event handler attributes (onclick, onerror, etc.),
  * javascript: URIs, and other XSS vectors.
+ * @api
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY | \Attribute::TARGET_METHOD)]
 final class SafeMarkup extends Constraint

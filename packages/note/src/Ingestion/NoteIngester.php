@@ -9,6 +9,7 @@ use Waaseyaa\Note\Note;
 
 /**
  * Creates and persists a core.note entity from a validated ingestion envelope.
+ * @api
  */
 final class NoteIngester
 {

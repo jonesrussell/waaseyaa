@@ -29,6 +29,7 @@ use Waaseyaa\Config\Sync\ConfigImporter;
  * @spec FR-026 — orphan handling (warn / --delete-orphans)
  * @spec FR-027 / FR-028 — typed failures + --halt-on-error / --no-dependency-check
  * @spec FR-029 — command registration + summary + exit code
+ * @api
  */
 final class ConfigImportCommand
 {

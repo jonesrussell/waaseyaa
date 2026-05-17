@@ -10,6 +10,7 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
 /**
  * Late binding for genealogy access policies (kernel discovery instantiates policies
  * without constructor DI). {@see GenealogyServiceProvider::configureHttpKernel()} wires this.
+ * @api
  */
 final class GenealogyBootstrap
 {

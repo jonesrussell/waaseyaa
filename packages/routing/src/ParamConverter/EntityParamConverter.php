@@ -19,6 +19,7 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
  *   $route->setOption('parameters', [
  *       'node' => ['type' => 'entity:node'],
  *   ]);
+ * @api
  */
 final class EntityParamConverter
 {
