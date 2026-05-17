@@ -2,21 +2,18 @@
 <!-- Mission metadata: docs/specs/missions/M-004-entity-storage-translatable-revisions/mission.json -->
 <!-- Mission ID: M-004 | Spec Kitty mission_id below in meta.json -->
 
-> **⚠️ PARTIALLY UNBLOCKED — DO NOT PLAN YET (2026-05-14, updated post-M-006 close-out)**
+> **✅ FULLY UNBLOCKED — PLANNABLE (revalidated 2026-05-17 against shipped substrates)**
 >
-> Original 2026-05-12 BLOCKED stamp identified two hard prerequisites. Status today:
+> Both hard prerequisites have shipped:
 >
-> 1. ~~**Single-axis translation substrate.**~~ ✅ **SATISFIED** by M-006 (`entity-storage-translations-v1-01KRF0FQ`, squash `0f7e1809a` on 2026-05-13, mission closed in PR #1485 / `a7840a36a` on 2026-05-14). The translation tombstone is gone: `TranslatableInterface` (`packages/entity/src/TranslatableInterface.php`) and `TranslatableEntityTrait` are in place; per-field `FieldDefinition::translatable()` works in both `sql-blob` and `sql-column` backends via `TranslationSchemaHandler`; `SaveContext::langcode` + `withLangcode()` carry per-langcode save semantics.
-> 2. **ADR 015 listing pipeline.** ⏳ **SPEC FILED**, implementation pending. Spec filed 2026-05-15 as **M-007 (`listing-pipeline-v1-01KRMN0B`)**; canonical doctrine at [`listing-pipeline-v1.md`](listing-pipeline-v1.md). Required for WP07 (per-langcode listing filters, langcode cache tags). M-007 §3.12 (FR-046..FR-049) explicitly carries the langcode-aware deliverables this mission's WP07 depends on. Implementation still has to ship — until then, WP07 remains gated.
+> 1. ✅ **Single-axis translation substrate** — M-006 (`entity-storage-translations-v1-01KRF0FQ`, squash `0f7e1809a` on 2026-05-13, mission closed in PR #1485 / `a7840a36a` on 2026-05-14). Concrete surface: `TranslatableInterface` (`packages/entity/src/TranslatableInterface.php`), `TranslatableEntityTrait`, `ContentEntityBase implements TranslatableInterface` composition, `FieldDefinition::translatable()` + `isTranslatable()`, `TranslationSchemaHandler` (sql-blob + sql-column), `SaveContext::langcode` + `withLangcode()`, `AfterSaveEvent::affectedLangcodes()`, unified `EntityTranslationException` (factory methods: `translationNotFound`, `cannotRemoveDefault`, `notTranslatable`, `translationAlreadyExists`, `langcodeRequired`), and the `make:migration --add-translations` flag (`packages/cli/src/Handler/AddTranslationsMigrationGenerator.php`).
+> 2. ✅ **Listing pipeline (ADR 015)** — M-007 (`listing-pipeline-v1-01KRMN0B`, shipped 2026-05-16). Concrete surface: `Filter::langcode()` canonical factory, `ListingCacheInvalidator` emitting `entity:<type>:<id>:<langcode>` tags from `AfterSaveEvent::affectedLangcodes()`, `language.content` cache context auto-injected when the entity type is translatable, `ListingDefinition` langcode-aware.
 >
-> **Plannable today:** WP01..WP06 (per §7.2 below, after WP01+WP02 the parallel branch WP03/WP04/WP05/WP06 has no listing-pipeline dependency).
-> **Still gated:** WP07 (needs `listing-pipeline-v1` to spec and ship) and WP08 (closes the mission; transitively gated).
->
-> **Unblocker (full):** Ship M-007 (`listing-pipeline-v1`, spec filed 2026-05-15). Before *any* planning of M-004 begins, the original author's caveat still holds — revisit §3 FRs and §7 WP decomposition against the M-006 + M-007 substrates that actually shipped; the decomposition may shift now that translation and listing deliverables become concrete code instead of a planned shape.
+> All eight WPs are now plannable. WP07's listing-pipeline integration becomes "extend M-007's canonical surface" rather than "design from scratch" — see §"Revalidation 2026-05-17" near the end of this spec for the substrate audit findings and FR/WP deltas they drive.
 
 # Entity Storage — Translatable + Revisionable Two-Axis Interaction
 
-**Status:** Draft mission spec (2026-05-11), **PARTIALLY UNBLOCKED 2026-05-14** (prereq 1 M-006 satisfied 2026-05-13 squash / 2026-05-14 close-out; prereq 2 `listing-pipeline-v1` still pending; spec still needs revalidation against the M-006 substrate before planning)
+**Status:** Draft mission spec (2026-05-11), **FULLY UNBLOCKED 2026-05-17** (prereq 1 M-006 shipped 2026-05-13/14; prereq 2 M-007 `listing-pipeline-v1` shipped 2026-05-16; revalidated against both substrates 2026-05-17 — see §12)
 **Audience:** framework maintainers; input for Spec Kitty `specify` → `plan` → `tasks` flow
 **Mission ID:** TBD (to be assigned by `@jonesrussell` on mission creation)
 **Origin:** [ADR 017](../adr/017-per-field-translation.md) §"Revision × translation interaction" (Accepted 2026-05-11).
@@ -118,13 +115,13 @@ Normative requirements use **MUST / SHOULD / MAY** per RFC 2119. Numbered for Sp
 - **FR-011** A save that mutates a non-translatable field MUST create a new default-langcode revision (storing the new non-translatable value). Other-language current revisions continue to reference the latest default-langcode revision for non-translatable values; they do not need new revisions of their own.
 - **FR-012** `SaveContext` MUST gain a `langcode` field. When unset, save targets the entity's current `activeLangcode()` (which defaults to the entity's `defaultLangcode()`).
 - **FR-013** Multi-language saves MUST be possible via `SaveContext::withTranslations(array $langcodes)`. All saves in the set run in one transaction; partial failure rolls back the whole set with `PartialSaveException` (per ADR 010 §6.5).
-- **FR-014** Lifecycle events (`BeforeSaveEvent` / `AfterSaveEvent`, per ADR 011) MUST fire per saved translation. A multi-language save firing four translations fires four pairs of events. Each event carries the saved langcode in `SaveContext`.
+- **FR-014** Lifecycle events (`BeforeSaveEvent` / `AfterSaveEvent`, per ADR 011) MUST fire per saved translation. A multi-language save firing four translations fires four pairs of events. Each event carries the saved langcode in `SaveContext`, and the existing `AfterSaveEvent::affectedLangcodes()` (shipped by M-006) MUST list every langcode written in the save — for multi-language atomic saves this is the full list. Listing-cache invalidation (M-007 `ListingCacheInvalidator`) consumes this field unchanged.
 
 ### 3.3 Load semantics
 
 - **FR-015** `$storage->load($entityType, $id)` MUST return the entity with its default-langcode current revision active.
-- **FR-016** `$entity->getTranslation($langcode)` MUST return the entity with that langcode's current revision active. If no translation exists, raise `TranslationNotFoundException` (per ADR 017's stable surface).
-- **FR-017** `$entity->getTranslation($langcode)->loadRevision($vid)` MUST return a specific revision of that translation. The returned entity is in a "historical" state; saves on it are forbidden (raise `HistoricalRevisionWriteException`).
+- **FR-016** `$entity->getTranslation($langcode)` MUST return the entity with that langcode's current revision active. If no translation exists, raise `EntityTranslationException::translationNotFound($langcode)` (M-006 established factory; reused unchanged).
+- **FR-017** `$entity->getTranslation($langcode)->loadRevision($vid)` MUST return a specific revision of that translation. The returned entity is in a "historical" state; saves on it are forbidden (raise `EntityTranslationException::historicalRevisionWrite($vid, $langcode)` — new factory on M-006's exception class, see FR-040).
 - **FR-018** `$entity->listRevisions()` MUST return revisions of ALL languages in interleaved descending-creation order. `$entity->listRevisions($langcode)` scopes to one language.
 - **FR-019** `$entity->translations()` MUST return langcodes that have at least one revision. Languages with translations that have been fully purged via pruning MUST NOT appear.
 
@@ -138,25 +135,28 @@ Normative requirements use **MUST / SHOULD / MAY** per RFC 2119. Numbered for Sp
 
 ### 3.5 Migration generator extensions
 
-- **FR-025** `bin/waaseyaa make:storage-migration <entity_type>` MUST gain two new flags:
-  - `--add-translations` — adds translation support to a revisionable-only type.
-  - `--add-revisions` — adds revision support to a translatable-only type.
+- **FR-025** `bin/waaseyaa make:storage-migration <entity_type>` MUST gain the missing flag and extend the existing one for two-axis promotion:
+  - `--add-translations` — **ALREADY SHIPPED** by M-006 (`packages/cli/src/Handler/AddTranslationsMigrationGenerator.php`) for revisionable-only → translatable. This mission MUST extend the generator so the same flag, when applied to a revisionable type, also creates the per-`(entity_id, langcode, vid)` translation-revision table (FR-001..FR-003) and backfills existing revisions as default-langcode revisions.
+  - `--add-revisions` — **NEW IN THIS MISSION.** Adds revision support to a translatable-only type. When the target is translatable, it creates the translation-revision table keyed `(entity_id, langcode, vid)` and backfills the current translation rows as initial revisions per langcode.
 - **FR-026** When promoting **revisionable-only → two-axis**: the migration creates the translation tables, backfills existing revisions as default-langcode revisions, sets per-(entity, langcode) current-revision pointers for the existing default-langcode revision.
 - **FR-027** When promoting **translatable-only → two-axis**: the migration adds `vid` to the existing translation tables, creates a parallel translation-revision table, backfills the current translation values as initial revisions.
 - **FR-028** Both promotions MUST be reversible by default. Reverse migration loses revision history for non-current revisions (documented in the migration file's docblock).
 - **FR-029** Promoting an entity type that is already two-axis MUST fail with `NoOpMigrationException`.
 
-### 3.6 Listing pipeline integration (ADR 015)
+### 3.6 Listing pipeline integration (ADR 015 / M-007 substrate)
 
-- **FR-030** `ListingDefinition` MUST gain an optional `langcode` field. When set, the listing returns the current revision of that langcode for each result entity. When unset, defaults to the request's active langcode or the site default.
-- **FR-031** A listing of `teaching` entities filtered by `langcode: 'oj'` MUST return only entities with an Anishinaabemowin translation. Entities without that translation are excluded.
-- **FR-032** Cache tags for two-axis listings MUST include the langcode: `entity:teaching:42:oj`. Tags without langcode (`entity:teaching:42`) MUST also be emitted; saving any translation of entity 42 invalidates both.
-- **FR-033** Cache contexts MUST include `language.requested` when the listing is langcode-aware. Listings with no langcode filter still depend on language context if non-translatable fields are surfaced.
+The M-007 substrate already ships the langcode-aware listing surface (`Filter::langcode()`, `entity:<type>:<id>:<langcode>` cache tags via `ListingCacheInvalidator`, `language.content` cache context auto-injected when the entity type is translatable). This mission MUST verify and extend that surface for the two-axis case (per-`(entity, langcode)` revision pointers).
+
+- **FR-030** Two-axis listings MUST use the existing `Filter::langcode($code)` canonical factory shipped by M-007. When applied, the listing returns the current revision of that langcode for each result entity. The mission MUST NOT add a new `ListingDefinition::langcode` value-object field; the canonical filter is the user-facing API.
+- **FR-031** A listing of two-axis entities filtered by `Filter::langcode('oj')` MUST return only entities whose `(entity_id, 'oj')` translation row exists (i.e., the translation has at least one revision and is not removed). Entities without that translation are excluded.
+- **FR-032** Cache-tag emission for two-axis saves MUST flow through the existing `AfterSaveEvent::affectedLangcodes()` → `ListingCacheInvalidator` path (no new invalidator). Saving the French translation of entity 42 MUST emit `entity:<type>:42` AND `entity:<type>:42:fr`; saving the default-langcode revision (when a non-translatable field changes) emits both `entity:<type>:42` and `entity:<type>:42:<default-langcode>`. Multi-language atomic saves emit one langcode-scoped tag per affected langcode plus the langcode-less tag.
+- **FR-033** Cache contexts for two-axis listings MUST inherit M-007's `language.content` auto-injection (which already triggers when the entity type is translatable). The mission MUST NOT introduce a parallel `language.requested` token; M-007's canonical naming wins.
+- **FR-033a** The two-axis filter resolver MUST integrate with the per-`(entity, langcode)` current-revision pointer: a `Filter::langcode('oj')` listing reads each result entity at the langcode's current revision, not at the entity-level "primary current revision."
 
 ### 3.7 Translation deletion
 
 - **FR-034** `$entity->removeTranslation($langcode)` MUST delete the (entity, langcode) row and all its revisions. The translation is unrecoverable.
-- **FR-035** Attempting to remove the default-langcode translation MUST raise `DefaultLangcodeRemovalException`. To remove the default-langcode "translation," operators delete the whole entity (`$storage->delete([$entity])`).
+- **FR-035** Attempting to remove the default-langcode translation MUST raise `EntityTranslationException::cannotRemoveDefault($langcode)` (M-006 established factory; reused unchanged). To remove the default-langcode "translation," operators delete the whole entity (`$storage->delete([$entity])`).
 - **FR-036** Removing a non-default translation MUST NOT affect other-language revisions or the entity itself.
 
 ### 3.8 Revision pruning extension
@@ -167,9 +167,11 @@ Normative requirements use **MUST / SHOULD / MAY** per RFC 2119. Numbered for Sp
 
 ### 3.9 Error model
 
-- **FR-040** The mission MUST ship these exception types on stable surface: `TranslationNotFoundException`, `HistoricalRevisionWriteException`, `DefaultLangcodeRemovalException`, `NoOpMigrationException`, `UnsupportedTwoAxisFieldException`.
-- **FR-041** Each carries a stable string `code` field per charter §4.4.
-- **FR-042** Renames or removals of any of these types follow the deprecation cycle (charter §4).
+- **FR-040** The mission MUST follow M-006's established exception pattern (a single domain exception class with static factory methods), NOT introduce five separate exception classes:
+  - Extend the existing `Waaseyaa\Entity\Exception\EntityTranslationException` with new factories: `historicalRevisionWrite($vid, $langcode)` (replaces the planned `HistoricalRevisionWriteException`), and reuse existing `cannotRemoveDefault($langcode)` for default-langcode removal attempts, `translationNotFound($langcode)` for missing translations.
+  - Add `Waaseyaa\EntityStorage\Exception\StorageMigrationException` (single class, factories: `noOpPromotion($entityType)`, `unsupportedTwoAxisField($fieldName, $backend)`) for the two new error modes specific to this mission's migration generator and field-backend guard.
+- **FR-041** Each factory MUST set a stable string `code` field per charter §4.4 (e.g. `'historical_revision_write'`, `'no_op_promotion'`, `'unsupported_two_axis_field'`).
+- **FR-042** Renames or removals of these factory methods follow the deprecation cycle (charter §4); the exception classes themselves are stable surface.
 
 ### 3.10 Validation (mission-internal)
 
@@ -200,10 +202,11 @@ Maps the mission's stable-surface output to charter §5.3.
 | Two-axis schema shape (sql-blob + sql-column) | Storage schema | Stable surface per charter §5.3 special-case (multi-axis migration governance) |
 | `SaveContext::langcode` field + `withTranslations(array)` builder | Method extension | Extension of existing SaveContext from entity-storage-v2 |
 | `RevisionableEntityInterface::listRevisions($langcode = null)` parameter | Signature extension | Backwards compatible; existing callers unchanged |
-| `TranslationNotFoundException`, `HistoricalRevisionWriteException`, `DefaultLangcodeRemovalException`, `NoOpMigrationException`, `UnsupportedTwoAxisFieldException` | Exception classes | New on stable surface |
-| `bin/waaseyaa make:storage-migration --add-translations / --add-revisions` flags | CLI flags | Extension of entity-storage-v2 generator |
-| `ListingDefinition::langcode` field | Value-object extension | Extension of ADR 015 surface |
-| Cache-tag format `entity:<type>:<id>:<langcode>` | Tag string convention | Stable surface |
+| `EntityTranslationException::historicalRevisionWrite()` factory | Method on existing M-006 exception class | Reuses M-006 unified-exception pattern; no new exception class |
+| `StorageMigrationException` (new class, factories: `noOpPromotion()`, `unsupportedTwoAxisField()`) | Exception class | New on stable surface; single class with factories (M-006 pattern) |
+| `bin/waaseyaa make:storage-migration --add-revisions` flag (new); `--add-translations` extended to two-axis | CLI flag | Extends M-006's existing `AddTranslationsMigrationGenerator` |
+| `Filter::langcode($code)` — already shipped by M-007 | Existing canonical filter | No change; this mission consumes it |
+| Cache-tag format `entity:<type>:<id>:<langcode>` — already shipped by M-007 | Tag string convention | Already stable; this mission verifies two-axis emission |
 
 No new top-level interfaces required. Two-axis composition is achieved by composing existing `RevisionableEntityInterface` + `TranslatableEntityInterface`.
 
@@ -339,47 +342,46 @@ Eight WPs.
 
 | WP | Title | Primary FRs | Depends on |
 |---|---|---|---|
-| **WP01** | Schema design + migration template for sql-column two-axis | FR-001..FR-006, FR-008 | entity-storage-v2 complete |
-| **WP02** | Schema design + migration template for sql-blob two-axis | FR-001, FR-003, FR-005, FR-008 | entity-storage-v2 complete |
-| **WP03** | Coordinator save semantics (per-translation revision creation, SaveContext extension) | FR-009..FR-014 | WP01, WP02 |
-| **WP04** | Coordinator load semantics (getTranslation × loadRevision composition) | FR-015..FR-019 | WP01, WP02 |
-| **WP05** | Access policy composition + per-langcode policy method signatures | FR-020..FR-024 | WP04 |
-| **WP06** | Migration generator extensions (`--add-translations`, `--add-revisions`, reverse) | FR-025..FR-029 | WP01, WP02 |
-| **WP07** | Listing pipeline + lifecycle event integration (per-langcode filters, cache tags, event payload) | FR-030..FR-033, FR-014 | WP03, WP04, ADR 015 listing pipeline shipping |
-| **WP08** | Validation + documentation (Minoo teaching round-trip, spec, cookbook, upgrade guide) | FR-043..FR-048 | WP03..WP07 |
+| **WP01** | Schema design + migration template for sql-column two-axis (composite `(entity_id, langcode, vid)` revision table; extends `RevisionTableBuilder` whose current surrogate `vid` PRIMARY KEY is single-axis only) | FR-001..FR-006, FR-008 | M-006 translation substrate (shipped) |
+| **WP02** | Schema design + migration template for sql-blob two-axis (extends `TranslationSchemaHandler` for per-revision blob rows) | FR-001, FR-003, FR-005, FR-008 | M-006 translation substrate (shipped) |
+| **WP03** | Coordinator save semantics — extend `SaveContext` with `withTranslations(array)` builder (note: `withLangcode()` already exists from M-006); compose `RevisionableStorageDriver::writeRevision()` with langcode pinning | FR-009..FR-014 | WP01, WP02 |
+| **WP04** | Coordinator load semantics — compose `TranslatableInterface::getTranslation()` (M-006) with `RevisionableEntityInterface::loadRevision()`; new `StorageMigrationException` and `EntityTranslationException::historicalRevisionWrite()` factory | FR-015..FR-019, FR-040..FR-042 | WP01, WP02 |
+| **WP05** | Access policy composition + per-langcode policy method signatures (compose with M-006's existing `'translate'` operation) | FR-020..FR-024 | WP04 |
+| **WP06** | Migration generator extensions — extend M-006's `AddTranslationsMigrationGenerator` for two-axis promotion; new `--add-revisions` flag; reverse migration | FR-025..FR-029 | WP01, WP02 |
+| **WP07** | Two-axis listing integration — verify `Filter::langcode()` + `ListingCacheInvalidator` (both shipped by M-007) behave correctly on two-axis types; route filter resolver to per-`(entity, langcode)` current-revision pointer; integration tests | FR-030..FR-033, FR-033a, FR-014 | WP03, WP04 (M-007 listing pipeline already shipped) |
+| **WP08** | Validation + documentation (Minoo teaching round-trip, canonical doctrine spec, cookbook, upgrade guide, charter cross-reference, surface-map sync) | FR-043..FR-048 | WP03..WP07 |
 
 ### 7.1 Sequencing diagram
 
 ```
-entity-storage-v2 complete ──┬──► WP01 (sql-column schema) ──┐
-                             │                                │
-                             └──► WP02 (sql-blob schema) ─────┤
-                                                              │
-                                              ┌───── WP03 (save) ──┐
-                                              │                    │
-                                              ├───── WP04 (load) ──┤
-                                              │                    │
-                                              ├───── WP06 (gen) ───┤
-                                              │                    │
-                                              └─── WP05 (access) ──┤
-                                                                   │
-                                  ADR 015 listing pipeline ────► WP07 ──► WP08 (close)
+M-006 translations (shipped) ──┬──► WP01 (sql-column schema) ──┐
+M-007 listing-pipeline (shipped) │                              │
+                               └──► WP02 (sql-blob schema) ─────┤
+                                                                │
+                                                ┌─── WP03 (save) ───┐
+                                                │                   │
+                                                ├─── WP04 (load) ───┤
+                                                │                   │
+                                                ├─── WP06 (gen) ────┤
+                                                │                   │
+                                                └─── WP05 (access) ─┤
+                                                                    │
+                                                              WP07 (listing) ──► WP08 (close)
 ```
 
 ### 7.2 Parallelizable WPs
 
-After WP01 + WP02: WP03, WP04, WP05, WP06 can run in parallel. WP07 needs ADR 015's listing pipeline shipping. WP08 closes the mission.
+After WP01 + WP02: WP03, WP04, WP05, WP06 can run in parallel. WP07 now depends only on WP03+WP04 (M-007 listing-pipeline already shipped). WP08 closes the mission.
 
 ### 7.3 Cross-mission dependencies
 
-This mission is the **most dependency-blocked** of the four:
+Both prior prerequisites have shipped (revalidated 2026-05-17):
 
-- **entity-storage-v2 single-axis revisions** — required for FR-001..FR-008. Schema design layers on top of single-axis revision schema.
-- **entity-storage-v2 single-axis translations** — required for FR-009..FR-014. Save/load composition layers on single-axis translation surface.
-- **ADR 015 listing pipeline** — required for WP07. Per-langcode listing filtering is a listing-pipeline extension.
-- **Migration generator** (entity-storage-v2 WP10) — required for WP06.
+- **M-006 `entity-storage-translations-v1`** — shipped 2026-05-13/14. Provides `TranslatableInterface`, `TranslatableEntityTrait`, `ContentEntityBase` composition, `FieldDefinition::translatable()`, `SaveContext::withLangcode()`, `AfterSaveEvent::affectedLangcodes()`, `EntityTranslationException` factories, `TranslationSchemaHandler`, and `AddTranslationsMigrationGenerator`. M-004 extends these for two-axis.
+- **M-007 `listing-pipeline-v1`** — shipped 2026-05-16. Provides `Filter::langcode()`, `ListingCacheInvalidator` with langcode cache tags, `language.content` cache-context auto-injection. M-004 WP07 verifies and composes; does not redesign.
+- **M-006 single-axis revisions substrate** — `RevisionableEntityInterface`, `RevisionableEntityTrait`, `RevisionableStorageDriver`, `RevisionTableBuilder`, `RevisionPruningPolicy`, `RevisionMetadata`, `RevisionableSqlBlobStorage` all shipped. M-004 extends `RevisionTableBuilder` from surrogate `vid` PK to composite `(entity_id, langcode, vid)` PK for two-axis entity types.
 
-WPs 01–05 can begin after entity-storage-v2's revision and translation WPs ship. WP07 cannot begin until listing-pipeline implementation lands (separate ADR 015 mission, not yet specced).
+All 8 WPs are now plannable.
 
 ---
 
@@ -433,6 +435,95 @@ Mission-specific, in addition to charter §11 operational items.
 - 2026-05-11 framework/app audit (`waaseyaa/minoo/docs/audits/2026-05-11-framework-app-audit.md`) — strategic context.
 - Drupal prior art: Content Translation × Entity Revisions composition (the closest reference for per-(entity, langcode) revisions).
 - Minoo milestone: #21 Anishinaabemowin Localization — the canonical consumer use case driving this mission.
+
+---
+
+## 12. Revalidation 2026-05-17 (post M-006 + M-007 substrate ship)
+
+This section captures the audit findings from re-validating §3 FRs and §7 WPs against the actual code that landed in M-006 (2026-05-13/14) and M-007 (2026-05-16). Filed as required by the original 2026-05-12 "Unblocker" caveat.
+
+### 12.1 M-006 substrate audit
+
+Shipped surfaces relevant to M-004:
+
+- `Waaseyaa\Entity\TranslatableInterface` — full per-langcode API (`defaultLangcode()`, `activeLangcode()`, `getTranslation()`, `addTranslation()`, `removeTranslation()`, `translations()`, `getTranslationLanguages()`).
+- `Waaseyaa\Entity\TranslatableEntityTrait` — default implementation; `Waaseyaa\Entity\ContentEntityBase` composes it.
+- `Waaseyaa\Entity\Exception\EntityTranslationException` — unified domain exception with static factories (`translationNotFound`, `cannotRemoveDefault`, `notTranslatable`, `translationAlreadyExists`, `langcodeRequired`). **No separate `TranslationNotFoundException` / `DefaultLangcodeRemovalException` classes.**
+- `Waaseyaa\Field\FieldDefinition::translatable()` + `isTranslatable()` — per-field flag.
+- `Waaseyaa\EntityStorage\Schema\TranslationSchemaHandler` — handles both sql-blob and sql-column translation tables; `sync()`, `translationTableName()`, `multiCardinalityTableName()`, `partitionTranslatableFields()`.
+- `Waaseyaa\EntityStorage\SaveContext` — has `?string $langcode` field and `withLangcode($langcode)` builder. **Does not have `withTranslations(array)` builder yet.**
+- `Waaseyaa\EntityStorage\Event\AfterSaveEvent::affectedLangcodes()` — already returns `list<string>|null` for multi-language saves.
+- `Waaseyaa\Cli\Handler\AddTranslationsMigrationGenerator` + `MissingLangcodeColumnException` — `make:migration --add-translations` flag for revisionable-only → translatable promotion (single-axis only today).
+
+Findings driving FR/WP edits:
+
+- **FR-040 must reconcile** with M-006's unified-exception pattern. M-004's original "five exception classes" plan conflicts with established naming. Updated to add factories to the existing `EntityTranslationException` and to ship a single new `StorageMigrationException` for migration-generator errors.
+- **FR-014** can lean on `AfterSaveEvent::affectedLangcodes()` unchanged for cache-invalidation propagation; updated to state this explicitly.
+- **WP03** scope clarified: only `withTranslations(array)` is new on `SaveContext`; `withLangcode` already exists.
+- **FR-025 / WP06** scope shrank: `--add-translations` exists; this mission extends it to two-axis promotion and adds `--add-revisions`.
+
+### 12.2 M-007 substrate audit
+
+Shipped surfaces relevant to M-004:
+
+- `Waaseyaa\Listing\Filter::langcode($code)` — canonical langcode filter factory.
+- `Waaseyaa\Listing\ListingCacheInvalidator` — emits `entity:<type>:<id>:<langcode>` tags from `AfterSaveEvent::affectedLangcodes()`; falls back to `activeLangcode()` for single-langcode saves; **also emits the langcode-less `entity:<type>:<id>` tag in both cases** (verified in source).
+- `Waaseyaa\Listing\ListingDefinition` — auto-injects `language.content` cache context when the entity type is translatable.
+- `FilterDefinition`, `ExposedFilterParser`, `ListingResolver`, `ListingResult`, `Pagination`, `Sort`, `SortDefinition`, `Operator`, `ListingDefinitionValidator`, `ListingCacheKeyBuilder`, `ExposedFilterCoercer`, `ExposedFilterValues`, `EntityRepositoryRegistry`, `ListingDiscoverer`, `HasListingsInterface`, `ServiceProvider` — full pipeline shipped.
+
+Findings driving FR/WP edits:
+
+- **FR-030 reframed**: original spec proposed a new `ListingDefinition::langcode` value-object field. M-007 ships the canonical `Filter::langcode()` factory instead — M-004 MUST use it, not introduce a parallel field-level API.
+- **FR-032 simplified**: the cache-tag emission contract already exists in M-007; M-004 WP07 only verifies it behaves correctly when invoked from a two-axis save (i.e., that `affectedLangcodes()` is correctly populated by the per-`(entity, langcode)` revision writer).
+- **FR-033 renamed** from `language.requested` to `language.content` to match M-007's canonical token.
+- **FR-033a added** to capture the genuinely new contract: filter resolver must read each result entity at the langcode's current revision, not at the entity-level primary current revision.
+- **WP07 scope shrank from "design + build" to "verify + integrate"** — the substrate is in place; M-004 verifies two-axis save events fire the right `affectedLangcodes` and the langcode filter routes through the per-`(entity, langcode)` current-revision pointer.
+
+### 12.3 Other findings
+
+- `RevisionTableBuilder` in `packages/entity-storage/src/Schema/` currently uses surrogate `vid INTEGER PRIMARY KEY`. M-004 WP01 MUST extend it (or fork a `TwoAxisRevisionTableBuilder`) to support the composite `(entity_id, langcode, vid)` PK for two-axis types. Single-axis types retain the surrogate PK — backward compatible.
+- `RevisionableStorageDriver` exposes `writeRevision($entityId, $values, ?$log)`, `updateRevision`, `readRevision`, `readMultipleRevisions`, `getLatestRevisionId`, `getRevisionIds`, `deleteRevision`, `deleteAllRevisions`. M-004 WP03 extends the read/write signatures to accept an optional `?string $langcode` so per-`(entity, langcode)` storage is dispatchable.
+- `RevisionableEntityInterface` has `revisionId()`, `isCurrentRevision()`, `revisionMetadata()`. M-004 needs no signature changes here; composition is via `getTranslation()->revisionId()`.
+- `ContentEntityBase implements TranslatableInterface` already; a two-axis entity additionally implements `RevisionableEntityInterface` and uses `RevisionableEntityTrait` (see the trait's class docblock: `class Teaching extends ContentEntityBase implements RevisionableEntityInterface { use RevisionableEntityTrait; }`). Composition shape verified.
+
+### 12.4 FR delta summary
+
+| Change kind | FRs |
+|---|---|
+| Renumbered / unchanged | FR-001..FR-013, FR-015, FR-018..FR-024, FR-026..FR-029, FR-031, FR-034, FR-036..FR-039, FR-043..FR-048 |
+| Edited to reference shipped substrate | FR-014, FR-016, FR-017, FR-025, FR-030, FR-032, FR-033, FR-035 |
+| New | FR-033a (filter resolver reads at langcode current revision) |
+| Reframed | FR-040, FR-041, FR-042 (consolidated to factory-on-`EntityTranslationException` + single new `StorageMigrationException`; five-class plan dropped) |
+| Removed | None |
+
+### 12.5 WP delta summary
+
+Final WP count remains **8**.
+
+| WP | Change |
+|---|---|
+| WP01 | Title clarified — extends single-axis `RevisionTableBuilder` to composite PK |
+| WP02 | Title clarified — extends M-006 `TranslationSchemaHandler` for per-revision blob rows |
+| WP03 | Scope clarified — only `withTranslations(array)` is new (M-006 already shipped `withLangcode`) |
+| WP04 | Scope expanded — owns FR-040..FR-042 (new exception class + factory) |
+| WP05 | Unchanged scope; called out composition with M-006's `'translate'` operation |
+| WP06 | Scope shrank — extend M-006's existing `AddTranslationsMigrationGenerator`; add `--add-revisions` |
+| WP07 | Scope shrank from design+build to verify+integrate (M-007 substrate already there); now depends only on WP03+WP04, not on a listing-pipeline mission |
+| WP08 | Unchanged scope |
+
+### 12.6 Recommended dispatch order for tasks phase
+
+1. **WP01 + WP02** (parallel) — schema substrate must land first.
+2. **WP03 + WP04 + WP06** (parallel after WP01+WP02) — save semantics, load semantics, migration generator.
+3. **WP05** — access policy composition (depends on WP04's load semantics).
+4. **WP07** — listing integration (depends on WP03 for save-event correctness and WP04 for read-at-langcode-revision).
+5. **WP08** — close-out validation and docs.
+
+### 12.7 Ambiguities flagged for plan phase
+
+- §9 Q1 (non-translatable field storage strategy) is recommended but not normative — plan phase should commit to "stored once on default-langcode revision" per the recommendation and update FR-004/FR-005 if anything changes.
+- §9 Q3 wide multi-language save atomicity remains advisory; no FR change needed.
+- §9 Q7 policy method signature (passing `?RevisionableEntityInterface $revision`) should be settled in WP05's plan.
 
 ---
 
