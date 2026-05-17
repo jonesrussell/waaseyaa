@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.180] - 2026-05-17
+
 ### Added
 
 - **M-004 entity-storage-translatable-revisions: Two-axis (revisionable × translatable) entity storage.** Mission `entity-storage-translatable-revisions-01KRCDEE` ships the substrate for entity types that are BOTH `revisionable: true` AND `translatable: true` (reference consumer: Minoo `teaching`). All eight WPs landed on a single lane; existing single-axis types unchanged (spec §12.3 R-A regression gate).
