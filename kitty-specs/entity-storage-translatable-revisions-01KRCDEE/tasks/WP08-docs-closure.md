@@ -113,3 +113,4 @@ This WP depends on: WP03, WP04, WP05, WP06, WP07 (closes the mission).
 - 2026-05-17T04:16:20Z – claude:sonnet:python-implementer:implementer – shell_pid=140368 – WP08 ready: M-004 doc closure + WP01 marker swap
 - 2026-05-17T04:17:02Z – claude:opus:python-reviewer:reviewer – shell_pid=144246 – Started review via action command
 - 2026-05-17T04:18:43Z – claude:opus:python-reviewer:reviewer – shell_pid=144246 – WP08 review passed: M-004 doc closure + WP01 marker swap complete
+- 2026-05-17T04:20:26Z – claude:opus:python-reviewer:reviewer – shell_pid=144246 – Done override: M-004 merged to main as 70b867c39
