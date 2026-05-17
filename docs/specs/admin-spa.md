@@ -143,7 +143,7 @@ Exposed via `useRuntimeConfig().public`:
 | Key | Env Var | Default | Purpose |
 |-----|---------|---------|---------|
 | `enableRealtime` | `NUXT_PUBLIC_ENABLE_REALTIME` | `'0'` in dev, `'1'` in production | Disable SSE in dev to avoid php -S single-process request starvation |
-| `appName` | `NUXT_PUBLIC_APP_NAME` | `'Waaseyaa'` | Override site name (e.g. "Minoo") |
+| `appName` | `NUXT_PUBLIC_APP_NAME` | `'Waaseyaa'` | Override site name (e.g. "Minoo"). Also feeds `app.head.title` so the static prerendered `<title>` matches the runtime brand before JS hydration. |
 | `docsUrl` | `NUXT_PUBLIC_DOCS_URL` | `'https://github.com/jonesrussell/waaseyaa'` | Quickstart docs link used by onboarding prompt |
 | `baseUrl` | `NUXT_PUBLIC_BASE_URL` | `'/admin'` | Base URL for subpath mounting, used by admin plugin to prefix surface API paths |
 
@@ -404,7 +404,7 @@ Key categories:
 - Realtime: `realtime_connected`
 - Onboarding: `onboarding_title`, `onboarding_body`, `onboarding_use_note`, `onboarding_create_type`, `onboarding_quickstart`
 - Type management: `disable_type`, `enable_type`, `type_disabled`, `disable_type_title`, `disable_type_body`, `disable_type_warning`, `disable_anyway`
-- Navigation groups: `nav_group_people`, `nav_group_content`, `nav_group_taxonomy`, `nav_group_media`, `nav_group_structure`, `nav_group_workflows`, `nav_group_ai`, `nav_group_events`, `nav_group_community`, `nav_group_knowledge`, `nav_group_language`, `nav_group_ingestion`, `nav_group_other`
+- Navigation groups: `nav_group_people`, `nav_group_content`, `nav_group_taxonomy`, `nav_group_media`, `nav_group_structure`, `nav_group_workflows`, `nav_group_ai`, `nav_group_events`, `nav_group_community`, `nav_group_communities`, `nav_group_knowledge`, `nav_group_language`, `nav_group_ingestion`, `nav_group_contributor`, `nav_group_editorial`, `nav_group_elders`, `nav_group_engagement`, `nav_group_games`, `nav_group_groups`, `nav_group_messaging`, `nav_group_newsletter`, `nav_group_oidc`, `nav_group_user`, `nav_group_other`, `nav_group_custom`. Consumer apps register entity-type nav-group attributes whose values resolve to `nav_group_{value}` keys; missing translations leak the raw key in the sidebar, so any new group value introduced by a consumer must add a matching translation here.
 - Ingestion widget: `ingest_widget_title`, `ingest_widget_empty`, `ingest_status_pending_review`, `ingest_status_approved`, `ingest_status_rejected`, `ingest_status_failed`
 - NC sync: `nc_sync_widget_title`, `nc_sync_last_sync`, `nc_sync_created`, `nc_sync_skipped`, `nc_sync_failed`, `nc_sync_open_dashboard`, `nc_sync_view_teachings`, `nc_sync_view_events`, `na`
 - Entity type labels: `entity_type_user`, `entity_type_node`, `entity_type_node_type`, `entity_type_taxonomy_term`, etc.
