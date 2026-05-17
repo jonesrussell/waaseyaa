@@ -88,3 +88,4 @@ This WP depends on: WP03 (save events for cache-tag emission), WP04 (read-at-lan
 - 2026-05-17T03:48:20Z – claude:sonnet:python-implementer:implementer – shell_pid=136822 – Started implementation via action command
 - 2026-05-17T03:57:13Z – claude:sonnet:python-implementer:implementer – shell_pid=136822 – WP07 ready: listing integration (TwoAxisFilterResolver + M-007 substrate verification) - acae7dbc3
 - 2026-05-17T03:57:50Z – claude:opus:python-reviewer:reviewer – shell_pid=139519 – Started review via action command
+- 2026-05-17T03:59:05Z – claude:opus:python-reviewer:reviewer – shell_pid=139519 – WP07 review passed: TwoAxisFilterResolver in L1 entity-storage correctly wires per-(entity,langcode) current-revision read on top of M-007 listing surface; FR-031 + FR-033a satisfied; single-axis no-op verified; M-007 source untouched; 982 listing+entity-storage tests, 33 Phase29 tests, cs-check, phpstan, package-layers all green.
