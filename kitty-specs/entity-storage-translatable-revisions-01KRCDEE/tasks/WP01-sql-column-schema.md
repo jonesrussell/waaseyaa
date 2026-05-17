@@ -23,8 +23,8 @@ subtasks:
 - T005
 - T006
 - T007
-agent: ''
-shell_pid: '116371'
+agent: "claude:sonnet:python-implementer:implementer"
+shell_pid: "116371"
 history: []
 authoritative_surface: packages/entity-storage/src/Schema/RevisionTableBuilder.php
 execution_mode: code_change
@@ -91,3 +91,4 @@ This WP depends on: none (entry point alongside WP02).
 ## Activity Log
 
 (populated by implement-review loop)
+- 2026-05-17T02:31:40Z – claude:sonnet:python-implementer:implementer – shell_pid=116371 – Assigned agent via action command
