@@ -23,8 +23,8 @@ subtasks:
 - T005
 - T006
 - T007
-agent: "claude:sonnet:python-implementer:implementer"
-shell_pid: "116371"
+agent: "claude:opus:python-reviewer:reviewer"
+shell_pid: "119512"
 history: []
 authoritative_surface: packages/entity-storage/src/Schema/RevisionTableBuilder.php
 execution_mode: code_change
@@ -93,3 +93,4 @@ This WP depends on: none (entry point alongside WP02).
 (populated by implement-review loop)
 - 2026-05-17T02:31:40Z – claude:sonnet:python-implementer:implementer – shell_pid=116371 – Assigned agent via action command
 - 2026-05-17T02:44:17Z – claude:sonnet:python-implementer:implementer – shell_pid=116371 – WP01 ready: two-axis sql-column schema (composite PK via surrogate vid + UNIQUE (entity_id, langcode, vid)); FR-001/002/004/005/006/008 covered by 21 new tests; M-006 single-axis tests pass unchanged (8 tests). Commit 7d46f164c.
+- 2026-05-17T02:44:56Z – claude:opus:python-reviewer:reviewer – shell_pid=119512 – Started review via action command
