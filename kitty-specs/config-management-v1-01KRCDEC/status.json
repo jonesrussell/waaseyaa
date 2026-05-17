@@ -1,19 +1,19 @@
 {
-  "event_count": 50,
-  "last_event_id": "01KRSQEA3HFGW1CNB16Z5KETFR",
-  "materialized_at": "2026-05-17T01:05:07.697362+00:00",
+  "event_count": 51,
+  "last_event_id": "01KRSQGJEXVJ5113E35VNQ0YWS",
+  "materialized_at": "2026-05-17T01:06:21.789173+00:00",
   "mission_number": "",
   "mission_slug": "config-management-v1-01KRCDEC",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 6,
+    "approved": 7,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
     "done": 0,
     "for_review": 0,
     "in_progress": 0,
-    "in_review": 1,
+    "in_review": 0,
     "planned": 4
   },
   "work_packages": {
@@ -60,11 +60,11 @@
       "last_transition_at": "2026-05-17T00:56:39.708330+00:00"
     },
     "WP07": {
-      "actor": "claude:opus:python-reviewer:reviewer",
+      "actor": "user",
       "force_count": 1,
-      "lane": "in_review",
-      "last_event_id": "01KRSQEA3HFGW1CNB16Z5KETFR",
-      "last_transition_at": "2026-05-17T01:05:07.697362+00:00"
+      "lane": "approved",
+      "last_event_id": "01KRSQGJEXVJ5113E35VNQ0YWS",
+      "last_transition_at": "2026-05-17T01:06:21.789173+00:00"
     },
     "WP08": {
       "actor": "finalize-tasks",
