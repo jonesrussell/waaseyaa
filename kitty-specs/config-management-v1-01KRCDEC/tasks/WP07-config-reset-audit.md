@@ -95,3 +95,4 @@ This WP depends on: WP04.
 - 2026-05-17T01:04:38Z – claude:sonnet:python-implementer:implementer – shell_pid=92656 – WP07 ready: config:reset + audit channel
 - 2026-05-17T01:05:08Z – claude:opus:python-reviewer:reviewer – shell_pid=94896 – Started review via action command
 - 2026-05-17T01:06:22Z – claude:opus:python-reviewer:reviewer – shell_pid=94896 – WP07 review passed: ConfigResetCommand (TTY/--yes/non-TTY refusal), ConfigResetter (apply-hook seam + audit emit), ConfigAuditChannel ('config.audit' stable), ConfigAuditEvent (OP_EXPORT/IMPORT/RESET + digest helper). Logger as ?callable consistent with WP04. All gates green: phpunit (config 378/cli 590), cs-check clean, phpstan OK, layers OK. One-per-file. Scope owned_files only.
+- 2026-05-17T02:01:02Z – claude:opus:python-reviewer:reviewer – shell_pid=94896 – Done override: M-003 merged to main as e71b0a093
