@@ -17,7 +17,7 @@ subtasks:
 - T044
 - T045
 - T046
-shell_pid: '95813'
+shell_pid: "95813"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -28,6 +28,7 @@ owned_files:
 - packages/config/tests/Unit/Backend/BackendRestrictionEnforcerTest.php
 - packages/config/tests/Unit/Exception/InvalidConfigBackendExceptionTest.php
 - packages/entity-storage/tests/Unit/StorageBackendRegistryConfigRestrictionTest.php
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP08 — Backend restriction enforcement (sql-blob/sql-column only; boot-time exception)
@@ -75,3 +76,7 @@ No prerequisite WPs — may dispatch immediately on mission start.
 - `composer phpstan` (level 5) green; `composer cs-check` clean.
 - `bin/check-package-layers` green (no upward `waaseyaa/*` edges introduced).
 - No modifications outside `owned_files` (other than rerun-of-generators where charter explicitly permits).
+
+## Activity Log
+
+- 2026-05-17T01:06:59Z – claude:sonnet:python-implementer:implementer – shell_pid=95813 – Assigned agent via action command
