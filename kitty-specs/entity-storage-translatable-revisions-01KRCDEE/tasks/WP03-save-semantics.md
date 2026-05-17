@@ -30,7 +30,7 @@ subtasks:
 - T019
 - T020
 - T021
-shell_pid: "124451"
+shell_pid: "127193"
 history: []
 authoritative_surface: packages/entity-storage/src/SaveContext.php
 execution_mode: code_change
@@ -42,7 +42,7 @@ owned_files:
 - packages/entity-storage/tests/Unit/Driver/RevisionableStorageDriverTwoAxisTest.php
 - packages/entity-storage/tests/Unit/Revision/RevisionPruningPolicyTwoAxisTest.php
 - tests/Integration/Phase29/TwoAxisSaveLifecycleIntegrationTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP03 — Save semantics (SaveContext::withTranslations, langcode-pinned write, pruning)
@@ -109,3 +109,4 @@ This WP depends on: WP01, WP02 (schema substrate must land first).
 (populated by implement-review loop)
 - 2026-05-17T03:02:22Z – claude:sonnet:python-implementer:implementer – shell_pid=124451 – Started implementation via action command
 - 2026-05-17T03:13:43Z – claude:sonnet:python-implementer:implementer – shell_pid=124451 – WP03 ready: SaveContext withTranslations + atomic two-axis save semantics; 36 new tests pass; all gates green; commit d25c48f64
+- 2026-05-17T03:14:16Z – claude:opus:python-reviewer:reviewer – shell_pid=127193 – Started review via action command
