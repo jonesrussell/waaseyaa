@@ -103,3 +103,4 @@ This WP depends on: WP01, WP02.
 ## Activity Log
 
 - 2026-05-17T00:25:01Z – claude:sonnet:python-implementer:implementer – shell_pid=82402 – Started implementation via action command
+- 2026-05-17T00:34:28Z – claude:sonnet:python-implementer:implementer – shell_pid=82402 – WP04 ready: config:import + DAG-ordered ConfigImporter
