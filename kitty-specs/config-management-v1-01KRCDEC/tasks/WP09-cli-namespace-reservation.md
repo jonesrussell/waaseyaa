@@ -20,7 +20,7 @@ subtasks:
 - T048
 - T049
 - T050
-shell_pid: "100148"
+shell_pid: "101861"
 history: []
 authoritative_surface: packages/cli/
 execution_mode: code_change
@@ -30,7 +30,7 @@ owned_files:
 - packages/cli/tests/Unit/Command/Config/ConfigCommandTest.php
 - packages/config/tests/Unit/Exception/ConfigCommandCollisionExceptionTest.php
 - tests/Integration/Phase28/ConfigCommandCollisionBootTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP09 — config:* CLI namespace reservation + collision-check + ConfigCommand base
@@ -82,3 +82,4 @@ No prerequisite WPs — may dispatch immediately on mission start.
 
 - 2026-05-17T01:27:26Z – claude:sonnet:python-implementer:implementer – shell_pid=100148 – Started implementation via action command
 - 2026-05-17T01:33:10Z – claude:sonnet:python-implementer:implementer – shell_pid=100148 – WP09 ready: config:* namespace reservation + collision-check + ConfigCommand base. 33 new tests (unit+integration), gates green.
+- 2026-05-17T01:33:39Z – claude:opus:python-reviewer:reviewer – shell_pid=101861 – Started review via action command
