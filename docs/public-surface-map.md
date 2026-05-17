@@ -203,6 +203,46 @@ Machine-readable source: `docs/public-surface-map.php`.
 | `StorageInterface` | interface | Reads and writes raw configuration data arrays by name |
 | `TranslatableConfigFactoryInterface` | interface | Creates language-specific overrides of configuration objects |
 
+#### config — CMI sync substrate (M-003)
+
+Configuration Management v1 — active/sync store split, six `config:*` CLI commands, dependency-ordered import. Charter §5.5; spec [`docs/specs/config-management.md`](specs/config-management.md); cookbook [`docs/cookbook/config-sync.md`](cookbook/config-sync.md); ADR 018.
+
+| Element | Type | Purpose |
+|---------|------|---------|
+| `Dependency\ConfigDependencyInterface` | interface | Config-entity contract: `configDependencies(): string[]` returns `<entity_type>.<entity_id>` ids consumed by the DAG (M-003, WP01) |
+| `Dependency\Exception\ConfigDependencyCycleException` | exception | Raised when the sync-store DAG contains a cycle; carries the full cycle path (M-003) |
+| `Dependency\Exception\ConfigDependencyMissingException` | exception | Raised when a `_meta.dependencies` entry references a config id absent from both stores (M-003) |
+| `Sync\ConfigSyncFile` | value object | In-memory parsed sync file: `_meta` block + field values (M-003, WP02) |
+| `Sync\ConfigSyncSerializer` | service | Entity → YAML; sorts keys alphabetically; emits leading `_meta` block (M-003, WP02) |
+| `Sync\ConfigSyncDeserializer` | service | YAML → `ConfigSyncFile`; validates `_meta.entity_type` matches filename prefix (M-003, WP02) |
+| `Sync\ConfigSyncRepository` | service | Filesystem read/write under `config.sync_path` (default `storage/config-sync/`) (M-003, WP02) |
+| `Sync\ConfigSyncFileSourceInterface` | interface | Extension point: alternative sync-file sources (e.g. in-memory test sources) (M-003) |
+| `Sync\ConfigSyncValidator` | service | Runs `FieldDefinition::validators()` over each sync file; powers `config:validate` (M-003, WP06) |
+| `Sync\ConfigExporter` | service | Active → sync; backs `config:export`; honours `--diff` and `--dry-run` (M-003, WP03) |
+| `Sync\ConfigImporter` | service | Sync → active in topological order; per-entity transaction; orphan-warn default (M-003, WP04) |
+| `Sync\ConfigImportApplyHookInterface` | interface | Cross-cutting hook fired per applied entity during `config:import` (extension point) (M-003, WP04) |
+| `Sync\ConfigDiffer` | service | Unified-diff renderer with UUID-tracked rename detection; backs `config:diff` (M-003, WP05) |
+| `Sync\ConfigStatusReporter` | service | Computes in-sync / drift / sync-only / active-only counts; backs `config:status` (M-003, WP05) |
+| `Sync\ConfigResetter` | service | Single-entity rollback from sync store; logs to `config.audit`; backs `config:reset` (M-003, WP07) |
+| `Sync\ConfigManifestEntry` | value object | Per-entity manifest row consumed by exporter/importer dashboards (M-003) |
+| `Audit\ConfigAuditChannel` | constants class | `CHANNEL` constant = `'config.audit'` (charter §4.4 amendment) (M-003, WP07) |
+| `Audit\ConfigAuditEvent` | event payload | Entity-type, id, operation, actor, before-after diff summary (M-003, WP07) |
+| `Backend\BackendRestrictionEnforcer` | service | Boot-time enforcement: config entities must declare `sql-blob` or `sql-column`; `ALLOWED_BACKEND_IDS` constant (M-003, WP08) |
+| `Exception\InvalidConfigBackendException` | exception | Raised when a config entity declares `vector` / `remote` / other disallowed backend (M-003, WP08) |
+| `Exception\ConfigSerializationException` | exception | Raised on `_meta.entity_type` mismatch or other YAML format errors (M-003, WP02) |
+| `Exception\ConfigImportFailedException` | exception | Raised per-entity during `config:import`; carries entity id + cause (M-003, WP04) |
+| `Exception\ConfigCommandCollisionException` | exception | Raised at boot when an app/extension command claims a reserved `config:*` sub-verb (M-003, WP09) |
+| `Waaseyaa\CLI\Command\Config\ConfigCommand` | abstract class | Base for the six `config:*` commands; exposes `RESERVED_VERBS`, `RESERVED_FULL_VERBS`, `RESERVED_FQCNS` constants for collision checks (M-003, WP09) |
+| `Waaseyaa\CLI\Command\Config\ConfigExportCommand` | command | `bin/waaseyaa config:export [--diff] [--dry-run]` (M-003, WP03) |
+| `Waaseyaa\CLI\Command\Config\ConfigImportCommand` | command | `bin/waaseyaa config:import [--dry-run] [--delete-orphans] [--halt-on-error] [--no-dependency-check]` (M-003, WP04) |
+| `Waaseyaa\CLI\Command\Config\ConfigDiffCommand` | command | `bin/waaseyaa config:diff [<entity-type>.<id>]` (M-003, WP05) |
+| `Waaseyaa\CLI\Command\Config\ConfigStatusCommand` | command | `bin/waaseyaa config:status [--format=plain|json]` (M-003, WP05) |
+| `Waaseyaa\CLI\Command\Config\ConfigValidateCommand` | command | `bin/waaseyaa config:validate` (M-003, WP06) |
+| `Waaseyaa\CLI\Command\Config\ConfigResetCommand` | command | `bin/waaseyaa config:reset <entity-type>.<id> [--yes]` (M-003, WP07) |
+| Sync-store file format | file format | `<entity_type>.<entity_id>.yml` with leading `_meta` block (charter §5.5; spec §5) |
+| Config key `config.sync_path` | config | Filesystem root for the sync store (default `storage/config-sync/`) (M-003, FR-014) |
+| `config.audit` log channel | log channel | Charter §4.4 amendment; receives import / export / reset audit events (M-003, FR-053) |
+
 ### field
 
 | Element | Type | Purpose |

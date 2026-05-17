@@ -47,6 +47,7 @@
         "waaseyaa/field": "^0.1.0-alpha.179",
         "waaseyaa/foundation": "^0.1.0-alpha.179",
         "waaseyaa/cache": "^0.1.0-alpha.179",
+        "waaseyaa/config": "^0.1.0-alpha.179",
         "waaseyaa/database-legacy": "^0.1.0-alpha.179",
         "waaseyaa/i18n": "^0.1.0-alpha.179",
         "symfony/event-dispatcher": "^7.0"

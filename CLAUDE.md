@@ -22,7 +22,9 @@ When working on files matching these patterns, retrieve the spec for deep contex
 
 | File pattern | Specialist skill | Cold memory spec |
 |---|---|---|
-| `packages/entity/*`, `packages/entity-storage/*`, `packages/field/*`, `packages/config/*` | `waaseyaa:entity-system` | `docs/specs/entity-system.md` |
+| `packages/entity/*`, `packages/entity-storage/*`, `packages/field/*` | `waaseyaa:entity-system` | `docs/specs/entity-system.md` |
+| `packages/config/*` (active store, runtime read API) | `waaseyaa:entity-system` | `docs/specs/entity-system.md` |
+| `packages/config/src/{Sync,Dependency,Audit,Backend}/*`, `packages/cli/src/Command/Config/*` (CMI: sync store, `config:*` CLI, `config.audit`) | — | `docs/specs/config-management.md`, `docs/cookbook/config-sync.md`, `docs/adr/018-configuration-management-sync.md` |
 | `packages/access/*`, `packages/user/src/Middleware/*` | `waaseyaa:access-control` | `docs/specs/access-control.md`, `docs/specs/field-access.md` |
 | `packages/auth/*` | `waaseyaa:access-control` | `docs/specs/access-control.md` |
 | `packages/api/*`, `packages/routing/*` | `waaseyaa:api-layer` | `docs/specs/api-layer.md`, `docs/specs/jsonapi.md` (cast-aware attributes) |

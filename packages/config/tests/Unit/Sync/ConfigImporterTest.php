@@ -1,0 +1,357 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Waaseyaa\Config\Tests\Unit\Sync;
+
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Waaseyaa\Config\Exception\ConfigImportFailedException;
+use Waaseyaa\Config\Sync\ConfigImportApplyHookInterface;
+use Waaseyaa\Config\Sync\ConfigImportEntryResult;
+use Waaseyaa\Config\Sync\ConfigImporter;
+use Waaseyaa\Config\Sync\ConfigImportResult;
+use Waaseyaa\Config\Sync\ConfigSyncFile;
+use Waaseyaa\Config\Sync\ConfigSyncRepository;
+
+#[CoversClass(ConfigImporter::class)]
+#[CoversClass(ConfigImportResult::class)]
+#[CoversClass(ConfigImportEntryResult::class)]
+final class ConfigImporterTest extends TestCase
+{
+    private string $tempDir = '';
+
+    protected function setUp(): void
+    {
+        $this->tempDir = sys_get_temp_dir() . '/waaseyaa_config_importer_' . uniqid('', true);
+        mkdir($this->tempDir, 0o755, true);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->removeDir($this->tempDir);
+    }
+
+    #[Test]
+    public function fresh_import_applies_files_in_topological_order(): void
+    {
+        $repository = $this->seed([
+            'role.admin' => [],
+            'menu.main' => ['role.admin'],
+            'taxonomy_vocabulary.tags' => [],
+        ]);
+
+        $applied = [];
+        $hook = $this->makeHook(applyOrder: $applied);
+        $importer = new ConfigImporter($repository, $hook);
+
+        $result = $importer->import();
+
+        self::assertSame(0, $result->failureCount());
+        // Dependencies-first: role.admin precedes menu.main; taxonomy_vocabulary.tags is
+        // independent so its position is determined by lex order at its topological level.
+        $roleIndex = array_search('role.admin', $applied, true);
+        $menuIndex = array_search('menu.main', $applied, true);
+        self::assertNotFalse($roleIndex);
+        self::assertNotFalse($menuIndex);
+        self::assertLessThan($menuIndex, $roleIndex, 'menu.main must be applied after role.admin.');
+        self::assertContains('taxonomy_vocabulary.tags', $applied);
+    }
+
+    #[Test]
+    public function dry_run_does_not_call_apply_hook(): void
+    {
+        $repository = $this->seed(['role.admin' => []]);
+        $applied = [];
+        $hook = $this->makeHook(applyOrder: $applied);
+
+        $importer = new ConfigImporter($repository, $hook);
+        $result = $importer->import(dryRun: true);
+
+        self::assertTrue($result->dryRun);
+        self::assertSame([], $applied);
+        self::assertCount(1, $result->entries);
+        self::assertSame(ConfigImportEntryResult::STATUS_UPDATED, $result->entries[0]->status);
+    }
+
+    #[Test]
+    public function per_entity_failure_is_recorded_and_run_continues(): void
+    {
+        $repository = $this->seed(['role.admin' => [], 'role.member' => []]);
+
+        $hook = new class implements ConfigImportApplyHookInterface {
+            public function apply(ConfigSyncFile $file): string
+            {
+                if ($file->ref() === 'role.admin') {
+                    throw ConfigImportFailedException::applyFailed('role.admin', 'db lock timeout');
+                }
+
+                return ConfigImportEntryResult::STATUS_CREATED;
+            }
+
+            public function delete(string $ref): void {}
+        };
+
+        $importer = new ConfigImporter($repository, $hook);
+        $result = $importer->import();
+
+        self::assertSame(1, $result->failureCount());
+        $statuses = array_map(static fn ($e) => $e->status, $result->entries);
+        self::assertContains(ConfigImportEntryResult::STATUS_FAILED, $statuses);
+        self::assertContains(ConfigImportEntryResult::STATUS_CREATED, $statuses);
+    }
+
+    #[Test]
+    public function halt_on_error_stops_after_first_failure(): void
+    {
+        $repository = $this->seed([
+            'role.admin' => [],
+            'role.member' => [],
+            'role.viewer' => [],
+        ]);
+
+        $hook = new class implements ConfigImportApplyHookInterface {
+            /** @var list<string> */
+            public array $calls = [];
+
+            public function apply(ConfigSyncFile $file): string
+            {
+                $this->calls[] = $file->ref();
+                throw ConfigImportFailedException::applyFailed($file->ref(), 'boom');
+            }
+
+            public function delete(string $ref): void {}
+        };
+
+        $importer = new ConfigImporter($repository, $hook);
+        $result = $importer->import(haltOnError: true);
+
+        self::assertCount(1, $hook->calls, '--halt-on-error must stop after the first failure.');
+        self::assertSame(1, $result->failureCount());
+    }
+
+    #[Test]
+    public function no_dependency_check_bypasses_resolver_and_logs_warning(): void
+    {
+        $repository = $this->seed([
+            // Circular declarations — would crash the resolver.
+            'menu.main' => ['role.admin'],
+            'role.admin' => ['menu.main'],
+        ]);
+
+        $applied = [];
+        $hook = $this->makeHook(applyOrder: $applied);
+
+        /** @var list<array{string, string, array<string, mixed>}> $auditLog */
+        $auditLog = [];
+        $auditor = static function (string $level, string $message, array $context) use (&$auditLog): void {
+            $auditLog[] = [$level, $message, $context];
+        };
+
+        $importer = new ConfigImporter(
+            $repository,
+            $hook,
+            auditLogger: $auditor,
+        );
+
+        $result = $importer->import(noDependencyCheck: true);
+
+        self::assertSame(0, $result->failureCount());
+        self::assertCount(2, $applied);
+        $warnings = array_filter($auditLog, static fn ($e) => $e[0] === 'warning');
+        self::assertCount(1, $warnings, 'Bypass must emit exactly one audit warning.');
+    }
+
+    #[Test]
+    public function dependency_cycle_aborts_apply_loop_with_failed_entry(): void
+    {
+        $repository = $this->seed([
+            'menu.main' => ['role.admin'],
+            'role.admin' => ['menu.main'],
+        ]);
+
+        $applied = [];
+        $hook = $this->makeHook(applyOrder: $applied);
+
+        $importer = new ConfigImporter($repository, $hook);
+        $result = $importer->import();
+
+        self::assertSame(1, $result->failureCount());
+        self::assertSame([], $applied, 'Cycle must prevent any apply calls.');
+    }
+
+    #[Test]
+    public function orphan_warn_default_emits_unchanged_entry_and_audit_info(): void
+    {
+        $repository = $this->seed(['role.admin' => []]);
+        $applied = [];
+        $hook = $this->makeHook(applyOrder: $applied);
+
+        $auditLog = [];
+        $auditor = static function (string $level, string $message, array $context) use (&$auditLog): void {
+            $auditLog[] = [$level, $message, $context];
+        };
+
+        $importer = new ConfigImporter($repository, $hook, auditLogger: $auditor);
+
+        // role.legacy exists in active store but has no sync file.
+        $result = $importer->import(activeRefs: ['role.admin', 'role.legacy']);
+
+        $orphanEntry = array_values(array_filter(
+            $result->entries,
+            static fn ($e) => $e->ref === 'role.legacy',
+        ))[0] ?? null;
+
+        self::assertNotNull($orphanEntry);
+        self::assertSame(ConfigImportEntryResult::STATUS_UNCHANGED, $orphanEntry->status);
+        $infos = array_filter($auditLog, static fn ($e) => $e[0] === 'info');
+        self::assertNotEmpty($infos, 'Orphan-warn must surface an audit info entry.');
+    }
+
+    #[Test]
+    public function delete_orphans_invokes_hook_delete_and_records_deleted_status(): void
+    {
+        $repository = $this->seed(['role.admin' => []]);
+
+        $hook = new class implements ConfigImportApplyHookInterface {
+            /** @var list<string> */
+            public array $deleted = [];
+
+            public function apply(ConfigSyncFile $file): string
+            {
+                return ConfigImportEntryResult::STATUS_UPDATED;
+            }
+
+            public function delete(string $ref): void
+            {
+                $this->deleted[] = $ref;
+            }
+        };
+
+        $importer = new ConfigImporter($repository, $hook);
+        $result = $importer->import(
+            deleteOrphans: true,
+            activeRefs: ['role.admin', 'role.legacy'],
+        );
+
+        self::assertSame(['role.legacy'], $hook->deleted);
+        $orphanEntry = array_values(array_filter(
+            $result->entries,
+            static fn ($e) => $e->ref === 'role.legacy',
+        ))[0] ?? null;
+        self::assertNotNull($orphanEntry);
+        self::assertSame(ConfigImportEntryResult::STATUS_DELETED, $orphanEntry->status);
+    }
+
+    #[Test]
+    public function delete_orphans_dry_run_does_not_call_hook(): void
+    {
+        $repository = $this->seed(['role.admin' => []]);
+
+        $hook = new class implements ConfigImportApplyHookInterface {
+            /** @var list<string> */
+            public array $deleted = [];
+
+            public function apply(ConfigSyncFile $file): string
+            {
+                return ConfigImportEntryResult::STATUS_UPDATED;
+            }
+
+            public function delete(string $ref): void
+            {
+                $this->deleted[] = $ref;
+            }
+        };
+
+        $importer = new ConfigImporter($repository, $hook);
+        $result = $importer->import(
+            dryRun: true,
+            deleteOrphans: true,
+            activeRefs: ['role.admin', 'role.legacy'],
+        );
+
+        self::assertSame([], $hook->deleted);
+        $orphanEntry = array_values(array_filter(
+            $result->entries,
+            static fn ($e) => $e->ref === 'role.legacy',
+        ))[0] ?? null;
+        self::assertNotNull($orphanEntry);
+        self::assertSame(ConfigImportEntryResult::STATUS_DELETED, $orphanEntry->status);
+    }
+
+    #[Test]
+    public function summary_line_matches_canonical_format(): void
+    {
+        $entries = [
+            new ConfigImportEntryResult(ref: 'role.admin', status: ConfigImportEntryResult::STATUS_CREATED),
+            new ConfigImportEntryResult(ref: 'role.member', status: ConfigImportEntryResult::STATUS_UPDATED),
+            new ConfigImportEntryResult(ref: 'role.viewer', status: ConfigImportEntryResult::STATUS_UNCHANGED),
+            new ConfigImportEntryResult(ref: 'role.bad', status: ConfigImportEntryResult::STATUS_FAILED, reason: 'x'),
+            new ConfigImportEntryResult(ref: 'role.legacy', status: ConfigImportEntryResult::STATUS_DELETED),
+        ];
+        $result = new ConfigImportResult(entries: $entries);
+
+        self::assertSame(
+            '1 created, 1 updated, 1 deleted, 1 failed, 1 unchanged.',
+            $result->summary(),
+        );
+    }
+
+    /**
+     * @param array<string, list<string>> $refsWithDeps Map of ref => declared deps.
+     */
+    private function seed(array $refsWithDeps): ConfigSyncRepository
+    {
+        $repository = new ConfigSyncRepository($this->tempDir);
+        foreach ($refsWithDeps as $ref => $dependencies) {
+            [$entityType, $entityId] = explode('.', $ref, 2);
+            $file = new ConfigSyncFile(
+                entityType: $entityType,
+                entityId: $entityId,
+                uuid: ConfigSyncFile::deterministicUuid($entityType, $entityId),
+                dependencies: $dependencies,
+                langcode: 'en',
+                fields: [],
+            );
+            $repository->put($file);
+        }
+
+        return $repository;
+    }
+
+    /**
+     * @param list<string> $applyOrder Captured ref-order of `apply()` calls.
+     */
+    private function makeHook(array &$applyOrder): ConfigImportApplyHookInterface
+    {
+        return new class($applyOrder) implements ConfigImportApplyHookInterface {
+            /** @param list<string> $applyOrder */
+            public function __construct(private array &$applyOrder) {}
+
+            public function apply(ConfigSyncFile $file): string
+            {
+                $this->applyOrder[] = $file->ref();
+
+                return ConfigImportEntryResult::STATUS_CREATED;
+            }
+
+            public function delete(string $ref): void {}
+        };
+    }
+
+    private function removeDir(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        foreach (scandir($dir) ?: [] as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $full = $dir . '/' . $entry;
+            is_dir($full) ? $this->removeDir($full) : @unlink($full);
+        }
+        @rmdir($dir);
+    }
+}

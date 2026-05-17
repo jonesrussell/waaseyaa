@@ -155,7 +155,7 @@ Pre-v1 beta trains (`0.x-beta.N`).
 6. **Owner authorization.** `@jonesrussell` opens a PR creating `release-approvals/beta.approved`, mirroring the `VERSIONING.md` §6 pattern.
 7. **Listing pipeline in production.** Per [ADR 015](../adr/015-listing-pipeline-views-equivalent.md) and ratified by mission `listing-pipeline-v1-01KRMN0B` (M-007, 2026-05-16): the `Waaseyaa\Listing\ListingDefinition` contract and the `ListingResolver` service are stable surface (see §5.6), the cache tag-aware operations and context registry are stable surface (see §5.9), and at least one consumer app uses them for production listings. The mission shipped the contract; remaining beta-gate work is the production-consumer demonstration. Reason: declaring beta without this misleads Drupal-migration consumers about what the framework covers.
 8. **Revisions in production.** Per [ADR 016](../adr/016-revisions-first-class.md), `RevisionableEntityInterface` is stable surface, and at least one revisionable entity type ships in a consumer app. Reason: editorial CMSs cannot rely on "alpha" semantics for revision history.
-9. **No unresolved critical mission gaps.** No `❌` entries in [`drupal-comparison-matrix.md`](drupal-comparison-matrix.md) §3 ("Mission-critical gaps") remain in `unknown` or `unresolved` state. `intentional-gap` decisions documented via ADR are acceptable; undecided gaps are not. **Per-field translation (matrix §3.2) — SATISFIED** by M-006 (`entity-storage-translations-v1`) shipping the single-axis translation substrate per ADR 017; see §5.3 for the stable surface. CMI config sync (matrix §3.5) remains ADR'd (ADR 018) but unshipped.
+9. **No unresolved critical mission gaps.** No `❌` entries in [`drupal-comparison-matrix.md`](drupal-comparison-matrix.md) §3 ("Mission-critical gaps") remain in `unknown` or `unresolved` state. `intentional-gap` decisions documented via ADR are acceptable; undecided gaps are not. **Per-field translation (matrix §3.2) — SATISFIED** by M-006 (`entity-storage-translations-v1`) shipping the single-axis translation substrate per ADR 017; see §5.3 for the stable surface. **CMI config sync (matrix §3.5) — SATISFIED** by M-003 (`config-management-v1-01KRCDEC`) shipping the active/sync store split per ADR 018; see §5.5 for the stable surface (`ConfigDependencyInterface`, sync-store YAML format, six `config:*` commands, `config.audit` log channel, backend restriction).
 
 **Beta rules:**
 - Stable-surface breaks require a full deprecation cycle (§4) — no abbreviated path.
@@ -367,18 +367,74 @@ The "until usage reaches zero" grant from the previous draft applies specificall
 
 ### 5.5 Config / env
 
-**Stable surface:**
+**Stable surface — runtime read API:**
 - Every config key referenced in shipped `config/*.php` files.
 - Every env var documented in `README.md`, `CONTRIBUTING.md`, or per-package docs.
 - `WAASEYAA_DB`, `WAASEYAA_LOG_LEVEL` (canonical examples).
 
+**Stable surface — CMI sync substrate** (per [ADR 018](../adr/018-configuration-management-sync.md) and mission `config-management-v1-01KRCDEC` (M-003, 2026-05-16); subsystem spec [`config-management.md`](config-management.md)):
+
+*Dependency declarations (`Waaseyaa\Config\Dependency\*`):*
+- `ConfigDependencyInterface` — implemented by config-entity classes to declare `configDependencies(): array` (list of `<entity_type>.<entity_id>` strings).
+
+*Sync-store file format:*
+- File-naming convention `<entity_type>.<entity_id>.yml` (lowercase ASCII with `_` separators).
+- Mandatory leading `_meta` block with keys `entity_type`, `uuid`, `dependencies` (string[]), `langcode`.
+- Field-value alphabetical key ordering within `_meta` and within the top-level field group (deterministic git diffs).
+- The `_meta` key vocabulary, the file-naming convention, and the field-type → YAML representation table (per spec §5.3) are load-bearing strings. They follow the §4 deprecation cycle even though they are not PHP types.
+
+*Sync-store services (`Waaseyaa\Config\Sync\*`):*
+- `ConfigSyncFile`, `ConfigSyncSerializer`, `ConfigSyncDeserializer`, `ConfigSyncRepository` — value object + format I/O.
+- `ConfigExporter`, `ConfigImporter`, `ConfigDiffer`, `ConfigStatusReporter`, `ConfigSyncValidator`, `ConfigResetter` — orchestrators.
+- `ConfigSyncFileSourceInterface`, `ConfigImportApplyHookInterface` — extension points.
+- `ConfigManifestEntry` — manifest value object.
+
+*Config keys:*
+- `config.sync_path` (default `storage/config-sync/`) — root path for the sync store. Resolved relative to the project root.
+
+*Audit log channel (`Waaseyaa\Config\Audit\*`):*
+- `ConfigAuditChannel::CHANNEL` constant (value `'config.audit'`) — receives import / export / reset events and `--no-dependency-check` bypass warnings.
+- `ConfigAuditEvent` — event payload shape (entity-type, id, operation, actor, before-after summary).
+
+*Backend restriction (`Waaseyaa\Config\Backend\*`):*
+- `BackendRestrictionEnforcer` with `ALLOWED_BACKEND_IDS = ['sql-blob', 'sql-column']` (boot-time gate) and `CONFIG_ENTITY_INTERFACE` reference constant.
+
+*CLI namespace reservation (`Waaseyaa\CLI\Command\Config\*`):*
+- Six reserved sub-verbs under the `config:*` namespace: `export`, `import`, `diff`, `status`, `validate`, `reset`.
+- `ConfigCommand` abstract base exposes `RESERVED_VERBS`, `RESERVED_FULL_VERBS`, `RESERVED_FQCNS` constants for boot-time collision checks.
+- Apps MAY register `config:<custom>` verbs that are NOT in the reserved set (e.g. `config:audit-export`); they own those.
+
+*Exception classes (stable error model, charter §4.4 codes):*
+- `Waaseyaa\Config\Dependency\Exception\ConfigDependencyCycleException`
+- `Waaseyaa\Config\Dependency\Exception\ConfigDependencyMissingException`
+- `Waaseyaa\Config\Exception\InvalidConfigBackendException`
+- `Waaseyaa\Config\Exception\ConfigSerializationException`
+- `Waaseyaa\Config\Exception\ConfigImportFailedException`
+- `Waaseyaa\Config\Exception\ConfigCommandCollisionException`
+
+**Internal (NOT stable surface — implementation detail):**
+- `Waaseyaa\Config\Dependency\DependencyGraph` / `DependencyResolver` — algorithm; the failure modes (cycle / missing-dep) are stable via the exceptions above, but the topological-sort implementation may evolve.
+- `Waaseyaa\Config\Sync\FieldValueMapper` — YAML representation for individual field-definition types; the mapping table in [`config-management.md`](config-management.md) §5.3 is stable, but the resolver class is refactorable.
+- `Waaseyaa\Config\Sync\DiffResult`, `StatusEntry`, `StatusReport`, `FieldViolation`, `ConfigExportFileResult`, `ConfigExportResult`, `ConfigImportEntryResult`, `ConfigImportResult`, `ConfigValidateEntry`, `ConfigValidateResult` — internal value objects describing operator output; CLI output format is the contract, not the PHP shape.
+
 **Allowed under deprecation cycle:**
-- Renames (old name continues working, emits `config.deprecation`).
+- Renames of config keys, env vars, audit-channel event names (old name continues working, emits `config.deprecation`).
 - Type tightening (e.g. boolean now required where string-coerced before).
+- Renames of any sync-store key in `_meta`, any of the six reserved `config:*` sub-verbs, or any of the six exception classes / their codes.
 
 **Allowed without deprecation:**
 - New keys with safe defaults.
 - Removal of keys explicitly marked `@internal` in their config-file PHPDoc.
+- New non-reserved `config:<custom>` CLI verbs registered by apps or extensions.
+- Additive fields to `_meta` (new optional keys) and additive `FieldDefinition` types in the YAML mapping table.
+
+**Forbidden:**
+- Silent change to the sync-store file-naming convention (would break operator git history).
+- Silent change to `_meta` block key vocabulary (would break consumer fixtures and CI gates).
+- Silent change to the `config:*` reserved sub-verb list (would break operator muscle memory and recipes).
+- Silent change to the `config.audit` channel name or event vocabulary (would break log-shipping configurations).
+
+**Per-environment overrides:** charter §11 names runtime config overrides (`$config['x']['y']` style) as a future-ADR door. CMI does NOT ship them. The supported pattern for per-environment values is env vars consumed inside `config/waaseyaa.php` — documented prominently in [`config-sync.md`](../cookbook/config-sync.md).
 
 ### 5.6 Listing pipeline
 
