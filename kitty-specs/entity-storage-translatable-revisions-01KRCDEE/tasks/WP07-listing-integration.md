@@ -86,3 +86,4 @@ This WP depends on: WP03 (save events for cache-tag emission), WP04 (read-at-lan
 
 (populated by implement-review loop)
 - 2026-05-17T03:48:20Z – claude:sonnet:python-implementer:implementer – shell_pid=136822 – Started implementation via action command
+- 2026-05-17T03:57:13Z – claude:sonnet:python-implementer:implementer – shell_pid=136822 – WP07 ready: listing integration (TwoAxisFilterResolver + M-007 substrate verification) - acae7dbc3
