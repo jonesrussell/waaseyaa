@@ -196,9 +196,17 @@ Design docs in `docs/plans/` are session artifacts (implementation history). Spe
 
 ## Dead code audits and intentional scaffolding
 
-We run `shipmonk/dead-code-detector` via `phpstan-dead-code.neon` as a **warn-only** CI job (`bin/audit-dead-code`, mirrors `bin/audit-require-dev-layers`). Its purpose is to catch *new* unused code introduced by future PRs — not to delete existing scaffolding. A baseline (`phpstan-dead-code-baseline.neon`) suppresses pre-existing findings; only newly-introduced dead members appear in CI output.
+We run `shipmonk/dead-code-detector` via `phpstan-dead-code.neon` as a **hard CI gate** (`bin/check-dead-code`, also in `composer verify`). Pre-existing findings are suppressed by `phpstan-dead-code-baseline.neon`; any *new* dead-code finding fails CI. Phase 4 of the dead-code cleanup audit (`docs/audits/2026-05-17-dead-code-baseline-audit.md`) flipped this from warn-only to fail-on-new in PR #1504 after the baseline dropped from 1,341 → 66 entries.
 
-Reflection-discovered entrypoints (classes carrying `#[PolicyAttribute]` or `#[AsMiddleware]`, FQCNs declared in `extra.waaseyaa.providers`, `\Ingestion\EntityMapper\` namespaces, `RouteProviderInterface` implementors) are auto-marked as used by `tools/phpstan/WaaseyaaEntrypointProvider.php`. If you add a new discovery convention, extend that provider before relying on the audit.
+Reflection-discovered entrypoints — auto-marked as used by `tools/phpstan/WaaseyaaEntrypointProvider.php`:
+- Classes carrying `#[PolicyAttribute]` or `#[AsMiddleware]`.
+- FQCNs declared in `extra.waaseyaa.providers`.
+- Classes whose FQCN sits under a `\Ingestion\EntityMapper\` namespace segment.
+- Implementors of `RouteProviderInterface`.
+- Subclasses of `EntityBase` / `ContentEntityBase`, plus the traits they `use` (members hydrated via `ReflectionProperty::setValue` and `ContentEntityBase::set()` are call-graph-invisible).
+- Classes carrying class-level `@api` PHPDoc (the canonical signal — covers extension points, public service facades, DTOs, the entire `packages/testing/src/` consumer surface).
+
+If you add a new discovery convention, extend that provider before relying on the gate.
 
 ### Marking intentional scaffolding
 

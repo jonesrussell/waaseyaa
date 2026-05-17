@@ -114,8 +114,8 @@ jobs:
           path: tmp/phpstan
           key: phpstan-result-cache-${{ github.run_id }}
 
-  dead-code-audit:
-    name: dead-code-audit (warn-only)
+  check-dead-code:
+    name: check-dead-code
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -144,8 +144,8 @@ jobs:
           restore-keys: |
             phpstan-dead-code-cache-
 
-      - name: Run dead-code audit (warn-only)
-        run: bash bin/audit-dead-code
+      - name: Run dead-code check (fails on new findings)
+        run: bash bin/check-dead-code
 
       - name: Save dead-code PHPStan result cache
         uses: actions/cache/save@v5
