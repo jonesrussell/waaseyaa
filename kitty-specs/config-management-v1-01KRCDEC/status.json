@@ -1,7 +1,7 @@
 {
-  "event_count": 36,
-  "last_event_id": "01KRSNTYSY2RGJJCV4V1X3YNBD",
-  "materialized_at": "2026-05-17T00:37:04.958382+00:00",
+  "event_count": 38,
+  "last_event_id": "01KRSNVV2WF173THVSKTXND732",
+  "materialized_at": "2026-05-17T00:37:33.916097+00:00",
   "mission_number": "",
   "mission_slug": "config-management-v1-01KRCDEC",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 7
+    "planned": 6
   },
   "work_packages": {
     "WP01": {
@@ -46,11 +46,11 @@
       "last_transition_at": "2026-05-17T00:37:04.958382+00:00"
     },
     "WP05": {
-      "actor": "finalize-tasks",
+      "actor": "claude:sonnet:python-implementer:implementer",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KRSJ9DJBPEF1QW2VGHQ91JVS",
-      "last_transition_at": "2026-05-16T23:35:04.523376+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KRSNVV2WF173THVSKTXND732",
+      "last_transition_at": "2026-05-17T00:37:33.916097+00:00"
     },
     "WP06": {
       "actor": "finalize-tasks",
