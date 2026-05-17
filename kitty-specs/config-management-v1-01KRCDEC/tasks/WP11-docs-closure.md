@@ -33,7 +33,7 @@ subtasks:
 - T062
 - T063
 - T064
-shell_pid: ''
+shell_pid: "106003"
 history: []
 authoritative_surface: docs/
 execution_mode: code_change
@@ -46,6 +46,7 @@ owned_files:
 - docs/public-surface-map.php
 - CLAUDE.md
 - CHANGELOG.md
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP11 — Docs closure: spec, cookbook, upgrade-guide, charter §5.5 amendment, CHANGELOG, public-surface-map
@@ -102,3 +103,7 @@ This WP depends on: WP04, WP05, WP07, WP09, WP10.
 - `composer phpstan` (level 5) green; `composer cs-check` clean.
 - `bin/check-package-layers` green (no upward `waaseyaa/*` edges introduced).
 - No modifications outside `owned_files` (other than rerun-of-generators where charter explicitly permits).
+
+## Activity Log
+
+- 2026-05-17T01:44:30Z – claude:sonnet:python-implementer:implementer – shell_pid=106003 – Started implementation via action command
