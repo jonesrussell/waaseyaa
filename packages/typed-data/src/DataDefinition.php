@@ -6,6 +6,9 @@ namespace Waaseyaa\TypedData;
 
 use Symfony\Component\Validator\Constraint;
 
+/**
+ * @api
+ */
 final readonly class DataDefinition implements DataDefinitionInterface
 {
     /**

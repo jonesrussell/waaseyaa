@@ -15,6 +15,7 @@ namespace Waaseyaa\Cache;
  * plain class name:
  *
  *   $config->setFactoryForBin('cache_db', fn() => new DatabaseBackend($pdo, 'cache_db'));
+ * @api
  */
 final class CacheConfiguration
 {

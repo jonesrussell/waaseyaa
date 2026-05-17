@@ -10,6 +10,7 @@ use Waaseyaa\Queue\Job;
  * Queued job for asynchronous notification delivery.
  *
  * Stores the notification data for later dispatch by the worker.
+ * @api
  */
 final class SendNotificationJob extends Job
 {

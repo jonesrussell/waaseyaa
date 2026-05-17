@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\OAuthProvider;
 
+/**
+ * @api
+ */
 final readonly class OAuthUserProfile
 {
     public function __construct(

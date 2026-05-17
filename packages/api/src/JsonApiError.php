@@ -8,6 +8,7 @@ namespace Waaseyaa\Api;
  * Value object representing a JSON:API error object.
  *
  * @see https://jsonapi.org/format/#error-objects
+ * @api
  */
 final readonly class JsonApiError
 {

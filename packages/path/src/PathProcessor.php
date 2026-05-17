@@ -9,6 +9,7 @@ namespace Waaseyaa\Path;
  *
  * Handles both inbound (alias -> system path) and outbound
  * (system path -> alias) path processing.
+ * @api
  */
 final class PathProcessor
 {

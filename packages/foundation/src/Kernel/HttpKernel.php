@@ -57,6 +57,7 @@ use Waaseyaa\User\Middleware\SessionMiddleware;
  * Error surface: JSON:API (`application/vnd.api+json`) for boot failures and
  * for unhandled exceptions after boot. See docs/specs/infrastructure.md
  * "HTTP error surface (JSON-first)".
+ * @api
  */
 final class HttpKernel extends AbstractKernel
 {

@@ -41,6 +41,7 @@ use Waaseyaa\Field\FieldDefinition;
  *       ALTER TABLE {table} DROP COLUMN default_langcode
  *
  * @internal
+ * @api
  */
 final class AddTranslationsMigrationGenerator
 {

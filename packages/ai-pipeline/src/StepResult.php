@@ -6,6 +6,7 @@ namespace Waaseyaa\AI\Pipeline;
 
 /**
  * Value object representing the result of a single pipeline step execution.
+ * @api
  */
 final readonly class StepResult
 {

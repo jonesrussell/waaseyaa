@@ -9,6 +9,7 @@ namespace Waaseyaa\TypedData;
  *
  * JSON {@code array} / {@code json} casts are not {@code map} or {@code list} without a schema;
  * this mapper returns {@code null} for those so callers do not assume a {@see TypedDataManager} primitive.
+ * @api
  */
 final class CastTokenMapper
 {

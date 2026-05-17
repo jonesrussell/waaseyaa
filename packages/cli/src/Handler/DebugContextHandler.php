@@ -6,6 +6,9 @@ namespace Waaseyaa\CLI\Handler;
 
 use Waaseyaa\CLI\CliIO;
 
+/**
+ * @api
+ */
 final class DebugContextHandler
 {
     public function execute(CliIO $io): int

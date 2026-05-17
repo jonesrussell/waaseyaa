@@ -6,6 +6,9 @@ namespace Waaseyaa\AI\Observability\Cost;
 
 use Waaseyaa\Database\DatabaseInterface;
 
+/**
+ * @api
+ */
 class CostTracker
 {
     public function __construct(private readonly DatabaseInterface $database) {}

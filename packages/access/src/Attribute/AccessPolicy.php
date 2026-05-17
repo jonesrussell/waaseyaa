@@ -11,6 +11,7 @@ use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
  *
  * Place this attribute on classes that implement AccessPolicyInterface
  * to enable attribute-based plugin discovery.
+ * @api
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class AccessPolicy extends WaaseyaaPlugin

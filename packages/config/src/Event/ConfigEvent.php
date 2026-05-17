@@ -6,6 +6,9 @@ namespace Waaseyaa\Config\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @api
+ */
 final class ConfigEvent extends Event
 {
     /**

@@ -11,6 +11,7 @@ use Waaseyaa\AI\Schema\Mcp\McpToolDefinition;
  *
  * Allows custom tools (MCP, Gmail, calendar, etc.) to be registered
  * alongside auto-generated entity CRUD tools.
+ * @api
  */
 interface ToolRegistryInterface
 {

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\TypedData;
 
+/**
+ * @api
+ */
 interface ComplexDataInterface extends TypedDataInterface, \Traversable
 {
     public function get(string $name): TypedDataInterface;

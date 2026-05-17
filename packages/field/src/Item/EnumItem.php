@@ -22,6 +22,7 @@ use Waaseyaa\Field\FieldItemBase;
  * `jsonSchema()` deliberately throw to make per-type misuse loud — callers
  * must use the per-definition `schemaFor()` / `jsonSchemaFor()` seams added
  * by WP01.
+ * @api
  */
 #[FieldType(id: 'enum', label: 'Enum')]
 final class EnumItem extends FieldItemBase

@@ -14,6 +14,9 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'file',
     defaultCardinality: 1,
 )]
+/**
+ * @api
+ */
 final class ImageItem extends FieldItemBase
 {
     public static function propertyDefinitions(): array

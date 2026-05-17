@@ -6,6 +6,9 @@ namespace Waaseyaa\Config;
 
 use Waaseyaa\Config\Exception\ImmutableConfigException;
 
+/**
+ * @api
+ */
 final class Config implements ConfigInterface
 {
     /**

@@ -13,6 +13,7 @@ namespace Waaseyaa\I18n;
  *
  * Supports custom fallback mappings (e.g. "pt-BR" -> "pt" -> "es" -> "en")
  * and automatic derivation from regional variants (e.g. "fr-CA" -> "fr").
+ * @api
  */
 final readonly class FallbackChain
 {

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Diagnostic;
 
+/**
+ * @api
+ */
 interface HealthCheckerInterface
 {
     /** @return list<HealthCheckResult> */

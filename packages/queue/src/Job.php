@@ -11,6 +11,7 @@ namespace Waaseyaa\Queue;
  * retry policies, timeouts, and failure handling.
  *
  * @internal
+ * @api
  */
 abstract class Job
 {

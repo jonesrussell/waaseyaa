@@ -28,6 +28,7 @@ use Waaseyaa\Foundation\Schema\Diff\CanonicalJson;
  * the actual SQL plan (what the database will see). They differ because
  * the same `CompositeDiff` compiled with different platforms / different
  * compiler versions produces different SQL.
+ * @api
  */
 final readonly class CompiledMigrationPlan
 {

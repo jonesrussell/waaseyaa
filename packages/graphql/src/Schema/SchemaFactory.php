@@ -24,6 +24,7 @@ use Waaseyaa\GraphQL\Resolver\ReferenceLoader;
  * to add custom args or replace the default resolver.
  *
  * Filter/sort/pagination reuses the same QueryApplier as JSON:API.
+ * @api
  */
 final class SchemaFactory
 {

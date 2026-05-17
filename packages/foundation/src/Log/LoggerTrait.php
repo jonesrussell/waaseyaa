@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Log;
 
+/**
+ * @api
+ */
 trait LoggerTrait
 {
     public function emergency(string|\Stringable $message, array $context = []): void

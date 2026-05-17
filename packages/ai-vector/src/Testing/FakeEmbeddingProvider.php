@@ -12,6 +12,7 @@ use Waaseyaa\AI\Vector\EmbeddingInterface;
  * Generates embeddings by hashing the input text and using the hash bytes
  * to produce float values. The resulting vectors are normalized to unit
  * magnitude. This ensures the same text always produces the same vector.
+ * @api
  */
 final class FakeEmbeddingProvider implements EmbeddingInterface
 {

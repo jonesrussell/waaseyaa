@@ -11,6 +11,9 @@ use Waaseyaa\TypedData\Coercion\EntityCastCoercion;
 use Waaseyaa\TypedData\DataDefinitionInterface;
 use Waaseyaa\TypedData\PrimitiveInterface;
 
+/**
+ * @api
+ */
 final class StringData implements PrimitiveInterface
 {
     private const COERCION_FIELD = 'value';

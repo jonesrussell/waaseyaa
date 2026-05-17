@@ -9,6 +9,7 @@ namespace Waaseyaa\Media;
  *
  * File repositories manage the persistence of File value objects.
  * They provide CRUD operations for files keyed by their URI.
+ * @api
  */
 interface FileRepositoryInterface
 {

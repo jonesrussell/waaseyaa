@@ -10,6 +10,7 @@ namespace Waaseyaa\Workflows;
  * The ContentModerator holds a registry of workflows and provides
  * methods to transition content between states within those workflows,
  * enforcing the allowed transitions.
+ * @api
  */
 final class ContentModerator
 {

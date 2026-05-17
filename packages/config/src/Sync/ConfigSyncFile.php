@@ -22,6 +22,7 @@ use Waaseyaa\Config\Exception\ConfigSerializationException;
  *
  * @see \Waaseyaa\Config\Sync\ConfigSyncSerializer
  * @see \Waaseyaa\Config\Sync\ConfigSyncDeserializer
+ * @api
  */
 final readonly class ConfigSyncFile
 {

@@ -25,6 +25,7 @@ namespace Waaseyaa\Config;
  *         checksum: "sha256:..."
  * generated_at: "2026-03-15T14:30:00Z"
  * ```
+ * @api
  */
 final class ConfigManifest
 {

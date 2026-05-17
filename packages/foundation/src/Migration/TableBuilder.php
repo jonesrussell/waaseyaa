@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Migration;
 
+/**
+ * @api
+ */
 final class TableBuilder
 {
     /** @var list<ColumnDefinition> */

@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Foundation\Migration\Migrator;
 
+/**
+ * @api
+ */
 final class MigrateRollbackHandler
 {
     /** @var \Closure(): array<string, array<string, \Waaseyaa\Foundation\Migration\Migration>> */

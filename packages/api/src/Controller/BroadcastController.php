@@ -23,6 +23,7 @@ use Waaseyaa\Foundation\Broadcasting\BroadcastMessage;
  *
  * The controller is framework-agnostic: it writes directly to the output
  * buffer using a configurable output callback (defaults to `echo`).
+ * @api
  */
 final class BroadcastController
 {

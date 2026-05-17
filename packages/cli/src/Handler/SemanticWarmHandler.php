@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\AI\Vector\SemanticIndexWarmer;
 use Waaseyaa\CLI\CliIO;
 
+/**
+ * @api
+ */
 final class SemanticWarmHandler
 {
     public function __construct(

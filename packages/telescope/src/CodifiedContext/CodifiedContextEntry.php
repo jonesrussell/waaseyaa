@@ -6,6 +6,7 @@ namespace Waaseyaa\Telescope\CodifiedContext;
 
 /**
  * Value object representing a single recorded codified context entry.
+ * @api
  */
 final class CodifiedContextEntry
 {

@@ -70,6 +70,7 @@ use Waaseyaa\Foundation\Schema\Diff\SchemaDiffOp;
  * constructs {@see CompiledStep} instances. Callers cannot smuggle raw
  * SQL through the diff layer; the only path is via a {@see SchemaDiffOp}
  * value type.
+ * @api
  */
 final readonly class SqliteCompiler
 {

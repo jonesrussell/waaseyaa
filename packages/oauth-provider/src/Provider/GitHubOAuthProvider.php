@@ -10,6 +10,9 @@ use Waaseyaa\OAuthProvider\OAuthToken;
 use Waaseyaa\OAuthProvider\OAuthUserProfile;
 use Waaseyaa\OAuthProvider\UnsupportedOperationException;
 
+/**
+ * @api
+ */
 final class GitHubOAuthProvider implements OAuthProviderInterface
 {
     private const AUTH_URL = 'https://github.com/login/oauth/authorize';

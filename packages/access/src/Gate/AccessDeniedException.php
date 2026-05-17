@@ -6,6 +6,7 @@ namespace Waaseyaa\Access\Gate;
 
 /**
  * Thrown when authorization fails in the Gate.
+ * @api
  */
 final class AccessDeniedException extends \RuntimeException
 {

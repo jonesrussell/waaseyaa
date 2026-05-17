@@ -6,6 +6,9 @@ namespace Waaseyaa\Auth;
 
 use Waaseyaa\User\User;
 
+/**
+ * @api
+ */
 final class AuthManager
 {
     /**

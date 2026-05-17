@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Billing;
 
+/**
+ * @api
+ */
 final readonly class SubscriptionData
 {
     private const array ACTIVE_STATUSES = ['active', 'trialing'];

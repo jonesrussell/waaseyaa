@@ -27,6 +27,7 @@ use Waaseyaa\EntityStorage\Connection\ConnectionResolverInterface;
  * {@see currentLangcodeRevision()} / {@see setCurrentLangcodeRevision()}.
  * Other-language pointers are NEVER touched by a per-langcode write
  * (FR-010 — invariant verified in `RevisionableStorageDriverTwoAxisTest`).
+ * @api
  */
 final class RevisionableStorageDriver
 {

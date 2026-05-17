@@ -9,6 +9,7 @@ namespace Waaseyaa\Media;
  *
  * Stores files in a PHP array, suitable for testing and prototyping.
  * File data does not persist beyond the lifetime of the object.
+ * @api
  */
 final class InMemoryFileRepository implements FileRepositoryInterface
 {

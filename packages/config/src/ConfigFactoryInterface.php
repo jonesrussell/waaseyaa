@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Config;
 
+/**
+ * @api
+ */
 interface ConfigFactoryInterface
 {
     public function get(string $name): ConfigInterface;

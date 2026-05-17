@@ -6,6 +6,9 @@ namespace Waaseyaa\Entity\Validation;
 
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 
+/**
+ * @api
+ */
 final class EntityValidationException extends \RuntimeException
 {
     public function __construct(

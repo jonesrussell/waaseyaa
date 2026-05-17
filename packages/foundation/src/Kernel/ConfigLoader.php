@@ -8,6 +8,9 @@ use Waaseyaa\Foundation\Log\Handler\ErrorLogHandler;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\LogManager;
 
+/**
+ * @api
+ */
 final class ConfigLoader
 {
     private static ?LoggerInterface $logger = null;

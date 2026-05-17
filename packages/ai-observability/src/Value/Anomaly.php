@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AI\Observability\Value;
 
+/**
+ * @api
+ */
 final readonly class Anomaly
 {
     public const KIND_SPAN_COUNT = 'span_count_outlier';

@@ -8,6 +8,7 @@ namespace Waaseyaa\AdminSurface\Catalog;
  * Value object for an action in the admin catalog.
  *
  * Maps to AdminSurfaceAction in contract/types.ts.
+ * @api
  */
 final class ActionDefinition
 {

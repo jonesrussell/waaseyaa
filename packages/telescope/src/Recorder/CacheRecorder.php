@@ -8,6 +8,7 @@ use Waaseyaa\Telescope\Storage\TelescopeStoreInterface;
 
 /**
  * Records cache operations (hit, miss, set, forget) with key, value, and duration.
+ * @api
  */
 final class CacheRecorder
 {

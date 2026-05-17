@@ -8,6 +8,7 @@ namespace Waaseyaa\AdminSurface\Catalog;
  * Fluent builder for defining a single entity type in the admin catalog.
  *
  * Maps to AdminSurfaceCatalogEntry in contract/types.ts.
+ * @api
  */
 final class EntityDefinition
 {

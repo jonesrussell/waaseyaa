@@ -18,6 +18,7 @@ namespace Waaseyaa\Foundation\Discovery;
  * loud at compile time with code `INVALID_MIGRATION_ENTRY`. Silent
  * skip would let typos pass through and never apply migrations the
  * operator believed were declared.
+ * @api
  */
 final class InvalidMigrationEntryException extends \RuntimeException
 {

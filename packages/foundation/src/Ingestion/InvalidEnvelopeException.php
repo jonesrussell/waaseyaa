@@ -8,6 +8,7 @@ namespace Waaseyaa\Foundation\Ingestion;
  * Thrown when an ingestion envelope fails validation.
  *
  * Carries canonical IngestionError objects for operator diagnostics.
+ * @api
  */
 final class InvalidEnvelopeException extends \RuntimeException
 {

@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\CLI\Command\Make\AbstractMakeHandler;
 
+/**
+ * @api
+ */
 final class MakeEntityHandler extends AbstractMakeHandler
 {
     public function execute(CliIO $io): int

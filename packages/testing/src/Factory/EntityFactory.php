@@ -25,6 +25,7 @@ use Waaseyaa\Entity\EntityTypeInterface;
  *
  *     $many = $factory->createMany('article', 3, ['status' => 0]);
  *     // => array of 3 value arrays, each with status=0
+ * @api
  */
 final class EntityFactory
 {

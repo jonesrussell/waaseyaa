@@ -6,6 +6,7 @@ namespace Waaseyaa\Queue;
 
 /**
  * @internal
+ * @api
  */
 interface FailedJobRepositoryInterface
 {

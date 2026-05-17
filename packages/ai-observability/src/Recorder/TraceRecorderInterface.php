@@ -9,6 +9,9 @@ use Waaseyaa\AI\Observability\Handle\TraceHandle;
 use Waaseyaa\AI\Observability\Value\DecisionTrace;
 use Waaseyaa\AI\Observability\Value\Outcome;
 
+/**
+ * @api
+ */
 interface TraceRecorderInterface
 {
     /** @param array<string, mixed> $attributes */

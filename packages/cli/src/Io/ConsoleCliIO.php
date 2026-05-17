@@ -13,6 +13,7 @@ use Waaseyaa\CLI\Parser\ParsedInput;
  *
  * This class fulfils the contract defined in contracts/cli-io.md and the
  * CliIO interface declared in WP02.
+ * @api
  */
 final class ConsoleCliIO implements CliIO
 {

@@ -7,6 +7,9 @@ namespace Waaseyaa\Bimaaji\Dsl;
 use Waaseyaa\Bimaaji\Mutation\MutationResult;
 use Waaseyaa\Bimaaji\Patch\PatchSet;
 
+/**
+ * @api
+ */
 final readonly class TaskPipelineResult
 {
     public function __construct(

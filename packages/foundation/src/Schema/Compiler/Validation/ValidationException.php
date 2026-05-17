@@ -19,6 +19,7 @@ namespace Waaseyaa\Foundation\Schema\Compiler\Validation;
  * **Production safety:** subclasses MUST NOT include filesystem paths,
  * connection strings, or other host-specific data in the message (spec
  * §7.3). The compiler is platform-pure — it never sees a filesystem.
+ * @api
  */
 abstract class ValidationException extends \RuntimeException
 {

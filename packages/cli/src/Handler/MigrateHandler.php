@@ -16,6 +16,9 @@ use Waaseyaa\Foundation\Migration\Migrator;
 use Waaseyaa\Foundation\Schema\Compiler\Sqlite\SqliteCompiler;
 use Waaseyaa\Foundation\Schema\Migration\MigrationInterfaceV2;
 
+/**
+ * @api
+ */
 final class MigrateHandler
 {
     /** @var \Closure(): array<string, array<string, \Waaseyaa\Foundation\Migration\Migration>> */

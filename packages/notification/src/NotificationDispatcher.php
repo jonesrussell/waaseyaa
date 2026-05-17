@@ -10,6 +10,7 @@ use Waaseyaa\Queue\QueueInterface;
 
 /**
  * Dispatches notifications to their designated channels.
+ * @api
  */
 final class NotificationDispatcher
 {

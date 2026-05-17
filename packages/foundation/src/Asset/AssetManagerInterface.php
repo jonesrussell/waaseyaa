@@ -9,6 +9,7 @@ namespace Waaseyaa\Foundation\Asset;
  *
  * Implementations read build manifests (e.g., Vite manifest.json)
  * to map source file paths to their production-hashed equivalents.
+ * @api
  */
 interface AssetManagerInterface
 {

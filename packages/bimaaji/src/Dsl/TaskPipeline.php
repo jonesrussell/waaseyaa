@@ -8,6 +8,9 @@ use Waaseyaa\Bimaaji\Mutation\MutationRequest;
 use Waaseyaa\Bimaaji\Mutation\MutationValidator;
 use Waaseyaa\Bimaaji\Patch\PatchGenerator;
 
+/**
+ * @api
+ */
 final class TaskPipeline
 {
     public function __construct(

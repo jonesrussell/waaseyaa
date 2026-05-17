@@ -30,6 +30,7 @@ use Waaseyaa\CLI\Parser\ArgvParser;
  * Two consecutive execute() calls on the same instance yield independent results.
  *
  * Full contract: kitty-specs/native-cli-kernel-01KR2NR7/contracts/cli-tester.md
+ * @api
  */
 final class CliTester
 {

@@ -6,6 +6,7 @@ namespace Waaseyaa\CLI\Io;
 
 /**
  * Read-only access to parsed CLI input (arguments and options).
+ * @api
  */
 interface CliInput
 {

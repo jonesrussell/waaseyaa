@@ -18,6 +18,7 @@ use Waaseyaa\Testing\Traits\InteractsWithEvents;
  * need the Waaseyaa application environment.
  *
  * @internal
+ * @api
  */
 abstract class WaaseyaaTestCase extends TestCase
 {

@@ -8,6 +8,9 @@ use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Queue\Worker\Worker;
 use Waaseyaa\Queue\Worker\WorkerOptions;
 
+/**
+ * @api
+ */
 final class QueueWorkHandler
 {
     public function __construct(

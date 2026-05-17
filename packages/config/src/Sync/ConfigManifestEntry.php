@@ -13,6 +13,7 @@ namespace Waaseyaa\Config\Sync;
  * unchanged files.
  *
  * @see \Waaseyaa\Config\Sync\ConfigSyncFile
+ * @api
  */
 final readonly class ConfigManifestEntry
 {

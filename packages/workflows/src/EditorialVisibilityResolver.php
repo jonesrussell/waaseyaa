@@ -9,6 +9,9 @@ use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityValues;
 
+/**
+ * @api
+ */
 final class EditorialVisibilityResolver
 {
     private readonly Workflow $workflow;

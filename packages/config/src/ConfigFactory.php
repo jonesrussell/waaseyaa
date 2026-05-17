@@ -6,6 +6,9 @@ namespace Waaseyaa\Config;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+/**
+ * @api
+ */
 final class ConfigFactory implements ConfigFactoryInterface
 {
     /**

@@ -31,6 +31,7 @@ namespace Waaseyaa\Foundation\Schema\Compiler\Sqlite;
  *
  * Use {@see for()} when the caller has an arbitrary version string from
  * `sqlite_version()`; use a checkpoint when authoring fixtures.
+ * @api
  */
 final readonly class SqliteCapabilityMatrix
 {

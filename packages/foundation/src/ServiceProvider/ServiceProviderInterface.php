@@ -21,6 +21,7 @@ namespace Waaseyaa\Foundation\ServiceProvider;
  * follow-on surface will split them into capability interfaces dispatched via
  * `instanceof` (see {@see \Waaseyaa\Foundation\Http\LanguagePathStripperInterface}
  * for the established pattern).
+ * @api
  */
 interface ServiceProviderInterface
 {

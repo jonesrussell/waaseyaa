@@ -33,6 +33,7 @@ namespace Waaseyaa\Migration\Schema;
  * @internal — mission-internal infrastructure, not stable surface.
  *
  * @spec FR-038 — per-record progress tracking
+ * @api
  */
 final class MigrationRunStateSchema
 {

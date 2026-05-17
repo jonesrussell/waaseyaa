@@ -9,6 +9,9 @@ use Waaseyaa\OAuthProvider\OAuthProviderInterface;
 use Waaseyaa\OAuthProvider\OAuthToken;
 use Waaseyaa\OAuthProvider\OAuthUserProfile;
 
+/**
+ * @api
+ */
 final class GoogleOAuthProvider implements OAuthProviderInterface
 {
     private const AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth';

@@ -8,6 +8,9 @@ use Symfony\Component\Validator\Constraint;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Field\Exception\InvalidFieldDefinitionException;
 
+/**
+ * @api
+ */
 final readonly class FieldDefinition implements FieldDefinitionInterface, \ArrayAccess
 {
     /**

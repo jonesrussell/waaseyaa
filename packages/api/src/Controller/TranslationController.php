@@ -23,6 +23,7 @@ use Waaseyaa\Entity\TranslatableInterface;
  *   POST   /api/{entity_type}/{id}/translations/{langcode}   — create translation
  *   PATCH  /api/{entity_type}/{id}/translations/{langcode}   — update translation
  *   DELETE /api/{entity_type}/{id}/translations/{langcode}   — delete translation
+ * @api
  */
 final class TranslationController
 {

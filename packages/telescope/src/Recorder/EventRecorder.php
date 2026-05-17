@@ -8,6 +8,7 @@ use Waaseyaa\Telescope\Storage\TelescopeStoreInterface;
 
 /**
  * Records dispatched events with class name, payload, and listeners.
+ * @api
  */
 final class EventRecorder
 {

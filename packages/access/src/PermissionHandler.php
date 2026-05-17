@@ -6,6 +6,7 @@ namespace Waaseyaa\Access;
 
 /**
  * Simple in-memory registry of permissions.
+ * @api
  */
 final class PermissionHandler implements PermissionHandlerInterface
 {

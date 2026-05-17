@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity\Event;
 
+/**
+ * @api
+ */
 enum EntityEvents: string
 {
     case PRE_SAVE = 'waaseyaa.entity.pre_save';

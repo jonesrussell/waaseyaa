@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Inertia;
 
+/**
+ * @api
+ */
 final class Inertia
 {
     /** @var array<string, mixed> */

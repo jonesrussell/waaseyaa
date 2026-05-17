@@ -8,6 +8,7 @@ use Waaseyaa\AI\Schema\Mcp\McpToolDefinition;
 
 /**
  * In-memory tool registry mapping tool names to definitions and executors.
+ * @api
  */
 final class ToolRegistry implements ToolRegistryInterface
 {

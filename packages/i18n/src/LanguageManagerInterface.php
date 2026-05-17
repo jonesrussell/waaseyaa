@@ -6,6 +6,7 @@ namespace Waaseyaa\I18n;
 
 /**
  * Manages the set of available languages in the system.
+ * @api
  */
 interface LanguageManagerInterface
 {

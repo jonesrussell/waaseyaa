@@ -6,6 +6,7 @@ namespace Waaseyaa\Telescope;
 
 /**
  * Value object representing a single recorded telescope entry.
+ * @api
  */
 final class TelescopeEntry
 {

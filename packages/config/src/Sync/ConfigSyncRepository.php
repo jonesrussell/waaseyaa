@@ -22,6 +22,7 @@ use Waaseyaa\Config\Exception\ConfigSerializationException;
  * test doubles / alternate stores.
  *
  * @see \Waaseyaa\Config\Sync\ConfigSyncFile
+ * @api
  */
 final class ConfigSyncRepository
 {

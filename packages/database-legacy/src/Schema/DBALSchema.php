@@ -10,6 +10,9 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Waaseyaa\Database\SchemaInterface;
 
+/**
+ * @api
+ */
 final class DBALSchema implements SchemaInterface
 {
     private readonly AbstractSchemaManager $sm;

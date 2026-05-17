@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Foundation\Schema\SchemaRegistryInterface;
 
+/**
+ * @api
+ */
 final class SchemaListHandler
 {
     public function __construct(

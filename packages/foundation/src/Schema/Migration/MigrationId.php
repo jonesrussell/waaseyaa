@@ -34,6 +34,7 @@ namespace Waaseyaa\Foundation\Schema\Migration;
  * second identifier column (Q1 ratified Option B-equivalent).
  *
  * @see docs/specs/schema-evolution-v2.md §15 Q1
+ * @api
  */
 final readonly class MigrationId
 {

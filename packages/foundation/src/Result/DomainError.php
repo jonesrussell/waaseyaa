@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Result;
 
+/**
+ * @api
+ */
 final readonly class DomainError
 {
     public function __construct(

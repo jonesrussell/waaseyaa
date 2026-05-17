@@ -9,6 +9,7 @@ namespace Waaseyaa\Foundation\Ingestion;
  *
  * Both success and failure events share this structure. The status field
  * distinguishes outcomes; errors are present only on failure.
+ * @api
  */
 final readonly class IngestionLogEntry
 {

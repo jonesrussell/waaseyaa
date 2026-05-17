@@ -6,6 +6,9 @@ namespace Waaseyaa\Auth\Token;
 
 use Waaseyaa\Database\DatabaseInterface;
 
+/**
+ * @api
+ */
 final class AuthTokenRepository implements AuthTokenRepositoryInterface
 {
     private const TABLE = 'auth_tokens';

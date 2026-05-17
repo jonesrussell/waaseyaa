@@ -10,6 +10,7 @@ use Waaseyaa\Field\FieldDefinition;
 /**
  * Resolves {@see ContentEntityType}, {@see ContentEntityKeys}, and {@see Field}
  * attributes for a class with per-class caching.
+ * @api
  */
 final class EntityMetadataReader
 {

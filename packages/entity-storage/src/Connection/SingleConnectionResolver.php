@@ -11,6 +11,7 @@ use Waaseyaa\Database\DatabaseInterface;
  *
  * Always returns the same database connection regardless of the
  * requested connection name. This is the default resolver.
+ * @api
  */
 final class SingleConnectionResolver implements ConnectionResolverInterface
 {

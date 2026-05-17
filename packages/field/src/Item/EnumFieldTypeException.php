@@ -22,6 +22,7 @@ namespace Waaseyaa\Field\Item;
  *
  * The string codes mirror the contract names (e.g. `EnumFieldType.UnknownEnumClass`)
  * so error messages remain greppable.
+ * @api
  */
 final class EnumFieldTypeException extends \RuntimeException
 {

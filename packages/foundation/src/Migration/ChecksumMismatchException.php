@@ -20,6 +20,7 @@ namespace Waaseyaa\Foundation\Migration;
  *
  * The diagnostic code `CHECKSUM_MISMATCH` is part of the operator
  * surface — runbooks and CI greps match on the string.
+ * @api
  */
 final class ChecksumMismatchException extends \RuntimeException
 {

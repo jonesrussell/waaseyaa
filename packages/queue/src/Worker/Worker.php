@@ -11,6 +11,7 @@ use Waaseyaa\Queue\Transport\TransportInterface;
 
 /**
  * Long-running worker that processes jobs from a queue transport.
+ * @api
  */
 final class Worker
 {

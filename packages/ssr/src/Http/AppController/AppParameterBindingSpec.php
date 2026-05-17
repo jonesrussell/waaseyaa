@@ -6,6 +6,7 @@ namespace Waaseyaa\SSR\Http\AppController;
 
 /**
  * Immutable description of how one controller action parameter is resolved.
+ * @api
  */
 final readonly class AppParameterBindingSpec
 {

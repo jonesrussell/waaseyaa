@@ -9,6 +9,9 @@ use Waaseyaa\AI\Observability\Handle\TraceHandle;
 use Waaseyaa\AI\Observability\Value\DecisionTrace;
 use Waaseyaa\AI\Observability\Value\Outcome;
 
+/**
+ * @api
+ */
 final class NullTraceRecorder implements TraceRecorderInterface
 {
     public function startTrace(string $label, array $attributes = []): TraceHandle

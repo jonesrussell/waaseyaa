@@ -14,6 +14,7 @@ use Waaseyaa\Database\DBALDatabase;
  * check: `UPDATE ... SET consumed_at = ? WHERE code = ? AND consumed_at IS NULL
  * AND expires_at > ?`. Concurrent consume() calls race on this one statement;
  * exactly one observes a non-zero affected-rows count.
+ * @api
  */
 final class DatabaseAuthorizationCodeRepository implements AuthorizationCodeRepositoryInterface
 {

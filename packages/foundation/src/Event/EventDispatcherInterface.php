@@ -34,6 +34,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
  * The kernel binds `SymfonyEventDispatcherAdapter` as the default
  * implementation; consumers can replace the binding with any other
  * implementation that satisfies this contract.
+ * @api
  */
 interface EventDispatcherInterface extends PsrEventDispatcherInterface
 {

@@ -10,6 +10,7 @@ namespace Waaseyaa\Config;
  * Implementations provide getTranslated() for fetching config with
  * language-specific overrides, and getOriginal() for the untranslated
  * version.
+ * @api
  */
 interface TranslatableConfigFactoryInterface extends ConfigFactoryInterface
 {

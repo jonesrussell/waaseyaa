@@ -13,6 +13,7 @@ namespace Waaseyaa\Foundation\Asset;
  *   3. dist/admin/                  (admin SPA)
  *
  * Falls back through the chain until the asset is found.
+ * @api
  */
 final class TenantAssetResolver implements AssetManagerInterface
 {

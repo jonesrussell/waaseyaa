@@ -6,6 +6,7 @@ namespace Waaseyaa\Config;
 
 /**
  * Result of a config manifest verification.
+ * @api
  */
 final readonly class ManifestVerificationResult
 {

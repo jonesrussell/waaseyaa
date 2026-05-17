@@ -9,6 +9,7 @@ use Waaseyaa\Field\FieldStorage;
 
 /**
  * Core {@see FieldDefinition} objects for genealogy entity types (registry boundary).
+ * @api
  */
 final class GenealogyFieldDefinitions
 {

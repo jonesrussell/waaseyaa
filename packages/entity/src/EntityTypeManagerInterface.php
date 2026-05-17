@@ -6,6 +6,9 @@ namespace Waaseyaa\Entity;
 
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
+/**
+ * @api
+ */
 interface EntityTypeManagerInterface
 {
     public function getDefinition(string $entityTypeId): EntityTypeInterface;

@@ -7,6 +7,9 @@ namespace Waaseyaa\Cache\Backend;
 use Waaseyaa\Cache\CacheBackendInterface;
 use Waaseyaa\Cache\CacheItem;
 
+/**
+ * @api
+ */
 final class NullBackend implements CacheBackendInterface
 {
     public function get(string $cid): CacheItem|false

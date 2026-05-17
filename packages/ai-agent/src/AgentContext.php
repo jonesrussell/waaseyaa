@@ -11,6 +11,7 @@ use Waaseyaa\Access\AccountInterface;
  *
  * Contains the user account the agent acts as, agent-specific parameters,
  * and whether this is a dry run.
+ * @api
  */
 final readonly class AgentContext
 {

@@ -6,6 +6,9 @@ namespace Waaseyaa\Entity;
 
 use Waaseyaa\Field\FieldDefinitionInterface;
 
+/**
+ * @api
+ */
 interface FieldableInterface
 {
     public function hasField(string $name): bool;

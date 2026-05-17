@@ -27,6 +27,7 @@ use Waaseyaa\Foundation\Schema\Diff\CompositeDiff;
  * **Layer:** Layer 1 (entity-storage). Imports the foundation
  * {@see CompositeDiff} value type — that direction is allowed
  * (downward); foundation never imports back.
+ * @api
  */
 final readonly class EntityLevelDiff
 {

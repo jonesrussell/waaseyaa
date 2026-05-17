@@ -8,6 +8,9 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Config\Event\ConfigEvent;
 use Waaseyaa\Config\Event\ConfigEvents;
 
+/**
+ * @api
+ */
 final class ConfigManager implements ConfigManagerInterface
 {
     public function __construct(

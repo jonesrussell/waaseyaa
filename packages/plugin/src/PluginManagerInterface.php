@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Plugin;
 
+/**
+ * @api
+ */
 interface PluginManagerInterface
 {
     public function getDefinition(string $pluginId): Definition\PluginDefinition;

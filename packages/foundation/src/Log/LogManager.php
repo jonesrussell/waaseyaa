@@ -20,6 +20,9 @@ use Waaseyaa\Foundation\Log\Processor\MemoryUsageProcessor;
 use Waaseyaa\Foundation\Log\Processor\ProcessorInterface;
 use Waaseyaa\Foundation\Log\Processor\RequestIdProcessor;
 
+/**
+ * @api
+ */
 final class LogManager implements LoggerInterface
 {
     use LoggerTrait;

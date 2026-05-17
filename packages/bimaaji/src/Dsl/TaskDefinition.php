@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Bimaaji\Dsl;
 
+/**
+ * @api
+ */
 final readonly class TaskDefinition
 {
     public function __construct(

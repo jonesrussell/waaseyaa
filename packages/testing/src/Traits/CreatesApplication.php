@@ -10,6 +10,7 @@ namespace Waaseyaa\Testing\Traits;
  * Provides a minimal bootstrap that creates an in-memory SQLite
  * database and a default configuration. Override bootApplication()
  * in your test class for custom setup.
+ * @api
  */
 trait CreatesApplication
 {

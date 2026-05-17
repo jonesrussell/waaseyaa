@@ -6,6 +6,9 @@ namespace Waaseyaa\Foundation\Middleware;
 
 use Waaseyaa\Queue\Job;
 
+/**
+ * @api
+ */
 final class JobPipeline
 {
     /** @param JobMiddlewareInterface[] $middleware */

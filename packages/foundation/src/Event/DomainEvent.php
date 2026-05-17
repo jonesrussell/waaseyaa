@@ -7,6 +7,9 @@ namespace Waaseyaa\Foundation\Event;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @api
+ */
 abstract class DomainEvent extends Event
 {
     public readonly string $eventId;

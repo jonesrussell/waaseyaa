@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\Access\PermissionHandlerInterface;
 use Waaseyaa\CLI\CliIO;
 
+/**
+ * @api
+ */
 final class PermissionListHandler
 {
     public function __construct(

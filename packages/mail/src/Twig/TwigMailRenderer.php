@@ -7,6 +7,9 @@ namespace Waaseyaa\Mail\Twig;
 use Twig\Environment;
 use Waaseyaa\Mail\Envelope;
 
+/**
+ * @api
+ */
 final class TwigMailRenderer
 {
     public function __construct(

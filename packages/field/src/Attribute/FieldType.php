@@ -6,6 +6,9 @@ namespace Waaseyaa\Field\Attribute;
 
 use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
 
+/**
+ * @api
+ */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class FieldType extends WaaseyaaPlugin
 {

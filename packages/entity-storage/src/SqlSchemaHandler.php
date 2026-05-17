@@ -24,6 +24,7 @@ use Waaseyaa\Foundation\Log\NullLogger;
  * for translatable entity types, and — for multi-bundle entity types whose
  * bundles carry registered fields — per-bundle subtables named
  * `{base_table}__{bundle}`. See docs/specs/bundle-scoped-storage.md.
+ * @api
  */
 final class SqlSchemaHandler
 {

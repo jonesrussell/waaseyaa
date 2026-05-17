@@ -6,6 +6,9 @@ namespace Waaseyaa\Field;
 
 use Waaseyaa\Plugin\PluginInspectionInterface;
 
+/**
+ * @api
+ */
 interface FieldTypeInterface extends PluginInspectionInterface
 {
     /** @return array<string, array{type: string, description?: string}> */

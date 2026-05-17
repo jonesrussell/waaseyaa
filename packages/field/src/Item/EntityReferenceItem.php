@@ -14,6 +14,9 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'reference',
     defaultCardinality: 1,
 )]
+/**
+ * @api
+ */
 final class EntityReferenceItem extends FieldItemBase
 {
     public static function propertyDefinitions(): array

@@ -8,6 +8,9 @@ use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Entity\Audit\EntityAuditLogger;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
 
+/**
+ * @api
+ */
 final class AuditLogHandler
 {
     public function __construct(

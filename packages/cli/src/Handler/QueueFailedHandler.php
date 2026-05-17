@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Queue\FailedJobRepositoryInterface;
 
+/**
+ * @api
+ */
 final class QueueFailedHandler
 {
     public function __construct(

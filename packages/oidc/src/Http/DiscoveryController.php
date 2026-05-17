@@ -6,6 +6,9 @@ namespace Waaseyaa\Oidc\Http;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 
+/**
+ * @api
+ */
 final readonly class DiscoveryController
 {
     public function __construct(private string $issuer) {}

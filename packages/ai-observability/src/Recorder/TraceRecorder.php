@@ -14,6 +14,9 @@ use Waaseyaa\AI\Observability\Value\Outcome;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 
+/**
+ * @api
+ */
 final class TraceRecorder implements TraceRecorderInterface
 {
     public function __construct(

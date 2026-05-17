@@ -6,6 +6,7 @@ namespace Waaseyaa\Routing\Exception;
 
 /**
  * Thrown when a route exists for a path but the HTTP method is not allowed.
+ * @api
  */
 final class RouteMethodNotAllowedException extends \RuntimeException
 {

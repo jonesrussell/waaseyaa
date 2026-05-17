@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Dead-code baseline collapsed (1,341 → 184 entries, -86%).** Phase 1 extends `WaaseyaaEntrypointProvider` to recognize `EntityBase`/`ContentEntityBase` subclasses and the traits they `use` (members hydrated via reflection are call-graph-invisible). Phase 2 applies `@api` PHPDoc to ~410 extension-point classes, public service facades, DTOs, and the entire `packages/testing/src/` consumer surface across 41 packages — promoting them to stable public surface. Six classes are deliberately excluded for Phase 3 review (`SqlEntityQuery`, `RevisionPruner`, `ReservedBackendIds`, `SseBroadcaster`, `AgentExecutor`, `TwoFactorManager`). Three `@internal` interfaces left untouched pending decision in #1493. Full audit and Phase 3 surface list: `docs/audits/2026-05-17-dead-code-baseline-audit.md`.
+
 ## [0.1.0-alpha.180] - 2026-05-17
 
 ### Added

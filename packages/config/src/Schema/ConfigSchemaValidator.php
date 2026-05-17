@@ -15,6 +15,7 @@ namespace Waaseyaa\Config\Schema;
  * - minimum / maximum: numeric range constraints
  * - default: default value (missing values with defaults are not violations)
  * - translatable: marker for translation-eligible keys (informational, not validated)
+ * @api
  */
 final class ConfigSchemaValidator
 {

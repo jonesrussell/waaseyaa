@@ -14,6 +14,7 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
  * - {type}_translation_create: Create a new translation for an entity
  * - {type}_translation_update: Update an existing translation
  * - {type}_translation_delete: Delete a translation for an entity
+ * @api
  */
 final class TranslationToolGenerator
 {

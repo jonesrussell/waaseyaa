@@ -6,6 +6,9 @@ namespace Waaseyaa\AI\Observability\Cost;
 
 use Waaseyaa\AI\Observability\Value\BudgetDecision;
 
+/**
+ * @api
+ */
 final class BudgetManager
 {
     private const WARN_RATIO = 0.8;

@@ -12,6 +12,7 @@ use Waaseyaa\Database\DatabaseInterface;
  * This is the multi-tenancy seam for database access. In single-tenant
  * mode, SingleConnectionResolver always returns the same connection.
  * Multi-tenant implementations can resolve per-tenant connections.
+ * @api
  */
 interface ConnectionResolverInterface
 {

@@ -10,6 +10,7 @@ namespace Waaseyaa\AI\Agent;
  * Agents operate as a specific user within the permission model,
  * support dry-run mode for previewing changes, and produce
  * structured results with audit logging.
+ * @api
  */
 interface AgentInterface
 {

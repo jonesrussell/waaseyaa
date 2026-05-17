@@ -7,6 +7,7 @@ namespace Waaseyaa\Foundation\Result;
 /**
  * @template T
  * @template E
+ * @api
  */
 final readonly class Result
 {

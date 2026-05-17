@@ -9,6 +9,7 @@ namespace Waaseyaa\Search;
  *
  * Carries only the document ID and entity type — the job handler
  * reloads the entity from storage to get fresh data.
+ * @api
  */
 final readonly class SearchIndexJob
 {

@@ -40,6 +40,7 @@ namespace Waaseyaa\Foundation\Schema\Compiler\Sqlite;
  *
  * Future WPs may append cases to this enum but MUST NOT remove or
  * rename existing ones without an ADR.
+ * @api
  */
 enum SqliteDiagnosticCode: string
 {

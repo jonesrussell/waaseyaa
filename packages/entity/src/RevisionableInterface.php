@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+/**
+ * @api
+ */
 interface RevisionableInterface
 {
     public function getRevisionId(): ?int;

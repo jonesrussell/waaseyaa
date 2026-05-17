@@ -15,6 +15,7 @@ use Waaseyaa\Access\AccountInterface;
  *
  * Alternate backends (Redis, in-memory) are allowed; the /token endpoint depends
  * only on this interface.
+ * @api
  */
 interface AuthorizationCodeRepositoryInterface
 {

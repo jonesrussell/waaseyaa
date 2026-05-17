@@ -6,6 +6,9 @@ namespace Waaseyaa\SSR;
 
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * @api
+ */
 final class SsrController
 {
     public function __construct(

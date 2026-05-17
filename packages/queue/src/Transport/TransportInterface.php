@@ -10,6 +10,7 @@ namespace Waaseyaa\Queue\Transport;
  * Handles the low-level storage and retrieval of serialized job payloads.
  *
  * @internal
+ * @api
  */
 interface TransportInterface
 {

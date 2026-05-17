@@ -14,6 +14,7 @@ namespace Waaseyaa\Config\Sync;
  * Stability scope: INTERNAL. The `--format=json` payload uses the field names
  * documented in `contracts/cli-namespace.md` (`counts.in_sync`, `counts.drift`,
  * `counts.sync_only`, `counts.active_only`, `counts.renamed`, plus `entries`).
+ * @api
  */
 final readonly class StatusReport
 {

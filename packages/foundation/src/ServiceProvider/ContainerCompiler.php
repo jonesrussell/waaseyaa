@@ -7,6 +7,9 @@ namespace Waaseyaa\Foundation\ServiceProvider;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
+/**
+ * @api
+ */
 final class ContainerCompiler
 {
     /**

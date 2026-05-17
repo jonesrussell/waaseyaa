@@ -11,6 +11,9 @@ use Waaseyaa\TypedData\Type\ListData;
 use Waaseyaa\TypedData\Type\MapData;
 use Waaseyaa\TypedData\Type\StringData;
 
+/**
+ * @api
+ */
 final class TypedDataManager implements TypedDataManagerInterface
 {
     /** @var array<string, class-string> */

@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\ServiceProvider;
 
+/**
+ * @api
+ */
 abstract class ServiceProvider implements ServiceProviderInterface
 {
     protected string $projectRoot = '';

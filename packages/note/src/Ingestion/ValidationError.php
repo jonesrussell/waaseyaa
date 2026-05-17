@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Note\Ingestion;
 
+/**
+ * @api
+ */
 final class ValidationError
 {
     public function __construct(

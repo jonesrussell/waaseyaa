@@ -6,6 +6,9 @@ namespace Waaseyaa\Field;
 
 use Waaseyaa\TypedData\ListInterface;
 
+/**
+ * @api
+ */
 interface FieldItemListInterface extends ListInterface
 {
     public function getFieldDefinition(): FieldDefinitionInterface;

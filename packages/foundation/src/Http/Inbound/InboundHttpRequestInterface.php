@@ -9,6 +9,7 @@ namespace Waaseyaa\Foundation\Http\Inbound;
  *
  * Built at the SSR/controller boundary from Symfony's Request plus the route and
  * query arrays Waaseyaa's dispatcher already extracts.
+ * @api
  */
 interface InboundHttpRequestInterface
 {

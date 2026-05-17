@@ -10,6 +10,7 @@ namespace Waaseyaa\Foundation\Diagnostic;
  * Each case documents the trigger condition, default human message, and
  * remediation steps. When a code fires, DiagnosticEmitter logs a structured
  * entry so operators can correlate errors across distributed systems.
+ * @api
  */
 enum DiagnosticCode: string
 {

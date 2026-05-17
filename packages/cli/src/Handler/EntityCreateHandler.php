@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 
+/**
+ * @api
+ */
 final class EntityCreateHandler
 {
     public function __construct(

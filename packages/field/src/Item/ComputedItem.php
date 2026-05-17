@@ -16,6 +16,9 @@ use Waaseyaa\Field\FieldItemBase;
     category: 'general',
     defaultCardinality: 1,
 )]
+/**
+ * @api
+ */
 final class ComputedItem extends FieldItemBase implements ComputedFieldInterface
 {
     public static function propertyDefinitions(): array

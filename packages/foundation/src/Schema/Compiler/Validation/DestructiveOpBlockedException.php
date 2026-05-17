@@ -15,6 +15,7 @@ namespace Waaseyaa\Foundation\Schema\Compiler\Validation;
  *
  * To allow destruction explicitly, construct the compiler with
  * `PlanPolicy(allowDestructive: true)`.
+ * @api
  */
 final class DestructiveOpBlockedException extends ValidationException
 {

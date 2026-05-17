@@ -14,6 +14,9 @@ use Waaseyaa\CLI\Ingestion\SemanticRefreshTriggerPlanner;
 use Waaseyaa\CLI\Ingestion\ValidationDiagnosticEmitter;
 use Waaseyaa\CLI\Ingestion\ValidationGateValidator;
 
+/**
+ * @api
+ */
 final class IngestRunHandler
 {
     private const array VALID_STATES = ['draft', 'review', 'published', 'archived'];

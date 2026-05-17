@@ -20,6 +20,7 @@ use Waaseyaa\Plugin\Attribute\WaaseyaaPlugin;
  *       keys: ['id' => 'nid', 'uuid' => 'uuid', 'label' => 'title'],
  *   )]
  *   class Node extends ContentEntityBase { ... }
+ * @api
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final class EntityTypeAttribute extends WaaseyaaPlugin

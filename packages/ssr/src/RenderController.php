@@ -10,6 +10,9 @@ use Twig\Error\LoaderError;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityInterface;
 
+/**
+ * @api
+ */
 final class RenderController
 {
     private readonly string $siteName;

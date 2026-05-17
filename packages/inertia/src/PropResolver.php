@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Inertia;
 
+/**
+ * @api
+ */
 final class PropResolver
 {
     public static function optional(\Closure $callback): OptionalProp

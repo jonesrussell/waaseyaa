@@ -7,6 +7,9 @@ namespace Waaseyaa\CLI\Handler;
 use Waaseyaa\CLI\CliIO;
 use Waaseyaa\Scheduler\ScheduleInterface;
 
+/**
+ * @api
+ */
 final class ScheduleListHandler
 {
     public function __construct(

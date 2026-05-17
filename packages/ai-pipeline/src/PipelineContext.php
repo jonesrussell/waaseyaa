@@ -9,6 +9,7 @@ namespace Waaseyaa\AI\Pipeline;
  *
  * Provides shared state that persists across all steps in a pipeline execution.
  * Steps can use this to communicate information outside the normal input/output flow.
+ * @api
  */
 final class PipelineContext
 {

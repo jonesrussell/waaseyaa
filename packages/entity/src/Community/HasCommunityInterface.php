@@ -26,6 +26,7 @@ namespace Waaseyaa\Entity\Community;
  *   }
  *
  * Config entities and system entities should NOT implement this interface.
+ * @api
  */
 interface HasCommunityInterface
 {

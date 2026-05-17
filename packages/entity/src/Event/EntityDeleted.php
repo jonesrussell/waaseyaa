@@ -6,6 +6,9 @@ namespace Waaseyaa\Entity\Event;
 
 use Waaseyaa\Foundation\Event\DomainEvent;
 
+/**
+ * @api
+ */
 final class EntityDeleted extends DomainEvent
 {
     public function __construct(

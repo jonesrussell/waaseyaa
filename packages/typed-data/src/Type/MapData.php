@@ -11,6 +11,9 @@ use Waaseyaa\TypedData\DataDefinitionInterface;
 use Waaseyaa\TypedData\TypedDataInterface;
 use Waaseyaa\TypedData\TypedDataManagerInterface;
 
+/**
+ * @api
+ */
 final class MapData implements ComplexDataInterface, \IteratorAggregate, \Countable
 {
     /** @var array<string, TypedDataInterface> */

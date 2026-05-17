@@ -9,6 +9,7 @@ namespace Waaseyaa\AI\Pipeline;
  *
  * Contains the overall success/failure status, individual step results,
  * the final output data, and execution timing information.
+ * @api
  */
 final readonly class PipelineResult
 {

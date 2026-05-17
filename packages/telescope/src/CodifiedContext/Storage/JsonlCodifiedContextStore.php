@@ -11,6 +11,7 @@ use Waaseyaa\Telescope\TelescopeEntry;
  * JSONL file-based storage backend for codified context entries.
  *
  * Each entry is stored as a JSON line in $directory/telescope_cc.jsonl.
+ * @api
  */
 final class JsonlCodifiedContextStore implements CodifiedContextStoreInterface
 {

@@ -8,6 +8,7 @@ namespace Waaseyaa\AI\Vector;
  * Interface for vector storage backends.
  *
  * Implementations may use in-memory storage, pgvector, Pinecone, Qdrant, etc.
+ * @api
  */
 interface VectorStoreInterface
 {

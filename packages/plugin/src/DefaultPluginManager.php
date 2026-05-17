@@ -9,6 +9,9 @@ use Waaseyaa\Plugin\Discovery\PluginDiscoveryInterface;
 use Waaseyaa\Plugin\Factory\ContainerFactory;
 use Waaseyaa\Plugin\Factory\PluginFactoryInterface;
 
+/**
+ * @api
+ */
 class DefaultPluginManager implements PluginManagerInterface
 {
     /** @var array<string, Definition\PluginDefinition>|null */

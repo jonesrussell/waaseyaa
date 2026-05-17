@@ -29,6 +29,7 @@ namespace Waaseyaa\Foundation\Schema\Compiler;
  * PHP 8.4 has no `sealed` keyword. The closed set per platform is
  * enforced socially (one implementation per kind) and structurally (the
  * compiler folds steps through their canonical dict, never their class).
+ * @api
  */
 interface CompiledStep
 {

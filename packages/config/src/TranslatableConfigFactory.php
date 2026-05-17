@@ -14,6 +14,7 @@ namespace Waaseyaa\Config;
  * Resolution order:
  * 1. Original config from main storage
  * 2. Translation overrides merged on top (shallow merge per top-level key)
+ * @api
  */
 final class TranslatableConfigFactory implements TranslatableConfigFactoryInterface
 {

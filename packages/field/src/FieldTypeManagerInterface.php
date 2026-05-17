@@ -6,6 +6,9 @@ namespace Waaseyaa\Field;
 
 use Waaseyaa\Plugin\PluginManagerInterface;
 
+/**
+ * @api
+ */
 interface FieldTypeManagerInterface extends PluginManagerInterface
 {
     public function getDefaultSettings(string $fieldType): array;

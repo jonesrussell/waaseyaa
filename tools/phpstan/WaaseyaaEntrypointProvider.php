@@ -8,19 +8,22 @@ use ReflectionProperty;
 use ShipMonk\PHPStan\DeadCode\Provider\ReflectionBasedMemberUsageProvider;
 use ShipMonk\PHPStan\DeadCode\Provider\VirtualUsageData;
 
+use function class_exists;
+use function file_get_contents;
+use function glob;
 use function in_array;
 use function interface_exists;
 use function is_array;
+use function is_dir;
 use function is_file;
 use function json_decode;
-use function file_get_contents;
-use function glob;
 use function preg_match;
 use function str_contains;
+use function str_ends_with;
 
 /**
  * Marks Waaseyaa-specific entrypoints as used so the dead-code detector does
- * not flag them. Covers the four discovery patterns Waaseyaa relies on that
+ * not flag them. Covers the six discovery patterns Waaseyaa relies on that
  * are invisible to AST-level call graph analysis:
  *
  *  1. Classes carrying the access-policy attribute (resolved by
@@ -33,6 +36,10 @@ use function str_contains;
  *     segment (resolved by ingestion runtime by namespace convention).
  *  5. Implementations of RouteProviderInterface (resolved by RouteBuilder
  *     when the interface exists in this checkout).
+ *  6. Subclasses of EntityBase or ContentEntityBase, plus traits they `use`
+ *     (populated by SqlEntityStorage via ReflectionProperty::setValue and
+ *     ContentEntityBase::set() string-keyed field magic — both invisible to
+ *     call-graph analysis).
  */
 final class WaaseyaaEntrypointProvider extends ReflectionBasedMemberUsageProvider
 {
@@ -40,13 +47,21 @@ final class WaaseyaaEntrypointProvider extends ReflectionBasedMemberUsageProvide
     private const MIDDLEWARE_ATTRIBUTE = 'Waaseyaa\\Foundation\\Attribute\\AsMiddleware';
     private const ROUTE_PROVIDER_INTERFACE = 'Waaseyaa\\Routing\\RouteProviderInterface';
     private const ENTITY_MAPPER_NAMESPACE_SEGMENT = '\\Ingestion\\EntityMapper\\';
+    private const ENTITY_BASE_CLASSES = [
+        'Waaseyaa\\Entity\\EntityBase',
+        'Waaseyaa\\Entity\\ContentEntityBase',
+    ];
 
     /** @var array<string, true> FQCN set of declared service providers. */
     private array $declaredProviders;
 
+    /** @var array<string, true> FQCN set of traits used by entity subclasses. */
+    private array $entitySupportingTraits;
+
     public function __construct(string $projectRoot)
     {
         $this->declaredProviders = self::loadDeclaredProviders($projectRoot);
+        $this->entitySupportingTraits = self::loadEntitySupportingTraits($projectRoot);
     }
 
     protected function shouldMarkMethodAsUsed(ReflectionMethod $method): ?VirtualUsageData
@@ -85,6 +100,10 @@ final class WaaseyaaEntrypointProvider extends ReflectionBasedMemberUsageProvide
             return true;
         }
 
+        if (isset($this->entitySupportingTraits[$fqcn])) {
+            return true;
+        }
+
         foreach ($reflection->getAttributes() as $attribute) {
             $name = $attribute->getName();
             if ($name === self::POLICY_ATTRIBUTE || $name === self::MIDDLEWARE_ATTRIBUTE) {
@@ -98,7 +117,82 @@ final class WaaseyaaEntrypointProvider extends ReflectionBasedMemberUsageProvide
             return true;
         }
 
+        if (self::isEntitySubclass($reflection)) {
+            return true;
+        }
+
         return false;
+    }
+
+    private static function isEntitySubclass(\ReflectionClass $reflection): bool
+    {
+        $parent = $reflection->getParentClass();
+        while ($parent !== false) {
+            if (in_array($parent->getName(), self::ENTITY_BASE_CLASSES, true)) {
+                return true;
+            }
+            $parent = $parent->getParentClass();
+        }
+        return false;
+    }
+
+    /**
+     * @return array<string, true>
+     */
+    private static function loadEntitySupportingTraits(string $projectRoot): array
+    {
+        $traits = [];
+        $packagesDir = $projectRoot . '/packages';
+        if (!is_dir($packagesDir)) {
+            return $traits;
+        }
+        // Entity classes live at packages/<pkg>/src/<Name>.php or packages/<pkg>/src/Entity/<Name>.php.
+        // Scan both patterns; deeper nests are rare and not worth a full recursive walk on every PHPStan run.
+        $candidates = [];
+        foreach (glob($packagesDir . '/*/src/*.php') ?: [] as $file) {
+            $candidates[] = $file;
+        }
+        foreach (glob($packagesDir . '/*/src/Entity/*.php') ?: [] as $file) {
+            $candidates[] = $file;
+        }
+        foreach ($candidates as $file) {
+            if (!is_file($file) || !str_ends_with($file, '.php')) {
+                continue;
+            }
+            $content = file_get_contents($file);
+            if ($content === false) {
+                continue;
+            }
+            if (preg_match('/\bextends\s+(EntityBase|ContentEntityBase)\b/', $content) !== 1) {
+                continue;
+            }
+            if (preg_match('/^namespace\s+([^;]+);/m', $content, $nsMatch) !== 1) {
+                continue;
+            }
+            if (preg_match('/^\s*(?:final\s+|abstract\s+)?class\s+(\w+)/m', $content, $classMatch) !== 1) {
+                continue;
+            }
+            $fqcn = trim($nsMatch[1]) . '\\' . $classMatch[1];
+            if (!class_exists($fqcn)) {
+                continue;
+            }
+            try {
+                $reflection = new \ReflectionClass($fqcn);
+            } catch (\Throwable) {
+                continue;
+            }
+            foreach ($reflection->getTraitNames() as $traitName) {
+                $traits[$traitName] = true;
+            }
+            $parent = $reflection->getParentClass();
+            while ($parent !== false) {
+                foreach ($parent->getTraitNames() as $traitName) {
+                    $traits[$traitName] = true;
+                }
+                $parent = $parent->getParentClass();
+            }
+        }
+        return $traits;
     }
 
     /**

@@ -11,6 +11,7 @@ use Waaseyaa\Queue\QueueInterface;
  *
  * This is a fire-and-forget dispatcher: it creates a queue message
  * and dispatches it, but does not execute the pipeline itself.
+ * @api
  */
 final class PipelineDispatcher
 {

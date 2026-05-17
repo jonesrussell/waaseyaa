@@ -9,6 +9,7 @@ namespace Waaseyaa\I18n;
  *
  * Holds a static collection of Language objects. The current language
  * defaults to the system default language.
+ * @api
  */
 final class LanguageManager implements LanguageManagerInterface
 {

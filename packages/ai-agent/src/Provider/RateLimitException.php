@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AI\Agent\Provider;
 
+/**
+ * @api
+ */
 final class RateLimitException extends \RuntimeException
 {
     public function __construct(

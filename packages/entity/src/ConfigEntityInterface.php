@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Entity;
 
+/**
+ * @api
+ */
 interface ConfigEntityInterface extends EntityInterface
 {
     public function status(): bool;

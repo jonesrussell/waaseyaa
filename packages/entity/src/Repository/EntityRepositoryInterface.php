@@ -12,6 +12,7 @@ use Waaseyaa\Entity\EntityInterface;
  * This is the public API developers use. It handles entity hydration,
  * language fallback, event dispatch, and delegates raw I/O to a
  * storage driver.
+ * @api
  */
 interface EntityRepositoryInterface
 {

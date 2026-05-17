@@ -33,6 +33,7 @@ use Waaseyaa\Foundation\Schema\Diff\CompositeDiff;
  * computed downstream of this value type — see §15 Q2.
  *
  * @see docs/specs/schema-evolution-v2.md §3, §15 Q1, Q2, Q3
+ * @api
  */
 final readonly class MigrationPlan
 {

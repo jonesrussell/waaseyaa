@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Mercure;
 
+/**
+ * @api
+ */
 final class MercurePublisher
 {
     public function __construct(

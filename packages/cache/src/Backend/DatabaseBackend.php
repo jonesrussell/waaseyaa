@@ -18,6 +18,7 @@ use Waaseyaa\Cache\TagAwareCacheInterface;
  *   created INTEGER
  *   tags   TEXT (comma-separated)
  *   valid  INTEGER (0 or 1)
+ * @api
  */
 final class DatabaseBackend implements TagAwareCacheInterface
 {

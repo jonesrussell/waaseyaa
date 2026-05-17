@@ -8,6 +8,7 @@ namespace Waaseyaa\AI\Vector;
  * In-memory vector store implementation for testing and development.
  *
  * Uses cosine similarity for search operations.
+ * @api
  */
 final class InMemoryVectorStore implements VectorStoreInterface
 {

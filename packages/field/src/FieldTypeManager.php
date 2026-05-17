@@ -9,6 +9,9 @@ use Waaseyaa\Field\Attribute\FieldType;
 use Waaseyaa\Plugin\DefaultPluginManager;
 use Waaseyaa\Plugin\Discovery\AttributeDiscovery;
 
+/**
+ * @api
+ */
 final class FieldTypeManager extends DefaultPluginManager implements FieldTypeManagerInterface
 {
     /**

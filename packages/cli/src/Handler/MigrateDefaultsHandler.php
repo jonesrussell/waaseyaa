@@ -10,6 +10,9 @@ use Waaseyaa\Entity\EntityTypeIdNormalizer;
 use Waaseyaa\Entity\EntityTypeLifecycleManager;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 
+/**
+ * @api
+ */
 final class MigrateDefaultsHandler
 {
     private const MIGRATION_LOG = '/storage/framework/migrate-defaults.jsonl';

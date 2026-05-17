@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Database;
 
+/**
+ * @api
+ */
 interface SchemaInterface
 {
     public function tableExists(string $table): bool;

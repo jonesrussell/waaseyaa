@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Foundation\Kernel;
 
+/**
+ * @api
+ */
 final class ConsoleKernel extends AbstractKernel
 {
     public function handle(): int

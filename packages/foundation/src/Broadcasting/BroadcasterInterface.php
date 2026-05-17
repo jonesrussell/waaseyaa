@@ -10,6 +10,7 @@ namespace Waaseyaa\Foundation\Broadcasting;
  * Implementations may use SSE, WebSockets, Redis Pub/Sub, or any other
  * transport mechanism. The interface decouples event producers from the
  * delivery mechanism.
+ * @api
  */
 interface BroadcasterInterface
 {

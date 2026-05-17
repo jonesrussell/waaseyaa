@@ -8,6 +8,7 @@ use Waaseyaa\Telescope\Storage\TelescopeStoreInterface;
 
 /**
  * Records individual codified context events (load, hash, fail, output, drift).
+ * @api
  */
 final class CodifiedContextEventRecorder
 {

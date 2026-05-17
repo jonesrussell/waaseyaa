@@ -6,6 +6,9 @@ namespace Waaseyaa\Relationship;
 
 use Waaseyaa\Database\DatabaseInterface;
 
+/**
+ * @api
+ */
 final class RelationshipSchemaManager
 {
     public function __construct(

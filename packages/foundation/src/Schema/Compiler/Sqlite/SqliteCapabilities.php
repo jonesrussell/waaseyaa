@@ -33,6 +33,7 @@ namespace Waaseyaa\Foundation\Schema\Compiler\Sqlite;
  * case; the constructor is provided for tests and explicit overrides.
  * For pre-tabulated checkpoints (`sqlite325()`, `sqlite340()`, …) see
  * {@see SqliteCapabilityMatrix}.
+ * @api
  */
 final readonly class SqliteCapabilities
 {
