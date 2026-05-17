@@ -30,7 +30,7 @@ subtasks:
 - T025
 - T026
 - T027
-shell_pid: "82402"
+shell_pid: "85519"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -42,7 +42,7 @@ owned_files:
 - packages/config/tests/Unit/Sync/ConfigImporterTest.php
 - packages/config/tests/Unit/Exception/ConfigImportFailedExceptionTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigImportCommandTest.php
-agent: "claude:sonnet:python-implementer:implementer"
+agent: "claude:opus:python-reviewer:reviewer"
 ---
 
 # Work Package Prompt: WP04 — config:import command + ConfigImporter (DAG order, per-entity tx, orphan-warn)
@@ -104,3 +104,4 @@ This WP depends on: WP01, WP02.
 
 - 2026-05-17T00:25:01Z – claude:sonnet:python-implementer:implementer – shell_pid=82402 – Started implementation via action command
 - 2026-05-17T00:34:28Z – claude:sonnet:python-implementer:implementer – shell_pid=82402 – WP04 ready: config:import + DAG-ordered ConfigImporter
+- 2026-05-17T00:35:17Z – claude:opus:python-reviewer:reviewer – shell_pid=85519 – Started review via action command
