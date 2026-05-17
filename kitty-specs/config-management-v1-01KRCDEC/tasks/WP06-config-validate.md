@@ -82,3 +82,4 @@ This WP depends on: WP02.
 ## Activity Log
 
 - 2026-05-17T00:48:31Z – claude:sonnet:python-implementer:implementer – shell_pid=89608 – Started implementation via action command
+- 2026-05-17T00:54:40Z – claude:sonnet:python-implementer:implementer – shell_pid=89608 – WP06 ready: config:validate + ConfigValidator
