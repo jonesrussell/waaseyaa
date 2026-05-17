@@ -23,7 +23,7 @@ subtasks:
 - T040
 - T041
 - T042
-shell_pid: ''
+shell_pid: "92656"
 history: []
 authoritative_surface: packages/config/
 execution_mode: code_change
@@ -36,6 +36,7 @@ owned_files:
 - packages/config/tests/Unit/Audit/ConfigAuditChannelTest.php
 - packages/config/tests/Unit/Audit/ConfigAuditEventTest.php
 - packages/cli/tests/Unit/Command/Config/ConfigResetCommandTest.php
+agent: "claude:sonnet:python-implementer:implementer"
 ---
 
 # Work Package Prompt: WP07 — config:reset + ConfigResetter + config.audit log channel
@@ -87,3 +88,7 @@ This WP depends on: WP04.
 - `composer phpstan` (level 5) green; `composer cs-check` clean.
 - `bin/check-package-layers` green (no upward `waaseyaa/*` edges introduced).
 - No modifications outside `owned_files` (other than rerun-of-generators where charter explicitly permits).
+
+## Activity Log
+
+- 2026-05-17T00:57:08Z – claude:sonnet:python-implementer:implementer – shell_pid=92656 – Started implementation via action command
