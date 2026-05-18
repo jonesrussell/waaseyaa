@@ -28,9 +28,9 @@ class and the sweep / tests / docs all need the filter to be live.
 
 | ID | Description | WP |
 |---|---|---|
-| T001 | `MissingQueryAccountException` final class + `forQuery()` factory | WP01 |
-| T002 | Add `setAccount(?AccountInterface): static` to `EntityQueryInterface` | WP01 |
-| T003 | Unit test: exception factory message + `\RuntimeException` parentage | WP01 |
+| T001 | `MissingQueryAccountException` final class + `forQuery()` factory | WP01 | [D] |
+| T002 | Add `setAccount(?AccountInterface): static` to `EntityQueryInterface` | WP01 | [D] |
+| T003 | Unit test: exception factory message + `\RuntimeException` parentage | WP01 | [D] |
 | T004 | `SqlEntityQuery` internal state (`$account`, `$accessCheckEnabled`) + `setAccount()` impl + real `accessCheck(bool)` | WP02 |
 | T005 | Inject `EntityAccessHandler` via lazy DI resolve (no constructor change) | WP02 |
 | T006 | `execute()` rewrite: remove stub comment, hydrate page, per-row check, throw on missing-account+enabled, return surviving IDs | WP02 |
@@ -65,9 +65,9 @@ class and the sweep / tests / docs all need the filter to be live.
 **Prompt:** [tasks/WP01-exception-and-interface.md](tasks/WP01-exception-and-interface.md)
 
 **Subtasks:**
-- [ ] T001 `MissingQueryAccountException` final class + `forQuery()` factory (WP01)
-- [ ] T002 Add `setAccount(?AccountInterface): static` to `EntityQueryInterface` (WP01)
-- [ ] T003 Unit test: exception factory message + `\RuntimeException` parentage (WP01)
+- [x] T001 `MissingQueryAccountException` final class + `forQuery()` factory (WP01)
+- [x] T002 Add `setAccount(?AccountInterface): static` to `EntityQueryInterface` (WP01)
+- [x] T003 Unit test: exception factory message + `\RuntimeException` parentage (WP01)
 
 **Risks:**
 - Interface change is technically a breaking change for third-party implementers (today: none known; verify via Composer search). *Mitigation:* the contract addition lands with documentation in CHANGELOG (WP05).
