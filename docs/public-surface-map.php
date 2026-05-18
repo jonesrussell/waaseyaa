@@ -426,6 +426,8 @@ return [
     'Waaseyaa\AI\Vector\EmbeddingInterface' => 'public',
     'Waaseyaa\AI\Vector\EmbeddingStorageInterface' => 'public',
     'Waaseyaa\AI\Vector\DistanceMetric' => 'public',
+    'Waaseyaa\AI\Observability\Recorder\AgentRunMetricsRecorderInterface' => 'public',
+    'Waaseyaa\AI\Observability\Recorder\AgentTelescopeRecorderInterface' => 'public',
     'Waaseyaa\AI\Observability\Recorder\TraceRecorderInterface' => 'public',
     'Waaseyaa\AI\Observability\Value\BudgetDecision' => 'public',
     'Waaseyaa\Bimaaji\Graph\GraphSectionProviderInterface' => 'public',
