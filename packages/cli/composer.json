@@ -10,6 +10,10 @@
         },
         {
             "type": "path",
+            "url": "../ai-agent"
+        },
+        {
+            "type": "path",
             "url": "../cache"
         },
         {
@@ -60,6 +64,7 @@
     "require": {
         "php": ">=8.5",
         "waaseyaa/access": "^0.1.0-alpha.180",
+        "waaseyaa/ai-agent": "^0.1.0-alpha.180",
         "waaseyaa/cache": "^0.1.0-alpha.180",
         "waaseyaa/config": "^0.1.0-alpha.180",
         "waaseyaa/entity": "^0.1.0-alpha.180",
@@ -96,6 +101,7 @@
         "waaseyaa": {
             "providers": [
                 "Waaseyaa\\CLI\\CliServiceProvider",
+                "Waaseyaa\\CLI\\Provider\\AiServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\BundleFixtureServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\EntityTypeServiceProvider",
                 "Waaseyaa\\CLI\\Provider\\HealthSchemaServiceProvider",
