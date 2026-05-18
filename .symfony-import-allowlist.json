@@ -16,6 +16,7 @@
     "packages/admin-surface/src/Host/AbstractAdminSurfaceHost.php",
     "packages/admin-surface/src/Host/GenericAdminSurfaceHost.php",
     "packages/admin-surface/src/Query/SurfaceQueryParser.php",
+    "packages/ai-observability/src/Listener/AgentRunTelemetryListener.php",
     "packages/ai-observability/src/Listener/LlmCallListener.php",
     "packages/ai-observability/src/Listener/ToolCallListener.php",
     "packages/ai-observability/src/ObservabilityServiceProvider.php",

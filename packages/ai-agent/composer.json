@@ -68,7 +68,7 @@
         "waaseyaa/access": "^0.1.0-alpha.180",
         "waaseyaa/ai-schema": "^0.1.0-alpha.180",
         "waaseyaa/ai-tools": "^0.1.0-alpha.180",
-        "waaseyaa/config": "^0.1.0-alpha.180",
+        "waaseyaa/api": "^0.1.0-alpha.180",
         "waaseyaa/database-legacy": "^0.1.0-alpha.180",
         "waaseyaa/entity": "^0.1.0-alpha.180",
         "waaseyaa/entity-storage": "^0.1.0-alpha.180",
@@ -99,7 +99,7 @@
             "providers": [
                 "Waaseyaa\\AI\\Agent\\AiAgentEntityServiceProvider",
                 "Waaseyaa\\AI\\Agent\\AiAgentServiceProvider",
-                "Waaseyaa\\AI\\Agent\\Mcp\\McpServiceProvider"
+                "Waaseyaa\\AI\\Agent\\MessagingServiceProvider"
             ]
         }
     },
