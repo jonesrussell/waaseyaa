@@ -1,7 +1,7 @@
 {
-  "event_count": 24,
-  "last_event_id": "01KRY1WBGDZH5B24E22SV71A0A",
-  "materialized_at": "2026-05-18T17:24:31.373996+00:00",
+  "event_count": 26,
+  "last_event_id": "01KRY21F89CMMHQASMTADZKYWZ",
+  "materialized_at": "2026-05-18T17:27:19.049632+00:00",
   "mission_number": "",
   "mission_slug": "agent-executor-01KRWPK7",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 7
+    "planned": 6
   },
   "work_packages": {
     "WP01": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-05-18T16:20:31.720414+00:00"
     },
     "WP03": {
-      "actor": "user",
+      "actor": "claude:sonnet:implementer:implementer",
       "force_count": 3,
-      "lane": "planned",
-      "last_event_id": "01KRY1WBGDZH5B24E22SV71A0A",
-      "last_transition_at": "2026-05-18T17:24:31.373996+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KRY21F89CMMHQASMTADZKYWZ",
+      "last_transition_at": "2026-05-18T17:27:19.049632+00:00"
     },
     "WP04": {
       "actor": "finalize-tasks",
