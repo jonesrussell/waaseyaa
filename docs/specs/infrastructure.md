@@ -70,7 +70,7 @@ Authoritative dispositions are in `docs/public-surface-map.php`, verified by `Pu
 
 | Package | Interfaces/Classes |
 |---------|-------------------|
-| foundation | `AssetManagerInterface`, `BroadcasterInterface`, `HealthCheckerInterface`, `LoggerInterface`, `HandlerInterface`, `FormatterInterface`, `ProcessorInterface`, `LoggerTrait`, `HttpHandlerInterface`, `HttpMiddlewareInterface`, `JobHandlerInterface`, `JobMiddlewareInterface`, `RateLimiterInterface`, `SchemaRegistryInterface`, `ServiceProviderInterface`, `ServiceProvider`, `DomainEvent`, `WaaseyaaException`, `JsonApiResponseTrait`, `InboundHttpRequestInterface`, `DomainRouterInterface`, `LanguagePathStripperInterface`, `InertiaPageResultInterface`, `InertiaFullPageRendererInterface`, `Migration` |
+| foundation | `AssetManagerInterface`, `HealthCheckerInterface`, `LoggerInterface`, `HandlerInterface`, `FormatterInterface`, `ProcessorInterface`, `LoggerTrait`, `HttpHandlerInterface`, `HttpMiddlewareInterface`, `JobHandlerInterface`, `JobMiddlewareInterface`, `RateLimiterInterface`, `SchemaRegistryInterface`, `ServiceProviderInterface`, `ServiceProvider`, `DomainEvent`, `WaaseyaaException`, `JsonApiResponseTrait`, `InboundHttpRequestInterface`, `DomainRouterInterface`, `LanguagePathStripperInterface`, `InertiaPageResultInterface`, `InertiaFullPageRendererInterface`, `Migration` |
 | cache | `CacheBackendInterface`, `CacheFactoryInterface`, `CacheTagsInvalidatorInterface`, `TagAwareCacheInterface` |
 | database-legacy | `DatabaseInterface`, `SelectInterface`, `InsertInterface`, `UpdateInterface`, `DeleteInterface`, `SchemaInterface`, `TransactionInterface` |
 | plugin | `PluginInspectionInterface`, `PluginManagerInterface`, `PluginBase` |
@@ -251,7 +251,7 @@ All properties are `public readonly`. There are no getter methods.
 
 Domain events use Symfony's `EventDispatcherInterface` directly. There is no custom EventBus wrapper. Service providers register listeners via `$dispatcher->addListener()` or `$dispatcher->addSubscriber()`.
 
-The `Broadcasting\` subsystem (`SseBroadcaster`, `BroadcastMessage`, `BroadcasterInterface`) handles real-time SSE delivery to the admin SPA independently of the event dispatcher.
+Real-time SSE delivery to the admin SPA is handled by the durable-log path: `EventListenerRegistrar::registerBroadcastListeners` subscribes to entity `post_save`/`post_delete` and writes rows into `BroadcastStorage` (DB-backed). `BroadcastRouter` polls that store for the `/broadcast` endpoint. See `docs/specs/broadcasting.md` for the full contract.
 
 ### Best-effort side effects
 

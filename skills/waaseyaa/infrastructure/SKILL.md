@@ -89,21 +89,22 @@ abstract class DomainEvent extends Event
 }
 ```
 
-### EventBus (packages/foundation/src/Event/EventBus.php)
+### Event dispatch (packages/foundation/src/Event/)
 
 ```php
-final class EventBus
+// Domain events extend DomainEvent and are dispatched via Symfony's
+// EventDispatcher (wrapped by SymfonyEventDispatcherAdapter).
+interface EventDispatcherInterface
 {
-    public function __construct(
-        EventDispatcherInterface $syncDispatcher,
-        MessageBusInterface $asyncBus,
-        BroadcasterInterface $broadcaster,
-        ?EventStoreInterface $eventStore = null,
-        ?EventPipeline $eventPipeline = null,
-    );
-    public function dispatch(DomainEvent $event): void;
+    public function dispatch(object $event, ?string $eventName = null): object;
+    public function addListener(string $eventName, callable $listener, int $priority = 0): void;
 }
 ```
+
+Listeners are registered by `EventListenerRegistrar` during HttpKernel boot.
+Real-time SSE broadcasting is fed by `EventListenerRegistrar::registerBroadcastListeners()`,
+which writes events into `BroadcastStorage` (DB-backed). `BroadcastRouter` polls
+that store for the `/broadcast` SSE endpoint. See `docs/specs/broadcasting.md`.
 
 ### Middleware pipeline interfaces
 
@@ -182,12 +183,12 @@ abstract class Migration
 ### Event dispatch flow
 
 ```
-EventBus::dispatch(DomainEvent)
-    1. $eventStore?->append($event)
-    2. If EventPipeline exists: pipeline wraps sync dispatch
-       Else: direct sync dispatch via Symfony EventDispatcher
-    3. $asyncBus->dispatch($event) -- Symfony Messenger
-    4. $broadcaster->broadcast($event) -- SSE
+EventDispatcherInterface::dispatch(DomainEvent)
+    1. SymfonyEventDispatcherAdapter delegates to Symfony EventDispatcher
+    2. Registered listeners (incl. registerBroadcastListeners) fire synchronously
+    3. registerBroadcastListeners pushes entity post_save/post_delete rows into
+       BroadcastStorage; BroadcastRouter polls the store for the /broadcast
+       SSE endpoint
 ```
 
 ### Service provider lifecycle
@@ -405,16 +406,15 @@ $result = $migrator->run([
 assert($result->count === 1);
 ```
 
-### Testing event bus
+### Testing event dispatch
 
 ```php
-$dispatcher = new EventDispatcher();
-$asyncBus = /* Symfony Messenger test bus */;
-$broadcaster = new class implements BroadcasterInterface {
-    public function broadcast(DomainEvent $event): void {}
-};
-$bus = new EventBus($dispatcher, $asyncBus, $broadcaster);
-$bus->dispatch($event);
+$dispatcher = new Symfony\Component\EventDispatcher\EventDispatcher();
+$adapter = new SymfonyEventDispatcherAdapter($dispatcher);
+$adapter->addListener(EntitySaved::class, function (EntitySaved $event): void {
+    // assert behavior
+});
+$adapter->dispatch($event);
 ```
 
 ### Testing query builder
