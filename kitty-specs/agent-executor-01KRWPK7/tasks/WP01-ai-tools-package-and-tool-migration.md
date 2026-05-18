@@ -5,8 +5,6 @@ dependencies: []
 requirement_refs:
 - FR-010
 - FR-011
-- FR-012
-- FR-013
 - FR-015
 - FR-016
 planning_base_branch: main
@@ -25,8 +23,8 @@ subtasks:
 - T007
 - T008
 - T009
-shell_pid: "335268"
-agent: "claude:opus-4-7:reviewer:reviewer"
+agent: claude:opus-4-7:reviewer:reviewer
+shell_pid: 335268
 history:
 - date: '2026-05-18T14:55:10Z'
   actor: tasks-skill
