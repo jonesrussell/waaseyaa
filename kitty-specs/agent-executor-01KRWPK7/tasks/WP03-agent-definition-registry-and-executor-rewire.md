@@ -27,8 +27,8 @@ subtasks:
 - T021
 - T022
 - T023
-shell_pid: "342779"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "353141"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-18T14:55:10Z'
   actor: tasks-skill
@@ -319,3 +319,4 @@ spec-kitty agent action implement WP03 --agent <name>
 
 - 2026-05-18T16:21:14Z – claude:sonnet:implementer:implementer – shell_pid=342779 – Assigned agent via action command
 - 2026-05-18T17:16:08Z – claude:sonnet:implementer:implementer – shell_pid=342779 – Ready for review: AgentExecutor rewired with HITL+retry+cancellation+token/cost; McpEndpoint now serves the 8-tool surface via AgentToolRegistryBridge (FR-012); McpToolDefinition + AgentInterface + ai-agent ToolRegistry + legacy AgentAuditLog VO + ai-schema Mcp/* + Phase8/10/11 legacy tests deleted; ExecutorHitlTest + McpControllerToolsSharingTest landed; all gates green. Pre-existing Phase13/Oidc failures unchanged. NOTE: McpController.php + Phase14/15 + McpControllerXxxTest unit tests remain on the legacy 11-tool surface — production HTTP surface (McpRouteProvider → McpEndpoint) uses the new registry; legacy McpController is reviewer territory for follow-up scoping.
+- 2026-05-18T17:17:14Z – claude:opus-4-7:reviewer:reviewer – shell_pid=353141 – Started review via action command
