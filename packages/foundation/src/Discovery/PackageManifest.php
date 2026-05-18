@@ -42,6 +42,17 @@ final class PackageManifest
         public readonly array $attributeEntityTypes = [],
         /** @var list<class-string> Provider classes that implement HasNativeCommandsInterface */
         public readonly array $nativeCommandProviders = [],
+        /**
+         * Classes carrying `#[Waaseyaa\AI\Tools\Attribute\AsAgentTool]`.
+         *
+         * Each entry records the attribute payload + the class FQCN so
+         * {@see \Waaseyaa\AI\Tools\Catalogue\AttributeToolRegistry} can
+         * lazily instantiate the tool via the container without
+         * re-reflecting at runtime.
+         *
+         * @var list<array{class: class-string, name: string, capability: string, destructive: bool, dry_run_supported: bool, category: string}>
+         */
+        public readonly array $agentTools = [],
     ) {}
 
     /**
@@ -57,7 +68,7 @@ final class PackageManifest
         unset($data['commands'], $data['routes']);
 
         $requiredKeys = ['providers', 'migrations', 'field_types', 'middleware'];
-        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types', 'native_command_providers'];
+        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types', 'native_command_providers', 'agent_tools'];
         $missing = array_diff($requiredKeys, array_keys($data));
 
         if ($missing !== []) {
@@ -88,6 +99,7 @@ final class PackageManifest
             packageDeclarations: $data['package_declarations'] ?? [],
             attributeEntityTypes: $data['attribute_entity_types'] ?? [],
             nativeCommandProviders: $data['native_command_providers'] ?? [],
+            agentTools: $data['agent_tools'] ?? [],
         );
     }
 
@@ -109,6 +121,7 @@ final class PackageManifest
             'package_declarations' => $this->packageDeclarations,
             'attribute_entity_types' => $this->attributeEntityTypes,
             'native_command_providers' => $this->nativeCommandProviders,
+            'agent_tools' => $this->agentTools,
         ];
     }
 }

@@ -186,8 +186,9 @@ final class McpToolExecutor
         $storage = $this->entityTypeManager->getStorage($entityTypeId);
         $query = $storage->getQuery();
 
-        // Disable access checking for MCP tool calls (AI agent context).
-        $query->accessCheck(false);
+        // Access checking left at the default (enabled): every tool-call
+        // must enforce entity-level access against the initiator account.
+        // See docs/adr/019-mcp-tool-access-enforcement.md.
 
         // Apply filters.
         if (isset($arguments['filters']) && \is_array($arguments['filters'])) {

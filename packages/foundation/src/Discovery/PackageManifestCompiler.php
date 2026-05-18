@@ -15,6 +15,9 @@ final class PackageManifestCompiler
     private const POLICY_ATTRIBUTE = 'Waaseyaa\\Access\\Gate\\PolicyAttribute';
     private const FORMATTER_ATTRIBUTE = 'Waaseyaa\\SSR\\Attribute\\AsFormatter';
 
+    /** @internal String FQN avoids upward layer import (Foundation/L0 must not import from AI Tools/L5). */
+    private const AGENT_TOOL_ATTRIBUTE = 'Waaseyaa\\AI\\Tools\\Attribute\\AsAgentTool';
+
     /** @internal String FQN avoids upward layer import (Foundation must not import from CLI/L6). */
     private const CAPABILITY_HAS_NATIVE_COMMANDS = 'Waaseyaa\\Foundation\\ServiceProvider\\Capability\\HasNativeCommandsInterface';
 
@@ -49,6 +52,7 @@ final class PackageManifestCompiler
         $packageDeclarations = [];
         $attributeEntityTypes = [];
         $nativeCommandProviders = [];
+        $agentTools = [];
         $packages = [];
 
         // Read installed packages manifest
@@ -141,6 +145,18 @@ final class PackageManifestCompiler
                 $instance = $attr->newInstance();
                 $policies[$class] = $instance->entityTypes;
             }
+
+            foreach ($ref->getAttributes(self::AGENT_TOOL_ATTRIBUTE) as $attr) {
+                $instance = $attr->newInstance();
+                $agentTools[] = [
+                    'class' => $class,
+                    'name' => $instance->name,
+                    'capability' => $instance->capability,
+                    'destructive' => $instance->destructive,
+                    'dry_run_supported' => $instance->dryRunSupported,
+                    'category' => $instance->category,
+                ];
+            }
         }
 
         // Sort middleware by priority (descending)
@@ -161,6 +177,7 @@ final class PackageManifestCompiler
             packageDeclarations: $packageDeclarations,
             attributeEntityTypes: $attributeEntityTypes,
             nativeCommandProviders: $nativeCommandProviders,
+            agentTools: $agentTools,
         );
     }
 
@@ -592,6 +609,8 @@ final class PackageManifestCompiler
             policies: $manifest->policies,
             packageDeclarations: $manifest->packageDeclarations,
             attributeEntityTypes: $manifest->attributeEntityTypes,
+            nativeCommandProviders: $manifest->nativeCommandProviders,
+            agentTools: $manifest->agentTools,
         );
     }
 
@@ -704,7 +723,8 @@ final class PackageManifestCompiler
                     || !empty($ref->getAttributes(AsMiddleware::class))
                     || !empty($ref->getAttributes(AsEntityType::class))
                     || !empty($ref->getAttributes(self::POLICY_ATTRIBUTE))
-                    || !empty($ref->getAttributes(self::FORMATTER_ATTRIBUTE));
+                    || !empty($ref->getAttributes(self::FORMATTER_ATTRIBUTE))
+                    || $ref->getAttributes(self::AGENT_TOOL_ATTRIBUTE) !== [];
 
                 if ($hasDiscoveryAttribute) {
                     $classes[] = $class;
