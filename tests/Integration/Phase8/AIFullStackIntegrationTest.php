@@ -13,7 +13,6 @@ use Waaseyaa\AI\Agent\AgentContext;
 use Waaseyaa\AI\Agent\AgentExecutor;
 use Waaseyaa\AI\Agent\AgentInterface;
 use Waaseyaa\AI\Agent\AgentResult;
-use Waaseyaa\AI\Agent\McpServer;
 use Waaseyaa\AI\Agent\ToolRegistry;
 use Waaseyaa\AI\Pipeline\Pipeline;
 use Waaseyaa\AI\Pipeline\PipelineContext;
@@ -51,7 +50,6 @@ final class AIFullStackIntegrationTest extends TestCase
     private McpToolExecutor $toolExecutor;
     private AgentExecutor $agentExecutor;
     private SchemaRegistry $registry;
-    private McpServer $mcpServer;
     private FakeEmbeddingProvider $embeddingProvider;
     private InMemoryVectorStore $vectorStore;
     private EntityEmbedder $embedder;
@@ -89,7 +87,6 @@ final class AIFullStackIntegrationTest extends TestCase
         $toolRegistry = new ToolRegistry();
         $this->registry->registerEntityTools($toolRegistry, $this->toolExecutor);
         $this->agentExecutor = new AgentExecutor($toolRegistry);
-        $this->mcpServer = new McpServer($toolRegistry);
 
         // AI vector layer.
         $this->embeddingProvider = new FakeEmbeddingProvider(128);
@@ -255,50 +252,6 @@ final class AIFullStackIntegrationTest extends TestCase
         // Embeddings should differ since content changed.
         $this->assertNotSame($embedding1->vector, $embedding2->vector);
         $this->assertSame('Completely Rewritten Content About AI', $embedding2->metadata['label']);
-    }
-
-    #[Test]
-    public function mcpServerAndVectorSearchEndToEnd(): void
-    {
-        $server = $this->mcpServer;
-
-        // Create entities via MCP server.
-        $server->callTool('create_node', [
-            'attributes' => ['title' => 'React Framework Guide', 'type' => 'article'],
-        ]);
-        $server->callTool('create_node', [
-            'attributes' => ['title' => 'Vue.js Getting Started', 'type' => 'article'],
-        ]);
-        $server->callTool('create_node', [
-            'attributes' => ['title' => 'Angular Architecture Patterns', 'type' => 'article'],
-        ]);
-
-        // Query via MCP server.
-        $queryResult = $server->callTool('query_node', []);
-        $queryData = json_decode($queryResult['content'][0]['text'], true);
-        $this->assertSame(3, $queryData['count']);
-
-        // Embed all entities.
-        foreach ($this->nodeStorage->loadMultiple() as $entity) {
-            $this->embedder->embedEntity($entity);
-        }
-
-        // Search for framework-related content.
-        $results = $this->embedder->searchSimilar('JavaScript frontend framework', 3);
-        $this->assertCount(3, $results);
-
-        // Delete one entity via MCP, remove its embedding.
-        $server->callTool('delete_node', ['id' => 2]);
-        $this->embedder->removeEntity('node', 2);
-
-        // Verify entity and embedding are gone.
-        $readResult = $server->callTool('read_node', ['id' => 2]);
-        $this->assertTrue($readResult['isError']);
-        $this->assertFalse($this->vectorStore->has('node', 2));
-
-        // Search should return only 2 results.
-        $results = $this->embedder->searchSimilar('JavaScript', 10, 'node');
-        $this->assertCount(2, $results);
     }
 
     #[Test]

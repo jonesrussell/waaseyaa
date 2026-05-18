@@ -108,13 +108,9 @@ Layer discipline: all four packages are in layer 5 (AI). They depend downward on
 3. Produces JSON Schema draft 2020-12 with `additionalProperties: true`
 4. `SchemaRegistry` caches tool definitions in memory via `$this->toolCache ??= $this->toolGenerator->generateAll()`
 
-### MCP Tool Execution Flow
+### MCP endpoint
 
-1. `McpServer::callTool()` looks up the tool in `SchemaRegistry::getTool()`
-2. Delegates to `McpToolExecutor::execute()`
-3. `McpToolExecutor` parses tool name: iterates `['create', 'read', 'update', 'delete', 'query']`, matches prefix, extracts entity type ID
-4. Dispatches to `executeCreate/Read/Update/Delete/Query` methods
-5. Returns MCP-compliant array: `{content: [{type: 'text', text: JSON}]}`, with `isError: true` on failure
+The framework's MCP surface is `Waaseyaa\Mcp\McpServerCard` in `packages/mcp/`, wired by `McpRouteProvider` at `/.well-known/mcp.json`. The earlier `Waaseyaa\AI\Agent\McpServer` `tools/list` + `tools/call` adapter was deleted as orphan scaffolding (#1498) — it was never reached. See `docs/specs/mcp-endpoint.md` for the live contract.
 
 ### Agent Execution Flow
 
@@ -199,7 +195,7 @@ Keys are `"{entityTypeId}:{entityId}:{langcode}"`. The `delete()` method removes
 
 - `packages/ai-schema/tests/Unit/` -- EntityJsonSchemaGenerator, SchemaRegistry
 - `packages/ai-schema/tests/Unit/Mcp/` -- McpToolGenerator, McpToolDefinition, McpToolExecutor, TranslationToolGenerator
-- `packages/ai-agent/tests/Unit/` -- AgentExecutor, AgentResult, AgentAction, AgentContext, AgentAuditLog, McpServer
+- `packages/ai-agent/tests/Unit/` -- AgentExecutor, AgentResult, AgentAction, AgentContext, AgentAuditLog
 - `packages/ai-pipeline/tests/Unit/` -- Pipeline, PipelineExecutor, PipelineContext, PipelineStepConfig, PipelineDispatcher, StepResult, PipelineResult, PipelineQueueMessage
 - `packages/ai-vector/tests/Unit/` -- InMemoryVectorStore, EntityEmbedder, EntityEmbedding, SimilarityResult, FakeEmbeddingProvider, DistanceMetric, LanguageAwareVectorTest
 

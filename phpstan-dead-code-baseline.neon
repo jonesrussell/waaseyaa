@@ -37,18 +37,6 @@ parameters:
 			path: packages/ai-agent/src/AgentExecutor.php
 
 		-
-			message: '#^Unused Waaseyaa\\AI\\Agent\\McpServer\:\:callTool$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/ai-agent/src/McpServer.php
-
-		-
-			message: '#^Unused Waaseyaa\\AI\\Agent\\McpServer\:\:listTools$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/ai-agent/src/McpServer.php
-
-		-
 			message: '#^Unused Waaseyaa\\Auth\\RateLimiterInterface\:\:attempts$#'
 			identifier: shipmonk.deadMethod
 			count: 1

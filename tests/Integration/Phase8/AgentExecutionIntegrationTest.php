@@ -13,7 +13,6 @@ use Waaseyaa\AI\Agent\AgentContext;
 use Waaseyaa\AI\Agent\AgentExecutor;
 use Waaseyaa\AI\Agent\AgentInterface;
 use Waaseyaa\AI\Agent\AgentResult;
-use Waaseyaa\AI\Agent\McpServer;
 use Waaseyaa\AI\Agent\ToolRegistry;
 use Waaseyaa\AI\Schema\EntityJsonSchemaGenerator;
 use Waaseyaa\AI\Schema\Mcp\McpToolExecutor;
@@ -28,7 +27,7 @@ use Waaseyaa\User\User;
  * Agent execution with audit logging, tool calls, and MCP server integration.
  *
  * Exercises: waaseyaa/ai-agent (AgentExecutor, AgentContext, AgentResult,
- * AgentAction, McpServer) with waaseyaa/ai-schema (McpToolExecutor,
+ * AgentAction) with waaseyaa/ai-schema (McpToolExecutor,
  * SchemaRegistry) and waaseyaa/entity, waaseyaa/user.
  */
 #[CoversNothing]
@@ -180,41 +179,6 @@ final class AgentExecutionIntegrationTest extends TestCase
         $lastEntry = end($auditLog);
         $this->assertFalse($lastEntry->success);
         $this->assertSame('execute', $lastEntry->action);
-    }
-
-    #[Test]
-    public function mcpServerListToolsAndCallToolWithRealStorage(): void
-    {
-        $toolRegistry = new ToolRegistry();
-        $this->registry->registerEntityTools($toolRegistry, $this->toolExecutor);
-        $server = new McpServer($toolRegistry);
-
-        // List tools.
-        $toolList = $server->listTools();
-        $this->assertArrayHasKey('tools', $toolList);
-        $this->assertCount(5, $toolList['tools']);
-
-        $toolNames = array_column($toolList['tools'], 'name');
-        $this->assertContains('create_node', $toolNames);
-        $this->assertContains('read_node', $toolNames);
-
-        // Call tool to create.
-        $createResult = $server->callTool('create_node', [
-            'attributes' => ['title' => 'MCP Server Node', 'type' => 'article'],
-        ]);
-        $this->assertArrayNotHasKey('isError', $createResult);
-
-        $data = json_decode($createResult['content'][0]['text'], true);
-        $this->assertSame('create', $data['operation']);
-
-        // Call tool to read.
-        $readResult = $server->callTool('read_node', ['id' => $data['id']]);
-        $readData = json_decode($readResult['content'][0]['text'], true);
-        $this->assertSame('MCP Server Node', $readData['data']['title']);
-
-        // Call unknown tool.
-        $unknownResult = $server->callTool('nonexistent_tool', []);
-        $this->assertTrue($unknownResult['isError']);
     }
 
     #[Test]
