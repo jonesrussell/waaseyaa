@@ -20,8 +20,8 @@ subtasks:
 - T026
 - T027
 - T028
-shell_pid: "362237"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "374982"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-18T14:55:10Z'
   actor: tasks-skill
@@ -246,3 +246,4 @@ spec-kitty agent action implement WP04 --agent <name>
 
 - 2026-05-18T17:44:33Z – claude:sonnet:implementer:implementer – shell_pid=362237 – Assigned agent via action command
 - 2026-05-18T18:11:58Z – claude:sonnet:implementer:implementer – shell_pid=362237 – Ready for review: Messenger handler with worker-concurrency guard (NFR-015 CAS), AgentRunService with enqueue+runInline (FR-008), StalledRunReaper (NFR-004 + C-014), config.ai.* schemas, defaults/ai.yaml (C-010 env-name indirection), all gates green (9034 tests, phpstan L5, layer/policy/secrets/defaults/dead-code/external-consumers checks)
+- 2026-05-18T18:12:41Z – claude:opus-4-7:reviewer:reviewer – shell_pid=374982 – Started review via action command
