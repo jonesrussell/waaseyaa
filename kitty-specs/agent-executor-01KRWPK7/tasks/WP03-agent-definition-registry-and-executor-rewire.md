@@ -4,6 +4,8 @@ title: AgentDefinition registry + AgentExecutor rewire
 dependencies:
 - WP02
 requirement_refs:
+- FR-012
+- FR-013
 - FR-014
 - FR-017
 - FR-020
