@@ -396,3 +396,7 @@ Planning + merge target: `main`. Execution lane is allocated by `spec-kitty agen
 ```
 spec-kitty agent action implement WP01 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-18T19:22:28Z – unknown – Moved to done
