@@ -4,8 +4,6 @@ title: AgentDefinition registry + AgentExecutor rewire
 dependencies:
 - WP02
 requirement_refs:
-- FR-012
-- FR-013
 - FR-014
 - FR-017
 - FR-020
@@ -40,34 +38,11 @@ owned_files:
 - packages/ai-agent/src/ToolRegistry.php
 - packages/ai-agent/src/ToolRegistryInterface.php
 - packages/ai-agent/src/AiAgentServiceProvider.php
-- packages/mcp/src/Tools/**
-- packages/mcp/src/McpController.php
-- packages/mcp/src/Bridge/**
-- packages/ai-schema/src/Mcp/**
-- tests/Integration/Phase8/SchemaToolIntegrationTest.php
-- tests/Integration/Phase8/AIFullStackIntegrationTest.php
-- tests/Integration/Phase8/AgentExecutionIntegrationTest.php
-- tests/Integration/Phase10/EndToEndSmokeTest.php
-- tests/Integration/Phase11/McpEndpointSmokeTest.php
 - tests/Integration/PhaseN/AgentRuntime/ExecutorHitlTest.php
-- tests/Integration/PhaseN/AgentRuntime/McpControllerToolsSharingTest.php
-- docs/public-surface-map.php
 tags: []
 ---
 
 # WP-03 — `AgentDefinition` registry + `AgentExecutor` rewire
-
-## Scope expanded from WP01 (read first)
-
-WP01's reviewer deferred two subtasks to WP03 because they would have
-forced edits across ~18 files in WP03 territory. **WP03 absorbs the
-following work** (and the new FR-012 / FR-013 mappings):
-
-- **T006 (absorbed):** Delete `packages/mcp/src/Tools/{Entity,Discovery,Traversal,Editorial}Tools.php`. Rewire `packages/mcp/src/McpController.php` to consume `Waaseyaa\AI\Tools\ToolRegistryInterface` (the `AttributeToolRegistry` shipped by WP01). The controller's `tools/list` / `tools/call` shape stays byte-identical externally.
-- **T007 (absorbed):** Delete `packages/ai-schema/src/Mcp/McpToolDefinition.php`. Update every generator under `packages/ai-schema/src/Mcp/*` and bridge under `packages/mcp/src/Bridge/*` to consume `Waaseyaa\AI\Tools\AgentTool` directly. Sweep test references in `tests/Integration/Phase8/{SchemaToolIntegrationTest,AIFullStackIntegrationTest,AgentExecutionIntegrationTest}.php`, `tests/Integration/Phase10/EndToEndSmokeTest.php`, `tests/Integration/Phase11/McpEndpointSmokeTest.php`, and `docs/public-surface-map.php`.
-- **Acceptance test:** add `tests/Integration/PhaseN/AgentRuntime/McpControllerToolsSharingTest.php` that boots the kernel, calls the MCP `/mcp` endpoint with `tools/list`, asserts the eight stock tools appear, and exercises `tools/call` for one read-only tool against a seeded entity.
-
-`bin/check-external-consumers ai-agent-orphans` (delivered by WP01) MUST exit 0 after these deletions land. The WP01 reviewer recorded one minor nit to clean up while you are touching adjacent code: `packages/ai-tools/src/Entity/EntityReadTool.php:104` uses `method_exists($entity, 'getValues')` — replace with `toArray()` (the actual `EntityInterface` method). Safe no-op fallback today, but worth tidying.
 
 ## Objective
 

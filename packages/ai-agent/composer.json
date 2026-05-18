@@ -18,6 +18,10 @@
         },
         {
             "type": "path",
+            "url": "../api"
+        },
+        {
+            "type": "path",
             "url": "../cache"
         },
         {
@@ -51,9 +55,12 @@
     ],
     "require": {
         "php": ">=8.5",
+        "symfony/messenger": "^7.0",
+        "symfony/uid": "^7.0",
         "waaseyaa/access": "^0.1.0-alpha.180",
         "waaseyaa/ai-schema": "^0.1.0-alpha.180",
         "waaseyaa/ai-tools": "^0.1.0-alpha.180",
+        "waaseyaa/api": "^0.1.0-alpha.180",
         "waaseyaa/database-legacy": "^0.1.0-alpha.180",
         "waaseyaa/entity": "^0.1.0-alpha.180",
         "waaseyaa/entity-storage": "^0.1.0-alpha.180",
@@ -82,7 +89,8 @@
         "waaseyaa": {
             "providers": [
                 "Waaseyaa\\AI\\Agent\\AiAgentEntityServiceProvider",
-                "Waaseyaa\\AI\\Agent\\AiAgentServiceProvider"
+                "Waaseyaa\\AI\\Agent\\AiAgentServiceProvider",
+                "Waaseyaa\\AI\\Agent\\MessagingServiceProvider"
             ]
         }
     },
