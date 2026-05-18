@@ -19,8 +19,8 @@ subtasks:
 - T035
 - T036
 - T037
-shell_pid: "378305"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "411660"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-18T14:55:10Z'
   actor: tasks-skill
@@ -185,3 +185,4 @@ spec-kitty agent action implement WP06 --agent <name>
 
 - 2026-05-18T18:19:08Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Assigned agent via action command
 - 2026-05-18T18:48:31Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Ready for review: 3 ai:* commands + 2 scheduler entries; --inline+interactive rejection enforced; NFR-001 wall-clock observed at ~35ms; gates green
+- 2026-05-18T18:49:42Z – claude:opus-4-7:reviewer:reviewer – shell_pid=411660 – Started review via action command
