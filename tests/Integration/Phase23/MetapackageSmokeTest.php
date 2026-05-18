@@ -46,8 +46,8 @@ final class MetapackageSmokeTest extends TestCase
     public static function fullClasses(): array
     {
         return [
-            'ai schema registry' => [\Waaseyaa\AI\Schema\SchemaRegistry::class],
-            'mcp endpoint'       => [\Waaseyaa\Mcp\McpEndpoint::class],
+            'ai tools agent tool' => [\Waaseyaa\AI\Tools\AgentTool::class],
+            'mcp endpoint'        => [\Waaseyaa\Mcp\McpEndpoint::class],
         ];
     }
 

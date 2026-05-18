@@ -4,429 +4,776 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AI\Agent;
 
-use Waaseyaa\AI\Agent\Provider\MaxIterationsException;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\AI\Agent\Entity\AgentAuditLog;
+use Waaseyaa\AI\Agent\Entity\AgentRun;
+use Waaseyaa\AI\Agent\Enum\EventType;
+use Waaseyaa\AI\Agent\Enum\HitlMode;
+use Waaseyaa\AI\Agent\Enum\RunStatus;
 use Waaseyaa\AI\Agent\Provider\MessageRequest;
+use Waaseyaa\AI\Agent\Provider\MessageResponse;
 use Waaseyaa\AI\Agent\Provider\ProviderInterface;
-use Waaseyaa\AI\Agent\Provider\StreamingProviderInterface;
+use Waaseyaa\AI\Agent\Provider\RateLimitException;
+use Waaseyaa\AI\Agent\Provider\ToolResultBlock;
+use Waaseyaa\AI\Agent\Repository\AgentAuditLogRepository;
+use Waaseyaa\AI\Agent\Repository\AgentRunRepository;
+use Waaseyaa\AI\Tools\AgentTool;
+use Waaseyaa\AI\Tools\AgentToolResult;
+use Waaseyaa\AI\Tools\ToolNotFoundException;
+use Waaseyaa\AI\Tools\ToolRegistryInterface;
+use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\Log\NullLogger;
 
 /**
- * Executes agents with safety guarantees and audit logging.
+ * Run-loop driver for an {@see AgentRun}.
  *
- * Wraps agent execution in try/catch, logs all executions to an
- * in-memory audit log, and provides MCP tool execution on behalf
- * of agents.
+ * Owns the lifecycle of a run from `queued → running → terminal`. Each
+ * provider call, tool call, approval gate, and error path is persisted
+ * as a row through {@see AgentAuditLogRepository::append()} (C-014). The
+ * legacy in-memory `$auditLog[]` array has been removed; all audit data
+ * lives in the persisted `agent_audit_log` table.
+ *
+ * Responsibilities:
+ *
+ *  - Resolve `AgentTool` instances from the new ai-tools registry and
+ *    dispatch tool calls against `AgentToolInterface::execute()` (FR-014,
+ *    FR-018).
+ *  - Implement the three HITL modes — `None`, `All`, `Interactive`
+ *    (FR-020, NFR-005).
+ *  - Poll the `AgentRun` status row at iteration boundaries and immediately
+ *    before tool invocation to honour cancellation requests (FR-024,
+ *    NFR-003).
+ *  - Retry provider failures with exponential backoff, capped at 30 s,
+ *    capped at 3 retries (FR-025).
+ *  - Surface token usage and USD-cent cost on the returned
+ *    {@see AgentResult} (FR-023).
+ *  - Enforce the transcript size cap from `config.ai.transcript_max_bytes`
+ *    at write boundaries (NFR-007).
+ *
+ * @api
  */
 final class AgentExecutor
 {
-    /** @var AgentAuditLog[] */
-    private array $auditLog = [];
+    /** Maximum retry attempts for transient provider failures (FR-025). */
+    private const int PROVIDER_MAX_RETRIES = 3;
+
+    /** Base backoff in ms; doubled per attempt then capped at 30s. */
+    private const int PROVIDER_BACKOFF_BASE_MS = 1000;
+
+    /** Hard cap per backoff sleep (30 s, FR-025). */
+    private const int PROVIDER_BACKOFF_CAP_MS = 30000;
+
+    private readonly LoggerInterface $logger;
 
     public function __construct(
         private readonly ToolRegistryInterface $toolRegistry,
-    ) {}
-
-    /**
-     * Execute an agent in normal mode.
-     */
-    public function execute(AgentInterface $agent, AgentContext $context): AgentResult
-    {
-        $agentId = $this->getAgentId($agent);
-        $accountId = (int) $context->account->id();
-
-        try {
-            $result = $agent->execute($context);
-
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: $agentId,
-                accountId: $accountId,
-                action: 'execute',
-                success: $result->success,
-                message: $result->message,
-                data: $result->data,
-                timestamp: \time(),
-            );
-
-            return $result;
-        } catch (\Throwable $e) {
-            $result = AgentResult::failure(
-                message: "Agent execution failed: {$e->getMessage()}",
-                data: ['exception' => $e::class],
-            );
-
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: $agentId,
-                accountId: $accountId,
-                action: 'execute',
-                success: false,
-                message: $result->message,
-                data: $result->data,
-                timestamp: \time(),
-            );
-
-            return $result;
-        }
+        private readonly AgentRunRepository $runRepository,
+        private readonly AgentAuditLogRepository $auditRepository,
+        private readonly int $transcriptMaxBytes = 262144,
+        private readonly int $hitlPollIntervalMs = 1000,
+        private readonly int $hitlTimeoutSeconds = 300,
+        ?LoggerInterface $logger = null,
+        ?\Closure $sleepMs = null,
+        ?\Closure $now = null,
+    ) {
+        $this->logger = $logger ?? new NullLogger();
+        $this->sleepMs = $sleepMs ?? static function (int $ms): void {
+            if ($ms > 0) {
+                \usleep($ms * 1000);
+            }
+        };
+        $this->now = $now ?? static fn(): \DateTimeImmutable => new \DateTimeImmutable('now');
     }
 
     /**
-     * Execute an agent in dry-run mode.
-     */
-    public function dryRun(AgentInterface $agent, AgentContext $context): AgentResult
-    {
-        $agentId = $this->getAgentId($agent);
-        $accountId = (int) $context->account->id();
-
-        try {
-            $result = $agent->dryRun($context);
-
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: $agentId,
-                accountId: $accountId,
-                action: 'dry_run',
-                success: $result->success,
-                message: $result->message,
-                data: $result->data,
-                timestamp: \time(),
-            );
-
-            return $result;
-        } catch (\Throwable $e) {
-            $result = AgentResult::failure(
-                message: "Agent dry-run failed: {$e->getMessage()}",
-                data: ['exception' => $e::class],
-            );
-
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: $agentId,
-                accountId: $accountId,
-                action: 'dry_run',
-                success: false,
-                message: $result->message,
-                data: $result->data,
-                timestamp: \time(),
-            );
-
-            return $result;
-        }
-    }
-
-    /**
-     * Execute an MCP tool call on behalf of an agent.
+     * Injected sleeper. Defaults to {@see usleep()} but is swappable for
+     * tests so retry/HITL polling backoffs do not pace the test suite.
      *
-     * @param string $toolName The MCP tool name to call
-     * @param array<string, mixed> $arguments Tool input arguments
-     * @param AgentContext $context The agent context
-     * @return array{content: array<int, array{type: string, text: string}>, isError?: bool}
+     * @var \Closure(int): void
      */
-    public function executeTool(string $toolName, array $arguments, AgentContext $context): array
-    {
-        $accountId = (int) $context->account->id();
-
-        try {
-            $result = $this->toolRegistry->execute($toolName, $arguments);
-            $isError = $result['isError'] ?? false;
-
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: 'tool',
-                accountId: $accountId,
-                action: 'tool_call',
-                success: !$isError,
-                message: "Tool call: {$toolName}",
-                data: [
-                    'tool' => $toolName,
-                    'arguments' => $arguments,
-                ],
-                timestamp: \time(),
-            );
-
-            return $result;
-        } catch (\Throwable $e) {
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: 'tool',
-                accountId: $accountId,
-                action: 'tool_call',
-                success: false,
-                message: "Tool call failed: {$toolName} - {$e->getMessage()}",
-                data: [
-                    'tool' => $toolName,
-                    'arguments' => $arguments,
-                    'exception' => $e::class,
-                ],
-                timestamp: \time(),
-            );
-
-            return [
-                'content' => [
-                    [
-                        'type' => 'text',
-                        'text' => \json_encode(['error' => $e->getMessage()], \JSON_THROW_ON_ERROR),
-                    ],
-                ],
-                'isError' => true,
-            ];
-        }
-    }
+    private \Closure $sleepMs;
 
     /**
-     * Execute an agent with an LLM provider, handling multi-turn tool loops.
+     * Injected clock. Defaults to `new DateTimeImmutable('now')` but is
+     * swappable for tests so HITL timeouts can be exercised deterministically.
+     *
+     * @var \Closure(): \DateTimeImmutable
      */
-    public function executeWithProvider(
-        AgentInterface $agent,
-        AgentContext $context,
+    private \Closure $now;
+
+    /**
+     * Drive an {@see AgentRun} to a terminal status.
+     *
+     * The run row is reloaded between provider attempts and before each
+     * tool call so that cancellation requests issued via the API surface
+     * are honoured within `3 iterations + 1 tool call` (NFR-003).
+     *
+     * @param array<int, array<string, mixed>> $messages Initial messages.
+     * @param array<int, array<string, mixed>> $tools     Tool descriptors to advertise to the provider.
+     * @param int $maxIterations Iteration budget (FR-026).
+     * @param int $maxTokens Provider per-call token budget.
+     */
+    public function executeRun(
+        AgentRun $run,
+        AccountInterface $initiatorAccount,
         ProviderInterface $provider,
+        array $messages,
+        ?string $system = null,
+        array $tools = [],
+        int $maxIterations = 10,
+        int $maxTokens = 4096,
     ): AgentResult {
-        $agentId = $this->getAgentId($agent);
-        $accountId = (int) $context->account->id();
+        $runId = (string) $run->get('id');
+        $hitl = $run->getDestructiveApproval();
+        $iteration = 0;
+        $transcript = '';
+        $tokenIn = 0;
+        $tokenOut = 0;
+        $costCents = null;
+        $finalText = '';
 
-        try {
-            // Let the agent prepare the initial request
-            $agentResult = $agent->execute($context);
-
-            $messages = $context->parameters['messages'] ?? [
-                ['role' => 'user', 'content' => $agentResult->message],
-            ];
-            $system = $context->parameters['system'] ?? null;
-            $tools = $this->buildToolDefinitions();
-
-            $iteration = 0;
-
-            while (true) {
-                $iteration++;
-                if ($iteration > $context->maxIterations) {
-                    throw new MaxIterationsException($context->maxIterations);
-                }
-
-                $request = new MessageRequest(
-                    messages: $messages,
-                    system: $system,
-                    tools: $tools,
-                    maxTokens: (int) ($context->parameters['max_tokens'] ?? 4096),
+        while (true) {
+            $iteration++;
+            if ($iteration > $maxIterations) {
+                $this->appendError(
+                    $runId,
+                    $iteration,
+                    'max_iterations',
+                    sprintf('Exceeded max iterations (%d).', $maxIterations),
+                );
+                $this->runRepository->markTerminal(
+                    $runId,
+                    RunStatus::Failed,
+                    ($this->now)(),
+                    errorCode: 'max_iterations',
+                    errorMessage: sprintf('Exceeded max iterations (%d).', $maxIterations),
                 );
 
+                return AgentResult::failure(
+                    message: sprintf('Exceeded max iterations (%d).', $maxIterations),
+                    data: ['iterations' => $iteration - 1, 'run_id' => $runId],
+                    tokenUsageIn: $tokenIn,
+                    tokenUsageOut: $tokenOut,
+                    costCents: $costCents,
+                );
+            }
+
+            // Iteration-entry cancellation poll (NFR-003).
+            if ($this->checkCancellation($runId, $iteration)) {
+                return AgentResult::failure(
+                    message: 'Run cancelled.',
+                    data: ['iterations' => $iteration - 1, 'run_id' => $runId, 'cancelled' => true],
+                    tokenUsageIn: $tokenIn,
+                    tokenUsageOut: $tokenOut,
+                    costCents: $costCents,
+                );
+            }
+
+            $this->appendAudit($runId, $iteration, EventType::IterationStart, success: true);
+
+            $request = new MessageRequest(
+                messages: $messages,
+                system: $system,
+                tools: $tools,
+                maxTokens: $maxTokens,
+            );
+
+            // Provider retry loop (FR-025).
+            $response = $this->callProviderWithRetry($provider, $request, $runId, $iteration);
+            if ($response === null) {
+                // Terminal status already written; return a failure result.
+                return AgentResult::failure(
+                    message: 'Provider exhausted retries.',
+                    data: ['iterations' => $iteration, 'run_id' => $runId],
+                    tokenUsageIn: $tokenIn,
+                    tokenUsageOut: $tokenOut,
+                    costCents: $costCents,
+                );
+            }
+
+            $tokenIn += $response->usage['input_tokens'];
+            $tokenOut += $response->usage['output_tokens'];
+
+            $messages[] = ['role' => 'assistant', 'content' => $response->content];
+            $transcript = $this->appendTranscript($transcript, json_encode($response->content, JSON_THROW_ON_ERROR));
+
+            if ($response->stopReason !== 'tool_use') {
+                $finalText = self::extractText($response);
+                break;
+            }
+
+            // Tool-call dispatch.
+            $toolResults = [];
+            foreach ($response->getToolUseBlocks() as $toolUseBlock) {
+                // Per-tool-call cancellation poll (NFR-003).
+                if ($this->checkCancellation($runId, $iteration)) {
+                    return AgentResult::failure(
+                        message: 'Run cancelled.',
+                        data: ['iterations' => $iteration, 'run_id' => $runId, 'cancelled' => true],
+                        tokenUsageIn: $tokenIn,
+                        tokenUsageOut: $tokenOut,
+                        costCents: $costCents,
+                    );
+                }
+
+                $toolName = $toolUseBlock->name;
+                $toolArgs = $toolUseBlock->input;
+
+                try {
+                    $tool = $this->toolRegistry->get($toolName);
+                } catch (ToolNotFoundException $e) {
+                    $this->appendError($runId, $iteration, 'tool_not_found', $e->getMessage(), $toolName, $toolArgs);
+                    $toolResults[] = new ToolResultBlock(
+                        toolUseId: $toolUseBlock->id,
+                        content: json_encode(['error' => $e->getMessage()], JSON_THROW_ON_ERROR),
+                        isError: true,
+                    )->toArray();
+                    continue;
+                }
+
+                // HITL gate for destructive tools (FR-020).
+                if ($tool->destructive) {
+                    $gate = $this->applyHitlGate($run, $hitl, $tool, $toolUseBlock->id, $iteration);
+                    if ($gate === self::HITL_DENIED) {
+                        return AgentResult::failure(
+                            message: sprintf('Destructive tool "%s" denied (mode=%s).', $toolName, $hitl->value),
+                            data: ['run_id' => $runId, 'tool' => $toolName, 'error_code' => 'destructive_denied'],
+                            tokenUsageIn: $tokenIn,
+                            tokenUsageOut: $tokenOut,
+                            costCents: $costCents,
+                        );
+                    }
+                    if ($gate === self::HITL_TIMEOUT) {
+                        return AgentResult::failure(
+                            message: sprintf('Approval timeout for tool "%s".', $toolName),
+                            data: ['run_id' => $runId, 'tool' => $toolName, 'error_code' => 'approval_timeout'],
+                            tokenUsageIn: $tokenIn,
+                            tokenUsageOut: $tokenOut,
+                            costCents: $costCents,
+                        );
+                    }
+                    if ($gate === self::HITL_DENIED_INTERACTIVE) {
+                        return AgentResult::failure(
+                            message: sprintf('Approval denied for tool "%s".', $toolName),
+                            data: ['run_id' => $runId, 'tool' => $toolName, 'error_code' => 'approval_denied'],
+                            tokenUsageIn: $tokenIn,
+                            tokenUsageOut: $tokenOut,
+                            costCents: $costCents,
+                        );
+                    }
+                    // GRANTED — fall through.
+                }
+
+                $toolCallStart = microtime(true);
+                $auditArgs = $tool->impl->argumentsForAudit($toolArgs);
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ToolCall,
+                    success: true,
+                    toolName: $toolName,
+                    toolArgumentsJson: json_encode($auditArgs, JSON_THROW_ON_ERROR),
+                );
+
+                try {
+                    $toolResult = $tool->impl->execute($toolArgs, $initiatorAccount);
+                } catch (\Throwable $e) {
+                    $this->logger->error(sprintf('Tool "%s" threw: %s', $toolName, $e->getMessage()));
+                    $this->appendAudit(
+                        $runId,
+                        $iteration,
+                        EventType::Error,
+                        success: false,
+                        toolName: $toolName,
+                        toolResultSummary: $e->getMessage(),
+                        durationMs: self::msSince($toolCallStart),
+                    );
+                    $toolResults[] = new ToolResultBlock(
+                        toolUseId: $toolUseBlock->id,
+                        content: json_encode(['error' => $e->getMessage()], JSON_THROW_ON_ERROR),
+                        isError: true,
+                    )->toArray();
+                    continue;
+                }
+
+                $resultEvent = $toolResult->isError ? EventType::Error : EventType::ToolResult;
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    $resultEvent,
+                    success: !$toolResult->isError,
+                    toolName: $toolName,
+                    toolResultSummary: $toolResult->summary,
+                    durationMs: self::msSince($toolCallStart),
+                );
+
+                $resultText = self::toolResultToText($toolResult);
+                $transcript = $this->appendTranscript($transcript, $resultText);
+
+                $toolResults[] = new ToolResultBlock(
+                    toolUseId: $toolUseBlock->id,
+                    content: $resultText,
+                    isError: $toolResult->isError,
+                )->toArray();
+            }
+
+            $messages[] = ['role' => 'user', 'content' => $toolResults];
+        }
+
+        $finishedAt = ($this->now)();
+        $this->runRepository->markTerminal($runId, RunStatus::Completed, $finishedAt);
+
+        return AgentResult::success(
+            message: $finalText,
+            data: ['iterations' => $iteration, 'run_id' => $runId, 'transcript' => $transcript],
+            tokenUsageIn: $tokenIn,
+            tokenUsageOut: $tokenOut,
+            costCents: $costCents,
+        );
+    }
+
+    /**
+     * Execute a single tool by name on behalf of an external caller.
+     *
+     * Used by mission-internal tooling that wants to invoke an
+     * `AgentTool` without going through the LLM loop. Audit rows are
+     * written when a `$runId` is supplied.
+     *
+     * @param array<string, mixed> $arguments
+     */
+    public function executeTool(
+        string $toolName,
+        array $arguments,
+        AccountInterface $account,
+        ?string $runId = null,
+        int $iteration = 0,
+    ): AgentToolResult {
+        try {
+            $tool = $this->toolRegistry->get($toolName);
+        } catch (ToolNotFoundException $e) {
+            if ($runId !== null) {
+                $this->appendError($runId, $iteration, 'tool_not_found', $e->getMessage(), $toolName, $arguments);
+            }
+
+            return AgentToolResult::error($e->getMessage());
+        }
+
+        try {
+            return $tool->impl->execute($arguments, $account);
+        } catch (\Throwable $e) {
+            if ($runId !== null) {
+                $this->appendError(
+                    $runId,
+                    $iteration,
+                    'tool_exception',
+                    $e->getMessage(),
+                    $toolName,
+                    $arguments,
+                );
+            }
+            $this->logger->error(sprintf('executeTool("%s") threw: %s', $toolName, $e->getMessage()));
+
+            return AgentToolResult::error($e->getMessage());
+        }
+    }
+
+    private const string HITL_GRANTED = 'granted';
+    private const string HITL_DENIED = 'denied';
+    private const string HITL_TIMEOUT = 'timeout';
+    private const string HITL_DENIED_INTERACTIVE = 'denied_interactive';
+
+    /**
+     * Apply the HITL gate for a destructive tool call (FR-020 / NFR-005).
+     */
+    private function applyHitlGate(
+        AgentRun $run,
+        HitlMode $mode,
+        AgentTool $tool,
+        string $callId,
+        int $iteration,
+    ): string {
+        $runId = (string) $run->get('id');
+
+        return match ($mode) {
+            HitlMode::None => $this->hitlDenyNone($runId, $iteration, $tool),
+            HitlMode::All => $this->hitlGrantAll($runId, $iteration, $tool),
+            HitlMode::Interactive => $this->hitlInteractive($run, $tool, $callId, $iteration),
+        };
+    }
+
+    private function hitlDenyNone(string $runId, int $iteration, AgentTool $tool): string
+    {
+        $this->appendAudit(
+            $runId,
+            $iteration,
+            EventType::ApprovalDenied,
+            success: false,
+            toolName: $tool->name,
+            toolResultSummary: 'destructive_denied (mode=none)',
+        );
+        $this->runRepository->markTerminal(
+            $runId,
+            RunStatus::Failed,
+            ($this->now)(),
+            errorCode: 'destructive_denied',
+            errorMessage: sprintf('Destructive tool "%s" rejected under mode=none.', $tool->name),
+        );
+
+        return self::HITL_DENIED;
+    }
+
+    private function hitlGrantAll(string $runId, int $iteration, AgentTool $tool): string
+    {
+        $this->appendAudit(
+            $runId,
+            $iteration,
+            EventType::ApprovalGranted,
+            success: true,
+            toolName: $tool->name,
+            toolResultSummary: 'blanket approval (mode=all)',
+        );
+
+        return self::HITL_GRANTED;
+    }
+
+    private function hitlInteractive(
+        AgentRun $run,
+        AgentTool $tool,
+        string $callId,
+        int $iteration,
+    ): string {
+        $runId = (string) $run->get('id');
+
+        $run->set('status', RunStatus::AwaitingApproval->value);
+        $run->set('pending_approval_call_id', $callId);
+        $this->runRepository->save($run);
+
+        $this->appendAudit(
+            $runId,
+            $iteration,
+            EventType::ApprovalRequired,
+            success: true,
+            toolName: $tool->name,
+            toolResultSummary: sprintf('awaiting approval (call_id=%s)', $callId),
+        );
+
+        $deadline = ($this->now)()->add(new \DateInterval('PT' . $this->hitlTimeoutSeconds . 'S'));
+
+        while (true) {
+            ($this->sleepMs)($this->hitlPollIntervalMs);
+
+            $fresh = $this->runRepository->find($runId);
+            if ($fresh === null) {
+                // Row vanished — treat as a timeout fail-closed.
+                return self::HITL_TIMEOUT;
+            }
+
+            $status = $fresh->getStatus();
+            if ($status === RunStatus::Running) {
+                // Approval granted by the API endpoint.
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ApprovalGranted,
+                    success: true,
+                    toolName: $tool->name,
+                    toolResultSummary: sprintf('approval granted (call_id=%s)', $callId),
+                );
+
+                return self::HITL_GRANTED;
+            }
+
+            if ($status === RunStatus::Cancelling || $status === RunStatus::Cancelled) {
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ApprovalDenied,
+                    success: false,
+                    toolName: $tool->name,
+                    toolResultSummary: 'cancelled while awaiting approval',
+                );
+                $this->runRepository->markTerminal(
+                    $runId,
+                    RunStatus::Cancelled,
+                    ($this->now)(),
+                    errorCode: 'cancelled',
+                    errorMessage: 'Cancelled while awaiting approval.',
+                );
+
+                return self::HITL_DENIED_INTERACTIVE;
+            }
+
+            if ($status === RunStatus::Failed && $fresh->get('error_code') === 'approval_denied') {
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ApprovalDenied,
+                    success: false,
+                    toolName: $tool->name,
+                    toolResultSummary: 'approval denied',
+                );
+
+                return self::HITL_DENIED_INTERACTIVE;
+            }
+
+            if (($this->now)() >= $deadline) {
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ApprovalDenied,
+                    success: false,
+                    toolName: $tool->name,
+                    toolResultSummary: 'approval timeout',
+                );
+                $this->runRepository->markTerminal(
+                    $runId,
+                    RunStatus::Failed,
+                    ($this->now)(),
+                    errorCode: 'approval_timeout',
+                    errorMessage: sprintf('Interactive approval timed out for "%s".', $tool->name),
+                );
+
+                return self::HITL_TIMEOUT;
+            }
+        }
+    }
+
+    /**
+     * Reload the run row and check for cancellation.
+     *
+     * If the row is in `Cancelling`, append the `cancelled` error audit
+     * row, transition to `Cancelled`, and return true.
+     */
+    private function checkCancellation(string $runId, int $iteration): bool
+    {
+        $fresh = $this->runRepository->find($runId);
+        if ($fresh === null) {
+            return false;
+        }
+        if ($fresh->getStatus() !== RunStatus::Cancelling) {
+            return false;
+        }
+
+        $this->appendError(
+            $runId,
+            $iteration,
+            'cancelled',
+            'Run cancelled by initiator.',
+        );
+        $this->runRepository->markTerminal(
+            $runId,
+            RunStatus::Cancelled,
+            ($this->now)(),
+            errorCode: 'cancelled',
+            errorMessage: 'Cancelled.',
+        );
+
+        return true;
+    }
+
+    /**
+     * Run provider->sendMessage with up to 3 retries on transient
+     * failures. Each attempt — successful or not — emits exactly one
+     * `provider_call` audit row (FR-025).
+     *
+     * Returns `null` on retry exhaustion (terminal status already
+     * written).
+     */
+    private function callProviderWithRetry(
+        ProviderInterface $provider,
+        MessageRequest $request,
+        string $runId,
+        int $iteration,
+    ): ?MessageResponse {
+        $attempts = 0;
+        $lastError = null;
+        $lastErrorIsRateLimit = false;
+
+        while ($attempts < self::PROVIDER_MAX_RETRIES) {
+            $attempts++;
+            $started = microtime(true);
+
+            try {
                 $response = $provider->sendMessage($request);
-
-                // Append assistant response to conversation
-                $messages[] = ['role' => 'assistant', 'content' => $response->content];
-
-                if ($response->stopReason !== 'tool_use') {
-                    break;
-                }
-
-                // Execute tool calls
-                $toolResults = [];
-                foreach ($response->getToolUseBlocks() as $toolUseBlock) {
-                    $toolResult = $this->toolRegistry->execute($toolUseBlock->name, $toolUseBlock->input);
-                    $isError = $toolResult['isError'] ?? false;
-                    $resultText = $toolResult['content'][0]['text'] ?? '';
-
-                    $this->auditLog[] = new AgentAuditLog(
-                        agentId: $agentId,
-                        accountId: $accountId,
-                        action: 'tool_call',
-                        success: !$isError,
-                        message: "Tool call: {$toolUseBlock->name}",
-                        data: ['tool' => $toolUseBlock->name, 'arguments' => $toolUseBlock->input],
-                        timestamp: \time(),
-                    );
-
-                    $toolResults[] = new Provider\ToolResultBlock(
-                        toolUseId: $toolUseBlock->id,
-                        content: $resultText,
-                        isError: $isError,
-                    )->toArray();
-                }
-
-                $messages[] = ['role' => 'user', 'content' => $toolResults];
-            }
-
-            $finalText = $response->getText();
-
-            $result = AgentResult::success(
-                message: $finalText,
-                data: ['usage' => $response->usage, 'iterations' => $iteration],
-            );
-
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: $agentId,
-                accountId: $accountId,
-                action: 'execute_with_provider',
-                success: true,
-                message: $finalText,
-                data: $result->data,
-                timestamp: \time(),
-            );
-
-            return $result;
-        } catch (MaxIterationsException $e) {
-            throw $e;
-        } catch (\Throwable $e) {
-            $result = AgentResult::failure(
-                message: "Agent execution failed: {$e->getMessage()}",
-                data: ['exception' => $e::class],
-            );
-
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: $agentId,
-                accountId: $accountId,
-                action: 'execute_with_provider',
-                success: false,
-                message: $result->message,
-                data: $result->data,
-                timestamp: \time(),
-            );
-
-            return $result;
-        }
-    }
-
-    /**
-     * Execute an agent with a streaming provider, forwarding chunks in real time.
-     *
-     * @param callable(StreamChunk): void $onChunk
-     */
-    public function streamWithProvider(
-        AgentInterface $agent,
-        AgentContext $context,
-        StreamingProviderInterface $provider,
-        callable $onChunk,
-    ): AgentResult {
-        $agentId = $this->getAgentId($agent);
-        $accountId = (int) $context->account->id();
-
-        try {
-            $agentResult = $agent->execute($context);
-
-            $messages = $context->parameters['messages'] ?? [
-                ['role' => 'user', 'content' => $agentResult->message],
-            ];
-            $system = $context->parameters['system'] ?? null;
-            $tools = $this->buildToolDefinitions();
-
-            $iteration = 0;
-
-            while (true) {
-                $iteration++;
-                if ($iteration > $context->maxIterations) {
-                    throw new MaxIterationsException($context->maxIterations);
-                }
-
-                $request = new MessageRequest(
-                    messages: $messages,
-                    system: $system,
-                    tools: $tools,
-                    maxTokens: (int) ($context->parameters['max_tokens'] ?? 4096),
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ProviderCall,
+                    success: true,
+                    toolResultSummary: sprintf('attempt %d', $attempts),
+                    durationMs: self::msSince($started),
                 );
 
-                $response = $provider->streamMessage($request, $onChunk);
-
-                $messages[] = ['role' => 'assistant', 'content' => $response->content];
-
-                if ($response->stopReason !== 'tool_use') {
-                    break;
-                }
-
-                // Execute tool calls synchronously between streaming rounds
-                $toolResults = [];
-                foreach ($response->getToolUseBlocks() as $toolUseBlock) {
-                    $toolResult = $this->toolRegistry->execute($toolUseBlock->name, $toolUseBlock->input);
-                    $isError = $toolResult['isError'] ?? false;
-                    $resultText = $toolResult['content'][0]['text'] ?? '';
-
-                    $this->auditLog[] = new AgentAuditLog(
-                        agentId: $agentId,
-                        accountId: $accountId,
-                        action: 'tool_call',
-                        success: !$isError,
-                        message: "Tool call: {$toolUseBlock->name}",
-                        data: ['tool' => $toolUseBlock->name, 'arguments' => $toolUseBlock->input],
-                        timestamp: \time(),
-                    );
-
-                    $toolResults[] = new Provider\ToolResultBlock(
-                        toolUseId: $toolUseBlock->id,
-                        content: $resultText,
-                        isError: $isError,
-                    )->toArray();
-                }
-
-                $messages[] = ['role' => 'user', 'content' => $toolResults];
+                return $response;
+            } catch (RateLimitException $e) {
+                $lastError = $e;
+                $lastErrorIsRateLimit = true;
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ProviderCall,
+                    success: false,
+                    toolResultSummary: sprintf('attempt %d: rate-limited (%s)', $attempts, $e->getMessage()),
+                    durationMs: self::msSince($started),
+                );
+            } catch (\Throwable $e) {
+                // @todo Narrow this catch once the provider exception
+                // hierarchy lands (see #1509). FR-025 calls for
+                // retry on 429 + 5xx + transport only; today the
+                // AnthropicProvider throws bare \RuntimeException for both
+                // 4xx (non-429) and 5xx, so we can't distinguish here.
+                $lastError = $e;
+                $lastErrorIsRateLimit = false;
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ProviderCall,
+                    success: false,
+                    toolResultSummary: sprintf('attempt %d: %s (%s)', $attempts, $e::class, $e->getMessage()),
+                    durationMs: self::msSince($started),
+                );
             }
 
-            $finalText = $response->getText();
+            if ($attempts < self::PROVIDER_MAX_RETRIES) {
+                $backoffMs = min(
+                    self::PROVIDER_BACKOFF_BASE_MS * (2 ** ($attempts - 1)),
+                    self::PROVIDER_BACKOFF_CAP_MS,
+                );
+                ($this->sleepMs)($backoffMs);
+            }
+        }
 
-            $result = AgentResult::success(
-                message: $finalText,
-                data: ['usage' => $response->usage, 'iterations' => $iteration],
+        $errorCode = $lastErrorIsRateLimit ? 'provider_rate_limited' : 'provider_unavailable';
+        $errorMessage = sprintf('%s: %s', $errorCode, $lastError->getMessage());
+
+        $this->appendError($runId, $iteration, $errorCode, $errorMessage);
+        $this->runRepository->markTerminal(
+            $runId,
+            RunStatus::Failed,
+            ($this->now)(),
+            errorCode: $errorCode,
+            errorMessage: $errorMessage,
+        );
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $arguments
+     */
+    private function appendError(
+        string $runId,
+        int $iteration,
+        string $code,
+        string $message,
+        ?string $toolName = null,
+        array $arguments = [],
+    ): void {
+        $this->appendAudit(
+            $runId,
+            $iteration,
+            EventType::Error,
+            success: false,
+            toolName: $toolName,
+            toolArgumentsJson: $arguments === [] ? null : json_encode($arguments, JSON_THROW_ON_ERROR),
+            toolResultSummary: sprintf('%s: %s', $code, $message),
+        );
+    }
+
+    /**
+     * Persist a single audit row through the entity-storage invariant.
+     */
+    private function appendAudit(
+        string $runId,
+        int $iteration,
+        EventType $eventType,
+        bool $success,
+        ?string $toolName = null,
+        ?string $toolArgumentsJson = null,
+        ?string $toolResultSummary = null,
+        ?int $durationMs = null,
+    ): void {
+        try {
+            $entry = AgentAuditLog::for(
+                id: $this->uuidV4(),
+                runId: $runId,
+                iteration: $iteration,
+                eventType: $eventType,
+                occurredAt: ($this->now)(),
+                success: $success,
+                toolName: $toolName,
+                toolArgumentsJson: $toolArgumentsJson,
+                toolResultSummary: $toolResultSummary,
+                durationMs: $durationMs,
             );
-
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: $agentId,
-                accountId: $accountId,
-                action: 'stream_with_provider',
-                success: true,
-                message: $finalText,
-                data: $result->data,
-                timestamp: \time(),
-            );
-
-            return $result;
-        } catch (MaxIterationsException $e) {
-            throw $e;
+            $this->auditRepository->append($entry);
         } catch (\Throwable $e) {
-            $result = AgentResult::failure(
-                message: "Agent execution failed: {$e->getMessage()}",
-                data: ['exception' => $e::class],
-            );
-
-            $this->auditLog[] = new AgentAuditLog(
-                agentId: $agentId,
-                accountId: $accountId,
-                action: 'stream_with_provider',
-                success: false,
-                message: $result->message,
-                data: $result->data,
-                timestamp: \time(),
-            );
-
-            return $result;
+            // Audit-log failures must not crash the executor. Per spec
+            // "best-effort side effects", we surface them via the logger
+            // and keep the run going.
+            $this->logger->error(sprintf(
+                'AgentExecutor: failed to append audit row (event=%s, run=%s): %s',
+                $eventType->value,
+                $runId,
+                $e->getMessage(),
+            ));
         }
     }
 
     /**
-     * Get the audit log.
-     *
-     * @return AgentAuditLog[]
+     * Append a chunk to the in-memory transcript, enforcing the
+     * `config.ai.transcript_max_bytes` cap (NFR-007). Once the cap is
+     * reached the marker `[truncated]` is appended exactly once and
+     * subsequent chunks are dropped.
      */
-    public function getAuditLog(): array
+    private function appendTranscript(string $transcript, string $chunk): string
     {
-        return $this->auditLog;
-    }
-
-    /**
-     * Build tool definitions array for the LLM provider.
-     *
-     * Note: Currently outputs Anthropic API format (input_schema).
-     * Future providers may need format adaptation.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function buildToolDefinitions(): array
-    {
-        $tools = [];
-        foreach ($this->toolRegistry->getTools() as $tool) {
-            $tools[] = [
-                'name' => $tool->name,
-                'description' => $tool->description,
-                'input_schema' => $tool->inputSchema,
-            ];
+        if (str_ends_with($transcript, '[truncated]')) {
+            return $transcript;
         }
-        return $tools;
+
+        $next = $transcript === '' ? $chunk : $transcript . "\n" . $chunk;
+        if (strlen($next) <= $this->transcriptMaxBytes) {
+            return $next;
+        }
+
+        return rtrim(substr($transcript, 0, $this->transcriptMaxBytes), "\n") . "\n[truncated]";
     }
 
-    /**
-     * Derive an agent identifier string.
-     */
-    private function getAgentId(AgentInterface $agent): string
+    private function uuidV4(): string
     {
-        return $agent::class;
+        $data = random_bytes(16);
+        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
+        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    private static function msSince(float $startedMicro): int
+    {
+        return (int) round((microtime(true) - $startedMicro) * 1000);
+    }
+
+    private static function toolResultToText(AgentToolResult $result): string
+    {
+        foreach ($result->content as $block) {
+            if ($block['type'] === 'text' && isset($block['text'])) {
+                return $block['text'];
+            }
+        }
+
+        return json_encode($result->content, JSON_THROW_ON_ERROR);
+    }
+
+    private static function extractText(MessageResponse $response): string
+    {
+        $text = '';
+        foreach ($response->content as $block) {
+            if (($block['type'] ?? '') === 'text' && isset($block['text'])) {
+                $text .= (string) $block['text'];
+            }
+        }
+
+        return $text;
     }
 }
