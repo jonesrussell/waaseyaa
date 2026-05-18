@@ -19,6 +19,7 @@ parameters:
         - packages/ai-observability/src
         - packages/ai-pipeline/src
         - packages/ai-schema/src
+        - packages/ai-tools/src
         - packages/ai-vector/src
         - packages/api/src
         - packages/auth/src
