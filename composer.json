@@ -138,6 +138,10 @@
         },
         {
             "type": "path",
+            "url": "packages/ai-tools"
+        },
+        {
+            "type": "path",
             "url": "packages/ssr"
         },
         {
@@ -292,6 +296,7 @@
         "waaseyaa/ai-observability": "self.version",
         "waaseyaa/ai-pipeline": "self.version",
         "waaseyaa/ai-schema": "self.version",
+        "waaseyaa/ai-tools": "self.version",
         "waaseyaa/ai-vector": "self.version",
         "waaseyaa/analytics": "self.version",
         "waaseyaa/api": "self.version",
@@ -425,6 +430,7 @@
             "Waaseyaa\\AI\\Agent\\Tests\\": "packages/ai-agent/tests/",
             "Waaseyaa\\AI\\Schema\\Tests\\": "packages/ai-schema/tests/",
             "Waaseyaa\\AI\\Pipeline\\Tests\\": "packages/ai-pipeline/tests/",
+            "Waaseyaa\\AI\\Tools\\Tests\\": "packages/ai-tools/tests/",
             "Waaseyaa\\AI\\Vector\\Tests\\": "packages/ai-vector/tests/",
             "Waaseyaa\\Testing\\Tests\\": "packages/testing/tests/",
             "Waaseyaa\\Telescope\\Tests\\": "packages/telescope/tests/",
@@ -441,6 +447,7 @@
     },
     "scripts": {
         "check-composer-policy": "bash bin/check-composer-policy",
+        "check-external-consumers": "php bin/check-external-consumers ai-agent-orphans",
         "check-ingestion-defaults": "bash bin/check-ingestion-defaults",
         "check-no-secrets": "bash bin/check-no-secrets",
         "check-package-layers": "bash bin/check-package-layers",
@@ -471,6 +478,7 @@
             "@check-ingestion-defaults",
             "@check-symfony-imports",
             "@check-dead-code",
+            "@check-external-consumers",
             "@test"
         ]
     },

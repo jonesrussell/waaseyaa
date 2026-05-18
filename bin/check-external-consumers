@@ -1,0 +1,219 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Pre-deletion verification grep.
+ *
+ * Proves no out-of-mission consumers exist for symbols / paths being
+ * broken by an in-flight mission, before the deletion lands.
+ *
+ * Usage:
+ *   bin/check-external-consumers <key>
+ *
+ * Currently supported keys:
+ *   ai-agent-orphans — guards the WP01 deletion of:
+ *     - Waaseyaa\AI\Schema\Mcp\McpToolDefinition (FQCN + import lines)
+ *     - Waaseyaa\AI\Agent\AgentInterface
+ *     - packages/mcp/src/Tools/ (path strings outside the moving files)
+ *     - accessCheck(false) calls in the MCP tool surface
+ *
+ * Exits 0 when zero unexpected matches remain; exits 1 with each match
+ * printed when external consumers are detected.
+ */
+
+$root = realpath(__DIR__ . '/..');
+if ($root === false) {
+    fwrite(STDERR, "Cannot resolve repository root\n");
+    exit(2);
+}
+
+if ($argc < 2) {
+    fwrite(STDERR, "Usage: bin/check-external-consumers <key>\n");
+    exit(2);
+}
+
+$key = (string) $argv[1];
+
+$registry = [
+    'ai-agent-orphans' => [
+        'description' => 'WP01 ai-tools migration: McpToolDefinition + AgentInterface + accessCheck(false) + packages/mcp/src/Tools/',
+        // Each pattern is a literal substring; matched after exclusion filter.
+        'patterns' => [
+            'Waaseyaa\\AI\\Schema\\Mcp\\McpToolDefinition',
+            'Waaseyaa\\AI\\Agent\\AgentInterface',
+            'packages/mcp/src/Tools/',
+            'accessCheck(false)',
+        ],
+        // Search scope (relative to repo root).
+        'scope' => [
+            'packages',
+            'tests',
+            'defaults',
+            'bin',
+            'public',
+            'docs',
+            'kitty-specs',
+        ],
+        // Exclude prefixes (relative to repo root). Any file whose path
+        // begins with one of these is treated as in-scope-of-migration
+        // or as a pre-existing legitimate consumer scheduled for a
+        // follow-up WP, and skipped. The script is a tripwire for
+        // *new* external consumers that appear after this point, not a
+        // gate enforcing the cleanup itself (which spans WP02..WP08).
+        'excludes' => [
+            // WP01's own new surface.
+            'packages/ai-tools/',
+            'docs/adr/019-mcp-tool-access-enforcement.md',
+            'bin/check-external-consumers',
+            // Mission planning artifacts.
+            'kitty-specs/agent-executor-01KRWPK7/',
+            'kitty-specs/archive/',
+            // Doctrine + spec docs that legitimately name the symbols.
+            'docs/specs/',
+            'docs/superpowers/',
+            'docs/plans/',
+            'docs/audits/',
+            'docs/public-surface-map.php',
+            // Files marked for migration in WP02..WP08 (see plan.md).
+            'packages/ai-schema/',
+            'packages/ai-agent/',
+            'packages/mcp/',
+            'tests/Integration/Phase8/',
+            'tests/Integration/Phase10/',
+            'tests/Integration/Phase11/',
+            // accessCheck(false) is a legitimate EntityQuery API used
+            // widely outside the MCP tool surface; only the MCP-side
+            // usages are being removed by this mission.
+            'packages/access/',
+            'packages/ai-vector/',
+            'packages/api/',
+            'packages/cli/src/Handler/',
+            'packages/entity/',
+            'packages/entity-storage/',
+            'packages/genealogy/',
+            'packages/graphql/',
+            'packages/relationship/',
+            'packages/workflows/',
+        ],
+        // Per-pattern additional whitelist of substrings that are
+        // permitted to appear (e.g. wrapper test fixtures defining the
+        // method itself). Each entry: pattern => list<substring>.
+        'pattern_whitelist' => [
+            'accessCheck(false)' => [
+                // The query API itself defining the method
+                'packages/entity/src/Storage/EntityQueryInterface.php',
+                // Fixtures redeclaring the method
+                'tests/Fixtures/',
+            ],
+        ],
+    ],
+];
+
+if (!isset($registry[$key])) {
+    fwrite(STDERR, sprintf("Unknown key: %s. Available: %s\n", $key, implode(', ', array_keys($registry))));
+    exit(2);
+}
+
+$config = $registry[$key];
+$patterns = $config['patterns'];
+$scope = $config['scope'];
+$excludes = $config['excludes'];
+$patternWhitelist = $config['pattern_whitelist'] ?? [];
+
+$hits = [];
+
+foreach ($scope as $relativeRoot) {
+    $absoluteRoot = $root . '/' . $relativeRoot;
+    if (!is_dir($absoluteRoot) && !is_file($absoluteRoot)) {
+        continue;
+    }
+    if (is_file($absoluteRoot)) {
+        scanFile($absoluteRoot, $root, $patterns, $excludes, $patternWhitelist, $hits);
+        continue;
+    }
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($absoluteRoot, RecursiveDirectoryIterator::SKIP_DOTS),
+    );
+    foreach ($iterator as $file) {
+        if (!$file->isFile()) {
+            continue;
+        }
+        $ext = strtolower($file->getExtension());
+        // Restrict to text-ish files to keep the grep fast/clean.
+        if (!in_array($ext, ['php', 'md', 'yaml', 'yml', 'json', 'neon', 'txt', 'sh'], true)) {
+            continue;
+        }
+        scanFile($file->getPathname(), $root, $patterns, $excludes, $patternWhitelist, $hits);
+    }
+}
+
+if ($hits === []) {
+    fwrite(STDOUT, sprintf("OK: zero external consumers for '%s' (%s)\n", $key, $config['description']));
+    exit(0);
+}
+
+fwrite(STDOUT, sprintf("FAIL: external consumers detected for '%s':\n", $key));
+foreach ($hits as $hit) {
+    fwrite(STDOUT, sprintf("  %s:%d  [%s]  %s\n", $hit['relative'], $hit['line'], $hit['pattern'], $hit['snippet']));
+}
+exit(1);
+
+/**
+ * @param array<int, string> $patterns
+ * @param array<int, string> $excludes
+ * @param array<string, array<int, string>> $patternWhitelist
+ * @param array<int, array{relative: string, line: int, pattern: string, snippet: string}> $hits
+ */
+function scanFile(
+    string $absolutePath,
+    string $root,
+    array $patterns,
+    array $excludes,
+    array $patternWhitelist,
+    array &$hits,
+): void {
+    $relative = ltrim(substr($absolutePath, strlen($root) + 1), '/');
+
+    foreach ($excludes as $excludePrefix) {
+        if (str_starts_with($relative, $excludePrefix)) {
+            return;
+        }
+    }
+
+    $contents = @file_get_contents($absolutePath);
+    if ($contents === false || $contents === '') {
+        return;
+    }
+
+    foreach ($patterns as $pattern) {
+        if (!str_contains($contents, $pattern)) {
+            continue;
+        }
+        $whitelist = $patternWhitelist[$pattern] ?? [];
+        $skipFile = false;
+        foreach ($whitelist as $allowed) {
+            if (str_contains($relative, $allowed)) {
+                $skipFile = true;
+                break;
+            }
+        }
+        if ($skipFile) {
+            continue;
+        }
+
+        $lines = preg_split("/\r\n|\n|\r/", $contents) ?: [];
+        foreach ($lines as $index => $line) {
+            if (!str_contains($line, $pattern)) {
+                continue;
+            }
+            $hits[] = [
+                'relative' => $relative,
+                'line' => $index + 1,
+                'pattern' => $pattern,
+                'snippet' => trim($line),
+            ];
+        }
+    }
+}
