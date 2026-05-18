@@ -18,6 +18,9 @@ final class PackageManifestCompiler
     /** @internal String FQN avoids upward layer import (Foundation/L0 must not import from AI Tools/L5). */
     private const AGENT_TOOL_ATTRIBUTE = 'Waaseyaa\\AI\\Tools\\Attribute\\AsAgentTool';
 
+    /** @internal String FQN avoids upward layer import (Foundation/L0 must not import from AI Agent/L5). */
+    private const AGENT_DEFINITION_ATTRIBUTE = 'Waaseyaa\\AI\\Agent\\Attribute\\AsAgentDefinition';
+
     /** @internal String FQN avoids upward layer import (Foundation must not import from CLI/L6). */
     private const CAPABILITY_HAS_NATIVE_COMMANDS = 'Waaseyaa\\Foundation\\ServiceProvider\\Capability\\HasNativeCommandsInterface';
 
@@ -53,6 +56,7 @@ final class PackageManifestCompiler
         $attributeEntityTypes = [];
         $nativeCommandProviders = [];
         $agentTools = [];
+        $agentDefinitions = [];
         $packages = [];
 
         // Read installed packages manifest
@@ -157,6 +161,24 @@ final class PackageManifestCompiler
                     'category' => $instance->category,
                 ];
             }
+
+            foreach ($ref->getAttributes(self::AGENT_DEFINITION_ATTRIBUTE) as $attr) {
+                $instance = $attr->newInstance();
+                $destructiveDefault = $instance->destructiveDefault;
+                $agentDefinitions[] = [
+                    'class' => $class,
+                    'id' => $instance->id,
+                    'label' => $instance->label,
+                    'description' => $instance->description,
+                    'prompt' => $instance->prompt,
+                    'system' => $instance->system,
+                    'tools' => $instance->tools,
+                    'model' => $instance->model,
+                    'max_iterations' => $instance->maxIterations,
+                    'destructive_default' => $destructiveDefault?->value,
+                    'requires_capability' => $instance->requiresCapability,
+                ];
+            }
         }
 
         // Sort middleware by priority (descending)
@@ -178,6 +200,7 @@ final class PackageManifestCompiler
             attributeEntityTypes: $attributeEntityTypes,
             nativeCommandProviders: $nativeCommandProviders,
             agentTools: $agentTools,
+            agentDefinitions: $agentDefinitions,
         );
     }
 
@@ -611,6 +634,7 @@ final class PackageManifestCompiler
             attributeEntityTypes: $manifest->attributeEntityTypes,
             nativeCommandProviders: $manifest->nativeCommandProviders,
             agentTools: $manifest->agentTools,
+            agentDefinitions: $manifest->agentDefinitions,
         );
     }
 
@@ -724,7 +748,8 @@ final class PackageManifestCompiler
                     || !empty($ref->getAttributes(AsEntityType::class))
                     || !empty($ref->getAttributes(self::POLICY_ATTRIBUTE))
                     || !empty($ref->getAttributes(self::FORMATTER_ATTRIBUTE))
-                    || $ref->getAttributes(self::AGENT_TOOL_ATTRIBUTE) !== [];
+                    || $ref->getAttributes(self::AGENT_TOOL_ATTRIBUTE) !== []
+                    || $ref->getAttributes(self::AGENT_DEFINITION_ATTRIBUTE) !== [];
 
                 if ($hasDiscoveryAttribute) {
                     $classes[] = $class;

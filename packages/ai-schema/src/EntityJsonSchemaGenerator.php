@@ -11,6 +11,8 @@ use Waaseyaa\Entity\EntityTypeManagerInterface;
  *
  * Inspects entity type definitions and produces a standards-compliant
  * JSON Schema describing the shape of each entity type's data.
+ *
+ * @api
  */
 final class EntityJsonSchemaGenerator
 {

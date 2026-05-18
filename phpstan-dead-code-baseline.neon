@@ -1,40 +1,5 @@
 parameters:
 	ignoreErrors:
-		-
-			message: '#^Unused Waaseyaa\\AI\\Agent\\AgentExecutor\:\:dryRun$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/ai-agent/src/AgentExecutor.php
-
-		-
-			message: '#^Unused Waaseyaa\\AI\\Agent\\AgentExecutor\:\:execute$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/ai-agent/src/AgentExecutor.php
-
-		-
-			message: '#^Unused Waaseyaa\\AI\\Agent\\AgentExecutor\:\:executeTool$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/ai-agent/src/AgentExecutor.php
-
-		-
-			message: '#^Unused Waaseyaa\\AI\\Agent\\AgentExecutor\:\:executeWithProvider$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/ai-agent/src/AgentExecutor.php
-
-		-
-			message: '#^Unused Waaseyaa\\AI\\Agent\\AgentExecutor\:\:getAuditLog$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/ai-agent/src/AgentExecutor.php
-
-		-
-			message: '#^Unused Waaseyaa\\AI\\Agent\\AgentExecutor\:\:streamWithProvider$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/ai-agent/src/AgentExecutor.php
 
 		-
 			message: '#^Unused Waaseyaa\\Auth\\RateLimiterInterface\:\:attempts$#'

@@ -4,17 +4,19 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Mcp\Tests\Unit;
 
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as HttpRequest;
 use Waaseyaa\Access\AccountInterface;
-use Waaseyaa\AI\Schema\Mcp\McpToolDefinition;
+use Waaseyaa\AI\Tools\AgentTool;
+use Waaseyaa\AI\Tools\AgentToolInterface;
+use Waaseyaa\AI\Tools\AgentToolResult;
 use Waaseyaa\Mcp\Auth\McpAuthInterface;
 use Waaseyaa\Mcp\Bridge\ToolExecutorInterface;
 use Waaseyaa\Mcp\Bridge\ToolRegistryInterface;
 use Waaseyaa\Mcp\McpEndpoint;
 use Waaseyaa\Mcp\McpResponse;
-use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\Test;
-use PHPUnit\Framework\TestCase;
 
 #[CoversClass(McpEndpoint::class)]
 #[CoversClass(McpResponse::class)]
@@ -55,6 +57,50 @@ final class McpEndpointTest extends TestCase
         return $endpoint->handle($this->account, $request);
     }
 
+    /**
+     * Build a small {@see AgentTool} fixture backed by an anonymous-class
+     * {@see AgentToolInterface} that returns a canned {@see AgentToolResult}.
+     */
+    private function makeTool(string $name, array $schema = []): AgentTool
+    {
+        $impl = new class implements AgentToolInterface {
+            public function execute(array $arguments, AccountInterface $account): AgentToolResult
+            {
+                return AgentToolResult::success([['type' => 'text', 'text' => 'ok']]);
+            }
+
+            public function dryRun(array $arguments, AccountInterface $account): AgentToolResult
+            {
+                return AgentToolResult::error('dry_run_not_supported');
+            }
+
+            public function argumentsForAudit(array $arguments): array
+            {
+                return $arguments;
+            }
+
+            public function inputSchema(): array
+            {
+                return ['type' => 'object', 'properties' => []];
+            }
+
+            public function description(): string
+            {
+                return 'Test tool fixture.';
+            }
+        };
+
+        return new AgentTool(
+            name: $name,
+            capability: 'tool.test',
+            destructive: false,
+            dryRunSupported: false,
+            category: 'test',
+            inputSchema: $schema !== [] ? $schema : ['type' => 'object', 'properties' => []],
+            impl: $impl,
+        );
+    }
+
     #[Test]
     public function missingAuthHeaderReturns401(): void
     {
@@ -81,18 +127,16 @@ final class McpEndpointTest extends TestCase
     }
 
     #[Test]
-    public function toolsListReturnsToolDefinitions(): void
+    public function toolsListReturnsToolDescriptors(): void
     {
         $this->auth->method('authenticate')->willReturn($this->account);
 
-        $tools = [
-            new McpToolDefinition('create_node', 'Create a node.', [
-                'type' => 'object',
-                'properties' => ['attributes' => ['type' => 'object']],
-                'required' => ['attributes'],
-            ]),
-        ];
-        $this->registry->method('getTools')->willReturn($tools);
+        $tool = $this->makeTool('create_node', [
+            'type' => 'object',
+            'properties' => ['attributes' => ['type' => 'object']],
+            'required' => ['attributes'],
+        ]);
+        $this->registry->method('getTools')->willReturn([$tool]);
 
         $endpoint = $this->createEndpoint();
         $response = $this->dispatch($endpoint, 'POST', \json_encode([
@@ -109,6 +153,7 @@ final class McpEndpointTest extends TestCase
         $this->assertArrayHasKey('result', $decoded);
         $this->assertCount(1, $decoded['result']['tools']);
         $this->assertSame('create_node', $decoded['result']['tools'][0]['name']);
+        $this->assertArrayHasKey('inputSchema', $decoded['result']['tools'][0]);
     }
 
     #[Test]
@@ -116,16 +161,11 @@ final class McpEndpointTest extends TestCase
     {
         $this->auth->method('authenticate')->willReturn($this->account);
 
-        $this->registry->method('getTools')->willReturn([
-            new McpToolDefinition('read_node', 'Read a node.', [
-                'type' => 'object',
-                'properties' => [],
-            ]),
-        ]);
-
+        $tool = $this->makeTool('read_node');
+        $this->registry->method('getTools')->willReturn([$tool]);
         $this->registry->method('getTool')
             ->with('read_node')
-            ->willReturn(new McpToolDefinition('read_node', 'Read a node.', ['type' => 'object', 'properties' => []]));
+            ->willReturn($tool);
 
         $this->executor
             ->expects($this->once())

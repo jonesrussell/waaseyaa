@@ -15,8 +15,6 @@ use Waaseyaa\AI\Pipeline\PipelineStepConfig;
 use Waaseyaa\AI\Pipeline\PipelineStepInterface;
 use Waaseyaa\AI\Pipeline\StepResult;
 use Waaseyaa\AI\Schema\EntityJsonSchemaGenerator;
-use Waaseyaa\AI\Schema\Mcp\McpToolGenerator;
-use Waaseyaa\AI\Schema\SchemaRegistry;
 use Waaseyaa\Entity\EntityType;
 use Waaseyaa\Entity\EntityTypeManager;
 
@@ -172,11 +170,11 @@ final class AIPipelineIntegrationTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // SchemaRegistry tests
+    // EntityJsonSchemaGenerator tests
     // -------------------------------------------------------------------------
 
     #[Test]
-    public function schema_registry_returns_valid_json_schema_for_entity_type(): void
+    public function schema_generator_returns_valid_json_schema_for_entity_type(): void
     {
         $manager = new EntityTypeManager(new EventDispatcher());
         $manager->registerEntityType(new EntityType(
@@ -187,10 +185,7 @@ final class AIPipelineIntegrationTest extends TestCase
         ));
 
         $generator = new EntityJsonSchemaGenerator($manager);
-        $toolGenerator = new McpToolGenerator($manager);
-        $registry = new SchemaRegistry($generator, $toolGenerator);
-
-        $schema = $registry->getSchema('article');
+        $schema = $generator->generate('article');
 
         $this->assertArrayHasKey('$schema', $schema);
         $this->assertSame('https://json-schema.org/draft/2020-12/schema', $schema['$schema']);
@@ -202,7 +197,7 @@ final class AIPipelineIntegrationTest extends TestCase
     }
 
     #[Test]
-    public function schema_registry_returns_all_schemas(): void
+    public function schema_generator_returns_all_schemas(): void
     {
         $manager = new EntityTypeManager(new EventDispatcher());
         $manager->registerEntityType(new EntityType(
@@ -219,10 +214,7 @@ final class AIPipelineIntegrationTest extends TestCase
         ));
 
         $generator = new EntityJsonSchemaGenerator($manager);
-        $toolGenerator = new McpToolGenerator($manager);
-        $registry = new SchemaRegistry($generator, $toolGenerator);
-
-        $all = $registry->getAllSchemas();
+        $all = $generator->generateAll();
 
         $this->assertArrayHasKey('page', $all);
         $this->assertArrayHasKey('tag', $all);

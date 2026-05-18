@@ -27,4 +27,21 @@ final readonly class AgentTool
         public array $inputSchema,
         public AgentToolInterface $impl,
     ) {}
+
+    /**
+     * MCP-compliant tool descriptor (`{name, description, inputSchema}`).
+     *
+     * The {@see $impl} field is deliberately omitted — the MCP endpoint
+     * receives only the declarative descriptor.
+     *
+     * @return array{name: string, description: string, inputSchema: array<string, mixed>}
+     */
+    public function toMcpDescriptor(): array
+    {
+        return [
+            'name' => $this->name,
+            'description' => $this->impl->description(),
+            'inputSchema' => $this->inputSchema,
+        ];
+    }
 }

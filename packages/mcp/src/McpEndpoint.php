@@ -99,7 +99,7 @@ final readonly class McpEndpoint
     {
         $tools = [];
         foreach ($this->registry->getTools() as $tool) {
-            $tools[] = $tool->toArray();
+            $tools[] = $tool->toMcpDescriptor();
         }
 
         return $this->jsonRpcResult($id, ['tools' => $tools]);

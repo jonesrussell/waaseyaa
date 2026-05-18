@@ -94,4 +94,41 @@ final class AgentResultTest extends TestCase
         self::assertTrue($reflection->isReadOnly());
         self::assertTrue($reflection->isFinal());
     }
+
+    public function testTokenAndCostFieldsDefaultToZero(): void
+    {
+        $result = AgentResult::success('done');
+
+        self::assertSame(0, $result->tokenUsageIn);
+        self::assertSame(0, $result->tokenUsageOut);
+        self::assertNull($result->costCents);
+    }
+
+    public function testSuccessFactoryCarriesTelemetry(): void
+    {
+        $result = AgentResult::success(
+            message: 'done',
+            tokenUsageIn: 1024,
+            tokenUsageOut: 256,
+            costCents: 12,
+        );
+
+        self::assertSame(1024, $result->tokenUsageIn);
+        self::assertSame(256, $result->tokenUsageOut);
+        self::assertSame(12, $result->costCents);
+    }
+
+    public function testFailureFactoryCarriesTelemetry(): void
+    {
+        $result = AgentResult::failure(
+            message: 'boom',
+            tokenUsageIn: 50,
+            tokenUsageOut: 0,
+            costCents: 1,
+        );
+
+        self::assertSame(50, $result->tokenUsageIn);
+        self::assertSame(0, $result->tokenUsageOut);
+        self::assertSame(1, $result->costCents);
+    }
 }
