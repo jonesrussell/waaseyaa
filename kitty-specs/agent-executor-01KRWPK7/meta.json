@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-18T04:48:04.224965+00:00",
+  "friendly_name": "agent executor",
+  "mission_id": "01KRWPK74279EH1Y2RKQZRG9RM",
+  "mission_number": null,
+  "mission_slug": "agent-executor-01KRWPK7",
+  "mission_type": "software-dev",
+  "slug": "agent-executor-01KRWPK7",
+  "target_branch": "main"
+}
