@@ -76,6 +76,7 @@ LAYER_BY_SHORT = {
     "ai-schema": 5,
     "ai-agent": 5,
     "ai-pipeline": 5,
+    "ai-tools": 5,
     "ai-vector": 5,
     "ai-observability": 5,
     # 6 — Interfaces

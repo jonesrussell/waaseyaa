@@ -1,0 +1,43 @@
+{
+    "name": "waaseyaa/ai-tools",
+    "description": "Shared agent-tool catalogue (#[AsAgentTool] + AttributeToolRegistry) used by AgentExecutor and McpController",
+    "type": "library",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "php": ">=8.5",
+        "waaseyaa/access": "^0.1.0-alpha.180",
+        "waaseyaa/entity": "^0.1.0-alpha.180",
+        "waaseyaa/foundation": "^0.1.0-alpha.180"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "waaseyaa/testing": "^0.1.0-alpha.180"
+    },
+    "autoload": {
+        "psr-4": {
+            "Waaseyaa\\AI\\Tools\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Waaseyaa\\AI\\Tools\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "extra": {
+        "branch-alias": {
+            "dev-main": "0.1.x-dev",
+            "dev-develop/v1.1": "0.1.x-dev"
+        },
+        "waaseyaa": {
+            "providers": [
+                "Waaseyaa\\AI\\Tools\\AiToolsServiceProvider"
+            ],
+            "layer": 5
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
