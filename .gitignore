@@ -16,8 +16,8 @@ packages/*/.phpunit.cache/
 # PHP CS Fixer
 .php-cs-fixer.cache
 
-# PHPStan
-tmp/phpstan/
+# PHPStan + dead-code cache + any other transient scratch
+/tmp/
 
 # Layer 0 / local audit bundles (regenerate via scripts/layer0_audit/)
 artifacts/
@@ -27,6 +27,9 @@ artifacts/
 
 # Background sync tool stray working dirs
 waaseyaa-sync-*/
+
+# OIDC JWKS test fixture working dirs (hash-suffixed, regenerated per run)
+waaseyaa_oidc_jwks_*/
 
 # Database
 *.sqlite
