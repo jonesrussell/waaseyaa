@@ -464,4 +464,9 @@ return [
     'Waaseyaa\Mcp\Tools\McpTool' => 'internal',
     'Waaseyaa\SSR\Http\AppController\AppControllerArgumentResolver' => 'public',
     'Waaseyaa\SSR\Http\AppController\AppParameterKind' => 'public',
+
+    // Layer 5: AI — agent-executor v1 (agent-executor-01KRWPK7, WP-02)
+    'Waaseyaa\AI\Agent\Enum\EventType' => 'public',
+    'Waaseyaa\AI\Agent\Enum\HitlMode' => 'public',
+    'Waaseyaa\AI\Agent\Enum\RunStatus' => 'public',
 ];
