@@ -15,8 +15,8 @@ subtasks:
 - T042
 - T043
 - T044
-shell_pid: "378305"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "405489"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-18T14:55:10Z'
   actor: tasks-skill
@@ -178,3 +178,4 @@ spec-kitty agent action implement WP08 --agent <name>
 
 - 2026-05-18T18:19:12Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Assigned agent via action command
 - 2026-05-18T18:40:49Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Ready for review: ModelPriceTable, AgentRunTelemetryListener, AgentTelescopeRecorderInterface, AgentRunMetricsRecorderInterface, Prometheus metrics; listener best-effort try-catch; gates green (cs-check, phpstan, layers, dead-code, composer-policy, symfony-imports)
+- 2026-05-18T18:41:39Z – claude:opus-4-7:reviewer:reviewer – shell_pid=405489 – Started review via action command
