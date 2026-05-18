@@ -25,8 +25,8 @@ subtasks:
 - T007
 - T008
 - T009
-shell_pid: "330256"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "335268"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-18T14:55:10Z'
   actor: tasks-skill
@@ -406,3 +406,4 @@ spec-kitty agent action implement WP01 --agent <name>
 
 - 2026-05-18T15:23:43Z – claude:sonnet:implementer:implementer – shell_pid=330256 – Assigned agent via action command
 - 2026-05-18T15:46:29Z – claude:sonnet:implementer:implementer – shell_pid=330256 – Lands packages/ai-tools (Layer 5) with AgentToolInterface, AgentTool VO, AgentToolResult, AbstractAgentTool, AsAgentTool attribute, AttributeToolRegistry + 8 stock tools. PackageManifestCompiler scans new attribute via string FQCN. bin/check-external-consumers + ADR-019 filed. accessCheck(false) removed from packages/ai-schema/src/Mcp/McpToolExecutor.php. Gates green. DEFERRED: T006/T007 deletions of packages/mcp/src/Tools and McpToolDefinition + McpController rewire + McpControllerToolsSharingTest -- impact 18+ consumers outside WP01 owned_files; follow-up WPs needed. Commit 84c57f0da.
+- 2026-05-18T15:47:31Z – claude:opus-4-7:reviewer:reviewer – shell_pid=335268 – Started review via action command
