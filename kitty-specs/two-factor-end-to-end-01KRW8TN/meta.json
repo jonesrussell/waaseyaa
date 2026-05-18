@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-18T00:47:28.295257+00:00",
+  "friendly_name": "two factor end to end",
+  "mission_id": "01KRW8TNS3ASTMKE7R6D1GR351",
+  "mission_number": null,
+  "mission_slug": "two-factor-end-to-end-01KRW8TN",
+  "mission_type": "software-dev",
+  "slug": "two-factor-end-to-end-01KRW8TN",
+  "target_branch": "main"
+}
