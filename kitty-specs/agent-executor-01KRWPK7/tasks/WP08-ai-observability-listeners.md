@@ -177,3 +177,4 @@ spec-kitty agent action implement WP08 --agent <name>
 ## Activity Log
 
 - 2026-05-18T18:19:12Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Assigned agent via action command
+- 2026-05-18T18:40:49Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Ready for review: ModelPriceTable, AgentRunTelemetryListener, AgentTelescopeRecorderInterface, AgentRunMetricsRecorderInterface, Prometheus metrics; listener best-effort try-catch; gates green (cs-check, phpstan, layers, dead-code, composer-policy, symfony-imports)
