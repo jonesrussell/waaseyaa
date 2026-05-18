@@ -184,3 +184,4 @@ spec-kitty agent action implement WP06 --agent <name>
 ## Activity Log
 
 - 2026-05-18T18:19:08Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Assigned agent via action command
+- 2026-05-18T18:48:31Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Ready for review: 3 ai:* commands + 2 scheduler entries; --inline+interactive rejection enforced; NFR-001 wall-clock observed at ~35ms; gates green
