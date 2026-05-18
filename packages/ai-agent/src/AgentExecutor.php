@@ -617,6 +617,11 @@ final class AgentExecutor
                     durationMs: self::msSince($started),
                 );
             } catch (\Throwable $e) {
+                // @todo Narrow this catch once the provider exception
+                // hierarchy lands (see #1509). FR-025 calls for
+                // retry on 429 + 5xx + transport only; today the
+                // AnthropicProvider throws bare \RuntimeException for both
+                // 4xx (non-429) and 5xx, so we can't distinguish here.
                 $lastError = $e;
                 $lastErrorIsRateLimit = false;
                 $this->appendAudit(

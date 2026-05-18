@@ -45,7 +45,7 @@ final class McpControllerToolsSharingTest extends TestCase
 
         self::assertSame(200, $response['statusCode']);
         self::assertArrayHasKey('result', $response['body']);
-        $names = array_map(static fn (array $t): string => $t['name'], $response['body']['result']['tools']);
+        $names = array_map(static fn(array $t): string => $t['name'], $response['body']['result']['tools']);
         self::assertContains('entity.list', $names);
         self::assertContains('relationship.traverse', $names);
     }
@@ -83,6 +83,7 @@ final class McpControllerToolsSharingTest extends TestCase
 
         $auth = new class ($account) implements McpAuthInterface {
             public function __construct(private readonly AccountInterface $account) {}
+
             public function authenticate(?string $authorizationHeader): ?AccountInterface
             {
                 return $authorizationHeader !== null ? $this->account : null;
@@ -126,12 +127,20 @@ final class McpControllerToolsSharingTest extends TestCase
             {
                 return AgentToolResult::error('dry_run_not_supported');
             }
-            public function argumentsForAudit(array $arguments): array { return $arguments; }
+            public function argumentsForAudit(array $arguments): array
+            {
+                return $arguments;
+            }
+
             public function inputSchema(): array
             {
                 return ['type' => 'object', 'properties' => []];
             }
-            public function description(): string { return $this->description; }
+
+            public function description(): string
+            {
+                return $this->description;
+            }
         };
 
         return new AgentTool(
@@ -149,10 +158,26 @@ final class McpControllerToolsSharingTest extends TestCase
     {
         return new class ($id) implements AccountInterface {
             public function __construct(private readonly int $accountId) {}
-            public function id(): int { return $this->accountId; }
-            public function hasPermission(string $permission): bool { return true; }
-            public function getRoles(): array { return ['administrator']; }
-            public function isAuthenticated(): bool { return true; }
+
+            public function id(): int
+            {
+                return $this->accountId;
+            }
+
+            public function hasPermission(string $permission): bool
+            {
+                return true;
+            }
+
+            public function getRoles(): array
+            {
+                return ['administrator'];
+            }
+
+            public function isAuthenticated(): bool
+            {
+                return true;
+            }
         };
     }
 
