@@ -48,6 +48,13 @@ final class User extends ContentEntityBase implements AccountInterface, Hydratab
     #[Field(type: 'integer', label: 'Member since', description: 'The date the user account was created.', settings: ['weight' => 20, 'subtype' => 'timestamp'])]
     public ?int $created = null;
 
+    #[Field(label: 'Two-factor secret', description: 'Base32 TOTP secret. null when 2FA is disabled.', settings: ['weight' => 50, 'internal' => true])]
+    public ?string $two_factor_secret = null;
+
+    /** @var list<string>|null */
+    #[Field(label: 'Two-factor recovery code hashes', description: 'Argon2id-hashed recovery codes; null when 2FA is disabled.', settings: ['weight' => 51, 'internal' => true])]
+    public ?array $two_factor_recovery_codes_hash = null;
+
     /**
      * @param array<string, mixed> $values Initial entity values.
      * @param array<string, string> $entityKeys Explicit keys when reconstructing via {@see ContentEntityBase::duplicateInstance()}.
@@ -236,6 +243,40 @@ final class User extends ContentEntityBase implements AccountInterface, Hydratab
         }
 
         return password_verify($plaintext, $hash);
+    }
+
+    // -----------------------------------------------------------------
+    // Two-factor authentication
+    // -----------------------------------------------------------------
+
+    public function getTwoFactorSecret(): ?string
+    {
+        $value = $this->get('two_factor_secret');
+
+        return is_string($value) ? $value : null;
+    }
+
+    public function setTwoFactorSecret(?string $secret): static
+    {
+        return $this->set('two_factor_secret', $secret);
+    }
+
+    /**
+     * @return list<string>|null
+     */
+    public function getTwoFactorRecoveryCodesHash(): ?array
+    {
+        $value = $this->get('two_factor_recovery_codes_hash');
+
+        return is_array($value) ? array_values(array_filter($value, 'is_string')) : null;
+    }
+
+    /**
+     * @param list<string>|null $hashes
+     */
+    public function setTwoFactorRecoveryCodesHash(?array $hashes): static
+    {
+        return $this->set('two_factor_recovery_codes_hash', $hashes);
     }
 
     // -----------------------------------------------------------------
