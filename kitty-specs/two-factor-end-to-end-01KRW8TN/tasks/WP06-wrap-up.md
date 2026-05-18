@@ -3,7 +3,17 @@ work_package_id: WP06
 title: Wrap-up — spec, baseline regen, CHANGELOG
 dependencies:
 - WP05
-requirement_refs: []
+requirement_refs:
+- FR-001
+- FR-002
+- FR-003
+- FR-004
+- FR-005
+- FR-006
+- FR-007
+- FR-008
+- FR-009
+- FR-010
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: single-lane
