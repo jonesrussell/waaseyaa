@@ -1,41 +1,106 @@
 ---
 name: waaseyaa:ai-integration
-description: Use when working with AI schema generation, agent execution, pipeline orchestration, vector storage, or files in packages/ai-schema/, packages/ai-agent/, packages/ai-pipeline/, packages/ai-vector/
+description: Use when working with AI schema generation, agent execution, pipeline orchestration, vector storage, agent tools, or files in packages/ai-schema/, packages/ai-agent/, packages/ai-pipeline/, packages/ai-vector/, packages/ai-tools/, packages/ai-observability/
 ---
 
 # AI Integration Specialist
 
 ## Scope
 
-This skill covers the four AI packages in layer 6 of the Waaseyaa architecture:
+This skill covers the AI packages in layer 5–6 of the Waaseyaa architecture:
 
-- `packages/ai-schema/` -- JSON Schema generation from entity types, MCP tool definitions and execution
-- `packages/ai-agent/` -- Agent executor with audit logging, MCP server adapter
+- `packages/ai-schema/` -- JSON Schema generation from entity types
+- `packages/ai-agent/` -- Agent runtime: executor, run service, Messenger handler, HTTP controller, persisted `AgentRun` + `AgentAuditLog` entities, HITL state machine, stalled-run reaper
+- `packages/ai-tools/` -- Shared tool catalogue (8 stock tools + `#[AsAgentTool]` attribute discovery; remote MCP via `McpClientToolSource`)
 - `packages/ai-pipeline/` -- Config-entity-based processing pipelines with sync and async execution
 - `packages/ai-vector/` -- Vector embedding storage, similarity search, distance metrics
+- `packages/ai-observability/` -- AgentRun lifecycle listeners, token/cost metrics, `ModelPriceTable`
 
 Use this skill when:
-- Modifying or extending any file in `packages/ai-schema/src/`, `packages/ai-agent/src/`, `packages/ai-pipeline/src/`, or `packages/ai-vector/src/`
-- Writing tests in `packages/ai-schema/tests/`, `packages/ai-agent/tests/`, `packages/ai-pipeline/tests/`, or `packages/ai-vector/tests/`
-- Adding new MCP tools, agent implementations, pipeline steps, or embedding providers
-- Debugging schema generation, tool execution, pipeline flow, or vector search
+- Modifying or extending any file in `packages/ai-schema/src/`, `packages/ai-agent/src/`, `packages/ai-tools/src/`, `packages/ai-pipeline/src/`, `packages/ai-vector/src/`, or `packages/ai-observability/src/`
+- Writing tests in any of those packages' `tests/` directories
+- Adding new agent tools, agent definitions, pipeline steps, or embedding providers
+- Debugging tool execution, agent runs, schema generation, pipeline flow, or vector search
 
-## Key Interfaces
+## Running an agent
 
-### AgentInterface (`packages/ai-agent/src/AgentInterface.php`)
+### CLI
+
+```bash
+bin/waaseyaa ai:run "<prompt>" --inline
+# Inline (sync) mode runs the agent in the current process. Useful for dev/CI.
+
+bin/waaseyaa ai:run "<prompt>" --agent=<bundle>
+# Async mode: enqueues a RunAgent message; a worker consumes it.
+
+bin/waaseyaa ai:purge-runs --older-than=30d
+bin/waaseyaa ai:reap-stalled-runs
+```
+
+### HTTP
+
+```http
+POST /api/ai/agent/run        # 202 Accepted + { run_id, ... }
+GET  /api/ai/agent/run/{id}   # current AgentRun state
+DELETE /api/ai/agent/run/{id} # cancel
+POST /api/ai/agent/run/{id}/approve  # HITL: approve a pending tool call
+```
+
+Stream progress via the durable broadcast channel:
+
+```http
+GET /broadcast?channels=agent.run.<id>     # SSE; events: run_started, iteration, tool_call, tool_result, approval_required, run_completed, run_failed, run_cancelled
+```
+
+### Extension
+
+Register an agent bundle:
 
 ```php
-namespace Waaseyaa\AI\Agent;
+use Waaseyaa\AI\Agent\Attribute\AsAgentDefinition;
 
-interface AgentInterface
+#[AsAgentDefinition(id: 'my_agent', model: 'gpt-4o-mini')]
+final class MyAgent
 {
-    public function execute(AgentContext $context): AgentResult;
-    public function dryRun(AgentContext $context): AgentResult;
-    public function describe(): string;
+    public function __construct(
+        public readonly string $prompt = '...',
+        public readonly array $tools = ['entity.read', 'entity.search'],
+    ) {}
 }
 ```
 
-Every agent must implement both `execute()` and `dryRun()`. The `AgentContext` carries an `AccountInterface $account`, `array $parameters`, and `bool $dryRun`.
+Register a tool:
+
+```php
+use Waaseyaa\AI\Tools\Attribute\AsAgentTool;
+use Waaseyaa\AI\Tools\AbstractAgentTool;
+
+#[AsAgentTool(name: 'my_tool', capability: 'my.feature', destructive: false)]
+final class MyTool extends AbstractAgentTool { /* execute() */ }
+```
+
+Both classes are auto-discovered by the package-manifest compiler. Run `bin/waaseyaa optimize:manifest` after adding them.
+
+## Where the code lives
+
+| Concern | Location |
+|---|---|
+| Agent runtime / executor | `packages/ai-agent/src/` (`AgentExecutor`, `AgentDefinition`, `AgentDefinitionRegistry`, `AgentRunService`) |
+| Run service + worker | `packages/ai-agent/src/Service/AgentRunService.php`, `packages/ai-agent/src/Message/{RunAgent,RunAgentHandler}.php` |
+| HTTP controller + validator | `packages/ai-agent/src/Controller/{AgentRunController,AgentRunRequestValidator}.php` |
+| Routes | `packages/ai-agent/src/Routing/AgentRouteServiceProvider.php` (post-review: routes ride with the package, not `packages/routing`) |
+| Persisted entities | `packages/ai-agent/src/Entity/{AgentRun,AgentAuditLog}.php` + repositories in `packages/ai-agent/src/Repository/` |
+| Access policies | `packages/ai-agent/src/AccessPolicy/AgentRunAccessPolicy.php` (initiator ownership + `agent.run.bypass_ownership` capability) |
+| Tools catalogue | `packages/ai-tools/src/` (8 stock tools + `AttributeToolRegistry`) |
+| Remote MCP source | `packages/ai-agent/src/Mcp/McpClientToolSource.php` + `StreamableHttpMcpClient` |
+| Stalled-run reaper | `packages/ai-agent/src/Service/StalledRunReaper.php` |
+| CLI commands | `packages/cli/src/Command/Ai/{AiRunCommand,AiPurgeRunsCommand,AiReapStalledRunsCommand}.php` |
+| Schedule entries | `packages/scheduler/src/Schedule/Ai/AgentScheduleEntries.php` |
+| Observability | `packages/ai-observability/src/Listener/AgentRunTelemetryListener.php`, `packages/ai-observability/src/Pricing/ModelPriceTable.php` |
+
+Cross-reference: `packages/ai-tools/README.md` for the tool catalogue surface.
+
+## Key Interfaces
 
 ### PipelineStepInterface (`packages/ai-pipeline/src/PipelineStepInterface.php`)
 
@@ -84,22 +149,25 @@ interface VectorStoreInterface
 ### Package Dependency Chain
 
 ```
-ai-schema   depends on: entity
-ai-agent    depends on: ai-schema, access
-ai-pipeline depends on: entity, queue
-ai-vector   depends on: entity
+ai-schema        depends on: entity
+ai-tools         depends on: entity, access, ai-schema, ai-vector
+ai-agent         depends on: ai-schema, ai-tools, access, entity-storage, queue
+ai-pipeline      depends on: entity, queue
+ai-vector        depends on: entity
+ai-observability depends on: ai-agent, telescope
 ```
 
-Layer discipline: all four packages are in layer 5 (AI). They depend downward on layer 1 (entity, access) and layer 0 (queue). They must never import from layer 6 (interfaces) or from each other except `ai-agent -> ai-schema`.
+Layer discipline: ai-tools / ai-agent / ai-pipeline / ai-vector / ai-observability are in layer 5 (AI). They depend downward on layer 1 (entity, entity-storage, access) and layer 0 (queue). They must never import from layer 6 (interfaces).
 
 ### Namespace Conventions
 
 - `Waaseyaa\AI\Schema\` -- ai-schema package
-- `Waaseyaa\AI\Schema\Mcp\` -- MCP-specific classes within ai-schema
 - `Waaseyaa\AI\Agent\` -- ai-agent package
+- `Waaseyaa\AI\Tools\` -- ai-tools package (`AgentTool` VO, `AgentToolInterface`, `AttributeToolRegistry`, stock tools)
 - `Waaseyaa\AI\Pipeline\` -- ai-pipeline package
 - `Waaseyaa\AI\Vector\` -- ai-vector package
 - `Waaseyaa\AI\Vector\Testing\` -- test fixtures within ai-vector
+- `Waaseyaa\AI\Observability\` -- ai-observability package
 
 ### Schema Generation Flow
 
@@ -114,10 +182,15 @@ The framework's MCP surface is `Waaseyaa\Mcp\McpServerCard` in `packages/mcp/`, 
 
 ### Agent Execution Flow
 
-1. Caller creates `AgentContext` with `AccountInterface`, parameters, and dryRun flag
-2. `AgentExecutor::execute()` or `dryRun()` wraps the agent call in try/catch
-3. Result (success or exception-wrapped failure) is logged to `AgentAuditLog`
-4. Tool calls via `AgentExecutor::executeTool()` delegate to `McpToolExecutor` with audit logging
+1. Caller submits `RunAgentRequest` (CLI inline, HTTP enqueue) — `AgentRunService::enqueue()` persists an `AgentRun` row in `queued` state and dispatches a `RunAgent` Messenger message.
+2. `RunAgentHandler::__invoke()` performs a CAS guard (`started_at IS NULL → markRunning()`) so duplicate worker delivery cannot double-execute (NFR-015). It then calls `AgentExecutor::executeWithProvider()`.
+3. Each iteration: poll for cancellation, call the provider, append `AgentAuditLog` rows (`provider_call`, `tool_call`, `tool_result`, `error`), broadcast SSE events on `agent.run.<id>`, check HITL state machine (`none` / `all` / `interactive`) for destructive tool gating.
+4. Tool dispatch goes through `Waaseyaa\AI\Tools\ToolRegistryInterface::register(AgentTool)`. The legacy `(McpToolDefinition, callable)` signature is gone; tools carry their executor.
+5. Terminal state (`completed`, `failed`, `cancelled`, `approval_timeout`) persists `transcript_json` (truncated at the configured cap, default 262144 bytes — overflow marked `[truncated]`), token / cost totals, and emits `run_completed` / `run_failed` / `run_cancelled` SSE.
+
+### MCP endpoint integration
+
+`McpController` (`packages/mcp/`) consumes the same `ToolRegistryInterface` from `packages/ai-tools` for `tools/list` and `tools/call`. Entity ACLs apply to every MCP tool call — the previous `McpToolExecutor::accessCheck(false)` bypass was removed in WP-03 (ADR-019).
 
 ### Pipeline Execution Flow
 
@@ -144,16 +217,15 @@ The Pipeline class stores steps in both `$this->steps` (typed array) and `$this-
 
 ### JSON symmetry
 
-`McpToolExecutor` and `EntityEmbedder` both use `json_encode(..., JSON_THROW_ON_ERROR)`. Always pair with `json_decode(..., JSON_THROW_ON_ERROR)`. Asymmetric usage causes silent null on corrupt data.
+`EntityEmbedder` uses `json_encode(..., JSON_THROW_ON_ERROR)`. Always pair with `json_decode(..., JSON_THROW_ON_ERROR)`. Asymmetric usage causes silent null on corrupt data.
 
 ### Final classes cannot be mocked
 
 All concrete classes in the AI packages are `final class`. PHPUnit's `createMock()` will fail on them. In tests:
-- Mock interfaces (`AgentInterface`, `PipelineStepInterface`, `EmbeddingInterface`, `VectorStoreInterface`, `EntityTypeManagerInterface`, `AccountInterface`)
-- Use real instances for value objects (`AgentResult`, `StepResult`, `EntityEmbedding`, `McpToolDefinition`)
+- Mock interfaces (`AgentToolInterface`, `ToolRegistryInterface`, `PipelineStepInterface`, `EmbeddingInterface`, `VectorStoreInterface`, `EntityTypeManagerInterface`, `AccountInterface`)
+- Use real instances for value objects (`AgentResult`, `AgentTool`, `AgentToolResult`, `StepResult`, `EntityEmbedding`)
 - Use `FakeEmbeddingProvider` for deterministic test embeddings
 - Use `InMemoryVectorStore` for vector storage in tests
-- For `AgentExecutor` tests, create a concrete `TestAgent` class (see `packages/ai-agent/tests/Unit/TestAgent.php`)
 
 ### Pipeline step plugins must be anonymous classes in tests
 
@@ -169,17 +241,13 @@ $step = new class implements PipelineStepInterface {
 };
 ```
 
-### MCP tool name parsing is prefix-based
+### Tool access checks are enforced
 
-`McpToolExecutor::parseToolName()` iterates known operations and checks `str_starts_with()`. A tool named `create_` (empty entity type) throws `InvalidArgumentException`. A tool named `totally_invalid` (no matching prefix) also throws. The executor catches these and returns MCP error results.
-
-### Query tool disables access checking
-
-`McpToolExecutor::executeQuery()` calls `$query->accessCheck(false)`. Access control for MCP operations is enforced at the agent/endpoint level. Do not add access checks inside individual tool execution methods.
+Every tool in `packages/ai-tools/` enforces entity-level access against the initiator account. The previous `McpToolExecutor::accessCheck(false)` bypass was removed (ADR-019). External MCP clients now enforce entity-level access via their bearer-token account.
 
 ### AccountInterface::id() returns int|string
 
-`AgentExecutor` casts `$context->account->id()` to `(int)` for the audit log's `accountId` field. If account IDs are strings (e.g., UUIDs), this cast will produce 0. Be aware of this when reviewing audit logs.
+`AgentRun.initiator_id` stores the raw account id (string or int via the `_data` blob). Audit logs reference `account_id` similarly. Do not cast to `(int)` blindly — UUID-style ids will collapse to `0`.
 
 ### EntityEmbedder text building
 
@@ -194,10 +262,12 @@ Keys are `"{entityTypeId}:{entityId}:{langcode}"`. The `delete()` method removes
 ### Unit test locations
 
 - `packages/ai-schema/tests/Unit/` -- EntityJsonSchemaGenerator, SchemaRegistry
-- `packages/ai-schema/tests/Unit/Mcp/` -- McpToolGenerator, McpToolDefinition, McpToolExecutor, TranslationToolGenerator
-- `packages/ai-agent/tests/Unit/` -- AgentExecutor, AgentResult, AgentAction, AgentContext, AgentAuditLog
+- `packages/ai-tools/tests/Unit/` -- AgentTool, AgentToolResult, AttributeToolRegistry, stock tools
+- `packages/ai-agent/tests/Unit/` -- AgentExecutor, AgentResult, AgentAction, AgentContext, AgentDefinition, RunAgentHandler, AgentRunService, StalledRunReaper, repositories
+- `packages/ai-observability/tests/Unit/` -- AgentRunTelemetryListener, ModelPriceTable
 - `packages/ai-pipeline/tests/Unit/` -- Pipeline, PipelineExecutor, PipelineContext, PipelineStepConfig, PipelineDispatcher, StepResult, PipelineResult, PipelineQueueMessage
 - `packages/ai-vector/tests/Unit/` -- InMemoryVectorStore, EntityEmbedder, EntityEmbedding, SimilarityResult, FakeEmbeddingProvider, DistanceMetric, LanguageAwareVectorTest
+- `tests/Integration/PhaseN/AgentRuntime/` -- CliInlineRunTest, EnqueueAndConsumeTest, AsyncHttpRunTest, CancellationTest, InteractiveHitlTest, ReaperTest, PurgeJobTest, TelemetryTest, McpClientToolSourceTest, EntityPersistenceTest
 
 ### Running tests
 
@@ -207,9 +277,14 @@ Keys are `"{entityTypeId}:{entityId}:{langcode}"`. The `delete()` method removes
 
 # Single package
 ./vendor/bin/phpunit packages/ai-schema/tests/
+./vendor/bin/phpunit packages/ai-tools/tests/
 ./vendor/bin/phpunit packages/ai-agent/tests/
+./vendor/bin/phpunit packages/ai-observability/tests/
 ./vendor/bin/phpunit packages/ai-pipeline/tests/
 ./vendor/bin/phpunit packages/ai-vector/tests/
+
+# Agent-runtime integration suite
+./vendor/bin/phpunit tests/Integration/PhaseN/AgentRuntime/
 ```
 
 Do NOT use `-v` flag -- PHPUnit 10.5 rejects it.
@@ -219,21 +294,6 @@ Do NOT use `-v` flag -- PHPUnit 10.5 rejects it.
 - `FakeEmbeddingProvider` (`packages/ai-vector/src/Testing/FakeEmbeddingProvider.php`) -- Deterministic, hash-based vectors. Default 128 dimensions. Use for all tests needing embeddings.
 - `InMemoryVectorStore` (`packages/ai-vector/src/InMemoryVectorStore.php`) -- Cosine similarity, no external dependencies. Use for all vector storage tests.
 - `TestAgent` (`packages/ai-agent/tests/Unit/TestAgent.php`) -- Configurable test agent with settable results and exceptions.
-
-### Pattern: Testing AgentExecutor
-
-```php
-$entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-$toolExecutor = new McpToolExecutor($entityTypeManager);
-$executor = new AgentExecutor($toolExecutor);
-
-$account = $this->createMock(AccountInterface::class);
-$account->method('id')->willReturn(1);
-$context = new AgentContext(account: $account, parameters: ['key' => 'value']);
-
-$result = $executor->execute($agent, $context);
-$log = $executor->getAuditLog();
-```
 
 ### Pattern: Testing PipelineExecutor
 
@@ -269,6 +329,10 @@ $results = $embedder->searchSimilar('search query', limit: 5, entityTypeId: 'nod
 
 ## Related Specs
 
-- `docs/specs/ai-integration.md` -- Full specification with interface signatures and architecture details
-- `docs/plans/2026-02-28-aurora-architecture-v2-design.md` -- Architecture v2 design (context for AI layer positioning)
+- `docs/specs/agent-executor.md` -- Canonical v1 agent runtime spec: SCs, NFRs, audit invariants, HITL state machine, SSE vocabulary, security posture, ADR-019 access-bypass removal
+- `docs/specs/ai-integration.md` -- Layer 5 AI surface overview (schema generation, agent runtime, pipelines, vector store)
+- `docs/specs/authoring-assist-contract.md` -- Downstream consumer contract for agents
+- `docs/specs/semantic-refresh-trigger-contract.md` -- Pipeline trigger contract
+- `packages/ai-tools/README.md` -- Tool catalogue surface (`#[AsAgentTool]`, stock tools, remote MCP via `McpClientToolSource`)
+- `packages/ai-agent/README.md` -- Agent-runtime package: surfaces (CLI, HTTP, Messenger), extension points, quality gates
 - `CLAUDE.md` -- Project-wide gotchas including dual-state bug pattern, JSON symmetry, final class mocking
