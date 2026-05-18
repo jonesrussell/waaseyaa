@@ -5,14 +5,13 @@ dependencies: []
 requirement_refs:
 - FR-010
 - FR-011
+- FR-012
+- FR-013
 - FR-015
 - FR-016
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
-base_branch: kitty/mission-agent-executor-01KRWPK7
-base_commit: eb2158425d828b628579169c5ab90ea062a88113
-created_at: '2026-05-18T15:23:42.291504+00:00'
 subtasks:
 - T001
 - T002
@@ -23,8 +22,6 @@ subtasks:
 - T007
 - T008
 - T009
-agent: claude:opus-4-7:reviewer:reviewer
-shell_pid: 335268
 history:
 - date: '2026-05-18T14:55:10Z'
   actor: tasks-skill
@@ -399,10 +396,3 @@ Planning + merge target: `main`. Execution lane is allocated by `spec-kitty agen
 ```
 spec-kitty agent action implement WP01 --agent <name>
 ```
-
-## Activity Log
-
-- 2026-05-18T15:23:43Z – claude:sonnet:implementer:implementer – shell_pid=330256 – Assigned agent via action command
-- 2026-05-18T15:46:29Z – claude:sonnet:implementer:implementer – shell_pid=330256 – Lands packages/ai-tools (Layer 5) with AgentToolInterface, AgentTool VO, AgentToolResult, AbstractAgentTool, AsAgentTool attribute, AttributeToolRegistry + 8 stock tools. PackageManifestCompiler scans new attribute via string FQCN. bin/check-external-consumers + ADR-019 filed. accessCheck(false) removed from packages/ai-schema/src/Mcp/McpToolExecutor.php. Gates green. DEFERRED: T006/T007 deletions of packages/mcp/src/Tools and McpToolDefinition + McpController rewire + McpControllerToolsSharingTest -- impact 18+ consumers outside WP01 owned_files; follow-up WPs needed. Commit 84c57f0da.
-- 2026-05-18T15:47:31Z – claude:opus-4-7:reviewer:reviewer – shell_pid=335268 – Started review via action command
-- 2026-05-18T15:50:43Z – claude:opus-4-7:reviewer:reviewer – shell_pid=335268 – Review passed. WP01's load-bearing contract (the new ai-tools catalogue) is fully delivered and consumable: packages/ai-tools/composer.json policy-compliant (Layer 5 declared, internal deps pinned to ^0.1.0-alpha.180, sort-packages true, no @dev, no wildcards); AgentTool VO + AgentToolInterface + AgentToolResult + AbstractAgentTool + #[AsAgentTool] all present with class-level @api; AttributeToolRegistry at packages/ai-tools/src/Catalogue/ hydrates from manifest, container-resolves lazily, validates AgentToolInterface, lets manually-registered tools win; PackageManifestCompiler extended via Layer-0-clean string FQCN constant (Foundation does not import L5); 8 stock tools shipped (Entity{Read,List,Search,Create,Update,Delete}, RelationshipTraverse, VectorSearch) with correct destructive flags; EntityCreateTool calls enforceIsNew() per CLAUDE.md gotcha; AbstractAgentTool redacts password/token/api_key/secret; McpToolExecutor accessCheck(false) removed with ADR-019 reference; ADR-019 filed and accurate; bin/check-external-consumers ai-agent-orphans script shipped and wired into composer verify. Gates green: composer cs-check clean, phpstan 0 errors, check-composer-policy OK, check-package-layers OK, check-external-consumers OK, ai-tools tests 5/5 pass. SCOPE ADJUSTMENT recorded: T006 (delete packages/mcp/src/Tools/*) and T007 (delete McpToolDefinition + rewire McpController) intentionally deferred by the implementer because those deletions force edits to ~18 consumer files in WP02/WP03 territory (notably packages/ai-agent/src/ToolRegistry.php which is WP03-owned). The deferral is sound: the new AttributeToolRegistry is independently consumable and check-external-consumers already proves zero out-of-mission consumers for the orphaned symbols. Orchestrator action required: rewire FR-012 (delete packages/mcp/src/Tools/*) and FR-013 (replace McpToolDefinition) from WP01 to WP03; ensure McpControllerToolsSharingTest lands in WP03's acceptance set; ensure WP02 sees a heads-up that its scope sequences after the WP03 cleanup. Minor nit (non-blocking): EntityReadTool::serialize() at line 104 calls method_exists($entity, 'getValues') as a soft fallback — getValues is not declared on EntityInterface (only toArray is). Currently a safe no-op fallback because of the guard, but a follow-up could switch to $entity->toArray() for the canonical path.
