@@ -29,7 +29,10 @@
     },
     "extra": {
         "waaseyaa": {
-            "providers": ["Waaseyaa\\AI\\Observability\\ObservabilityServiceProvider"],
+            "providers": [
+                "Waaseyaa\\AI\\Observability\\AgentTelemetryServiceProvider",
+                "Waaseyaa\\AI\\Observability\\ObservabilityServiceProvider"
+            ],
             "migrations": "migrations"
         },
         "branch-alias": {
