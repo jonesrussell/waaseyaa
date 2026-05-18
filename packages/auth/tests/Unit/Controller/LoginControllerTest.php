@@ -10,6 +10,8 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\Auth\Controller\LoginController;
 use Waaseyaa\Auth\RateLimiter;
+use Waaseyaa\Auth\TwoFactorManager;
+use Waaseyaa\Auth\TwoFactorService;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 
@@ -34,10 +36,14 @@ final class LoginControllerTest extends TestCase
     private function makeController(
         ?EntityTypeManager $entityTypeManager = null,
         ?RateLimiter $rateLimiter = null,
+        ?TwoFactorService $twoFactor = null,
     ): LoginController {
+        $entityTypeManager ??= $this->makeEntityTypeManager();
+
         return new LoginController(
-            entityTypeManager: $entityTypeManager ?? $this->makeEntityTypeManager(),
+            entityTypeManager: $entityTypeManager,
             rateLimiter: $rateLimiter ?? new RateLimiter(),
+            twoFactor: $twoFactor ?? new TwoFactorService(new TwoFactorManager(), $entityTypeManager),
         );
     }
 

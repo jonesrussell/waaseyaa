@@ -985,3 +985,5 @@ bin/check-symfony-imports --list-stale # also reports legacy_files entries
 <!-- Spec reviewed 2026-05-17 - dead-code baseline reduction (#1493 / PR TBD): @api PHPDoc sweep on extension-point classes + WaaseyaaEntrypointProvider extended to recognize EntityBase/ContentEntityBase subclasses and their traits. No behavioural change. -->
 
 <!-- Spec reviewed 2026-05-17 - dead-code Phase 3 Bucket 4: @api PHPDoc sweep on additional public-API classes. No behavioural change. -->
+
+<!-- Spec reviewed 2026-05-18 - mission two-factor-end-to-end-01KRW8TN (#1499): adds 2FA section to access-control, adds 4 new routes documented in routing surface. No behavioural change to existing access pipeline. -->

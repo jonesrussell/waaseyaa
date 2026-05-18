@@ -34,6 +34,11 @@ final class AuthServiceProvider extends ServiceProvider implements HasMiddleware
         });
 
         $this->singleton(TwoFactorManager::class, fn() => new TwoFactorManager());
+
+        $this->singleton(TwoFactorService::class, fn() => new TwoFactorService(
+            $this->resolve(TwoFactorManager::class),
+            $this->resolve(EntityTypeManager::class),
+        ));
     }
 
     /**

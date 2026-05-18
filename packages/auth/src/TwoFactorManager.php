@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Auth;
 
+/**
+ * Stateless TOTP + recovery-code primitives (RFC 6238).
+ *
+ * The high-level orchestration lives in {@see TwoFactorService}; this class
+ * is the underlying cryptographic primitive layer and is part of Waaseyaa's
+ * public extension surface so consumers can compose their own 2FA flows.
+ *
+ * @api
+ */
 final class TwoFactorManager
 {
     private const int CODE_LENGTH = 6;
