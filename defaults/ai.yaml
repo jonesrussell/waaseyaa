@@ -6,6 +6,11 @@
 # at boot. bin/check-no-secrets parses this file to keep credentials out
 # of the repo.
 
+project_versioning:
+  release_stage: pre-v1
+  owner: jonesrussell
+  release_approval_required: true
+
 # Scalar config keys consumed by the executor and the reaper.
 run_retention_days: 30           # TTL for AgentRun + AgentAuditLog rows.
 hitl_timeout_seconds: 300        # Interactive HITL auto-deny window.
