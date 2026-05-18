@@ -49,3 +49,108 @@ exceptions:
   - path: "kitty-specs/archive/ai-agent-end-to-end-01KRW91P/**"
     action: do_not_change
     reason: "Archived predecessor mission. Historical record; must not be modified."
+  - path: "phpstan-baseline.neon"
+    action: rename
+    reason: "PHPStan level-5 baseline regenerated automatically when new @api extension points + reflection-discovered classes land. Touched by WP01/WP03/WP04 lanes; each baseline diff was justified during review."
+  - path: "phpstan-dead-code-baseline.neon"
+    action: rename
+    reason: "Dead-code baseline regenerated when public extension points land (every new @api class). Touched by multiple lanes; baseline-diff rationale captured in WP01/WP03 review notes."
+  - path: "composer.lock"
+    action: rename
+    reason: "composer.lock updates land alongside any new internal sibling package (packages/ai-tools introduced in WP01) or sibling-version sweep. Internal bookkeeping; no third-party additions in this mission."
+  - path: "composer.json"
+    action: rename
+    reason: "Root composer.json gained the packages/ai-tools path repository entry + the bin/check-external-consumers script registration."
+  - path: "bin/check-package-layers"
+    action: rename
+    reason: "Layer registry table extended to include packages/ai-tools at Layer 5 (WP01)."
+  - path: "bin/check-external-consumers"
+    action: rename
+    reason: "New verification script shipped by WP01; codifies C-006 (no external consumers for the deleted symbols)."
+  - path: ".symfony-import-allowlist.json"
+    action: rename
+    reason: "Allowlist extended for ai-observability AgentRunTelemetryListener (WP08) mirroring existing LlmCallListener / ToolCallListener precedent."
+  - path: "docs/public-surface-map.php"
+    action: rename
+    reason: "Public surface map updated by WP02 (entities + enums) / WP04 (broadcaster interface + InitiatorAccountLoaderInterface) / WP05 (controller) / WP07 (Mcp client surface) / WP08 (recorder interfaces)."
+  - path: "packages/mcp/src/Bridge/**"
+    action: rename
+    reason: "WP03 absorbed the bridge rewrite from WP01's deferral — old Bridge/ToolRegistryInterface + Bridge/ToolExecutorInterface adapted to consume the new Waaseyaa\\AI\\Tools\\AgentTool surface; AgentToolRegistryBridge added."
+  - path: "packages/mcp/src/McpEndpoint.php"
+    action: rename
+    reason: "WP03 rewired the production MCP endpoint to serve the 8-tool surface via Waaseyaa\\AI\\Tools\\ToolRegistryInterface (FR-012). Legacy McpController kept as the older McpRouter fallback per WP03 review note."
+  - path: "packages/scheduler/src/Schedule/Ai/**"
+    action: rename
+    reason: "New scheduler entries for daily ai:purge-runs (03:00 UTC) and 5-minute ai:reap-stalled-runs (WP06 / FR-030)."
+  - path: "packages/cli/src/Command/Ai/**"
+    action: rename
+    reason: "Three new ai:* CLI commands (FR-005, FR-006, FR-007) — net-new namespace, no prior ai:* commands exist."
+  - path: "packages/cli/src/Provider/AiServiceProvider.php"
+    action: rename
+    reason: "Registers the ai:* commands and wires the closure invoker into the scheduler entries (WP06)."
+  - path: "packages/api/src/Controller/AgentRunController.php"
+    action: rename
+    reason: "Initial WP05 plan placed the controller in packages/api (L4); ultimately moved to packages/ai-agent (L5) per FR-031 revision. Path listed in case the merge surfaced a stale copy."
+  - path: "packages/routing/src/AgentRouteServiceProvider.php"
+    action: rename
+    reason: "Initial WP05 plan placed the route provider in packages/routing (L4); ultimately moved to packages/ai-agent (L5) per FR-031 revision."
+  - path: "tests/Integration/**"
+    action: rename
+    reason: "Integration tests landed by WP01-WP08: PhaseN/AgentRuntime/* (new directory) plus targeted edits in Phase8/10/11 to swap the deleted McpToolDefinition surface for the new AgentTool VO (WP03 absorbed cleanup)."
+  - path: "defaults/ai.yaml"
+    action: rename
+    reason: "New config defaults file (env-var names only per C-010); WP04 created it with scalars + empty providers list; WP07's mcp_servers entry deferred to merge-phase / follow-up per its review note."
+  - path: "packages/foundation/src/Discovery/PackageManifest.php"
+    action: rename
+    reason: "Foundation L0 manifest container extended with `agentTools` (WP01) and `agentDefinitions` (WP03) collections + fromArray/toArray round-trip. Narrow additive edit beside existing collectors."
+  - path: "packages/foundation/src/Discovery/PackageManifestCompiler.php"
+    action: rename
+    reason: "Foundation L0 compiler extended with #[AsAgentTool] (WP01) and #[AsAgentDefinition] (WP03) discovery collectors. Uses string FQCN to preserve Foundation cleanliness."
+  - path: "packages/*/composer.json"
+    action: rename
+    reason: "Per-package composer.json bumps for new internal deps + provider registrations: WP01 (ai-tools NEW + mcp + ai-schema); WP02 (ai-agent + access); WP04 (ai-agent + config); WP05 (ai-agent); WP06 (cli); WP07 (ai-agent); WP08 (ai-observability). CP-NEW pin to ^<current-tag> respected; sort-packages true."
+  - path: ".kittify/**"
+    action: rename
+    reason: "Spec-kitty bookkeeping (status.json, status.events.jsonl, lanes.json, mission.json) advanced as WPs progressed."
+  - path: ".claude/skills/**"
+    action: rename
+    reason: "Per-project Claude Code skill symlinks regenerated during mission execution (machine-specific; gitignored)."
+  - path: "skills/waaseyaa/ai-integration/SKILL.md"
+    action: rename
+    reason: "Skill content updated by WP09 to point at the new doctrine spec and document the new CLI/HTTP/extension surfaces."
+  - path: "packages/ai-agent/README.md"
+    action: rename
+    reason: "Full rewrite in WP09: dropped AgentInterface / McpToolDefinition references; documented new surface."
+  - path: "CHANGELOG.md"
+    action: rename
+    reason: "WP09 added [Unreleased] Added/Changed/Removed bullets covering the entire mission scope."
+  - path: "docs/security/agent-executor-review.md"
+    action: rename
+    reason: "WP09 deliverable: manual security review output (the security-review slash skill is a Claude Code surface, not invokable from subagent context)."
+  - path: "docs/specs/**"
+    action: rename
+    reason: "Doctrine specs received review-stamp refreshes during the WP07 rebase (access-control, entity-system, infrastructure, mcp-endpoint) per the drift-detector convention."
+  - path: "packages/ai-tools/**"
+    action: rename
+    reason: "NEW Layer-5 package introduced by WP01: composer.json, ServiceProvider, AgentTool VO, AgentToolInterface, AgentToolResult, AbstractAgentTool, #[AsAgentTool], AttributeToolRegistry, ToolRegistryInterface, plus eight stock tool classes (Entity/Relationship/Vector). Replaces the deleted packages/mcp/src/Tools/* — accounted-for under filesystem_paths rename + this exception for the destination tree."
+  - path: "packages/ai-agent/src/**"
+    action: rename
+    reason: "Major edits across the ai-agent package: WP02 added Entity/Repository/Access/Enum + AiAgentEntityServiceProvider + migrations; WP03 rewired AgentExecutor + deleted AgentInterface/ToolRegistry + added AgentDefinition + AgentDefinitionRegistry + Attribute/AsAgentDefinition + AiAgentServiceProvider; WP04 added Message/Service/Reaper/Broadcast/Account + MessagingServiceProvider; WP05 added Controller/Routing + AgentRunBroadcaster; WP07 added Mcp/ + McpServiceProvider."
+  - path: "packages/ai-agent/migrations/**"
+    action: rename
+    reason: "WP02 added the create_agent_run migration (creates agent_run + agent_audit_log tables + four indexes per data-model)."
+  - path: "packages/ai-observability/**"
+    action: rename
+    reason: "WP08 added Pricing/ModelPriceTable, Recorder/AgentTelescopeRecorderInterface + Null impl, Recorder/AgentRunMetricsRecorderInterface + Null impl, Event/* (five lifecycle events), Listener/AgentRunTelemetryListener, AgentTelemetryServiceProvider — all new files (the ai-observability listener surface)."
+  - path: "packages/config/src/Schema/Ai/**"
+    action: rename
+    reason: "WP04 added ProvidersConfig + ScalarsConfig; WP07 added McpServersConfig. All declare env-var-name indirection (C-010) for secrets."
+  - path: "packages/access/src/Capability/**"
+    action: rename
+    reason: "WP02 added AgentCapabilities seed with 11 capability names (agent.run, agent.run.approve, agent.run.bypass_ownership, tool.*)."
+  - path: "packages/ai-schema/src/**"
+    action: rename
+    reason: "WP03 absorbed the McpToolDefinition deletion (FR-013); generators rewritten against AgentTool VO; broader deletions (McpToolGenerator, TranslationToolGenerator, McpToolExecutor, SchemaRegistry) plus updates to top-level EntityJsonSchemaGenerator + (deleted) SchemaRegistry accepted by WP03 reviewer."
+  - path: "docs/adr/**"
+    action: rename
+    reason: "WP01 filed ADR-019 documenting the McpToolExecutor::accessCheck(false) removal posture."
