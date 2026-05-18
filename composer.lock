@@ -3417,7 +3417,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/ai-agent",
-                "reference": "1fb4ad759f639611875efb4dd2a4e03e6b173ada"
+                "reference": "8ba29932b1d0f760a78c483ec5b87ab849481723"
             },
             "require": {
                 "php": ">=8.5",
@@ -3430,7 +3430,8 @@
                 "waaseyaa/database-legacy": "^0.1.0-alpha.180",
                 "waaseyaa/entity": "^0.1.0-alpha.180",
                 "waaseyaa/entity-storage": "^0.1.0-alpha.180",
-                "waaseyaa/foundation": "^0.1.0-alpha.180"
+                "waaseyaa/foundation": "^0.1.0-alpha.180",
+                "waaseyaa/http-client": "^0.1.0-alpha.180"
             },
             "require-dev": {
                 "phpunit/phpunit": "^10.5"
@@ -3445,9 +3446,7 @@
                     "providers": [
                         "Waaseyaa\\AI\\Agent\\AiAgentEntityServiceProvider",
                         "Waaseyaa\\AI\\Agent\\AiAgentServiceProvider",
-                        "Waaseyaa\\AI\\Agent\\MessagingServiceProvider",
-                        "Waaseyaa\\AI\\Agent\\Broadcast\\AgentRunBroadcasterServiceProvider",
-                        "Waaseyaa\\AI\\Agent\\Routing\\AgentRouteServiceProvider"
+                        "Waaseyaa\\AI\\Agent\\MessagingServiceProvider"
                     ]
                 }
             },
@@ -3475,7 +3474,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/ai-observability",
-                "reference": "adf77aa8d2c8ef4cad0e5c606edccc75b4337f04"
+                "reference": "ab8942fb76cb1e1e0edf0185a896ea6fb3db93c4"
             },
             "require": {
                 "php": ">=8.5",
@@ -3492,6 +3491,7 @@
             "extra": {
                 "waaseyaa": {
                     "providers": [
+                        "Waaseyaa\\AI\\Observability\\AgentTelemetryServiceProvider",
                         "Waaseyaa\\AI\\Observability\\ObservabilityServiceProvider"
                     ],
                     "migrations": "migrations"
@@ -4017,7 +4017,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "be433053f9acbf95159c8ad55bf0052e696a75a1"
+                "reference": "23e8a2460f0e49987f4f77273b36d91c1d6a9252"
             },
             "require": {
                 "php": ">=8.5",
@@ -4048,6 +4048,7 @@
                 "waaseyaa": {
                     "providers": [
                         "Waaseyaa\\CLI\\CliServiceProvider",
+                        "Waaseyaa\\CLI\\Provider\\AiServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\BundleFixtureServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\EntityTypeServiceProvider",
                         "Waaseyaa\\CLI\\Provider\\HealthSchemaServiceProvider",
