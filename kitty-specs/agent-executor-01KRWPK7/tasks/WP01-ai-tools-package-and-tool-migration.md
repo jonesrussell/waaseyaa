@@ -11,7 +11,7 @@ requirement_refs:
 - FR-016
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: 'Plan + merge target: main. Execution worktree is allocated per lane at finalize-tasks time; consult kitty-specs/agent-executor-01KRWPK7/lanes.json.'
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T001
 - T002
