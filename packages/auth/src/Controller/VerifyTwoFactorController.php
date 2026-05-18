@@ -8,14 +8,24 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\Auth\RateLimiterInterface;
 use Waaseyaa\Auth\TwoFactorService;
+use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\User\User;
 
 /**
  * POST /auth/2fa/verify — submit a TOTP or recovery code.
  *
  * Rate-limited identically to the login endpoint (5 attempts per IP per 60s)
- * under the distinct `2fa-verify:` namespace. Used both during login's
- * second-factor step and for sensitive-operation re-authentication.
+ * under the distinct `2fa-verify:` namespace. Two dispatch modes:
+ *
+ *   - **Pending-login mode:** `_account` is not set but `$_SESSION` carries
+ *     `waaseyaa_pending_2fa_uid` (placed there by LoginController when 2FA
+ *     is enabled). The controller loads that user, verifies the submitted
+ *     code, and on success promotes the session to a full login (sets
+ *     `waaseyaa_uid`, clears the pending key, regenerates the session id).
+ *
+ *   - **Authenticated re-verify mode:** `_account` is a User instance.
+ *     Used to re-confirm 2FA for sensitive operations (e.g. disable). No
+ *     session promotion happens here.
  *
  * @api
  */
@@ -24,19 +34,20 @@ final class VerifyTwoFactorController
     public function __construct(
         private readonly TwoFactorService $twoFactor,
         private readonly RateLimiterInterface $rateLimiter,
+        private readonly EntityTypeManagerInterface $entityTypeManager,
     ) {}
 
     public function __invoke(Request $request): JsonResponse
     {
-        $account = $request->attributes->get('_account');
-        if (!$account instanceof User) {
+        [$user, $isPending] = $this->resolveUser($request);
+        if ($user === null) {
             return new JsonResponse([
                 'jsonapi' => ['version' => '1.1'],
                 'errors' => [['status' => '401', 'title' => 'Unauthorized', 'detail' => 'Authentication required.']],
             ], 401);
         }
 
-        if (!$this->twoFactor->isEnabled($account)) {
+        if (!$this->twoFactor->isEnabled($user)) {
             return new JsonResponse([
                 'jsonapi' => ['version' => '1.1'],
                 'errors' => [['status' => '400', 'title' => 'Two-Factor Not Enabled', 'detail' => 'Two-factor authentication is not enabled for this user.']],
@@ -72,7 +83,7 @@ final class VerifyTwoFactorController
             ], 400);
         }
 
-        if (!$this->twoFactor->verify($account, $code)) {
+        if (!$this->twoFactor->verify($user, $code)) {
             $this->rateLimiter->hit($key, 60);
             return new JsonResponse([
                 'jsonapi' => ['version' => '1.1'],
@@ -80,9 +91,40 @@ final class VerifyTwoFactorController
             ], 401);
         }
 
+        if ($isPending) {
+            $_SESSION['waaseyaa_uid'] = $user->id();
+            unset($_SESSION['waaseyaa_pending_2fa_uid']);
+            if (session_status() === \PHP_SESSION_ACTIVE) {
+                session_regenerate_id(true);
+            }
+        }
+
         return new JsonResponse([
             'jsonapi' => ['version' => '1.1'],
             'data' => ['type' => 'two-factor', 'attributes' => ['verified' => true]],
         ]);
+    }
+
+    /**
+     * @return array{0: ?User, 1: bool} [user, isPending]
+     */
+    private function resolveUser(Request $request): array
+    {
+        $account = $request->attributes->get('_account');
+        if ($account instanceof User) {
+            return [$account, false];
+        }
+
+        $pendingUid = $_SESSION['waaseyaa_pending_2fa_uid'] ?? null;
+        if (!is_int($pendingUid)) {
+            return [null, false];
+        }
+
+        $loaded = $this->entityTypeManager->getStorage('user')->load($pendingUid);
+        if (!$loaded instanceof User) {
+            return [null, false];
+        }
+
+        return [$loaded, true];
     }
 }

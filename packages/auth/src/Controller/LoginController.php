@@ -7,6 +7,7 @@ namespace Waaseyaa\Auth\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Waaseyaa\Auth\RateLimiterInterface;
+use Waaseyaa\Auth\TwoFactorService;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\User\Http\AuthController;
 
@@ -15,6 +16,7 @@ final class LoginController
     public function __construct(
         private readonly EntityTypeManager $entityTypeManager,
         private readonly RateLimiterInterface $rateLimiter,
+        private readonly TwoFactorService $twoFactor,
     ) {}
 
     public function __invoke(Request $request): JsonResponse
@@ -66,6 +68,25 @@ final class LoginController
                 'jsonapi' => ['version' => '1.1'],
                 'errors' => [['status' => '500', 'title' => 'Internal Server Error', 'detail' => 'Session not available. Login cannot be completed.']],
             ], 500);
+        }
+
+        // If 2FA is enabled, do NOT issue a session yet. Store the user's UID
+        // under a pending key; the client must POST to /auth/2fa/verify with a
+        // TOTP or recovery code to complete login. VerifyTwoFactorController
+        // detects the pending key and promotes it to a full session.
+        if ($this->twoFactor->isEnabled($user)) {
+            $_SESSION['waaseyaa_pending_2fa_uid'] = $user->id();
+
+            return new JsonResponse([
+                'jsonapi' => ['version' => '1.1'],
+                'data' => [
+                    'type' => 'auth',
+                    'attributes' => [
+                        'state' => '2fa_required',
+                        'pending_user_id' => $user->id(),
+                    ],
+                ],
+            ]);
         }
 
         $_SESSION['waaseyaa_uid'] = $user->id();

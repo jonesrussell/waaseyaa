@@ -22,7 +22,7 @@ final class VerifyTwoFactorControllerTest extends TestCase
         $user->setTwoFactorSecret($secret);
         $user->setTwoFactorRecoveryCodesHash([]);
         $rateLimiter = TwoFactorTestKit::makeRateLimiter();
-        $controller = new VerifyTwoFactorController($service, $rateLimiter);
+        $controller = new VerifyTwoFactorController($service, $rateLimiter, TwoFactorTestKit::makeEntityTypeManager());
         $request = TwoFactorTestKit::makeAuthenticatedRequest($user, ['code' => $manager->getCurrentCode($secret)]);
 
         $response = $controller($request);
@@ -39,7 +39,7 @@ final class VerifyTwoFactorControllerTest extends TestCase
         $user->setTwoFactorSecret('JBSWY3DPEHPK3PXP');
         $user->setTwoFactorRecoveryCodesHash([]);
         $rateLimiter = TwoFactorTestKit::makeRateLimiter();
-        $controller = new VerifyTwoFactorController(TwoFactorTestKit::makeService(), $rateLimiter);
+        $controller = new VerifyTwoFactorController(TwoFactorTestKit::makeService(), $rateLimiter, TwoFactorTestKit::makeEntityTypeManager());
         $request = TwoFactorTestKit::makeAuthenticatedRequest($user, ['code' => '000000']);
 
         $response = $controller($request);
@@ -54,7 +54,7 @@ final class VerifyTwoFactorControllerTest extends TestCase
         $user = TwoFactorTestKit::makeUser();
         $user->setTwoFactorSecret('JBSWY3DPEHPK3PXP');
         $rateLimiter = TwoFactorTestKit::makeRateLimiter(limited: true);
-        $controller = new VerifyTwoFactorController(TwoFactorTestKit::makeService(), $rateLimiter);
+        $controller = new VerifyTwoFactorController(TwoFactorTestKit::makeService(), $rateLimiter, TwoFactorTestKit::makeEntityTypeManager());
         $request = TwoFactorTestKit::makeAuthenticatedRequest($user, ['code' => '123456']);
 
         $response = $controller($request);
@@ -65,7 +65,7 @@ final class VerifyTwoFactorControllerTest extends TestCase
 
     public function testNotEnabledReturns400(): void
     {
-        $controller = new VerifyTwoFactorController(TwoFactorTestKit::makeService(), TwoFactorTestKit::makeRateLimiter());
+        $controller = new VerifyTwoFactorController(TwoFactorTestKit::makeService(), TwoFactorTestKit::makeRateLimiter(), TwoFactorTestKit::makeEntityTypeManager());
         $request = TwoFactorTestKit::makeAuthenticatedRequest(TwoFactorTestKit::makeUser(), ['code' => '123456']);
 
         $response = $controller($request);

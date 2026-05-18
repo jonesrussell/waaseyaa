@@ -26,11 +26,21 @@ final class TwoFactorTestKit
         return User::make(['uid' => 42, 'name' => 'alice', 'mail' => 'alice@example.com']);
     }
 
-    public static function makeService(): TwoFactorService
+    public static function makeService(?EntityTypeManagerInterface $manager = null): TwoFactorService
     {
-        $storage = new class () implements EntityStorageInterface {
+        return new TwoFactorService(new TwoFactorManager(), $manager ?? self::makeEntityTypeManager());
+    }
+
+    /**
+     * @param array<int, User> $usersById Optional preloaded users (load() returns them).
+     */
+    public static function makeEntityTypeManager(array $usersById = []): EntityTypeManagerInterface
+    {
+        $storage = new class ($usersById) implements EntityStorageInterface {
+            /** @param array<int, User> $usersById */
+            public function __construct(private array $usersById) {}
             public function create(array $values = []): EntityInterface { throw new \BadMethodCallException(); }
-            public function load(int|string $id): ?EntityInterface { return null; }
+            public function load(int|string $id): ?EntityInterface { return $this->usersById[(int) $id] ?? null; }
             public function loadByKey(string $key, mixed $value): ?EntityInterface { return null; }
             public function loadMultiple(array $ids = []): array { return []; }
             public function save(EntityInterface $entity): int { return 2; }
@@ -38,7 +48,7 @@ final class TwoFactorTestKit
             public function getQuery(): EntityQueryInterface { throw new \BadMethodCallException(); }
             public function getEntityTypeId(): string { return 'user'; }
         };
-        $manager = new class ($storage) implements EntityTypeManagerInterface {
+        return new class ($storage) implements EntityTypeManagerInterface {
             public function __construct(private readonly EntityStorageInterface $storage) {}
             public function getDefinition(string $entityTypeId): EntityTypeInterface { throw new \BadMethodCallException(); }
             public function registerEntityType(EntityTypeInterface $type, ?string $registrant = null): void {}
@@ -48,7 +58,6 @@ final class TwoFactorTestKit
             public function getStorage(string $entityTypeId): EntityStorageInterface { return $this->storage; }
             public function getRepository(string $entityTypeId): EntityRepositoryInterface { throw new \BadMethodCallException(); }
         };
-        return new TwoFactorService(new TwoFactorManager(), $manager);
     }
 
     /** @param array<string,mixed> $body */

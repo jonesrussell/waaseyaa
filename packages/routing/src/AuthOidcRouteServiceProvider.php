@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Waaseyaa\Routing;
 
 use Waaseyaa\Auth\Config\AuthConfig;
+use Waaseyaa\Auth\Controller\DisableTwoFactorController;
+use Waaseyaa\Auth\Controller\EnableTwoFactorController;
 use Waaseyaa\Auth\Controller\ForgotPasswordController;
 use Waaseyaa\Auth\Controller\LoginController;
 use Waaseyaa\Auth\Controller\LogoutController;
@@ -12,9 +14,12 @@ use Waaseyaa\Auth\Controller\MeController;
 use Waaseyaa\Auth\Controller\RegisterController;
 use Waaseyaa\Auth\Controller\ResendVerificationController;
 use Waaseyaa\Auth\Controller\ResetPasswordController;
+use Waaseyaa\Auth\Controller\SetupTwoFactorController;
 use Waaseyaa\Auth\Controller\VerifyEmailController;
+use Waaseyaa\Auth\Controller\VerifyTwoFactorController;
 use Waaseyaa\Auth\RateLimiterInterface;
 use Waaseyaa\Auth\Token\AuthTokenRepositoryInterface;
+use Waaseyaa\Auth\TwoFactorService;
 use Waaseyaa\Entity\EntityTypeManager;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Oidc\Authorize\AuthorizeController;
@@ -41,6 +46,7 @@ final class AuthOidcRouteServiceProvider extends ServiceProvider
         $tokenRepo = $this->resolve(AuthTokenRepositoryInterface::class);
         $rateLimiter = $this->resolve(RateLimiterInterface::class);
         $authMailer = $this->resolve(AuthMailer::class);
+        $twoFactor = $this->resolve(TwoFactorService::class);
         $etm = $entityTypeManager;
 
         $router->addRoute(
@@ -118,6 +124,7 @@ final class AuthOidcRouteServiceProvider extends ServiceProvider
                 ->controller(new LoginController(
                     entityTypeManager: $etm,
                     rateLimiter: $rateLimiter,
+                    twoFactor: $twoFactor,
                 ))
                 ->allowAll()
                 ->methods('POST')
@@ -139,6 +146,42 @@ final class AuthOidcRouteServiceProvider extends ServiceProvider
                 ->controller(new MeController())
                 ->allowAll()
                 ->methods('GET')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'api.auth.2fa.setup',
+            RouteBuilder::create('/api/auth/2fa/setup')
+                ->controller(new SetupTwoFactorController($twoFactor))
+                ->allowAll()
+                ->methods('POST')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'api.auth.2fa.enable',
+            RouteBuilder::create('/api/auth/2fa/enable')
+                ->controller(new EnableTwoFactorController($twoFactor))
+                ->allowAll()
+                ->methods('POST')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'api.auth.2fa.verify',
+            RouteBuilder::create('/api/auth/2fa/verify')
+                ->controller(new VerifyTwoFactorController($twoFactor, $rateLimiter, $etm))
+                ->allowAll()
+                ->methods('POST')
+                ->build(),
+        );
+
+        $router->addRoute(
+            'api.auth.2fa.disable',
+            RouteBuilder::create('/api/auth/2fa/disable')
+                ->controller(new DisableTwoFactorController($twoFactor))
+                ->allowAll()
+                ->methods('POST')
                 ->build(),
         );
     }
