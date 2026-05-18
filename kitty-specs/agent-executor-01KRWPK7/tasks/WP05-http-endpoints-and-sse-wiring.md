@@ -236,3 +236,4 @@ spec-kitty agent action implement WP05 --agent <name>
 ## Activity Log
 
 - 2026-05-18T18:19:05Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Assigned agent via action command
+- 2026-05-18T18:44:18Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Ready for review: 4 endpoints, AgentRouteServiceProvider, concrete AgentRunBroadcaster (overrides WP04 stub adapter), request validator, capability+ownership checks; gates green
