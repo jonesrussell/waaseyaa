@@ -4018,11 +4018,12 @@
             "dist": {
                 "type": "path",
                 "url": "packages/cli",
-                "reference": "5e8754ff36bd6eb1757e5b095e9b43ab5b6ee9c9"
+                "reference": "be433053f9acbf95159c8ad55bf0052e696a75a1"
             },
             "require": {
                 "php": ">=8.5",
                 "waaseyaa/access": "^0.1.0-alpha.180",
+                "waaseyaa/ai-agent": "^0.1.0-alpha.180",
                 "waaseyaa/cache": "^0.1.0-alpha.180",
                 "waaseyaa/config": "^0.1.0-alpha.180",
                 "waaseyaa/entity": "^0.1.0-alpha.180",
