@@ -1,7 +1,7 @@
 {
-  "event_count": 9,
-  "last_event_id": "01KRXT7ZYEV13H84K0YR60PVG0",
-  "materialized_at": "2026-05-18T15:11:04.142900+00:00",
+  "event_count": 10,
+  "last_event_id": "01KRY7Q8ETFYQMVB4TH54VFMTS",
+  "materialized_at": "2026-05-18T19:06:35.866737+00:00",
   "mission_number": "",
   "mission_slug": "agent-executor-01KRWPK7",
   "mission_type": "software-dev",
@@ -11,10 +11,10 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "in_review": 0,
-    "planned": 9
+    "planned": 8
   },
   "work_packages": {
     "WP01": {
@@ -25,60 +25,60 @@
       "last_transition_at": "2026-05-18T15:11:03.269414+00:00"
     },
     "WP02": {
-      "actor": "user",
-      "force_count": 3,
-      "lane": "approved",
-      "last_event_id": "01KRXY75V87XB06BKJWPFQJ8SS",
-      "last_transition_at": "2026-05-18T16:20:31.720414+00:00"
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRXT7ZPPGDE0Y4BZ44PG3SHS",
+      "last_transition_at": "2026-05-18T15:11:03.894116+00:00"
     },
     "WP03": {
-      "actor": "user",
-      "force_count": 5,
-      "lane": "approved",
-      "last_event_id": "01KRY2ZE9BN40HXP4Q1AGYBX8H",
-      "last_transition_at": "2026-05-18T17:43:41.099520+00:00"
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRXT7ZQQ9D4QKD6JQTP7ANNY",
+      "last_transition_at": "2026-05-18T15:11:03.927678+00:00"
     },
     "WP04": {
-      "actor": "user",
-      "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KRY4Y63Y5FW7TMAJ1X7HTWDK",
-      "last_transition_at": "2026-05-18T18:17:57.118188+00:00"
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRXT7ZRW1ZR2EAN2JN4FG2MS",
+      "last_transition_at": "2026-05-18T15:11:03.964942+00:00"
     },
     "WP05": {
-      "actor": "user",
-      "force_count": 3,
-      "lane": "approved",
-      "last_event_id": "01KRY6R096P9HK57CYESHRKZH7",
-      "last_transition_at": "2026-05-18T18:49:31.686184+00:00"
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRXT7ZT1MK216A59HJNA3K3N",
+      "last_transition_at": "2026-05-18T15:11:04.001786+00:00"
     },
     "WP06": {
-      "actor": "user",
-      "force_count": 3,
-      "lane": "approved",
-      "last_event_id": "01KRY70KY1HH7GT087YMHM9PMF",
-      "last_transition_at": "2026-05-18T18:54:13.953247+00:00"
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRXT7ZV7SGPC6RTK85C1PZHS",
+      "last_transition_at": "2026-05-18T15:11:04.039222+00:00"
     },
     "WP07": {
-      "actor": "user",
-      "force_count": 2,
-      "lane": "approved",
-      "last_event_id": "01KRY5Y67NYQP1YB8XDTJD3J4X",
-      "last_transition_at": "2026-05-18T18:35:25.813065+00:00"
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRXT7ZWCYAWTGZN16TFKFDZ5",
+      "last_transition_at": "2026-05-18T15:11:04.076196+00:00"
     },
     "WP08": {
-      "actor": "user",
-      "force_count": 3,
-      "lane": "approved",
-      "last_event_id": "01KRY6K7JE6MJQN0WM3S5FAKKR",
-      "last_transition_at": "2026-05-18T18:46:55.310096+00:00"
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRXT7ZXC1EC3PJFSAJJKAAHQ",
+      "last_transition_at": "2026-05-18T15:11:04.108742+00:00"
     },
     "WP09": {
-      "actor": "claude:sonnet:implementer:implementer",
-      "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KRY72S0QWNRXYKY786ZC13K0",
-      "last_transition_at": "2026-05-18T18:55:24.695355+00:00"
+      "actor": "user",
+      "force_count": 2,
+      "lane": "for_review",
+      "last_event_id": "01KRY7Q8ETFYQMVB4TH54VFMTS",
+      "last_transition_at": "2026-05-18T19:06:35.866737+00:00"
     }
   }
 }
