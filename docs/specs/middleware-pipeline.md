@@ -399,3 +399,7 @@ if (PHP_SAPI === 'cli-server') {
 Middleware classes implement `Waaseyaa\Foundation\Http\HttpMiddlewareInterface`, which type-hints Symfony's `HttpFoundation\Request` and `Response`. Per ratified contract C-002 of mission 1107-api-symfony-decoupling, those Symfony types remain in the foundation-internal middleware contract — the mission narrows app-level decoupling to controllers and event-dispatch (Path R-narrow). App code that authors middleware can use the `Waaseyaa\Foundation\Http\Request` alias on the inbound side; the response side stays Symfony's `Response` until a future major version revisits it.
 
 For event-dispatch in middleware (e.g., emitting `DomainEvent` instances during request handling), inject `Waaseyaa\Foundation\Event\EventDispatcherInterface` rather than `Symfony\Contracts\EventDispatcher\EventDispatcherInterface`. The kernel binds `SymfonyEventDispatcherAdapter` as the default, so existing Symfony-typed services continue to work.
+
+## Implementation gotchas
+
+- **Interface naming**: handler interfaces follow `{Type}HandlerInterface` (`HttpHandlerInterface`, `EventHandlerInterface`, `JobHandlerInterface`); middleware interfaces follow `{Type}MiddlewareInterface`. The attribute-discovery for `#[AsMiddleware]` only picks up classes that implement the right interface for their pipeline — naming a class `FooMiddleware` without implementing the matching `{Type}MiddlewareInterface` silently skips it during compilation.

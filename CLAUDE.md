@@ -244,10 +244,9 @@ Cross-cutting rules that affect work anywhere in the framework. Subsystem-specif
 
 **Entity & storage:**
 - **Entity subclass constructors**: User, Node etc. only accept `(array $values)` and hardcode entityTypeId/entityKeys. SqlEntityStorage uses reflection to detect constructor shape.
-- **`_data` JSON blob**: SqlSchemaHandler adds a `_data` TEXT column. SqlEntityStorage::splitForStorage() puts non-schema values into it as JSON; mapRowToEntity() merges them back on load.
 - **`enforceIsNew()` for pre-set IDs**: When creating entities with pre-set IDs (e.g., `new User(['uid' => 2])`), call `$entity->enforceIsNew()` before `save()`. Otherwise `isNew()` returns false, storage tries UPDATE instead of INSERT, and silently affects 0 rows.
-- **EntityEvent uses public properties**: `$event->entity` and `$event->originalEntity` are public readonly — no getter methods. Common mistake: `$event->getEntity()`.
 - **Dual-state bug pattern**: When data can come from two sources (e.g., attribute vs registry), always use one canonical source. Found repeatedly in ComponentRenderer, Pipeline, entity values.
+- More entity gotchas (`_data` JSON blob, `EntityEvent` public props, etc.) live in [docs/specs/entity-system.md](docs/specs/entity-system.md) §"Implementation gotchas".
 
 **Database / DBAL:**
 - **`DatabaseInterface` vs `DBALDatabase`**: `DatabaseInterface` does NOT have `getConnection()`. If the DBAL `Connection` is needed, type-hint `DBALDatabase` directly. Prefer the query builder (`select()`, `insert()`, `delete()`) over raw DBAL when possible.
@@ -258,13 +257,11 @@ Cross-cutting rules that affect work anywhere in the framework. Subsystem-specif
 - **Layer discipline for imports**: Foundation (layer 0) must never import from higher layers. When cross-layer attribute scanning is needed, use string constants instead of `::class` references (e.g., `private const POLICY_ATTRIBUTE = 'Waaseyaa\\Access\\Gate\\PolicyAttribute'`). `ReflectionClass::getAttributes()` accepts string class names.
 - **Avoid circular package deps**: Access owns `AccountInterface`; User owns `AnonymousUser`. Access must not depend on User. Middleware needing an account should type-hint `AccountInterface`, not concrete `AnonymousUser`.
 - **Never put classes that extend dev-only deps under `autoload`**: Any class under `src/` is reachable via PSR-4 in production consumer installs (`composer install --no-dev`). If such a class `extends PHPUnit\Framework\TestCase` or any dev-only symbol, a consumer's `PackageManifestCompiler` class scan will Reflection-load it, fail to resolve the parent, and crash kernel boot with "Application failed to boot." Fix: put test-helper base classes in a top-level `testing/` directory (sibling to `src/` and `tests/`) and register `"Waaseyaa\\Foo\\Testing\\": "testing/"` under `autoload-dev` only. Caught in `waaseyaa/graphql` alpha.106 → alpha.107 via a production outage on minoo.
-- **Middleware interface naming**: Handler interfaces follow `{Type}HandlerInterface` (HttpHandlerInterface, EventHandlerInterface, JobHandlerInterface). Middleware follows `{Type}MiddlewareInterface`.
 
 **HTTP, auth, request lifecycle:**
 - **Request attribute is `_account` not `account`**: SessionMiddleware sets `$request->attributes->set('_account', $account)`. Any code reading the authenticated account (controllers, surface hosts, middleware) must use `_account`. Reading `account` (no underscore) silently returns `null`.
 - **`php://input` is single-read**: `HttpRequest::createFromGlobals()` consumes `php://input`. For subsequent body reads, use `$httpRequest->getContent()`, not `file_get_contents('php://input')`.
 - **Account sentinel IDs**: `AnonymousUser` uses `id: 0`, `DevAdminAccount` uses `PHP_INT_MAX`. Never use `1` or other low integers for non-real accounts — they collide with auto-increment UIDs.
-- **Paired nullable parameters**: `ResourceSerializer::serialize()` and `SchemaPresenter::present()` accept `?EntityAccessHandler` + `?AccountInterface`. Both must be non-null or both null — only two of four states are meaningful. Guard with `if ($handler !== null && $account !== null)`.
 
 **Logging, side effects, file I/O:**
 - **No `psr/log`**: Use `Waaseyaa\Foundation\Log\LoggerInterface`. Accept `?LoggerInterface $logger = null` in constructors and default to `NullLogger`. Reserve `error_log()` only for last-resort fallbacks inside the logging infrastructure itself.
