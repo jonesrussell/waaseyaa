@@ -1,0 +1,51 @@
+# Bulk-edit occurrence map for the agent-executor-01KRWPK7 mission
+# (DIRECTIVE_035 / spec-kitty-bulk-edit-classification).
+#
+# This mission renames / moves FIVE named cross-cutting symbols and paths.
+# The schema accepts only one `target.term`; the primary rename
+# (most cross-cutting symbol) is captured here. Secondary renames follow
+# the same category-level rules with explicit path exceptions where needed.
+#
+# Secondary renames governed by the same map:
+#   - packages/mcp/src/Tools/*Tools.php → packages/ai-tools/src/*Tool.php
+#   - Waaseyaa\AI\Agent\AgentInterface → DELETED
+#   - ToolRegistry::register(McpToolDefinition, callable) → register(AgentTool)
+#   - McpToolExecutor::accessCheck(false) → REMOVED (call sites enforce ACLs)
+#
+# All five changes are internal-only — WP-01 ships a pre-deletion
+# verification grep (bin/check-external-consumers ai-agent-orphans)
+# asserting zero matches outside the mission's own scope.
+#
+# See spec.md § Bulk-Edit Classification and plan.md § Bulk-Edit Plan.
+
+target:
+  term: McpToolDefinition
+  replacement: AgentTool
+  operation: rename
+
+categories:
+  code_symbols:        { action: rename }                  # PHP class / interface / VO renames; internal only.
+  import_paths:        { action: rename }                  # `use` statements follow symbol renames mechanically.
+  filesystem_paths:    { action: rename }                  # packages/mcp/src/Tools/*.php → packages/ai-tools/src/*.php.
+  serialized_keys:     { action: do_not_change }           # Existing JSON API response keys preserved; new endpoints introduce new keys.
+  cli_commands:        { action: do_not_change }           # No prior `ai:*` commands exist; the new `ai:run`, `ai:purge-runs`, `ai:reap-stalled-runs` are net-new.
+  user_facing_strings: { action: manual_review }           # Admin SPA strings TBD this phase; PR reviewers flag any leakage.
+  tests_fixtures:      { action: rename }                  # Tests follow new symbol names.
+  logs_telemetry:      { action: do_not_change }           # Existing log / metric labels preserved; new telemetry uses new event names.
+
+exceptions:
+  - path: "packages/mcp/src/Tools/**"
+    action: rename
+    reason: "Tool classes are MOVED (deleted from packages/mcp, recreated under new namespace in packages/ai-tools/). Documents the move explicitly so reviewers don't confuse it with a cross-cutting symbol-only rename."
+  - path: "docs/adr/0*-mcp-tool-access-enforcement.md"
+    action: rename
+    reason: "New ADR documenting the McpToolExecutor::accessCheck(false) removal posture (WP-01 deliverable)."
+  - path: "docs/specs/agent-executor.md"
+    action: rename
+    reason: "Doctrine spec references symbols by name and is part of the rename surface (already filed in commit 5a25eeed8)."
+  - path: "kitty-specs/agent-executor-01KRWPK7/**"
+    action: rename
+    reason: "Mission's own planning docs reference the symbols by their new and old names; renames within the planning corpus are expected."
+  - path: "kitty-specs/archive/ai-agent-end-to-end-01KRW91P/**"
+    action: do_not_change
+    reason: "Archived predecessor mission. Historical record; must not be modified."

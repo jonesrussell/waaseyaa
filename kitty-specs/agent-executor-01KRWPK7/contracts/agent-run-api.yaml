@@ -1,0 +1,319 @@
+openapi: 3.1.0
+info:
+  title: Waaseyaa Agent Run API
+  version: 0.1.0
+  description: |
+    HTTP surface for the Agent Executor v1 mission. CLI and HTTP both
+    enqueue runs through this API; the Symfony Messenger worker is the
+    only path that executes `AgentExecutor` in production. Streaming
+    happens on the existing `/broadcast` SSE endpoint, channel
+    `agent.run.<id>`.
+
+    Authentication is the existing Waaseyaa session-cookie or bearer-token
+    flow as enforced by `SessionMiddleware` / `AuthorizationMiddleware`.
+    Authorization layered on top:
+
+    - **Route capability**: every endpoint here requires `agent.run`.
+    - **Per-tool capability**: any tool the agent invokes additionally
+      requires `tool.<name>` (or `tool.mcp.<server>.<name>`).
+    - **Ownership**: GET / DELETE / POST .../approve enforce
+      `account_id == run.initiator_account_id` unless the account holds
+      `agent.run.bypass_ownership`.
+
+servers:
+  - url: https://{host}
+    variables:
+      host:
+        default: localhost
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: WAASEYAA_SESSION
+    bearerToken:
+      type: http
+      scheme: bearer
+
+  schemas:
+    AgentRunRequestNamed:
+      type: object
+      required: [agent_id]
+      properties:
+        agent_id:
+          type: string
+          description: ID of a registered AgentDefinition.
+          example: "authoring_assist"
+        params:
+          type: object
+          additionalProperties: true
+          description: Free-form parameters interpolated into the bundle's prompt template.
+        destructive_approval:
+          $ref: '#/components/schemas/HitlMode'
+        dry_run:
+          type: boolean
+          default: false
+
+    AgentRunRequestInline:
+      type: object
+      required: [bundle]
+      properties:
+        bundle:
+          $ref: '#/components/schemas/InlineBundle'
+        destructive_approval:
+          $ref: '#/components/schemas/HitlMode'
+        dry_run:
+          type: boolean
+          default: false
+
+    InlineBundle:
+      type: object
+      required: [prompt, tools, model]
+      properties:
+        prompt:
+          type: string
+        system:
+          type: string
+        tools:
+          type: array
+          items: { type: string }
+          description: Whitelist of tool names (must be in the user's capability set).
+        model:
+          type: string
+          description: Fully-qualified model ref, e.g. "anthropic:claude-sonnet-4-6".
+        max_iterations:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 10
+
+    HitlMode:
+      type: string
+      enum: [none, all, interactive]
+      default: none
+
+    AgentRunCreated:
+      type: object
+      required: [run_id, stream_url, status_url]
+      properties:
+        run_id:
+          type: string
+          format: uuid
+        stream_url:
+          type: string
+          format: uri-reference
+          example: "/broadcast?channels=agent.run.01J6XW9KQT7M0YB3N4R5CQZ2EX"
+        status_url:
+          type: string
+          format: uri-reference
+        approve_url:
+          type: string
+          format: uri-reference
+
+    AgentRunStatus:
+      type: object
+      required: [run_id, status, queued_at]
+      properties:
+        run_id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [queued, running, awaiting_approval, cancelling, cancelled, completed, failed]
+        agent_id: { type: string, nullable: true }
+        prompt: { type: string }
+        response: { type: string, nullable: true }
+        transcript:
+          type: array
+          items: { $ref: '#/components/schemas/TranscriptItem' }
+          description: Conversation snapshot, possibly truncated.
+        truncated:
+          type: boolean
+          description: True when transcript was truncated at config.ai.transcript_max_bytes.
+        token_usage_in: { type: integer }
+        token_usage_out: { type: integer }
+        cost_cents: { type: integer, nullable: true }
+        tool_call_count: { type: integer }
+        destructive_approval: { $ref: '#/components/schemas/HitlMode' }
+        pending_approval:
+          $ref: '#/components/schemas/PendingApproval'
+          nullable: true
+        queued_at: { type: string, format: date-time }
+        started_at: { type: string, format: date-time, nullable: true }
+        finished_at: { type: string, format: date-time, nullable: true }
+        error_code:
+          type: string
+          nullable: true
+          enum:
+            - destructive_denied
+            - approval_denied
+            - approval_timeout
+            - cancelled_by_user
+            - max_iterations_exceeded
+            - provider_rate_limited
+            - provider_unavailable
+            - provider_invalid_response
+            - tool_unauthorized
+            - tool_not_found
+            - worker_crashed
+            - internal_error
+        error_message: { type: string, nullable: true }
+
+    TranscriptItem:
+      type: object
+      required: [role, content]
+      properties:
+        role:
+          type: string
+          enum: [user, assistant, tool_call, tool_result, system]
+        content: { type: string }
+        tool_name: { type: string, nullable: true }
+        tool_call_id: { type: string, nullable: true }
+
+    PendingApproval:
+      type: object
+      required: [call_id, tool_name, arguments, expires_at]
+      properties:
+        call_id: { type: string }
+        tool_name: { type: string }
+        arguments: { type: object, additionalProperties: true }
+        expires_at: { type: string, format: date-time }
+
+    ApprovalDecision:
+      type: object
+      required: [call_id, decision]
+      properties:
+        call_id: { type: string }
+        decision:
+          type: string
+          enum: [approve, deny]
+
+    Error:
+      type: object
+      required: [error_code, error_message]
+      properties:
+        error_code: { type: string }
+        error_message: { type: string }
+        details: { type: object, additionalProperties: true }
+
+paths:
+  /api/ai/agent/run:
+    post:
+      summary: Enqueue an agent run.
+      operationId: createAgentRun
+      tags: [agent]
+      security:
+        - sessionCookie: []
+        - bearerToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/AgentRunRequestNamed'
+                - $ref: '#/components/schemas/AgentRunRequestInline'
+      responses:
+        '202':
+          description: Run queued. Worker will pick up asynchronously.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AgentRunCreated' }
+        '400':
+          description: Invalid request shape, unknown agent_id, tool not in user's capability set, or bundle references undeclared tool.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '401':
+          description: Unauthenticated.
+        '403':
+          description: Account lacks `agent.run` capability.
+
+  /api/ai/agent/run/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, format: uuid }
+    get:
+      summary: Read the current state of a run.
+      operationId: getAgentRun
+      tags: [agent]
+      security:
+        - sessionCookie: []
+        - bearerToken: []
+      responses:
+        '200':
+          description: Run snapshot. Updates land on the SSE stream.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AgentRunStatus' }
+        '401':
+          description: Unauthenticated.
+        '403':
+          description: Account is not the initiator and lacks `agent.run.bypass_ownership`.
+        '404':
+          description: Run does not exist.
+
+    delete:
+      summary: Cancel a run.
+      operationId: cancelAgentRun
+      description: |
+        Writes `status='cancelling'` on the row. The worker polls and
+        transitions to `cancelled` between iteration / tool-call
+        boundaries. If the run is still `queued`, the handler will
+        observe `cancelling` on pickup and short-circuit to `cancelled`
+        without invoking `AgentExecutor`.
+      tags: [agent]
+      security:
+        - sessionCookie: []
+        - bearerToken: []
+      responses:
+        '204':
+          description: Cancellation request accepted.
+        '401':
+          description: Unauthenticated.
+        '403':
+          description: Account is not the initiator and lacks `agent.run.bypass_ownership`.
+        '404':
+          description: Run does not exist.
+        '409':
+          description: Run is already terminal (completed / failed / cancelled). No-op.
+
+  /api/ai/agent/run/{id}/approve:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: string, format: uuid }
+    post:
+      summary: Resolve an interactive HITL approval gate.
+      operationId: approveAgentRun
+      description: |
+        Required when a destructive tool is invoked under
+        `destructive_approval: 'interactive'`. The worker has paused at
+        `status='awaiting_approval'` with `pending_approval_call_id` set.
+        Posting a decision unblocks the worker (or fails the run on
+        `deny`). Times out per `config.ai.hitl_timeout_seconds` (default
+        300 s) if no decision arrives.
+      tags: [agent]
+      security:
+        - sessionCookie: []
+        - bearerToken: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ApprovalDecision' }
+      responses:
+        '204':
+          description: Decision recorded. Worker resumes (approve) or fails the run (deny).
+        '400':
+          description: Wrong call_id (run is awaiting approval for a different call).
+        '401':
+          description: Unauthenticated.
+        '403':
+          description: Account lacks `agent.run.approve` (or, if separate, ownership of the run).
+        '404':
+          description: Run does not exist or is not awaiting approval.
+        '409':
+          description: Approval window has expired (run already failed with `approval_timeout`).
