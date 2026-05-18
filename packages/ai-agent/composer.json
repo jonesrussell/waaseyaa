@@ -14,6 +14,10 @@
         },
         {
             "type": "path",
+            "url": "../ai-tools"
+        },
+        {
+            "type": "path",
             "url": "../cache"
         },
         {
@@ -49,6 +53,7 @@
         "php": ">=8.5",
         "waaseyaa/access": "^0.1.0-alpha.180",
         "waaseyaa/ai-schema": "^0.1.0-alpha.180",
+        "waaseyaa/ai-tools": "^0.1.0-alpha.180",
         "waaseyaa/database-legacy": "^0.1.0-alpha.180",
         "waaseyaa/entity": "^0.1.0-alpha.180",
         "waaseyaa/entity-storage": "^0.1.0-alpha.180",
@@ -76,7 +81,8 @@
         },
         "waaseyaa": {
             "providers": [
-                "Waaseyaa\\AI\\Agent\\AiAgentEntityServiceProvider"
+                "Waaseyaa\\AI\\Agent\\AiAgentEntityServiceProvider",
+                "Waaseyaa\\AI\\Agent\\AiAgentServiceProvider"
             ]
         }
     },

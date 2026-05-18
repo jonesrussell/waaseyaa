@@ -7,8 +7,10 @@ namespace Waaseyaa\Mcp\Bridge;
 /**
  * Interface for executing MCP tool calls.
  *
- * Abstracts the McpToolExecutor so the MCP endpoint can be tested
+ * Abstracts the agent-tool executor so the MCP endpoint can be tested
  * independently of the final concrete class.
+ *
+ * @api
  */
 interface ToolExecutorInterface
 {

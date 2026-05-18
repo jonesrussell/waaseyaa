@@ -14,6 +14,10 @@
         },
         {
             "type": "path",
+            "url": "../ai-tools"
+        },
+        {
+            "type": "path",
             "url": "../routing"
         },
         {
@@ -67,14 +71,15 @@
     ],
     "require": {
         "php": ">=8.5",
-        "waaseyaa/ai-schema": "^0.1.0-alpha.180",
-        "waaseyaa/ai-agent": "^0.1.0-alpha.180",
-        "waaseyaa/routing": "^0.1.0-alpha.180",
         "waaseyaa/access": "^0.1.0-alpha.180",
-        "waaseyaa/cache": "^0.1.0-alpha.180",
-        "waaseyaa/api": "^0.1.0-alpha.180",
+        "waaseyaa/ai-agent": "^0.1.0-alpha.180",
+        "waaseyaa/ai-schema": "^0.1.0-alpha.180",
+        "waaseyaa/ai-tools": "^0.1.0-alpha.180",
         "waaseyaa/ai-vector": "^0.1.0-alpha.180",
+        "waaseyaa/api": "^0.1.0-alpha.180",
+        "waaseyaa/cache": "^0.1.0-alpha.180",
         "waaseyaa/entity": "^0.1.0-alpha.180",
+        "waaseyaa/routing": "^0.1.0-alpha.180",
         "waaseyaa/workflows": "^0.1.0-alpha.180"
     },
     "require-dev": {

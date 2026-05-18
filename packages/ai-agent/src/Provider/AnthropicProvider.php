@@ -6,6 +6,8 @@ namespace Waaseyaa\AI\Agent\Provider;
 
 /**
  * Anthropic Messages API provider using cURL.
+ *
+ * @api
  */
 final class AnthropicProvider implements StreamingProviderInterface
 {

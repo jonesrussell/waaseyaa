@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AI\Agent\Provider;
 
+/**
+ * Provider response value object.
+ *
+ * @api
+ */
 final readonly class MessageResponse
 {
     /**
