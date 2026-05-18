@@ -25,8 +25,8 @@ subtasks:
 - T031
 - T032
 - T033
-shell_pid: "378305"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "408769"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-18T14:55:10Z'
   actor: tasks-skill
@@ -237,3 +237,4 @@ spec-kitty agent action implement WP05 --agent <name>
 
 - 2026-05-18T18:19:05Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Assigned agent via action command
 - 2026-05-18T18:44:18Z – claude:sonnet:implementer:implementer – shell_pid=378305 – Ready for review: 4 endpoints, AgentRouteServiceProvider, concrete AgentRunBroadcaster (overrides WP04 stub adapter), request validator, capability+ownership checks; gates green
+- 2026-05-18T18:45:25Z – claude:opus-4-7:reviewer:reviewer – shell_pid=408769 – Started review via action command
