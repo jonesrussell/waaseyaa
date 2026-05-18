@@ -724,6 +724,26 @@ Canonical sources: `kitty-specs/entity-storage-v2-01KRCDDC/contracts/revisionabl
 
 → See `docs/upgrades/waaseyaa-alpha-X-to-Y.md` for the `view_revision` policy template and migration steps.
 
+## Two-factor authentication
+
+When a user enables 2FA, `LoginController` short-circuits after password verification: instead of issuing a session token, it sets `$_SESSION['waaseyaa_pending_2fa_uid']` to the user's UID and returns `{ data: { type: 'auth', attributes: { state: '2fa_required', pending_user_id: <uid> } } }`. The client must follow up with `POST /api/auth/2fa/verify` carrying a TOTP code or recovery code. On success, `VerifyTwoFactorController` promotes the pending key to a full `waaseyaa_uid` session and regenerates the session id.
+
+Surface:
+
+- `Waaseyaa\Auth\TwoFactorService` — orchestrator. `setup(User)`, `enable(User, secret, plaintextCodes, firstCode)`, `verify(User, code)`, `disable(User)`, `isEnabled(User)`. All persistence goes through `EntityTypeManagerInterface`.
+- `Waaseyaa\Auth\TwoFactorManager` — primitive layer (RFC 6238 TOTP + recovery generation/verification).
+- `Waaseyaa\Auth\TwoFactorSetupResult` — readonly value object carrying secret + QR URI + plaintext recovery codes for one-time display.
+- Controllers: `SetupTwoFactorController`, `EnableTwoFactorController`, `VerifyTwoFactorController`, `DisableTwoFactorController` (`packages/auth/src/Controller/`).
+- Routes registered in `Waaseyaa\Routing\AuthOidcRouteServiceProvider`:
+  - `POST /api/auth/2fa/setup` — initiates setup, returns secret+QR+recovery codes; does NOT persist.
+  - `POST /api/auth/2fa/enable` — verifies first TOTP, persists Argon2id-hashed recovery codes.
+  - `POST /api/auth/2fa/verify` — accepts TOTP OR recovery code; rate-limited 5/IP/60s under `2fa-verify:` namespace.
+  - `POST /api/auth/2fa/disable` — requires valid code as proof-of-possession; wipes secret + codes atomically.
+
+Storage: two `#[Field]` properties on `User` — `two_factor_secret` (Base32 string, nullable) and `two_factor_recovery_codes_hash` (list of Argon2id hashes, nullable). Both live in the entity's `_data` JSON blob; no schema migration required.
+
+Full contract: `docs/specs/two-factor-auth.md`.
+
 ## Implementation gotchas
 
 - **Avoid double `$storage->create()` in access checks**: When checking field access before persisting a new entity, create once and reuse for both the access check and the save. Don't create a throwaway temp entity.

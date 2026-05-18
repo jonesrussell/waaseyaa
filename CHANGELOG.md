@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Two-Factor Authentication, end-to-end (#1499).** Real TOTP + recovery-code 2FA wired from the existing primitives (`TwoFactorManager`) through a new orchestrating service (`TwoFactorService`), four HTTP endpoints (`POST /api/auth/2fa/{setup,enable,verify,disable}`), and `LoginController` integration that emits `state: 2fa_required` for enabled users without issuing a session token until the second factor verifies. User entity gains two `#[Field]` properties (`two_factor_secret`, `two_factor_recovery_codes_hash`) persisted via the entity-storage `_data` JSON blob — no migration. Recovery codes are stored as Argon2id hashes and consumed on use. Verify endpoint rate-limited 5/IP/60s under a `2fa-verify:` namespace distinct from login. Full contract: `docs/specs/two-factor-auth.md`. Closes the wire gap left when the primitives shipped in March; drops 6 `TwoFactorManager` entries from `phpstan-dead-code-baseline.neon` (66 → 59).
+
 ### Changed
 
 - **Dead-code detection extended for route controller strings (#1500).** `WaaseyaaEntrypointProvider` now scans `*RouteProvider.php`, `*RouteRegistrar.php`, and `*Routes.php` files for `->controller('FQCN::method')` references and marks those methods as used. Drops `McpServerCard::serve` from the baseline (66 → 65). Cumulative reduction from original 1,341: **-95%**.
