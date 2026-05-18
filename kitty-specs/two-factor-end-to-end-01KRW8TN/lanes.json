@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "mission_slug": "two-factor-end-to-end-01KRW8TN",
+  "mission_id": "01KRW8TNS3ASTMKE7R6D1GR351",
+  "mission_branch": "kitty/mission-two-factor-end-to-end-01KRW8TN",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05"
+      ],
+      "write_scope": [
+        "packages/auth/src/AuthServiceProvider.php",
+        "packages/auth/src/Controller/DisableTwoFactorController.php",
+        "packages/auth/src/Controller/EnableTwoFactorController.php",
+        "packages/auth/src/Controller/LoginController.php",
+        "packages/auth/src/Controller/SetupTwoFactorController.php",
+        "packages/auth/src/Controller/VerifyTwoFactorController.php",
+        "packages/auth/src/TwoFactorService.php",
+        "packages/auth/src/TwoFactorSetupResult.php",
+        "packages/auth/tests/Unit/Controller/DisableTwoFactorControllerTest.php",
+        "packages/auth/tests/Unit/Controller/EnableTwoFactorControllerTest.php",
+        "packages/auth/tests/Unit/Controller/LoginControllerTest.php",
+        "packages/auth/tests/Unit/Controller/SetupTwoFactorControllerTest.php",
+        "packages/auth/tests/Unit/Controller/VerifyTwoFactorControllerTest.php",
+        "packages/auth/tests/Unit/TwoFactorServiceTest.php",
+        "packages/routing/src/AuthOidcRouteServiceProvider.php",
+        "packages/user/src/User.php",
+        "packages/user/tests/Unit/UserTwoFactorFieldsTest.php",
+        "tests/Integration/PhaseTwoFactor/TwoFactorE2ETest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP06"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "docs/specs/access-control.md",
+        "docs/specs/two-factor-auth.md",
+        "phpstan-dead-code-baseline.neon"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-18T01:05:40.345132+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP06"
+  ],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP02"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP04"
+      }
+    ],
+    "total_merges": 4,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 4
+    }
+  }
+}
