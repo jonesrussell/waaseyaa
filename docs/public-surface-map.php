@@ -407,9 +407,11 @@ return [
     'Waaseyaa\Routing\Language\LanguageNegotiatorInterface' => 'public',
 
     // Layer 5: AI — public
+    'Waaseyaa\AI\Agent\Account\InitiatorAccountLoaderInterface' => 'public',
     'Waaseyaa\AI\Agent\AgentDefinition' => 'public',
     'Waaseyaa\AI\Agent\AgentDefinitionRegistry' => 'public',
     'Waaseyaa\AI\Agent\Attribute\AsAgentDefinition' => 'public',
+    'Waaseyaa\AI\Agent\Broadcast\AgentRunBroadcasterInterface' => 'public',
     'Waaseyaa\AI\Agent\Provider\ProviderInterface' => 'public',
     'Waaseyaa\AI\Agent\Provider\StreamingProviderInterface' => 'public',
     'Waaseyaa\AI\Tools\AbstractAgentTool' => 'public',
