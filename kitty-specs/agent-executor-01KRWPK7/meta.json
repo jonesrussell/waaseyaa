@@ -1,10 +1,13 @@
 {
+  "change_mode": "bulk_edit",
   "created_at": "2026-05-18T04:48:04.224965+00:00",
-  "friendly_name": "agent executor",
+  "friendly_name": "Agent Executor v1",
   "mission_id": "01KRWPK74279EH1Y2RKQZRG9RM",
   "mission_number": null,
   "mission_slug": "agent-executor-01KRWPK7",
   "mission_type": "software-dev",
   "slug": "agent-executor-01KRWPK7",
-  "target_branch": "main"
+  "source_description": "Implement the doctrine spec at docs/specs/agent-executor.md end-to-end across 9 work packages. Delivers what 'running an agent' means in Waaseyaa as a worker-native hybrid: CLI and HTTP both dispatch a RunAgent Symfony Messenger message; the worker is the only path that executes AgentExecutor in production; streaming via existing BroadcastStorage SSE on channel agent.run.<id>. Locked design decisions include the bundle paradigm (AgentDefinition VO + registry replacing AgentInterface), a new Layer-5 packages/ai-tools package shared between packages/mcp and packages/ai-agent (8 stock tool classes; #[AsAgentTool] attribute discovery), initiator-account identity with per-tool capability checks (agent.run + tool.<name>), three HITL modes (none / all / interactive) with pause/resume state machine, McpClientToolSource for remote MCP server consumption, AgentRun and AgentAuditLog as persisted entities with 30-day TTL and a reaper for stalled runs, and ai-observability hooks for token/cost/tool-count/latency. Five locked internal breaking changes: AgentInterface deleted; packages/mcp/src/Tools/ moves to ai-tools; McpToolDefinition replaced by AgentTool VO; ToolRegistry::register() signature changes; McpToolExecutor::accessCheck(false) bypass removed. All breaks are internal-only (no external consumers exist for any of these symbols). Mission is change_mode: bulk_edit; occurrence_map.yaml produced during /spec-kitty.plan. Refs issue #1496 (reopened for this design) and PR #1508 (companion orphan deletion).",
+  "target_branch": "main",
+  "vcs": "git"
 }
