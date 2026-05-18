@@ -67,42 +67,6 @@ parameters:
 			path: packages/auth/src/Token/AuthTokenRepositoryInterface.php
 
 		-
-			message: '#^Unused Waaseyaa\\Auth\\TwoFactorManager\:\:generateRecoveryCodes$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/auth/src/TwoFactorManager.php
-
-		-
-			message: '#^Unused Waaseyaa\\Auth\\TwoFactorManager\:\:generateSecret$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/auth/src/TwoFactorManager.php
-
-		-
-			message: '#^Unused Waaseyaa\\Auth\\TwoFactorManager\:\:getCurrentCode$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/auth/src/TwoFactorManager.php
-
-		-
-			message: '#^Unused Waaseyaa\\Auth\\TwoFactorManager\:\:getQrCodeUri$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/auth/src/TwoFactorManager.php
-
-		-
-			message: '#^Unused Waaseyaa\\Auth\\TwoFactorManager\:\:verifyCode$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/auth/src/TwoFactorManager.php
-
-		-
-			message: '#^Unused Waaseyaa\\Auth\\TwoFactorManager\:\:verifyRecoveryCode$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/auth/src/TwoFactorManager.php
-
-		-
 			message: '#^Unused Waaseyaa\\CLI\\Command\\Make\\AbstractMakeCommand\:\:renderStub$#'
 			identifier: shipmonk.deadMethod
 			count: 1
