@@ -31,18 +31,6 @@ parameters:
 			path: packages/access/src/Gate/Gate.php
 
 		-
-			message: '#^Parameter \#2 \$onChunk of method Waaseyaa\\AI\\Agent\\Provider\\StreamingProviderInterface\:\:streamMessage\(\) expects callable\(Waaseyaa\\AI\\Agent\\Provider\\StreamChunk\)\: void, callable\(Waaseyaa\\AI\\Agent\\StreamChunk\)\: void given\.$#'
-			identifier: argument.type
-			count: 1
-			path: packages/ai-agent/src/AgentExecutor.php
-
-		-
-			message: '#^Parameter \$onChunk of method Waaseyaa\\AI\\Agent\\AgentExecutor\:\:streamWithProvider\(\) has invalid type Waaseyaa\\AI\\Agent\\StreamChunk\.$#'
-			identifier: class.notFound
-			count: 1
-			path: packages/ai-agent/src/AgentExecutor.php
-
-		-
 			message: '#^Anonymous function has an unused use \$contentBlocks\.$#'
 			identifier: closure.unusedUse
 			count: 1

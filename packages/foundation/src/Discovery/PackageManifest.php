@@ -53,6 +53,16 @@ final class PackageManifest
          * @var list<array{class: class-string, name: string, capability: string, destructive: bool, dry_run_supported: bool, category: string}>
          */
         public readonly array $agentTools = [],
+        /**
+         * Classes carrying `#[Waaseyaa\AI\Agent\Attribute\AsAgentDefinition]`.
+         *
+         * Each entry records the attribute payload + the class FQCN so
+         * {@see \Waaseyaa\AI\Agent\AgentDefinitionRegistry} can build a
+         * static catalogue without re-reflecting at runtime.
+         *
+         * @var list<array{class: class-string, id: string, label: string, description: string, prompt: string, system: string, tools: list<string>, model: string, max_iterations: int, destructive_default: string|null, requires_capability: string|null}>
+         */
+        public readonly array $agentDefinitions = [],
     ) {}
 
     /**
@@ -68,7 +78,7 @@ final class PackageManifest
         unset($data['commands'], $data['routes']);
 
         $requiredKeys = ['providers', 'migrations', 'field_types', 'middleware'];
-        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types', 'native_command_providers', 'agent_tools'];
+        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types', 'native_command_providers', 'agent_tools', 'agent_definitions'];
         $missing = array_diff($requiredKeys, array_keys($data));
 
         if ($missing !== []) {
@@ -100,6 +110,7 @@ final class PackageManifest
             attributeEntityTypes: $data['attribute_entity_types'] ?? [],
             nativeCommandProviders: $data['native_command_providers'] ?? [],
             agentTools: $data['agent_tools'] ?? [],
+            agentDefinitions: $data['agent_definitions'] ?? [],
         );
     }
 
@@ -122,6 +133,7 @@ final class PackageManifest
             'attribute_entity_types' => $this->attributeEntityTypes,
             'native_command_providers' => $this->nativeCommandProviders,
             'agent_tools' => $this->agentTools,
+            'agent_definitions' => $this->agentDefinitions,
         ];
     }
 }
