@@ -1,7 +1,7 @@
 {
-  "event_count": 11,
-  "last_event_id": "01KRXTZ4ZB6G6EAP8GDQEQYPQM",
-  "materialized_at": "2026-05-18T15:23:42.955999+00:00",
+  "event_count": 12,
+  "last_event_id": "01KRXW8V9BDD0KT4P5PD2JGAJF",
+  "materialized_at": "2026-05-18T15:46:29.291823+00:00",
   "mission_number": "",
   "mission_slug": "agent-executor-01KRWPK7",
   "mission_type": "software-dev",
@@ -11,18 +11,18 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 8
   },
   "work_packages": {
     "WP01": {
-      "actor": "implement-command",
+      "actor": "user",
       "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KRXTZ4ZB6G6EAP8GDQEQYPQM",
-      "last_transition_at": "2026-05-18T15:23:42.955999+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KRXW8V9BDD0KT4P5PD2JGAJF",
+      "last_transition_at": "2026-05-18T15:46:29.291823+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",
