@@ -16,8 +16,8 @@ subtasks:
 - T039
 - T040
 - T041
-shell_pid: "362237"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "395352"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-18T14:55:10Z'
   actor: tasks-skill
@@ -194,3 +194,4 @@ spec-kitty agent action implement WP07 --agent <name>
 
 - 2026-05-18T17:44:36Z – claude:sonnet:implementer:implementer – shell_pid=362237 – Assigned agent via action command
 - 2026-05-18T18:08:52Z – claude:sonnet:implementer:implementer – shell_pid=362237 – Ready for review: Streamable-HTTP MCP client + DTOs + McpServerUnavailableException, McpServersConfig schema with C-010 env-var-name indirection, McpClientToolSource binds remote tools under tool.mcp.<alias>.<name> with destructive=true conservative default and graceful degrade on server outage, McpCapabilitiesSource surfaces prefixes without touching WP02 territory, McpServiceProvider wires bootstrap into kernel boot inside try/catch. Stub-server integration test green via ToolRegistry::execute() (WP04 AgentRunService::runInline not yet on lane-g, so executor driven directly — WP04 will later wrap that seam). All gates green. defaults/ai.yaml mcp_servers entry deferred to merge-phase coordination with WP04.
+- 2026-05-18T18:31:41Z – claude:opus-4-7:reviewer:reviewer – shell_pid=395352 – Started review via action command
