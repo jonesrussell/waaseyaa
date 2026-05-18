@@ -8,10 +8,14 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-sql-entity-query-access-checking-01KRYP15
+base_commit: 22337d0fd7ded09e8ac80c88c88b35df0bef8a51
+created_at: '2026-05-18T23:51:22.376332+00:00'
 subtasks:
 - T001
 - T002
 - T003
+shell_pid: '455031'
 history:
 - date: '2026-05-18T23:44:03Z'
   actor: tasks-skill

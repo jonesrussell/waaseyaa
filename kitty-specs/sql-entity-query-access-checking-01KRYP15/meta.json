@@ -6,5 +6,7 @@
   "mission_slug": "sql-entity-query-access-checking-01KRYP15",
   "mission_type": "software-dev",
   "slug": "sql-entity-query-access-checking-01KRYP15",
-  "target_branch": "main"
+  "target_branch": "main",
+  "vcs": "git",
+  "vcs_locked_at": "2026-05-18T23:51:21.835578+00:00"
 }
