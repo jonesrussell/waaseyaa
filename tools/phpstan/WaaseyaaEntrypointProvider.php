@@ -58,14 +58,23 @@ final class WaaseyaaEntrypointProvider extends ReflectionBasedMemberUsageProvide
     /** @var array<string, true> FQCN set of traits used by entity subclasses. */
     private array $entitySupportingTraits;
 
+    /** @var array<string, true> Set of "FQCN::method" strings wired via ->controller('…') in route providers. */
+    private array $controllerMethodRefs;
+
     public function __construct(string $projectRoot)
     {
         $this->declaredProviders = self::loadDeclaredProviders($projectRoot);
         $this->entitySupportingTraits = self::loadEntitySupportingTraits($projectRoot);
+        $this->controllerMethodRefs = self::loadControllerMethodRefs($projectRoot);
     }
 
     protected function shouldMarkMethodAsUsed(ReflectionMethod $method): ?VirtualUsageData
     {
+        $ref = $method->getDeclaringClass()->getName() . '::' . $method->getName();
+        if (isset($this->controllerMethodRefs[$ref])) {
+            return VirtualUsageData::withNote('Waaseyaa route controller (string ref)');
+        }
+
         return $this->isEntrypointClass($method->getDeclaringClass()->getName(), $method->getDeclaringClass())
             ? VirtualUsageData::withNote('Waaseyaa entrypoint (policy/middleware/provider/mapper/route-provider)')
             : null;
@@ -155,6 +164,54 @@ final class WaaseyaaEntrypointProvider extends ReflectionBasedMemberUsageProvide
             $parent = $parent->getParentClass();
         }
         return false;
+    }
+
+    /**
+     * Scan route-provider files for `->controller('FQCN::method')` references.
+     * shipmonk's AST-level call graph can't see method names that are passed
+     * as strings, so route handlers wired this way get flagged as dead.
+     *
+     * @return array<string, true> Set of "FQCN::method" strings.
+     */
+    private static function loadControllerMethodRefs(string $projectRoot): array
+    {
+        $refs = [];
+        $packagesDir = $projectRoot . '/packages';
+        if (!is_dir($packagesDir)) {
+            return $refs;
+        }
+        $candidates = [];
+        // Route registration lives in *RouteProvider.php, *RouteRegistrar.php, *Routes.php — plus
+        // packages/foundation/src/Kernel/BuiltinRouteRegistrar.php and a handful of nested cases.
+        foreach ([
+            $packagesDir . '/*/src/*RouteProvider.php',
+            $packagesDir . '/*/src/*RouteRegistrar.php',
+            $packagesDir . '/*/src/*Routes.php',
+            $packagesDir . '/*/src/**/*RouteProvider.php',
+            $packagesDir . '/*/src/**/*RouteRegistrar.php',
+            $packagesDir . '/*/src/**/*Routes.php',
+        ] as $pattern) {
+            foreach (glob($pattern) ?: [] as $file) {
+                $candidates[] = $file;
+            }
+        }
+        foreach ($candidates as $file) {
+            if (!is_file($file) || !str_ends_with($file, '.php')) {
+                continue;
+            }
+            $content = file_get_contents($file);
+            if ($content === false) {
+                continue;
+            }
+            if (preg_match_all('/->controller\(\s*[\'\"]([\\\\A-Za-z0-9_]+)::(\w+)[\'\"]\s*\)/', $content, $matches, PREG_SET_ORDER) === false) {
+                continue;
+            }
+            foreach ($matches as $match) {
+                $fqcn = ltrim(str_replace('\\\\', '\\', $match[1]), '\\');
+                $refs[$fqcn . '::' . $match[2]] = true;
+            }
+        }
+        return $refs;
     }
 
     /**
