@@ -212,8 +212,7 @@ Planning + merge target: `main`. Lane allocated by `spec-kitty agent mission fin
 
 **Files:**
 - `packages/ai-agent/src/AgentExecutor.php`
-- `packages/ai-agent/tests/Contract/AgentExecutorHitlContractTest.php`
-- `tests/Integration/PhaseN/AgentRuntime/ExecutorHitlTest.php`
+- `tests/Integration/PhaseN/AgentRuntime/ExecutorHitlTest.php` (integration tests — review cycle-1 confirmed this is the right shape for this codebase; the originally-listed `tests/Contract/AgentExecutorHitlContractTest.php` is replaced by these integration tests)
 
 **Validation:**
 - [ ] All three modes have green tests.
