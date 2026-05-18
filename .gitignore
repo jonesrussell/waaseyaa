@@ -31,6 +31,9 @@ waaseyaa-sync-*/
 # OIDC JWKS test fixture working dirs (hash-suffixed, regenerated per run)
 waaseyaa_oidc_jwks_*/
 
+# Playwright runner state (transient, regenerated per test run)
+test-results/
+
 # Database
 *.sqlite
 
