@@ -256,17 +256,9 @@ final readonly class AgentAuditLog
 
 The audit log is in-memory (`AgentExecutor::$auditLog`), retrieved via `getAuditLog()`, and accumulates across multiple executions within the same executor instance.
 
-### McpServer
+### MCP endpoint
 
-**File:** `packages/ai-agent/src/McpServer.php`
-**Class:** `Waaseyaa\AI\Agent\McpServer`
-
-Lightweight adapter exposing `tools/list` and `tools/call` from the MCP protocol. Not a full protocol server (no transport layer).
-
-```php
-public function listTools(): array;                         // {tools: [...]}
-public function callTool(string $name, array $arguments): array; // MCP result
-```
+The framework's MCP-facing surface is `Waaseyaa\Mcp\McpServerCard` in `packages/mcp/`, wired by `McpRouteProvider` at `/.well-known/mcp.json`. See `docs/specs/mcp-endpoint.md`. The earlier `Waaseyaa\AI\Agent\McpServer` `tools/list` + `tools/call` adapter was deleted as orphan scaffolding (closes #1498); it was never reached and duplicated nothing the production path needed. If a `tools/list` / `tools/call` JSON-RPC surface becomes a requirement, it will be designed against the `McpServerCard` path, not resurrected.
 
 ## LLM Provider System
 
@@ -838,7 +830,6 @@ Pipeline uses `syncStepsToValues()` to maintain a single source of truth. Called
 | `packages/ai-agent/src/AgentResult.php` | `AgentResult` | Execution result with actions |
 | `packages/ai-agent/src/AgentAction.php` | `AgentAction` | Single action value object |
 | `packages/ai-agent/src/AgentAuditLog.php` | `AgentAuditLog` | Audit log entry |
-| `packages/ai-agent/src/McpServer.php` | `McpServer` | MCP protocol adapter (tools/list, tools/call) |
 | `packages/ai-agent/src/ToolRegistry.php` | `ToolRegistry` | Tool registration and lookup |
 | `packages/ai-agent/src/ToolRegistryInterface.php` | `ToolRegistryInterface` | Tool registry contract |
 | `packages/ai-agent/src/Provider/ProviderInterface.php` | `ProviderInterface` | LLM provider contract (sendMessage) |
