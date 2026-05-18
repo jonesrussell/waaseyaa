@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "mission_slug": "sql-entity-query-access-checking-01KRYP15",
+  "mission_id": "01KRYP1581AWTRZHQ14XR7TNJ4",
+  "mission_branch": "kitty/mission-sql-entity-query-access-checking-01KRYP15",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01"
+      ],
+      "write_scope": [
+        "packages/entity-storage/src/Exception/MissingQueryAccountException.php",
+        "packages/entity-storage/tests/Unit/Exception/MissingQueryAccountExceptionTest.php",
+        "packages/entity/src/Storage/EntityQueryInterface.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "app-shell"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-b",
+      "wp_ids": [
+        "WP02"
+      ],
+      "write_scope": [
+        "packages/entity-storage/src/SqlEntityQuery.php",
+        "packages/entity-storage/tests/Unit/SqlEntityQueryAccessCheckTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-c",
+      "wp_ids": [
+        "WP03"
+      ],
+      "write_scope": [
+        "packages/ai-vector/src/SearchController.php",
+        "packages/ai-vector/src/SemanticIndexWarmer.php",
+        "packages/api/src/JsonApiController.php",
+        "packages/genealogy/src/Service/GenealogyFamilyService.php",
+        "packages/genealogy/src/Service/GenealogyPedigreeService.php",
+        "packages/genealogy/src/Ssr/GenealogySsrController.php",
+        "packages/graphql/src/Resolver/EntityResolver.php",
+        "packages/oidc/src/ClientRegistry/OidcClientLookup.php",
+        "packages/oidc/src/ClientRegistry/OidcClientSeeder.php",
+        "packages/relationship/src/RelationshipDeleteGuardListener.php",
+        "packages/relationship/src/RelationshipValidator.php",
+        "packages/workflows/src/DomainValidationListener.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-d",
+      "wp_ids": [
+        "WP04"
+      ],
+      "write_scope": [
+        "tests/Integration/PhaseN/EntityQueryAccessCheck/AdminBypassCapabilityTest.php",
+        "tests/Integration/PhaseN/EntityQueryAccessCheck/AnonymousAccountFilterTest.php",
+        "tests/Integration/PhaseN/EntityQueryAccessCheck/BypassRespectsSystemContextTest.php",
+        "tests/Integration/PhaseN/EntityQueryAccessCheck/GraphQLResolverFilterTest.php",
+        "tests/Integration/PhaseN/EntityQueryAccessCheck/ListingFilterTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP05"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "docs/security/sql-entity-query-access-check-bypass-audit.md",
+        "docs/specs/access-control.md"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-18T23:50:45.922620+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP05"
+  ]
+}

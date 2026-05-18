@@ -1,0 +1,56 @@
+{
+  "event_count": 5,
+  "last_event_id": "01KRYQZJVYG9D4WXQ7HFB616F4",
+  "materialized_at": "2026-05-18T23:50:45.886225+00:00",
+  "mission_number": "",
+  "mission_slug": "sql-entity-query-access-checking-01KRYP15",
+  "mission_type": "software-dev",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 5
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRYQZJ6FZWVDWMEZP9G4JB1M",
+      "last_transition_at": "2026-05-18T23:50:45.199904+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRYQZJQYPTZ2QQC6RC992CSV",
+      "last_transition_at": "2026-05-18T23:50:45.758783+00:00"
+    },
+    "WP03": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRYQZJS4S7E4MENYPPP4KCJQ",
+      "last_transition_at": "2026-05-18T23:50:45.796054+00:00"
+    },
+    "WP04": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRYQZJTEN8W7E7E69Q566ZAQ",
+      "last_transition_at": "2026-05-18T23:50:45.838366+00:00"
+    },
+    "WP05": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KRYQZJVYG9D4WXQ7HFB616F4",
+      "last_transition_at": "2026-05-18T23:50:45.886225+00:00"
+    }
+  }
+}
