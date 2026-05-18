@@ -235,36 +235,6 @@ parameters:
 			path: packages/field/src/Item/ComputedItem.php
 
 		-
-			message: '#^Unused Waaseyaa\\Foundation\\Broadcasting\\SseBroadcaster\:\:clearLog$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/foundation/src/Broadcasting/SseBroadcaster.php
-
-		-
-			message: '#^Unused Waaseyaa\\Foundation\\Broadcasting\\SseBroadcaster\:\:clearSubscribers$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/foundation/src/Broadcasting/SseBroadcaster.php
-
-		-
-			message: '#^Unused Waaseyaa\\Foundation\\Broadcasting\\SseBroadcaster\:\:getMessageLog$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/foundation/src/Broadcasting/SseBroadcaster.php
-
-		-
-			message: '#^Unused Waaseyaa\\Foundation\\Broadcasting\\SseBroadcaster\:\:hasSubscribers$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/foundation/src/Broadcasting/SseBroadcaster.php
-
-		-
-			message: '#^Unused Waaseyaa\\Foundation\\Broadcasting\\SseBroadcaster\:\:subscriberCount$#'
-			identifier: shipmonk.deadMethod
-			count: 1
-			path: packages/foundation/src/Broadcasting/SseBroadcaster.php
-
-		-
 			message: '#^Unused Waaseyaa\\Foundation\\Tenant\\TenantMiddleware\:\:handle$#'
 			identifier: shipmonk.deadMethod
 			count: 1

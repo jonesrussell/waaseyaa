@@ -69,8 +69,7 @@ Foundation still wires several shared HTTP surfaces that are not entity-package 
 | `src/Controller/TranslationController.php` | `Waaseyaa\Api\Controller` | Translation sub-resource CRUD endpoints |
 | `src/CodifiedContext/CodifiedContextSessionStoreInterface.php` | `Waaseyaa\Api\CodifiedContext` | Port for listing/querying codified-context session rows (Telescope adapter in `waaseyaa/telescope`) |
 | `src/CodifiedContext/CodifiedContextSessionRow.php` | `Waaseyaa\Api\CodifiedContext` | Value object for a single session-oriented telescope row exposed through the port |
-| `src/Controller/BroadcastController.php` | `Waaseyaa\Api\Controller` | SSE real-time broadcast endpoint |
-| `src/Controller/BroadcastStorage.php` | `Waaseyaa\Api\Controller` | PDO-backed message queue for SSE broadcasting |
+| `src/Controller/BroadcastStorage.php` | `Waaseyaa\Api\Controller` | Durable message log feeding the SSE `/broadcast` endpoint owned by foundation's `BroadcastRouter`. Contract: `docs/specs/broadcasting.md`. |
 | `src/Cache/ApiCacheMiddleware.php` | `Waaseyaa\Api\Cache` | ETag, If-None-Match, Cache-Control header generation |
 | `src/OpenApi/OpenApiGenerator.php` | `Waaseyaa\Api\OpenApi` | Generates OpenAPI 3.1 spec from entity type definitions |
 | `src/OpenApi/SchemaBuilder.php` | `Waaseyaa\Api\OpenApi` | Builds component schemas for OpenAPI spec |
@@ -869,7 +868,6 @@ packages/api/
       CodifiedContextSessionRow.php
       CodifiedContextSessionStoreInterface.php
     Controller/
-      BroadcastController.php
       BroadcastStorage.php
       CodifiedContextController.php
       SchemaController.php

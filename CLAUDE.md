@@ -29,6 +29,7 @@ When working on files matching these patterns, retrieve the spec for deep contex
 | `packages/access/*`, `packages/user/src/Middleware/*` | `waaseyaa:access-control` | `docs/specs/access-control.md`, `docs/specs/field-access.md` |
 | `packages/auth/*` | `waaseyaa:access-control` | `docs/specs/access-control.md` |
 | `packages/api/*`, `packages/routing/*` | `waaseyaa:api-layer` | `docs/specs/api-layer.md`, `docs/specs/jsonapi.md` (cast-aware attributes) |
+| `packages/api/src/Controller/BroadcastStorage.php`, `packages/foundation/src/Http/Router/BroadcastRouter.php`, `packages/foundation/src/Kernel/EventListenerRegistrar.php` (SSE broadcasting) | — | `docs/specs/broadcasting.md` |
 | `packages/attachment/*`, `packages/structured-import/*`, `packages/field/src/Form/*`, `packages/field/src/Attribute/BundleTemplate.php`, `packages/field/src/Attribute/FieldTemplate.php`, `packages/field/src/BundleTemplateCompiler.php`, `packages/routing/src/EntityDeepLinkRouteBuilder.php`, `packages/api/src/Controller/FieldAutoSaveController.php` | — | `docs/specs/work-surface.md` |
 | `packages/admin/*` | `waaseyaa:admin-spa` | `docs/specs/admin-spa.md` |
 | `packages/ai-*/*` | `waaseyaa:ai-integration` | `docs/specs/ai-integration.md`, `docs/specs/authoring-assist-contract.md`, `docs/specs/semantic-refresh-trigger-contract.md` |

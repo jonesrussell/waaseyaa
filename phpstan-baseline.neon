@@ -937,12 +937,6 @@ parameters:
 			path: packages/field/src/FieldItemList.php
 
 		-
-			message: '#^Parameter \#1 \$array \(list\<string\>\) of array_values is already a list, call has no effect\.$#'
-			identifier: arrayValues.list
-			count: 1
-			path: packages/foundation/src/Broadcasting/SseBroadcaster.php
-
-		-
 			message: '#^Casting to string something that''s already string\.$#'
 			identifier: cast.useless
 			count: 5

@@ -7,7 +7,6 @@ namespace Waaseyaa\Foundation\Http\Router;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Waaseyaa\Api\Controller\BroadcastController;
 use Waaseyaa\Foundation\Http\JsonApiResponseTrait;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
@@ -29,7 +28,7 @@ final class BroadcastRouter implements DomainRouterInterface
     {
         $ctx = WaaseyaaContext::fromRequest($request);
         $broadcastStorage = $ctx->broadcastStorage;
-        $channels = BroadcastController::parseChannels($ctx->query['channels'] ?? 'admin');
+        $channels = self::parseChannels($ctx->query['channels'] ?? 'admin');
         if ($channels === []) {
             $channels = ['admin'];
         }
@@ -93,5 +92,19 @@ final class BroadcastRouter implements DomainRouterInterface
             'Connection' => 'keep-alive',
             'X-Accel-Buffering' => 'no',
         ]);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function parseChannels(string $channelsParam): array
+    {
+        if ($channelsParam === '') {
+            return [];
+        }
+
+        $channels = array_map('trim', explode(',', $channelsParam));
+
+        return array_values(array_filter($channels, static fn(string $ch): bool => $ch !== ''));
     }
 }
