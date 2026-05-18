@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AI\Agent\Mcp;
 
-use Waaseyaa\AI\Agent\ToolRegistry;
-use Waaseyaa\AI\Agent\ToolRegistryInterface;
+use Waaseyaa\AI\Tools\ToolRegistryInterface;
 use Waaseyaa\Config\ConfigManagerInterface;
 use Waaseyaa\Config\Schema\Ai\McpServersConfig;
 use Waaseyaa\Config\Schema\ConfigSchemaValidator;
@@ -42,21 +41,28 @@ final class McpServiceProvider extends ServiceProvider
             ),
         );
 
-        $this->singleton(
-            McpClientToolSource::class,
-            fn(): McpClientToolSource => new McpClientToolSource(
-                $this->resolve(StreamableHttpMcpClient::class),
-                $this->resolveToolRegistry(),
-                $this->resolveConfigStorage(),
-                $this->resolveLogger(),
-            ),
-        );
+        // McpClientToolSource requires a host-bound ToolRegistryInterface.
+        // If none is wired we skip the binding entirely; boot() falls back
+        // to a no-op path and McpCapabilitiesSource is constructed with a
+        // null tool source (its constructor accepts ?McpClientToolSource).
+        $registry = $this->resolveToolRegistry();
+        if ($registry !== null) {
+            $this->singleton(
+                McpClientToolSource::class,
+                fn(): McpClientToolSource => new McpClientToolSource(
+                    $this->resolve(StreamableHttpMcpClient::class),
+                    $registry,
+                    $this->resolveConfigStorage(),
+                    $this->resolveLogger(),
+                ),
+            );
+        }
 
         $this->singleton(
             McpCapabilitiesSource::class,
             fn(): McpCapabilitiesSource => new McpCapabilitiesSource(
                 $this->resolveConfigStorage(),
-                $this->resolve(McpClientToolSource::class),
+                $this->hasToolSource() ? $this->resolve(McpClientToolSource::class) : null,
             ),
         );
     }
@@ -71,6 +77,9 @@ final class McpServiceProvider extends ServiceProvider
 
         // Bootstrap remote tool catalogues. Failures degrade gracefully —
         // we never let a flaky MCP server abort the kernel boot.
+        if (!$this->hasToolSource()) {
+            return;
+        }
         try {
             $source = $this->resolve(McpClientToolSource::class);
             $source->bootstrap();
@@ -80,6 +89,11 @@ final class McpServiceProvider extends ServiceProvider
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    private function hasToolSource(): bool
+    {
+        return array_key_exists(McpClientToolSource::class, $this->getBindings());
     }
 
     private function resolveLogger(): LoggerInterface
@@ -99,16 +113,16 @@ final class McpServiceProvider extends ServiceProvider
         return new StreamHttpClient();
     }
 
-    private function resolveToolRegistry(): ToolRegistryInterface
+    private function resolveToolRegistry(): ?ToolRegistryInterface
     {
         $candidate = $this->kernelServices?->get(ToolRegistryInterface::class);
         if ($candidate instanceof ToolRegistryInterface) {
             return $candidate;
         }
-        // No host-bound registry — fall back to an isolated in-memory
-        // registry. This keeps boot non-fatal in test harnesses that do
-        // not wire ai-agent end-to-end.
-        return new ToolRegistry();
+        // No host-bound registry — skip MCP tool registration entirely.
+        // Hosts that wire ai-tools (via AttributeToolRegistry) get a
+        // populated catalogue; minimal CLI smoke harnesses skip cleanly.
+        return null;
     }
 
     private function resolveConfigStorage(): ConfigStorageInterface

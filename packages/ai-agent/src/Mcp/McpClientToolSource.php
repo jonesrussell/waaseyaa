@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Waaseyaa\AI\Agent\Mcp;
 
-use Waaseyaa\AI\Agent\ToolRegistryInterface;
-use Waaseyaa\AI\Schema\Mcp\McpToolDefinition;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\AI\Tools\AbstractAgentTool;
+use Waaseyaa\AI\Tools\AgentTool;
+use Waaseyaa\AI\Tools\AgentToolResult;
+use Waaseyaa\AI\Tools\ToolRegistryInterface;
 use Waaseyaa\Config\Schema\Ai\McpServersConfig;
 use Waaseyaa\Config\StorageInterface as ConfigStorageInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
@@ -19,14 +22,19 @@ use Waaseyaa\Foundation\Log\NullLogger;
  *
  * - **Tool name**       `"{$alias}.{$descriptor->name}"`         (e.g. `github.create_issue`)
  * - **Capability**      `"{$capabilityPrefix}.{$descriptor->name}"` (e.g. `tool.mcp.github.create_issue`)
- * - **Category** (hint) `"mcp.{$alias}"`
+ * - **Category**        `"mcp.{$alias}"`
  *
  * Per-server failures are caught and logged; the rest of the catalogue
  * is built unaffected ("graceful degrade" per spec edge case).
  *
- * Each registered executor reads the auth header from
+ * Each registered tool reads the auth header from
  * `getenv($auth_header_env_var)` at call time — never at config-load
  * time — per C-010.
+ *
+ * Tool VOs are constructed against the post-WP03 `AgentTool` surface
+ * shipped by `waaseyaa/ai-tools` (one VO carries `destructive`,
+ * `dryRunSupported`, `category`, `inputSchema`, and an
+ * {@see \Waaseyaa\AI\Tools\AgentToolInterface} `impl`).
  *
  * @api
  */
@@ -153,6 +161,7 @@ final class McpClientToolSource
     {
         $localName = sprintf('%s.%s', $row['alias'], $descriptor->name);
         $capability = sprintf('%s.%s', $row['capability_prefix'], $descriptor->name);
+        $category = sprintf('mcp.%s', $row['alias']);
 
         // Conservative default: remote tools are destructive unless the
         // server opts out via a `destructive: false` hint in its descriptor.
@@ -165,62 +174,139 @@ final class McpClientToolSource
             ? $descriptor->description
             : sprintf('Remote MCP tool %s on server %s', $descriptor->name, $row['alias']);
 
-        // Surface routing/governance metadata via inputSchema annotation so
-        // it survives transport through the legacy McpToolDefinition shape.
-        // Strict consumers will ignore `x-*` keys; richer consumers (once
-        // WP01's AgentTool lands) can reify them into real fields.
-        $annotated = $descriptor->inputSchema;
-        $annotated['x-mcp-source'] = [
-            'alias' => $row['alias'],
-            'capability' => $capability,
-            'category' => sprintf('mcp.%s', $row['alias']),
-            'destructive' => $destructive,
-            'dry_run_supported' => false,
-        ];
-
-        $definition = new McpToolDefinition(
-            name: $localName,
+        $impl = $this->makeRemoteToolImpl(
+            client: $this->client,
+            url: $row['url'],
+            envVar: $row['auth_header_env_var'],
+            remoteName: $descriptor->name,
             description: $description,
-            inputSchema: $annotated,
+            inputSchema: $descriptor->inputSchema,
+            capability: $capability,
+            logger: $this->logger,
         );
 
-        $url = $row['url'];
-        $envVar = $row['auth_header_env_var'];
-        $remoteName = $descriptor->name;
-        $client = $this->client;
-        $logger = $this->logger;
+        $tool = new AgentTool(
+            name: $localName,
+            capability: $capability,
+            destructive: $destructive,
+            dryRunSupported: false,
+            category: $category,
+            inputSchema: $descriptor->inputSchema,
+            impl: $impl,
+        );
 
-        $executor = static function (array $arguments) use ($client, $url, $envVar, $remoteName, $logger): array {
-            $authHeader = null;
-            if ($envVar !== '') {
-                $envValue = getenv($envVar);
-                $authHeader = ($envValue === false || $envValue === '') ? null : $envValue;
-            }
-            try {
-                $result = $client->callTool($url, $authHeader, $remoteName, $arguments);
-            } catch (McpServerUnavailableException $e) {
-                $logger->warning('Remote MCP tool call failed: server unavailable', [
-                    'url' => $url,
-                    'tool' => $remoteName,
-                    'message' => $e->getMessage(),
-                ]);
+        $this->registry->register($tool);
+    }
 
-                return [
-                    'content' => [[
-                        'type' => 'text',
-                        'text' => json_encode(
+    /**
+     * Build the {@see AbstractAgentTool} implementation that proxies a
+     * single remote MCP tool over Streamable HTTP.
+     *
+     * @param array<string, mixed> $inputSchema
+     */
+    private function makeRemoteToolImpl(
+        StreamableHttpMcpClient $client,
+        string $url,
+        string $envVar,
+        string $remoteName,
+        string $description,
+        array $inputSchema,
+        string $capability,
+        LoggerInterface $logger,
+    ): AbstractAgentTool {
+        return new class ($client, $url, $envVar, $remoteName, $description, $inputSchema, $capability, $logger) extends AbstractAgentTool {
+            /**
+             * @param array<string, mixed> $inputSchema
+             */
+            public function __construct(
+                private readonly StreamableHttpMcpClient $client,
+                private readonly string $url,
+                private readonly string $envVar,
+                private readonly string $remoteName,
+                private readonly string $description,
+                private readonly array $inputSchema,
+                private readonly string $capability,
+                private readonly LoggerInterface $logger,
+            ) {}
+
+            public function execute(array $arguments, AccountInterface $account): AgentToolResult
+            {
+                $denied = $this->requireCapability($this->capability, $account);
+                if ($denied !== null) {
+                    return $denied;
+                }
+
+                $authHeader = $this->resolveAuth();
+
+                try {
+                    $remote = $this->client->callTool($this->url, $authHeader, $this->remoteName, $arguments);
+                } catch (McpServerUnavailableException $e) {
+                    $this->logger->warning('Remote MCP tool call failed: server unavailable', [
+                        'url' => $this->url,
+                        'tool' => $this->remoteName,
+                        'message' => $e->getMessage(),
+                    ]);
+
+                    return AgentToolResult::error(
+                        message: json_encode(
                             ['error' => 'mcp_server_unavailable', 'detail' => $e->getMessage()],
                             JSON_THROW_ON_ERROR,
                         ),
-                    ]],
-                    'isError' => true,
-                ];
+                        summary: 'mcp_server_unavailable',
+                    );
+                }
+
+                $blocks = $this->normaliseContent($remote->content);
+                if ($remote->isError) {
+                    $text = $blocks[0]['text'] ?? 'remote_error';
+
+                    return AgentToolResult::error(message: $text, summary: 'remote_error');
+                }
+
+                return AgentToolResult::success(content: $blocks);
             }
 
-            return $result->toRegistryShape();
-        };
+            public function description(): string
+            {
+                return $this->description;
+            }
 
-        $this->registry->register($definition, $executor);
+            /**
+             * @return array<string, mixed>
+             */
+            public function inputSchema(): array
+            {
+                return $this->inputSchema;
+            }
+
+            /**
+             * @param list<array<string, mixed>> $content
+             * @return list<array{type: string, text: string}>
+             */
+            private function normaliseContent(array $content): array
+            {
+                $out = [];
+                foreach ($content as $block) {
+                    $type = isset($block['type']) && is_string($block['type']) ? $block['type'] : 'text';
+                    $text = isset($block['text']) && is_string($block['text'])
+                        ? $block['text']
+                        : json_encode($block, JSON_THROW_ON_ERROR);
+                    $out[] = ['type' => $type, 'text' => $text];
+                }
+
+                return $out;
+            }
+
+            private function resolveAuth(): ?string
+            {
+                if ($this->envVar === '') {
+                    return null;
+                }
+                $value = getenv($this->envVar);
+
+                return ($value === false || $value === '') ? null : $value;
+            }
+        };
     }
 
     /**

@@ -7,10 +7,14 @@ namespace Waaseyaa\Tests\Integration\PhaseN\AgentRuntime;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\AI\Agent\Mcp\McpClientToolSource;
 use Waaseyaa\AI\Agent\Mcp\StreamableHttpMcpClient;
-use Waaseyaa\AI\Agent\ToolRegistry;
+use Waaseyaa\AI\Tools\AgentTool;
+use Waaseyaa\AI\Tools\Catalogue\AttributeToolRegistry;
 use Waaseyaa\Config\Schema\Ai\McpServersConfig;
+use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Tests\Integration\PhaseN\AgentRuntime\Fixture\InMemoryConfigStorage;
 use Waaseyaa\Tests\Integration\PhaseN\AgentRuntime\Fixture\StubMcpServerHttpClient;
 
@@ -21,13 +25,10 @@ use Waaseyaa\Tests\Integration\PhaseN\AgentRuntime\Fixture\StubMcpServerHttpClie
  *
  * The stub server defines two tools (`echo`, `add`). After
  * `bootstrap()` we assert both appear in the registry under the
- * configured `stub` alias, and that calling the registered executor
- * round-trips the JSON-RPC payload.
- *
- * Per the WP-07 implementer prompt: WP-04's `AgentRunService::runInline()`
- * is not yet present on lane-g, so this test exercises the registered
- * executor directly via {@see ToolRegistry::execute()} — the seam WP-04
- * will later wrap.
+ * configured `stub` alias and inspect the synthesised
+ * {@see AgentTool} VO; one test then executes the registered tool
+ * through {@see \Waaseyaa\AI\Tools\AgentToolInterface::execute()} to
+ * round-trip a JSON-RPC payload.
  */
 #[CoversNothing]
 final class McpClientToolSourceTest extends TestCase
@@ -69,7 +70,7 @@ final class McpClientToolSourceTest extends TestCase
             ],
         ]);
 
-        $registry = new ToolRegistry();
+        $registry = $this->makeRegistry();
         $client = new StreamableHttpMcpClient($http);
         $source = new McpClientToolSource($client, $registry, $configStorage);
 
@@ -78,16 +79,15 @@ final class McpClientToolSourceTest extends TestCase
         self::assertTrue($registry->has('stub.echo'), 'echo tool registered under alias');
         self::assertTrue($registry->has('stub.add'), 'add tool registered under alias');
 
-        $echo = $registry->getTool('stub.echo');
-        self::assertNotNull($echo);
-        self::assertSame('Echo back input', $echo->description);
-        self::assertSame([
-            'alias' => 'stub',
-            'capability' => 'tool.mcp.stub.echo',
-            'category' => 'mcp.stub',
-            'destructive' => true,
-            'dry_run_supported' => false,
-        ], $echo->inputSchema['x-mcp-source']);
+        $echo = $registry->get('stub.echo');
+        self::assertInstanceOf(AgentTool::class, $echo);
+        self::assertSame('stub.echo', $echo->name);
+        self::assertSame('tool.mcp.stub.echo', $echo->capability);
+        self::assertSame('mcp.stub', $echo->category);
+        self::assertTrue($echo->destructive, 'remote MCP tools default to destructive');
+        self::assertFalse($echo->dryRunSupported);
+        self::assertSame('Echo back input', $echo->impl->description());
+        self::assertSame('object', $echo->inputSchema['type']);
     }
 
     #[Test]
@@ -115,14 +115,16 @@ final class McpClientToolSourceTest extends TestCase
             ],
         ]);
 
-        $registry = new ToolRegistry();
+        $registry = $this->makeRegistry();
         $source = new McpClientToolSource(new StreamableHttpMcpClient($http), $registry, $configStorage);
         $source->bootstrap();
 
-        $result = $registry->execute('stub.echo', ['msg' => 'hello']);
+        $tool = $registry->get('stub.echo');
+        $account = $this->makeAccount('tool.mcp.stub.echo');
+        $result = $tool->impl->execute(['msg' => 'hello'], $account);
 
-        self::assertSame('echoed:hello', $result['content'][0]['text']);
-        self::assertArrayNotHasKey('isError', $result);
+        self::assertFalse($result->isError);
+        self::assertSame('echoed:hello', $result->content[0]['text']);
     }
 
     #[Test]
@@ -143,13 +145,13 @@ final class McpClientToolSourceTest extends TestCase
             ],
         ]);
 
-        $registry = new ToolRegistry();
+        $registry = $this->makeRegistry();
         $source = new McpClientToolSource(new StreamableHttpMcpClient($http), $registry, $configStorage);
 
         // Must not throw — graceful degrade per FR-021 edge case.
         $source->bootstrap();
 
-        self::assertSame([], $registry->getTools());
+        self::assertSame([], iterator_to_array($this->normalise($registry->all())));
     }
 
     #[Test]
@@ -171,10 +173,68 @@ final class McpClientToolSourceTest extends TestCase
             ],
         ]);
 
-        $registry = new ToolRegistry();
+        $registry = $this->makeRegistry();
         $source = new McpClientToolSource(new StreamableHttpMcpClient($http), $registry, $configStorage);
         $source->bootstrap();
 
         self::assertFalse($registry->has('stub.echo'));
+    }
+
+    private function makeRegistry(): AttributeToolRegistry
+    {
+        // AttributeToolRegistry hydrates lazily from PackageManifest.
+        // An empty manifest means hand-registered tools win uncontested.
+        $manifest = new PackageManifest();
+        $container = new class implements ContainerInterface {
+            public function get(string $id): mixed
+            {
+                throw new \RuntimeException(sprintf('Container has no entry: %s', $id));
+            }
+
+            public function has(string $id): bool
+            {
+                return false;
+            }
+        };
+
+        return new AttributeToolRegistry($manifest, $container);
+    }
+
+    private function makeAccount(string $permission): AccountInterface
+    {
+        return new class ($permission) implements AccountInterface {
+            public function __construct(private readonly string $permission) {}
+
+            public function id(): int|string
+            {
+                return 1;
+            }
+
+            public function isAuthenticated(): bool
+            {
+                return true;
+            }
+
+            public function hasPermission(string $permission): bool
+            {
+                return $permission === $this->permission;
+            }
+
+            public function getRoles(): array
+            {
+                return [];
+            }
+        };
+    }
+
+    /**
+     * @param iterable<AgentTool> $iter
+     * @return iterable<AgentTool>
+     */
+    private function normalise(iterable $iter): iterable
+    {
+        foreach ($iter as $tool) {
+            yield $tool;
+        }
     }
 }
