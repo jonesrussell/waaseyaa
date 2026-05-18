@@ -1,0 +1,19 @@
+# config.ai — Waaseyaa agent-executor defaults
+# Authoritative shape: kitty-specs/agent-executor-01KRWPK7/data-model.md § "Config entities".
+#
+# Secrets policy (C-010): values are env var NAMES, never the credentials
+# themselves. The worker resolves real values from the process environment
+# at boot. bin/check-no-secrets parses this file to keep credentials out
+# of the repo.
+
+# Scalar config keys consumed by the executor and the reaper.
+run_retention_days: 30           # TTL for AgentRun + AgentAuditLog rows.
+hitl_timeout_seconds: 300        # Interactive HITL auto-deny window.
+max_runtime_seconds: 600         # StalledRunReaper threshold for stuck runs.
+transcript_max_bytes: 262144     # Application-layer cap on AgentRun.transcript_json.
+hitl_poll_interval_ms: 1000      # Worker poll interval during awaiting_approval.
+
+# LLM providers. Each item carries the env-var NAME from which the worker
+# resolves the API key; the value itself NEVER lives in config rows.
+# Empty by default — apps populate this list per environment.
+providers: []
