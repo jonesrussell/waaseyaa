@@ -139,15 +139,14 @@ When the mapping is not obvious, search under `docs/specs/` (e.g. `rg -n "TopicO
 
 ## Workflow (Spec Kitty–first)
 
-Substantive work is driven by **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** missions and work packages (`.kittify/`, `spec-kitty next`, dashboard); **GitHub** is the PR/CI/releases surface and optional issue visibility. Full rules: `docs/specs/workflow.md` (versioning, semantic milestones, Track mirror, PR traceability).
+Substantive work is driven by **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** missions and work packages (`.kittify/`, `spec-kitty next`, dashboard); **GitHub** is the PR/CI/releases surface and optional issue visibility. Full rules: `docs/specs/workflow.md` (versioning, PR traceability).
 
-**The 5 rules (summary — see `docs/specs/workflow.md` for nuance):**
+**The 4 rules (summary — see `docs/specs/workflow.md` for nuance):**
 
 1. **Substantive work begins in Spec Kitty** — active mission/WP or `spec-kitty next`; M11 filings may still require a GitHub issue as the audit front door (link it).
-2. **GitHub issues (when used) get a Track milestone** — `bin/check-milestones` surfaces gaps; issues are not mandatory for every change.
-3. **Roadmap intent** — semantic v1.x table + mission state; GitHub Tracks mirror themes for issue-only readers.
-4. **PRs must be traceable** — `#N` and/or Spec Kitty mission/WP reference per `docs/specs/workflow.md` and `.github/pull_request_template.md`.
-5. **Session context** — prefer Spec Kitty state when under a mission; read `bin/check-milestones` when touching GitHub issues.
+2. **GitHub issues are optional** — not every change needs one. When filed, they're pure tracking with no enforced milestone or taxonomy. Spec Kitty mission state is the canonical execution map.
+3. **PRs must be traceable** — `#N` and/or Spec Kitty mission/WP reference per `docs/specs/workflow.md` and `.github/pull_request_template.md`.
+4. **Session context** — prefer Spec Kitty state when under a mission (`spec-kitty next`, dashboard, active WP).
 
 ## Agent context and Spec Kitty
 

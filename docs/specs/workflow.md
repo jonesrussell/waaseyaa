@@ -43,21 +43,11 @@ The Waaseyaa Framework and Minoo (the flagship consumer app) version independent
 
 **Update this table whenever milestones are added, closed, or redescribed.**
 
-## GitHub milestone tracks (mirror for issues)
+## GitHub issues (optional)
 
-When a **GitHub issue** exists (community visibility, Dependabot, M11 templates, or contributor preference), assign it to **one** of the **five Track milestones** (*Track 1* … *Track 5* — not separate `v1.5` … `v2.0` titles on GitHub). That keeps the issue board consistent for anyone browsing GitHub only. The semantic table above remains the **capability narrative**; Tracks are a **slice label** for issues, parallel to how Spec Kitty missions group work.
+GitHub issues are no longer organized into Track milestones. When an issue exists (community visibility, Dependabot, M11 templates, or contributor preference), it stands on its own — no enforced taxonomy or assignment is required. The **Framework Milestones** table above is the semantic capability narrative; Spec Kitty mission state is the execution map. The Track 1–5 GitHub milestones from earlier 2026 are retained on GitHub for historical context but are no longer load-bearing for workflow decisions.
 
-| GitHub milestone | Primary focus | Typical semantic alignment |
-|------------------|---------------|----------------------------|
-| Track 1 — Entity system & hydration | Core platform, entity stack, foundation, package discovery | v1.4 outcomes, entity/storage contracts, L0–L3 depth |
-| Track 2 — Bimaaji & agentic | Bimaaji, AI packages, agent-facing APIs | v1.5–v1.6 adjacent surfaces, L4–L5 |
-| Track 3 — Parity & performance | CI parity, coverage, PHPStan, DX, performance | Cross-cutting quality; supports all semantic versions |
-| Track 4 — Schema evolution | Schema and migration evolution workstreams | v2.0 preparatory work |
-| Track 5 — Ecosystem identity | Split/release, tokens, docs/tooling, northcloud ecosystem | Governance, packaging, consumer rollout |
-
-**Dependabot and dependency PRs:** Open **issues** (including bots) should still carry a Track milestone when they exist as issues. **Pull requests** that only bump dependencies may omit `(#N)` / mission reference in the title when there is no tracking artifact; if there is a chore or security issue or Spec Kitty WP, link it per rule #4.
-
-**Periodic audit:** After large roadmap changes, reconcile GitHub issue hygiene if you use issues — see [docs/audits/2026-04-25-github-milestones-issues-audit.md](../audits/2026-04-25-github-milestones-issues-audit.md) for an inventory template.
+**Dependabot and dependency PRs:** **Pull requests** that only bump dependencies may omit `(#N)` / mission reference in the title when there is no tracking artifact; if there is a chore or security issue or Spec Kitty WP, link it per rule #3.
 
 ## Milestone Narrative Arc
 
@@ -82,32 +72,23 @@ When a **GitHub issue** exists (community visibility, Dependabot, M11 templates,
 **v2.x (breaking changes):**
 - v2.0 — automatic schema evolution (field-definition diffing, migration generation)
 
-## The 5 Workflow Rules
+## The 4 Workflow Rules
 
 ### 1. Substantive work begins in Spec Kitty
 Do not drive multi-step implementation from a blank prompt. Use an **active Spec Kitty mission and work package** (or the next step from `spec-kitty next`) so intent, review gates, and merge discipline stay in `.kittify/` and the mission state machine. **M11 governed-change** and similar templates that require a **GitHub filing issue** still use that issue as the audit front door — link it from the mission or PR body so traceability stays intact.
 
-### 2. GitHub issues (when they exist) belong to a Track milestone
-If an issue is open on GitHub, assign **exactly one** Track milestone. Unassigned issues are incomplete triage for **that surface**. Use `bin/check-milestones` to surface gaps. Omitting GitHub issues entirely for Spec Kitty–only work is allowed; do not force an issue if the mission alone is sufficient for your slice.
+### 2. GitHub issues are optional
+Not every change needs an issue. When filed, GitHub issues are pure tracking — no enforced milestone or taxonomy. Omitting GitHub issues entirely for Spec Kitty–only work is allowed; do not force an issue if the mission alone is sufficient for your slice. The **Framework milestones** table and narrative in this document describe **capability intent** (v1.x / v2.0); **Spec Kitty mission structure** is the primary execution map for agents.
 
-### 3. Roadmap intent is semantic + mission state
-The **Framework milestones** table and narrative in this document describe **capability intent** (v1.x / v2.0). **Spec Kitty mission structure** is the primary execution map for agents. **GitHub Track 1–5** names mirror rough themes for issue readers; they do not override mission ordering.
-
-### 4. PRs must be traceable
+### 3. PRs must be traceable
 Every PR must link **what it delivers**: prefer `feat(#N): …` when a GitHub issue exists; otherwise reference the **Spec Kitty mission / work package** (title, path under `.kittify/`, or link) in the title or body. Use `.github/pull_request_template.md`. Dependency-only PRs may follow the Dependabot exception above.
 
-### 5. Read mission context before generating work
-At session start, prefer **Spec Kitty** context (`spec-kitty next`, dashboard, active WP) when the repo is under a mission. **`bin/check-milestones`** remains a **supplementary** GitHub hygiene signal (SessionStart hook): read it when work touches GitHub issues or community triage.
+### 4. Read mission context before generating work
+At session start, prefer **Spec Kitty** context (`spec-kitty next`, dashboard, active WP) when the repo is under a mission.
 
 ## Drift Detection
 
 **Specs:** `tools/drift-detector.sh` and manual reads of `docs/specs/` — see [ops/observability/drift-detection.md](../../ops/observability/drift-detection.md).
-
-**GitHub issue hygiene:** `bin/check-milestones` (SessionStart hook) reports:
-- Open issues with no milestone (incomplete triage **on GitHub**)
-- Open milestones with no open issues (possibly stale **on GitHub**)
-
-The script exits 0 always. Output is a warning surface, not a CI gate. It does **not** replace Spec Kitty mission state or spec ownership.
 
 ## Composer Manifest Policy (Codified + Gated)
 

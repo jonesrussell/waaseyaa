@@ -101,7 +101,7 @@ enum DiagnosticCode: string
             self::TAG_QUARANTINE_DETECTED =>
                 'Follow VERSIONING.md §2 to either approve the tag or delete it. Do not proceed with CI until resolved.',
             self::MANIFEST_VERSIONING_MISSING =>
-                'Add a project_versioning block to the manifest per VERSIONING.md §3. Run `bin/check-milestones` to verify.',
+                'Add a project_versioning block to the manifest per VERSIONING.md §3.',
             self::NAMESPACE_RESERVED =>
                 'Use a custom namespace prefix (e.g., myorg.article). The "core." prefix is reserved for platform built-ins.',
             self::DATABASE_UNREACHABLE =>

@@ -32,7 +32,6 @@ The scan is owned by the active conformance governor or, when that role is not e
 
 Every scan must include:
 
-- `bin/check-milestones` for GitHub Track milestone hygiene when issues are in use (supplementary to Spec Kitty; see `docs/specs/workflow.md`).
 - `bash tools/drift-detector.sh 5` for drift detection.
 - Inspection of changed routes, providers, manifests, contracts, adapters, and registries.
 
@@ -41,14 +40,13 @@ The steward selects targeted PHPUnit, Node, and integration suites based on the 
 ## Scan Procedure
 
 1. Confirm the current scan trigger, the owning role, and the affected surfaces.
-2. Run `bin/check-milestones` and review the report for milestone drift or hygiene regressions.
-3. Run `bash tools/drift-detector.sh 5` and capture the output for spec and governance drift.
-4. Inspect the changed routes, providers, manifests, contracts, adapters, and registries that could explain the scan surface.
-5. Verify that each new or modified governed surface since the last scan has a governed-change record instantiated from the `m11-governed-change` template.
-6. Run the targeted PHPUnit, Node, and integration suites that cover the affected surfaces.
-7. Evaluate any anomalies against the `#988` invariants and the `#990` dependency expectations before classifying the result.
-8. Classify the result using the drift rules below.
-9. Log the outcome with evidence, even when the scan is clean.
+2. Run `bash tools/drift-detector.sh 5` and capture the output for spec and governance drift.
+3. Inspect the changed routes, providers, manifests, contracts, adapters, and registries that could explain the scan surface.
+4. Verify that each new or modified governed surface since the last scan has a governed-change record instantiated from the `m11-governed-change` template.
+5. Run the targeted PHPUnit, Node, and integration suites that cover the affected surfaces.
+6. Evaluate any anomalies against the `#988` invariants and the `#990` dependency expectations before classifying the result.
+7. Classify the result using the drift rules below.
+8. Log the outcome with evidence, even when the scan is clean.
 
 ## Drift Classification Rules
 
@@ -95,10 +93,9 @@ Do not convert a confirmed anomaly into a clean scan entry. Clean scans and drif
 These are the baseline suite options for M11 drift scans:
 
 ```bash
-bin/check-milestones
 bash tools/drift-detector.sh 5
 vendor/bin/phpunit
 cd packages/admin && npm test
 ```
 
-Use `bin/check-milestones` and `bash tools/drift-detector.sh 5` on every scan. Treat the PHPUnit and Node commands as baseline suite options to narrow or expand based on the governed surfaces affected by the scan.
+Run `bash tools/drift-detector.sh 5` on every scan. Treat the PHPUnit and Node commands as baseline suite options to narrow or expand based on the governed surfaces affected by the scan.

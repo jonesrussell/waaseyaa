@@ -130,7 +130,7 @@ Add a `DriftAlertDispatcher` that fires a `DomainEvent` when drift score drops
 below a configurable threshold. Consumers can subscribe to trigger:
 - GitHub issue creation ("spec drift detected in entity-system")
 - Slack/Teams webhook notification
-- Block CI pipeline via `bin/check-milestones` exit code
+- Block CI pipeline via a dedicated drift-gate script exit code
 
 ### Retention Policy
 

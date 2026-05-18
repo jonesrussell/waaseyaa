@@ -42,11 +42,10 @@ Defer mixing with schema evolution:
 - **PHPDoc** / @covers families  
 - **Hydration** edge-case clusters  
 
+<!--
 ## Hygiene (keep as routine)
 
-```bash
-cd /path/to/waaseyaa && ./bin/check-milestones
-gh issue list --repo waaseyaa/framework --state open --search "no:milestone" --limit 200
-```
-
-Expect: no `WARNING` lines from `check-milestones`; zero `no:milestone` hits.
+(Removed 2026-05-18: GitHub milestones are no longer the canonical issue
+taxonomy. Spec Kitty mission state is the execution map; ad-hoc GitHub
+issues are pure tracking.)
+-->

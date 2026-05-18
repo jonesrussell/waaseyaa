@@ -21,11 +21,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bin/check-milestones 2>&1",
-            "show_output": true
-          },
-          {
-            "type": "command",
             "command": "tools/drift-detector.sh 5 2>&1",
             "show_output": true
           }
