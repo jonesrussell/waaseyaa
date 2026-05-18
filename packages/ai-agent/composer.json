@@ -50,6 +50,10 @@
         },
         {
             "type": "path",
+            "url": "../routing"
+        },
+        {
+            "type": "path",
             "url": "../typed-data"
         }
     ],
@@ -64,7 +68,8 @@
         "waaseyaa/database-legacy": "^0.1.0-alpha.180",
         "waaseyaa/entity": "^0.1.0-alpha.180",
         "waaseyaa/entity-storage": "^0.1.0-alpha.180",
-        "waaseyaa/foundation": "^0.1.0-alpha.180"
+        "waaseyaa/foundation": "^0.1.0-alpha.180",
+        "waaseyaa/routing": "^0.1.0-alpha.180"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
@@ -90,7 +95,9 @@
             "providers": [
                 "Waaseyaa\\AI\\Agent\\AiAgentEntityServiceProvider",
                 "Waaseyaa\\AI\\Agent\\AiAgentServiceProvider",
-                "Waaseyaa\\AI\\Agent\\MessagingServiceProvider"
+                "Waaseyaa\\AI\\Agent\\MessagingServiceProvider",
+                "Waaseyaa\\AI\\Agent\\Broadcast\\AgentRunBroadcasterServiceProvider",
+                "Waaseyaa\\AI\\Agent\\Routing\\AgentRouteServiceProvider"
             ]
         }
     },

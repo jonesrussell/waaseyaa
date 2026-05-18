@@ -748,7 +748,6 @@ final class PackageManifestCompiler
                     || !empty($ref->getAttributes(AsEntityType::class))
                     || !empty($ref->getAttributes(self::POLICY_ATTRIBUTE))
                     || !empty($ref->getAttributes(self::FORMATTER_ATTRIBUTE))
-                    || $ref->getAttributes(self::AGENT_TOOL_ATTRIBUTE) !== [];
                     || $ref->getAttributes(self::AGENT_TOOL_ATTRIBUTE) !== []
                     || $ref->getAttributes(self::AGENT_DEFINITION_ATTRIBUTE) !== [];
 
