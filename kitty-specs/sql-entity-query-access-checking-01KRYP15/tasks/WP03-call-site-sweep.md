@@ -246,3 +246,4 @@ spec-kitty agent action implement WP03 --agent <name>
 ## Activity Log
 
 - 2026-05-19T00:35:28Z – claude:sonnet:implementer:implementer – shell_pid=465581 – Assigned agent via action command
+- 2026-05-19T01:05:03Z – claude:sonnet:implementer:implementer – shell_pid=465581 – Ready for review: filter end-to-end via SqlEntityStorage::getQuery(); 7 packages swept; 5 existing accessCheck(false) audited (1 kept, 4 removed); SearchControllerTest fixture updated; gates green (cs-check, phpstan, layers, dead-code, composer-policy)
