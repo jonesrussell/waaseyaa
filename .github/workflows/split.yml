@@ -54,6 +54,7 @@ jobs:
           - { local: 'packages/billing', remote: 'billing' }
           - { local: 'packages/bimaaji', remote: 'bimaaji' }
           # Layer 3: Services
+          - { local: 'packages/listing', remote: 'listing' }
           - { local: 'packages/migration', remote: 'migration' }
           - { local: 'packages/search', remote: 'search' }
           - { local: 'packages/seo', remote: 'seo' }
@@ -68,6 +69,7 @@ jobs:
           - { local: 'packages/ai-pipeline', remote: 'ai-pipeline' }
           - { local: 'packages/ai-vector', remote: 'ai-vector' }
           - { local: 'packages/ai-observability', remote: 'ai-observability' }
+          - { local: 'packages/ai-tools', remote: 'ai-tools' }
           # Layer 5.5: GraphQL
           - { local: 'packages/graphql', remote: 'graphql' }
           # Layer 6: Interfaces
