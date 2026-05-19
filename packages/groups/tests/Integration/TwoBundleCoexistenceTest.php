@@ -163,6 +163,7 @@ final class TwoBundleCoexistenceTest extends TestCase
         ]));
 
         $ids = (new SqlEntityQuery($this->groupType, $this->database, null, $this->registry))
+            ->accessCheck(false)
             ->condition('type', 'alpha')
             ->condition('alpha_code', 'A-42')
             ->execute();
@@ -183,6 +184,7 @@ final class TwoBundleCoexistenceTest extends TestCase
         $this->expectException(BundleAmbiguousFieldException::class);
 
         (new SqlEntityQuery($this->groupType, $this->database, null, $this->registry))
+            ->accessCheck(false)
             ->condition('shared_tag', 'anything')
             ->execute();
     }

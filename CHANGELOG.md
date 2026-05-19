@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **SSR rendering broken under fail-closed access checking.** `PathAliasResolver` was missed by the #1495 sweep and called `getQuery()->execute()` without binding an account or opting out — every SSR request (and every other URL → entity lookup) hit `MissingQueryAccountException` and returned HTTP 500. Eight Phase13 `SsrHttpKernelIntegrationTest` cases regressed in v0.1.0-alpha.181. Marked as a documented system-context bypass (URL aliases must resolve globally; entity-level access is enforced when the caller subsequently loads the resolved entity). Added to `docs/security/sql-entity-query-access-check-bypass-audit.md`.
+- **`Groups\Tests\Integration\TwoBundleCoexistenceTest` regressed in v0.1.0-alpha.181.** Tests that construct `SqlEntityQuery` directly to exercise bundle-routing semantics now opt out of access checking — they verify field-resolution behaviour, not access semantics.
+
 ## [0.1.0-alpha.181] - 2026-05-19
 
 ### Added

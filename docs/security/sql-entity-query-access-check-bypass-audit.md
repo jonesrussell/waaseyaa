@@ -38,6 +38,7 @@ These sites never have an end-user `AccountInterface` available and run with ful
 | `packages/genealogy/src/Ssr/GenealogySsrController.php` | 155 | SSR controller hydrates pedigree data for the demo surface; mirrors the service-layer policy above. Revisit when genealogy has a proper account-aware access policy. | 2026-05-18 |
 | `packages/genealogy/src/Ssr/GenealogySsrController.php` | 164 | Same SSR controller, sibling query. | 2026-05-18 |
 | `packages/mcp/src/Tools/McpTool.php` | 68 | MCP relationship-id lookup feeds tool-execution context; the MCP surface authenticates via its own credential layer (not the user account model), so the entity-query account is intentionally unset. | 2026-05-18 |
+| `packages/path/src/PathAliasResolver.php` | 25 | System-context URL → entity-id lookup. Path aliases must resolve globally for any visitor; entity-level access is enforced when the caller subsequently loads the resolved entity. Missed during the original audit and caught when Phase13 SSR integration tests started returning HTTP 500 instead of 200/403/404 after v0.1.0-alpha.181 shipped. | 2026-05-19 |
 
 ### Conditional fallback — set account when available, bypass otherwise
 
