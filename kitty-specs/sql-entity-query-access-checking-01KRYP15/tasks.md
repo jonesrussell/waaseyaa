@@ -49,9 +49,9 @@ class and the sweep / tests / docs all need the filter to be live.
 | T019 | Integration: `BypassRespectsSystemContextTest` (`accessCheck(false)` returns all) | WP04 | [D] |
 | T020 | Integration: `AnonymousAccountFilterTest` (Anonymous account filter behaviour) | WP04 | [D] |
 | T021 | Integration: `AdminBypassCapabilityTest` (bypass-capability holder sees full set) | WP04 | [D] |
-| T022 | Update `docs/specs/access-control.md` with the new query-layer enforcement; refresh the spec stamp | WP05 |
-| T023 | File `docs/security/sql-entity-query-access-check-bypass-audit.md` — line-by-line review of remaining `accessCheck(false)` sites | WP05 |
-| T024 | `CHANGELOG.md` `[Unreleased]` bullets (Added / Changed / Security) | WP05 |
+| T022 | Update `docs/specs/access-control.md` with the new query-layer enforcement; refresh the spec stamp | WP05 | [D] |
+| T023 | File `docs/security/sql-entity-query-access-check-bypass-audit.md` — line-by-line review of remaining `accessCheck(false)` sites | WP05 | [D] |
+| T024 | `CHANGELOG.md` `[Unreleased]` bullets (Added / Changed / Security) | WP05 | [D] |
 
 ---
 
@@ -153,9 +153,9 @@ class and the sweep / tests / docs all need the filter to be live.
 **Prompt:** [tasks/WP05-docs-and-bypass-audit.md](tasks/WP05-docs-and-bypass-audit.md)
 
 **Subtasks:**
-- [ ] T022 Update `docs/specs/access-control.md` (WP05)
-- [ ] T023 File `docs/security/sql-entity-query-access-check-bypass-audit.md` (WP05)
-- [ ] T024 `CHANGELOG.md` `[Unreleased]` bullets (WP05)
+- [x] T022 Update `docs/specs/access-control.md` (WP05)
+- [x] T023 File `docs/security/sql-entity-query-access-check-bypass-audit.md` (WP05)
+- [x] T024 `CHANGELOG.md` `[Unreleased]` bullets (WP05)
 
 **Risks:**
 - Audit doc bit-rots if more `accessCheck(false)` calls are added without updating it: *Mitigation:* the doc names the grep command (`grep -rn "accessCheck(false)" packages/`) for future audits; a follow-up could add a CI grep to enforce.
