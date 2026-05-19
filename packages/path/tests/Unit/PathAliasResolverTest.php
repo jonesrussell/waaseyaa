@@ -28,6 +28,7 @@ final class PathAliasResolverTest extends TestCase
         ]);
 
         $query = $this->createMock(EntityQueryInterface::class);
+        $query->method('accessCheck')->willReturnSelf();
         $query->method('condition')->willReturnSelf();
         $query->method('range')->willReturnSelf();
         $query->method('execute')->willReturn([10]);
@@ -48,6 +49,7 @@ final class PathAliasResolverTest extends TestCase
     public function returns_null_when_alias_not_found(): void
     {
         $query = $this->createMock(EntityQueryInterface::class);
+        $query->method('accessCheck')->willReturnSelf();
         $query->method('condition')->willReturnSelf();
         $query->method('range')->willReturnSelf();
         $query->method('execute')->willReturn([]);

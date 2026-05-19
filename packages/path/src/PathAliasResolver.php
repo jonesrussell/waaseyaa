@@ -18,7 +18,12 @@ final readonly class PathAliasResolver
             return null;
         }
 
+        // System-context URL → entity-id lookup. Path aliases must resolve
+        // globally; entity-level access is enforced when the resolved entity
+        // is subsequently loaded by the caller.
+        // See docs/security/sql-entity-query-access-check-bypass-audit.md.
         $query = $this->pathAliasStorage->getQuery()
+            ->accessCheck(false)
             ->condition('alias', $alias)
             ->condition('langcode', $langcode)
             ->range(0, 20);
