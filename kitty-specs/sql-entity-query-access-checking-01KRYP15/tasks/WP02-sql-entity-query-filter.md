@@ -24,8 +24,8 @@ subtasks:
 - T007
 - T008
 - T009
-shell_pid: "459188"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "464329"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-18T23:44:03Z'
   actor: tasks-skill
@@ -277,3 +277,4 @@ spec-kitty agent action implement WP02 --agent <name>
 
 - 2026-05-19T00:02:53Z – claude:sonnet:implementer:implementer – shell_pid=459188 – Assigned agent via action command
 - 2026-05-19T00:27:21Z – claude:sonnet:implementer:implementer – shell_pid=459188 – Ready for review: SqlEntityQuery now filters via EntityAccessHandler::check(); accessCheck(false) preserved as a hydration-free bypass fast path; throws MissingQueryAccountException on missing account; 10 unit tests pass (9 named cases per T009 + 1 transitional pre-WP03 fallback). SqlEntityStorage::loadByKey() opts into accessCheck(false) (system-context identity primitive). All in-scope quality gates green (cs-check, phpstan, layers, dead-code, composer-policy, entity-storage test suite 679/679). Existing consumer packages (oidc, relationship, ai-vector, graphql, genealogy, workflows, api) will throw MissingQueryAccountException after this WP merges — that is FR-003 and the explicit WP03 sweep scope. ai-vector tests carrying anonymous EntityQueryInterface mocks need WP03 to add setAccount().
+- 2026-05-19T00:28:31Z – claude:opus-4-7:reviewer:reviewer – shell_pid=464329 – Started review via action command
