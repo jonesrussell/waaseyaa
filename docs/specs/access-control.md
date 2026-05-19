@@ -1,5 +1,6 @@
 # Access Control
 
+<!-- Spec reviewed 2026-05-19 - SqlEntityQuery query-layer access checking added per mission sql-entity-query-access-checking-01KRYP15 (#1495): EntityQueryInterface::setAccount() binds the account used for per-row filtering; SqlEntityQuery::execute() now runs EntityAccessHandler::check($entity, 'view', $account) for every candidate row; accessCheck(true) is the default and accessCheck(false) is preserved as an audited system-context opt-out (see docs/security/sql-entity-query-access-check-bypass-audit.md); MissingQueryAccountException is thrown when neither bypass nor account is bound. -->
 <!-- Spec reviewed 2026-05-10 - #1395 dead-code removal: CsrfMiddleware::attachXsrfCookie() instance method deleted; attachCookieIfHtml() static helper (called by HttpKernel) remains the sole live cookie-attachment path. No change to session resolution, gate logic, or access pipeline semantics. -->
 <!-- Spec reviewed 2026-05-10 - WP05 php-8.5 upgrade: @PHP8x5Migration cs-fixer pass — AuthorizationMiddleware and EntityAccessHandler touched by octal_notation + new_expression_parentheses rules only; no semantic change to access pipeline or gate logic. -->
 <!-- Spec reviewed 2026-05-10 - WP03 php-8.5 upgrade: AccessResult::allowed/forbidden/neutral/unauthenticated gained #[\NoDiscard] — no semantic change to access pipeline, gate logic, or AccessChecker. -->
@@ -421,6 +422,29 @@ Permissions are declared in `composer.json` under `extra.waaseyaa.permissions` a
   }
 }
 ```
+
+## Enforcement Layers
+
+Access enforcement runs at four distinct layers. Each layer is independent — the request must pass every applicable check.
+
+| # | Layer | Site | Contract | Granularity |
+|---|-------|------|----------|-------------|
+| 1 | **Route** | `AccessChecker::check(Route, AccountInterface)` in `AuthorizationMiddleware` | Route options (`_public`, `_authenticated`, `_session`, `_permission`, `_role`, `_gate`) | Per HTTP request, before controller dispatch |
+| 2 | **Entity (handler)** | `EntityAccessHandler::check(EntityInterface, $operation, AccountInterface)` invoked by controllers | `AccessPolicyInterface::access()` policies combined via `orIf()` | A single, already-loaded entity instance |
+| 3 | **Entity (query) — NEW (mission `sql-entity-query-access-checking-01KRYP15`, #1495)** | `SqlEntityQuery::execute()` runs `EntityAccessHandler::check($entity, 'view', $account)` for every candidate row | Same `AccessPolicyInterface` pipeline as layer 2, applied per-row at query time | Cardinality and rows returned by entity queries (count + list) |
+| 4 | **Field** | `EntityAccessHandler::filterFields(EntityInterface, fieldNames, $operation, AccountInterface)` invoked by `ResourceSerializer` | `FieldAccessPolicyInterface::fieldAccess()` policies | Individual fields on an entity — open-by-default (only `Forbidden` removes) |
+
+Layer 2 uses **deny-by-default** semantics (`$result->isAllowed()`); layer 4 uses **open-by-default** semantics (`!$result->isForbidden()`). Layer 3 inherits layer 2's `view`-policy decisions but filters rather than throws — `Allowed` and `Neutral` both admit a row, `Forbidden` drops it. This asymmetry is intentional (see `docs/specs/field-access.md`).
+
+### Layer 3 contract details
+
+- **Default:** `SqlEntityQuery::accessCheck(true)` is the default state.
+- **Account binding:** Call `$query->setAccount($account)` before `execute()` to bind the request's authenticated account. `EntityQueryInterface::setAccount(?AccountInterface): static` is required on every implementation.
+- **Fail-closed:** When `accessCheck(true)` is active and no account is bound, `execute()` throws `Waaseyaa\EntityStorage\Exception\MissingQueryAccountException`. This is the v1 default — the query layer cannot silently leak rows.
+- **System-context opt-out:** `$query->accessCheck(false)` preserves the pre-mission behaviour (no per-row filter, no account required). Every remaining call site is audited at [`docs/security/sql-entity-query-access-check-bypass-audit.md`](../security/sql-entity-query-access-check-bypass-audit.md); new bypasses MUST update that document.
+- **Filter semantics:** Per-row, `EntityAccessHandler::check($entity, 'view', $account)` is consulted. `Allowed` + `Neutral` admit the row; `Forbidden` drops it. This matches the entity-handler's `isAllowed()` semantics for layer 2 — under the entity handler's `orIf()` combinator, `Neutral` and `Allowed` are produced when no policy or some policy declined to deny, and the query layer treats both as "do not drop".
+
+The `view`-operation symmetry between layers 2 and 3 is deliberate: a row's visibility in a list and its visibility on a detail page are governed by the same policy code, so consumers cannot construct a query that returns rows they could not otherwise load individually.
 
 ## Authorization Pipeline
 
