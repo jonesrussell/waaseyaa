@@ -44,11 +44,11 @@ class and the sweep / tests / docs all need the filter to be live.
 | T014 | Sweep `packages/genealogy/src/` (6 call sites — classify each as system or user-context) | WP03 | [D] |
 | T015 | Sweep `packages/workflows/src/DomainValidationListener.php` (system context) | WP03 | [D] |
 | T016 | Sweep `packages/api/src/JsonApiController.php` (bind `_account` from request) | WP03 | [D] |
-| T017 | Integration: `ListingFilterTest` (JSON:API index endpoint) | WP04 |
-| T018 | Integration: `GraphQLResolverFilterTest` (count + main query both filtered) | WP04 |
-| T019 | Integration: `BypassRespectsSystemContextTest` (`accessCheck(false)` returns all) | WP04 |
-| T020 | Integration: `AnonymousAccountFilterTest` (Anonymous account filter behaviour) | WP04 |
-| T021 | Integration: `AdminBypassCapabilityTest` (bypass-capability holder sees full set) | WP04 |
+| T017 | Integration: `ListingFilterTest` (JSON:API index endpoint) | WP04 | [D] |
+| T018 | Integration: `GraphQLResolverFilterTest` (count + main query both filtered) | WP04 | [D] |
+| T019 | Integration: `BypassRespectsSystemContextTest` (`accessCheck(false)` returns all) | WP04 | [D] |
+| T020 | Integration: `AnonymousAccountFilterTest` (Anonymous account filter behaviour) | WP04 | [D] |
+| T021 | Integration: `AdminBypassCapabilityTest` (bypass-capability holder sees full set) | WP04 | [D] |
 | T022 | Update `docs/specs/access-control.md` with the new query-layer enforcement; refresh the spec stamp | WP05 |
 | T023 | File `docs/security/sql-entity-query-access-check-bypass-audit.md` — line-by-line review of remaining `accessCheck(false)` sites | WP05 |
 | T024 | `CHANGELOG.md` `[Unreleased]` bullets (Added / Changed / Security) | WP05 |
@@ -131,11 +131,11 @@ class and the sweep / tests / docs all need the filter to be live.
 **Prompt:** [tasks/WP04-integration-tests.md](tasks/WP04-integration-tests.md)
 
 **Subtasks:**
-- [ ] T017 `ListingFilterTest` (JSON:API index) (WP04)
-- [ ] T018 `GraphQLResolverFilterTest` (WP04)
-- [ ] T019 `BypassRespectsSystemContextTest` (WP04)
-- [ ] T020 `AnonymousAccountFilterTest` (WP04)
-- [ ] T021 `AdminBypassCapabilityTest` (WP04)
+- [x] T017 `ListingFilterTest` (JSON:API index) (WP04)
+- [x] T018 `GraphQLResolverFilterTest` (WP04)
+- [x] T019 `BypassRespectsSystemContextTest` (WP04)
+- [x] T020 `AnonymousAccountFilterTest` (WP04)
+- [x] T021 `AdminBypassCapabilityTest` (WP04)
 
 **Risks:**
 - Tests over-assert SQL shape: *Mitigation:* assert on observable behaviour (which rows are returned, what counts) — not on internal query shape.
