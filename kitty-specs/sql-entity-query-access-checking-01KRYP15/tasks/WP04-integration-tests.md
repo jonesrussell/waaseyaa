@@ -18,7 +18,8 @@ subtasks:
 - T019
 - T020
 - T021
-shell_pid: '474906'
+shell_pid: "474906"
+agent: "claude:sonnet:implementer:implementer"
 history:
 - date: '2026-05-18T23:44:03Z'
   actor: tasks-skill
@@ -206,3 +207,7 @@ Planning + merge target: `main`. Lane allocated by `spec-kitty agent mission fin
 ```
 spec-kitty agent action implement WP04 --agent <name>
 ```
+
+## Activity Log
+
+- 2026-05-19T01:14:08Z – claude:sonnet:implementer:implementer – shell_pid=474906 – Assigned agent via action command
