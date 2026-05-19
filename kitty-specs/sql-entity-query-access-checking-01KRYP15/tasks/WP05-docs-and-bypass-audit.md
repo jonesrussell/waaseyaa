@@ -208,3 +208,4 @@ spec-kitty agent action implement WP05 --agent <name>
 ## Activity Log
 
 - 2026-05-19T01:28:08Z – claude:sonnet:implementer:implementer – shell_pid=479732 – Started implementation via action command
+- 2026-05-19T01:35:27Z – claude:sonnet:implementer:implementer – shell_pid=479732 – Ready for review: access-control spec updated with 4-layer enforcement section + spec stamp; bypass-audit doc filed (16 unconditional system-context sites + 8 conditional-fallback sites + 10 'removed during mission' entries reflecting WP03's sweep); CHANGELOG [Unreleased] carries Added (3), Changed (2), Security (1) bullets referencing #1495; drift detector quiet
