@@ -18,8 +18,8 @@ subtasks:
 - T019
 - T020
 - T021
-shell_pid: "474906"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "478682"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-18T23:44:03Z'
   actor: tasks-skill
@@ -212,3 +212,4 @@ spec-kitty agent action implement WP04 --agent <name>
 
 - 2026-05-19T01:14:08Z – claude:sonnet:implementer:implementer – shell_pid=474906 – Assigned agent via action command
 - 2026-05-19T01:24:36Z – claude:sonnet:implementer:implementer – shell_pid=474906 – Ready for review: 5 integration tests green (11 methods, 23 assertions); GraphQL count-leak bug fix locked via filtered total assertion; gates green (cs-check, phpstan, layers, dead-code, composer-policy)
+- 2026-05-19T01:25:38Z – claude:opus-4-7:reviewer:reviewer – shell_pid=478682 – Started review via action command
