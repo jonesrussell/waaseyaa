@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.181] - 2026-05-19
+
 ### Added
 
 - **Agent executor v1 (#1496).** Full async agent runtime: `bin/waaseyaa ai:run "<prompt>" [--inline]`, `POST /api/ai/agent/run`, `GET /api/ai/agent/run/{id}`, `DELETE /api/ai/agent/run/{id}`, `POST /api/ai/agent/run/{id}/approve`. Persisted `AgentRun` + append-only `AgentAuditLog` entities replace the in-memory audit list; HITL state machine (`none` / `all` / `interactive`) gates destructive tool calls; per-iteration cancellation poll; provider retry logic; static `ModelPriceTable` for token / cost accounting. Stalled-run reaper (`ai:reap-stalled-runs`, 5-minute scheduler entry) transitions runs stuck past `max_runtime_seconds`. Daily purge job (`ai:purge-runs`) supports retention policy. Worker concurrency is safe via Messenger transport-level locking plus a `started_at IS NULL` CAS at handler entry (NFR-015). SSE event vocabulary on durable `BroadcastStorage` channel `agent.run.<id>`: `run_started`, `iteration`, `tool_call`, `tool_result`, `approval_required`, `run_completed`, `run_failed`, `run_cancelled`. Routes ride with the package via `Waaseyaa\AI\Agent\Routing\AgentRouteServiceProvider` (post-review revision of FR-031 — previously planned for `packages/routing`). Initiator-ownership enforced by `AgentRunAccessPolicy`; `agent.run.bypass_ownership` capability scoped to administrators. Observability via `AgentRunTelemetryListener` in `packages/ai-observability`. Canonical spec: `docs/specs/agent-executor.md`.
