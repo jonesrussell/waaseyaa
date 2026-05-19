@@ -37,13 +37,13 @@ class and the sweep / tests / docs all need the filter to be live.
 | T007 | `count()` returns post-filter cardinality when `accessCheck=true`; pre-filter when `accessCheck=false` | WP02 | [D] |
 | T008 | `range()` page cursor advances by unfiltered window (FR-007) | WP02 | [D] |
 | T009 | Unit tests for `SqlEntityQuery`: allow / deny / mixed / count / cursor / missing-account-throws | WP02 | [D] |
-| T010 | Sweep `packages/oidc/src/ClientRegistry/` (`OidcClientSeeder`, `OidcClientLookup`) | WP03 |
-| T011 | Sweep `packages/relationship/src/` (`RelationshipValidator`, `RelationshipDeleteGuardListener`) | WP03 |
-| T012 | Sweep `packages/ai-vector/src/` (`SemanticIndexWarmer` keep bypass; `SearchController` bind account) | WP03 |
-| T013 | Sweep `packages/graphql/src/Resolver/EntityResolver.php` (drop all 3 `accessCheck(false)`; bind context user) | WP03 |
-| T014 | Sweep `packages/genealogy/src/` (6 call sites — classify each as system or user-context) | WP03 |
-| T015 | Sweep `packages/workflows/src/DomainValidationListener.php` (system context) | WP03 |
-| T016 | Sweep `packages/api/src/JsonApiController.php` (bind `_account` from request) | WP03 |
+| T010 | Sweep `packages/oidc/src/ClientRegistry/` (`OidcClientSeeder`, `OidcClientLookup`) | WP03 | [D] |
+| T011 | Sweep `packages/relationship/src/` (`RelationshipValidator`, `RelationshipDeleteGuardListener`) | WP03 | [D] |
+| T012 | Sweep `packages/ai-vector/src/` (`SemanticIndexWarmer` keep bypass; `SearchController` bind account) | WP03 | [D] |
+| T013 | Sweep `packages/graphql/src/Resolver/EntityResolver.php` (drop all 3 `accessCheck(false)`; bind context user) | WP03 | [D] |
+| T014 | Sweep `packages/genealogy/src/` (6 call sites — classify each as system or user-context) | WP03 | [D] |
+| T015 | Sweep `packages/workflows/src/DomainValidationListener.php` (system context) | WP03 | [D] |
+| T016 | Sweep `packages/api/src/JsonApiController.php` (bind `_account` from request) | WP03 | [D] |
 | T017 | Integration: `ListingFilterTest` (JSON:API index endpoint) | WP04 |
 | T018 | Integration: `GraphQLResolverFilterTest` (count + main query both filtered) | WP04 |
 | T019 | Integration: `BypassRespectsSystemContextTest` (`accessCheck(false)` returns all) | WP04 |
@@ -107,13 +107,13 @@ class and the sweep / tests / docs all need the filter to be live.
 **Prompt:** [tasks/WP03-call-site-sweep.md](tasks/WP03-call-site-sweep.md)
 
 **Subtasks:**
-- [ ] T010 Sweep `packages/oidc/src/ClientRegistry/` (WP03)
-- [ ] T011 Sweep `packages/relationship/src/` (WP03)
-- [ ] T012 Sweep `packages/ai-vector/src/` (WP03)
-- [ ] T013 Sweep `packages/graphql/src/Resolver/EntityResolver.php` (WP03)
-- [ ] T014 Sweep `packages/genealogy/src/` (WP03)
-- [ ] T015 Sweep `packages/workflows/src/DomainValidationListener.php` (WP03)
-- [ ] T016 Sweep `packages/api/src/JsonApiController.php` (WP03)
+- [x] T010 Sweep `packages/oidc/src/ClientRegistry/` (WP03)
+- [x] T011 Sweep `packages/relationship/src/` (WP03)
+- [x] T012 Sweep `packages/ai-vector/src/` (WP03)
+- [x] T013 Sweep `packages/graphql/src/Resolver/EntityResolver.php` (WP03)
+- [x] T014 Sweep `packages/genealogy/src/` (WP03)
+- [x] T015 Sweep `packages/workflows/src/DomainValidationListener.php` (WP03)
+- [x] T016 Sweep `packages/api/src/JsonApiController.php` (WP03)
 
 **Risks:**
 - A consumer can't statically know the account at call time (e.g. a background context that runs ad-hoc): *Mitigation:* such call sites either get an explicit `accessCheck(false)` (documented in the WP05 audit) or thread a service account through. WP03 captures the disposition for each site.
