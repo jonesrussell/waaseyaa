@@ -31,12 +31,12 @@ class and the sweep / tests / docs all need the filter to be live.
 | T001 | `MissingQueryAccountException` final class + `forQuery()` factory | WP01 | [D] |
 | T002 | Add `setAccount(?AccountInterface): static` to `EntityQueryInterface` | WP01 | [D] |
 | T003 | Unit test: exception factory message + `\RuntimeException` parentage | WP01 | [D] |
-| T004 | `SqlEntityQuery` internal state (`$account`, `$accessCheckEnabled`) + `setAccount()` impl + real `accessCheck(bool)` | WP02 |
-| T005 | Inject `EntityAccessHandler` via lazy DI resolve (no constructor change) | WP02 |
-| T006 | `execute()` rewrite: remove stub comment, hydrate page, per-row check, throw on missing-account+enabled, return surviving IDs | WP02 |
-| T007 | `count()` returns post-filter cardinality when `accessCheck=true`; pre-filter when `accessCheck=false` | WP02 |
-| T008 | `range()` page cursor advances by unfiltered window (FR-007) | WP02 |
-| T009 | Unit tests for `SqlEntityQuery`: allow / deny / mixed / count / cursor / missing-account-throws | WP02 |
+| T004 | `SqlEntityQuery` internal state (`$account`, `$accessCheckEnabled`) + `setAccount()` impl + real `accessCheck(bool)` | WP02 | [D] |
+| T005 | Inject `EntityAccessHandler` via lazy DI resolve (no constructor change) | WP02 | [D] |
+| T006 | `execute()` rewrite: remove stub comment, hydrate page, per-row check, throw on missing-account+enabled, return surviving IDs | WP02 | [D] |
+| T007 | `count()` returns post-filter cardinality when `accessCheck=true`; pre-filter when `accessCheck=false` | WP02 | [D] |
+| T008 | `range()` page cursor advances by unfiltered window (FR-007) | WP02 | [D] |
+| T009 | Unit tests for `SqlEntityQuery`: allow / deny / mixed / count / cursor / missing-account-throws | WP02 | [D] |
 | T010 | Sweep `packages/oidc/src/ClientRegistry/` (`OidcClientSeeder`, `OidcClientLookup`) | WP03 |
 | T011 | Sweep `packages/relationship/src/` (`RelationshipValidator`, `RelationshipDeleteGuardListener`) | WP03 |
 | T012 | Sweep `packages/ai-vector/src/` (`SemanticIndexWarmer` keep bypass; `SearchController` bind account) | WP03 |
@@ -84,12 +84,12 @@ class and the sweep / tests / docs all need the filter to be live.
 **Prompt:** [tasks/WP02-sql-entity-query-filter.md](tasks/WP02-sql-entity-query-filter.md)
 
 **Subtasks:**
-- [ ] T004 `SqlEntityQuery` internal state + `setAccount()` + real `accessCheck(bool)` (WP02)
-- [ ] T005 Inject `EntityAccessHandler` via lazy DI resolve (WP02)
-- [ ] T006 `execute()` rewrite — hydrate, check, throw, return surviving IDs (WP02)
-- [ ] T007 `count()` post-filter cardinality (WP02)
-- [ ] T008 `range()` unfiltered-window cursor (WP02)
-- [ ] T009 Unit tests covering the matrix (WP02)
+- [x] T004 `SqlEntityQuery` internal state + `setAccount()` + real `accessCheck(bool)` (WP02)
+- [x] T005 Inject `EntityAccessHandler` via lazy DI resolve (WP02)
+- [x] T006 `execute()` rewrite — hydrate, check, throw, return surviving IDs (WP02)
+- [x] T007 `count()` post-filter cardinality (WP02)
+- [x] T008 `range()` unfiltered-window cursor (WP02)
+- [x] T009 Unit tests covering the matrix (WP02)
 
 **Risks:**
 - Performance regression on large pages (NFR-002): *Mitigation:* per-row check is in-memory; the unit test asserts the < 100 ms threshold for a 25-row page.
