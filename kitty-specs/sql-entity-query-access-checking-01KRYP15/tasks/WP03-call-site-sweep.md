@@ -248,3 +248,4 @@ spec-kitty agent action implement WP03 --agent <name>
 - 2026-05-19T00:35:28Z – claude:sonnet:implementer:implementer – shell_pid=465581 – Assigned agent via action command
 - 2026-05-19T01:05:03Z – claude:sonnet:implementer:implementer – shell_pid=465581 – Ready for review: filter end-to-end via SqlEntityStorage::getQuery(); 7 packages swept; 5 existing accessCheck(false) audited (1 kept, 4 removed); SearchControllerTest fixture updated; gates green (cs-check, phpstan, layers, dead-code, composer-policy)
 - 2026-05-19T01:08:22Z – claude:opus-4-7:reviewer:reviewer – shell_pid=472959 – Started review via action command
+- 2026-05-19T01:13:24Z – claude:opus-4-7:reviewer:reviewer – shell_pid=472959 – Review passed: count-query cardinality bug fixed; nullable-account bypass documented; gates green; 9 pre-existing failures confirmed unrelated to WP03.
