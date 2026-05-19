@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Tests\Fixtures;
 
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 
@@ -77,6 +78,11 @@ class InMemoryEntityQuery implements EntityQueryInterface
     }
 
     public function accessCheck(bool $check = true): static
+    {
+        return $this;
+    }
+
+    public function setAccount(?AccountInterface $account): static
     {
         return $this;
     }

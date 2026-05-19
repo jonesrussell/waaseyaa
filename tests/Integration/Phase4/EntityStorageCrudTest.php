@@ -313,7 +313,7 @@ final class EntityStorageCrudTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('bundle', 'blog')
             ->execute();
 
@@ -324,7 +324,7 @@ final class EntityStorageCrudTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->sort('title', 'DESC')
             ->execute();
 
@@ -344,7 +344,7 @@ final class EntityStorageCrudTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->sort('id', 'ASC')
             ->range(0, 2)
             ->execute();
@@ -356,7 +356,7 @@ final class EntityStorageCrudTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $result = $this->storage->getQuery()
+        $result = $this->storage->getQuery()->accessCheck(false)
             ->condition('bundle', 'blog')
             ->count()
             ->execute();
@@ -368,7 +368,7 @@ final class EntityStorageCrudTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $result = $this->storage->getQuery()
+        $result = $this->storage->getQuery()->accessCheck(false)
             ->count()
             ->execute();
 
@@ -379,7 +379,7 @@ final class EntityStorageCrudTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('bundle', 'blog')
             ->condition('title', 'Blog Post 1')
             ->execute();

@@ -121,6 +121,8 @@ final class OidcClientSeeder
     private function findByClientId(string $clientId): ?OidcClient
     {
         $ids = $this->storage->getQuery()
+            // system context: client registry seed runs pre-auth
+            ->accessCheck(false)
             ->condition('client_id', $clientId)
             ->execute();
 

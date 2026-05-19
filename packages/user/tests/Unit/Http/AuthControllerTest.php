@@ -7,6 +7,7 @@ namespace Waaseyaa\User\Tests\Unit\Http;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 use Waaseyaa\User\AnonymousUser;
@@ -106,6 +107,7 @@ final class AuthControllerTest extends TestCase
             public function range(int $offset, int $limit): static { return $this; }
             public function count(): static { return $this; }
             public function accessCheck(bool $check = true): static { return $this; }
+            public function setAccount(?AccountInterface $account): static { return $this; }
 
             public function execute(): array
             {
@@ -185,6 +187,7 @@ final class AuthControllerTest extends TestCase
             public function range(int $offset, int $limit): static { return $this; }
             public function count(): static { return $this; }
             public function accessCheck(bool $check = true): static { return $this; }
+            public function setAccount(?AccountInterface $account): static { return $this; }
             public function execute(): array { return $this->ids; }
         };
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Genealogy\Service;
 
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 use Waaseyaa\Genealogy\GenealogyRelationshipType;
@@ -21,11 +22,16 @@ final class GenealogyFamilyService
     /**
      * @return list<string>
      */
-    public function memberPersonIds(string $familyId): array
+    public function memberPersonIds(string $familyId, ?AccountInterface $account = null): array
     {
         $storage = $this->relationshipStorage();
         $q = $storage->getQuery();
-        $q->accessCheck(false);
+        if ($account !== null) {
+            $q->setAccount($account);
+        } else {
+            // system context: caller did not thread an account; relationship topology only
+            $q->accessCheck(false);
+        }
         $q->condition('relationship_type', GenealogyRelationshipType::MEMBER_OF_FAMILY);
         $q->condition('to_entity_type', 'genealogy_family');
         $q->condition('to_entity_id', $familyId);

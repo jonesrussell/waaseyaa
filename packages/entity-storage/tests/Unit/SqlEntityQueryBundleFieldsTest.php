@@ -70,6 +70,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
         $ids = $query->condition('label', 'Acme')->execute();
 
         self::assertCount(1, $ids);
@@ -89,6 +90,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
         $ids = $query->condition('phone', '555-0100')->execute();
 
         self::assertCount(1, $ids);
@@ -108,6 +110,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
         // Two conditions on 'business' bundle fields must not produce duplicate
         // JOIN aliases — DBAL would throw on a repeated alias.
         $ids = $query
@@ -132,6 +135,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
         // 'phone' only in business, 'website' only in organization — each is
         // individually unambiguous, so routing succeeds. No single entity can
         // be in both bundles, so the intersection via INNER JOINs is empty.
@@ -157,6 +161,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
         $ids = $query
             ->condition('type', 'business')
             ->sort('phone', 'ASC')
@@ -183,6 +188,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
 
         $this->expectException(UnknownFieldException::class);
         $this->expectExceptionMessage('not_a_field');
@@ -203,6 +209,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
 
         $this->expectException(BundleAmbiguousFieldException::class);
         $this->expectExceptionMessage('Field "email" is bundle-scoped');
@@ -226,6 +233,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
         $ids = $query
             ->condition('type', 'business')
             ->condition('email', 'hi@acme.example')
@@ -248,6 +256,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
         // 'website' only exists in organization — no ambiguity even without
         // an explicit bundle condition.
         $ids = $query->condition('website', 'https://openorg.example')->execute();
@@ -269,6 +278,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
         // 'phone' is business-only; it uniquely identifies the bundle, so the
         // otherwise-ambiguous 'email' reference must resolve to 'business'.
         $ids = $query
@@ -316,6 +326,7 @@ final class SqlEntityQueryBundleFieldsTest extends TestCase
             null,
             $this->registry,
         );
+        $query->accessCheck(false);
         $ids = $query->condition('label', 'Solo')->execute();
 
         self::assertCount(1, $ids);

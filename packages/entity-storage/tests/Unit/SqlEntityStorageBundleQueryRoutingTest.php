@@ -126,6 +126,7 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
         $this->storage->save($other);
 
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('gizmo_code', 'X-1')
             ->execute();
 
@@ -144,6 +145,7 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
         $this->storage->save($entity);
 
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('status', 1)
             ->execute();
 
@@ -156,6 +158,7 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
         $this->expectException(UnknownFieldException::class);
 
         $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('totally_made_up_field', 'whatever')
             ->execute();
     }
@@ -243,6 +246,7 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
         );
 
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('status', 1)
             ->execute();
 
@@ -280,6 +284,7 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
 
         // Sanity: integer-bound query already works.
         $idsInt = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('status', 13)
             ->execute();
         self::assertSame([$entity->id()], $idsInt, 'integer binding (control)');
@@ -287,6 +292,7 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
         // The bug: numeric-string bound against integer-typed _data field
         // returns no rows pre-WP05 because SQLite compares int 13 != string "13".
         $idsString = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('status', '13')
             ->execute();
 
@@ -314,6 +320,7 @@ final class SqlEntityStorageBundleQueryRoutingTest extends TestCase
         // Mixed string/int IN-set against an integer-typed _data field must
         // match by numeric value, not lexical bytes.
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('status', ['1', 3], 'IN')
             ->execute();
 

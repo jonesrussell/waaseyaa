@@ -278,7 +278,7 @@ final class DBALRegressionTest extends TestCase
         $storage->save($storage->create(['title' => 'Regular title', 'bundle' => 'a']));
 
         // Search for literal "50%" should only match first entity.
-        $ids = $storage->getQuery()
+        $ids = $storage->getQuery()->accessCheck(false)
             ->condition('title', '50%', 'CONTAINS')
             ->execute();
 
@@ -296,7 +296,7 @@ final class DBALRegressionTest extends TestCase
         $storage->save($storage->create(['title' => 'other content', 'bundle' => 'a']));
 
         // Search for "field_name" should only match the one with literal underscore.
-        $ids = $storage->getQuery()
+        $ids = $storage->getQuery()->accessCheck(false)
             ->condition('title', 'field_name', 'CONTAINS')
             ->execute();
 
@@ -312,7 +312,7 @@ final class DBALRegressionTest extends TestCase
         $storage->save($storage->create(['title' => '%discount applied', 'bundle' => 'a']));
         $storage->save($storage->create(['title' => 'discount applied', 'bundle' => 'a']));
 
-        $ids = $storage->getQuery()
+        $ids = $storage->getQuery()->accessCheck(false)
             ->condition('title', '%discount', 'STARTS_WITH')
             ->execute();
 
@@ -328,7 +328,7 @@ final class DBALRegressionTest extends TestCase
         $storage->save($storage->create(['title' => '100%_complete', 'bundle' => 'a']));
         $storage->save($storage->create(['title' => '100X complete', 'bundle' => 'a']));
 
-        $ids = $storage->getQuery()
+        $ids = $storage->getQuery()->accessCheck(false)
             ->condition('title', '100%_', 'CONTAINS')
             ->execute();
 

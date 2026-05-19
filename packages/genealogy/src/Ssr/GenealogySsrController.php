@@ -67,9 +67,9 @@ final class GenealogySsrController
 
         $html = $this->twig->render('genealogy_person.html.twig', [
             'person' => $person,
-            'parent_neighbors' => $this->pedigree->neighborSlots($this->pedigree->parentPersonIds($id), $account, $this->gate),
-            'child_neighbors' => $this->pedigree->neighborSlots($this->pedigree->childPersonIds($id), $account, $this->gate),
-            'spouse_neighbors' => $this->pedigree->neighborSlots($this->pedigree->spousePersonIds($id), $account, $this->gate),
+            'parent_neighbors' => $this->pedigree->neighborSlots($this->pedigree->parentPersonIds($id, $account), $account, $this->gate),
+            'child_neighbors' => $this->pedigree->neighborSlots($this->pedigree->childPersonIds($id, $account), $account, $this->gate),
+            'spouse_neighbors' => $this->pedigree->neighborSlots($this->pedigree->spousePersonIds($id, $account), $account, $this->gate),
         ]);
 
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
@@ -93,7 +93,7 @@ final class GenealogySsrController
 
         $html = $this->twig->render('genealogy_family.html.twig', [
             'family' => $family,
-            'member_neighbors' => $this->pedigree->neighborSlots($this->familyService->memberPersonIds($id), $account, $this->gate),
+            'member_neighbors' => $this->pedigree->neighborSlots($this->familyService->memberPersonIds($id, $account), $account, $this->gate),
         ]);
 
         return new Response($html, 200, ['Content-Type' => 'text/html; charset=UTF-8']);
@@ -151,6 +151,7 @@ final class GenealogySsrController
         $personStorage = $this->entityTypeManager->getStorage('genealogy_person');
         $personIds = $personStorage->getQuery()
             ->condition('display_name', GenealogyLocalDemoMarkers::CHILD_PERSON_DISPLAY)
+            // system context: local-demo link discovery runs without an account in scope
             ->accessCheck(false)
             ->range(0, 1)
             ->execute();
@@ -159,6 +160,7 @@ final class GenealogySsrController
         $familyStorage = $this->entityTypeManager->getStorage('genealogy_family');
         $familyIds = $familyStorage->getQuery()
             ->condition('display_name', GenealogyLocalDemoMarkers::FAMILY_DISPLAY)
+            // system context: local-demo link discovery runs without an account in scope
             ->accessCheck(false)
             ->range(0, 1)
             ->execute();

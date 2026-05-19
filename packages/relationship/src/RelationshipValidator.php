@@ -271,6 +271,7 @@ final class RelationshipValidator
         $storage = $this->entityTypeManager->getStorage($entityType);
         $ids = $storage->getQuery()
             ->condition($uuidKey, $candidate)
+            // system context: referential-integrity check spans access boundaries
             ->accessCheck(false)
             ->range(0, 1)
             ->execute();

@@ -46,6 +46,7 @@ final class SqlEntityQueryDataFieldTest extends TestCase
     public function conditionOnDataFieldFindsMatch(): void
     {
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('mail', 'alice@example.com')
             ->execute();
 
@@ -56,6 +57,7 @@ final class SqlEntityQueryDataFieldTest extends TestCase
     public function conditionOnDataFieldReturnsEmptyWhenNoMatch(): void
     {
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('mail', 'nobody@example.com')
             ->execute();
 
@@ -66,6 +68,7 @@ final class SqlEntityQueryDataFieldTest extends TestCase
     public function conditionOnDataFieldWithMultipleResults(): void
     {
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('role', 'volunteer')
             ->execute();
 
@@ -76,6 +79,7 @@ final class SqlEntityQueryDataFieldTest extends TestCase
     public function sortOnDataField(): void
     {
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->sort('mail', 'ASC')
             ->execute();
 
@@ -87,6 +91,7 @@ final class SqlEntityQueryDataFieldTest extends TestCase
     public function sortOnDataFieldDescending(): void
     {
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->sort('mail', 'DESC')
             ->execute();
 
@@ -97,6 +102,7 @@ final class SqlEntityQueryDataFieldTest extends TestCase
     public function containsOnDataField(): void
     {
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('mail', 'bob', 'CONTAINS')
             ->execute();
 
@@ -107,6 +113,7 @@ final class SqlEntityQueryDataFieldTest extends TestCase
     public function mixedColumnAndDataFieldConditions(): void
     {
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('name', 'Bob')
             ->condition('role', 'volunteer')
             ->execute();

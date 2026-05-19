@@ -48,9 +48,15 @@ final class JsonApiController
         $parsedQuery = $parser->parse($query);
         $applier = new QueryApplier();
 
-        // Count total matching entities (before pagination).
+        // Count total matching entities (before pagination). Bind the request's
+        // authenticated account so the query layer filters access at source.
         $countQuery = $storage->getQuery();
-        $countQuery->accessCheck(false);
+        if ($this->account !== null) {
+            $countQuery->setAccount($this->account);
+        } else {
+            // system context: controller invoked without an account in scope
+            $countQuery->accessCheck(false);
+        }
         // Apply only filters to the count query (not sorts/pagination).
         foreach ($parsedQuery->filters as $filter) {
             $countQuery->condition($filter->field, $filter->value, $filter->operator);
@@ -61,7 +67,12 @@ final class JsonApiController
 
         // Build and execute the main query with filters, sorts, and pagination.
         $entityQuery = $storage->getQuery();
-        $entityQuery->accessCheck(false);
+        if ($this->account !== null) {
+            $entityQuery->setAccount($this->account);
+        } else {
+            // system context: controller invoked without an account in scope
+            $entityQuery->accessCheck(false);
+        }
         $applier->apply($parsedQuery, $entityQuery);
 
         $ids = $entityQuery->execute();
@@ -448,7 +459,12 @@ final class JsonApiController
         // If the entity type has a uuid key and the ID looks like a UUID, query by uuid.
         if (isset($keys['uuid']) && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', (string) $id)) {
             $query = $storage->getQuery();
-            $query->accessCheck(false);
+            if ($this->account !== null) {
+                $query->setAccount($this->account);
+            } else {
+                // system context: controller invoked without an account in scope
+                $query->accessCheck(false);
+            }
             $query->condition($keys['uuid'], (string) $id);
             $ids = $query->execute();
             if ($ids === []) {

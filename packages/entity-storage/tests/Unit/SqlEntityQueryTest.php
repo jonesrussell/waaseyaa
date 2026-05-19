@@ -61,7 +61,7 @@ final class SqlEntityQueryTest extends TestCase
     public function testConditionEquals(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
-        $ids = $query->condition('bundle', 'article')->execute();
+        $ids = $query->accessCheck(false)->condition('bundle', 'article')->execute();
 
         $this->assertCount(3, $ids);
         $this->assertContains(1, $ids);
@@ -72,7 +72,7 @@ final class SqlEntityQueryTest extends TestCase
     public function testConditionIn(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
-        $ids = $query->condition('id', [1, 3], 'IN')->execute();
+        $ids = $query->accessCheck(false)->condition('id', [1, 3], 'IN')->execute();
 
         $this->assertCount(2, $ids);
         $this->assertContains(1, $ids);
@@ -82,7 +82,7 @@ final class SqlEntityQueryTest extends TestCase
     public function testExists(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
-        $ids = $query->exists('status')->execute();
+        $ids = $query->accessCheck(false)->exists('status')->execute();
 
         // Rows 1, 2, 3 have non-null status; row 4 has null.
         $this->assertCount(3, $ids);
@@ -92,7 +92,7 @@ final class SqlEntityQueryTest extends TestCase
     public function testNotExists(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
-        $ids = $query->notExists('status')->execute();
+        $ids = $query->accessCheck(false)->notExists('status')->execute();
 
         // Only row 4 has null status.
         $this->assertCount(1, $ids);
@@ -102,7 +102,7 @@ final class SqlEntityQueryTest extends TestCase
     public function testSortAscending(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
-        $ids = $query->sort('label', 'ASC')->execute();
+        $ids = $query->accessCheck(false)->sort('label', 'ASC')->execute();
 
         $this->assertSame([3, 1, 2, 4], $ids);
     }
@@ -110,7 +110,7 @@ final class SqlEntityQueryTest extends TestCase
     public function testSortDescending(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
-        $ids = $query->sort('label', 'DESC')->execute();
+        $ids = $query->accessCheck(false)->sort('label', 'DESC')->execute();
 
         $this->assertSame([4, 2, 1, 3], $ids);
     }
@@ -118,7 +118,7 @@ final class SqlEntityQueryTest extends TestCase
     public function testRange(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
-        $ids = $query->sort('id', 'ASC')->range(1, 2)->execute();
+        $ids = $query->accessCheck(false)->sort('id', 'ASC')->range(1, 2)->execute();
 
         $this->assertCount(2, $ids);
         $this->assertSame([2, 3], $ids);
@@ -127,7 +127,7 @@ final class SqlEntityQueryTest extends TestCase
     public function testCount(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
-        $result = $query->condition('bundle', 'article')->count()->execute();
+        $result = $query->accessCheck(false)->condition('bundle', 'article')->count()->execute();
 
         $this->assertSame([3], $result);
     }
@@ -136,6 +136,7 @@ final class SqlEntityQueryTest extends TestCase
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
         $ids = $query
+            ->accessCheck(false)
             ->condition('bundle', 'article')
             ->condition('langcode', 'en')
             ->sort('label', 'DESC')
@@ -147,15 +148,16 @@ final class SqlEntityQueryTest extends TestCase
         $this->assertSame([2], $ids);
     }
 
-    public function testAccessCheckIsNoOp(): void
+    public function testAccessCheckFalseReturnsFluentInstance(): void
     {
+        // Mission sql-entity-query-access-checking-01KRYP15 WP02: accessCheck()
+        // is no longer a no-op. accessCheck(false) toggles the bypass path
+        // (no hydration, no per-row check) and must remain chainable.
         $query = new SqlEntityQuery($this->entityType, $this->database);
-        $result = $query->accessCheck(true);
+        $result = $query->accessCheck(false);
 
-        // Should return same instance (fluent).
         $this->assertSame($query, $result);
 
-        // Should still execute normally.
         $ids = $result->sort('id', 'ASC')->execute();
         $this->assertCount(4, $ids);
     }

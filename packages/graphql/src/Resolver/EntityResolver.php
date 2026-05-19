@@ -61,8 +61,14 @@ final class EntityResolver
         $offset = isset($args['offset']) ? max(0, (int) $args['offset']) : 0;
         $limit = isset($args['limit']) ? min(self::MAX_LIMIT, max(1, (int) $args['limit'])) : self::DEFAULT_LIMIT;
 
-        // Count query — filters only, no sorts/pagination, access deferred to post-fetch
-        $countQuery = $storage->getQuery()->accessCheck(false);
+        // Count query — filters only, no sorts/pagination, access enforced at query layer.
+        $countQuery = $storage->getQuery();
+        if ($this->account !== null) {
+            $countQuery = $countQuery->setAccount($this->account);
+        } else {
+            // system context: resolver invoked without an account in scope (e.g. internal tooling)
+            $countQuery = $countQuery->accessCheck(false);
+        }
         foreach ($filters as $filter) {
             $countQuery->condition($filter->field, $filter->value, $filter->operator);
         }
@@ -70,7 +76,7 @@ final class EntityResolver
         $countResult = $countQuery->execute();
         $total = (int) ($countResult[0] ?? 0);
 
-        // Main query via QueryApplier — access deferred to post-fetch
+        // Main query via QueryApplier — access enforced at query layer.
         $parsedQuery = new ParsedQuery(
             filters: $filters,
             sorts: $sorts,
@@ -78,7 +84,14 @@ final class EntityResolver
             limit: $limit,
         );
         $applier = new QueryApplier();
-        $mainQuery = $applier->apply($parsedQuery, $storage->getQuery()->accessCheck(false));
+        $baseQuery = $storage->getQuery();
+        if ($this->account !== null) {
+            $baseQuery = $baseQuery->setAccount($this->account);
+        } else {
+            // system context: resolver invoked without an account in scope (e.g. internal tooling)
+            $baseQuery = $baseQuery->accessCheck(false);
+        }
+        $mainQuery = $applier->apply($parsedQuery, $baseQuery);
         $ids = $mainQuery->execute();
 
         $entities = $ids !== [] ? $storage->loadMultiple($ids) : [];
@@ -208,7 +221,14 @@ final class EntityResolver
         if (is_string($id) && isset($keys['uuid'])
             && preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $id)
         ) {
-            $ids = $storage->getQuery()->condition($keys['uuid'], $id)->execute();
+            $uuidQuery = $storage->getQuery()->condition($keys['uuid'], $id);
+            if ($this->account !== null) {
+                $uuidQuery = $uuidQuery->setAccount($this->account);
+            } else {
+                // system context: resolver invoked without an account in scope
+                $uuidQuery = $uuidQuery->accessCheck(false);
+            }
+            $ids = $uuidQuery->execute();
             if ($ids === []) {
                 return null;
             }

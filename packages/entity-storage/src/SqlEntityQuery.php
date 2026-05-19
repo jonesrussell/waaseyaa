@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Waaseyaa\EntityStorage;
 
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Database\DatabaseInterface;
+use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\EntityStorage\Exception\BundleAmbiguousFieldException;
+use Waaseyaa\EntityStorage\Exception\MissingQueryAccountException;
 use Waaseyaa\EntityStorage\Exception\UnknownFieldException;
 use Waaseyaa\Field\FieldDefinitionInterface;
 use Waaseyaa\Field\FieldStorage;
@@ -26,6 +30,13 @@ use Waaseyaa\Field\FieldStorage;
  * field names that exist in multiple bundles must be narrowed by an explicit
  * bundle condition (or by a sibling bundle-scoped condition that uniquely
  * identifies the bundle).
+ *
+ * Access checking is enabled by default (see {@see accessCheck()}). When
+ * enabled, `execute()` hydrates each candidate row, runs
+ * `EntityAccessHandler::check($entity, 'view', $account)`, and drops rows
+ * whose result is Forbidden. Callers MUST bind an account via
+ * {@see setAccount()} before execution; otherwise
+ * {@see MissingQueryAccountException} is thrown (fail-closed).
  */
 final class SqlEntityQuery implements EntityQueryInterface
 {
@@ -55,6 +66,51 @@ final class SqlEntityQuery implements EntityQueryInterface
      * @var array<string, true>|null
      */
     private ?array $dataStoredCoreFieldNames = null;
+
+    /**
+     * Account bound to this query for per-row access checking. When
+     * {@see $accessCheckEnabled} is true and this is null, {@see execute()}
+     * throws {@see MissingQueryAccountException} (fail-closed per FR-005 / C-006).
+     */
+    private ?AccountInterface $account = null;
+
+    /**
+     * When true (the default), {@see execute()} runs an
+     * `EntityAccessHandler::check($entity, 'view', $account)` per candidate row
+     * and drops rows whose result is Forbidden. When false, the candidate IDs
+     * are returned without hydration — a fast bypass path reserved for system
+     * contexts (background jobs, index warmers) per FR-004 / C-004.
+     */
+    private bool $accessCheckEnabled = true;
+
+    /**
+     * Lazy-resolved {@see EntityAccessHandler} consulted by {@see execute()}
+     * when access checking is enabled. The query has no constructor-injected
+     * DI container; the handler is injected via {@see withAccessHandler()}
+     * (used by `SqlEntityStorage::getQuery()` wiring in WP03 / by test
+     * harnesses), or — as a safe fallback — lazy-instantiated as an empty
+     * handler that returns Neutral for every entity. Neutral is not Forbidden,
+     * so the fallback acts as an open-by-default pass-through and does not
+     * silently lock callers out before WP03 wires real policies in.
+     */
+    private ?EntityAccessHandler $accessHandler = null;
+
+    /**
+     * Optional hydrator callable used by {@see execute()} to materialize
+     * candidate rows into entity objects for the per-row access check. The
+     * callable signature is `callable(array<int, int|string>): array<int|string, EntityInterface>`
+     * where the input is the list of candidate IDs and the output is an
+     * id-keyed map of hydrated entities. Injected by
+     * {@see withEntityLoader()}; the natural production binding is
+     * `$storage->loadMultiple(...)` (wired in WP03). When the loader is null
+     * and access checking is enabled, the query returns the candidate IDs
+     * unfiltered — the access handler cannot run without entities to inspect.
+     * This null-loader path is the pre-WP03 transitional behaviour; once WP03
+     * wires every consumer, the loader is always set when the handler is set.
+     *
+     * @var (callable(array<int, int|string>): array<int|string, EntityInterface>)|null
+     */
+    private $entityLoader = null;
 
     public function __construct(
         private readonly EntityTypeInterface $entityType,
@@ -111,6 +167,17 @@ final class SqlEntityQuery implements EntityQueryInterface
         return $this;
     }
 
+    /**
+     * Set the SQL `LIMIT`/`OFFSET` for the candidate page.
+     *
+     * Cursor contract (FR-007): the page cursor advances by the **unfiltered
+     * candidate window**. Paginated callers MUST advance by adding `$limit` to
+     * the previous `$offset`, NOT by adding `count(execute())`. Example: a
+     * 25-row page request may return 18 surviving rows after access
+     * filtering; the next-page cursor is `offset + 25` (not `offset + 18`).
+     * This guarantees successive page requests do not re-scan candidates
+     * already evaluated for the same query.
+     */
     public function range(int $offset, int $limit): static
     {
         $this->rangeOffset = $offset;
@@ -128,7 +195,53 @@ final class SqlEntityQuery implements EntityQueryInterface
 
     public function accessCheck(bool $check = true): static
     {
-        // No-op in v0.1.0 — access checking is not implemented yet.
+        $this->accessCheckEnabled = $check;
+
+        return $this;
+    }
+
+    public function setAccount(?AccountInterface $account): static
+    {
+        $this->account = $account;
+
+        return $this;
+    }
+
+    /**
+     * Inject the {@see EntityAccessHandler} consulted by {@see execute()}.
+     *
+     * Package-internal wiring helper. The production binding is performed by
+     * `SqlEntityStorage::getQuery()` (WP03); test harnesses inject directly.
+     * Returning `$this` keeps the fluent interface consistent with the
+     * existing chainable surface.
+     *
+     * @api
+     */
+    public function withAccessHandler(EntityAccessHandler $handler): static
+    {
+        $this->accessHandler = $handler;
+
+        return $this;
+    }
+
+    /**
+     * Inject the hydrator callable used to materialize candidate rows for
+     * the per-row access check.
+     *
+     * Signature: `callable(array<int, int|string>): array<int|string, EntityInterface>`.
+     * The input is the list of candidate IDs from the SQL window; the output
+     * is an id-keyed map of hydrated entities (matching
+     * `EntityStorageInterface::loadMultiple()`'s shape so the natural
+     * production binding is `$storage->loadMultiple(...)`).
+     *
+     * @param callable(array<int, int|string>): array<int|string, EntityInterface> $loader
+     *
+     * @api
+     */
+    public function withEntityLoader(callable $loader): static
+    {
+        $this->entityLoader = $loader;
+
         return $this;
     }
 
@@ -215,6 +328,87 @@ final class SqlEntityQuery implements EntityQueryInterface
         }
 
         return $this->dataStoredCoreFieldNames = $names;
+    }
+
+    /**
+     * Resolve (and cache) the {@see EntityAccessHandler} used by
+     * {@see execute()}.
+     *
+     * The query intentionally avoids constructor DI for the handler (the
+     * single factory site is `SqlEntityStorage::getQuery()` and we do not
+     * want to thread access wiring through every storage subclass). Instead,
+     * the production binding flows through {@see withAccessHandler()} (wired
+     * by WP03's `getQuery()` update). Until WP03 lands, callers that have
+     * not bound a handler get an empty handler whose `check()` returns
+     * Neutral for every entity — a pass-through that does not block
+     * legitimate queries while the consumer sweep is in flight.
+     */
+    private function resolveAccessHandler(): EntityAccessHandler
+    {
+        return $this->accessHandler ??= new EntityAccessHandler();
+    }
+
+    /**
+     * Hydrate the candidate IDs into entities, run the per-row access check,
+     * and return survivors as a list of IDs (or, when {@see $isCount} is
+     * true, as `[count($survivors)]`).
+     *
+     * Centralises the post-SQL filter so that {@see execute()} and the
+     * `count()` branch share one machinery — no duplicated SQL count path,
+     * no risk that the cardinality and the page diverge.
+     *
+     * @param array<int, int|string> $candidateIds
+     * @return array<int, int|string>
+     */
+    private function filterCandidates(array $candidateIds): array
+    {
+        if ($candidateIds === []) {
+            return $this->isCount ? [0] : [];
+        }
+
+        // FR-007: the candidate window is the unfiltered SQL `LIMIT/OFFSET`
+        // window. Hydration here does not advance the cursor — successive
+        // pages still index by `$offset + $limit`, not by survivor count.
+        $entities = $this->entityLoader !== null
+            ? ($this->entityLoader)($candidateIds)
+            : [];
+
+        // Without a hydrator, we cannot run a per-row entity check. This is
+        // the pre-WP03 transitional path: behave as a pass-through so that
+        // callers which have not yet been wired up by WP03 keep returning
+        // candidate IDs. The throw on missing account in execute() still
+        // enforces fail-closed at the contract level.
+        if ($entities === []) {
+            return $this->isCount ? [\count($candidateIds)] : $candidateIds;
+        }
+
+        $handler = $this->resolveAccessHandler();
+        $account = $this->account;
+        \assert($account !== null, 'Account must be bound; checked in execute() before filterCandidates() is called.');
+
+        $survivors = [];
+        // Preserve the SQL-side ordering — iterate candidate IDs, not the
+        // hydrator's return order (which may be id-keyed and lose order).
+        foreach ($candidateIds as $id) {
+            $entity = $entities[$id] ?? null;
+            if (!$entity instanceof EntityInterface) {
+                // Loader did not return an entity for this id (row vanished
+                // between SQL and hydration, or the loader filtered it out).
+                // Drop the row defensively — a missing entity cannot be
+                // proved allowed.
+                continue;
+            }
+
+            if (!$handler->check($entity, 'view', $account)->isForbidden()) {
+                $survivors[] = $id;
+            }
+        }
+
+        if ($this->isCount) {
+            return [\count($survivors)];
+        }
+
+        return $survivors;
     }
 
     /**
@@ -467,12 +661,26 @@ final class SqlEntityQuery implements EntityQueryInterface
     /**
      * Execute the query and return entity IDs.
      *
-     * When count() has been called, returns a single-element array with the count.
+     * When `count()` has been called, returns a single-element array with the
+     * cardinality (post-filter when access checking is enabled, pre-filter
+     * when bypassed).
+     *
+     * Security contract (FR-005 / C-006): when access checking is enabled
+     * and no account is bound, throws {@see MissingQueryAccountException}
+     * BEFORE any database work — the throw is the first statement in this
+     * method so callers fail closed without any observable side effect.
      *
      * @return array<int|string>
      */
     public function execute(): array
     {
+        // FR-005 / C-006: fail closed. The throw precedes every other side
+        // effect (no SQL, no cache lookup, no logging) so callers cannot
+        // observe a partial result without an authenticated principal.
+        if ($this->accessCheckEnabled && $this->account === null) {
+            throw MissingQueryAccountException::forQuery($this->entityType);
+        }
+
         $entityTypeId = $this->entityType->id();
         $fingerprint = $this->resultCache !== null ? $this->buildCacheFingerprint() : null;
 
@@ -489,7 +697,13 @@ final class SqlEntityQuery implements EntityQueryInterface
 
         $select = $this->database->select($this->tableName);
 
-        if ($this->isCount) {
+        // When access checking is enabled we always materialize candidate IDs
+        // (so the filter can run on hydrated rows) and compute count() in PHP
+        // from the survivor list. When bypassed, the existing SQL COUNT(*)
+        // fast path is preserved.
+        $useSqlCount = $this->isCount && !$this->accessCheckEnabled;
+
+        if ($useSqlCount) {
             $select = $select->countQuery();
         } else {
             $select = $select->addField($this->tableName, $this->idKey);
@@ -561,7 +775,8 @@ final class SqlEntityQuery implements EntityQueryInterface
 
         $result = $select->execute();
 
-        if ($this->isCount) {
+        if ($useSqlCount) {
+            // Bypass fast path: SQL COUNT(*) without hydration. C-004 / FR-004.
             $countResult = [0];
             foreach ($result as $row) {
                 $row = (array) $row;
@@ -586,10 +801,26 @@ final class SqlEntityQuery implements EntityQueryInterface
             $ids[] = $id;
         }
 
-        if ($fingerprint !== null) {
-            $this->resultCache->set($entityTypeId, $fingerprint, $ids);
+        if (!$this->accessCheckEnabled) {
+            // C-004 bypass: skip hydration entirely and return candidate IDs
+            // (or candidate count, when isCount && bypassed — handled above
+            // via SQL COUNT).
+            if ($fingerprint !== null) {
+                $this->resultCache->set($entityTypeId, $fingerprint, $ids);
+            }
+
+            return $ids;
         }
 
-        return $ids;
+        // Slow path: hydrate the candidate window, run per-row
+        // EntityAccessHandler::check(), drop Forbidden rows. count() reuses
+        // this machinery — no duplicated SQL count branch (FR-006).
+        $filtered = $this->filterCandidates($ids);
+
+        if ($fingerprint !== null) {
+            $this->resultCache->set($entityTypeId, $fingerprint, $filtered);
+        }
+
+        return $filtered;
     }
 }

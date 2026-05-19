@@ -170,7 +170,14 @@ final class SearchController
 
         try {
             $relationshipStorage = $this->entityTypeManager->getStorage('relationship');
-            $relationshipIds = $relationshipStorage->getQuery()->accessCheck(false)->execute();
+            $relationshipQuery = $relationshipStorage->getQuery();
+            if ($this->account !== null) {
+                $relationshipQuery = $relationshipQuery->setAccount($this->account);
+            } else {
+                // system context: anonymous reranker scope; no account in scope
+                $relationshipQuery = $relationshipQuery->accessCheck(false);
+            }
+            $relationshipIds = $relationshipQuery->execute();
             if ($relationshipIds === []) {
                 return [
                     'ids' => $ids,
@@ -300,10 +307,16 @@ final class SearchController
         $candidateIds = [];
         foreach (['title', 'name', 'body'] as $field) {
             try {
-                $ids = $storage->getQuery()
+                $keywordQuery = $storage->getQuery()
                     ->condition($field, $query, 'CONTAINS')
-                    ->range(0, $limit)
-                    ->execute();
+                    ->range(0, $limit);
+                if ($this->account !== null) {
+                    $keywordQuery = $keywordQuery->setAccount($this->account);
+                } else {
+                    // system context: keyword fallback runs without an account in scope
+                    $keywordQuery = $keywordQuery->accessCheck(false);
+                }
+                $ids = $keywordQuery->execute();
             } catch (\Throwable) {
                 continue;
             }

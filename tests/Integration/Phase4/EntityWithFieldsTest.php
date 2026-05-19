@@ -191,7 +191,7 @@ final class EntityWithFieldsTest extends TestCase
     {
         $this->createSampleProducts();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('bundle', 'physical')
             ->execute();
 
@@ -202,7 +202,7 @@ final class EntityWithFieldsTest extends TestCase
     {
         $this->createSampleProducts();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('sku', 'LAP-001')
             ->execute();
 
@@ -215,7 +215,7 @@ final class EntityWithFieldsTest extends TestCase
     {
         $this->createSampleProducts();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->sort('price', 'ASC')
             ->execute();
 
@@ -234,7 +234,7 @@ final class EntityWithFieldsTest extends TestCase
     {
         $this->createSampleProducts();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->sort('price', 'DESC')
             ->range(0, 2)
             ->execute();
@@ -256,7 +256,7 @@ final class EntityWithFieldsTest extends TestCase
     {
         $this->createSampleProducts();
 
-        $result = $this->storage->getQuery()
+        $result = $this->storage->getQuery()->accessCheck(false)
             ->condition('is_active', 1)
             ->count()
             ->execute();
@@ -269,7 +269,7 @@ final class EntityWithFieldsTest extends TestCase
     {
         $this->createSampleProducts();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('bundle', 'physical')
             ->condition('is_active', 1)
             ->execute();

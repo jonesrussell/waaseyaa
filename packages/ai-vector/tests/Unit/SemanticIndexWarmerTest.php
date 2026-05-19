@@ -7,6 +7,7 @@ namespace Waaseyaa\AI\Vector\Tests\Unit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\AI\Vector\EmbeddingProviderInterface;
 use Waaseyaa\AI\Vector\EmbeddingStorageInterface;
 use Waaseyaa\AI\Vector\SemanticIndexWarmer;
@@ -29,6 +30,7 @@ final class SemanticIndexWarmerTest extends TestCase
             public function range(int $offset, int $limit): static { return $this; }
             public function count(): static { return $this; }
             public function accessCheck(bool $check = true): static { return $this; }
+            public function setAccount(?AccountInterface $account): static { return $this; }
             public function execute(): array { return [3, 1, 2]; }
         };
 
@@ -114,6 +116,7 @@ final class SemanticIndexWarmerTest extends TestCase
             public function range(int $offset, int $limit): static { return $this; }
             public function count(): static { return $this; }
             public function accessCheck(bool $check = true): static { return $this; }
+            public function setAccount(?AccountInterface $account): static { return $this; }
             public function execute(): array { return [1, 2, 3]; }
         };
 

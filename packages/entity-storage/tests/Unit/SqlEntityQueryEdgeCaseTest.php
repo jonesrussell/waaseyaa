@@ -69,6 +69,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryWithEmptyConditionsReturnsAllEntities(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->execute();
 
         $this->assertCount(4, $ids);
@@ -82,6 +83,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryWithNoMatchesReturnsEmptyArray(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('bundle', 'nonexistent_bundle')->execute();
 
         $this->assertSame([], $ids);
@@ -92,6 +94,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     {
         // Sort by bundle ASC, then by label ASC within each bundle.
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query
             ->sort('bundle', 'ASC')
             ->sort('label', 'ASC')
@@ -106,6 +109,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     {
         // Sort by bundle ASC, then by priority DESC within each bundle.
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query
             ->sort('bundle', 'ASC')
             ->sort('priority', 'DESC')
@@ -119,6 +123,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryRangeWithZeroOffset(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->sort('id', 'ASC')->range(0, 2)->execute();
 
         $this->assertCount(2, $ids);
@@ -129,6 +134,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryRangeWithLargeOffsetReturnsEmpty(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->sort('id', 'ASC')->range(100, 10)->execute();
 
         $this->assertSame([], $ids);
@@ -138,6 +144,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryRangeWithLimitOfOne(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->sort('id', 'ASC')->range(0, 1)->execute();
 
         $this->assertCount(1, $ids);
@@ -148,6 +155,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryCountWithNoConditions(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $result = $query->count()->execute();
 
         $this->assertSame([4], $result);
@@ -157,6 +165,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryCountWithNoMatchesReturnsZero(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $result = $query->condition('bundle', 'nonexistent')->count()->execute();
 
         $this->assertSame([0], $result);
@@ -166,6 +175,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryFluentInterfaceReturnsSameInstance(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
 
         $result = $query
             ->condition('bundle', 'article')
@@ -180,6 +190,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryWithEmptyArrayInOperatorReturnsNoResults(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('id', [], 'IN')->execute();
 
         // Empty IN() matches nothing — no rows satisfy "id IN ()".
@@ -190,6 +201,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
     public function queryWithEmptyArrayNotInOperatorReturnsNoResults(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('id', [], 'NOT IN')->execute();
 
         // DBAL produces empty parameter list for NOT IN(), which matches nothing.
@@ -212,6 +224,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
 
         // Query on a _data field using > operator.
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('score', 50, '>')->execute();
 
         $this->assertCount(1, $ids);
@@ -228,6 +241,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
             ->execute();
 
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('tag', 'important', 'CONTAINS')->execute();
 
         $this->assertCount(1, $ids);
@@ -249,6 +263,7 @@ final class SqlEntityQueryEdgeCaseTest extends TestCase
 
         // Sort by data field, filtering to only our inserted rows.
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query
             ->condition('id', [20, 21], 'IN')
             ->sort('weight', 'ASC')

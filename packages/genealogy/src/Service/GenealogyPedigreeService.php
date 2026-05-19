@@ -25,11 +25,16 @@ final class GenealogyPedigreeService
     /**
      * @return list<string>
      */
-    public function parentPersonIds(string $personId): array
+    public function parentPersonIds(string $personId, ?AccountInterface $account = null): array
     {
         $storage = $this->relationshipStorage();
         $q = $storage->getQuery();
-        $q->accessCheck(false);
+        if ($account !== null) {
+            $q->setAccount($account);
+        } else {
+            // system context: caller did not thread an account; relationship topology only
+            $q->accessCheck(false);
+        }
         $q->condition('relationship_type', GenealogyRelationshipType::PARENT_OF);
         $q->condition('to_entity_type', 'genealogy_person');
         $q->condition('to_entity_id', $personId);
@@ -43,11 +48,16 @@ final class GenealogyPedigreeService
     /**
      * @return list<string>
      */
-    public function childPersonIds(string $personId): array
+    public function childPersonIds(string $personId, ?AccountInterface $account = null): array
     {
         $storage = $this->relationshipStorage();
         $q = $storage->getQuery();
-        $q->accessCheck(false);
+        if ($account !== null) {
+            $q->setAccount($account);
+        } else {
+            // system context: caller did not thread an account; relationship topology only
+            $q->accessCheck(false);
+        }
         $q->condition('relationship_type', GenealogyRelationshipType::PARENT_OF);
         $q->condition('from_entity_type', 'genealogy_person');
         $q->condition('from_entity_id', $personId);
@@ -61,11 +71,11 @@ final class GenealogyPedigreeService
     /**
      * @return list<string>
      */
-    public function spousePersonIds(string $personId): array
+    public function spousePersonIds(string $personId, ?AccountInterface $account = null): array
     {
         $storage = $this->relationshipStorage();
         $ids = [];
-        foreach ($this->edgesForSpouse($storage, $personId) as $edge) {
+        foreach ($this->edgesForSpouse($storage, $personId, $account) as $edge) {
             $other = $this->otherPersonId($edge, $personId);
             if ($other !== null) {
                 $ids[] = $other;
@@ -80,7 +90,7 @@ final class GenealogyPedigreeService
      *
      * @return list<list<string>>
      */
-    public function ancestorGenerations(string $personId, int $maxGenerations = 8): array
+    public function ancestorGenerations(string $personId, int $maxGenerations = 8, ?AccountInterface $account = null): array
     {
         $maxGenerations = max(1, $maxGenerations);
         $levels = [[$personId]];
@@ -90,7 +100,7 @@ final class GenealogyPedigreeService
             $prev = $levels[$g - 1];
             $next = [];
             foreach ($prev as $pid) {
-                foreach ($this->parentPersonIds($pid) as $parentId) {
+                foreach ($this->parentPersonIds($pid, $account) as $parentId) {
                     if (!isset($seen[$parentId])) {
                         $seen[$parentId] = true;
                         $next[] = $parentId;
@@ -151,7 +161,7 @@ final class GenealogyPedigreeService
         GateInterface $gate,
         int $maxGenerations = 8,
     ): array {
-        $levels = $this->ancestorGenerations($personId, $maxGenerations);
+        $levels = $this->ancestorGenerations($personId, $maxGenerations, $account);
         $out = [];
         foreach ($levels as $i => $idsAtLevel) {
             if ($i === 0) {
@@ -219,11 +229,16 @@ final class GenealogyPedigreeService
     /**
      * @return iterable<Relationship>
      */
-    private function edgesForSpouse(EntityStorageInterface $storage, string $personId): iterable
+    private function edgesForSpouse(EntityStorageInterface $storage, string $personId, ?AccountInterface $account = null): iterable
     {
         foreach (['from_entity_id', 'to_entity_id'] as $field) {
             $q = $storage->getQuery();
-            $q->accessCheck(false);
+            if ($account !== null) {
+                $q->setAccount($account);
+            } else {
+                // system context: caller did not thread an account; relationship topology only
+                $q->accessCheck(false);
+            }
             $q->condition('relationship_type', GenealogyRelationshipType::SPOUSE_OF);
             $q->condition('from_entity_type', 'genealogy_person');
             $q->condition('to_entity_type', 'genealogy_person');

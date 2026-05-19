@@ -267,7 +267,7 @@ final class Mission1257KernelPathTest extends TestCase
 
         // Read side: condition() resolves via `json_extract(_data, ...)`,
         // never through a column lookup.
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('rank', 7)
             ->execute();
         self::assertSame([$entity->id()], $ids);
@@ -288,14 +288,14 @@ final class Mission1257KernelPathTest extends TestCase
         $this->storage->save($entity);
 
         // Control: integer binding works.
-        $idsInt = $this->storage->getQuery()
+        $idsInt = $this->storage->getQuery()->accessCheck(false)
             ->condition('rank', 13)
             ->execute();
         self::assertSame([$entity->id()], $idsInt, 'integer binding (control)');
 
         // The mission anchor (#1257): numeric-string against integer-typed
         // `_data` field. Pre-WP05 returned no rows.
-        $idsString = $this->storage->getQuery()
+        $idsString = $this->storage->getQuery()->accessCheck(false)
             ->condition('rank', '13')
             ->execute();
         self::assertSame(
@@ -316,7 +316,7 @@ final class Mission1257KernelPathTest extends TestCase
         $this->storage->save($b);
         $this->storage->save($c);
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('rank', ['1', 3], 'IN')
             ->execute();
         sort($ids);

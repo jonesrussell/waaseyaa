@@ -26,6 +26,8 @@ final class OidcClientLookup
         }
 
         $ids = $this->storage->getQuery()
+            // system context: client registry lookup runs pre-auth
+            ->accessCheck(false)
             ->condition('client_id', $clientId)
             ->execute();
 

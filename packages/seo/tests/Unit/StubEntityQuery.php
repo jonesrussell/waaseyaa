@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Seo\Tests\Unit;
 
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 
 /**
@@ -47,6 +48,11 @@ final class StubEntityQuery implements EntityQueryInterface
     }
 
     public function accessCheck(bool $check = true): static
+    {
+        return $this;
+    }
+
+    public function setAccount(?AccountInterface $account): static
     {
         return $this;
     }

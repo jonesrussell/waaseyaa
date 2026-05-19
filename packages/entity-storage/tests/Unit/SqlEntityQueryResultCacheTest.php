@@ -60,6 +60,7 @@ final class SqlEntityQueryResultCacheTest extends TestCase
     {
         $cache = new SqlEntityQueryResultCache();
         $query = new SqlEntityQuery($this->entityType, $this->database, $cache);
+        $query->accessCheck(false);
 
         $idsFirst = $query->condition('bundle', 'article')->execute();
         $this->assertSame([1], $idsFirst);
@@ -70,12 +71,14 @@ final class SqlEntityQueryResultCacheTest extends TestCase
             ->execute();
 
         $query2 = new SqlEntityQuery($this->entityType, $this->database, $cache);
+        $query2->accessCheck(false);
         $idsStale = $query2->condition('bundle', 'article')->execute();
         $this->assertSame([1], $idsStale);
 
         $cache->invalidate('cache_test_entity');
 
         $query3 = new SqlEntityQuery($this->entityType, $this->database, $cache);
+        $query3->accessCheck(false);
         $idsFresh = $query3->condition('bundle', 'article')->execute();
         $this->assertCount(2, $idsFresh);
         $this->assertContains(1, $idsFresh);
@@ -89,7 +92,7 @@ final class SqlEntityQueryResultCacheTest extends TestCase
         $dispatcher = new EventDispatcher();
         $storage = new SqlEntityStorage($this->entityType, $this->database, $dispatcher, queryResultCache: $cache);
 
-        $before = $storage->getQuery()->condition('bundle', 'article')->execute();
+        $before = $storage->getQuery()->accessCheck(false)->condition('bundle', 'article')->execute();
         $this->assertSame([1], $before);
 
         $entity = $storage->create([
@@ -101,7 +104,7 @@ final class SqlEntityQueryResultCacheTest extends TestCase
         ]);
         $storage->save($entity);
 
-        $after = $storage->getQuery()->condition('bundle', 'article')->execute();
+        $after = $storage->getQuery()->accessCheck(false)->condition('bundle', 'article')->execute();
         $this->assertCount(2, $after);
     }
 }

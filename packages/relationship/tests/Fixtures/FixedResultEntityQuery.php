@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Relationship\Tests\Fixtures;
 
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 
 /**
@@ -29,6 +30,7 @@ class FixedResultEntityQuery implements EntityQueryInterface
     public function range(int $offset, int $limit): static { return $this; }
     public function count(): static { return $this; }
     public function accessCheck(bool $check = true): static { return $this; }
+    public function setAccount(?AccountInterface $account): static { return $this; }
 
     public function getCallCount(): int
     {

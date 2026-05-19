@@ -36,11 +36,13 @@ final class RelationshipDeleteGuardListener
         $outbound = $relationshipStorage->getQuery()
             ->condition('from_entity_type', $this->guardedEntityType)
             ->condition('from_entity_id', $idString)
+            // system context: referential-integrity check spans access boundaries
             ->accessCheck(false)
             ->execute();
         $inbound = $relationshipStorage->getQuery()
             ->condition('to_entity_type', $this->guardedEntityType)
             ->condition('to_entity_id', $idString)
+            // system context: referential-integrity check spans access boundaries
             ->accessCheck(false)
             ->execute();
 

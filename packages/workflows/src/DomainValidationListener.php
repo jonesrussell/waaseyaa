@@ -132,6 +132,7 @@ final class DomainValidationListener
         $nodeStorage = $this->entityTypeManager->getStorage('node');
         $ids = $nodeStorage->getQuery()
             ->condition('type', $bundle)
+            // system context: workflow validator runs inside save transaction; needs unrestricted read
             ->accessCheck(false)
             ->execute();
         if ($ids === []) {

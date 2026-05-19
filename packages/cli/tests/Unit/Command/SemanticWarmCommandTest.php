@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\AI\Vector\EmbeddingProviderInterface;
 use Waaseyaa\AI\Vector\EmbeddingStorageInterface;
 use Waaseyaa\AI\Vector\SemanticIndexWarmer;
@@ -79,6 +80,7 @@ final class SemanticWarmCommandTest extends TestCase
             public function range(int $offset, int $limit): static { return $this; }
             public function count(): static { return $this; }
             public function accessCheck(bool $check = true): static { return $this; }
+            public function setAccount(?AccountInterface $account): static { return $this; }
             public function execute(): array { return [1]; }
         };
 

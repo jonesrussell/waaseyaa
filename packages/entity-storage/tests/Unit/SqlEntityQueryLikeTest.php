@@ -46,6 +46,7 @@ final class SqlEntityQueryLikeTest extends TestCase
         $this->storage->save($this->storage->create(['title' => 'World Peace']));
 
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('title', 'World', 'CONTAINS')
             ->execute();
 
@@ -60,6 +61,7 @@ final class SqlEntityQueryLikeTest extends TestCase
         $this->storage->save($this->storage->create(['title' => 'Hello Again']));
 
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('title', 'Hello', 'STARTS_WITH')
             ->execute();
 
@@ -73,6 +75,7 @@ final class SqlEntityQueryLikeTest extends TestCase
         $this->storage->save($this->storage->create(['title' => '100 items found']));
 
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('title', '100%', 'CONTAINS')
             ->execute();
 
@@ -87,6 +90,7 @@ final class SqlEntityQueryLikeTest extends TestCase
         $this->storage->save($this->storage->create(['title' => 'hello world']));
 
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('title', 'hello', 'CONTAINS')
             ->execute();
 

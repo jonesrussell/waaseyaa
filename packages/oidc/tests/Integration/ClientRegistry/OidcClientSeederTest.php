@@ -46,7 +46,7 @@ final class OidcClientSeederTest extends TestCase
     public function testSeedEmptyConfigIsNoOp(): void
     {
         $this->seeder->seed([]);
-        $this->assertCount(0, $this->storage->getQuery()->execute());
+        $this->assertCount(0, $this->storage->getQuery()->accessCheck(false)->execute());
     }
 
     public function testSeedCreatesNewClient(): void
@@ -58,7 +58,7 @@ final class OidcClientSeederTest extends TestCase
             ],
         ]);
 
-        $ids = $this->storage->getQuery()->condition('client_id', 'minoo-web')->execute();
+        $ids = $this->storage->getQuery()->accessCheck(false)->condition('client_id', 'minoo-web')->execute();
         $this->assertCount(1, $ids);
 
         $client = $this->storage->load($ids[0]);
@@ -82,7 +82,7 @@ final class OidcClientSeederTest extends TestCase
             ],
         ]);
 
-        $ids = $this->storage->getQuery()->condition('client_id', 'biindigen')->execute();
+        $ids = $this->storage->getQuery()->accessCheck(false)->condition('client_id', 'biindigen')->execute();
         $client = $this->storage->load($ids[0]);
         $this->assertSame(['openid', 'profile', 'email'], $client->getScopes());
         $this->assertSame(['authorization_code', 'refresh_token'], $client->getGrantTypes());
@@ -99,7 +99,7 @@ final class OidcClientSeederTest extends TestCase
                 'redirect_uris' => ['https://minoo.test/callback'],
             ],
         ]);
-        $ids = $this->storage->getQuery()->condition('client_id', 'minoo-web')->execute();
+        $ids = $this->storage->getQuery()->accessCheck(false)->condition('client_id', 'minoo-web')->execute();
         $originalId = $ids[0];
         $originalUuid = $this->storage->load($originalId)->uuid();
 
@@ -116,7 +116,7 @@ final class OidcClientSeederTest extends TestCase
         ]);
 
         // Still only one row.
-        $this->assertCount(1, $this->storage->getQuery()->condition('client_id', 'minoo-web')->execute());
+        $this->assertCount(1, $this->storage->getQuery()->accessCheck(false)->condition('client_id', 'minoo-web')->execute());
 
         // Updated in place: same id, same uuid, new fields.
         $reloaded = $this->storage->load($originalId);
@@ -143,7 +143,7 @@ final class OidcClientSeederTest extends TestCase
         $this->seeder->seed($config);
         $this->seeder->seed($config);
 
-        $this->assertCount(1, $this->storage->getQuery()->execute());
+        $this->assertCount(1, $this->storage->getQuery()->accessCheck(false)->execute());
     }
 
     public function testSeedDoesNotDeleteAdminCreatedClients(): void
@@ -167,7 +167,7 @@ final class OidcClientSeederTest extends TestCase
         // Admin client survives.
         $this->assertCount(
             1,
-            $this->storage->getQuery()->condition('client_id', 'admin-added')->execute(),
+            $this->storage->getQuery()->accessCheck(false)->condition('client_id', 'admin-added')->execute(),
             'admin-added client must not be deleted by seeder',
         );
     }
@@ -179,7 +179,7 @@ final class OidcClientSeederTest extends TestCase
             'minoo-web' => ['name' => 'Minoo', 'redirect_uris' => ['https://minoo.test/cb']],
             'biindigen' => ['name' => 'Biindigen', 'redirect_uris' => ['https://biindigen.test/cb']],
         ]);
-        $this->assertCount(2, $this->storage->getQuery()->execute());
+        $this->assertCount(2, $this->storage->getQuery()->accessCheck(false)->execute());
 
         // Re-seed with only one.
         $this->seeder->seed([
@@ -187,7 +187,7 @@ final class OidcClientSeederTest extends TestCase
         ]);
 
         // biindigen was NOT deleted — config removal is non-destructive.
-        $this->assertCount(2, $this->storage->getQuery()->execute());
+        $this->assertCount(2, $this->storage->getQuery()->accessCheck(false)->execute());
     }
 
     public function testSeedThrowsOnMissingName(): void

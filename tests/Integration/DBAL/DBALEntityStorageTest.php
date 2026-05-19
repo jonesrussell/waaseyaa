@@ -292,7 +292,7 @@ final class DBALEntityStorageTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('bundle', 'blog')
             ->execute();
 
@@ -303,7 +303,7 @@ final class DBALEntityStorageTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->sort('title', 'DESC')
             ->execute();
 
@@ -321,7 +321,7 @@ final class DBALEntityStorageTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->sort('id', 'ASC')
             ->range(0, 2)
             ->execute();
@@ -338,21 +338,21 @@ final class DBALEntityStorageTest extends TestCase
         }
 
         // Page 1.
-        $page1 = $this->storage->getQuery()
+        $page1 = $this->storage->getQuery()->accessCheck(false)
             ->sort('id', 'ASC')
             ->range(0, 2)
             ->execute();
         $this->assertCount(2, $page1);
 
         // Page 2.
-        $page2 = $this->storage->getQuery()
+        $page2 = $this->storage->getQuery()->accessCheck(false)
             ->sort('id', 'ASC')
             ->range(2, 2)
             ->execute();
         $this->assertCount(2, $page2);
 
         // Page 3 (only 1 remaining).
-        $page3 = $this->storage->getQuery()
+        $page3 = $this->storage->getQuery()->accessCheck(false)
             ->sort('id', 'ASC')
             ->range(4, 2)
             ->execute();
@@ -366,7 +366,7 @@ final class DBALEntityStorageTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $result = $this->storage->getQuery()
+        $result = $this->storage->getQuery()->accessCheck(false)
             ->condition('bundle', 'blog')
             ->count()
             ->execute();
@@ -378,7 +378,7 @@ final class DBALEntityStorageTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('bundle', 'blog')
             ->condition('title', 'Blog Post 1')
             ->execute();
@@ -390,7 +390,7 @@ final class DBALEntityStorageTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('title', 'Blog', 'CONTAINS')
             ->execute();
 
@@ -401,7 +401,7 @@ final class DBALEntityStorageTest extends TestCase
     {
         $this->createSampleEntities();
 
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('title', 'About', 'STARTS_WITH')
             ->execute();
 
@@ -421,13 +421,13 @@ final class DBALEntityStorageTest extends TestCase
         $this->storage->save($e3);
 
         // CONTAINS with % in user input should only match the literal %.
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('title', '100%', 'CONTAINS')
             ->execute();
         $this->assertCount(1, $ids);
 
         // CONTAINS with _ in user input should only match the literal _.
-        $ids = $this->storage->getQuery()
+        $ids = $this->storage->getQuery()->accessCheck(false)
             ->condition('title', 'field_', 'CONTAINS')
             ->execute();
         $this->assertCount(1, $ids);

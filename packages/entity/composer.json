@@ -6,6 +6,10 @@
     "repositories": [
         {
             "type": "path",
+            "url": "../access"
+        },
+        {
+            "type": "path",
             "url": "../cache"
         },
         {
@@ -31,11 +35,12 @@
     ],
     "require": {
         "php": ">=8.5",
-        "waaseyaa/typed-data": "^0.1.0-alpha.180",
-        "waaseyaa/plugin": "^0.1.0-alpha.180",
+        "waaseyaa/access": "^0.1.0-alpha.180",
         "waaseyaa/cache": "^0.1.0-alpha.180",
         "waaseyaa/config": "^0.1.0-alpha.180",
         "waaseyaa/foundation": "^0.1.0-alpha.180",
+        "waaseyaa/plugin": "^0.1.0-alpha.180",
+        "waaseyaa/typed-data": "^0.1.0-alpha.180",
         "waaseyaa/validation": "^0.1.0-alpha.180",
         "symfony/event-dispatcher": "^7.0",
         "symfony/uid": "^7.0",

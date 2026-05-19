@@ -166,6 +166,7 @@ final class OidcClientStorageTest extends TestCase
         $this->seedClients();
 
         $ids = $this->storage->getQuery()
+            ->accessCheck(false)
             ->condition('client_id', 'biindigen')
             ->execute();
 
@@ -177,13 +178,13 @@ final class OidcClientStorageTest extends TestCase
     public function testDeleteRemovesClient(): void
     {
         $this->seedClients();
-        $all = $this->storage->getQuery()->execute();
+        $all = $this->storage->getQuery()->accessCheck(false)->execute();
         $this->assertCount(2, $all);
 
         $toDelete = $this->storage->load($all[0]);
         $this->storage->delete([$toDelete]);
 
-        $remaining = $this->storage->getQuery()->execute();
+        $remaining = $this->storage->getQuery()->accessCheck(false)->execute();
         $this->assertCount(1, $remaining);
         $this->assertNull($this->storage->load($all[0]));
     }

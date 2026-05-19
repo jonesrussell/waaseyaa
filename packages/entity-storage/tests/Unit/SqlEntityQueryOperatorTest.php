@@ -76,6 +76,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     public function queryOperatorNotEqual(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('bundle', 'article', '!=')->execute();
 
         // Rows 3 and 5 are pages.
@@ -88,6 +89,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     public function queryOperatorStartsWith(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('label', 'A', 'STARTS_WITH')->execute();
 
         // "A Page" (3) and "Another Page" (5) start with "A".
@@ -103,6 +105,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
         $this->insertRow(6, 'uuid-6', 'article', '100% Complete', 'en', 1, 50);
 
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('label', '100%', 'STARTS_WITH')->execute();
 
         // Only the row with "100% Complete" should match, not "10..." rows.
@@ -114,6 +117,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     public function queryOperatorLessThan(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('priority', 20, '<')->execute();
 
         // Rows with priority < 20: id 1 (10), id 5 (15).
@@ -126,6 +130,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     public function queryOperatorGreaterThan(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('priority', 20, '>')->execute();
 
         // Rows with priority > 20: id 3 (30).
@@ -137,6 +142,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     public function queryOperatorLessThanOrEqual(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('priority', 20, '<=')->execute();
 
         // Rows with priority <= 20: id 1 (10), id 2 (20), id 5 (15).
@@ -150,6 +156,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     public function queryOperatorGreaterThanOrEqual(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('priority', 20, '>=')->execute();
 
         // Rows with priority >= 20: id 2 (20), id 3 (30).
@@ -162,6 +169,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     public function queryOperatorIsNull(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->notExists('status')->execute();
 
         // Only row 4 has null status.
@@ -173,6 +181,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     public function queryOperatorIsNotNull(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->exists('status')->execute();
 
         // Rows 1, 2, 3, 5 have non-null status.
@@ -185,6 +194,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     {
         // Test IS NULL via the condition() method with explicit operator.
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('priority', null, 'IS NULL')->execute();
 
         // Row 4 has null priority.
@@ -197,6 +207,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     {
         // Test IS NOT NULL via the condition() method with explicit operator.
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('priority', null, 'IS NOT NULL')->execute();
 
         // Rows 1, 2, 3, 5 have non-null priority.
@@ -208,6 +219,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     public function queryOperatorNotIn(): void
     {
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('id', [1, 2, 4], 'NOT IN')->execute();
 
         // Rows 3 and 5 are not in the exclusion list.
@@ -223,6 +235,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
         $this->insertRow(7, 'uuid-7', 'article', 'test_value here', 'en', 1, 5);
 
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query->condition('label', 'test_value', 'CONTAINS')->execute();
 
         // Only the row with literal "test_value" should match.
@@ -235,6 +248,7 @@ final class SqlEntityQueryOperatorTest extends TestCase
     {
         // Combine multiple operators in a single query.
         $query = new SqlEntityQuery($this->entityType, $this->database);
+        $query->accessCheck(false);
         $ids = $query
             ->condition('bundle', 'article')
             ->condition('priority', 15, '>')

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\EntityStorage;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Entity\DateTime\EntityClockInterface;
 use Waaseyaa\Entity\DateTime\TimestampFieldConvention;
@@ -72,6 +73,8 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     private readonly ?FieldDefinitionRegistryInterface $fieldRegistry;
 
+    private readonly ?EntityAccessHandler $accessHandler;
+
     public function __construct(
         private readonly EntityTypeInterface $entityType,
         private readonly DatabaseInterface $database,
@@ -81,6 +84,7 @@ final class SqlEntityStorage implements EntityStorageInterface
         ?EntityEventFactoryInterface $eventFactory = null,
         ?SqlEntityQueryResultCache $queryResultCache = null,
         ?EntityClockInterface $clock = null,
+        ?EntityAccessHandler $accessHandler = null,
     ) {
         $this->tableName = $this->entityType->id();
         $keys = $this->entityType->getKeys();
@@ -92,6 +96,7 @@ final class SqlEntityStorage implements EntityStorageInterface
         $this->queryResultCache = $queryResultCache ?? new SqlEntityQueryResultCache();
         $this->clock = $clock ?? new UtcEntityClock();
         $this->fieldRegistry = $fieldRegistry;
+        $this->accessHandler = $accessHandler;
     }
 
     public function create(array $values = []): EntityInterface
@@ -224,7 +229,14 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     public function loadByKey(string $key, mixed $value): ?EntityInterface
     {
+        // System-context lookup: identity resolution by a key (uuid, label,
+        // bundle, etc.). The access check belongs to whoever calls
+        // loadByKey(); the storage primitive itself bypasses query-layer
+        // filtering. Mission sql-entity-query-access-checking-01KRYP15, WP02
+        // (C-004) — `accessCheck(false)` is the documented system-context
+        // bypass.
         $ids = $this->getQuery()
+            ->accessCheck(false)
             ->condition($key, $value)
             ->range(0, 1)
             ->execute();
@@ -1158,11 +1170,24 @@ final class SqlEntityStorage implements EntityStorageInterface
 
     public function getQuery(): EntityQueryInterface
     {
-        return new SqlEntityQuery(
+        $query = new SqlEntityQuery(
             $this->entityType,
             $this->database,
             $this->queryResultCache,
             $this->fieldRegistry,
+        );
+
+        // Mission sql-entity-query-access-checking-01KRYP15 WP03: light the
+        // end-to-end filter. WP02 added these setters but deferred the wiring
+        // to WP03 so the slow-path filter only activates after the consumer
+        // sweep lands in the same PR.
+        if ($this->accessHandler !== null) {
+            $query = $query->withAccessHandler($this->accessHandler);
+        }
+
+        return $query->withEntityLoader(
+            /** @param list<int|string> $ids */
+            fn(array $ids): array => $this->loadMultiple($ids),
         );
     }
 
