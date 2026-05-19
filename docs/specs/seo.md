@@ -1,5 +1,6 @@
 # SEO package (`waaseyaa/seo`)
 
+<!-- Spec reviewed 2026-05-19 - mission sql-entity-query-access-checking-01KRYP15 (#1495) incidental: test fixture `StubEntityQuery` (packages/seo/tests/Unit/) got the new `EntityQueryInterface::setAccount()` method to satisfy the interface contract. SEO package contracts, sitemap/meta/JSON-LD/robots generators unchanged. -->
 <!-- Spec reviewed 2026-05-01 - README skeleton added under packages/seo/ (purpose, layer, key classes only); SitemapGenerator, MetaTagBuilder, JsonLdBuilder, RobotsTxtGenerator contracts unchanged from prior review (mission #824 WP09 surface F, closes #849) -->
 
 **Audience:** framework contributors and app authors wiring sitemaps, robots, and head metadata.
