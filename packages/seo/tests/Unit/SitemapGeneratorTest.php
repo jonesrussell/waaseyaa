@@ -7,6 +7,8 @@ namespace Waaseyaa\Seo\Tests\Unit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
 use Waaseyaa\Entity\EntityTypeInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
@@ -131,5 +133,61 @@ final class SitemapGeneratorTest extends TestCase
 
         $this->assertCount(1, $urls);
         $this->assertSame('https://example.com/a/2', $urls[0]->loc);
+    }
+
+    #[Test]
+    public function collect_disables_access_check_per_entity_type(): void
+    {
+        // Sitemap generation enumerates public URLs for crawlers and runs
+        // without a request-scoped account. Same shape as PathAliasResolver
+        // (#1518) and AuthController (#1525): without ->accessCheck(false),
+        // SqlEntityQuery::execute() throws MissingQueryAccountException under
+        // the fail-closed default introduced in v0.1.0-alpha.181, returning
+        // HTTP 500 on /sitemap.xml.
+
+        /** @var list<bool> $accessCheckCalls */
+        $accessCheckCalls = [];
+        $query = new class($accessCheckCalls) implements EntityQueryInterface {
+            /** @param list<bool> $accessCheckCalls */
+            public function __construct(private array &$accessCheckCalls) {}
+
+            public function condition(string $field, mixed $value, string $operator = '='): static { return $this; }
+            public function exists(string $field): static { return $this; }
+            public function notExists(string $field): static { return $this; }
+            public function sort(string $field, string $direction = 'ASC'): static { return $this; }
+            public function range(int $offset, int $limit): static { return $this; }
+            public function count(): static { return $this; }
+            public function accessCheck(bool $check = true): static
+            {
+                $this->accessCheckCalls[] = $check;
+                return $this;
+            }
+            public function setAccount(?AccountInterface $account): static { return $this; }
+            public function execute(): array { return [1]; }
+        };
+
+        $storage = $this->createStub(EntityStorageInterface::class);
+        $storage->method('getQuery')->willReturn($query);
+
+        $def = $this->createStub(EntityTypeInterface::class);
+        $etm = $this->createStub(EntityTypeManagerInterface::class);
+        $etm->method('getDefinitions')->willReturn([
+            'article' => $def,
+            'page' => $def,
+        ]);
+        $etm->method('hasDefinition')->willReturn(true);
+        $etm->method('getStorage')->willReturn($storage);
+
+        $gen = new SitemapGenerator();
+        $gen->collectFromEntityTypes(
+            $etm,
+            static fn (string $type, int|string $id): string => 'https://example.com/' . $type . '/' . $id,
+        );
+
+        $this->assertSame(
+            [false, false],
+            $accessCheckCalls,
+            'collectFromEntityTypes must call accessCheck(false) for every entity type (pre-auth system context).',
+        );
     }
 }

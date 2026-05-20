@@ -92,7 +92,12 @@ final class SitemapGenerator
                 continue;
             }
 
-            $ids = $entityTypeManager->getStorage($entityTypeId)->getQuery()->range(0, $limit)->execute();
+            // System-context bypass: sitemap generation enumerates public URLs for
+            // crawlers and runs without a request-scoped account. Mirrors
+            // PathAliasResolver — entity-level access is enforced when the caller
+            // subsequently loads the entity to render its page.
+            // See docs/security/sql-entity-query-access-check-bypass-audit.md (C-004).
+            $ids = $entityTypeManager->getStorage($entityTypeId)->getQuery()->accessCheck(false)->range(0, $limit)->execute();
             $changefreqRaw = $typeOpts['changefreq'] ?? null;
             $changefreq = is_string($changefreqRaw) && $changefreqRaw !== '' ? $changefreqRaw : null;
             $priority = null;
