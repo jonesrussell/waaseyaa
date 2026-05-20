@@ -31,10 +31,10 @@
     ],
     "require": {
         "php": ">=8.5",
-        "waaseyaa/access": "^0.1.0-alpha.186",
-        "waaseyaa/entity": "^0.1.0-alpha.186",
-        "waaseyaa/plugin": "^0.1.0-alpha.186",
-        "waaseyaa/typed-data": "^0.1.0-alpha.186"
+        "waaseyaa/access": "^0.1.0-alpha.187",
+        "waaseyaa/entity": "^0.1.0-alpha.187",
+        "waaseyaa/plugin": "^0.1.0-alpha.187",
+        "waaseyaa/typed-data": "^0.1.0-alpha.187"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
