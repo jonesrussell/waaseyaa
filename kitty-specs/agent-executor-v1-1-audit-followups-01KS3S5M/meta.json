@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-20T22:47:45.910790+00:00",
+  "friendly_name": "agent executor v1 1 audit followups",
+  "mission_id": "01KS3S5MNY4ZVG122ME4R5H7D1",
+  "mission_number": null,
+  "mission_slug": "agent-executor-v1-1-audit-followups-01KS3S5M",
+  "mission_type": "software-dev",
+  "slug": "agent-executor-v1-1-audit-followups-01KS3S5M",
+  "target_branch": "main"
+}
