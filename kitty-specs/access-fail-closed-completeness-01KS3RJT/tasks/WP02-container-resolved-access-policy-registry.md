@@ -22,7 +22,8 @@ subtasks:
 - T009
 - T010
 - T011
-shell_pid: '677610'
+shell_pid: "677610"
+agent: "claude:sonnet:implementer:implementer"
 history:
 - date: '2026-05-20T23:30:18Z'
   agent: claude:sonnet:tasks:tasks
@@ -390,3 +391,7 @@ final class AccessPolicyRegistryTest extends TestCase
 3. Run `AttachmentPolicyDiscoveryTest` directly and confirm `ParentDelegatedAccessPolicy` is the returned policy.
 4. Confirm `ConfigEntityAccessPolicy` tests still pass (backward compat).
 5. The two-phase algorithm: check that phase-2 deferred policies actually receive the phase-1 `EntityAccessHandler`, not null.
+
+## Activity Log
+
+- 2026-05-20T23:56:11Z – claude:sonnet:implementer:implementer – shell_pid=677610 – Assigned agent via action command
