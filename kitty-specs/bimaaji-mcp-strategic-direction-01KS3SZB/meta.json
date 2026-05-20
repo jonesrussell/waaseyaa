@@ -1,10 +1,12 @@
 {
   "created_at": "2026-05-20T23:01:48.014579+00:00",
-  "friendly_name": "bimaaji mcp strategic direction",
+  "friendly_name": "Bimaaji MCP — Strategic Direction",
+  "source_description": "Strategic fork: should bimaaji ship an MCP server, and if so, in what shape? Deferred from #1387 as #1463. Three options on the table: (1) keep bimaaji PHP-only and close #1463 with conviction; (2) extend the existing packages/mcp/ surface to expose bimaaji's graph operations as MCP tools (no Node sidecar); (3) restore a separate Node-based MCP server with a corrected install path. The previous attempt (Node mcp/ subdirectory + composer bimaaji-mcp-install) never reached consumers reliably and was removed. This mission is a research-style brainstorm whose deliverable is a written decision + scoped follow-up missions if applicable, not code.",
   "mission_id": "01KS3SZB66HY2SFG18EYWXQ0ND",
   "mission_number": null,
   "mission_slug": "bimaaji-mcp-strategic-direction-01KS3SZB",
-  "mission_type": "software-dev",
+  "mission_type": "research",
+  "vcs": "git",
   "slug": "bimaaji-mcp-strategic-direction-01KS3SZB",
   "target_branch": "main"
 }
