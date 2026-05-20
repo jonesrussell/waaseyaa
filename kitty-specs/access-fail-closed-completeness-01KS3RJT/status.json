@@ -1,7 +1,7 @@
 {
-  "event_count": 11,
-  "last_event_id": "01KS3X2YJD2YM3RJ34R7QNP9ED",
-  "materialized_at": "2026-05-20T23:56:11.213348+00:00",
+  "event_count": 13,
+  "last_event_id": "01KS3X3F7ESMAW79BN7YG91SQV",
+  "materialized_at": "2026-05-20T23:56:28.270586+00:00",
   "mission_number": "",
   "mission_slug": "access-fail-closed-completeness-01KS3RJT",
   "mission_type": "software-dev",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 1,
+    "in_progress": 2,
     "in_review": 1,
-    "planned": 3
+    "planned": 2
   },
   "work_packages": {
     "WP01": {
@@ -32,11 +32,11 @@
       "last_transition_at": "2026-05-20T23:56:11.213348+00:00"
     },
     "WP03": {
-      "actor": "finalize-tasks",
+      "actor": "implement-command",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KS3WBPJF9YEPP55WNRSVSGZY",
-      "last_transition_at": "2026-05-20T23:43:29.359030+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KS3X3F7ESMAW79BN7YG91SQV",
+      "last_transition_at": "2026-05-20T23:56:28.270586+00:00"
     },
     "WP04": {
       "actor": "finalize-tasks",
