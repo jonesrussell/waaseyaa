@@ -1,6 +1,8 @@
 {
   "created_at": "2026-05-20T22:43:45.323984+00:00",
-  "friendly_name": "m006 translation hardening",
+  "friendly_name": "M-006 Translation Hardening",
+  "source_description": "Post-merge audit follow-ups for M-006 (entity-storage-translations-v1, squash 0f7e1809a). #1445 (HIGH): TranslationController has no access gate. #1446 (MEDIUM): --default-langcode + --add-translations CLI args interpolated into generated PHP without regex validation. #1447 (MEDIUM): fieldLangcode() ships only on TranslatableEntityTrait, not declared on TranslatableInterface. Mission must land before any consumer flips an entity type to translatable: true.",
+  "vcs": "git",
   "mission_id": "01KS3RY9TFJNQYWQX820552BP7",
   "mission_number": null,
   "mission_slug": "m006-translation-hardening-01KS3RY9",
