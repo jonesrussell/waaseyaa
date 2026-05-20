@@ -16,6 +16,8 @@ subtasks:
 - T017
 - T018
 - T019
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "678898"
 history:
 - date: '2026-05-20T23:30:18Z'
   agent: claude:sonnet:tasks:tasks
@@ -417,3 +419,7 @@ Review the output, add missing inline comments, and commit. The M-B.1 follow-up 
 3. Confirm the gate appears in `composer verify` script array (run `composer verify` and check output).
 4. Run `time php bin/check-getquery-bindings --verify` — must complete under 30 seconds (NFR-001).
 5. Confirm `CLAUDE.md` now has the CI gates section.
+
+## Activity Log
+
+- 2026-05-20T23:56:37Z – claude:sonnet:implementer:implementer – shell_pid=678898 – Started implementation via action command
