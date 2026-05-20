@@ -51,10 +51,10 @@
     ],
     "require": {
         "php": ">=8.5",
-        "waaseyaa/entity": "^0.1.0-alpha.186",
-        "waaseyaa/access": "^0.1.0-alpha.186",
-        "waaseyaa/foundation": "^0.1.0-alpha.186",
-        "waaseyaa/mail": "^0.1.0-alpha.186",
+        "waaseyaa/entity": "^0.1.0-alpha.187",
+        "waaseyaa/access": "^0.1.0-alpha.187",
+        "waaseyaa/foundation": "^0.1.0-alpha.187",
+        "waaseyaa/mail": "^0.1.0-alpha.187",
         "symfony/http-foundation": "^7.0",
         "twig/twig": "^3.0"
     },
