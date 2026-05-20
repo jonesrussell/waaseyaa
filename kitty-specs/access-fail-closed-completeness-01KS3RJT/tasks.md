@@ -12,10 +12,10 @@
 
 | ID | Description | Parallel |
 |---|---|---|
-| T001 | Add `?EntityAccessHandler $accessHandler` param to `SearchRouter` constructor | — |
-| T002 | Thread `_account` from request attributes into `SearchController` in `SearchRouter::handle()` | — |
-| T003 | Verify kernel/service-provider wires `EntityAccessHandler` into `SearchRouter` at registration time | — |
-| T004 | Write `SemanticSearchAccessTest` (FR-010): two-user kernel integration test | — |
+| T001 | Add `?EntityAccessHandler $accessHandler` param to `SearchRouter` constructor | — | [D] |
+| T002 | Thread `_account` from request attributes into `SearchController` in `SearchRouter::handle()` | — | [D] |
+| T003 | Verify kernel/service-provider wires `EntityAccessHandler` into `SearchRouter` at registration time | — | [D] |
+| T004 | Write `SemanticSearchAccessTest` (FR-010): two-user kernel integration test | — | [D] |
 | T005 | Create `PolicyDependencyResolverInterface` in `packages/foundation/src/Kernel/Bootstrap/` | — |
 | T006 | Create `KernelPolicyDependencyResolver` implementing the interface | — |
 | T007 | Create `PolicyInstantiationException` in `packages/foundation/src/Kernel/Bootstrap/Exception/` | — |
@@ -57,10 +57,10 @@
 
 **Included subtasks**:
 
-- [ ] T001 Add `?EntityAccessHandler $accessHandler = null` param to `SearchRouter` constructor
-- [ ] T002 Thread `_account` from request attributes into `SearchController` in `SearchRouter::handle()`
-- [ ] T003 Verify kernel/service-provider wires `EntityAccessHandler` into `SearchRouter` at registration time
-- [ ] T004 Write `SemanticSearchAccessTest` (FR-010): two-user kernel integration test
+- [x] T001 Add `?EntityAccessHandler $accessHandler = null` param to `SearchRouter` constructor
+- [x] T002 Thread `_account` from request attributes into `SearchController` in `SearchRouter::handle()`
+- [x] T003 Verify kernel/service-provider wires `EntityAccessHandler` into `SearchRouter` at registration time
+- [x] T004 Write `SemanticSearchAccessTest` (FR-010): two-user kernel integration test
 
 **Implementation sketch**:
 1. Add `?EntityAccessHandler $accessHandler = null` to `SearchRouter::__construct()`.
