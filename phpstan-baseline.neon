@@ -183,13 +183,13 @@ parameters:
 		-
 			message: '#^Cannot call method execute\(\) on PDOStatement\|false\.$#'
 			identifier: method.nonObject
-			count: 3
+			count: 4
 			path: packages/api/src/Controller/BroadcastStorage.php
 
 		-
 			message: '#^Cannot call method fetch\(\) on PDOStatement\|false\.$#'
 			identifier: method.nonObject
-			count: 1
+			count: 2
 			path: packages/api/src/Controller/BroadcastStorage.php
 
 		-
