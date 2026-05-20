@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Admin SPA `npm ci` failing against the vendored framework package.** `packages/admin/package-lock.json` had drifted under months of partial Dependabot bumps, carrying ~1,700 lines of orphaned subtrees. Consumers (notably Minoo's admin build) hit "missing commander@13.1.0" because `@nuxt/cli`'s nested `@bomb.sh/tab` declares it as an optional peer dep that some npm versions promote to required when the lockfile is internally inconsistent. Regenerated from scratch on node 25 / npm 11.12.1; net −1,546 lines; `package.json` unchanged; `nuxt prepare` postinstall verified clean.
+
 ## [0.1.0-alpha.182] - 2026-05-19
 
 ### Fixed
