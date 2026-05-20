@@ -23,9 +23,9 @@
 | T009 | Wire `KernelPolicyDependencyResolver` into `AbstractKernel::discoverAccessPolicies()` | — |
 | T010 | Write `AttachmentPolicyDiscoveryTest` (FR-011): `ParentDelegatedAccessPolicy` active for `attachment` | — |
 | T011 | Write `AccessPolicyRegistryTest` boot-failure unit test (FR-012) | — |
-| T012 | Create `packages/entity/testing/RecordingEntityQuery.php` implementing `EntityQueryInterface` | [P] |
-| T013 | Add `Waaseyaa\Entity\Testing` PSR-4 entry to `packages/entity/composer.json` `autoload-dev` | [P] |
-| T014 | Identify and migrate existing inline `EntityQueryInterface` anonymous stubs | [P] |
+| T012 | Create `packages/entity/testing/RecordingEntityQuery.php` implementing `EntityQueryInterface` | [D] |
+| T013 | Add `Waaseyaa\Entity\Testing` PSR-4 entry to `packages/entity/composer.json` `autoload-dev` | [D] |
+| T014 | Identify and migrate existing inline `EntityQueryInterface` anonymous stubs | [D] |
 | T015 | Write `bin/check-getquery-bindings` PHP CLI scanner | — |
 | T016 | Run `--generate-baseline`; commit `tools/getquery-bindings-baseline.txt` | — |
 | T017 | Wire `@check-getquery-bindings` into `composer.json` verify array | — |
@@ -122,9 +122,9 @@
 
 **Included subtasks**:
 
-- [ ] T012 Create `packages/entity/testing/RecordingEntityQuery.php` implementing `EntityQueryInterface`
-- [ ] T013 Add `"Waaseyaa\\Entity\\Testing\\": "testing/"` to `packages/entity/composer.json` `autoload-dev`
-- [ ] T014 Identify and migrate existing inline `EntityQueryInterface` anonymous stubs
+- [x] T012 Create `packages/entity/testing/RecordingEntityQuery.php` implementing `EntityQueryInterface`
+- [x] T013 Add `"Waaseyaa\\Entity\\Testing\\": "testing/"` to `packages/entity/composer.json` `autoload-dev`
+- [x] T014 Identify and migrate existing inline `EntityQueryInterface` anonymous stubs
 
 **Implementation sketch**:
 1. Create `packages/entity/testing/RecordingEntityQuery.php` exactly per the contract in contracts/RecordingEntityQuery-contract.md.
