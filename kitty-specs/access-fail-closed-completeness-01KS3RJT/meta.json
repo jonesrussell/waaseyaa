@@ -1,6 +1,8 @@
 {
   "created_at": "2026-05-20T22:37:30.631137+00:00",
-  "friendly_name": "access fail closed completeness",
+  "friendly_name": "Access Fail-Closed Completeness",
+  "source_description": "Close the entire getQuery()-without-account-binding bug class. Triage groups #1516, #1519, #1528, #1529; retro-covers closed misses #1518, #1525, #1527; predecessor mission sql-entity-query-access-checking-01KRYP15 flipped accessCheck() fail-closed but left three classes of gap (account threading, policy auto-instantiation, no CI guard).",
+  "vcs": "git",
   "mission_id": "01KS3RJTYB3PNN9S4PF641TS0J",
   "mission_number": null,
   "mission_slug": "access-fail-closed-completeness-01KS3RJT",
