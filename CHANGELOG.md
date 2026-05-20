@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.186] - 2026-05-20
+
 ### Security
 
 - **`waaseyaa/api` — `ResourceSerializer` now filters credential and internal fields** (#1531). Previously `GET /api/{type}/{id}` and the admin SPA's `/admin/_surface/{type}` exposed every key in the entity's `_data` blob — including the bcrypt `pass` hash on the `User` entity — to any account with `view` access (e.g. `administer content`). Two layers of defense:

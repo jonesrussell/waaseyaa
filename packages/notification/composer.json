@@ -23,10 +23,10 @@
     ],
     "require": {
         "php": ">=8.5",
-        "waaseyaa/foundation": "^0.1.0-alpha.185",
-        "waaseyaa/queue": "^0.1.0-alpha.185",
-        "waaseyaa/mail": "^0.1.0-alpha.185",
-        "waaseyaa/database-legacy": "^0.1.0-alpha.185"
+        "waaseyaa/foundation": "^0.1.0-alpha.186",
+        "waaseyaa/queue": "^0.1.0-alpha.186",
+        "waaseyaa/mail": "^0.1.0-alpha.186",
+        "waaseyaa/database-legacy": "^0.1.0-alpha.186"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
