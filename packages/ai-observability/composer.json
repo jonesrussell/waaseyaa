@@ -12,11 +12,11 @@
     ],
     "require": {
         "php": ">=8.5",
-        "waaseyaa/ai-agent": "^0.1.0-alpha.182",
-        "waaseyaa/database-legacy": "^0.1.0-alpha.182",
-        "waaseyaa/entity": "^0.1.0-alpha.182",
-        "waaseyaa/entity-storage": "^0.1.0-alpha.182",
-        "waaseyaa/foundation": "^0.1.0-alpha.182"
+        "waaseyaa/ai-agent": "^0.1.0-alpha.183",
+        "waaseyaa/database-legacy": "^0.1.0-alpha.183",
+        "waaseyaa/entity": "^0.1.0-alpha.183",
+        "waaseyaa/entity-storage": "^0.1.0-alpha.183",
+        "waaseyaa/foundation": "^0.1.0-alpha.183"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"

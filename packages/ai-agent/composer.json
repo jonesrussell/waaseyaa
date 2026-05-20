@@ -65,15 +65,15 @@
         "php": ">=8.5",
         "symfony/messenger": "^7.0",
         "symfony/uid": "^7.0",
-        "waaseyaa/access": "^0.1.0-alpha.182",
-        "waaseyaa/ai-schema": "^0.1.0-alpha.182",
-        "waaseyaa/ai-tools": "^0.1.0-alpha.182",
-        "waaseyaa/api": "^0.1.0-alpha.182",
-        "waaseyaa/database-legacy": "^0.1.0-alpha.182",
-        "waaseyaa/entity": "^0.1.0-alpha.182",
-        "waaseyaa/entity-storage": "^0.1.0-alpha.182",
-        "waaseyaa/foundation": "^0.1.0-alpha.182",
-        "waaseyaa/http-client": "^0.1.0-alpha.182"
+        "waaseyaa/access": "^0.1.0-alpha.183",
+        "waaseyaa/ai-schema": "^0.1.0-alpha.183",
+        "waaseyaa/ai-tools": "^0.1.0-alpha.183",
+        "waaseyaa/api": "^0.1.0-alpha.183",
+        "waaseyaa/database-legacy": "^0.1.0-alpha.183",
+        "waaseyaa/entity": "^0.1.0-alpha.183",
+        "waaseyaa/entity-storage": "^0.1.0-alpha.183",
+        "waaseyaa/foundation": "^0.1.0-alpha.183",
+        "waaseyaa/http-client": "^0.1.0-alpha.183"
     },
     "require-dev": {
         "phpunit/phpunit": "^10.5"
