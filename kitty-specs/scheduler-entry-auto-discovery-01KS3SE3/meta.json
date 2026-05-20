@@ -1,6 +1,8 @@
 {
   "created_at": "2026-05-20T22:52:23.283437+00:00",
-  "friendly_name": "scheduler entry auto discovery",
+  "friendly_name": "Scheduler Entry Auto-Discovery",
+  "source_description": "Close the 'declared but not invoked' gap. #1512 — AgentScheduleEntries::register() declares two recurring tasks (ai:purge-runs daily, ai:reap-stalled-runs every 5min) but has no production caller. #1536 — BroadcastStorage::push() writes to _broadcast_log on every entity save/delete with no scheduled prune (Minoo's local DB had 243 rows from 2026-03 testing). Both are symptoms of the same architectural gap: no auto-discovery path for schedule entries. Introduce ScheduleEntriesInterface and PackageManifestCompiler discovery, mirroring access-policy discovery (cross-references M-B's container-resolved resolver).",
+  "vcs": "git",
   "mission_id": "01KS3SE3EW76ZT4XETWW5A0A7Y",
   "mission_number": null,
   "mission_slug": "scheduler-entry-auto-discovery-01KS3SE3",
