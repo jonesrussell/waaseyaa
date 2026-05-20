@@ -15,7 +15,8 @@ subtasks:
 - T012
 - T013
 - T014
-shell_pid: '678260'
+shell_pid: "678260"
+agent: "claude:sonnet:implementer:implementer"
 history:
 - date: '2026-05-20T23:30:18Z'
   agent: claude:sonnet:tasks:tasks
@@ -258,3 +259,7 @@ $query = new RecordingEntityQuery();
 2. Confirm `autoload-dev` (not `autoload`) in `composer.json`.
 3. Run `./vendor/bin/phpunit packages/entity/tests/` and confirm no new failures.
 4. Spot-check: `(new RecordingEntityQuery())->accessCheck(true)->accessCheck(false)->accessChecks === [true, false]`.
+
+## Activity Log
+
+- 2026-05-20T23:56:29Z – claude:sonnet:implementer:implementer – shell_pid=678260 – Assigned agent via action command
