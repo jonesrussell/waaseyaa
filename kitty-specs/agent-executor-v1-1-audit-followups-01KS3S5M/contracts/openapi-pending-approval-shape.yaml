@@ -1,0 +1,83 @@
+# Contract: AgentRun pending_approval broadcast payload shape
+# Mission: agent-executor-v1-1-audit-followups-01KS3S5M
+# FR-007 / NFR-004 — must match what AgentRunBroadcaster actually emits.
+# This is the design-time contract; WP02 creates packages/api/openapi.yaml
+# as the living canonical document wired into composer verify.
+
+openapi: "3.1.0"
+info:
+  title: Waaseyaa Agent Run — pending_approval broadcast shape
+  version: "0.1.0-alpha"
+
+components:
+  schemas:
+    AgentRunPendingApprovalEvent:
+      type: object
+      required:
+        - run_id
+        - state
+        - iteration
+        - tool_calls
+        - requires
+        - timestamp
+      properties:
+        run_id:
+          type: string
+          format: uuid
+          description: UUID of the agent run record.
+        state:
+          type: string
+          enum: [pending_approval]
+          description: Always "pending_approval" for this payload type.
+        iteration:
+          type: integer
+          minimum: 1
+          description: Which iteration triggered the approval gate.
+        tool_calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolCallSummary'
+          description: Tool calls the agent wants to make that require approval.
+        requires:
+          $ref: '#/components/schemas/ApprovalRequirement'
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 UTC timestamp when the event was emitted.
+
+    ToolCallSummary:
+      type: object
+      required:
+        - name
+        - input
+      properties:
+        name:
+          type: string
+          description: Tool name (non-nullable — broadcaster always sets this).
+        input:
+          type: object
+          additionalProperties: true
+          description: Tool input parameters as key-value pairs.
+
+    ApprovalRequirement:
+      type: object
+      required:
+        - approval_kind
+        - prompt
+      properties:
+        approval_kind:
+          type: string
+          enum: [tool_call, escalation]
+          description: >
+            "tool_call" — a specific tool call needs operator approval.
+            "escalation" — the agent has reached an escalation threshold
+            and requires human judgement before continuing.
+        prompt:
+          type: string
+          description: Human-readable description of what requires approval.
+
+# Drift items corrected vs. pre-mission draft shape (FR-007):
+# 1. "id" → "run_id" (canonical field name from AgentRunBroadcaster)
+# 2. "tool_calls[].name" was nullable in draft; non-nullable here (broadcaster always sets it)
+# 3. "requires.approval_kind" enum was missing from draft
+# 4. "timestamp" field was entirely absent from draft
