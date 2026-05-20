@@ -1,6 +1,8 @@
 {
   "created_at": "2026-05-20T22:47:45.910790+00:00",
-  "friendly_name": "agent executor v1 1 audit followups",
+  "friendly_name": "Agent Executor v1.1 — Audit Follow-ups",
+  "source_description": "Post-merge audit follow-ups from agent-executor-01KRWPK7 mission. Four issues from WP review cycles: #1509 (WP03 — provider exception hierarchy for retry semantics), #1510 (WP08 — dispatch domain events for ai-observability listener), #1511 (WP05 — collapse BroadcastStorageAdapter, reconcile pending_approval OpenAPI shape), #1513 (WP06 — AiRunCommand --watch attaches real SSE consumer, not informational stub). Land before the v1 contract crystallizes.",
+  "vcs": "git",
   "mission_id": "01KS3S5MNY4ZVG122ME4R5H7D1",
   "mission_number": null,
   "mission_slug": "agent-executor-v1-1-audit-followups-01KS3S5M",
