@@ -1,10 +1,11 @@
 import { ref, onUnmounted, type Ref } from 'vue'
 
 export interface BroadcastMessage {
+  id: number
   channel: string
   event: string
   data: Record<string, unknown>
-  timestamp: number
+  created_at: number
 }
 
 const MAX_RETRIES = 10

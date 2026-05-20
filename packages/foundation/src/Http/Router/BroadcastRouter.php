@@ -34,14 +34,16 @@ final class BroadcastRouter implements DomainRouterInterface
         }
         $logger = $this->logger ?? new NullLogger();
 
-        return new StreamedResponse(function () use ($broadcastStorage, $channels, $logger): void {
+        $initialCursor = self::resolveInitialCursor($request, $broadcastStorage->maxId($channels));
+
+        return new StreamedResponse(function () use ($broadcastStorage, $channels, $logger, $initialCursor): void {
             echo "event: connected\ndata: " . json_encode(['channels' => $channels], JSON_THROW_ON_ERROR) . "\n\n";
             if (ob_get_level() > 0) {
                 ob_flush();
             }
             flush();
 
-            $cursor = 0;
+            $cursor = $initialCursor;
             $lastKeepalive = time();
 
             while (connection_aborted() === 0) {
@@ -61,7 +63,14 @@ final class BroadcastRouter implements DomainRouterInterface
                 foreach ($messages as $msg) {
                     $cursor = $msg['id'];
                     try {
-                        $frame = "event: {$msg['event']}\ndata: " . json_encode($msg, JSON_THROW_ON_ERROR) . "\n\n";
+                        // Emit `id:` so EventSource sends Last-Event-ID on reconnect,
+                        // letting the resume path above pick up from this exact point.
+                        $frame = sprintf(
+                            "id: %d\nevent: %s\ndata: %s\n\n",
+                            $msg['id'],
+                            $msg['event'],
+                            json_encode($msg, JSON_THROW_ON_ERROR),
+                        );
                         echo $frame;
                     } catch (\JsonException $e) {
                         $logger->error(sprintf('SSE json_encode error for event %s: %s', $msg['event'], $e->getMessage()));
@@ -92,6 +101,23 @@ final class BroadcastRouter implements DomainRouterInterface
             'Connection' => 'keep-alive',
             'X-Accel-Buffering' => 'no',
         ]);
+    }
+
+    /**
+     * Resolve the starting cursor for a new SSE connection.
+     *
+     * Resume from the EventSource `Last-Event-ID` header when the client sent
+     * one (auto-reconnect path) so no events are missed. Otherwise begin at
+     * the supplied high-water mark — new connections do NOT receive history.
+     */
+    public static function resolveInitialCursor(Request $request, int $highWaterMark): int
+    {
+        $lastEventId = $request->headers->get('Last-Event-ID');
+        if ($lastEventId !== null && ctype_digit($lastEventId)) {
+            return (int) $lastEventId;
+        }
+
+        return $highWaterMark;
     }
 
     /**

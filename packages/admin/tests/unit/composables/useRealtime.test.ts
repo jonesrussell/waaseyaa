@@ -76,10 +76,11 @@ describe('useRealtime', () => {
     expect(connected.value).toBe(true)
 
     es.emitNamed('entity.saved', {
+      id: 1,
       channel: 'admin',
       event: 'entity.saved',
       data: { id: '1' },
-      timestamp: 1,
+      created_at: 1,
     })
 
     expect(messages.value).toHaveLength(1)
