@@ -238,3 +238,4 @@ final class SemanticSearchAccessTest extends TestCase
 ## Activity Log
 
 - 2026-05-20T23:45:56Z – claude:sonnet:implementer:implementer – shell_pid=672099 – Assigned agent via action command
+- 2026-05-20T23:54:59Z – claude:sonnet:implementer:implementer – shell_pid=672099 – Threaded _account into SearchController via SearchRouter constructor injection. Integration test asserts row-level filtering (viewer-a sees uuid-1 only, viewer-b sees both). Only one SearchRouter construction site exists (HttpKernel.php). HTTP-path test dropped: SearchRouter::handle() calls WaaseyaaContext::fromRequest() unconditionally, which requires BroadcastStorage not available outside a booted kernel. Mocked-storage controller tests provide full FR-010 coverage.
