@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-20T22:55:55.304270+00:00",
+  "friendly_name": "entrypoint provider trait reachability",
+  "mission_id": "01KS3SMJNGNQVY11VTVDCNHJ1E",
+  "mission_number": null,
+  "mission_slug": "entrypoint-provider-trait-reachability-01KS3SMJ",
+  "mission_type": "software-dev",
+  "slug": "entrypoint-provider-trait-reachability-01KS3SMJ",
+  "target_branch": "main"
+}
