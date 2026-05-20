@@ -1,108 +1,180 @@
-# Implementation Plan: [FEATURE]
-*Path: [templates/plan-template.md](templates/plan-template.md)*
+# Research Plan: Bimaaji MCP — Strategic Direction
 
+**Mission**: `bimaaji-mcp-strategic-direction-01KS3SZB`
+**Mission type**: `research` (decision document — no production code ships)
+**Branch**: `main` → `main`
+**Date**: 2026-05-20
+**Spec**: `kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/spec.md`
 
-**Branch**: `[###-feature-name]` | **Date**: [DATE] | **Spec**: [link]
-**Input**: Feature specification from `/kitty-specs/[###-feature-name]/spec.md`
+---
 
-**Note**: This template is filled in by the `/spec-kitty.plan` command. See `src/specify_cli/missions/software-dev/command-templates/plan.md` for the execution workflow.
+## Branch Contract
 
-The planner will not begin until all planning questions have been answered—capture those answers in this document before progressing to later phases.
+- **Current branch at plan start**: `main`
+- **Planning/base branch**: `main`
+- **Final merge target**: `main`
+- **Branch matches target**: yes
+
+All artifacts commit directly to `main`. No feature branch. No worktrees.
+
+---
 
 ## Summary
 
-[Extract from feature spec: primary requirement + technical approach from research]
+This is a **research mission**. The deliverable is a written decision document
+(`decision.md`) that names one of three options for bimaaji's MCP surface and
+backs the choice with cited evidence. No production PHP, JavaScript, or
+configuration code is produced. Any coding need goes into follow-up mission
+M-G.1.
+
+**Decision space (three options):**
+1. PHP-only with conviction — close #1463 as `not-planned`.
+2. Extend `packages/mcp/` with bimaaji PHP tools — file M-G.1 for implementation.
+3. Restore a Node-based MCP sidecar — file M-G.1 with prior-failure diagnosis.
+
+**Effort cap**: ≤ 4 focused hours total (NFR-001).
+
+---
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
+**Mission type**: research — no language/version/storage concerns.
+**Languages present in scope**: PHP 8.5 (`packages/bimaaji/`, `packages/mcp/`), TypeScript (admin SPA — out of scope for this mission).
+**Primary dependencies to survey**: `packages/bimaaji/src/`, `packages/mcp/src/`, `docs/specs/mcp-endpoint.md`.
+**Storage**: N/A (no code ships).
+**Testing**: N/A (no code ships).
+**Target platform**: N/A.
+**Performance goals**: N/A.
+**Constraints**: decision document ≤ 2 pages including pros/cons table (NFR-002).
+**Scale/scope**: one research mission, ~4 hours max.
 
-**Language/Version**: [e.g., Python 3.11, Swift 5.9, Rust 1.75 or NEEDS CLARIFICATION]  
-**Primary Dependencies**: [e.g., FastAPI, UIKit, LLVM or NEEDS CLARIFICATION]  
-**Storage**: [if applicable, e.g., PostgreSQL, CoreData, files or N/A]  
-**Testing**: [Project-specific test approach or NEEDS CLARIFICATION]
-**Target Platform**: [e.g., Linux server, iOS 15+, WASM or NEEDS CLARIFICATION]
-**Project Type**: [single/web/mobile - determines source structure]  
-**Performance Goals**: [domain-specific, e.g., 1000 req/s, 10k lines/sec, 60 fps or NEEDS CLARIFICATION]  
-**Constraints**: [domain-specific, e.g., <200ms p95, <100MB memory, offline-capable or NEEDS CLARIFICATION]  
-**Scale/Scope**: [domain-specific, e.g., 10k users, 1M LOC, 50 screens or NEEDS CLARIFICATION]
+---
 
 ## Charter Check
 
-*GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
+Charter template: `software-dev-default`. Directives DIR-001, DIR-002, DIR-003
+active. This is a research mission — no code is produced, so software-dev
+quality gates (tests, linting, layer checks) do not apply to this mission's
+output. The only gate that matters: **no production code may land in this
+mission** (C-001). Compliance is structural — any file under `packages/` or
+`src/` would be a violation.
 
-[Gates determined based on charter file]
+Charter check: **PASS** (research mission, no code output).
+
+---
 
 ## Project Structure
 
-### Documentation (this feature)
+### Mission artifacts
 
 ```
-kitty-specs/[###-feature]/
-├── plan.md              # This file (/spec-kitty.plan command output)
-├── research.md          # Phase 0 output (/spec-kitty.plan command)
-├── data-model.md        # Phase 1 output (/spec-kitty.plan command)
-├── quickstart.md        # Phase 1 output (/spec-kitty.plan command)
-├── contracts/           # Phase 1 output (/spec-kitty.plan command)
-└── tasks.md             # Phase 2 output (/spec-kitty.tasks command - NOT created by /spec-kitty.plan)
+kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/
+├── plan.md                  # This file (planner output)
+├── spec.md                  # Mission spec
+├── meta.json                # Mission metadata
+├── research.md              # Phase 0+3 methodology + gathered evidence index
+├── research/                # Phase 3 individual evidence notes
+│   ├── bimaaji-surface.md   # Bimaaji public PHP API inventory (WP03)
+│   ├── mcp-capability.md    # packages/mcp/ capability snapshot (WP03)
+│   ├── consumer-signal.md   # Downstream consumer signal log (WP03)
+│   └── sidecar-cost.md      # Node sidecar maintenance-cost history (WP03)
+├── decision-frame.md        # Phase 1 output: options + criteria (WP01)
+├── methodology.md           # Phase 2 output: what to gather + where (WP02)
+├── analysis.md              # Phase 4 output: pros/cons per option (WP04)
+├── decision.md              # Phase 5 output: final recommendation (WP05)
+└── tasks/                   # WP files (generated by /spec-kitty.tasks)
 ```
 
-### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
+### Repository edits (Phase 6 only)
 
 ```
-# [REMOVE IF UNUSED] Option 1: Single project (DEFAULT)
-src/
-├── models/
-├── services/
-├── cli/
-└── lib/
-
-tests/
-├── contract/
-├── integration/
-└── unit/
-
-# [REMOVE IF UNUSED] Option 2: Web application (when "frontend" + "backend" detected)
-backend/
-├── src/
-│   ├── models/
-│   ├── services/
-│   └── api/
-└── tests/
-
-frontend/
-├── src/
-│   ├── components/
-│   ├── pages/
-│   └── services/
-└── tests/
-
-# [REMOVE IF UNUSED] Option 3: Mobile + API (when "iOS/Android" detected)
-api/
-└── [same as backend above]
-
-ios/ or android/
-└── [platform-specific structure: feature modules, UI flows, platform tests]
+docs/specs/mcp-endpoint.md       # Add "Bimaaji MCP positioning" section (FR-004)
+  OR
+packages/bimaaji/README.md       # Alternative location for FR-004 — planner picks
+                                  # mcp-endpoint.md (decision context belongs with
+                                  # the framework's MCP surface spec)
 ```
 
-**Structure Decision**: [Document the selected structure and reference the real
-directories captured above]
+No `src/`, `packages/`, `public/`, or configuration files are touched during
+this mission.
 
-## Complexity Tracking
+---
 
-*Fill ONLY if Charter Check has violations that must be justified*
+## WP Outline
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| [e.g., 4th project] | [current need] | [why 3 projects insufficient] |
-| [e.g., Repository pattern] | [specific problem] | [why direct DB access insufficient] |
+Six work packages map to the six investigation phases. All are research/writing
+tasks — no code.
+
+| WP | Phase | Deliverable | Effort estimate |
+|----|-------|-------------|-----------------|
+| WP01 | Phase 1 — Decision frame | `decision-frame.md`: confirm 3-option space, identify criteria | ~30 min |
+| WP02 | Phase 2 — Methodology | `methodology.md`: list evidence to gather + source locations | ~20 min |
+| WP03 | Phase 3 — Gather | `research/*.md`: bimaaji surface, mcp capability, consumer signal, sidecar cost | ~90 min |
+| WP04 | Phase 4 — Analyze | `analysis.md`: pros/cons table per option vs. criteria | ~40 min |
+| WP05 | Phase 5 — Decide | `decision.md`: named option + evidence-backed rationale (≤2 pages) | ~30 min |
+| WP06 | Phase 6 — Publish | Edit `docs/specs/mcp-endpoint.md`, file M-G.1 if applicable, close #1463 | ~30 min |
+
+**Total estimate**: ~4 hours (within NFR-001 cap).
+
+---
+
+## Phase 0: Research Pre-work
+
+No outstanding NEEDS CLARIFICATION items. The spec fully defines the decision
+space. The `research.md` file documents the methodology and will serve as the
+evidence index for WP03.
+
+See: `kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/research.md`
+
+---
+
+## Phase 1: Design / Contracts
+
+Not applicable — this is a research mission. No data-model.md, no contracts/,
+no quickstart.md. The equivalent "design" artifact is `decision-frame.md`
+(WP01) and `methodology.md` (WP02), which together constitute the research
+design for this mission.
+
+---
+
+## Decision Criteria (pre-loaded for WP01)
+
+The agent executing WP01 should confirm and possibly extend these criteria:
+
+| Criterion | Weight | Notes |
+|-----------|--------|-------|
+| Consumer signal | High | Is there a real downstream ask? No signal = lean Option 1 |
+| Framework readiness | High | Does `packages/mcp/` support PHP tool registration today? |
+| Maintenance cost | Medium | Node sidecar history in this repo |
+| Implementation complexity | Medium | Blast radius of each option |
+| Reversibility | Low | Can we change the decision cheaply if signal arrives later? |
+
+---
+
+## NFR Compliance Plan
+
+| NFR | Threshold | How met |
+|-----|-----------|---------|
+| NFR-001 | ≤ 4 hours total | WP effort estimates total ~4 h; planner pauses and rescopes if WP03 runs > 2 h |
+| NFR-002 | decision.md ≤ 2 pages | Enforced by WP05 scope — pros/cons table + rationale only |
+| NFR-003 | Evidence from (a) framework code, (b) consumer signal, (c) maintenance cost | WP03 research notes cover all three; WP05 must cite all three |
+
+---
+
+## Constraints Checklist
+
+- [ ] C-001: No production code in this mission (enforced structurally — no `packages/` edits)
+- [ ] C-002: #1463 closed via close comment, not `Closes #N` footer
+- [ ] C-003: `decision.md` committed permanently (not deleted on archive)
+- [ ] C-004: No CI hooks bypassed
+
+---
+
+## Branch Contract (repeat — mandatory per skill)
+
+- **Planning/base branch**: `main`
+- **Final merge target**: `main`
+
+---
+
+*Next step*: Run `/spec-kitty.tasks` to generate WP files.
