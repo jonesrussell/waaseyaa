@@ -64,4 +64,18 @@ export default defineNuxtConfig({
       },
     },
   },
+
+  // Pre-bundle the Vue devtools deps so Vite doesn't discover them at runtime
+  // and trigger a mid-request server restart. The restart was tearing down the
+  // vite-node IPC socket and producing "Vite Node IPC socket path not
+  // configured" errors on the first /admin/ request after dev startup.
+  // See https://vite.dev/guide/dep-pre-bundling.html.
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit',
+      ],
+    },
+  },
 })
