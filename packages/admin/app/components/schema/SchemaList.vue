@@ -14,7 +14,9 @@ const { hasCapability } = useAdmin()
 const canUpdate = hasCapability(props.entityType, 'update')
 const canDelete = hasCapability(props.entityType, 'delete')
 const config = useRuntimeConfig()
-const realtimeEnabled = config.public.enableRealtime === '1'
+// Nuxt's runtime-config serializer coerces digit-string env vars to numbers,
+// so accept both the string '1' (default in nuxt.config.ts) and the number 1.
+const realtimeEnabled = String(config.public.enableRealtime) === '1'
 const { schema, loading: schemaLoading, fetch: fetchSchema, sortedProperties } = useSchema(props.entityType)
 const { list, remove } = useEntity()
 const { messages, connected, error: sseError, connect, reconnect } = useRealtime(['admin'], { autoConnect: false })
@@ -28,6 +30,11 @@ const sortField = ref<string | null>(null)
 const sortAsc = ref(true)
 const listError = ref<string | null>(null)
 const bundleFilter = ref<string | null>(null)
+// Unix-epoch seconds at component setup. Used to gate the messages watch so
+// historical events the SSE server replayed on connect cannot trigger refetch
+// floods. The framework's BroadcastRouter now starts new connections at the
+// current high-water mark; this is a defensive second line if that regresses.
+const mountedAtSec = Date.now() / 1000
 
 // Bundle filter target: the property name that holds the bundle value (e.g.
 // 'type' for nodes). Schema exposes this as `x-bundle-key` (M3A, #1413).
@@ -163,8 +170,11 @@ onMounted(async () => {
 watch(messages, (msgs) => {
   if (msgs.length === 0) return
   const latest = msgs[msgs.length - 1]
+  if (latest === undefined) return
+  // Ignore events that predate this component's mount — protects against an
+  // SSE backend that ever replays history on connect (see BroadcastRouter).
+  if (typeof latest.created_at === 'number' && latest.created_at < mountedAtSec) return
   if (
-    latest !== undefined &&
     (latest.event === 'entity.saved' || latest.event === 'entity.deleted') &&
     latest.data?.entityType === props.entityType
   ) {

@@ -88,6 +88,39 @@ final class BroadcastStorageTest extends TestCase
     }
 
     #[Test]
+    public function maxIdReturnsZeroOnEmptyLog(): void
+    {
+        $this->assertSame(0, $this->storage->maxId());
+        $this->assertSame(0, $this->storage->maxId(['admin']));
+    }
+
+    #[Test]
+    public function maxIdReturnsHighestRowId(): void
+    {
+        $this->storage->push('admin', 'a', []);
+        $this->storage->push('admin', 'b', []);
+        $this->storage->push('admin', 'c', []);
+
+        $messages = $this->storage->poll(0);
+        $expected = $messages[count($messages) - 1]['id'];
+
+        $this->assertSame($expected, $this->storage->maxId());
+    }
+
+    #[Test]
+    public function maxIdFiltersByChannels(): void
+    {
+        $this->storage->push('admin', 'a', []);   // id 1
+        $this->storage->push('system', 'b', []);  // id 2
+        $this->storage->push('admin', 'c', []);   // id 3
+
+        $this->assertSame(3, $this->storage->maxId(['admin']));
+        $this->assertSame(2, $this->storage->maxId(['system']));
+        $this->assertSame(0, $this->storage->maxId(['nonexistent']));
+        $this->assertSame(3, $this->storage->maxId());
+    }
+
+    #[Test]
     public function pruneRemovesOldMessages(): void
     {
         $this->storage->push('admin', 'old', []);

@@ -92,6 +92,32 @@ final class BroadcastStorage
     }
 
     /**
+     * Return the highest existing row id, optionally filtered by channels.
+     *
+     * Returns 0 when the log is empty. Used by SSE handlers to start new
+     * connections at "now" instead of replaying history on every connect.
+     *
+     * @param list<string> $channels Filter to specific channels. Empty = all.
+     */
+    public function maxId(array $channels = []): int
+    {
+        $sql = 'SELECT MAX(id) AS max_id FROM _broadcast_log';
+        $params = [];
+
+        if ($channels !== []) {
+            $placeholders = implode(', ', array_fill(0, count($channels), '?'));
+            $sql .= " WHERE channel IN ({$placeholders})";
+            $params = $channels;
+        }
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute($params);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return (int) ($row['max_id'] ?? 0);
+    }
+
+    /**
      * Remove messages older than $maxAgeSeconds.
      */
     public function prune(int $maxAgeSeconds = 300): void

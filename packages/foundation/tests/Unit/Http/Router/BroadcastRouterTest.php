@@ -32,6 +32,34 @@ final class BroadcastRouterTest extends TestCase
     }
 
     #[Test]
+    public function resolve_initial_cursor_uses_high_water_mark_when_no_last_event_id(): void
+    {
+        $request = Request::create('/api/broadcast?channels=admin');
+
+        self::assertSame(42, BroadcastRouter::resolveInitialCursor($request, 42));
+        self::assertSame(0, BroadcastRouter::resolveInitialCursor($request, 0));
+    }
+
+    #[Test]
+    public function resolve_initial_cursor_resumes_from_last_event_id_header(): void
+    {
+        $request = Request::create('/api/broadcast?channels=admin');
+        $request->headers->set('Last-Event-ID', '17');
+
+        // Even though storage's high-water mark is 99, we resume at 17.
+        self::assertSame(17, BroadcastRouter::resolveInitialCursor($request, 99));
+    }
+
+    #[Test]
+    public function resolve_initial_cursor_rejects_non_numeric_last_event_id(): void
+    {
+        $request = Request::create('/api/broadcast?channels=admin');
+        $request->headers->set('Last-Event-ID', 'not-a-number');
+
+        self::assertSame(42, BroadcastRouter::resolveInitialCursor($request, 42));
+    }
+
+    #[Test]
     public function handle_returns_streamed_response(): void
     {
         $router = new BroadcastRouter();
