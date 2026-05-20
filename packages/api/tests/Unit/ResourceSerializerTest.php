@@ -42,6 +42,63 @@ final class ResourceSerializerTest extends TestCase
     }
 
     #[Test]
+    public function serializeOmitsAlwaysInternalCredentialFields(): void
+    {
+        // Credential-like raw _data keys must never leak via the JSON:API
+        // serializer, even when no FieldDefinition exists for them.
+        $entity = new TestEntity([
+            'id' => 42,
+            'uuid' => 'abc-123-def',
+            'title' => 'My Article',
+            'pass' => '$2y$12$NEVER_LEAK_BCRYPT_HASH',
+            'password' => 'plaintext-should-not-leak',
+            'password_hash' => 'alt-credential-key',
+        ]);
+
+        $resource = $this->serializer->serialize($entity);
+
+        $this->assertArrayNotHasKey('pass', $resource->attributes);
+        $this->assertArrayNotHasKey('password', $resource->attributes);
+        $this->assertArrayNotHasKey('password_hash', $resource->attributes);
+        $this->assertSame('My Article', $resource->attributes['title']);
+    }
+
+    #[Test]
+    public function serializeOmitsFieldsMarkedInternalInSettings(): void
+    {
+        // Fields whose FieldDefinition sets `settings['internal'] => true`
+        // (e.g. User::two_factor_secret) must not appear in serialized output.
+        $entityTypeManager = new EntityTypeManager(new EventDispatcher());
+        $entityTypeManager->registerEntityType(TestEntityType::stub(
+            'article',
+            [
+                'two_factor_secret' => new FieldDefinition(
+                    name: 'two_factor_secret',
+                    type: 'string',
+                    settings: ['internal' => true],
+                ),
+                'title' => new FieldDefinition(name: 'title', type: 'string'),
+            ],
+            keys: TestEntity::definitionKeys(),
+            class: TestEntity::class,
+            label: 'Article',
+        ));
+        $serializer = new ResourceSerializer($entityTypeManager);
+
+        $entity = new TestEntity([
+            'id' => 7,
+            'uuid' => 'aaa-111-bbb',
+            'title' => 'visible',
+            'two_factor_secret' => 'JBSWY3DPEHPK3PXP',
+        ]);
+
+        $resource = $serializer->serialize($entity);
+
+        $this->assertArrayNotHasKey('two_factor_secret', $resource->attributes);
+        $this->assertSame('visible', $resource->attributes['title']);
+    }
+
+    #[Test]
     public function serializeEntityToResource(): void
     {
         $entity = new TestEntity([

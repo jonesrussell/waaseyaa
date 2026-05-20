@@ -36,6 +36,31 @@ final class WaaseyaaRouterTest extends TestCase
     }
 
     #[Test]
+    public function priority_static_route_beats_earlier_dynamic_catchall(): void
+    {
+        // Regression for framework#1532: `/api/user/me` was treated as a literal
+        // entity id by `/api/user/{id}` because JsonApiRouteProvider registered
+        // the dynamic route first. Bumping the static route's priority must
+        // make it match before the catch-all regardless of registration order.
+        $router = new WaaseyaaRouter(new RequestContext('', 'GET'));
+        $router->addRoute(
+            'api.user.show',
+            RouteBuilder::create('/api/user/{id}')->controller('Show')->methods('GET')->build(),
+        );
+        $router->addRoute(
+            'api.user.me',
+            RouteBuilder::create('/api/user/me')->priority(10)->controller('Me')->methods('GET')->build(),
+        );
+        $router->sortRoutesByPriority();
+
+        $params = $router->match('/api/user/me');
+        $this->assertSame('api.user.me', $params['_route']);
+
+        $params = $router->match('/api/user/42');
+        $this->assertSame('api.user.show', $params['_route']);
+    }
+
+    #[Test]
     public function match_throws_route_not_found_for_unknown_path(): void
     {
         $router = new WaaseyaaRouter(new RequestContext('', 'GET'));

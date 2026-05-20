@@ -25,6 +25,13 @@ use Waaseyaa\Field\FieldDefinitionInterface;
  */
 final class ResourceSerializer
 {
+    /**
+     * Field names that are NEVER serialized, regardless of whether the entity
+     * declares them as `#[Field(... internal: true)]`. Defense in depth for
+     * entities that store credential material in raw `_data` keys.
+     */
+    private const ALWAYS_INTERNAL_FIELDS = ['pass', 'password', 'password_hash'];
+
     public function __construct(
         private readonly EntityTypeManagerInterface $entityTypeManager,
         private readonly string $basePath = '/api',
@@ -60,6 +67,10 @@ final class ResourceSerializer
         };
 
         $attributes = $this->attributesFromEntity($entity, $keys);
+
+        // Drop fields marked `internal: true` and any always-internal credential keys.
+        // Runs before the per-account filter so credentials never reach EntityAccessHandler.
+        $attributes = $this->filterInternalFields($attributes, $entityType->getFieldDefinitions());
 
         // Filter out fields the account cannot view.
         if ($accessHandler !== null && $account !== null) {
@@ -144,6 +155,35 @@ final class ResourceSerializer
                 continue;
             }
             $attributes[$fieldName] = $value;
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Drop attributes that must never leave the server:
+     *   1. Anything in {@see self::ALWAYS_INTERNAL_FIELDS} (`pass`, `password`, `password_hash`).
+     *      Honored even when no FieldDefinition exists, so raw `_data` keys
+     *      holding credential material cannot leak via JSON:API.
+     *   2. Any field whose definition sets `settings['internal'] => true`
+     *      (e.g. `two_factor_secret` on the User entity).
+     *
+     * @param array<string, mixed> $attributes
+     * @param array<string, FieldDefinitionInterface> $fieldDefinitions
+     * @return array<string, mixed>
+     */
+    private function filterInternalFields(array $attributes, array $fieldDefinitions): array
+    {
+        foreach (array_keys($attributes) as $name) {
+            if (in_array($name, self::ALWAYS_INTERNAL_FIELDS, true)) {
+                unset($attributes[$name]);
+                continue;
+            }
+
+            $definition = $fieldDefinitions[$name] ?? null;
+            if ($definition !== null && $definition->getSetting('internal') === true) {
+                unset($attributes[$name]);
+            }
         }
 
         return $attributes;

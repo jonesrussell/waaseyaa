@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **`waaseyaa/api` — `ResourceSerializer` now filters credential and internal fields** (#1531). Previously `GET /api/{type}/{id}` and the admin SPA's `/admin/_surface/{type}` exposed every key in the entity's `_data` blob — including the bcrypt `pass` hash on the `User` entity — to any account with `view` access (e.g. `administer content`). Two layers of defense:
+    1. A hard-coded list `ResourceSerializer::ALWAYS_INTERNAL_FIELDS = ['pass', 'password', 'password_hash']` is dropped from attributes regardless of whether the entity declares a matching `FieldDefinition`. This covers credential keys stored as raw `_data` JSON.
+    2. Any `FieldDefinition` whose settings include `'internal' => true` (e.g. `User::two_factor_secret`, `User::two_factor_recovery_codes_hash`) is now dropped — the existing `internal` flag is finally honored. Mark new sensitive fields with `#[Field(... settings: ['internal' => true])]` to extend this.
+  Filter runs before `EntityAccessHandler::filterFields()` so credentials never reach per-account policy code. No consumer changes required.
+
+### Fixed
+
+- **`waaseyaa/routing` — `GET /api/user/me` no longer shadowed by JSON:API `/api/user/{id}`** (#1532). Routes are matched by `WaaseyaaRouter::sortRoutesByPriority()` (higher first), and `api.user.me` was registered at the default priority of `0`. The JSON:API catch-all `/api/user/{id}` registered by `JsonApiRouteProvider` matched first and returned `404 Entity of type 'user' with ID 'me' not found.` `api.user.me` is now registered with `->priority(10)` so it always beats the dynamic-id route. Regression locked in by `WaaseyaaRouterTest::priority_static_route_beats_earlier_dynamic_catchall`.
+
 ## [0.1.0-alpha.185] - 2026-05-20
 
 ### Fixed
