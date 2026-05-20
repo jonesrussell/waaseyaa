@@ -16,7 +16,8 @@ subtasks:
 - T002
 - T003
 - T004
-shell_pid: '672099'
+shell_pid: "672099"
+agent: "claude:sonnet:implementer:implementer"
 history:
 - date: '2026-05-20T23:30:18Z'
   agent: claude:sonnet:tasks:tasks
@@ -233,3 +234,7 @@ final class SemanticSearchAccessTest extends TestCase
 2. Confirm `SearchController` is constructed with both `account:` and `accessHandler:` — neither alone is sufficient.
 3. Run `SemanticSearchAccessTest` directly and confirm both assertions fire.
 4. Check `bin/check-package-layers` does not regress.
+
+## Activity Log
+
+- 2026-05-20T23:45:56Z – claude:sonnet:implementer:implementer – shell_pid=672099 – Assigned agent via action command
