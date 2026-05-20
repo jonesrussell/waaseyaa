@@ -146,6 +146,9 @@ final class AuthOidcRouteServiceProvider extends ServiceProvider
                 ->controller(new MeController())
                 ->allowAll()
                 ->methods('GET')
+                // Beat JsonApiRouteProvider's `/api/user/{id}` (priority 0),
+                // which would otherwise treat `me` as a literal entity id.
+                ->priority(10)
                 ->build(),
         );
 
