@@ -1,0 +1,10 @@
+{
+  "created_at": "2026-05-20T22:58:56.833487+00:00",
+  "friendly_name": "admin spa realtime config contract",
+  "mission_id": "01KS3ST407QFCW2RH3EANXR805",
+  "mission_number": null,
+  "mission_slug": "admin-spa-realtime-config-contract-01KS3ST4",
+  "mission_type": "software-dev",
+  "slug": "admin-spa-realtime-config-contract-01KS3ST4",
+  "target_branch": "main"
+}
