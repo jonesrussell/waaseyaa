@@ -1,6 +1,8 @@
 {
   "created_at": "2026-05-20T22:55:55.304270+00:00",
-  "friendly_name": "entrypoint provider trait reachability",
+  "friendly_name": "Entrypoint Provider — Trait-Member Reachability",
+  "source_description": "Close #1501. After Bucket 3 of Phase 3 dead-code cleanup, 31 baseline entries remain for three traits whose class-level docblock carries @api: RevisionableEntityTrait (17 property-never-read), InteractsWithApi (9), RefreshDatabase (5). Other @api-carrying traits DO drop from the baseline, proving the mechanism works in general. The hole is specifically in how class-level @api propagates to trait members — neither shipmonk's ApiPhpDocUsageProvider nor WaaseyaaEntrypointProvider's hasApiPhpDoc handles the trait-member case. The fix audits the propagation logic, extends it, and drops these 31 entries.",
+  "vcs": "git",
   "mission_id": "01KS3SMJNGNQVY11VTVDCNHJ1E",
   "mission_number": null,
   "mission_slug": "entrypoint-provider-trait-reachability-01KS3SMJ",
