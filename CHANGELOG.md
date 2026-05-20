@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.185] - 2026-05-20
+
 ### Fixed
 
 - **Two more pre-auth `getQuery()` sites missed by the #1495 sweep.** Post-#1525 audit caught two service-layer helpers that throw `MissingQueryAccountException` under fail-closed access checking: (1) `Waaseyaa\Seo\SitemapGenerator::collectFromEntityTypes()` — sitemap URL enumeration is anonymous-served by definition and has no request-scoped account; same shape as `PathAliasResolver`. (2) `Waaseyaa\User\UserBlockService::isBlocked()` — block-relationship existence is an integrity primitive (mirrors `RelationshipValidator`) and cannot be gated by either party's `view` policy on `user_block` without breaking the safety semantics this service exists to enforce. Both marked as documented system-context bypasses via `accessCheck(false)` with inline C-004 references. Regression coverage in `SitemapGeneratorAccessCheckTest` and `UserBlockServiceAccessCheckTest`.
