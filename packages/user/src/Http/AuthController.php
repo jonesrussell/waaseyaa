@@ -52,11 +52,19 @@ final class AuthController
 
     /**
      * Looks up a user by name or email in storage. Returns null if not found.
+     *
+     * Pre-authentication identity resolution: there is no bound account on the
+     * request, so the SqlEntityQuery fail-closed guard (mission
+     * sql-entity-query-access-checking-01KRYP15, C-006) would throw at
+     * execute(). The two lookups below opt out with accessCheck(false), mirroring
+     * the documented system-context pattern in SqlEntityStorage::loadByKey
+     * (C-004). The status=1 condition still excludes blocked users.
      */
     public function findUserByName(EntityStorageInterface $storage, string $name): ?User
     {
         // Try by name first.
         $ids = $storage->getQuery()
+            ->accessCheck(false)
             ->condition('name', $name)
             ->condition('status', 1)
             ->range(0, 1)
@@ -65,6 +73,7 @@ final class AuthController
         // If not found, try by mail field (stored in _data JSON blob).
         if ($ids === []) {
             $ids = $storage->getQuery()
+                ->accessCheck(false)
                 ->condition('mail', $name)
                 ->condition('status', 1)
                 ->range(0, 1)

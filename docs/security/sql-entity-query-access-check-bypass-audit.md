@@ -39,6 +39,8 @@ These sites never have an end-user `AccountInterface` available and run with ful
 | `packages/genealogy/src/Ssr/GenealogySsrController.php` | 164 | Same SSR controller, sibling query. | 2026-05-18 |
 | `packages/mcp/src/Tools/McpTool.php` | 68 | MCP relationship-id lookup feeds tool-execution context; the MCP surface authenticates via its own credential layer (not the user account model), so the entity-query account is intentionally unset. | 2026-05-18 |
 | `packages/path/src/PathAliasResolver.php` | 25 | System-context URL → entity-id lookup. Path aliases must resolve globally for any visitor; entity-level access is enforced when the caller subsequently loads the resolved entity. Missed during the original audit and caught when Phase13 SSR integration tests started returning HTTP 500 instead of 200/403/404 after v0.1.0-alpha.181 shipped. | 2026-05-19 |
+| `packages/user/src/Http/AuthController.php` | 67 | Pre-authentication identity resolution: `findUserByName()` runs *before* the user has a session — there is no account to bind. Mirrors `SqlEntityStorage::loadByKey` (C-004). Name-lookup chain. Missed during the original audit and caught when the admin SPA login surface returned HTTP 500 on `POST /api/auth/login` after v0.1.0-alpha.181 shipped (#1525). | 2026-05-20 |
+| `packages/user/src/Http/AuthController.php` | 76 | Same controller, mail-fallback chain. Runs only when the name lookup misses, but identical justification: no bound account exists pre-authentication. (#1525) | 2026-05-20 |
 
 ### Conditional fallback — set account when available, bypass otherwise
 
