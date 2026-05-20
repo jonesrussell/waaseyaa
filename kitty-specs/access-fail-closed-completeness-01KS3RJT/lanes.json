@@ -1,0 +1,102 @@
+{
+  "version": 1,
+  "mission_slug": "access-fail-closed-completeness-01KS3RJT",
+  "mission_id": "01KS3RJTYB3PNN9S4PF641TS0J",
+  "mission_branch": "kitty/mission-access-fail-closed-completeness-01KS3RJT",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01"
+      ],
+      "write_scope": [
+        "packages/foundation/src/Http/Router/SearchRouter.php",
+        "tests/Integration/Phase24/SemanticSearchAccessTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-b",
+      "wp_ids": [
+        "WP02"
+      ],
+      "write_scope": [
+        "packages/foundation/src/Kernel/AbstractKernel.php",
+        "packages/foundation/src/Kernel/Bootstrap/AccessPolicyRegistry.php",
+        "packages/foundation/src/Kernel/Bootstrap/Exception/PolicyInstantiationException.php",
+        "packages/foundation/src/Kernel/Bootstrap/KernelPolicyDependencyResolver.php",
+        "packages/foundation/src/Kernel/Bootstrap/PolicyDependencyResolverInterface.php",
+        "packages/foundation/tests/Unit/Kernel/Bootstrap/AccessPolicyRegistryTest.php",
+        "tests/Integration/Phase24/AttachmentPolicyDiscoveryTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-c",
+      "wp_ids": [
+        "WP03",
+        "WP04",
+        "WP05"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "bin/check-getquery-bindings",
+        "composer.json",
+        "docs/specs/access-control.md",
+        "packages/entity/composer.json",
+        "packages/entity/testing/RecordingEntityQuery.php",
+        "packages/path/tests/Unit/PathAliasResolverBindingTest.php",
+        "packages/seo/tests/Unit/SitemapGeneratorBindingTest.php",
+        "packages/user/tests/Unit/AuthControllerFindUserByNameBindingTest.php",
+        "packages/user/tests/Unit/UserBlockServiceBindingTest.php",
+        "tests/Integration/Phase24/GetQueryBindingsGateTest.php",
+        "tools/getquery-bindings-baseline.txt"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-20T23:43:29.581078+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP03"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP04",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP04"
+      }
+    ],
+    "total_merges": 2,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 2
+    }
+  }
+}
