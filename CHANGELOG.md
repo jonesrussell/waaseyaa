@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.184] - 2026-05-20
+
 ### Fixed
 
 - **Admin SPA login flow broken under fail-closed access checking (#1525).** `Waaseyaa\User\Http\AuthController::findUserByName` was missed by the #1495 sweep — same class of miss as `PathAliasResolver` (#1518). The pre-authentication user lookup called `getQuery()->execute()` without binding an account or opting out, so every `POST /api/auth/login` hit `MissingQueryAccountException` and returned HTTP 500. End users had to log in via the SSR `/login` page first and then navigate to `/admin`. Marked both query chains (by `name` and by `mail` fallback) as a documented system-context bypass via `accessCheck(false)`, mirroring `SqlEntityStorage::loadByKey` (C-004). Pre-existing `status=1` condition continues to exclude blocked users. Regression coverage in `AuthControllerTest::findUserByNameDisablesAccessCheckForPreAuthLookup` asserts both queries opt out.
