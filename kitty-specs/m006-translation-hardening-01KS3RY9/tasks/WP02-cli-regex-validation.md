@@ -498,3 +498,4 @@ methods. Add them as no-ops returning sensible defaults.
 ## Activity Log
 
 - 2026-05-21T00:43:51Z – claude:sonnet:implementer:implementer – shell_pid=732406 – Started implementation via action command
+- 2026-05-21T00:46:19Z – claude:sonnet:implementer:implementer – shell_pid=732406 – BCP-47 regex constant in packages/entity/src/LangcodeValidator.php; validation wired in render(), generate(), renderTwoAxisFromRevisionable(); backend assert added; all interpolation sites confirmed; 32 tests pass (cs-check + phpstan clean)
