@@ -14,8 +14,8 @@ subtasks:
 - T009
 - T010
 - T011
-agent: "claude:sonnet:researcher:implementer"
-shell_pid: "740452"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "758830"
 history:
 - date: '2026-05-20T23:57:38Z'
   agent: tasks-materializer
@@ -371,3 +371,4 @@ Reviewer should verify: (1) all four research notes are present, (2) each has a 
 
 - 2026-05-21T00:46:54Z – claude:sonnet:researcher:implementer – shell_pid=740452 – Started implementation via action command
 - 2026-05-21T00:50:53Z – claude:sonnet:researcher:implementer – shell_pid=740452 – 4 evidence files committed: bimaaji surface (25 files, 5 graph op candidates), mcp capability (PHP tool registration YES via Bridge interfaces), consumer signal (NONE as of 2026-05-20), sidecar cost (exit-254 failure, ~1 month lifespan, medium cost)
+- 2026-05-21T00:51:57Z – claude:opus-4-7:reviewer:reviewer – shell_pid=758830 – Started review via action command
