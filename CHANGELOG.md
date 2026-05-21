@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.0-alpha.188] - 2026-05-21
+
 ### Added
 
 - **Admin SPA realtime config contract (#1537, #1538).** Closed the duplicate `fetchSchema` race via `useSchema()` in-flight Promise dedup. Introduced `useAdminConfig()` typed envelope with `asBoolean`/`asString`/`asUrl` coercion helpers so digit-string env vars (`NUXT_PUBLIC_ENABLE_REALTIME=1`) no longer silently break `=== '1'` checks. Migrated all 17 admin SPA call sites; CI gate `bin/check-admin-coercion-patterns` prevents regression.
