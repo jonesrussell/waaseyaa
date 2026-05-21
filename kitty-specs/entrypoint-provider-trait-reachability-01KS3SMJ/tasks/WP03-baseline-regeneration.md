@@ -223,3 +223,4 @@ Per spec C-002: "The fix shrinks the baseline by exactly 31 entries (the trait c
 ## Activity Log
 
 - 2026-05-21T00:54:18Z – claude:sonnet:implementer:implementer – shell_pid=764533 – Started implementation via action command
+- 2026-05-21T00:56:02Z – claude:sonnet:implementer:implementer – shell_pid=764533 – Baseline regeneration idempotent at 13 entries. RevisionableEntityTrait/InteractsWithApi/RefreshDatabase all at 0. Delta 66->13 (-53; spec minimum was -31, extra drop from WP02 provider improvements). bin/check-dead-code OK. 7/7 unit tests pass. composer verify fails on pre-existing symfony-imports violation unrelated to this mission.
