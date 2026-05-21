@@ -189,3 +189,4 @@ Reviewer should verify: (1) methodology.md gives WP03 enough specificity to exec
 ## Activity Log
 
 - 2026-05-21T00:44:12Z – claude:sonnet:researcher:implementer – shell_pid=733210 – Started implementation via action command
+- 2026-05-21T00:44:52Z – claude:sonnet:researcher:implementer – shell_pid=733210 – methodology.md committed; 4 evidence categories with sources; investigation order set
