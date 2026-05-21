@@ -358,3 +358,4 @@ Layer note: all new exception classes live in `packages/ai-agent/src/Provider/` 
 ## Activity Log
 
 - 2026-05-21T00:25:35Z – claude:sonnet:implementer:implementer – shell_pid=705035 – Assigned agent via action command
+- 2026-05-21T00:38:56Z – claude:sonnet:implementer:implementer – shell_pid=705035 – TransportException/ClientErrorException/RateLimitException hierarchy; AnthropicProvider and OpenAiCompatibleProvider categorize by HTTP status; AgentExecutor retry budget unchanged; 4/4 AgentExecutorRetryTest green; cs-check + phpstan clean
