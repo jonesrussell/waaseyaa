@@ -18,6 +18,8 @@ subtasks:
 - T029
 - T030
 - T031
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "827505"
 history:
 - date: '2026-05-20T23:57:13Z'
   event: created
@@ -259,3 +261,4 @@ Closes #1513
 ## Activity Log
 
 - 2026-05-21T01:28:56Z – unknown – AI pipeline spec documents exception hierarchy + event dispatch + --watch SSE; CHANGELOG bullet covers all 4 WPs; composer verify green (11 pre-existing check-symfony-imports violations, none from this mission)
+- 2026-05-21T01:29:32Z – claude:opus-4-7:reviewer:reviewer – shell_pid=827505 – Started review via action command
