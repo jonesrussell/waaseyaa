@@ -26,8 +26,6 @@ subtasks:
 - T016
 - T017
 - T018
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "726372"
 history:
 - date: '2026-05-20T23:57:13Z'
   event: created
@@ -499,7 +497,3 @@ No `openapi.yaml` exists outside vendor. This WP creates `packages/api/openapi.y
 2. Verify `dispatchSafely` wraps every dispatch call (not just some).
 3. Check `AgentRunObservabilityTest` boots without hitting network or real filesystem.
 4. Confirm `packages/api/openapi.yaml`'s `pending_approval` shape field names match `AgentRunBroadcaster::push()` payload keys exactly.
-
-## Activity Log
-
-- 2026-05-21T00:42:25Z – claude:sonnet:implementer:implementer – shell_pid=726372 – Started implementation via action command

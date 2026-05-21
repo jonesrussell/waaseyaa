@@ -12,9 +12,6 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
-base_branch: kitty/mission-scheduler-entry-auto-discovery-01KS3SE3
-base_commit: a1763ce48f205a0f2227040f0c215e109bfba246
-created_at: '2026-05-21T00:25:49.308976+00:00'
 subtasks:
 - T001
 - T002
@@ -22,8 +19,6 @@ subtasks:
 - T004
 - T005
 - T006
-shell_pid: "721346"
-agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-20T23:57:21Z'
   event: created
@@ -327,10 +322,3 @@ final class ScheduleEntriesInterfaceTest extends TestCase
 - Confirm no `use Waaseyaa\Scheduler\...` import appears in any Foundation file (layer discipline)
 - Check `PackageManifest` for symmetric `fromArray()`/`toArray()` — asymmetric serialization causes runtime discovery gaps
 - Run `bin/waaseyaa optimize:manifest` against a dev checkout and verify `schedule_entries` key appears in the compiled manifest file
-
-## Activity Log
-
-- 2026-05-21T00:25:52Z – claude:sonnet:implementer:implementer – shell_pid=705854 – Assigned agent via action command
-- 2026-05-21T00:39:15Z – claude:sonnet:implementer:implementer – shell_pid=705854 – Interface added (L0 scheduler); PackageManifestCompiler discovers implementors via string-constant FQCN; ScheduleListHandler confirmed present; 70 tests pass, PHPStan L5 clean, cs-check clean, bin/check-package-layers passes
-- 2026-05-21T00:40:09Z – claude:opus-4-7:reviewer:reviewer – shell_pid=721346 – Started review via action command
-- 2026-05-21T00:41:15Z – claude:opus-4-7:reviewer:reviewer – shell_pid=721346 – Review passed: interface shape clean (single register() method, @api, L0-pure), string-FQCN scanner preserves layer discipline, manifest round-trip verified via discoversScheduleEntries test (assertContains on toArray/fromArray), layer check OK, 979 scheduler+foundation tests pass, ScheduleListHandler exists at packages/cli/src/Handler/, no premature M-B PolicyDependencyResolver coupling — WP02 boundary respected.

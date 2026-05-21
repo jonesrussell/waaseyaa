@@ -14,8 +14,6 @@ subtasks:
 - T003
 - T004
 - T005
-agent: "claude:opus-4-7:reviewer:reviewer"
-shell_pid: "734161"
 history:
 - date: '2026-05-20T23:57:25Z'
   author: tasks-materializer
@@ -334,10 +332,3 @@ Three hypotheses for the failure:
 - Confirm probes were removed from source.
 - Verify the WP02 design instruction is actionable without further investigation.
 - Check that hypothesis (d) (mixed) was specifically tested — entity trait and testing traits may have different root causes.
-
-## Activity Log
-
-- 2026-05-21T00:26:09Z – claude:sonnet:implementer:implementer – shell_pid=706738 – Started implementation via action command
-- 2026-05-21T00:42:51Z – claude:sonnet:implementer:implementer – shell_pid=706738 – Diagnosis at research/wp01-diagnosis.md; hypothesis (d) mixed confirmed; WP02 design instruction written. Root cause: PHPStan NodeScopeResolver short-circuits Trait_ nodes before InClassNode, so ReflectionBasedMemberUsageProvider is never invoked for trait files. Fix: override getUsages() to handle Node\Stmt\Trait_ directly for @api-tagged traits.
-- 2026-05-21T00:44:47Z – claude:opus-4-7:reviewer:reviewer – shell_pid=734161 – Started review via action command
-- 2026-05-21T00:45:38Z – claude:opus-4-7:reviewer:reviewer – shell_pid=734161 – Diagnosis sound: hypothesis (d) confirmed by empirical probe + vendor source read. InClassNode-only dispatch in ReflectionBasedMemberUsageProvider.getUsages (line 32-49) verified; ProvidedUsagesCollector::getNodeType returns Node::class so Stmt\Trait_ branch is reachable. Private createMethodUsage/createPropertyUsage visibility constraint correctly flagged with inline-copy resolution path. Unified Trait_+@api fix covers all 31 entries.

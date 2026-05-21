@@ -22,8 +22,8 @@ subtasks:
 - T009
 - T010
 - T011
-shell_pid: "737773"
-agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "702754"
+agent: "claude:sonnet:implementer:implementer"
 history:
 - date: '2026-05-20T23:30:18Z'
   agent: claude:sonnet:tasks:tasks
@@ -398,10 +398,3 @@ final class AccessPolicyRegistryTest extends TestCase
 - 2026-05-21T00:14:05Z – claude:sonnet:implementer:implementer – shell_pid=677610 – Container-resolved registry; ParentDelegatedAccessPolicy auto-instantiates via two-phase algorithm; boot fails on unresolvable deps; 5/5 tests pass, PHPStan clean
 - 2026-05-21T00:14:56Z – claude:opus-4-7:reviewer:reviewer – shell_pid=696102 – Started review via action command
 - 2026-05-21T00:23:01Z – claude:sonnet:implementer:implementer – shell_pid=702754 – Started implementation via action command
-- 2026-05-21T00:37:59Z – claude:sonnet:implementer:implementer – shell_pid=702754 – Cycle 1: optional resolver param + in-place handler mutation; SurfaceMap fixed; SSR/OIDC failures pre-existing from cycle 0
-- 2026-05-21T00:38:53Z – claude:opus-4-7:reviewer:reviewer – shell_pid=717401 – Started review via action command
-- 2026-05-21T00:41:45Z – claude:opus-4-7:reviewer:reviewer – shell_pid=717401 – Moved to planned
-- 2026-05-21T00:43:15Z – claude:sonnet:implementer:implementer – shell_pid=727675 – Started implementation via action command
-- 2026-05-21T00:44:57Z – claude:sonnet:implementer:implementer – shell_pid=727675 – Cycle 2: fixed missed AdminSurfaceServiceProvider call site; 12 SSR+OIDC regressions cleared (16/16 pass)
-- 2026-05-21T00:46:06Z – claude:opus-4-7:reviewer:reviewer – shell_pid=737773 – Started review via action command
-- 2026-05-21T00:48:30Z – claude:opus-4-7:reviewer:reviewer – shell_pid=737773 – Cycle 2 approved: 16/16 SSR+Oidc cleared (matches main baseline); ParentDelegatedAccessPolicy auto-instantiates via container-resolved registry; discoverAccessHandler call site fixed in AdminSurfaceServiceProvider; kernelServices lifecycle verified (set before routes() runs); resolver delegates to KernelServicesInterface::get(); two-phase handler mutation preserves single-object identity; cs-check + phpstan clean; 1198/1198 integration tests pass

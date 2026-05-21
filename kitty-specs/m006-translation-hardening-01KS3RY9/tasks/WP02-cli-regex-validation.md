@@ -19,8 +19,6 @@ subtasks:
 - T005
 - T006
 - T007
-agent: "claude:opus-4-7:reviewer:reviewer"
-shell_pid: "742669"
 history:
 - date: '2026-05-20T23:57:09Z'
   author: tasks-materializer
@@ -494,10 +492,3 @@ methods. Add them as no-ops returning sensible defaults.
 - Confirm the `$backend` assertion fires before the heredoc (check method order in the file diff).
 - Confirm no partial file output is possible if validation throws (the throw must happen before any `file_put_contents` or equivalent — the generator only renders a string, so there is no file write in this class; that happens in the calling handler).
 - Confirm `LangcodeValidatorTest` covers `zh-Hant` (script subtag with 4 letters) explicitly.
-
-## Activity Log
-
-- 2026-05-21T00:43:51Z – claude:sonnet:implementer:implementer – shell_pid=732406 – Started implementation via action command
-- 2026-05-21T00:46:19Z – claude:sonnet:implementer:implementer – shell_pid=732406 – BCP-47 regex constant in packages/entity/src/LangcodeValidator.php; validation wired in render(), generate(), renderTwoAxisFromRevisionable(); backend assert added; all interpolation sites confirmed; 32 tests pass (cs-check + phpstan clean)
-- 2026-05-21T00:47:25Z – claude:opus-4-7:reviewer:reviewer – shell_pid=742669 – Started review via action command
-- 2026-05-21T00:48:57Z – claude:opus-4-7:reviewer:reviewer – shell_pid=742669 – Review passed: LangcodeValidator at L1, /D modifier verified (en\n rejected, valid BCP47 accepted), 6 phpStringLiteral sites audited and safe (raw interpolations limited to docblocks or regex-validated values), $backend whitelist-gated at MakeMigrationHandler:117 before reaching generator (assert is genuine defense-in-depth, not the only guard), 32/32 tests pass, layer check passes, diff scope tight.

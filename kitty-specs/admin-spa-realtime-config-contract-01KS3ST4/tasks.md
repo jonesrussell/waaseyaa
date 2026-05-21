@@ -11,15 +11,15 @@
 
 | ID | Description | WP | Parallel? |
 |---|---|---|---|
-| T001 | Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts | WP01 | No | [D] |
-| T002 | Implement in-flight dedup in `fetch()` — return existing Promise if present | WP01 | No | [D] |
-| T003 | Clear `inflightCache` on rejection; clear both caches in `invalidate()` | WP01 | No | [D] |
-| T004 | Write unit tests FR-008 (no duplicate POSTs), FR-009 (invalidate clears inflight), FR-010 (rejection doesn't poison) | WP01 | [D] |
-| T005 | Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (FR-007) | WP02 | [D] |
-| T006 | Create `AdminConfig` TypeScript interface (no `any`/`unknown` fields, NFR-003) | WP02 | No | [D] |
-| T007 | Create `useAdminConfig()` composable with `useState()`-backed referential stability (NFR-002) | WP02 | No | [D] |
-| T008 | Write unit tests for coercion helpers and composable (FR-011) | WP02 | [D] |
-| T009 | Add "Runtime config" section to `packages/admin/README.md` (FR-013) | WP02 | [D] |
+| T001 | Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts | WP01 | No |
+| T002 | Implement in-flight dedup in `fetch()` — return existing Promise if present | WP01 | No |
+| T003 | Clear `inflightCache` on rejection; clear both caches in `invalidate()` | WP01 | No |
+| T004 | Write unit tests FR-008 (no duplicate POSTs), FR-009 (invalidate clears inflight), FR-010 (rejection doesn't poison) | WP01 | [P] |
+| T005 | Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (FR-007) | WP02 | [P] |
+| T006 | Create `AdminConfig` TypeScript interface (no `any`/`unknown` fields, NFR-003) | WP02 | No |
+| T007 | Create `useAdminConfig()` composable with `useState()`-backed referential stability (NFR-002) | WP02 | No |
+| T008 | Write unit tests for coercion helpers and composable (FR-011) | WP02 | [P] |
+| T009 | Add "Runtime config" section to `packages/admin/README.md` (FR-013) | WP02 | [P] |
 | T010 | Migrate `app/plugins/admin.ts`, `app/middleware/auth.global.ts`, `app/composables/useApi.ts` | WP03 | No |
 | T011 | Migrate all `app/components/**` files (AdminShell.vue, BrandPanel.vue, SchemaList.vue — remove String coerce) | WP03 | [P] |
 | T012 | Migrate all `app/pages/**` files (14 page files) | WP03 | [P] |
@@ -44,10 +44,10 @@
 
 #### Included subtasks
 
-- [x] T001 Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts (WP01)
-- [x] T002 Implement in-flight dedup in `fetch()` — return existing Promise if present (WP01)
-- [x] T003 Clear `inflightCache` on rejection; clear both caches in `invalidate()` (WP01)
-- [x] T004 Write unit tests FR-008, FR-009, FR-010 (WP01)
+- [ ] T001 Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts (WP01)
+- [ ] T002 Implement in-flight dedup in `fetch()` — return existing Promise if present (WP01)
+- [ ] T003 Clear `inflightCache` on rejection; clear both caches in `invalidate()` (WP01)
+- [ ] T004 Write unit tests FR-008, FR-009, FR-010 (WP01)
 
 #### Implementation sketch
 
@@ -77,11 +77,11 @@
 
 #### Included subtasks
 
-- [x] T005 Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (WP02)
-- [x] T006 Create `AdminConfig` TypeScript interface (WP02)
-- [x] T007 Create `useAdminConfig()` composable (WP02)
-- [x] T008 Write unit tests for coercion helpers and composable (WP02)
-- [x] T009 Add "Runtime config" section to README.md (WP02)
+- [ ] T005 Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (WP02)
+- [ ] T006 Create `AdminConfig` TypeScript interface (WP02)
+- [ ] T007 Create `useAdminConfig()` composable (WP02)
+- [ ] T008 Write unit tests for coercion helpers and composable (WP02)
+- [ ] T009 Add "Runtime config" section to README.md (WP02)
 
 #### Implementation sketch
 

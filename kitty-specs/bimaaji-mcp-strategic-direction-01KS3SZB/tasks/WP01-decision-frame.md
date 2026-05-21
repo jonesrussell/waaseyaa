@@ -12,8 +12,6 @@ subtasks:
 - T002
 - T003
 - T004
-agent: "claude:opus-4-7:reviewer:reviewer"
-shell_pid: "712047"
 history:
 - date: '2026-05-20T23:57:38Z'
   agent: tasks-materializer
@@ -193,10 +191,3 @@ The spec names three options:
 ## Reviewer Guidance
 
 Reviewer should verify: (1) options match the spec exactly unless a 4th was explicitly justified, (2) criteria weights are reasonable for a framework-level MCP decision, (3) decision-maker is the maintainer (not the implementing agent).
-
-## Activity Log
-
-- 2026-05-21T00:26:37Z – claude:sonnet:researcher:implementer – shell_pid=707975 – Started implementation via action command
-- 2026-05-21T00:27:29Z – claude:sonnet:researcher:implementer – shell_pid=707975 – decision-frame.md committed; 3 options confirmed exhaustive; 5 criteria defined with weights
-- 2026-05-21T00:28:32Z – claude:opus-4-7:reviewer:reviewer – shell_pid=712047 – Started review via action command
-- 2026-05-21T00:37:38Z – claude:opus-4-7:reviewer:reviewer – shell_pid=712047 – Research approved: 3-option frame with explicit dismissal of 3 alternatives; 5 measurable independent criteria; decision-maker + 4h bound confirmed; well under 1 page.

@@ -14,16 +14,11 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
-base_branch: kitty/mission-admin-spa-realtime-config-contract-01KS3ST4
-base_commit: 43e5f6eb9c708d875e4f7798c8ae6bb831eec4d8
-created_at: '2026-05-21T00:26:19.580155+00:00'
 subtasks:
 - T001
 - T002
 - T003
 - T004
-shell_pid: "723435"
-agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-20T23:57:32Z'
   event: created
@@ -331,10 +326,3 @@ it('doesNotPoisonOnRejection: a rejected fetch() does not prevent a subsequent f
 3. Confirm `invalidate()` has TWO `delete()` calls.
 4. Run `cd packages/admin && npm test` and verify all three new test names appear in output with ✓.
 5. Run `cd packages/admin && npm run build` and verify zero TypeScript errors.
-
-## Activity Log
-
-- 2026-05-21T00:26:21Z – claude:sonnet:implementer:implementer – shell_pid=707133 – Assigned agent via action command
-- 2026-05-21T00:40:11Z – claude:sonnet:implementer:implementer – shell_pid=707133 – inflightCache added at module scope; clears on rejection (FR-002) and invalidate (FR-003); 3 dedup tests pass (doesNotDuplicateConcurrentFetches, clearsInflightOnInvalidate, doesNotPoisonOnRejection); build clean; 11/11 tests pass
-- 2026-05-21T00:41:00Z – claude:opus-4-7:reviewer:reviewer – shell_pid=723435 – Started review via action command
-- 2026-05-21T00:42:04Z – claude:opus-4-7:reviewer:reviewer – shell_pid=723435 – Review passed: dedup mechanism sound (Map<string,Promise>, .delete on resolve/reject/invalidate). All 9 tests pass incl. 3 new concurrency tests. requireAdminRuntime() inside try is correct — preserves the synchronous-throw error path test. Diff scope tight (useSchema.ts + test only). 0 lint errors, 0 type errors, 206/206 tests green. Orthogonal to WP02 (separate composable, separate cache key).

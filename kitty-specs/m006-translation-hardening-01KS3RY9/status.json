@@ -1,12 +1,12 @@
 {
-  "event_count": 16,
-  "last_event_id": "01KS405WSPBYKCQ9CXM3JEKZX3",
-  "materialized_at": "2026-05-21T00:50:13.430635+00:00",
+  "event_count": 6,
+  "last_event_id": "01KS3YRBDQBV0RK8FXSX6B7CEX",
+  "materialized_at": "2026-05-21T00:25:21.079187+00:00",
   "mission_number": "",
   "mission_slug": "m006-translation-hardening-01KS3RY9",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 2,
+    "approved": 0,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
@@ -14,29 +14,29 @@
     "for_review": 0,
     "in_progress": 1,
     "in_review": 0,
-    "planned": 1
+    "planned": 3
   },
   "work_packages": {
     "WP01": {
-      "actor": "claude:sonnet:implementer:implementer",
+      "actor": "finalize-tasks",
       "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KS405WSPBYKCQ9CXM3JEKZX3",
-      "last_transition_at": "2026-05-21T00:50:13.430635+00:00"
+      "lane": "planned",
+      "last_event_id": "01KS3XZKVNBMWW6X5CCFHV5Q4S",
+      "last_transition_at": "2026-05-21T00:11:50.517989+00:00"
     },
     "WP02": {
-      "actor": "user",
+      "actor": "finalize-tasks",
       "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KS403J5S37QC8T03XFSDAPNC",
-      "last_transition_at": "2026-05-21T00:48:57.017062+00:00"
+      "lane": "planned",
+      "last_event_id": "01KS3XZMDREQT7KHE78V8Z1NYQ",
+      "last_transition_at": "2026-05-21T00:11:51.096600+00:00"
     },
     "WP03": {
-      "actor": "user",
+      "actor": "implement-command",
       "force_count": 1,
-      "lane": "approved",
-      "last_event_id": "01KS3ZPBDBDXX2ETSY4D9SE5VA",
-      "last_transition_at": "2026-05-21T00:41:44.107998+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KS3YRBDQBV0RK8FXSX6B7CEX",
+      "last_transition_at": "2026-05-21T00:25:21.079187+00:00"
     },
     "WP04": {
       "actor": "finalize-tasks",
