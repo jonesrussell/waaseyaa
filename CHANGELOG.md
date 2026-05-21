@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Bimaaji MCP positioning resolved (M-G).** Strategic mission concluded: bimaaji remains PHP-only; #1463 closed as `not-planned`. If a consumer requests MCP-exposed graph operations, future work would extend `packages/mcp/` (Option 2 from the research mission) — not restore a Node sidecar.
+
 ### Fixed
 
 - fix(access,api): thread request account through `SearchRouter` into `SearchController`; closes #1516
