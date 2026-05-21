@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "mission_slug": "scheduler-entry-auto-discovery-01KS3SE3",
+  "mission_id": "01KS3SE3EW76ZT4XETWW5A0A7Y",
+  "mission_branch": "kitty/mission-scheduler-entry-auto-discovery-01KS3SE3",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "docs/specs/broadcasting.md",
+        "docs/specs/operations-playbooks.md",
+        "packages/api/src/Controller/BroadcastStorage.php",
+        "packages/api/src/Schedule/BroadcastStorageScheduleEntries.php",
+        "packages/api/tests/Unit/Schedule/BroadcastStorageScheduleEntriesTest.php",
+        "packages/cli/src/Handler/ScheduleListHandler.php",
+        "packages/foundation/src/Discovery/PackageManifest.php",
+        "packages/foundation/src/Discovery/PackageManifestCompiler.php",
+        "packages/foundation/src/Kernel/AbstractKernel.php",
+        "packages/foundation/src/Kernel/Bootstrap/Exception/ScheduleEntryInstantiationException.php",
+        "packages/foundation/src/Kernel/Bootstrap/ScheduleEntryRegistry.php",
+        "packages/foundation/tests/Unit/Discovery/PackageManifestCompilerTest.php",
+        "packages/foundation/tests/Unit/Kernel/AbstractKernelTest.php",
+        "packages/scheduler/src/Schedule/Ai/AgentScheduleEntries.php",
+        "packages/scheduler/src/ScheduleEntriesInterface.php",
+        "packages/scheduler/tests/Unit/ScheduleEntriesInterfaceTest.php",
+        "tests/Integration/Phase13/ScheduleEntryAutoDiscoveryTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "app-shell",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-21T00:13:06.550868+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP02"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP03"
+      }
+    ],
+    "total_merges": 4,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 4
+    }
+  }
+}
