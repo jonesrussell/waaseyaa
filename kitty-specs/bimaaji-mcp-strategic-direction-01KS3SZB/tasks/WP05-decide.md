@@ -15,8 +15,8 @@ subtasks:
 - T016
 - T017
 - T018
-agent: "claude:sonnet:researcher:implementer"
-shell_pid: "770903"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "782185"
 history:
 - date: '2026-05-20T23:57:38Z'
   agent: tasks-materializer
@@ -223,3 +223,4 @@ Reviewer (the maintainer) should verify: (1) the named option matches their own 
 
 - 2026-05-21T00:56:32Z – claude:sonnet:researcher:implementer – shell_pid=770903 – Started implementation via action command
 - 2026-05-21T00:58:33Z – claude:sonnet:researcher:implementer – shell_pid=770903 – decision.md committed (ad36efec0); Option 1 selected — PHP-only, close #1463 as not-planned; WP06 will execute issue close
+- 2026-05-21T00:59:55Z – claude:opus-4-7:reviewer:reviewer – shell_pid=782185 – Started review via action command
