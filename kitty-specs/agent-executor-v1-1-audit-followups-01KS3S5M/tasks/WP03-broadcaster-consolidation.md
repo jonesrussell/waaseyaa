@@ -230,3 +230,4 @@ After this WP, `MessagingServiceProvider` should either delegate to `AgentRunBro
 - 2026-05-21T01:03:35Z – claude:opus-4-7:reviewer:reviewer – shell_pid=789896 – Started review via action command
 - 2026-05-21T01:05:09Z – claude:opus-4-7:reviewer:reviewer – shell_pid=789896 – Moved to planned
 - 2026-05-21T01:06:01Z – claude:sonnet:implementer:implementer – shell_pid=793163 – Started implementation via action command
+- 2026-05-21T01:09:52Z – claude:sonnet:implementer:implementer – shell_pid=793163 – Provider registered in extra.waaseyaa.providers; smoke test asserts kernel resolves AgentRunBroadcasterInterface non-null
