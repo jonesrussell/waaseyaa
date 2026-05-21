@@ -12,7 +12,6 @@ use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
 use Waaseyaa\AI\Agent\Account\InitiatorAccountLoaderInterface;
 use Waaseyaa\AI\Agent\Account\StubInitiatorAccountLoader;
 use Waaseyaa\AI\Agent\Broadcast\AgentRunBroadcasterInterface;
-use Waaseyaa\AI\Agent\Broadcast\BroadcastStorageAdapter;
 use Waaseyaa\AI\Agent\Message\RunAgent;
 use Waaseyaa\AI\Agent\Message\RunAgentHandler;
 use Waaseyaa\AI\Agent\Provider\NullLlmProvider;
@@ -21,8 +20,6 @@ use Waaseyaa\AI\Agent\Reaper\StalledRunReaper;
 use Waaseyaa\AI\Agent\Repository\AgentAuditLogRepository;
 use Waaseyaa\AI\Agent\Repository\AgentRunRepository;
 use Waaseyaa\AI\Agent\Service\AgentRunService;
-use Waaseyaa\Api\Controller\BroadcastStorage;
-use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
@@ -37,9 +34,9 @@ use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
  *  - {@see AgentRunService} — the application-facing facade
  *    (`enqueue()` + `runInline()`).
  *  - {@see StalledRunReaper} — recovers worker-crashed rows.
- *  - {@see AgentRunBroadcasterInterface} — wired to
- *    {@see BroadcastStorageAdapter} for WP-04. WP-05 rebinds this to
- *    the real `AgentRunBroadcaster` once the broadcast surface lands.
+ *  - {@see AgentRunBroadcasterInterface} — bound by
+ *    {@see \Waaseyaa\AI\Agent\Broadcast\AgentRunBroadcasterServiceProvider}
+ *    (registered after this provider so its binding wins).
  *  - {@see InitiatorAccountLoaderInterface} — wired to
  *    {@see StubInitiatorAccountLoader}. Apps that need real users
  *    rebind it in their own provider.
@@ -63,13 +60,8 @@ final class MessagingServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->singleton(
-            AgentRunBroadcasterInterface::class,
-            fn(): AgentRunBroadcasterInterface => new BroadcastStorageAdapter(
-                new BroadcastStorage($this->resolve(DatabaseInterface::class)),
-                $this->safeResolve(LoggerInterface::class) ?? new NullLogger(),
-            ),
-        );
+        // AgentRunBroadcasterInterface is bound by AgentRunBroadcasterServiceProvider,
+        // which is registered after this provider so its singleton wins.
 
         $this->singleton(
             InitiatorAccountLoaderInterface::class,

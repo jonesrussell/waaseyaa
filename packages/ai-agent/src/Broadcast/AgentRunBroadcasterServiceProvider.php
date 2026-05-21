@@ -11,16 +11,10 @@ use Waaseyaa\Foundation\Log\NullLogger;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 
 /**
- * Override the WP-04 baseline {@see BroadcastStorageAdapter} binding with
- * the canonical {@see AgentRunBroadcaster}.
+ * Binds {@see AgentRunBroadcasterInterface} → {@see AgentRunBroadcaster}.
  *
- * The kernel resolves the *last* binding for a given abstract; this
- * provider MUST be registered after {@see \Waaseyaa\AI\Agent\MessagingServiceProvider}
- * so the rebind wins (composer.json provider order).
- *
- * Kept as its own provider so WP-04's `MessagingServiceProvider` stays
- * a stable WP-04 artifact: rebinding here documents WP-05 ownership
- * of the broadcaster.
+ * Registered after {@see \Waaseyaa\AI\Agent\MessagingServiceProvider} in
+ * `composer.json` so its singleton is the one the kernel resolves.
  *
  * @api
  */
