@@ -13,7 +13,7 @@ onMounted(() => {
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue('--waaseyaa-auth-hide-brand-panel')
     .trim()
-  if (value === '1') {
+  if (value === '1') { // allow-coercion: CSS custom property --waaseyaa-auth-hide-brand-panel, not a runtime-config value
     hidePanel.value = true
   }
 })
