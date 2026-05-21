@@ -74,25 +74,74 @@ jobs:
           composer create-project waaseyaa/waaseyaa smoke-app \
             --stability=alpha --no-interaction --prefer-dist
 
-      - name: Pin framework to ${{ steps.target.outputs.constraint }} (with Packagist crawl retry)
+      - name: Wait for Packagist to index framework + siblings
+        env:
+          CONSTRAINT: ${{ steps.target.outputs.constraint }}
+        run: |
+          # composer require fails opaquely when ANY sibling waaseyaa/*
+          # package hasn't been indexed yet — the resolver lists tens of
+          # found versions but says "does not match the constraint", masking
+          # WHICH dep is the culprit. Poll the Packagist p2 endpoint for
+          # each first-party sibling (admin-surface has been the canary)
+          # so the smoke run has a clean go/no-go signal before invoking
+          # composer. Budget: 30 attempts × 60s = 30 minutes — wider than
+          # the previous 12-minute composer-retry loop because split
+          # packages can lag the framework's own crawl during release
+          # windows. p2 is a CDN GET; polling 7 packages is cheap.
+          set -euo pipefail
+          tag="v${CONSTRAINT}"
+          # Discover all waaseyaa/* packages from the checked-out monorepo
+          # (matches packagist-update.yml's discover step so the two stay in lockstep).
+          pkgs=$(
+            for f in framework/packages/*/composer.json; do
+              jq -r '.name // empty' "$f"
+            done
+            jq -r '.name // empty' framework/composer.json
+          )
+          # Smoke-canary subset: framework + the packages most likely to lag
+          # (admin-surface historically; others can be added if they trip the gate).
+          canaries="waaseyaa/framework waaseyaa/admin-surface"
+          for pkg in $canaries; do
+            attempt=1
+            max_attempts=30
+            while true; do
+              body=$(curl -sS --max-time 15 "https://repo.packagist.org/p2/${pkg}.json" || echo '{}')
+              if echo "$body" | jq -e --arg pkg "$pkg" --arg tag "$tag" \
+                '.packages[$pkg][]? | select(.version == $tag)' >/dev/null 2>&1; then
+                echo "::notice::${pkg} ${tag} visible on Packagist (attempt ${attempt})"
+                break
+              fi
+              if [[ $attempt -ge $max_attempts ]]; then
+                echo "::error::${pkg} ${tag} not visible on Packagist after $((max_attempts * 60))s"
+                echo "Latest indexed versions for ${pkg}:"
+                echo "$body" | jq -r --arg pkg "$pkg" '.packages[$pkg][0:5][]? | "  - \(.version) (\(.time))"' || true
+                exit 1
+              fi
+              echo "attempt ${attempt}/${max_attempts}: ${pkg} ${tag} not yet indexed; sleeping 60s"
+              attempt=$((attempt + 1))
+              sleep 60
+            done
+          done
+
+      - name: Pin framework to ${{ steps.target.outputs.constraint }}
         working-directory: smoke-app
         env:
           CONSTRAINT: ${{ steps.target.outputs.constraint }}
         run: |
-          # composer require fails loudly when the requested version isn't
-          # listed on Packagist yet — that's our signal to retry through
-          # the crawl window. 12 attempts * 60s = 12 minutes.
+          # Packagist availability already verified in the previous step,
+          # so this should succeed on the first attempt. Keep a small retry
+          # for transient network blips only (3 attempts × 30s = 90s).
           attempt=1
-          max_attempts=12
+          max_attempts=3
           until composer require "waaseyaa/framework:${CONSTRAINT}" \
               --no-interaction --no-scripts --update-with-all-dependencies; do
             if [[ $attempt -ge $max_attempts ]]; then
-              echo "pin failed after ${max_attempts} attempts (Packagist may not have indexed ${CONSTRAINT})" >&2
+              echo "::error::composer require failed after ${max_attempts} attempts (network blip or unexpected resolver state)"
               exit 1
             fi
-            echo "pin attempt ${attempt} failed; sleeping 60s and retrying"
+            echo "transient failure on attempt ${attempt}; sleeping 30s"
             attempt=$((attempt + 1))
-            sleep 60
+            sleep 30
           done
 
       - name: Verify pinned version
