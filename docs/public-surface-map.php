@@ -116,6 +116,8 @@ return [
     'Waaseyaa\Queue\Job' => 'internal',
     'Waaseyaa\Scheduler\Lock\LockInterface' => 'internal',
     'Waaseyaa\Scheduler\ScheduleEntriesInterface' => 'public',
+    'Waaseyaa\AI\Agent\Provider\ProviderException' => 'public',
+    'Waaseyaa\HttpClient\SseLineStreamInterface' => 'public',
     'Waaseyaa\Scheduler\ScheduleInterface' => 'internal',
     'Waaseyaa\State\StateInterface' => 'internal',
     'Waaseyaa\Mail\MailerInterface' => 'internal',
