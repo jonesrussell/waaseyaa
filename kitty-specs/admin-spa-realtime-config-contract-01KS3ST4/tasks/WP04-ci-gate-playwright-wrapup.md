@@ -386,3 +386,4 @@ Closes #1538
 ## Activity Log
 
 - 2026-05-21T01:08:42Z – claude:sonnet:implementer:implementer – shell_pid=798647 – Started implementation via action command
+- 2026-05-21T01:12:26Z – claude:sonnet:implementer:implementer – shell_pid=798647 – bin/check-admin-coercion-patterns wired into composer verify; Playwright spec packages/admin/e2e/schema-dedup.spec.ts asserts exactly 1 schema request per page load (NFR-004/FR-012); CHANGELOG bullet covers all 4 M-F WPs; README CI gates subsection added.
