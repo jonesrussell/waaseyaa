@@ -22,6 +22,8 @@ subtasks:
 - T010
 - T011
 - T012
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "755033"
 history:
 - date: '2026-05-20T23:57:09Z'
   author: tasks-materializer
@@ -494,3 +496,7 @@ private function makeAccount(int $id, array $roles = []): AccountInterface
 - Confirm `_account` (with underscore prefix) is used, not `account`.
 - Confirm the 403 response does not reveal entity existence (same response whether entity is not found vs. access denied on a found entity — but this is tricky since `loadTranslatableEntity` already returns 404 for missing entities; the 403 path only fires on found entities, which is acceptable per FR-003's intent: "response does not leak whether the entity exists" means the 403 body gives no entity-state information, not that 403 and 404 look identical).
 - Confirm integration test asserts entity is **unmodified** after a denied PATCH.
+
+## Activity Log
+
+- 2026-05-21T00:50:13Z – claude:sonnet:implementer:implementer – shell_pid=755033 – Started implementation via action command
