@@ -16,13 +16,13 @@
 | T002 | Thread `_account` from request attributes into `SearchController` in `SearchRouter::handle()` | — | [D] |
 | T003 | Verify kernel/service-provider wires `EntityAccessHandler` into `SearchRouter` at registration time | — | [D] |
 | T004 | Write `SemanticSearchAccessTest` (FR-010): two-user kernel integration test | — | [D] |
-| T005 | Create `PolicyDependencyResolverInterface` in `packages/foundation/src/Kernel/Bootstrap/` | — |
-| T006 | Create `KernelPolicyDependencyResolver` implementing the interface | — |
-| T007 | Create `PolicyInstantiationException` in `packages/foundation/src/Kernel/Bootstrap/Exception/` | — |
-| T008 | Rewrite `AccessPolicyRegistry::discover()` with two-phase container-resolved loop | — |
-| T009 | Wire `KernelPolicyDependencyResolver` into `AbstractKernel::discoverAccessPolicies()` | — |
-| T010 | Write `AttachmentPolicyDiscoveryTest` (FR-011): `ParentDelegatedAccessPolicy` active for `attachment` | — |
-| T011 | Write `AccessPolicyRegistryTest` boot-failure unit test (FR-012) | — |
+| T005 | Create `PolicyDependencyResolverInterface` in `packages/foundation/src/Kernel/Bootstrap/` | — | [D] |
+| T006 | Create `KernelPolicyDependencyResolver` implementing the interface | — | [D] |
+| T007 | Create `PolicyInstantiationException` in `packages/foundation/src/Kernel/Bootstrap/Exception/` | — | [D] |
+| T008 | Rewrite `AccessPolicyRegistry::discover()` with two-phase container-resolved loop | — | [D] |
+| T009 | Wire `KernelPolicyDependencyResolver` into `AbstractKernel::discoverAccessPolicies()` | — | [D] |
+| T010 | Write `AttachmentPolicyDiscoveryTest` (FR-011): `ParentDelegatedAccessPolicy` active for `attachment` | — | [D] |
+| T011 | Write `AccessPolicyRegistryTest` boot-failure unit test (FR-012) | — | [D] |
 | T012 | Create `packages/entity/testing/RecordingEntityQuery.php` implementing `EntityQueryInterface` | [D] |
 | T013 | Add `Waaseyaa\Entity\Testing` PSR-4 entry to `packages/entity/composer.json` `autoload-dev` | [D] |
 | T014 | Identify and migrate existing inline `EntityQueryInterface` anonymous stubs | [D] |
@@ -87,13 +87,13 @@
 
 **Included subtasks**:
 
-- [ ] T005 Create `PolicyDependencyResolverInterface` in `packages/foundation/src/Kernel/Bootstrap/`
-- [ ] T006 Create `KernelPolicyDependencyResolver` implementing the interface
-- [ ] T007 Create `PolicyInstantiationException` in `packages/foundation/src/Kernel/Bootstrap/Exception/`
-- [ ] T008 Rewrite `AccessPolicyRegistry::discover()` with two-phase container-resolved loop
-- [ ] T009 Wire `KernelPolicyDependencyResolver` into `AbstractKernel::discoverAccessPolicies()`
-- [ ] T010 Write `AttachmentPolicyDiscoveryTest` (FR-011)
-- [ ] T011 Write `AccessPolicyRegistryTest` boot-failure unit test (FR-012)
+- [x] T005 Create `PolicyDependencyResolverInterface` in `packages/foundation/src/Kernel/Bootstrap/`
+- [x] T006 Create `KernelPolicyDependencyResolver` implementing the interface
+- [x] T007 Create `PolicyInstantiationException` in `packages/foundation/src/Kernel/Bootstrap/Exception/`
+- [x] T008 Rewrite `AccessPolicyRegistry::discover()` with two-phase container-resolved loop
+- [x] T009 Wire `KernelPolicyDependencyResolver` into `AbstractKernel::discoverAccessPolicies()`
+- [x] T010 Write `AttachmentPolicyDiscoveryTest` (FR-011)
+- [x] T011 Write `AccessPolicyRegistryTest` boot-failure unit test (FR-012)
 
 **Implementation sketch**:
 1. Create the three new files per the contracts/ spec.
