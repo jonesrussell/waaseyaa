@@ -46,6 +46,7 @@ final class JsonApiRouteProvider
         foreach ($this->entityTypeManager->getDefinitions() as $entityTypeId => $definition) {
             $this->registerEntityTypeRoutes($router, $entityTypeId);
             $this->registerFieldAutoSave($router, $entityTypeId);
+            $this->registerTranslationRoutes($router, $entityTypeId);
         }
     }
 
@@ -106,6 +107,78 @@ final class JsonApiRouteProvider
             "api.{$entityTypeId}.destroy",
             RouteBuilder::create($resourcePath)
                 ->controller('Waaseyaa\\Api\\JsonApiController::destroy')
+                ->methods('DELETE')
+                ->requireAuthentication()
+                ->default('_entity_type', $entityTypeId)
+                ->build(),
+        );
+    }
+
+    /**
+     * Register the 5 translation CRUD sub-routes for a single entity type.
+     *
+     *   GET    /api/{entityType}/{id}/translations
+     *   GET    /api/{entityType}/{id}/translations/{langcode}
+     *   POST   /api/{entityType}/{id}/translations/{langcode}
+     *   PATCH  /api/{entityType}/{id}/translations/{langcode}
+     *   DELETE /api/{entityType}/{id}/translations/{langcode}
+     */
+    private function registerTranslationRoutes(WaaseyaaRouter $router, string $entityTypeId): void
+    {
+        $collectionPath = $this->basePath . '/' . $entityTypeId . '/{id}/translations';
+        $resourcePath = $collectionPath . '/{langcode}';
+
+        // GET translation list.
+        $router->addRoute(
+            "api.{$entityTypeId}.translations.index",
+            RouteBuilder::create($collectionPath)
+                ->controller('Waaseyaa\\Api\\Controller\\TranslationController::index')
+                ->methods('GET')
+                ->requireAuthentication()
+                ->default('_entity_type', $entityTypeId)
+                ->build(),
+        );
+
+        // GET single translation.
+        $router->addRoute(
+            "api.{$entityTypeId}.translations.show",
+            RouteBuilder::create($resourcePath)
+                ->controller('Waaseyaa\\Api\\Controller\\TranslationController::show')
+                ->methods('GET')
+                ->requireAuthentication()
+                ->default('_entity_type', $entityTypeId)
+                ->build(),
+        );
+
+        // POST create translation.
+        $router->addRoute(
+            "api.{$entityTypeId}.translations.store",
+            RouteBuilder::create($resourcePath)
+                ->controller('Waaseyaa\\Api\\Controller\\TranslationController::store')
+                ->methods('POST')
+                ->requireAuthentication()
+                ->jsonApi()
+                ->default('_entity_type', $entityTypeId)
+                ->build(),
+        );
+
+        // PATCH update translation.
+        $router->addRoute(
+            "api.{$entityTypeId}.translations.update",
+            RouteBuilder::create($resourcePath)
+                ->controller('Waaseyaa\\Api\\Controller\\TranslationController::update')
+                ->methods('PATCH')
+                ->requireAuthentication()
+                ->jsonApi()
+                ->default('_entity_type', $entityTypeId)
+                ->build(),
+        );
+
+        // DELETE translation.
+        $router->addRoute(
+            "api.{$entityTypeId}.translations.destroy",
+            RouteBuilder::create($resourcePath)
+                ->controller('Waaseyaa\\Api\\Controller\\TranslationController::destroy')
                 ->methods('DELETE')
                 ->requireAuthentication()
                 ->default('_entity_type', $entityTypeId)

@@ -1,4 +1,4 @@
-<!-- Spec reviewed 2026-05-17 - new canonical doctrine, M-004 post-mortem stamp -->
+<!-- Spec reviewed 2026-05-20 - M-006 translation-hardening: added §11 translation access-gate convention -->
 # Entity Storage — Two-Axis (Revisionable × Translatable)
 
 > **Canonical doctrine for entity types that are BOTH `revisionable: true` AND
@@ -256,7 +256,46 @@ input side — they converge on the same two-table output.
 
 ---
 
-## 11. Cross-references
+## 11. Translation access-gate convention
+
+M-006 (`translation-hardening-01KS3RY9`) added `TranslationController` which gates every
+translation sub-endpoint via `EntityAccessHandler::check()`. The five HTTP methods map to
+the following abilities:
+
+| HTTP method | Route                                           | Ability checked |
+|-------------|-------------------------------------------------|-----------------|
+| `GET`       | `/api/{type}/{id}/translations`                 | `view`          |
+| `GET`       | `/api/{type}/{id}/translations/{langcode}`      | `view`          |
+| `POST`      | `/api/{type}/{id}/translations/{langcode}`      | `create`        |
+| `PATCH`     | `/api/{type}/{id}/translations/{langcode}`      | `update`        |
+| `DELETE`    | `/api/{type}/{id}/translations/{langcode}`      | `delete`        |
+
+Access failures always return a generic `403 Forbidden` JSON:API error document (anti-enumeration:
+the same shape is returned regardless of whether the entity exists or the account lacks the
+required ability).
+
+### Langcode validation
+
+Operator-supplied langcodes (e.g. in `AddTranslationsMigrationGenerator`) are validated against
+the BCP-47 pattern constant:
+
+```
+Waaseyaa\Entity\LangcodeValidator::BCP47_PATTERN
+```
+
+This regex accepts language tags with optional script (`-Latn`) and region (`-CA`) subtags (e.g.
+`en`, `fr-CA`, `zh-Hant-TW`). Tags that do not match are rejected with a descriptive validation
+error before any storage operation is attempted.
+
+### fieldLangcode() compile-time enforcement
+
+`TranslatableInterface` now declares `fieldLangcode(): string` (added in WP03) so
+non-trait implementors get compile-time enforcement of the per-field language accessor.
+See `packages/entity/src/TranslatableInterface.php`.
+
+---
+
+## 12. Cross-references
 
 - Charter §5.3 — Two-axis stable surface (added by M-004).
 - ADR 016 — Revisions first-class.
@@ -270,7 +309,7 @@ input side — they converge on the same two-table output.
 
 ---
 
-## 12. Mission post-mortem (M-004, 2026-05-17)
+## 13. Mission post-mortem (M-004, 2026-05-17)
 
 All eight WPs landed on lane-a (sequential single-lane execution).
 

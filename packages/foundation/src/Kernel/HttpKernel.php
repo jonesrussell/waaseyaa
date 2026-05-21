@@ -401,6 +401,7 @@ final class HttpKernel extends AbstractKernel
         }
 
         $foundationRouters = [
+            new HttpRouter\TranslationRouter($this->entityTypeManager, $this->accessHandler),
             new HttpRouter\JsonApiRouter($this->entityTypeManager, $this->accessHandler),
             new HttpRouter\EntityTypeLifecycleRouter($this->entityTypeManager, $this->lifecycleManager),
             new HttpRouter\SchemaRouter($this->entityTypeManager, $this->accessHandler, $this->fieldRegistry),

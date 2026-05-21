@@ -98,4 +98,9 @@ final class TranslatableArticleEntity extends ContentEntityBase implements Trans
     {
         return [$this->activeLangcode()];
     }
+
+    public function fieldLangcode(string $fieldName): ?string
+    {
+        return $this->activeLangcode();
+    }
 }
