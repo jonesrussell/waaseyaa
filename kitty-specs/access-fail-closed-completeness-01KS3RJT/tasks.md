@@ -26,11 +26,11 @@
 | T012 | Create `packages/entity/testing/RecordingEntityQuery.php` implementing `EntityQueryInterface` | [D] |
 | T013 | Add `Waaseyaa\Entity\Testing` PSR-4 entry to `packages/entity/composer.json` `autoload-dev` | [D] |
 | T014 | Identify and migrate existing inline `EntityQueryInterface` anonymous stubs | [D] |
-| T015 | Write `bin/check-getquery-bindings` PHP CLI scanner | — |
-| T016 | Run `--generate-baseline`; commit `tools/getquery-bindings-baseline.txt` | — |
-| T017 | Wire `@check-getquery-bindings` into `composer.json` verify array | — |
-| T018 | Write `GetQueryBindingsGateTest` (SC-003) | — |
-| T019 | Add "CI gates" section to `CLAUDE.md` | — |
+| T015 | Write `bin/check-getquery-bindings` PHP CLI scanner | — | [D] |
+| T016 | Run `--generate-baseline`; commit `tools/getquery-bindings-baseline.txt` | — | [D] |
+| T017 | Wire `@check-getquery-bindings` into `composer.json` verify array | — | [D] |
+| T018 | Write `GetQueryBindingsGateTest` (SC-003) | — | [D] |
+| T019 | Add "CI gates" section to `CLAUDE.md` | — | [D] |
 | T020 | Write `PathAliasResolverBindingTest` (FR-009 / retro #1518) | [P] |
 | T021 | Write `AuthControllerFindUserByNameBindingTest` (FR-009 / retro #1525) | [P] |
 | T022 | Write `SitemapGeneratorBindingTest` (FR-009 / retro #1527) | [P] |
@@ -152,11 +152,11 @@
 
 **Included subtasks**:
 
-- [ ] T015 Write `bin/check-getquery-bindings` PHP CLI scanner
-- [ ] T016 Run `--generate-baseline`; commit `tools/getquery-bindings-baseline.txt`
-- [ ] T017 Wire `@check-getquery-bindings` into `composer.json` verify array
-- [ ] T018 Write `GetQueryBindingsGateTest` (SC-003)
-- [ ] T019 Add "CI gates" section to `CLAUDE.md`
+- [x] T015 Write `bin/check-getquery-bindings` PHP CLI scanner
+- [x] T016 Run `--generate-baseline`; commit `tools/getquery-bindings-baseline.txt`
+- [x] T017 Wire `@check-getquery-bindings` into `composer.json` verify array
+- [x] T018 Write `GetQueryBindingsGateTest` (SC-003)
+- [x] T019 Add "CI gates" section to `CLAUDE.md`
 
 **Implementation sketch**:
 1. Write `bin/check-getquery-bindings` as a PHP CLI script using `RecursiveDirectoryIterator` to scan `packages/*/src/**/*.php`. Use a sliding-window regex to detect `getQuery()...->execute()` chains missing `setAccount(` or `->accessCheck(false)`. Support `--generate-baseline` and `--verify` flags. Sort output by path then line.
