@@ -31,7 +31,7 @@ M-B WP02 to merge first if running in parallel).
 | T011 | Unit test `TranslationControllerTest`: happy path + 403 for each of 5 endpoints | WP01 | [D] |
 | T012 | Integration test `TranslationAccessControlTest` in `tests/Integration/Phase29/` | WP01 | [D] |
 | T013 | Update `docs/specs/entity-storage-two-axis.md`: access-gate convention + BCP-47 regex constant reference | WP04 | — | [D] |
-| T014 | Add `CHANGELOG.md` `[Unreleased]` entry covering #1445, #1446, #1447 | WP04 | [P] |
+| T014 | Add `CHANGELOG.md` `[Unreleased]` entry covering #1445, #1446, #1447 | WP04 | [D] |
 | T015 | Run `composer verify` and confirm green; document result in WP04 commit | WP04 | — |
 
 ---
@@ -141,7 +141,7 @@ T011, T012 can be written in parallel once T008–T010 are done (different files
 #### Subtasks
 
 - [x] T013 Update `docs/specs/entity-storage-two-axis.md` with access-gate convention and BCP-47 regex constant reference (WP04)
-- [ ] T014 Add `CHANGELOG.md` `[Unreleased]` entry covering #1445, #1446, #1447 (WP04)
+- [x] T014 Add `CHANGELOG.md` `[Unreleased]` entry covering #1445, #1446, #1447 (WP04)
 - [ ] T015 Run `composer verify` green; document result in commit message (WP04)
 
 #### Implementation sketch
