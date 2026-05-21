@@ -11,11 +11,11 @@ const workflow = computed(() => findById(workflowId.value))
 
 await fetchWorkflows()
 
-const config = useRuntimeConfig()
+const { appName } = useAdminConfig()
 useHead({
   title: computed(() => {
     const label = workflow.value?.label ?? workflowId.value
-    return `${t('workflow_detail_title').replace('{label}', label)} | ${config.public.appName}`
+    return `${t('workflow_detail_title').replace('{label}', label)} | ${appName}`
   }),
 })
 

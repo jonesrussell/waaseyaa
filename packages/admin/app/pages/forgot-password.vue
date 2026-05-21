@@ -1,10 +1,8 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 
-const config = useRuntimeConfig()
 const { forgotPassword } = useAuth()
-
-const logoUrl = config.public.logoUrl as string | undefined
+const { logoUrl } = useAdminConfig()
 
 const error = ref<string>('')
 const success = ref<string>('')

@@ -29,8 +29,8 @@ onMounted(async () => {
   ])
 })
 
-const config = useRuntimeConfig()
-useHead({ title: computed(() => `${t('telescope_codified_context')} | ${config.public.appName}`) })
+const { appName } = useAdminConfig()
+useHead({ title: computed(() => `${t('telescope_codified_context')} | ${appName}`) })
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleString()

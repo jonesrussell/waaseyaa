@@ -74,8 +74,8 @@ onMounted(async () => {
   await fetchSchema()
 })
 const entityLabel = computed(() => translateEntityLabel(entityType.value, schema.value?.title ?? entityType.value))
-const config = useRuntimeConfig()
-useHead({ title: computed(() => `${entityLabel.value} | ${config.public.appName}`) })
+const { appName } = useAdminConfig()
+useHead({ title: computed(() => `${entityLabel.value} | ${appName}`) })
 </script>
 
 <template>

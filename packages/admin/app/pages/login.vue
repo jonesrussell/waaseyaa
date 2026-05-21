@@ -4,10 +4,9 @@ definePageMeta({ layout: false })
 const config = useRuntimeConfig()
 const route = useRoute()
 const { login } = useAuth()
+const { logoUrl, auth } = useAdminConfig()
 
-const logoUrl = config.public.logoUrl as string | undefined
-const authConfig = config.public.auth as Record<string, unknown> | undefined
-const registrationMode = authConfig?.registration ?? 'admin'
+const registrationMode = auth.registration ?? 'admin'
 const showRegister = registrationMode === 'open' || registrationMode === 'invite'
 
 // Validate returnTo is a local path to prevent open redirect attacks

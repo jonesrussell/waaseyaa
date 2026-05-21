@@ -4,9 +4,9 @@ import { useAdmin } from '~/composables/useAdmin'
 import { adminNavLinkIsExternal } from '~/runtime/navLinkExternal'
 
 const { t, locale, locales, setLocale } = useLanguage()
-const config = useRuntimeConfig()
+const { appName: configAppName } = useAdminConfig()
 const { tenant, ui } = useAdmin()
-const appName = tenant?.name ?? (config.public.appName as string)
+const appName = tenant?.name ?? configAppName
 const sidebarOpen = ref(false)
 
 function toggleSidebar() {

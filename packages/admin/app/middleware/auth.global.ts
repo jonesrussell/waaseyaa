@@ -30,8 +30,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   // ensureVerifiedEmail: when requireVerifiedEmail is enabled in auth config,
   // redirect unverified users to /verify-email before accessing any protected page.
-  const authConfig = config.public.auth as Record<string, unknown> | undefined
-  const requireVerified = authConfig?.requireVerifiedEmail
+  const { auth } = useAdminConfig()
+  const requireVerified = auth.requireVerifiedEmail
 
   if (requireVerified) {
     const { currentUser } = useAuth()

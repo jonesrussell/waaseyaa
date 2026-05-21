@@ -1,11 +1,9 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 
-const config = useRuntimeConfig()
 const route = useRoute()
 const { resetPassword } = useAuth()
-
-const logoUrl = config.public.logoUrl as string | undefined
+const { logoUrl } = useAdminConfig()
 
 const token = route.query.token as string | undefined
 

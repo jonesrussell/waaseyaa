@@ -1,13 +1,12 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 
-const config = useRuntimeConfig()
 const route = useRoute()
 const { register } = useAuth()
+const { logoUrl, auth } = useAdminConfig()
 
-const logoUrl = config.public.logoUrl as string | undefined
-const registrationMode = (config.public.auth as Record<string, unknown>)?.registration ?? 'admin'
-const requireVerifiedEmail = (config.public.auth as Record<string, unknown>)?.requireVerifiedEmail === true
+const registrationMode = auth.registration ?? 'admin'
+const requireVerifiedEmail = auth.requireVerifiedEmail
 const inviteToken = route.query.token as string | undefined
 
 if (registrationMode === 'admin') {

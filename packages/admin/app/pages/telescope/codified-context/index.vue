@@ -7,8 +7,8 @@ const { sessions, loading, error, fetchSessions } = useCodifiedContext()
 
 onMounted(() => fetchSessions())
 
-const config = useRuntimeConfig()
-useHead({ title: computed(() => `${t('telescope_codified_context')} | ${config.public.appName}`) })
+const { appName } = useAdminConfig()
+useHead({ title: computed(() => `${t('telescope_codified_context')} | ${appName}`) })
 
 function formatDuration(ms: number | null): string {
   if (ms === null) return '—'

@@ -7,8 +7,8 @@ const { workflows, loading, error, fetchWorkflows } = useWorkflowDefinitions()
 
 onMounted(() => fetchWorkflows())
 
-const config = useRuntimeConfig()
-useHead({ title: computed(() => `${t('workflows_list_title')} | ${config.public.appName}`) })
+const { appName } = useAdminConfig()
+useHead({ title: computed(() => `${t('workflows_list_title')} | ${appName}`) })
 </script>
 
 <template>
