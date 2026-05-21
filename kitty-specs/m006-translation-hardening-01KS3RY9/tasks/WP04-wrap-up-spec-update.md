@@ -16,6 +16,8 @@ subtasks:
 - T013
 - T014
 - T015
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "782878"
 history:
 - date: '2026-05-20T23:57:09Z'
   author: tasks-materializer
@@ -259,3 +261,7 @@ add them to the commit message. See memory `feedback_partial_fix_closes_footer.m
 - Confirm `LangcodeValidator::BCP47_PATTERN` is referenced by its full FQCN.
 - Confirm all three `Closes #N` lines are in the commit/PR body.
 - Confirm no source code changes are in this WP — only docs and changelog.
+
+## Activity Log
+
+- 2026-05-21T01:00:23Z – claude:sonnet:implementer:implementer – shell_pid=782878 – Started implementation via action command
