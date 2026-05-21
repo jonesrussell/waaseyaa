@@ -423,3 +423,4 @@ Review the output, add missing inline comments, and commit. The M-B.1 follow-up 
 ## Activity Log
 
 - 2026-05-20T23:56:37Z – claude:sonnet:implementer:implementer – shell_pid=678898 – Started implementation via action command
+- 2026-05-21T00:01:43Z – claude:sonnet:implementer:implementer – shell_pid=678898 – CI gate added; baseline generated with 2 entries (1 PHPDoc false-positive, 1 NcSyncService system-context); wired into composer verify; 5 integration tests pass; gate runs in 34ms (NFR-001 <30s met)
