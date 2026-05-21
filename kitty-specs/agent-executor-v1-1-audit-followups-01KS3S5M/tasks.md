@@ -9,14 +9,14 @@
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
-| T001 | Create `ProviderException` abstract base class | WP01 | N |
-| T002 | Create `TransportException` (5xx/network, retryable) | WP01 | [P] |
-| T003 | Create `ClientErrorException` (4xx non-429, non-retryable) | WP01 | [P] |
-| T004 | Update `RateLimitException` to extend `ProviderException` | WP01 | N |
-| T005 | Update `AnthropicProvider` to throw typed exceptions | WP01 | N |
-| T006 | Update `OpenAiCompatibleProvider` to throw typed exceptions | WP01 | [P] |
-| T007 | Refine `AgentExecutor::callProviderWithRetry` catch clauses | WP01 | N |
-| T008 | Write `AgentExecutorRetryTest` (FR-010) | WP01 | N |
+| T001 | Create `ProviderException` abstract base class | WP01 | N | [D] |
+| T002 | Create `TransportException` (5xx/network, retryable) | WP01 | [D] |
+| T003 | Create `ClientErrorException` (4xx non-429, non-retryable) | WP01 | [D] |
+| T004 | Update `RateLimitException` to extend `ProviderException` | WP01 | N | [D] |
+| T005 | Update `AnthropicProvider` to throw typed exceptions | WP01 | N | [D] |
+| T006 | Update `OpenAiCompatibleProvider` to throw typed exceptions | WP01 | [D] |
+| T007 | Refine `AgentExecutor::callProviderWithRetry` catch clauses | WP01 | N | [D] |
+| T008 | Write `AgentExecutorRetryTest` (FR-010) | WP01 | N | [D] |
 | T009 | Inject `EventDispatcherInterface` into `AgentExecutor` | WP02 | N |
 | T010 | Dispatch `AgentRunStarted` + `AgentRunTerminated` from `AgentExecutor` | WP02 | N |
 | T011 | Dispatch `AgentRunIterationCompleted` from `AgentExecutor` | WP02 | N |
@@ -58,14 +58,14 @@ Create the typed exception hierarchy (`ProviderException`, `TransportException`,
 
 ### Included subtasks
 
-- [ ] T001 Create `ProviderException` abstract base class (WP01)
-- [ ] T002 Create `TransportException` (5xx/network, retryable) (WP01)
-- [ ] T003 Create `ClientErrorException` (4xx non-429, non-retryable) (WP01)
-- [ ] T004 Update `RateLimitException` to extend `ProviderException` (WP01)
-- [ ] T005 Update `AnthropicProvider` to throw typed exceptions (WP01)
-- [ ] T006 Update `OpenAiCompatibleProvider` to throw typed exceptions (WP01)
-- [ ] T007 Refine `AgentExecutor::callProviderWithRetry` catch clauses (WP01)
-- [ ] T008 Write `AgentExecutorRetryTest` (FR-010) (WP01)
+- [x] T001 Create `ProviderException` abstract base class (WP01)
+- [x] T002 Create `TransportException` (5xx/network, retryable) (WP01)
+- [x] T003 Create `ClientErrorException` (4xx non-429, non-retryable) (WP01)
+- [x] T004 Update `RateLimitException` to extend `ProviderException` (WP01)
+- [x] T005 Update `AnthropicProvider` to throw typed exceptions (WP01)
+- [x] T006 Update `OpenAiCompatibleProvider` to throw typed exceptions (WP01)
+- [x] T007 Refine `AgentExecutor::callProviderWithRetry` catch clauses (WP01)
+- [x] T008 Write `AgentExecutorRetryTest` (FR-010) (WP01)
 
 **Parallel opportunities**: T002 and T003 can be written in parallel (independent new files). T006 can be written in parallel with T005 (different provider file).
 
