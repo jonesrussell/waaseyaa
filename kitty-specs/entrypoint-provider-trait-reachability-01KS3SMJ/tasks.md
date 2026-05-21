@@ -19,10 +19,10 @@
 | T006 | Add `isTraitWithApiPhpDoc()` named method to WaaseyaaEntrypointProvider | WP02 | — | [D] |
 | T007 | Wire isTraitWithApiPhpDoc into shouldMarkPropertyAsRead/Written and shouldMarkMethodAsUsed | WP02 | — | [D] |
 | T008 | Write WaaseyaaEntrypointProviderTest.php: fixtures (a) @api trait, (b) no-@api trait, (c) regression for all three real traits | WP02 | — | [D] |
-| T009 | Regenerate phpstan-dead-code-baseline.neon | WP03 | — |
-| T010 | Assert 31 entries dropped — grep returns 0 for the three trait names | WP03 | — |
-| T011 | Run `composer verify` — exits 0 | WP03 | — |
-| T012 | Run `phpunit --filter WaaseyaaEntrypointProviderTest` — exits 0 | WP03 | — |
+| T009 | Regenerate phpstan-dead-code-baseline.neon | WP03 | — | [D] |
+| T010 | Assert 31 entries dropped — grep returns 0 for the three trait names | WP03 | — | [D] |
+| T011 | Run `composer verify` — exits 0 | WP03 | — | [D] |
+| T012 | Run `phpunit --filter WaaseyaaEntrypointProviderTest` — exits 0 | WP03 | — | [D] |
 | T013 | Update CLAUDE.md § "Dead code audits and intentional scaffolding" | WP04 | — |
 | T014 | Add CHANGELOG.md [Unreleased] bullet | WP04 | — |
 | T015 | Final `composer verify` green confirmation | WP04 | — |
@@ -93,10 +93,10 @@ Confirm `composer verify` and unit test both exit 0.
 **Dependencies**: WP02
 
 ### Subtasks
-- [ ] T009 Regenerate phpstan-dead-code-baseline.neon (WP03)
-- [ ] T010 Assert 31 entries dropped — grep returns 0 for the three trait names (WP03)
-- [ ] T011 Run `composer verify` — exits 0 (WP03)
-- [ ] T012 Run `phpunit --filter WaaseyaaEntrypointProviderTest` — exits 0 (WP03)
+- [x] T009 Regenerate phpstan-dead-code-baseline.neon (WP03)
+- [x] T010 Assert 31 entries dropped — grep returns 0 for the three trait names (WP03)
+- [x] T011 Run `composer verify` — exits 0 (WP03)
+- [x] T012 Run `phpunit --filter WaaseyaaEntrypointProviderTest` — exits 0 (WP03)
 
 ### Implementation sketch
 1. Count entries in baseline before regeneration.
