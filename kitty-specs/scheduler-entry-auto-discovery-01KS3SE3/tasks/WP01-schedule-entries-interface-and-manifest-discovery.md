@@ -331,3 +331,4 @@ final class ScheduleEntriesInterfaceTest extends TestCase
 ## Activity Log
 
 - 2026-05-21T00:25:52Z – claude:sonnet:implementer:implementer – shell_pid=705854 – Assigned agent via action command
+- 2026-05-21T00:39:15Z – claude:sonnet:implementer:implementer – shell_pid=705854 – Interface added (L0 scheduler); PackageManifestCompiler discovers implementors via string-constant FQCN; ScheduleListHandler confirmed present; 70 tests pass, PHPStan L5 clean, cs-check clean, bin/check-package-layers passes
