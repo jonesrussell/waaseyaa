@@ -23,8 +23,8 @@ subtasks:
 - T011
 - T012
 - T013
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "754274"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "780586"
 history:
 - date: '2026-05-20T23:57:21Z'
   event: created
@@ -412,3 +412,4 @@ Note: Testing `AbstractKernel` directly may require a concrete test-double subcl
 
 - 2026-05-21T00:50:03Z – claude:sonnet:implementer:implementer – shell_pid=754274 – Started implementation via action command
 - 2026-05-21T00:57:53Z – claude:sonnet:implementer:implementer – shell_pid=754274 – Boot wiring via PolicyDependencyResolverInterface (M-B adopted); fail-closed on unresolvable deps via ScheduleEntryInstantiationException; schedule.disabled_entries opt-out honored; 10/10 tests pass, PHPStan clean, CS clean
+- 2026-05-21T00:59:27Z – claude:opus-4-7:reviewer:reviewer – shell_pid=780586 – Started review via action command
