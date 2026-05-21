@@ -183,3 +183,4 @@ Update `CLAUDE.md` to document the trait `@api` propagation behavior (FR-005). A
 ## Activity Log
 
 - 2026-05-21T00:58:40Z – claude:sonnet:implementer:implementer – shell_pid=778658 – Started implementation via action command
+- 2026-05-21T00:59:49Z – claude:sonnet:implementer:implementer – shell_pid=778658 – CLAUDE.md 7th pattern documented; CHANGELOG bullet added; composer verify result: cs-check OK, phpstan OK, check-dead-code OK (baseline 66→13); check-symfony-imports 11 pre-existing violations (not a regression)
