@@ -837,8 +837,23 @@ final class PackageManifestCompiler
         $classes = [];
 
         foreach ($psr4Map as $namespace => $dirs) {
-            // Skip test namespaces and namespaces not in scan prefixes.
+            // Skip test namespaces (Tests\) and dev-only testing/ helper namespaces.
+            // Namespaces like Waaseyaa\Entity\PhpStan\ map to testing/ directories
+            // but do NOT contain 'Tests\' — they must also be excluded to prevent
+            // the "Cannot redeclare class" fatal from double-loading dev helpers
+            // via both classmap and PSR-4 directory scan (alpha.106→107 pattern).
             if (str_contains($namespace, 'Tests\\')) {
+                continue;
+            }
+            $normalizedDirs = is_array($dirs) ? $dirs : [$dirs];
+            $isTestingDir = false;
+            foreach ($normalizedDirs as $dir) {
+                if (str_contains((string) $dir, '/testing/') || str_ends_with((string) $dir, '/testing')) {
+                    $isTestingDir = true;
+                    break;
+                }
+            }
+            if ($isTestingDir) {
                 continue;
             }
             $matched = false;

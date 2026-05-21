@@ -118,11 +118,15 @@ final class BroadcastStorage
     }
 
     /**
-     * Remove messages older than $maxAgeSeconds.
+     * Remove messages older than $retentionDays days.
+     *
+     * @param int $retentionDays Number of days to retain. Rows with created_at
+     *                           older than this many days are deleted.
+     *                           Default: 7 days (matches BroadcastStorageScheduleEntries).
      */
-    public function prune(int $maxAgeSeconds = 300): void
+    public function prune(int $retentionDays = 7): void
     {
-        $cutoff = microtime(true) - $maxAgeSeconds;
+        $cutoff = microtime(true) - ($retentionDays * 86400);
         $stmt = $this->pdo->prepare(
             'DELETE FROM _broadcast_log WHERE created_at < ?',
         );
