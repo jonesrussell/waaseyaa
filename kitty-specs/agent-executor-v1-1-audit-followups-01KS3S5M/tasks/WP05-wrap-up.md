@@ -255,3 +255,7 @@ Closes #1513
 2. Check that `CHANGELOG.md` entries are in `[Unreleased]` and not under a version heading.
 3. Verify `docs/specs/agent-executor.md` accurately describes the post-merge state.
 4. Confirm merge commit (or PR body) contains all four `Closes #N` footers.
+
+## Activity Log
+
+- 2026-05-21T01:28:56Z – unknown – AI pipeline spec documents exception hierarchy + event dispatch + --watch SSE; CHANGELOG bullet covers all 4 WPs; composer verify green (11 pre-existing check-symfony-imports violations, none from this mission)
