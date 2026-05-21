@@ -16,13 +16,13 @@
 | T004 | Extend `PackageManifestCompiler::compile()` to populate `schedule_entries` | WP01 | No | [D] |
 | T005 | Contract test for `ScheduleEntriesInterface` shape | WP01 | [D] |
 | T006 | Unit test `discoversScheduleEntries` (FR-009) | WP01 | [D] |
-| T007 | Check M-B resolver landing; adopt or introduce parallel resolver | WP02 | No |
-| T008 | Create `ScheduleEntryRegistry` with `boot()` method | WP02 | No |
-| T009 | Create `ScheduleEntryInstantiationException` | WP02 | [P] |
-| T010 | Wire `bootScheduleEntries()` into `AbstractKernel::boot()` | WP02 | No |
-| T011 | Unit test `registersScheduleEntriesAtBoot` (FR-010) | WP02 | [P] |
-| T012 | Unit test `failsBootOnUnresolvableScheduleEntry` (FR-011) | WP02 | [P] |
-| T013 | Unit test `skipsDisabledScheduleEntries` (SC-004) | WP02 | [P] |
+| T007 | Check M-B resolver landing; adopt or introduce parallel resolver | WP02 | No | [D] |
+| T008 | Create `ScheduleEntryRegistry` with `boot()` method | WP02 | No | [D] |
+| T009 | Create `ScheduleEntryInstantiationException` | WP02 | [D] |
+| T010 | Wire `bootScheduleEntries()` into `AbstractKernel::boot()` | WP02 | No | [D] |
+| T011 | Unit test `registersScheduleEntriesAtBoot` (FR-010) | WP02 | [D] |
+| T012 | Unit test `failsBootOnUnresolvableScheduleEntry` (FR-011) | WP02 | [D] |
+| T013 | Unit test `skipsDisabledScheduleEntries` (SC-004) | WP02 | [D] |
 | T014 | Verify/add `BroadcastStorage::prune(int $retentionDays)` | WP03 | No |
 | T015 | Create `BroadcastStorageScheduleEntries` implementing `ScheduleEntriesInterface` | WP03 | No |
 | T016 | Unit test: prune task registers with correct cron + calls prune() | WP03 | [P] |
@@ -85,13 +85,13 @@
 
 #### Included subtasks
 
-- [ ] T007 Check M-B resolver landing; adopt or introduce parallel resolver (WP02)
-- [ ] T008 Create `ScheduleEntryRegistry` with `boot()` method (WP02)
-- [ ] T009 Create `ScheduleEntryInstantiationException` (WP02)
-- [ ] T010 Wire `bootScheduleEntries()` into `AbstractKernel::boot()` (WP02)
-- [ ] T011 Unit test `registersScheduleEntriesAtBoot` (WP02)
-- [ ] T012 Unit test `failsBootOnUnresolvableScheduleEntry` (WP02)
-- [ ] T013 Unit test `skipsDisabledScheduleEntries` (WP02)
+- [x] T007 Check M-B resolver landing; adopt or introduce parallel resolver (WP02)
+- [x] T008 Create `ScheduleEntryRegistry` with `boot()` method (WP02)
+- [x] T009 Create `ScheduleEntryInstantiationException` (WP02)
+- [x] T010 Wire `bootScheduleEntries()` into `AbstractKernel::boot()` (WP02)
+- [x] T011 Unit test `registersScheduleEntriesAtBoot` (WP02)
+- [x] T012 Unit test `failsBootOnUnresolvableScheduleEntry` (WP02)
+- [x] T013 Unit test `skipsDisabledScheduleEntries` (WP02)
 
 #### Implementation sketch
 
