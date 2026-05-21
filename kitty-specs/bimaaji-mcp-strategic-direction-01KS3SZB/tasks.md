@@ -18,10 +18,10 @@
 | T005 | Enumerate what evidence each option needs before it can be accepted or rejected | WP02 | — |
 | T006 | Map each evidence item to a concrete source location in the repo or consumer repos | WP02 | — |
 | T007 | Write `methodology.md` in mission directory | WP02 | — |
-| T008 | Inventory bimaaji's public PHP surface (FQCNs, public methods, doc annotations) | WP03 | [P] |
-| T009 | Snapshot `packages/mcp/` capability — does it support PHP-tool registration today? | WP03 | [P] |
-| T010 | Log consumer signal — search Minoo for bimaaji-via-MCP requests or tickets | WP03 | [P] |
-| T011 | Document Node sidecar cost history — what failed before, effort cost estimate | WP03 | [P] |
+| T008 | Inventory bimaaji's public PHP surface (FQCNs, public methods, doc annotations) | WP03 | [D] |
+| T009 | Snapshot `packages/mcp/` capability — does it support PHP-tool registration today? | WP03 | [D] |
+| T010 | Log consumer signal — search Minoo for bimaaji-via-MCP requests or tickets | WP03 | [D] |
+| T011 | Document Node sidecar cost history — what failed before, effort cost estimate | WP03 | [D] |
 | T012 | Evaluate Option 1 (PHP-only, close) against all decision criteria | WP04 | — |
 | T013 | Evaluate Option 2 (extend packages/mcp/) against all decision criteria | WP04 | — |
 | T014 | Evaluate Option 3 (restore Node sidecar) against all decision criteria | WP04 | — |
@@ -102,10 +102,10 @@ Low. The evidence sources are all local to the repo or accessible via gh CLI.
 
 ### Subtasks
 
-- [ ] T008 Inventory bimaaji's public PHP surface (FQCNs, public methods, doc annotations) (WP03)
-- [ ] T009 Snapshot `packages/mcp/` capability — does it support PHP-tool registration today? (WP03)
-- [ ] T010 Log consumer signal — search Minoo for bimaaji-via-MCP requests or tickets (WP03)
-- [ ] T011 Document Node sidecar cost history — what failed before, effort cost estimate (WP03)
+- [x] T008 Inventory bimaaji's public PHP surface (FQCNs, public methods, doc annotations) (WP03)
+- [x] T009 Snapshot `packages/mcp/` capability — does it support PHP-tool registration today? (WP03)
+- [x] T010 Log consumer signal — search Minoo for bimaaji-via-MCP requests or tickets (WP03)
+- [x] T011 Document Node sidecar cost history — what failed before, effort cost estimate (WP03)
 
 ### Implementation sketch
 
