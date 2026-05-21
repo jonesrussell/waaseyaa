@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Waaseyaa\CLI\Handler;
 
 use Waaseyaa\Entity\EntityTypeInterface;
+use Waaseyaa\Entity\LangcodeValidator;
 use Waaseyaa\EntityStorage\Exception\StorageMigrationException;
 use Waaseyaa\Field\FieldDefinition;
 
@@ -57,10 +58,21 @@ final class AddTranslationsMigrationGenerator
         string $backend,
         array $translatableColumns,
     ): string {
+        LangcodeValidator::validate($defaultLangcode);
+
         $table = $this->phpStringLiteral($entityType->id());
         $translationsTable = $this->phpStringLiteral($entityType->id() . '_translations');
         $defaultLc = $this->phpStringLiteral($defaultLangcode);
         $cols = $this->phpArrayLiteral($translatableColumns);
+
+        // Defense in depth per FR-007: the PHP type system narrows $backend to
+        // 'sql-blob'|'sql-column', making injection practically impossible. The
+        // assert documents this intent and will fire in development/test environments
+        // if the type contract is ever widened.
+        \assert(
+            in_array($backend, ['sql-blob', 'sql-column'], true),
+            "backend must be 'sql-blob' or 'sql-column', got: {$backend}",
+        );
 
         return <<<PHP
             <?php
@@ -291,6 +303,8 @@ final class AddTranslationsMigrationGenerator
         string $backend,
         array $translatableColumns,
     ): string {
+        LangcodeValidator::validate($defaultLangcode);
+
         if ($entityType->isTranslatable()) {
             throw StorageMigrationException::noOpPromotion($entityType->id());
         }
@@ -334,6 +348,8 @@ final class AddTranslationsMigrationGenerator
         string $defaultLangcode,
         array $translatableColumns,
     ): string {
+        LangcodeValidator::validate($defaultLangcode);
+
         $entityTable = $this->phpStringLiteral($entityType->id());
         $translationTable = $this->phpStringLiteral($entityType->id() . '__translation');
         $translationRevisionTable = $this->phpStringLiteral($entityType->id() . '__translation__revision');
