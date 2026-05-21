@@ -31,13 +31,13 @@
 | T017 | Wire `@check-getquery-bindings` into `composer.json` verify array | — | [D] |
 | T018 | Write `GetQueryBindingsGateTest` (SC-003) | — | [D] |
 | T019 | Add "CI gates" section to `CLAUDE.md` | — | [D] |
-| T020 | Write `PathAliasResolverBindingTest` (FR-009 / retro #1518) | [P] |
-| T021 | Write `AuthControllerFindUserByNameBindingTest` (FR-009 / retro #1525) | [P] |
-| T022 | Write `SitemapGeneratorBindingTest` (FR-009 / retro #1527) | [P] |
-| T023 | Write `UserBlockServiceBindingTest` (FR-009 / retro #1527) | [P] |
-| T024 | Add `[Unreleased]` CHANGELOG entry | — |
-| T025 | Finalize `docs/specs/access-control.md` with registry resolver contract section | — |
-| T026 | File GitHub issue "M-B.1: drive getquery-bindings-baseline.txt to zero" | — |
+| T020 | Write `PathAliasResolverBindingTest` (FR-009 / retro #1518) | [D] |
+| T021 | Write `AuthControllerFindUserByNameBindingTest` (FR-009 / retro #1525) | [D] |
+| T022 | Write `SitemapGeneratorBindingTest` (FR-009 / retro #1527) | [D] |
+| T023 | Write `UserBlockServiceBindingTest` (FR-009 / retro #1527) | [D] |
+| T024 | Add `[Unreleased]` CHANGELOG entry | — | [D] |
+| T025 | Finalize `docs/specs/access-control.md` with registry resolver contract section | — | [D] |
+| T026 | File GitHub issue "M-B.1: drive getquery-bindings-baseline.txt to zero" | — | [D] |
 
 ---
 
@@ -185,13 +185,13 @@
 
 **Included subtasks**:
 
-- [ ] T020 Write `PathAliasResolverBindingTest` (FR-009 / retro #1518)
-- [ ] T021 Write `AuthControllerFindUserByNameBindingTest` (FR-009 / retro #1525)
-- [ ] T022 Write `SitemapGeneratorBindingTest` (FR-009 / retro #1527)
-- [ ] T023 Write `UserBlockServiceBindingTest` (FR-009 / retro #1527)
-- [ ] T024 Add `[Unreleased]` CHANGELOG entry
-- [ ] T025 Finalize `docs/specs/access-control.md` with registry resolver contract section
-- [ ] T026 File GitHub issue for the getquery-bindings-baseline follow-up mission
+- [x] T020 Write `PathAliasResolverBindingTest` (FR-009 / retro #1518)
+- [x] T021 Write `AuthControllerFindUserByNameBindingTest` (FR-009 / retro #1525)
+- [x] T022 Write `SitemapGeneratorBindingTest` (FR-009 / retro #1527)
+- [x] T023 Write `UserBlockServiceBindingTest` (FR-009 / retro #1527)
+- [x] T024 Add `[Unreleased]` CHANGELOG entry
+- [x] T025 Finalize `docs/specs/access-control.md` with registry resolver contract section
+- [x] T026 File GitHub issue for the getquery-bindings-baseline follow-up mission
 
 **Implementation sketch**:
 1. For each retro test: locate the class under test, find the `getQuery()` callsite, write a unit test that injects a `RecordingEntityQuery` stub, runs the production method, and asserts either `$query->boundAccount !== null` or `$query->accessChecks === [false]` (for system-context callers).
