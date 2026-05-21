@@ -22,8 +22,8 @@ subtasks:
 - T002
 - T003
 - T004
-shell_pid: "707133"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "723435"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-20T23:57:32Z'
   event: created
@@ -336,3 +336,4 @@ it('doesNotPoisonOnRejection: a rejected fetch() does not prevent a subsequent f
 
 - 2026-05-21T00:26:21Z – claude:sonnet:implementer:implementer – shell_pid=707133 – Assigned agent via action command
 - 2026-05-21T00:40:11Z – claude:sonnet:implementer:implementer – shell_pid=707133 – inflightCache added at module scope; clears on rejection (FR-002) and invalidate (FR-003); 3 dedup tests pass (doesNotDuplicateConcurrentFetches, clearsInflightOnInvalidate, doesNotPoisonOnRejection); build clean; 11/11 tests pass
+- 2026-05-21T00:41:00Z – claude:opus-4-7:reviewer:reviewer – shell_pid=723435 – Started review via action command
