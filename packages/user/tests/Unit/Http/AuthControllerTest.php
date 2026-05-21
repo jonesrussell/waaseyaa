@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Waaseyaa\Access\AccountInterface;
 use Waaseyaa\Entity\Storage\EntityQueryInterface;
 use Waaseyaa\Entity\Storage\EntityStorageInterface;
+use Waaseyaa\Entity\Testing\RecordingEntityQuery;
 use Waaseyaa\User\AnonymousUser;
 use Waaseyaa\User\Http\AuthController;
 use Waaseyaa\User\User;
@@ -153,26 +154,7 @@ final class AuthControllerTest extends TestCase
         // SqlEntityStorage::loadByKey (mission sql-entity-query-access-
         // checking-01KRYP15, C-004) for the dual name/mail lookup.
 
-        /** @var list<bool> $accessCheckCalls */
-        $accessCheckCalls = [];
-        $query = new class($accessCheckCalls) implements EntityQueryInterface {
-            /** @param list<bool> $accessCheckCalls */
-            public function __construct(private array &$accessCheckCalls) {}
-
-            public function condition(string $field, mixed $value, string $operator = '='): static { return $this; }
-            public function exists(string $field): static { return $this; }
-            public function notExists(string $field): static { return $this; }
-            public function sort(string $field, string $direction = 'ASC'): static { return $this; }
-            public function range(int $offset, int $limit): static { return $this; }
-            public function count(): static { return $this; }
-            public function accessCheck(bool $check = true): static
-            {
-                $this->accessCheckCalls[] = $check;
-                return $this;
-            }
-            public function setAccount(?AccountInterface $account): static { return $this; }
-            public function execute(): array { return []; }
-        };
+        $query = new RecordingEntityQuery();
 
         $storage = $this->createMock(EntityStorageInterface::class);
         $storage->method('getQuery')->willReturn($query);
@@ -182,7 +164,7 @@ final class AuthControllerTest extends TestCase
 
         $this->assertSame(
             [false, false],
-            $accessCheckCalls,
+            $query->accessChecks,
             'findUserByName must call accessCheck(false) on both the name lookup and the mail fallback (pre-auth system context).',
         );
     }

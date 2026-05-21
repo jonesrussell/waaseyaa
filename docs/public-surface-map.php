@@ -36,6 +36,9 @@ return [
     'Waaseyaa\Foundation\ServiceProvider\ServiceProviderInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\ServiceProvider' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface' => 'public',
+    // Access policy bootstrap extension point (M-B / WP02): implementors supply
+    // constructor-parameter resolution for policies that need kernel services.
+    'Waaseyaa\Foundation\Kernel\Bootstrap\PolicyDependencyResolverInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\ConfiguresHttpKernelInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasNativeCommandsInterface' => 'public',
     'Waaseyaa\Foundation\ServiceProvider\Capability\HasGraphqlMutationOverridesInterface' => 'public',

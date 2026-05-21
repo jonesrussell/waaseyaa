@@ -8,6 +8,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Waaseyaa\Database\DatabaseInterface;
 use Waaseyaa\Database\DBALDatabase;
 use Waaseyaa\Entity\EntityTypeManager;
+use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\ServiceProvider\KernelServicesInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
@@ -41,7 +42,7 @@ final class ProviderRegistryKernelServices implements KernelServicesInterface
 
     public function get(string $abstract): ?object
     {
-        if ($abstract === EntityTypeManager::class) {
+        if ($abstract === EntityTypeManager::class || $abstract === EntityTypeManagerInterface::class) {
             return $this->entityTypeManager;
         }
         if ($abstract === DatabaseInterface::class) {

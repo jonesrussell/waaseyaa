@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- fix(access,api): thread request account through `SearchRouter` into `SearchController`; closes #1516
+- fix(foundation): replace `AccessPolicyRegistry` silent-skip heuristic with container-resolved instantiation; auto-discovers policies with service dependencies; fail-closed on unresolvable deps via `PolicyInstantiationException`; closes #1519
+- fix(entity,access): add `RecordingEntityQuery` shared test helper to `packages/entity/testing/`; closes #1529
+- fix(foundation): add `bin/check-getquery-bindings` CI gate and `tools/getquery-bindings-baseline.txt`; `composer verify` now enforces no new unbound `getQuery()->execute()` callsites; closes #1528
+- test(path,auth,seo,user): add `PathAliasResolverBindingTest`, `AuthControllerFindUserByNameBindingTest`, `SitemapGeneratorBindingTest`, `UserBlockServiceBindingTest` — regression guards for #1518, #1525, #1527; four dedicated `*BindingTest.php` files using `RecordingEntityQuery`
+
 ## [0.1.0-alpha.187] - 2026-05-20
 
 ### Changed

@@ -1,0 +1,292 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+// Usage: php bin/check-getquery-bindings [--generate-baseline | --verify] [--scan-dir <dir>] [--baseline <file>]
+//
+// Scans packages/*/src/**/*.php for unbound getQuery()->...->execute() callsites.
+// A callsite is "unbound" if neither ->setAccount( nor ->accessCheck(false) appears
+// in the same method chain (sliding window of 15 lines).
+//
+// Modes:
+//   (no flags)          Verify mode: fail on new unbound callsites not in baseline.
+//   --verify            Explicit verify mode (same as no flags).
+//   --generate-baseline Write/overwrite tools/getquery-bindings-baseline.txt.
+//
+// Flags (for test isolation):
+//   --scan-dir <dir>    Override the scan root (default: packages/*/src).
+//   --baseline <file>   Override the baseline path (default: tools/getquery-bindings-baseline.txt).
+//
+// History: gate introduced in PR #1528 (mission access-fail-closed-completeness-01KS3RJT WP04)
+// after three production 500s from unbound getQuery() chains (alpha.181–triage 2026-05-20).
+
+$mode = 'verify';
+$customScanDir = null;
+$customBaseline = null;
+
+for ($i = 1; $i < $argc; ++$i) {
+    $arg = $argv[$i];
+    if ($arg === '--generate-baseline') {
+        $mode = 'generate';
+    } elseif ($arg === '--verify') {
+        $mode = 'verify';
+    } elseif ($arg === '--scan-dir') {
+        $customScanDir = $argv[++$i] ?? null;
+    } elseif ($arg === '--baseline') {
+        $customBaseline = $argv[++$i] ?? null;
+    }
+}
+
+$repoRoot = dirname(__DIR__);
+$baselineFile = $customBaseline ?? ($repoRoot . '/tools/getquery-bindings-baseline.txt');
+
+if ($customScanDir !== null) {
+    $scanDirs = [$customScanDir];
+} else {
+    $scanDirs = glob($repoRoot . '/packages/*/src', GLOB_ONLYDIR) ?: [];
+}
+
+$offenders = findOffenders($scanDirs, $repoRoot);
+
+if ($mode === 'generate') {
+    generateBaseline($offenders, $baselineFile, $repoRoot);
+    $count = count($offenders);
+    echo "Generated baseline with {$count} entr" . ($count === 1 ? 'y' : 'ies') . ".\n";
+    echo "File: {$baselineFile}\n";
+    echo "IMPORTANT: Review each entry and add a mandatory inline comment (# <reason>).\n";
+    echo "           Entries without inline comments will fail CI.\n";
+    exit(0);
+}
+
+// Verify mode
+if (!file_exists($baselineFile)) {
+    if ($offenders === []) {
+        echo "check-getquery-bindings: OK (no baseline, no offenders found)\n";
+        exit(0);
+    }
+    echo "ERROR: Baseline file not found: {$baselineFile}\n";
+    echo "Run 'php bin/check-getquery-bindings --generate-baseline' to create it.\n";
+    echo count($offenders) . " unbound callsite(s) found:\n";
+    foreach ($offenders as $entry) {
+        echo "  {$entry}\n";
+    }
+    exit(1);
+}
+
+$baseline = loadBaseline($baselineFile);
+
+// Check for incomplete baseline entries (missing inline comments) — fail CI if found
+$incomplete = validateBaselineComments($baselineFile);
+if ($incomplete !== []) {
+    echo "ERROR: Incomplete baseline entries (missing mandatory inline comment):\n";
+    foreach ($incomplete as $line) {
+        echo "  {$line}\n";
+    }
+    echo "Each entry MUST have an inline comment: <path>:<line>  # <reason>\n";
+    exit(1);
+}
+
+$newOffenders = array_diff($offenders, $baseline);
+if ($newOffenders !== []) {
+    foreach ($newOffenders as $entry) {
+        echo "NEW unbound getQuery()->execute() callsite: {$entry}\n";
+    }
+    $count = count($newOffenders);
+    echo "{$count} new unbound callsite(s) found.\n";
+    echo "Fix the callsite or add it to {$baselineFile} with a mandatory exemption comment.\n";
+    echo "See CLAUDE.md § CI gates for details.\n";
+    exit(1);
+}
+
+$baselineCount = count($baseline);
+echo "check-getquery-bindings: OK ({$baselineCount} known exemption(s), 0 new offenders)\n";
+exit(0);
+
+// ---------------------------------------------------------------------------
+// Functions
+// ---------------------------------------------------------------------------
+
+/**
+ * Walk all .php files under $scanDirs and return path:line strings for every
+ * unbound getQuery()->execute() chain found (sliding window of 15 lines).
+ *
+ * A chain is "unbound" when:
+ *   - getQuery() appears in the window, AND
+ *   - ->execute() appears in the window, AND
+ *   - neither ->setAccount( nor ->accessCheck(false) appears in the window.
+ *
+ * Known limitation: split-variable patterns (e.g. $q = $storage->getQuery(); $q->execute();
+ * separated by more than 15 lines) may produce false negatives. AST-level analysis
+ * is tracked by M-B.1 follow-up.
+ *
+ * @param string[] $scanDirs
+ * @param string $repoRoot
+ * @return string[]  Sorted "relative/path:line" strings
+ */
+function findOffenders(array $scanDirs, string $repoRoot): array
+{
+    $offenders = [];
+
+    foreach ($scanDirs as $dir) {
+        $iter = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::LEAVES_ONLY
+        );
+
+        foreach ($iter as $file) {
+            if ($file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $filePath = $file->getPathname();
+            $lines = file($filePath, FILE_IGNORE_NEW_LINES);
+            if ($lines === false) {
+                continue;
+            }
+
+            $lineCount = count($lines);
+
+            for ($i = 0; $i < $lineCount; ++$i) {
+                // Fast guard: skip lines that don't contain getQuery()
+                if (!str_contains($lines[$i], 'getQuery()')) {
+                    continue;
+                }
+
+                // Build a sliding window of up to 15 lines from this point
+                $windowEnd = min($i + 14, $lineCount - 1);
+                $window = implode(' ', array_slice($lines, $i, $windowEnd - $i + 1));
+
+                // Must have ->execute() to be a callsite at all
+                if (!str_contains($window, '->execute()')) {
+                    continue;
+                }
+
+                // Bound if setAccount or accessCheck(false) is present
+                if (str_contains($window, '->setAccount(') || str_contains($window, '->accessCheck(false)')) {
+                    continue;
+                }
+
+                // Unbound callsite found
+                $relPath = ltrim(str_replace($repoRoot, '', $filePath), '/');
+                $lineNumber = $i + 1; // 1-based
+                $offenders[] = $relPath . ':' . $lineNumber;
+            }
+        }
+    }
+
+    // Sort by path then line number (numeric)
+    usort($offenders, static function (string $a, string $b): int {
+        [$pathA, $lineA] = explode(':', $a, 2);
+        [$pathB, $lineB] = explode(':', $b, 2);
+        $cmp = strcmp($pathA, $pathB);
+        if ($cmp !== 0) {
+            return $cmp;
+        }
+
+        return (int) $lineA <=> (int) $lineB;
+    });
+
+    return $offenders;
+}
+
+/**
+ * Load baseline entries (path:line) from a baseline file.
+ * Strips comment-only lines (starting with #) and inline comments (# ...).
+ *
+ * @return string[]  Path:line strings
+ */
+function loadBaseline(string $baselineFile): array
+{
+    $lines = file($baselineFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return [];
+    }
+
+    $entries = [];
+    foreach ($lines as $line) {
+        $line = trim($line);
+        // Skip full-line comments
+        if (str_starts_with($line, '#')) {
+            continue;
+        }
+        // Strip inline comment
+        $pos = strpos($line, '  #');
+        if ($pos !== false) {
+            $line = trim(substr($line, 0, $pos));
+        }
+        if ($line !== '') {
+            $entries[] = $line;
+        }
+    }
+
+    return $entries;
+}
+
+/**
+ * Return all non-comment data lines that lack a mandatory inline comment.
+ * Contract: every entry must have "  # <reason>" (two spaces, hash, space, text).
+ *
+ * @return string[]  The offending raw lines
+ */
+function validateBaselineComments(string $baselineFile): array
+{
+    $lines = file($baselineFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return [];
+    }
+
+    $incomplete = [];
+    foreach ($lines as $rawLine) {
+        $line = trim($rawLine);
+        if ($line === '' || str_starts_with($line, '#')) {
+            continue;
+        }
+        // Must contain "  # " (two spaces + hash + space) with non-empty text after it
+        if (!preg_match('/  # .+/', $rawLine)) {
+            $incomplete[] = $rawLine;
+        }
+    }
+
+    return $incomplete;
+}
+
+/**
+ * Write the baseline file with a header comment block.
+ * Entries are written WITHOUT inline comments — the author must add them manually.
+ */
+function generateBaseline(array $offenders, string $baselineFile, string $repoRoot): void
+{
+    $date = date('Y-m-d');
+    $header = <<<EOH
+# Baseline: getQuery() bindings exempt from CI gate
+# Format: <relative-path-from-repo-root>:<line>  # <mandatory-exemption-reason>
+# Generated by: php bin/check-getquery-bindings --generate-baseline
+# Last generated: {$date}
+#
+# Rules:
+# - One entry per unbound callsite (path:line sorted ascending).
+# - Every entry MUST have an inline comment explaining the exemption.
+# - An entry WITHOUT a comment causes CI to fail with "incomplete baseline entry".
+# - To add an exemption: append <path>:<line>  # <reason>, verify with
+#   php bin/check-getquery-bindings --verify
+# - To regenerate after a codebase change:
+#   php bin/check-getquery-bindings --generate-baseline
+#
+# TODO(WP05/M-B.1): Drive this baseline to zero — see GitHub issue for tracking.
+#
+EOH;
+
+    $lines = [$header];
+    foreach ($offenders as $entry) {
+        // Stub comment — author must replace with a real reason before committing
+        $lines[] = $entry . '  # TODO: add exemption reason';
+    }
+
+    $content = implode("\n", $lines) . "\n";
+
+    // Atomic write: temp file then rename
+    $tmpFile = $baselineFile . '.tmp.' . getmypid();
+    file_put_contents($tmpFile, $content);
+    rename($tmpFile, $baselineFile);
+}

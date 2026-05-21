@@ -1,5 +1,6 @@
 # Access Control
 
+<!-- Spec reviewed 2026-05-20 - updated for M-B container-resolved registry (PolicyDependencyResolverInterface), fail-closed CI gate (bin/check-getquery-bindings), and WP05 retro regression tests. -->
 <!-- Spec reviewed 2026-05-20 - post-#1525 sweep caught two more #1495 misses: SitemapGenerator::collectFromEntityTypes() (sitemap generation is anonymous-served by definition; same shape as PathAliasResolver) and UserBlockService::isBlocked() (block-relationship existence is an integrity primitive; same shape as RelationshipValidator). Both opt out via accessCheck(false) with C-004 inline references; audit doc updated. No change to access pipeline, gate logic, or access semantics. -->
 <!-- Spec reviewed 2026-05-20 - #1525 #1495-sweep miss in AuthController::findUserByName (pre-auth identity resolution) now opts out with accessCheck(false); semantics unchanged — the documented system-context bypass simply applies to a missed call site. Audit doc updated with two new entries. No change to access pipeline, gate logic, or access semantics. -->
 <!-- Spec reviewed 2026-05-19 - SqlEntityQuery query-layer access checking added per mission sql-entity-query-access-checking-01KRYP15 (#1495): EntityQueryInterface::setAccount() binds the account used for per-row filtering; SqlEntityQuery::execute() now runs EntityAccessHandler::check($entity, 'view', $account) for every candidate row; accessCheck(true) is the default and accessCheck(false) is preserved as an audited system-context opt-out (see docs/security/sql-entity-query-access-check-bypass-audit.md); MissingQueryAccountException is thrown when neither bypass nor account is bound. -->
@@ -774,6 +775,95 @@ Full contract: `docs/specs/two-factor-auth.md`.
 
 - **Avoid double `$storage->create()` in access checks**: When checking field access before persisting a new entity, create once and reuse for both the access check and the save. Don't create a throwaway temp entity.
 - **`discoverAccessPolicies()` constructor heuristic**: `ConfigEntityAccessPolicy` takes `array $entityTypeIds` as a required constructor parameter (from `#[PolicyAttribute]`). The reflection-based heuristic in `AbstractKernel::discoverAccessPolicies()` that passes entity types to constructors with required params exists for this reason — do not remove it.
+
+## Container-resolved policy instantiation (M-B, v0.1.0-alpha.187+)
+
+Added in mission `access-fail-closed-completeness-01KS3RJT` (closes #1519). Replaces the
+previous silent-skip heuristic in `AccessPolicyRegistry` with container-resolved instantiation
+for every discovered policy class.
+
+### PolicyDependencyResolverInterface
+
+**File:** `packages/foundation/src/Kernel/Bootstrap/PolicyDependencyResolverInterface.php`
+**Namespace:** `Waaseyaa\Foundation\Kernel\Bootstrap`
+
+```php
+interface PolicyDependencyResolverInterface
+{
+    /**
+     * Instantiate a policy class, resolving its constructor dependencies from
+     * the container. Throws PolicyInstantiationException if the class cannot
+     * be resolved.
+     *
+     * @param class-string<AccessPolicyInterface> $fqcn
+     */
+    public function resolve(string $fqcn): AccessPolicyInterface;
+}
+```
+
+### Two-phase resolution algorithm
+
+When `AccessPolicyRegistry` builds the `EntityAccessHandler`, each policy FQCN goes through a
+5-rule resolution cascade:
+
+1. **Container binding** — if the DI container has an explicit binding for `$fqcn`, use it.
+2. **Auto-wire** — inspect the constructor via `ReflectionClass`; resolve each parameter from
+   the container by type-hint. Primitives and unresolvable params use their default values if
+   declared, otherwise fail.
+3. **No-arg constructor** — if the class has no constructor or a zero-arg constructor, call
+   `new $fqcn()`.
+4. **`EntityAccessHandler` forward-reference** — for policies that accept an `EntityAccessHandler`
+   (e.g. `ParentDelegatedAccessPolicy`-style policies needing the handler itself for recursive
+   delegation), the handler being assembled is injected. This breaks the forward-reference
+   cycle without a separate service-locator step.
+5. **Fail-closed** — if none of the above succeeds, throw `PolicyInstantiationException` with
+   the FQCN and the underlying cause. The kernel does **not** log-and-skip; a single
+   unresolvable policy is a hard boot failure. This is intentional: silent skips cause
+   undetected permission holes at runtime.
+
+### Writing a new policy with injected dependencies
+
+No manual `ServiceProvider::boot()` wiring needed. Declare dependencies in the constructor:
+
+```php
+#[PolicyAttribute(entityType: 'node')]
+final class NodeAccessPolicy implements AccessPolicyInterface
+{
+    public function __construct(
+        private readonly NodeTypeRepository $nodeTypes,
+        private readonly PermissionHandlerInterface $permissions,
+    ) {}
+    // ...
+}
+```
+
+`AccessPolicyRegistry` will auto-wire `NodeTypeRepository` and `PermissionHandlerInterface`
+from the container when the kernel boots. Register those services in any package's
+`ServiceProvider::register()` as usual.
+
+### CI gate: unbound getQuery() check
+
+`bin/check-getquery-bindings` (added in #1528, part of `composer verify`) fails on new
+`getQuery()->...->execute()` callsites that have neither `->setAccount()` nor
+`->accessCheck(false)` in the call chain. Pre-existing exemptions are listed in
+`tools/getquery-bindings-baseline.txt`; every entry must carry an inline comment. Driving the
+baseline to zero is tracked in M-B.1 (see *Known limitations* below).
+
+## Known limitations
+
+### Anonymous semantic-search calls (SearchController)
+
+`SearchController` currently falls through to `accessCheck(false)` when `$account` is null
+(anonymous caller). This was flagged during the WP01 review for mission
+`access-fail-closed-completeness-01KS3RJT` as a pre-existing fail-open posture: anonymous
+users can trigger entity-query execution with system-context bypass, bypassing per-row view
+policies. Fixing this is out of M-B scope (it requires the search subsystem to guarantee an
+account is always present by the time queries execute).
+
+**TODO (M-B.1):** Audit the `SearchController` anonymous path. Either bind `AnonymousUser`
+so per-row policies can run, or add an explicit `_authenticated` route option to block
+unauthenticated calls. Track via the M-B.1 follow-up issue
+(`M-B.1: drive getquery-bindings-baseline.txt to zero`).
 
 <!-- Spec reviewed 2026-05-17 - dead-code baseline reduction (#1493 / PR TBD): @api PHPDoc sweep on extension-point classes + WaaseyaaEntrypointProvider extended to recognize EntityBase/ContentEntityBase subclasses and their traits. No behavioural change. -->
 

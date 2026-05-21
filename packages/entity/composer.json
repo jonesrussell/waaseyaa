@@ -61,6 +61,7 @@
     "autoload-dev": {
         "psr-4": {
             "Waaseyaa\\Entity\\PhpStan\\": "testing/PhpStan/",
+            "Waaseyaa\\Entity\\Testing\\": "testing/",
             "Waaseyaa\\Entity\\Testing\\Translation\\": "testing/Translation/",
             "Waaseyaa\\Entity\\Tests\\": "tests/"
         }

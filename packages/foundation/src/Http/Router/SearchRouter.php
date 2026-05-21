@@ -6,6 +6,8 @@ namespace Waaseyaa\Foundation\Http\Router;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\AI\Vector\EmbeddingProviderFactory;
 use Waaseyaa\AI\Vector\SearchController;
 use Waaseyaa\AI\Vector\SqliteEmbeddingStorage;
@@ -25,6 +27,7 @@ final class SearchRouter implements DomainRouterInterface
         private readonly array $config,
         private readonly DatabaseInterface $database,
         private readonly ?EntityTypeManagerInterface $entityTypeManager = null,
+        private readonly ?EntityAccessHandler $accessHandler = null,
     ) {}
 
     public function supports(Request $request): bool
@@ -61,6 +64,9 @@ final class SearchRouter implements DomainRouterInterface
             ]);
         }
 
+        $rawAccount = $request->attributes->get('_account');
+        $account = $rawAccount instanceof AccountInterface ? $rawAccount : null;
+
         $embeddingProvider = EmbeddingProviderFactory::fromConfig($this->config);
         assert($this->database instanceof \Waaseyaa\Database\DBALDatabase);
         $embeddingStorage = new SqliteEmbeddingStorage($this->database->getConnection()->getNativeConnection());
@@ -71,6 +77,8 @@ final class SearchRouter implements DomainRouterInterface
             serializer: $serializer,
             embeddingStorage: $embeddingStorage,
             embeddingProvider: $embeddingProvider,
+            accessHandler: $this->accessHandler,
+            account: $account,
         );
 
         $results = $searchController->search($searchQuery, $entityType, $limit);
