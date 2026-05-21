@@ -395,3 +395,4 @@ final class AccessPolicyRegistryTest extends TestCase
 ## Activity Log
 
 - 2026-05-20T23:56:11Z – claude:sonnet:implementer:implementer – shell_pid=677610 – Assigned agent via action command
+- 2026-05-21T00:14:05Z – claude:sonnet:implementer:implementer – shell_pid=677610 – Container-resolved registry; ParentDelegatedAccessPolicy auto-instantiates via two-phase algorithm; boot fails on unresolvable deps; 5/5 tests pass, PHPStan clean
