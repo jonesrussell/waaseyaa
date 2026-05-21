@@ -22,8 +22,8 @@ subtasks:
 - T004
 - T005
 - T006
-shell_pid: "705854"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "721346"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-20T23:57:21Z'
   event: created
@@ -332,3 +332,4 @@ final class ScheduleEntriesInterfaceTest extends TestCase
 
 - 2026-05-21T00:25:52Z – claude:sonnet:implementer:implementer – shell_pid=705854 – Assigned agent via action command
 - 2026-05-21T00:39:15Z – claude:sonnet:implementer:implementer – shell_pid=705854 – Interface added (L0 scheduler); PackageManifestCompiler discovers implementors via string-constant FQCN; ScheduleListHandler confirmed present; 70 tests pass, PHPStan L5 clean, cs-check clean, bin/check-package-layers passes
+- 2026-05-21T00:40:09Z – claude:opus-4-7:reviewer:reviewer – shell_pid=721346 – Started review via action command
