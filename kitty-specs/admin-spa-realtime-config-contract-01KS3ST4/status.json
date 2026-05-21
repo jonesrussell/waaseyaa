@@ -1,30 +1,19 @@
 {
-<<<<<<< HEAD
-  "event_count": 28,
-  "last_event_id": "01KS41G1CHTWG8EJB2WAHQHVQZ",
-  "materialized_at": "2026-05-21T01:13:14.385715+00:00",
-=======
-  "event_count": 4,
-  "last_event_id": "01KS3XXMCVNV74F2VVDZYVFS61",
-  "materialized_at": "2026-05-21T00:10:45.531735+00:00",
->>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
+  "event_count": 30,
+  "last_event_id": "01KS41YGWRRWWZ5MX1PM28FEB3",
+  "materialized_at": "2026-05-21T01:21:09.016920+00:00",
   "mission_number": "",
   "mission_slug": "admin-spa-realtime-config-contract-01KS3ST4",
   "mission_type": "software-dev",
   "summary": {
-<<<<<<< HEAD
     "approved": 3,
-=======
-    "approved": 0,
->>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
+    "for_review": 1,
     "in_progress": 0,
-<<<<<<< HEAD
-    "in_review": 1,
+    "in_review": 0,
     "planned": 0
   },
   "work_packages": {
@@ -50,44 +39,11 @@
       "last_transition_at": "2026-05-21T01:01:49.934076+00:00"
     },
     "WP04": {
-      "actor": "claude:opus-4-7:reviewer:reviewer",
-      "force_count": 1,
-      "lane": "in_review",
-      "last_event_id": "01KS41G1CHTWG8EJB2WAHQHVQZ",
-      "last_transition_at": "2026-05-21T01:13:14.385715+00:00"
-=======
-    "in_review": 0,
-    "planned": 4
-  },
-  "work_packages": {
-    "WP01": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KS3XXKRVX9GV11191KCPEJV3",
-      "last_transition_at": "2026-05-21T00:10:44.891148+00:00"
-    },
-    "WP02": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KS3XXM972NSQ6A9YPTEZ4CPC",
-      "last_transition_at": "2026-05-21T00:10:45.415931+00:00"
-    },
-    "WP03": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KS3XXMB2MZ8KBK93NXPTVAYS",
-      "last_transition_at": "2026-05-21T00:10:45.474539+00:00"
-    },
-    "WP04": {
-      "actor": "finalize-tasks",
-      "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KS3XXMCVNV74F2VVDZYVFS61",
-      "last_transition_at": "2026-05-21T00:10:45.531735+00:00"
->>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
+      "actor": "user",
+      "force_count": 2,
+      "lane": "for_review",
+      "last_event_id": "01KS41YGWRRWWZ5MX1PM28FEB3",
+      "last_transition_at": "2026-05-21T01:21:09.016920+00:00"
     }
   }
 }
