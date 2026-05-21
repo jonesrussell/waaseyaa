@@ -161,7 +161,11 @@ jobs:
         working-directory: smoke-app
         env:
           APP_ENV: local
-        run: ./vendor/bin/waaseyaa migrate --no-interaction
+        run: |
+          # migrate is non-interactive by design; redirect stdin from
+          # /dev/null so any future prompt EOF-falls-back to default.
+          # Avoids --no-interaction which wasn't a global option in alpha.187.
+          ./vendor/bin/waaseyaa migrate </dev/null
 
       - name: Entity round-trip smoke
         working-directory: smoke-app
