@@ -14,6 +14,8 @@ subtasks:
 - T009
 - T010
 - T011
+agent: "claude:sonnet:researcher:implementer"
+shell_pid: "740452"
 history:
 - date: '2026-05-20T23:57:38Z'
   agent: tasks-materializer
@@ -364,3 +366,7 @@ git commit -m "tasks(M-G): WP03 gather — bimaaji surface, mcp capability, cons
 ## Reviewer Guidance
 
 Reviewer should verify: (1) all four research notes are present, (2) each has a date stamp, (3) the mcp-capability.md answers the PHP-tool-registration question unambiguously, (4) consumer-signal.md names all sources checked (not just sources that returned results), (5) sidecar-cost.md identifies at least the failure mode even if root cause is unknown.
+
+## Activity Log
+
+- 2026-05-21T00:46:54Z – claude:sonnet:researcher:implementer – shell_pid=740452 – Started implementation via action command
