@@ -411,3 +411,4 @@ Note: Testing `AbstractKernel` directly may require a concrete test-double subcl
 ## Activity Log
 
 - 2026-05-21T00:50:03Z – claude:sonnet:implementer:implementer – shell_pid=754274 – Started implementation via action command
+- 2026-05-21T00:57:53Z – claude:sonnet:implementer:implementer – shell_pid=754274 – Boot wiring via PolicyDependencyResolverInterface (M-B adopted); fail-closed on unresolvable deps via ScheduleEntryInstantiationException; schedule.disabled_entries opt-out honored; 10/10 tests pass, PHPStan clean, CS clean
