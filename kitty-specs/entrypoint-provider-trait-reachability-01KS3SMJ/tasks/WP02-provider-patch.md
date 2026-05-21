@@ -20,7 +20,8 @@ subtasks:
 - T006
 - T007
 - T008
-shell_pid: '739599'
+shell_pid: "739599"
+agent: "claude:sonnet:implementer:implementer"
 history:
 - date: '2026-05-20T23:57:25Z'
   author: tasks-materializer
@@ -332,3 +333,7 @@ The plan assumes (b)/(c) is most likely based on provider code analysis, but **t
 - Verify test cases (a) and (b) use different fixture traits (not the same trait toggling a flag).
 - Verify regression test (c) uses real reflection of the actual trait classes.
 - Confirm `Closes #1501` is in the commit footer.
+
+## Activity Log
+
+- 2026-05-21T00:46:41Z – claude:sonnet:implementer:implementer – shell_pid=739599 – Assigned agent via action command
