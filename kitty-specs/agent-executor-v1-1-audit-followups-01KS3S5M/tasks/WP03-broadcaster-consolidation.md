@@ -228,3 +228,4 @@ After this WP, `MessagingServiceProvider` should either delegate to `AgentRunBro
 - 2026-05-21T00:59:04Z – claude:sonnet:implementer:implementer – shell_pid=779252 – Started implementation via action command
 - 2026-05-21T01:02:51Z – claude:sonnet:implementer:implementer – shell_pid=779252 – Adapter deleted; DI bindings updated; no external references; OpenAPI shape preserved; 100/100 tests pass; PHPStan clean; CS clean
 - 2026-05-21T01:03:35Z – claude:opus-4-7:reviewer:reviewer – shell_pid=789896 – Started review via action command
+- 2026-05-21T01:05:09Z – claude:opus-4-7:reviewer:reviewer – shell_pid=789896 – Moved to planned
