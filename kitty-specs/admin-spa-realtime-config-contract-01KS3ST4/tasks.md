@@ -24,10 +24,10 @@
 | T011 | Migrate all `app/components/**` files (AdminShell.vue, BrandPanel.vue, SchemaList.vue — remove String coerce) | WP03 | [D] |
 | T012 | Migrate all `app/pages/**` files (14 page files) | WP03 | [D] |
 | T013 | Verify no residual `useRuntimeConfig`/`config.public` references remain in `packages/admin/app/**` | WP03 | No | [D] |
-| T014 | Create `bin/check-admin-coercion-patterns` CI gate shell script (NFR-004) | WP04 | No |
-| T015 | Create `packages/admin/e2e/schema-dedup.spec.ts` Playwright network-capture spec (FR-012) | WP04 | [P] |
-| T016 | Add `CHANGELOG.md` `[Unreleased]` entries for #1537 and #1538 | WP04 | [P] |
-| T017 | Final verification: full CI suite green (`composer verify` + `npm run build && npm test && npm run test:e2e && npm run lint`) | WP04 | No |
+| T014 | Create `bin/check-admin-coercion-patterns` CI gate shell script (NFR-004) | WP04 | No | [D] |
+| T015 | Create `packages/admin/e2e/schema-dedup.spec.ts` Playwright network-capture spec (FR-012) | WP04 | [D] |
+| T016 | Add `CHANGELOG.md` `[Unreleased]` entries for #1537 and #1538 | WP04 | [D] |
+| T017 | Final verification: full CI suite green (`composer verify` + `npm run build && npm test && npm run test:e2e && npm run lint`) | WP04 | No | [D] |
 
 ---
 
@@ -147,10 +147,10 @@
 
 #### Included subtasks
 
-- [ ] T014 Create `bin/check-admin-coercion-patterns` CI gate script (WP04)
-- [ ] T015 Create `packages/admin/e2e/schema-dedup.spec.ts` Playwright spec (WP04)
-- [ ] T016 Add `CHANGELOG.md` `[Unreleased]` entries (WP04)
-- [ ] T017 Final verification — full CI suite (WP04)
+- [x] T014 Create `bin/check-admin-coercion-patterns` CI gate script (WP04)
+- [x] T015 Create `packages/admin/e2e/schema-dedup.spec.ts` Playwright spec (WP04)
+- [x] T016 Add `CHANGELOG.md` `[Unreleased]` entries (WP04)
+- [x] T017 Final verification — full CI suite (WP04)
 
 #### Implementation sketch
 
