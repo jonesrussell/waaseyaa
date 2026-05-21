@@ -13,6 +13,8 @@ subtasks:
 - T013
 - T014
 - T015
+agent: "claude:sonnet:researcher:implementer"
+shell_pid: "762096"
 history:
 - date: '2026-05-20T23:57:38Z'
   agent: tasks-materializer
@@ -220,3 +222,7 @@ You have four research notes from WP03 and a criteria table from WP01 (`decision
 ## Reviewer Guidance
 
 Reviewer should verify: (1) the table covers all three options and all criteria from decision-frame.md, (2) each cell references evidence (even by citing the research note name), (3) the document does not pre-empt WP05 by declaring a decision, (4) the convergence signal is present but appropriately non-committal.
+
+## Activity Log
+
+- 2026-05-21T00:53:18Z – claude:sonnet:researcher:implementer – shell_pid=762096 – Started implementation via action command
