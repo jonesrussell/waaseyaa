@@ -16,8 +16,8 @@ subtasks:
 - T013
 - T014
 - T015
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "782878"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "799678"
 history:
 - date: '2026-05-20T23:57:09Z'
   author: tasks-materializer
@@ -266,3 +266,4 @@ add them to the commit message. See memory `feedback_partial_fix_closes_footer.m
 
 - 2026-05-21T01:00:23Z – claude:sonnet:implementer:implementer – shell_pid=782878 – Started implementation via action command
 - 2026-05-21T01:08:30Z – claude:sonnet:implementer:implementer – shell_pid=782878 – Routes wired; DI complete; spec updated; CHANGELOG bullet added
+- 2026-05-21T01:09:15Z – claude:opus-4-7:reviewer:reviewer – shell_pid=799678 – Started review via action command
