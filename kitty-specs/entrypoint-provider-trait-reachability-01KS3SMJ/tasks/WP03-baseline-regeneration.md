@@ -15,6 +15,8 @@ subtasks:
 - T010
 - T011
 - T012
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "764533"
 history:
 - date: '2026-05-20T23:57:25Z'
   author: tasks-materializer
@@ -217,3 +219,7 @@ Per spec C-002: "The fix shrinks the baseline by exactly 31 entries (the trait c
 - Verify `composer verify` exit code was 0 (ask for the CI run URL or log).
 - Verify the commit message has accurate BEFORE/AFTER counts — these document the mission's effect for future reference.
 - Confirm no manual edits to `phpstan-dead-code-baseline.neon` — only regeneration (C-002).
+
+## Activity Log
+
+- 2026-05-21T00:54:18Z – claude:sonnet:implementer:implementer – shell_pid=764533 – Started implementation via action command
