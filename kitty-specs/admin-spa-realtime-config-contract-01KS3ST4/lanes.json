@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "mission_slug": "admin-spa-realtime-config-contract-01KS3ST4",
+  "mission_id": "01KS3ST407QFCW2RH3EANXR805",
+  "mission_branch": "kitty/mission-admin-spa-realtime-config-contract-01KS3ST4",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "bin/check-admin-coercion-patterns",
+        "packages/admin/README.md",
+        "packages/admin/app/components/auth/BrandPanel.vue",
+        "packages/admin/app/components/layout/AdminShell.vue",
+        "packages/admin/app/components/schema/SchemaList.vue",
+        "packages/admin/app/composables/useAdminConfig.ts",
+        "packages/admin/app/composables/useApi.ts",
+        "packages/admin/app/composables/useSchema.ts",
+        "packages/admin/app/middleware/auth.global.ts",
+        "packages/admin/app/pages/[entityType]/[id].vue",
+        "packages/admin/app/pages/[entityType]/create.vue",
+        "packages/admin/app/pages/[entityType]/index.vue",
+        "packages/admin/app/pages/[entityType]/pipeline.vue",
+        "packages/admin/app/pages/forgot-password.vue",
+        "packages/admin/app/pages/index.vue",
+        "packages/admin/app/pages/login.vue",
+        "packages/admin/app/pages/register.vue",
+        "packages/admin/app/pages/reset-password.vue",
+        "packages/admin/app/pages/telescope/codified-context/[sessionId].vue",
+        "packages/admin/app/pages/telescope/codified-context/index.vue",
+        "packages/admin/app/pages/workflows/[id].vue",
+        "packages/admin/app/pages/workflows/index.vue",
+        "packages/admin/app/plugins/admin.ts",
+        "packages/admin/app/types/AdminConfig.ts",
+        "packages/admin/app/utils/configCoercion.ts",
+        "packages/admin/e2e/schema-dedup.spec.ts",
+        "packages/admin/tests/composables/useAdminConfig.test.ts",
+        "packages/admin/tests/composables/useSchema.test.ts",
+        "packages/admin/tests/utils/configCoercion.test.ts"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "app-shell",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-21T00:10:45.587345+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP01"
+      }
+    ],
+    "total_merges": 3,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 3
+    }
+  }
+}
