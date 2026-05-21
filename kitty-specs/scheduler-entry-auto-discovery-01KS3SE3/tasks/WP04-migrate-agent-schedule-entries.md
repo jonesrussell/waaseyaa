@@ -286,3 +286,7 @@ public function pruneTaskRemovesOldRows(): void
 - Verify `#[CoversNothing]` on integration test (not `#[CoversClass]`)
 - Check that `pruneTaskRemovesOldRows` actually verifies database state (not just that prune was called)
 - Verify `Closes #1512` appears in the PR description / merge commit
+
+## Activity Log
+
+- 2026-05-21T01:23:08Z – unknown – AgentScheduleEntries auto-discovered via ScheduleEntriesInterface; Phase30 integration test asserts schedule:list tasks and prune behavior (FR-005, FR-012, FR-013)

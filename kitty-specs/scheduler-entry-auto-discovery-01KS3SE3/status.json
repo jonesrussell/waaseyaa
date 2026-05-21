@@ -1,7 +1,7 @@
 {
-  "event_count": 25,
-  "last_event_id": "01KS41VV11R22XGBZ83BHMGK9X",
-  "materialized_at": "2026-05-21T01:19:41.089327+00:00",
+  "event_count": 28,
+  "last_event_id": "01KS4225C8YFH984ZW2MBYX7JH",
+  "materialized_at": "2026-05-21T01:23:08.296669+00:00",
   "mission_number": "",
   "mission_slug": "scheduler-entry-auto-discovery-01KS3SE3",
   "mission_type": "software-dev",
@@ -11,10 +11,10 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
+    "for_review": 1,
     "in_progress": 0,
     "in_review": 0,
-    "planned": 2
+    "planned": 1
   },
   "work_packages": {
     "WP01": {
@@ -39,11 +39,11 @@
       "last_transition_at": "2026-05-21T01:19:41.089327+00:00"
     },
     "WP04": {
-      "actor": "finalize-tasks",
+      "actor": "user",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KS3Y1XZGJ2MWD0YM44FMAJE7",
-      "last_transition_at": "2026-05-21T00:13:06.416700+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KS4225C8YFH984ZW2MBYX7JH",
+      "last_transition_at": "2026-05-21T01:23:08.296669+00:00"
     },
     "WP05": {
       "actor": "finalize-tasks",
