@@ -26,8 +26,8 @@ subtasks:
 - T016
 - T017
 - T018
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "726372"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "767088"
 history:
 - date: '2026-05-20T23:57:13Z'
   event: created
@@ -504,3 +504,4 @@ No `openapi.yaml` exists outside vendor. This WP creates `packages/api/openapi.y
 
 - 2026-05-21T00:42:25Z – claude:sonnet:implementer:implementer – shell_pid=726372 – Started implementation via action command
 - 2026-05-21T00:54:07Z – claude:sonnet:implementer:implementer – shell_pid=726372 – 5 lifecycle events dispatched from AgentExecutor (Started, IterationCompleted, ProviderCallCompleted, ToolCallObserved, Terminated); RunAgentHandler dispatches Terminated for handler-owned failure path only; openapi.yaml bootstrapped + spectral lint wired into composer verify; 141 tests pass, PHPStan clean, cs-check clean
+- 2026-05-21T00:55:03Z – claude:opus-4-7:reviewer:reviewer – shell_pid=767088 – Started review via action command
