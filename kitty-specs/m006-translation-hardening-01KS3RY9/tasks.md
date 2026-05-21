@@ -25,11 +25,11 @@ M-B WP02 to merge first if running in parallel).
 | T005 | Wire `LangcodeValidator::validate()` into `AddTranslationsMigrationGenerator` (both render paths + `generate()`) | WP02 | — | [D] |
 | T006 | Audit `$backend` interpolation in generator; document PHP type narrowing; add assertion per FR-007 | WP02 | [D] |
 | T007 | Unit test `AddTranslationsMigrationGeneratorTest`: injection payload rejection + valid langcode acceptance | WP02 | [D] |
-| T008 | Add `EntityAccessHandler` constructor parameter to `TranslationController` | WP01 | — |
-| T009 | Insert per-method `check()` calls with FR-002 ability mapping (index/show→view, store→create, update→update, destroy→delete) | WP01 | — |
-| T010 | Implement 403 response shape: JSON:API error document with `status: "403"`, `code: "FORBIDDEN"`, stable title | WP01 | — |
-| T011 | Unit test `TranslationControllerTest`: happy path + 403 for each of 5 endpoints | WP01 | [P] |
-| T012 | Integration test `TranslationAccessControlTest` in `tests/Integration/Phase29/` | WP01 | [P] |
+| T008 | Add `EntityAccessHandler` constructor parameter to `TranslationController` | WP01 | — | [D] |
+| T009 | Insert per-method `check()` calls with FR-002 ability mapping (index/show→view, store→create, update→update, destroy→delete) | WP01 | — | [D] |
+| T010 | Implement 403 response shape: JSON:API error document with `status: "403"`, `code: "FORBIDDEN"`, stable title | WP01 | — | [D] |
+| T011 | Unit test `TranslationControllerTest`: happy path + 403 for each of 5 endpoints | WP01 | [D] |
+| T012 | Integration test `TranslationAccessControlTest` in `tests/Integration/Phase29/` | WP01 | [D] |
 | T013 | Update `docs/specs/entity-storage-two-axis.md`: access-gate convention + BCP-47 regex constant reference | WP04 | — |
 | T014 | Add `CHANGELOG.md` `[Unreleased]` entry covering #1445, #1446, #1447 | WP04 | [P] |
 | T015 | Run `composer verify` and confirm green; document result in WP04 commit | WP04 | — |
@@ -102,11 +102,11 @@ T004, T006, T007 can be written in parallel with T003/T005 (different files).
 
 #### Subtasks
 
-- [ ] T008 Add `EntityAccessHandler` constructor parameter to `TranslationController` (WP01)
-- [ ] T009 Insert per-method `check()` calls with FR-002 ability mapping (WP01)
-- [ ] T010 Implement 403 response shape with JSON:API error document (WP01)
-- [ ] T011 Unit test `TranslationControllerTest`: happy path + 403 for each endpoint (WP01)
-- [ ] T012 Integration test `TranslationAccessControlTest` in `tests/Integration/Phase29/` (WP01)
+- [x] T008 Add `EntityAccessHandler` constructor parameter to `TranslationController` (WP01)
+- [x] T009 Insert per-method `check()` calls with FR-002 ability mapping (WP01)
+- [x] T010 Implement 403 response shape with JSON:API error document (WP01)
+- [x] T011 Unit test `TranslationControllerTest`: happy path + 403 for each endpoint (WP01)
+- [x] T012 Integration test `TranslationAccessControlTest` in `tests/Integration/Phase29/` (WP01)
 
 #### Implementation sketch
 
