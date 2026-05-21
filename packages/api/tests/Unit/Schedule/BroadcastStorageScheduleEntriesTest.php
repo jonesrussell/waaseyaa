@@ -80,4 +80,19 @@ final class BroadcastStorageScheduleEntriesTest extends TestCase
         // Invoke the closure — must not throw.
         ($task->command)();
     }
+
+    #[Test]
+    public function registerIsInertWhenBroadcastStorageIsNull(): void
+    {
+        // Regression test: kernels that do not bind BroadcastStorage (e.g. minimal SSR/OIDC
+        // test kernels) must not fail. The entry must be inert — empty task map, nothing added
+        // to the schedule.
+        $schedule = new Schedule();
+
+        $entries = new BroadcastStorageScheduleEntries(broadcastStorage: null);
+        $result = $entries->register($schedule);
+
+        self::assertSame([], $result);
+        self::assertCount(0, $schedule->tasks());
+    }
 }

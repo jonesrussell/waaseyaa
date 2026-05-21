@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Waaseyaa\Api\Schedule;
 
 use Waaseyaa\Api\Controller\BroadcastStorage;
+use Waaseyaa\Foundation\Log\LoggerInterface;
+use Waaseyaa\Foundation\Log\NullLogger;
 use Waaseyaa\Scheduler\ScheduledTask;
 use Waaseyaa\Scheduler\ScheduleEntriesInterface;
 use Waaseyaa\Scheduler\ScheduleInterface;
@@ -18,21 +20,39 @@ use Waaseyaa\Scheduler\ScheduleInterface;
  * To disable: add Waaseyaa\Api\Schedule\BroadcastStorageScheduleEntries to
  * schedule.disabled_entries in your configuration.
  *
+ * BroadcastStorage is optional: if the dependency is absent (e.g. minimal SSR
+ * or OIDC test kernels that do not bind the broadcasting subsystem), this entry
+ * is inert — it logs a warning once and returns an empty task map. Mirrors the
+ * M-B NullPolicyDependencyResolver optional-binding pattern.
+ *
  * @api
  */
 final class BroadcastStorageScheduleEntries implements ScheduleEntriesInterface
 {
     private int $retentionDays;
+    private LoggerInterface $logger;
 
     public function __construct(
-        private readonly BroadcastStorage $broadcastStorage,
+        private readonly ?BroadcastStorage $broadcastStorage = null,
         array $config = [],
+        ?LoggerInterface $logger = null,
     ) {
         $this->retentionDays = (int) ($config['schedule']['broadcast_log_retention_days'] ?? 7);
+        $this->logger = $logger ?? new NullLogger();
     }
 
     public function register(ScheduleInterface $schedule): array
     {
+        if ($this->broadcastStorage === null) {
+            $this->logger->warning(
+                'BroadcastStorageScheduleEntries: BroadcastStorage not bound; '
+                . 'broadcast_log_prune task will not be registered. '
+                . 'Bind Waaseyaa\\Api\\Controller\\BroadcastStorage in a ServiceProvider to enable pruning.',
+            );
+
+            return [];
+        }
+
         $retentionDays = $this->retentionDays;
         $broadcastStorage = $this->broadcastStorage;
 
