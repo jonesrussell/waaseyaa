@@ -14,9 +14,12 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+<<<<<<< HEAD
 base_branch: kitty/mission-agent-executor-v1-1-audit-followups-01KS3S5M
 base_commit: c654a1198721c28a88a4fa2c568a378574a18c89
 created_at: '2026-05-21T00:25:33.495326+00:00'
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 subtasks:
 - T001
 - T002
@@ -26,8 +29,11 @@ subtasks:
 - T006
 - T007
 - T008
+<<<<<<< HEAD
 shell_pid: "720208"
 agent: "claude:opus-4-7:reviewer:reviewer"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:13Z'
   event: created
@@ -354,6 +360,7 @@ Layer note: all new exception classes live in `packages/ai-agent/src/Provider/` 
 2. Verify `callProviderWithRetry` retry budget variables (`$maxAttempts`, sleep values) are unchanged.
 3. Confirm `AgentExecutorRetryTest` tests each of the four branches and uses `exactly(1)` / `exactly(2)` mock expectations to validate retry count.
 4. Confirm `ProviderException` is abstract (not final, not interface).
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -361,3 +368,5 @@ Layer note: all new exception classes live in `packages/ai-agent/src/Provider/` 
 - 2026-05-21T00:38:56Z – claude:sonnet:implementer:implementer – shell_pid=705035 – TransportException/ClientErrorException/RateLimitException hierarchy; AnthropicProvider and OpenAiCompatibleProvider categorize by HTTP status; AgentExecutor retry budget unchanged; 4/4 AgentExecutorRetryTest green; cs-check + phpstan clean
 - 2026-05-21T00:39:42Z – claude:opus-4-7:reviewer:reviewer – shell_pid=720208 – Started review via action command
 - 2026-05-21T00:41:24Z – claude:opus-4-7:reviewer:reviewer – shell_pid=720208 – Review passed: typed provider exception hierarchy (ProviderException abstract @api, RateLimit/Transport/ClientError siblings) correctly classifies 429/5xx/4xx/cURL across AnthropicProvider both code paths + OpenAiCompatibleProvider (new 429 path is robust, HTTP-code-based not string-match). AgentExecutor catch order RateLimit->Transport->ClientError->Throwable is sound; ClientError and Throwable re-throw without consuming retry budget. FR-025 constants (3 retries, 1s base, 30s cap) unchanged. 4/4 retry tests pass; RateLimit/Transport tests assert exact invocation count (==2). 95/95 ai-agent tests, cs-check, phpstan all clean. Minor follow-ups (not blocking): curl_init===false fallback still throws bare RuntimeException in both providers; ClientError/generic tests can't assert post-exception invocation count (acknowledged in code).
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

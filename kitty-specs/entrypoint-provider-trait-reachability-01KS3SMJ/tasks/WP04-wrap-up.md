@@ -12,8 +12,11 @@ subtasks:
 - T013
 - T014
 - T015
+<<<<<<< HEAD
 agent: "claude:opus-4-7:reviewer:reviewer"
 shell_pid: "784400"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:25Z'
   author: tasks-materializer
@@ -179,6 +182,7 @@ Update `CLAUDE.md` to document the trait `@api` propagation behavior (FR-005). A
 - Confirm the new note names the specific method `isTraitWithApiPhpDoc()` so it can be found by grep.
 - Confirm CHANGELOG entry is under `[Unreleased]` and not under a versioned heading.
 - Confirm `composer verify` passed (check the worktree's CI run or local output).
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -186,3 +190,5 @@ Update `CLAUDE.md` to document the trait `@api` propagation behavior (FR-005). A
 - 2026-05-21T00:59:49Z – claude:sonnet:implementer:implementer – shell_pid=778658 – CLAUDE.md 7th pattern documented; CHANGELOG bullet added; composer verify result: cs-check OK, phpstan OK, check-dead-code OK (baseline 66→13); check-symfony-imports 11 pre-existing violations (not a regression)
 - 2026-05-21T01:01:06Z – claude:opus-4-7:reviewer:reviewer – shell_pid=784400 – Started review via action command
 - 2026-05-21T01:01:45Z – claude:opus-4-7:reviewer:reviewer – shell_pid=784400 – Review passed: CLAUDE.md 7th bullet documents trait-@api propagation via WaaseyaaEntrypointProvider::getUsages(); CHANGELOG [Unreleased] bullet cites #1501, names 3 traits, 66→13 baseline drop, forward guidance. composer verify: all gates green except 11 pre-existing symfony-imports violations (untouched by WP). Diff: 2 files, 2 inserts. No scope creep.
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

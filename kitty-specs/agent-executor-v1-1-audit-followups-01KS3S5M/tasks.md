@@ -9,6 +9,7 @@
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
+<<<<<<< HEAD
 | T001 | Create `ProviderException` abstract base class | WP01 | N | [D] |
 | T002 | Create `TransportException` (5xx/network, retryable) | WP01 | [D] |
 | T003 | Create `ClientErrorException` (4xx non-429, non-retryable) | WP01 | [D] |
@@ -32,6 +33,31 @@
 | T021 | Clean `MessagingServiceProvider` — remove adapter reference | WP03 | N | [D] |
 | T022 | Update/create `AgentRunBroadcasterTest` (FR-012) | WP03 | N | [D] |
 | T023 | Confirm `pending_approval` OpenAPI shape matches broadcaster emission | WP03 | N | [D] |
+=======
+| T001 | Create `ProviderException` abstract base class | WP01 | N |
+| T002 | Create `TransportException` (5xx/network, retryable) | WP01 | [P] |
+| T003 | Create `ClientErrorException` (4xx non-429, non-retryable) | WP01 | [P] |
+| T004 | Update `RateLimitException` to extend `ProviderException` | WP01 | N |
+| T005 | Update `AnthropicProvider` to throw typed exceptions | WP01 | N |
+| T006 | Update `OpenAiCompatibleProvider` to throw typed exceptions | WP01 | [P] |
+| T007 | Refine `AgentExecutor::callProviderWithRetry` catch clauses | WP01 | N |
+| T008 | Write `AgentExecutorRetryTest` (FR-010) | WP01 | N |
+| T009 | Inject `EventDispatcherInterface` into `AgentExecutor` | WP02 | N |
+| T010 | Dispatch `AgentRunStarted` + `AgentRunTerminated` from `AgentExecutor` | WP02 | N |
+| T011 | Dispatch `AgentRunIterationCompleted` from `AgentExecutor` | WP02 | N |
+| T012 | Dispatch `AgentRunProviderCallCompleted` + `AgentRunToolCallObserved` from `AgentExecutor` | WP02 | N |
+| T013 | Dispatch `AgentRunTerminated` from `RunAgentHandler` (owned paths only) | WP02 | N |
+| T014 | Write `AgentExecutorEventDispatchTest` (FR-011) | WP02 | N |
+| T015 | Write `AgentRunObservabilityTest` integration test (FR-014) | WP02 | N |
+| T016 | Create `packages/api/openapi.yaml` bootstrap document | WP02 | [P] |
+| T017 | Create `bin/check-openapi` lint script | WP02 | [P] |
+| T018 | Wire `bin/check-openapi` into `composer verify` | WP02 | N |
+| T019 | Verify `AgentRunBroadcasterServiceProvider` is the canonical binding | WP03 | N |
+| T020 | Delete `BroadcastStorageAdapter` and its test (if any) | WP03 | N |
+| T021 | Clean `MessagingServiceProvider` — remove adapter reference | WP03 | N |
+| T022 | Update/create `AgentRunBroadcasterTest` (FR-012) | WP03 | N |
+| T023 | Confirm `pending_approval` OpenAPI shape matches broadcaster emission | WP03 | N |
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 | T024 | Implement real SSE consumer in `AiRunCommand::runAsync` | WP04 | N |
 | T025 | Wire SIGINT / Ctrl-C teardown | WP04 | N |
 | T026 | Write `AiRunCommandWatchTest` (FR-013) | WP04 | N |
@@ -58,6 +84,7 @@ Create the typed exception hierarchy (`ProviderException`, `TransportException`,
 
 ### Included subtasks
 
+<<<<<<< HEAD
 - [x] T001 Create `ProviderException` abstract base class (WP01)
 - [x] T002 Create `TransportException` (5xx/network, retryable) (WP01)
 - [x] T003 Create `ClientErrorException` (4xx non-429, non-retryable) (WP01)
@@ -66,6 +93,16 @@ Create the typed exception hierarchy (`ProviderException`, `TransportException`,
 - [x] T006 Update `OpenAiCompatibleProvider` to throw typed exceptions (WP01)
 - [x] T007 Refine `AgentExecutor::callProviderWithRetry` catch clauses (WP01)
 - [x] T008 Write `AgentExecutorRetryTest` (FR-010) (WP01)
+=======
+- [ ] T001 Create `ProviderException` abstract base class (WP01)
+- [ ] T002 Create `TransportException` (5xx/network, retryable) (WP01)
+- [ ] T003 Create `ClientErrorException` (4xx non-429, non-retryable) (WP01)
+- [ ] T004 Update `RateLimitException` to extend `ProviderException` (WP01)
+- [ ] T005 Update `AnthropicProvider` to throw typed exceptions (WP01)
+- [ ] T006 Update `OpenAiCompatibleProvider` to throw typed exceptions (WP01)
+- [ ] T007 Refine `AgentExecutor::callProviderWithRetry` catch clauses (WP01)
+- [ ] T008 Write `AgentExecutorRetryTest` (FR-010) (WP01)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 **Parallel opportunities**: T002 and T003 can be written in parallel (independent new files). T006 can be written in parallel with T005 (different provider file).
 
@@ -92,6 +129,7 @@ Wire the five domain event dispatches into `AgentExecutor` and `RunAgentHandler`
 
 ### Included subtasks
 
+<<<<<<< HEAD
 - [x] T009 Inject `EventDispatcherInterface` into `AgentExecutor` (WP02)
 - [x] T010 Dispatch `AgentRunStarted` + `AgentRunTerminated` from `AgentExecutor` (WP02)
 - [x] T011 Dispatch `AgentRunIterationCompleted` from `AgentExecutor` (WP02)
@@ -102,6 +140,18 @@ Wire the five domain event dispatches into `AgentExecutor` and `RunAgentHandler`
 - [x] T016 Create `packages/api/openapi.yaml` bootstrap document (WP02)
 - [x] T017 Create `bin/check-openapi` lint script (WP02)
 - [x] T018 Wire `bin/check-openapi` into `composer verify` (WP02)
+=======
+- [ ] T009 Inject `EventDispatcherInterface` into `AgentExecutor` (WP02)
+- [ ] T010 Dispatch `AgentRunStarted` + `AgentRunTerminated` from `AgentExecutor` (WP02)
+- [ ] T011 Dispatch `AgentRunIterationCompleted` from `AgentExecutor` (WP02)
+- [ ] T012 Dispatch `AgentRunProviderCallCompleted` + `AgentRunToolCallObserved` from `AgentExecutor` (WP02)
+- [ ] T013 Dispatch `AgentRunTerminated` from `RunAgentHandler` (owned paths only) (WP02)
+- [ ] T014 Write `AgentExecutorEventDispatchTest` (FR-011) (WP02)
+- [ ] T015 Write `AgentRunObservabilityTest` integration test (FR-014) (WP02)
+- [ ] T016 Create `packages/api/openapi.yaml` bootstrap document (WP02)
+- [ ] T017 Create `bin/check-openapi` lint script (WP02)
+- [ ] T018 Wire `bin/check-openapi` into `composer verify` (WP02)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 **Parallel opportunities**: T016+T017 (OpenAPI file + script) can be done in parallel with T009–T013 (event wiring) since they touch different files.
 
@@ -129,11 +179,19 @@ Delete `BroadcastStorageAdapter` (confirmed no external consumers per plan grep)
 
 ### Included subtasks
 
+<<<<<<< HEAD
 - [x] T019 Verify `AgentRunBroadcasterServiceProvider` is the canonical binding (WP03)
 - [x] T020 Delete `BroadcastStorageAdapter` and its test (if any) (WP03)
 - [x] T021 Clean `MessagingServiceProvider` — remove adapter reference (WP03)
 - [x] T022 Update/create `AgentRunBroadcasterTest` (FR-012) (WP03)
 - [x] T023 Confirm `pending_approval` OpenAPI shape matches broadcaster emission (WP03)
+=======
+- [ ] T019 Verify `AgentRunBroadcasterServiceProvider` is the canonical binding (WP03)
+- [ ] T020 Delete `BroadcastStorageAdapter` and its test (if any) (WP03)
+- [ ] T021 Clean `MessagingServiceProvider` — remove adapter reference (WP03)
+- [ ] T022 Update/create `AgentRunBroadcasterTest` (FR-012) (WP03)
+- [ ] T023 Confirm `pending_approval` OpenAPI shape matches broadcaster emission (WP03)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 **Parallel opportunities**: T022 can be written after T019/T020 but is independent of T021/T023.
 

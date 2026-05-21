@@ -18,8 +18,11 @@ subtasks:
 - T011
 - T012
 - T013
+<<<<<<< HEAD
 agent: "claude:opus-4-7:reviewer:reviewer"
 shell_pid: "783912"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:32Z'
   event: created
@@ -352,6 +355,7 @@ If any grep returns matches:
 3. Check `SchemaList.vue` specifically — this is the file that contained the original #1538 workaround. Verify `enableRealtime` is now a typed boolean consumed directly.
 4. Run `cd packages/admin && npm run build` and verify zero errors.
 5. Review `auth.global.ts` — the auth middleware is security-sensitive. Verify the boolean check (`if (auth.requireVerifiedEmail)`) is semantically equivalent to the old `=== '1'` check.
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -359,3 +363,5 @@ If any grep returns matches:
 - 2026-05-21T00:59:38Z – claude:sonnet:implementer:implementer – shell_pid=769518 – 17 files migrated; String(x) === '1' pattern removed from SchemaList.vue; zero config.public.* references remain; 243 tests pass, build clean, lint 0 errors
 - 2026-05-21T01:00:51Z – claude:opus-4-7:reviewer:reviewer – shell_pid=783912 – Started review via action command
 - 2026-05-21T01:01:50Z – claude:opus-4-7:reviewer:reviewer – shell_pid=783912 – Approved: 0 config.public.* remain (was 17 callsites). 4 exemptions (plugins/admin.ts, composables/useApi.ts, pages/login.vue, middleware/auth.global.ts) confirmed using only config.app.baseURL (Nuxt internal). SchemaList.vue migrated to useAdminConfig().enableRealtime as typed boolean - #1538 regression vector closed. 243/243 tests pass, build clean, 0 lint errors. Remaining 6 === '1' matches are unrelated query-param parsing (?verified=1) and the legitimate configCoercion.ts helper, not runtime-config workarounds.
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

@@ -13,15 +13,21 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+<<<<<<< HEAD
 base_branch: kitty/mission-entrypoint-provider-trait-reachability-01KS3SMJ
 base_commit: e4620a19d4e6acaa7df15a9b9c48af6bdb44cf0b
 created_at: '2026-05-21T00:46:39.695794+00:00'
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 subtasks:
 - T006
 - T007
 - T008
+<<<<<<< HEAD
 shell_pid: "759897"
 agent: "claude:opus-4-7:reviewer:reviewer"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:25Z'
   author: tasks-materializer
@@ -333,6 +339,7 @@ The plan assumes (b)/(c) is most likely based on provider code analysis, but **t
 - Verify test cases (a) and (b) use different fixture traits (not the same trait toggling a flag).
 - Verify regression test (c) uses real reflection of the actual trait classes.
 - Confirm `Closes #1501` is in the commit footer.
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -340,3 +347,5 @@ The plan assumes (b)/(c) is most likely based on provider code analysis, but **t
 - 2026-05-21T00:51:12Z – claude:sonnet:implementer:implementer – shell_pid=739599 – Trait_ AST node branch added; trait_exists guard used (class_exists returns false for traits); private factory bodies copy-inlined; all 3 target traits (RevisionableEntityTrait/InteractsWithApi/RefreshDatabase) now have zero baseline entries; 7 tests pass; dead-code gate passes; baseline 66→13
 - 2026-05-21T00:52:28Z – claude:opus-4-7:reviewer:reviewer – shell_pid=759897 – Started review via action command
 - 2026-05-21T00:53:24Z – claude:opus-4-7:reviewer:reviewer – shell_pid=759897 – Review passed: getUsages override on Stmt\Trait_ uses trait_exists() correctly; buildTraitMemberUsages emits ClassMethodUsage + ClassPropertyUsage READ/WRITE via UsageOrigin::createVirtual; comments cite inlined-from-vendor source. Baseline 199->79 lines / ~66->13 entries: 0 hits for RevisionableEntityTrait, InteractsWithApi, RefreshDatabase. 7/7 phpunit tests pass. bin/check-dead-code returns OK. Remaining baseline entries are unrelated class-level interface/abstract methods (no entry-point regression). Diff scope tight to provider, new test, baseline, phpunit.xml.dist Tools testsuite.
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

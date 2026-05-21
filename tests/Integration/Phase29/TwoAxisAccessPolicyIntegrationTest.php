@@ -432,6 +432,11 @@ final class TestTeaching implements EntityInterface, TranslatableInterface
     {
         return $this->langcodes;
     }
+
+    public function fieldLangcode(string $fieldName): ?string
+    {
+        return $this->activeLangcode;
+    }
 }
 
 /**
@@ -551,6 +556,11 @@ final class TestTeachingRevision implements EntityInterface, RevisionableEntityI
     public function getTranslationLanguages(): array
     {
         return [$this->activeLangcode];
+    }
+
+    public function fieldLangcode(string $fieldName): ?string
+    {
+        return $this->activeLangcode;
     }
 }
 

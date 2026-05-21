@@ -150,6 +150,11 @@ final class TwoAxisListingInvalidationIntegrationTest extends TestCase
             {
                 return ['en', $this->activeLc];
             }
+
+            public function fieldLangcode(string $fieldName): ?string
+            {
+                return $this->activeLc;
+            }
         };
     }
 

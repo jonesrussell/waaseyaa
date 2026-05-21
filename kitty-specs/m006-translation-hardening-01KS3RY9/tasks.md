@@ -18,6 +18,7 @@ M-B WP02 to merge first if running in parallel).
 
 | ID   | Description                                                      | WP   | Parallel |
 |------|------------------------------------------------------------------|------|----------|
+<<<<<<< HEAD
 | T001 | Add `fieldLangcode(string $fieldName): ?string` to `TranslatableInterface` | WP03 | — | [D] |
 | T002 | Contract test: reflection asserts method + signature; trait satisfies via anonymous class | WP03 | [D] |
 | T003 | Create `packages/entity/src/LangcodeValidator.php` with `BCP47_PATTERN` const + `validate()` | WP02 | — | [D] |
@@ -33,6 +34,23 @@ M-B WP02 to merge first if running in parallel).
 | T013 | Update `docs/specs/entity-storage-two-axis.md`: access-gate convention + BCP-47 regex constant reference | WP04 | — | [D] |
 | T014 | Add `CHANGELOG.md` `[Unreleased]` entry covering #1445, #1446, #1447 | WP04 | [D] |
 | T015 | Run `composer verify` and confirm green; document result in WP04 commit | WP04 | — | [D] |
+=======
+| T001 | Add `fieldLangcode(string $fieldName): ?string` to `TranslatableInterface` | WP03 | — |
+| T002 | Contract test: reflection asserts method + signature; trait satisfies via anonymous class | WP03 | [P] |
+| T003 | Create `packages/entity/src/LangcodeValidator.php` with `BCP47_PATTERN` const + `validate()` | WP02 | — |
+| T004 | Unit test `LangcodeValidatorTest`: acceptance + rejection cases | WP02 | [P] |
+| T005 | Wire `LangcodeValidator::validate()` into `AddTranslationsMigrationGenerator` (both render paths + `generate()`) | WP02 | — |
+| T006 | Audit `$backend` interpolation in generator; document PHP type narrowing; add assertion per FR-007 | WP02 | [P] |
+| T007 | Unit test `AddTranslationsMigrationGeneratorTest`: injection payload rejection + valid langcode acceptance | WP02 | [P] |
+| T008 | Add `EntityAccessHandler` constructor parameter to `TranslationController` | WP01 | — |
+| T009 | Insert per-method `check()` calls with FR-002 ability mapping (index/show→view, store→create, update→update, destroy→delete) | WP01 | — |
+| T010 | Implement 403 response shape: JSON:API error document with `status: "403"`, `code: "FORBIDDEN"`, stable title | WP01 | — |
+| T011 | Unit test `TranslationControllerTest`: happy path + 403 for each of 5 endpoints | WP01 | [P] |
+| T012 | Integration test `TranslationAccessControlTest` in `tests/Integration/Phase29/` | WP01 | [P] |
+| T013 | Update `docs/specs/entity-storage-two-axis.md`: access-gate convention + BCP-47 regex constant reference | WP04 | — |
+| T014 | Add `CHANGELOG.md` `[Unreleased]` entry covering #1445, #1446, #1447 | WP04 | [P] |
+| T015 | Run `composer verify` and confirm green; document result in WP04 commit | WP04 | — |
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 ---
 
@@ -47,8 +65,13 @@ M-B WP02 to merge first if running in parallel).
 
 #### Subtasks
 
+<<<<<<< HEAD
 - [x] T001 Add `fieldLangcode(string $fieldName): ?string` to `TranslatableInterface` (WP03)
 - [x] T002 Contract test: reflection asserts method + signature; trait satisfies via anonymous class (WP03)
+=======
+- [ ] T001 Add `fieldLangcode(string $fieldName): ?string` to `TranslatableInterface` (WP03)
+- [ ] T002 Contract test: reflection asserts method + signature; trait satisfies via anonymous class (WP03)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 #### Implementation sketch
 
@@ -70,11 +93,19 @@ M-B WP02 to merge first if running in parallel).
 
 #### Subtasks
 
+<<<<<<< HEAD
 - [x] T003 Create `packages/entity/src/LangcodeValidator.php` with `BCP47_PATTERN` const + `validate()` method (WP02)
 - [x] T004 Unit test `LangcodeValidatorTest`: acceptance and rejection cases (WP02)
 - [x] T005 Wire `LangcodeValidator::validate()` into generator `render()`, `renderTwoAxisFromRevisionable()`, and `generate()` (WP02)
 - [x] T006 Audit `$backend` interpolation; document PHP type narrowing; add assertion per FR-007 defense-in-depth (WP02)
 - [x] T007 Unit test `AddTranslationsMigrationGeneratorTest`: injection payload rejection + acceptance (WP02)
+=======
+- [ ] T003 Create `packages/entity/src/LangcodeValidator.php` with `BCP47_PATTERN` const + `validate()` method (WP02)
+- [ ] T004 Unit test `LangcodeValidatorTest`: acceptance and rejection cases (WP02)
+- [ ] T005 Wire `LangcodeValidator::validate()` into generator `render()`, `renderTwoAxisFromRevisionable()`, and `generate()` (WP02)
+- [ ] T006 Audit `$backend` interpolation; document PHP type narrowing; add assertion per FR-007 defense-in-depth (WP02)
+- [ ] T007 Unit test `AddTranslationsMigrationGeneratorTest`: injection payload rejection + acceptance (WP02)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 #### Implementation sketch
 
@@ -102,11 +133,19 @@ T004, T006, T007 can be written in parallel with T003/T005 (different files).
 
 #### Subtasks
 
+<<<<<<< HEAD
 - [x] T008 Add `EntityAccessHandler` constructor parameter to `TranslationController` (WP01)
 - [x] T009 Insert per-method `check()` calls with FR-002 ability mapping (WP01)
 - [x] T010 Implement 403 response shape with JSON:API error document (WP01)
 - [x] T011 Unit test `TranslationControllerTest`: happy path + 403 for each endpoint (WP01)
 - [x] T012 Integration test `TranslationAccessControlTest` in `tests/Integration/Phase29/` (WP01)
+=======
+- [ ] T008 Add `EntityAccessHandler` constructor parameter to `TranslationController` (WP01)
+- [ ] T009 Insert per-method `check()` calls with FR-002 ability mapping (WP01)
+- [ ] T010 Implement 403 response shape with JSON:API error document (WP01)
+- [ ] T011 Unit test `TranslationControllerTest`: happy path + 403 for each endpoint (WP01)
+- [ ] T012 Integration test `TranslationAccessControlTest` in `tests/Integration/Phase29/` (WP01)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 #### Implementation sketch
 
@@ -140,9 +179,15 @@ T011, T012 can be written in parallel once T008–T010 are done (different files
 
 #### Subtasks
 
+<<<<<<< HEAD
 - [x] T013 Update `docs/specs/entity-storage-two-axis.md` with access-gate convention and BCP-47 regex constant reference (WP04)
 - [x] T014 Add `CHANGELOG.md` `[Unreleased]` entry covering #1445, #1446, #1447 (WP04)
 - [x] T015 Run `composer verify` green; document result in commit message (WP04)
+=======
+- [ ] T013 Update `docs/specs/entity-storage-two-axis.md` with access-gate convention and BCP-47 regex constant reference (WP04)
+- [ ] T014 Add `CHANGELOG.md` `[Unreleased]` entry covering #1445, #1446, #1447 (WP04)
+- [ ] T015 Run `composer verify` green; document result in commit message (WP04)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 #### Implementation sketch
 

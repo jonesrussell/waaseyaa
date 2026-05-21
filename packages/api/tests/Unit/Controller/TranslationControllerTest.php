@@ -4,18 +4,24 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Tests\Unit\Controller;
 
-use Waaseyaa\Api\Controller\TranslationController;
-use Waaseyaa\Api\ResourceSerializer;
-use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
-use Waaseyaa\Api\Tests\Fixtures\ConfigContentTestEntity;
-use Waaseyaa\Api\Tests\Fixtures\ReadOnlyTranslatableTestEntity;
-use Waaseyaa\Api\Tests\Fixtures\TranslatableTestEntity;
-use Waaseyaa\Entity\EntityType;
-use Waaseyaa\Entity\EntityTypeManager;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\HttpFoundation\Request;
+use Waaseyaa\Access\AccessPolicyInterface;
+use Waaseyaa\Access\AccessResult;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\EntityAccessHandler;
+use Waaseyaa\Api\Controller\TranslationController;
+use Waaseyaa\Api\ResourceSerializer;
+use Waaseyaa\Api\Tests\Fixtures\ConfigContentTestEntity;
+use Waaseyaa\Api\Tests\Fixtures\InMemoryEntityStorage;
+use Waaseyaa\Api\Tests\Fixtures\ReadOnlyTranslatableTestEntity;
+use Waaseyaa\Api\Tests\Fixtures\TranslatableTestEntity;
+use Waaseyaa\Entity\EntityInterface;
+use Waaseyaa\Entity\EntityType;
+use Waaseyaa\Entity\EntityTypeManager;
 
 #[CoversClass(TranslationController::class)]
 final class TranslationControllerTest extends TestCase
@@ -25,6 +31,7 @@ final class TranslationControllerTest extends TestCase
     private InMemoryEntityStorage $readonlyStorage;
     private ResourceSerializer $serializer;
     private TranslationController $controller;
+    private TranslationController $forbiddenController;
 
     protected function setUp(): void
     {
@@ -70,8 +77,18 @@ final class TranslationControllerTest extends TestCase
         ));
 
         $this->serializer = new ResourceSerializer($this->entityTypeManager);
+
+        // Controller that allows all access.
         $this->controller = new TranslationController(
             $this->entityTypeManager,
+            $this->makeAccessHandler(allow: true),
+            $this->serializer,
+        );
+
+        // Controller that denies all access.
+        $this->forbiddenController = new TranslationController(
+            $this->entityTypeManager,
+            $this->makeAccessHandler(allow: false),
             $this->serializer,
         );
     }
@@ -88,7 +105,7 @@ final class TranslationControllerTest extends TestCase
         $fr->set('title', 'Bonjour');
         $this->storage->save($entity);
 
-        $doc = $this->controller->index('article', $entity->id());
+        $doc = $this->controller->index($this->makeRequest(), 'article', $entity->id());
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('data', $array);
@@ -109,7 +126,7 @@ final class TranslationControllerTest extends TestCase
     {
         $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
 
-        $doc = $this->controller->index('article', $entity->id());
+        $doc = $this->controller->index($this->makeRequest(), 'article', $entity->id());
         $array = $doc->toArray();
 
         $this->assertCount(1, $array['data']);
@@ -119,7 +136,7 @@ final class TranslationControllerTest extends TestCase
     #[Test]
     public function indexReturnsErrorForUnknownEntityType(): void
     {
-        $doc = $this->controller->index('nonexistent', 1);
+        $doc = $this->controller->index($this->makeRequest(), 'nonexistent', 1);
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('errors', $array);
@@ -129,7 +146,7 @@ final class TranslationControllerTest extends TestCase
     #[Test]
     public function indexReturnsErrorForNonTranslatableType(): void
     {
-        $doc = $this->controller->index('config', 1);
+        $doc = $this->controller->index($this->makeRequest(), 'config', 1);
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('errors', $array);
@@ -140,11 +157,36 @@ final class TranslationControllerTest extends TestCase
     #[Test]
     public function indexReturnsErrorForMissingEntity(): void
     {
-        $doc = $this->controller->index('article', 9999);
+        $doc = $this->controller->index($this->makeRequest(), 'article', 9999);
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('errors', $array);
         $this->assertSame('404', $array['errors'][0]['status']);
+    }
+
+    #[Test]
+    public function indexForbiddenReturns403(): void
+    {
+        $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
+
+        $doc = $this->forbiddenController->index($this->makeRequest(), 'article', $entity->id());
+        $array = $doc->toArray();
+
+        $this->assertSame(403, $doc->statusCode);
+        $this->assertSame('403', $array['errors'][0]['status']);
+        $this->assertSame('FORBIDDEN', $array['errors'][0]['code']);
+    }
+
+    #[Test]
+    public function indexNoAccountReturns403(): void
+    {
+        $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
+
+        $doc = $this->controller->index(new Request(), 'article', $entity->id());
+        $array = $doc->toArray();
+
+        $this->assertSame(403, $doc->statusCode);
+        $this->assertSame('FORBIDDEN', $array['errors'][0]['code']);
     }
 
     // --- Show (get specific translation) ---
@@ -157,7 +199,7 @@ final class TranslationControllerTest extends TestCase
         $fr->set('title', 'Bonjour');
         $this->storage->save($entity);
 
-        $doc = $this->controller->show('article', $entity->id(), 'fr');
+        $doc = $this->controller->show($this->makeRequest(), 'article', $entity->id(), 'fr');
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('data', $array);
@@ -170,7 +212,7 @@ final class TranslationControllerTest extends TestCase
     {
         $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
 
-        $doc = $this->controller->show('article', $entity->id(), 'en');
+        $doc = $this->controller->show($this->makeRequest(), 'article', $entity->id(), 'en');
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('data', $array);
@@ -183,12 +225,24 @@ final class TranslationControllerTest extends TestCase
     {
         $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
 
-        $doc = $this->controller->show('article', $entity->id(), 'de');
+        $doc = $this->controller->show($this->makeRequest(), 'article', $entity->id(), 'de');
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('errors', $array);
         $this->assertSame('404', $array['errors'][0]['status']);
         $this->assertStringContainsString('de', $array['errors'][0]['detail']);
+    }
+
+    #[Test]
+    public function showForbiddenReturns403(): void
+    {
+        $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
+
+        $doc = $this->forbiddenController->show($this->makeRequest(), 'article', $entity->id(), 'en');
+        $array = $doc->toArray();
+
+        $this->assertSame(403, $doc->statusCode);
+        $this->assertSame('FORBIDDEN', $array['errors'][0]['code']);
     }
 
     // --- Store (create translation) ---
@@ -206,7 +260,7 @@ final class TranslationControllerTest extends TestCase
             ],
         ];
 
-        $doc = $this->controller->store('article', $entity->id(), 'es', $data);
+        $doc = $this->controller->store($this->makeRequest(), 'article', $entity->id(), 'es', $data);
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('data', $array);
@@ -229,7 +283,7 @@ final class TranslationControllerTest extends TestCase
             ],
         ];
 
-        $doc = $this->controller->store('article', $entity->id(), 'fr', $data);
+        $doc = $this->controller->store($this->makeRequest(), 'article', $entity->id(), 'fr', $data);
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('errors', $array);
@@ -254,12 +308,25 @@ final class TranslationControllerTest extends TestCase
             ],
         ];
 
-        $doc = $this->controller->store('readonly', $entity->id(), 'fr', $data);
+        $doc = $this->controller->store($this->makeRequest(), 'readonly', $entity->id(), 'fr', $data);
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('errors', $array);
         $this->assertSame('422', $array['errors'][0]['status']);
         $this->assertStringContainsString('does not support creating translations', $array['errors'][0]['detail']);
+    }
+
+    #[Test]
+    public function storeForbiddenReturns403(): void
+    {
+        $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
+        $data = ['data' => ['attributes' => ['title' => 'Hola']]];
+
+        $doc = $this->forbiddenController->store($this->makeRequest(), 'article', $entity->id(), 'es', $data);
+        $array = $doc->toArray();
+
+        $this->assertSame(403, $doc->statusCode);
+        $this->assertSame('FORBIDDEN', $array['errors'][0]['code']);
     }
 
     // --- Update (modify translation) ---
@@ -278,7 +345,7 @@ final class TranslationControllerTest extends TestCase
             ],
         ];
 
-        $doc = $this->controller->update('article', $entity->id(), 'fr', $data);
+        $doc = $this->controller->update($this->makeRequest(), 'article', $entity->id(), 'fr', $data);
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('data', $array);
@@ -297,11 +364,24 @@ final class TranslationControllerTest extends TestCase
             ],
         ];
 
-        $doc = $this->controller->update('article', $entity->id(), 'de', $data);
+        $doc = $this->controller->update($this->makeRequest(), 'article', $entity->id(), 'de', $data);
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('errors', $array);
         $this->assertSame('404', $array['errors'][0]['status']);
+    }
+
+    #[Test]
+    public function updateForbiddenReturns403(): void
+    {
+        $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
+        $data = ['data' => ['attributes' => ['title' => 'Hacked']]];
+
+        $doc = $this->forbiddenController->update($this->makeRequest(), 'article', $entity->id(), 'en', $data);
+        $array = $doc->toArray();
+
+        $this->assertSame(403, $doc->statusCode);
+        $this->assertSame('FORBIDDEN', $array['errors'][0]['code']);
     }
 
     // --- Destroy (delete translation) ---
@@ -314,7 +394,7 @@ final class TranslationControllerTest extends TestCase
         $fr->set('title', 'Bonjour');
         $this->storage->save($entity);
 
-        $doc = $this->controller->destroy('article', $entity->id(), 'fr');
+        $doc = $this->controller->destroy($this->makeRequest(), 'article', $entity->id(), 'fr');
         $array = $doc->toArray();
 
         $this->assertNull($array['data']);
@@ -328,7 +408,7 @@ final class TranslationControllerTest extends TestCase
     {
         $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
 
-        $doc = $this->controller->destroy('article', $entity->id(), 'en');
+        $doc = $this->controller->destroy($this->makeRequest(), 'article', $entity->id(), 'en');
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('errors', $array);
@@ -341,11 +421,26 @@ final class TranslationControllerTest extends TestCase
     {
         $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
 
-        $doc = $this->controller->destroy('article', $entity->id(), 'de');
+        $doc = $this->controller->destroy($this->makeRequest(), 'article', $entity->id(), 'de');
         $array = $doc->toArray();
 
         $this->assertArrayHasKey('errors', $array);
         $this->assertSame('404', $array['errors'][0]['status']);
+    }
+
+    #[Test]
+    public function destroyForbiddenReturns403(): void
+    {
+        $entity = $this->createTranslatableEntity(['title' => 'Hello', 'langcode' => 'en']);
+        $fr = $entity->addTranslation('fr');
+        $fr->set('title', 'Bonjour');
+        $this->storage->save($entity);
+
+        $doc = $this->forbiddenController->destroy($this->makeRequest(), 'article', $entity->id(), 'fr');
+        $array = $doc->toArray();
+
+        $this->assertSame(403, $doc->statusCode);
+        $this->assertSame('FORBIDDEN', $array['errors'][0]['code']);
     }
 
     // --- Helpers ---
@@ -360,5 +455,81 @@ final class TranslationControllerTest extends TestCase
         $this->storage->save($entity);
 
         return $entity;
+    }
+
+    /**
+     * Create a Request with a test account set on the `_account` attribute.
+     */
+    private function makeRequest(): Request
+    {
+        $request = new Request();
+        $request->attributes->set('_account', $this->makeAccount(42));
+
+        return $request;
+    }
+
+    /**
+     * Create a simple test AccountInterface implementation.
+     *
+     * @param string[] $roles
+     */
+    private function makeAccount(int $id, array $roles = ['authenticated']): AccountInterface
+    {
+        return new class ($id, $roles) implements AccountInterface {
+            public function __construct(private int $id, private array $roles) {}
+
+            public function id(): int|string
+            {
+                return $this->id;
+            }
+
+            public function hasPermission(string $permission): bool
+            {
+                return false;
+            }
+
+            public function getRoles(): array
+            {
+                return $this->roles;
+            }
+
+            public function isAuthenticated(): bool
+            {
+                return true;
+            }
+        };
+    }
+
+    /**
+     * Build an EntityAccessHandler that always allows or always denies.
+     *
+     * EntityAccessHandler is not final and not mockable without instantiation,
+     * so we feed it an anonymous AccessPolicyInterface that returns a fixed result.
+     */
+    private function makeAccessHandler(bool $allow): EntityAccessHandler
+    {
+        $handler = new EntityAccessHandler();
+        $handler->addPolicy(
+            new class ($allow) implements AccessPolicyInterface {
+                public function __construct(private bool $allow) {}
+
+                public function access(EntityInterface $entity, string $operation, AccountInterface $account): AccessResult
+                {
+                    return $this->allow ? AccessResult::allowed() : AccessResult::forbidden();
+                }
+
+                public function createAccess(string $entityTypeId, string $bundle, AccountInterface $account): AccessResult
+                {
+                    return $this->allow ? AccessResult::allowed() : AccessResult::forbidden();
+                }
+
+                public function appliesTo(string $entityTypeId): bool
+                {
+                    return true;
+                }
+            },
+        );
+
+        return $handler;
     }
 }

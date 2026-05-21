@@ -11,6 +11,7 @@
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
+<<<<<<< HEAD
 | T001 | Run PHPStan baseline grep — enumerate all 31 trait entries | WP01 | — | [D] |
 | T002 | Add temporary probe in provider to capture declaringClass + isTrait() | WP01 | — | [D] |
 | T003 | Verify hasApiPhpDoc fires for the three traits via php -r reflection script | WP01 | — | [D] |
@@ -23,6 +24,20 @@
 | T010 | Assert 31 entries dropped — grep returns 0 for the three trait names | WP03 | — | [D] |
 | T011 | Run `composer verify` — exits 0 | WP03 | — | [D] |
 | T012 | Run `phpunit --filter WaaseyaaEntrypointProviderTest` — exits 0 | WP03 | — | [D] |
+=======
+| T001 | Run PHPStan baseline grep — enumerate all 31 trait entries | WP01 | — |
+| T002 | Add temporary probe in provider to capture declaringClass + isTrait() | WP01 | — |
+| T003 | Verify hasApiPhpDoc fires for the three traits via php -r reflection script | WP01 | — |
+| T004 | Confirm loadEntitySupportingTraits populates RevisionableEntityTrait | WP01 | — |
+| T005 | Write wp01-diagnosis.md with findings, confirmed hypothesis, WP02 design instruction | WP01 | — |
+| T006 | Add `isTraitWithApiPhpDoc()` named method to WaaseyaaEntrypointProvider | WP02 | — |
+| T007 | Wire isTraitWithApiPhpDoc into shouldMarkPropertyAsRead/Written and shouldMarkMethodAsUsed | WP02 | — |
+| T008 | Write WaaseyaaEntrypointProviderTest.php: fixtures (a) @api trait, (b) no-@api trait, (c) regression for all three real traits | WP02 | — |
+| T009 | Regenerate phpstan-dead-code-baseline.neon | WP03 | — |
+| T010 | Assert 31 entries dropped — grep returns 0 for the three trait names | WP03 | — |
+| T011 | Run `composer verify` — exits 0 | WP03 | — |
+| T012 | Run `phpunit --filter WaaseyaaEntrypointProviderTest` — exits 0 | WP03 | — |
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 | T013 | Update CLAUDE.md § "Dead code audits and intentional scaffolding" | WP04 | — |
 | T014 | Add CHANGELOG.md [Unreleased] bullet | WP04 | — |
 | T015 | Final `composer verify` green confirmation | WP04 | — |
@@ -39,11 +54,19 @@ No code changes. Deliverable is `research/wp01-diagnosis.md`.
 **Dependencies**: none
 
 ### Subtasks
+<<<<<<< HEAD
 - [x] T001 Run PHPStan baseline grep — enumerate all 31 trait entries (WP01)
 - [x] T002 Add temporary probe in provider to capture declaringClass + isTrait() (WP01)
 - [x] T003 Verify hasApiPhpDoc fires for the three traits via php -r reflection script (WP01)
 - [x] T004 Confirm loadEntitySupportingTraits populates RevisionableEntityTrait (WP01)
 - [x] T005 Write wp01-diagnosis.md with findings, confirmed hypothesis, WP02 design instruction (WP01)
+=======
+- [ ] T001 Run PHPStan baseline grep — enumerate all 31 trait entries (WP01)
+- [ ] T002 Add temporary probe in provider to capture declaringClass + isTrait() (WP01)
+- [ ] T003 Verify hasApiPhpDoc fires for the three traits via php -r reflection script (WP01)
+- [ ] T004 Confirm loadEntitySupportingTraits populates RevisionableEntityTrait (WP01)
+- [ ] T005 Write wp01-diagnosis.md with findings, confirmed hypothesis, WP02 design instruction (WP01)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 ### Implementation sketch
 1. Run PHPStan dead-code analysis, grep for the three trait names, capture all 31 findings.
@@ -67,9 +90,15 @@ Write unit tests covering fixtures (a), (b) and regression cases (c).
 **Dependencies**: WP01
 
 ### Subtasks
+<<<<<<< HEAD
 - [x] T006 Add `isTraitWithApiPhpDoc()` named method to WaaseyaaEntrypointProvider (WP02)
 - [x] T007 Wire isTraitWithApiPhpDoc into shouldMarkPropertyAsRead/Written and shouldMarkMethodAsUsed (WP02)
 - [x] T008 Write WaaseyaaEntrypointProviderTest.php: (a) @api trait, (b) no-@api trait, (c) regression for real traits (WP02)
+=======
+- [ ] T006 Add `isTraitWithApiPhpDoc()` named method to WaaseyaaEntrypointProvider (WP02)
+- [ ] T007 Wire isTraitWithApiPhpDoc into shouldMarkPropertyAsRead/Written and shouldMarkMethodAsUsed (WP02)
+- [ ] T008 Write WaaseyaaEntrypointProviderTest.php: (a) @api trait, (b) no-@api trait, (c) regression for real traits (WP02)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 ### Implementation sketch
 1. Add private static `isTraitWithApiPhpDoc(\ReflectionClass $declaringClass): bool` that returns `$declaringClass->isTrait() && self::hasApiPhpDoc($declaringClass)`.
@@ -93,10 +122,17 @@ Confirm `composer verify` and unit test both exit 0.
 **Dependencies**: WP02
 
 ### Subtasks
+<<<<<<< HEAD
 - [x] T009 Regenerate phpstan-dead-code-baseline.neon (WP03)
 - [x] T010 Assert 31 entries dropped — grep returns 0 for the three trait names (WP03)
 - [x] T011 Run `composer verify` — exits 0 (WP03)
 - [x] T012 Run `phpunit --filter WaaseyaaEntrypointProviderTest` — exits 0 (WP03)
+=======
+- [ ] T009 Regenerate phpstan-dead-code-baseline.neon (WP03)
+- [ ] T010 Assert 31 entries dropped — grep returns 0 for the three trait names (WP03)
+- [ ] T011 Run `composer verify` — exits 0 (WP03)
+- [ ] T012 Run `phpunit --filter WaaseyaaEntrypointProviderTest` — exits 0 (WP03)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 ### Implementation sketch
 1. Count entries in baseline before regeneration.

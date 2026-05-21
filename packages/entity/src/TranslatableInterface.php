@@ -95,4 +95,14 @@ interface TranslatableInterface
      * @return string[]
      */
     public function getTranslationLanguages(): array;
+
+    /**
+     * Returns the stored langcode for a specific field on this translation.
+     *
+     * Returns `null` when the field has no per-language override and falls back
+     * to the entity's default langcode, or when the field name is not recognized.
+     *
+     * @param string $fieldName The field machine name.
+     */
+    public function fieldLangcode(string $fieldName): ?string;
 }

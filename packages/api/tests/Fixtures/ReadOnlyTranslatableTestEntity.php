@@ -69,4 +69,9 @@ class ReadOnlyTranslatableTestEntity extends ContentEntityBase implements Transl
 
         return $this;
     }
+
+    public function fieldLangcode(string $fieldName): ?string
+    {
+        return $this->language();
+    }
 }

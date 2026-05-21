@@ -19,8 +19,11 @@ subtasks:
 - T015
 - T016
 - T017
+<<<<<<< HEAD
 agent: "claude:opus-4-7:reviewer:reviewer"
 shell_pid: "807489"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:32Z'
   event: created
@@ -382,9 +385,12 @@ Closes #1538
 3. Verify the `schema-dedup.spec.ts` first test assertion: `schemaRequests` must have length 1 (not 2 — 2 was the pre-fix behavior).
 4. Check `CHANGELOG.md` — two bullets under `[Unreleased]` → `### Fixed`, both referencing issue numbers.
 5. Confirm the final commit's footer contains both `Closes #1537` and `Closes #1538`.
+<<<<<<< HEAD
 
 ## Activity Log
 
 - 2026-05-21T01:08:42Z – claude:sonnet:implementer:implementer – shell_pid=798647 – Started implementation via action command
 - 2026-05-21T01:12:26Z – claude:sonnet:implementer:implementer – shell_pid=798647 – bin/check-admin-coercion-patterns wired into composer verify; Playwright spec packages/admin/e2e/schema-dedup.spec.ts asserts exactly 1 schema request per page load (NFR-004/FR-012); CHANGELOG bullet covers all 4 M-F WPs; README CI gates subsection added.
 - 2026-05-21T01:13:15Z – claude:opus-4-7:reviewer:reviewer – shell_pid=807489 – Started review via action command
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

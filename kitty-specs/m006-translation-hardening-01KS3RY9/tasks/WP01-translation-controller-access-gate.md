@@ -22,8 +22,11 @@ subtasks:
 - T010
 - T011
 - T012
+<<<<<<< HEAD
 agent: "claude:opus-4-7:reviewer:reviewer"
 shell_pid: "773450"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:09Z'
   author: tasks-materializer
@@ -496,6 +499,7 @@ private function makeAccount(int $id, array $roles = []): AccountInterface
 - Confirm `_account` (with underscore prefix) is used, not `account`.
 - Confirm the 403 response does not reveal entity existence (same response whether entity is not found vs. access denied on a found entity — but this is tricky since `loadTranslatableEntity` already returns 404 for missing entities; the 403 path only fires on found entities, which is acceptable per FR-003's intent: "response does not leak whether the entity exists" means the 403 body gives no entity-state information, not that 403 and 404 look identical).
 - Confirm integration test asserts entity is **unmodified** after a denied PATCH.
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -503,3 +507,5 @@ private function makeAccount(int $id, array $roles = []): AccountInterface
 - 2026-05-21T00:56:36Z – claude:sonnet:implementer:implementer – shell_pid=755033 – EntityAccessHandler injected; per-method check() calls (view/create/update/delete); 403 JSON:API error shape with FORBIDDEN code; anti-enumeration confirmed; 22 unit tests + 3 integration tests pass; phpstan clean; stale baseline entries removed
 - 2026-05-21T00:57:24Z – claude:opus-4-7:reviewer:reviewer – shell_pid=773450 – Started review via action command
 - 2026-05-21T00:58:22Z – claude:opus-4-7:reviewer:reviewer – shell_pid=773450 – Review passed (M-C): 5 ability mappings verified (index/show=view, store=create, update=update, destroy=delete); anti-enumeration intact (loadTranslatableEntity 404 + checkAccess 403 share JSON:API error shape, generic FORBIDDEN body leaks no entity state); null-account fail-closed at line 306-308 BEFORE accessHandler->check; JsonApiError::forbidden() factory shape status=403/code=FORBIDDEN/stable title — used uniformly across all 5 methods and consistent with sibling JsonApiController; intersection-type EntityInterface&TranslatableInterface clean (loadTranslatableEntity returns it, checkAccess accepts it, phpstan -24 baseline entries); 22/22 unit + 3/3 integration green; cs-check + phpstan clean; diff scope tight (TranslationController + JsonApiError + tests only). Route wiring deferred to WP04 by design.
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

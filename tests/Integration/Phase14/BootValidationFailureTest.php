@@ -286,4 +286,9 @@ final class BootFakeTranslatableEntity implements TranslatableInterface
     {
         return [];
     }
+
+    public function fieldLangcode(string $fieldName): ?string
+    {
+        return null;
+    }
 }

@@ -15,8 +15,11 @@ subtasks:
 - T010
 - T011
 - T012
+<<<<<<< HEAD
 agent: "claude:opus-4-7:reviewer:reviewer"
 shell_pid: "772291"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:25Z'
   author: tasks-materializer
@@ -219,6 +222,7 @@ Per spec C-002: "The fix shrinks the baseline by exactly 31 entries (the trait c
 - Verify `composer verify` exit code was 0 (ask for the CI run URL or log).
 - Verify the commit message has accurate BEFORE/AFTER counts — these document the mission's effect for future reference.
 - Confirm no manual edits to `phpstan-dead-code-baseline.neon` — only regeneration (C-002).
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -226,3 +230,5 @@ Per spec C-002: "The fix shrinks the baseline by exactly 31 entries (the trait c
 - 2026-05-21T00:56:02Z – claude:sonnet:implementer:implementer – shell_pid=764533 – Baseline regeneration idempotent at 13 entries. RevisionableEntityTrait/InteractsWithApi/RefreshDatabase all at 0. Delta 66->13 (-53; spec minimum was -31, extra drop from WP02 provider improvements). bin/check-dead-code OK. 7/7 unit tests pass. composer verify fails on pre-existing symfony-imports violation unrelated to this mission.
 - 2026-05-21T00:56:55Z – claude:opus-4-7:reviewer:reviewer – shell_pid=772291 – Started review via action command
 - 2026-05-21T00:57:43Z – claude:opus-4-7:reviewer:reviewer – shell_pid=772291 – Review passed: 3 target traits at 0 in baseline; baseline regeneration idempotent (zero diff); bin/check-dead-code green; check-symfony-imports failure verified pre-existing on main (11 same violations); 13 remaining baseline entries are legitimate extension-point candidates (interfaces, abstracts, public service APIs - RateLimiterInterface, AuthTokenRepositoryInterface, AbstractMakeCommand, EventAwareStorage, SqlEntityQuery, ComputedFieldInterface, TenantMiddleware, etc.)
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

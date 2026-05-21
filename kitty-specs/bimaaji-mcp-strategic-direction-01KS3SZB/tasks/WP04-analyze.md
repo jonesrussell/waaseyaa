@@ -13,8 +13,11 @@ subtasks:
 - T013
 - T014
 - T015
+<<<<<<< HEAD
 agent: "claude:opus-4-7:reviewer:reviewer"
 shell_pid: "768291"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:38Z'
   agent: tasks-materializer
@@ -222,6 +225,7 @@ You have four research notes from WP03 and a criteria table from WP01 (`decision
 ## Reviewer Guidance
 
 Reviewer should verify: (1) the table covers all three options and all criteria from decision-frame.md, (2) each cell references evidence (even by citing the research note name), (3) the document does not pre-empt WP05 by declaring a decision, (4) the convergence signal is present but appropriately non-committal.
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -229,3 +233,5 @@ Reviewer should verify: (1) the table covers all three options and all criteria 
 - 2026-05-21T00:54:47Z – claude:sonnet:researcher:implementer – shell_pid=762096 – analysis.md committed; evidence-backed trade-off table; synthesis identifies strongest option + sleeper
 - 2026-05-21T00:55:31Z – claude:opus-4-7:reviewer:reviewer – shell_pid=768291 – Started review via action command
 - 2026-05-21T00:55:48Z – claude:opus-4-7:reviewer:reviewer – shell_pid=768291 – Analysis approved: 15/15 cells filled with citations to consumer-signal/mcp-capability/sidecar-cost/bimaaji-surface/decision-frame; synthesis honestly names Option 2 as sleeper (framework ready, demand absent) and Option 3 weakest on evidence; stops short of recommending — WP05 retains decision authority.
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

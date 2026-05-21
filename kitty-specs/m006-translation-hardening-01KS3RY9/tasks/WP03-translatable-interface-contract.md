@@ -11,6 +11,7 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+<<<<<<< HEAD
 base_branch: kitty/mission-m006-translation-hardening-01KS3RY9
 base_commit: 090fed7ef7bd015bd8aa6026b5f6257c6ad79707
 created_at: '2026-05-21T00:25:19.635151+00:00'
@@ -19,6 +20,11 @@ subtasks:
 - T002
 shell_pid: "722296"
 agent: "claude:opus-4-7:reviewer:reviewer"
+=======
+subtasks:
+- T001
+- T002
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:09Z'
   author: tasks-materializer
@@ -251,6 +257,7 @@ implementation and add the minimal initialization if needed to avoid `TypeError`
 - Verify the method declaration in `TranslatableInterface.php` matches the signature in `TranslatableEntityTrait` exactly (parameter name, type, return type).
 - Confirm `TranslatableEntityTrait` is unmodified (diff should show zero changes to the trait file).
 - Confirm `TranslatableInterfaceContractTest.php` is under `autoload-dev`, not `autoload`.
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -258,3 +265,5 @@ implementation and add the minimal initialization if needed to avoid `TypeError`
 - 2026-05-21T00:39:36Z – claude:sonnet:implementer:implementer – shell_pid=704409 – Interface contract enforced; trait satisfies without changes; all existing implementors verified and stubs added; 1414 tests pass across entity/listing/access/api packages
 - 2026-05-21T00:40:30Z – claude:opus-4-7:reviewer:reviewer – shell_pid=722296 – Started review via action command
 - 2026-05-21T00:41:44Z – claude:opus-4-7:reviewer:reviewer – shell_pid=722296 – Review passed: interface declares fieldLangcode(string): ?string (line 107); trait signature matches at TranslatableEntityTrait.php:264; 4 direct test-only implementors stubbed with return null (RevisionPolicyCompositionTest x2, ListingCacheInvalidatorTest, ListingDefinitionValidatorTest); contract test passes (2/11); autoload clean; full sweep 1518/3387/0 across entity+access+listing+node+api.
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

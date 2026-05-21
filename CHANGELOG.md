@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **M-006 translation hardening (#1445, #1446, #1447).** `TranslationController` now gates every endpoint via `EntityAccessHandler::check()` with per-method abilities (view/create/update/delete); 403 JSON:API errors are anti-enumeration-safe. Operator-provided langcodes in `AddTranslationsMigrationGenerator` validated against `Waaseyaa\Entity\LangcodeValidator::BCP47_PATTERN` (BCP-47 with script + region subtags). `TranslatableInterface` now declares `fieldLangcode()` so non-trait implementors get compile-time enforcement. Closes the HIGH-severity post-merge audit blockers.
+
 ### Changed
 
 - **Bimaaji MCP positioning resolved (M-G).** Strategic mission concluded: bimaaji remains PHP-only; #1463 closed as `not-planned`. If a consumer requests MCP-exposed graph operations, future work would extend `packages/mcp/` (Option 2 from the research mission) — not restore a Node sidecar.

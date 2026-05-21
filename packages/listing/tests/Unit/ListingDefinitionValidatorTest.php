@@ -554,4 +554,9 @@ final class ValidatorTestTranslatableEntity implements \Waaseyaa\Entity\Translat
     {
         return [];
     }
+
+    public function fieldLangcode(string $fieldName): ?string
+    {
+        return null;
+    }
 }

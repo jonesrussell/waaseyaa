@@ -15,8 +15,11 @@ subtasks:
 - T016
 - T017
 - T018
+<<<<<<< HEAD
 agent: "claude:opus-4-7:reviewer:reviewer"
 shell_pid: "782185"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:38Z'
   agent: tasks-materializer
@@ -218,6 +221,7 @@ Verify that the rationale for the chosen option includes all three citation type
 ## Reviewer Guidance
 
 Reviewer (the maintainer) should verify: (1) the named option matches their own reading of the evidence, (2) each evidence citation references a specific finding (not "research shows that..."), (3) the follow-up section is correctly populated for the chosen option, (4) no production code is referenced or implied.
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -225,3 +229,5 @@ Reviewer (the maintainer) should verify: (1) the named option matches their own 
 - 2026-05-21T00:58:33Z – claude:sonnet:researcher:implementer – shell_pid=770903 – decision.md committed (ad36efec0); Option 1 selected — PHP-only, close #1463 as not-planned; WP06 will execute issue close
 - 2026-05-21T00:59:55Z – claude:opus-4-7:reviewer:reviewer – shell_pid=782185 – Started review via action command
 - 2026-05-21T01:00:25Z – claude:opus-4-7:reviewer:reviewer – shell_pid=782185 – Decision approved: Option 1, evidence-backed
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

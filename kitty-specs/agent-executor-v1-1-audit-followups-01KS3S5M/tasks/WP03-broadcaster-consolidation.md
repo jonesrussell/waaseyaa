@@ -17,8 +17,11 @@ subtasks:
 - T021
 - T022
 - T023
+<<<<<<< HEAD
 agent: "claude:opus-4-7:reviewer:reviewer"
 shell_pid: "801656"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:13Z'
   event: created
@@ -222,6 +225,7 @@ After this WP, `MessagingServiceProvider` should either delegate to `AgentRunBro
 2. Check `MessagingServiceProvider` still registers all other bindings it owned (only the adapter binding should be gone).
 3. Verify `AgentRunBroadcasterTest` uses `CoversClass(AgentRunBroadcaster::class)` not the deleted adapter.
 4. SC-005 check: `! [ -f packages/ai-agent/src/Broadcast/BroadcastStorageAdapter.php ] && echo PASS`.
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -233,3 +237,5 @@ After this WP, `MessagingServiceProvider` should either delegate to `AgentRunBro
 - 2026-05-21T01:09:52Z – claude:sonnet:implementer:implementer – shell_pid=793163 – Provider registered in extra.waaseyaa.providers; smoke test asserts kernel resolves AgentRunBroadcasterInterface non-null
 - 2026-05-21T01:10:22Z – claude:opus-4-7:reviewer:reviewer – shell_pid=801656 – Started review via action command
 - 2026-05-21T01:11:01Z – claude:opus-4-7:reviewer:reviewer – shell_pid=801656 – Cycle 1 approved: provider registered, smoke test asserts non-null binding
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

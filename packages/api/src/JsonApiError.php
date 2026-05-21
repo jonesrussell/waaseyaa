@@ -16,12 +16,14 @@ final readonly class JsonApiError
      * @param string      $status HTTP status code as a string.
      * @param string      $title  Short, human-readable summary of the problem.
      * @param string      $detail Detailed explanation specific to this occurrence.
+     * @param string      $code   Machine-readable error code (e.g. 'FORBIDDEN', 'NOT_FOUND').
      * @param array<string, string> $source An object containing references to the primary source of the error.
      */
     public function __construct(
         public string $status,
         public string $title,
         public string $detail = '',
+        public string $code = '',
         public array $source = [],
     ) {}
 
@@ -36,6 +38,10 @@ final readonly class JsonApiError
             'status' => $this->status,
             'title' => $this->title,
         ];
+
+        if ($this->code !== '') {
+            $error['code'] = $this->code;
+        }
 
         if ($this->detail !== '') {
             $error['detail'] = $this->detail;
@@ -69,6 +75,7 @@ final readonly class JsonApiError
             status: '403',
             title: 'Forbidden',
             detail: $detail,
+            code: 'FORBIDDEN',
         );
     }
 

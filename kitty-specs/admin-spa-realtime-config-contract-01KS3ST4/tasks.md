@@ -11,6 +11,7 @@
 
 | ID | Description | WP | Parallel? |
 |---|---|---|---|
+<<<<<<< HEAD
 | T001 | Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts | WP01 | No | [D] |
 | T002 | Implement in-flight dedup in `fetch()` — return existing Promise if present | WP01 | No | [D] |
 | T003 | Clear `inflightCache` on rejection; clear both caches in `invalidate()` | WP01 | No | [D] |
@@ -28,6 +29,25 @@
 | T015 | Create `packages/admin/e2e/schema-dedup.spec.ts` Playwright network-capture spec (FR-012) | WP04 | [D] |
 | T016 | Add `CHANGELOG.md` `[Unreleased]` entries for #1537 and #1538 | WP04 | [D] |
 | T017 | Final verification: full CI suite green (`composer verify` + `npm run build && npm test && npm run test:e2e && npm run lint`) | WP04 | No | [D] |
+=======
+| T001 | Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts | WP01 | No |
+| T002 | Implement in-flight dedup in `fetch()` — return existing Promise if present | WP01 | No |
+| T003 | Clear `inflightCache` on rejection; clear both caches in `invalidate()` | WP01 | No |
+| T004 | Write unit tests FR-008 (no duplicate POSTs), FR-009 (invalidate clears inflight), FR-010 (rejection doesn't poison) | WP01 | [P] |
+| T005 | Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (FR-007) | WP02 | [P] |
+| T006 | Create `AdminConfig` TypeScript interface (no `any`/`unknown` fields, NFR-003) | WP02 | No |
+| T007 | Create `useAdminConfig()` composable with `useState()`-backed referential stability (NFR-002) | WP02 | No |
+| T008 | Write unit tests for coercion helpers and composable (FR-011) | WP02 | [P] |
+| T009 | Add "Runtime config" section to `packages/admin/README.md` (FR-013) | WP02 | [P] |
+| T010 | Migrate `app/plugins/admin.ts`, `app/middleware/auth.global.ts`, `app/composables/useApi.ts` | WP03 | No |
+| T011 | Migrate all `app/components/**` files (AdminShell.vue, BrandPanel.vue, SchemaList.vue — remove String coerce) | WP03 | [P] |
+| T012 | Migrate all `app/pages/**` files (14 page files) | WP03 | [P] |
+| T013 | Verify no residual `useRuntimeConfig`/`config.public` references remain in `packages/admin/app/**` | WP03 | No |
+| T014 | Create `bin/check-admin-coercion-patterns` CI gate shell script (NFR-004) | WP04 | No |
+| T015 | Create `packages/admin/e2e/schema-dedup.spec.ts` Playwright network-capture spec (FR-012) | WP04 | [P] |
+| T016 | Add `CHANGELOG.md` `[Unreleased]` entries for #1537 and #1538 | WP04 | [P] |
+| T017 | Final verification: full CI suite green (`composer verify` + `npm run build && npm test && npm run test:e2e && npm run lint`) | WP04 | No |
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 ---
 
@@ -44,10 +64,17 @@
 
 #### Included subtasks
 
+<<<<<<< HEAD
 - [x] T001 Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts (WP01)
 - [x] T002 Implement in-flight dedup in `fetch()` — return existing Promise if present (WP01)
 - [x] T003 Clear `inflightCache` on rejection; clear both caches in `invalidate()` (WP01)
 - [x] T004 Write unit tests FR-008, FR-009, FR-010 (WP01)
+=======
+- [ ] T001 Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts (WP01)
+- [ ] T002 Implement in-flight dedup in `fetch()` — return existing Promise if present (WP01)
+- [ ] T003 Clear `inflightCache` on rejection; clear both caches in `invalidate()` (WP01)
+- [ ] T004 Write unit tests FR-008, FR-009, FR-010 (WP01)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 #### Implementation sketch
 
@@ -77,11 +104,19 @@
 
 #### Included subtasks
 
+<<<<<<< HEAD
 - [x] T005 Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (WP02)
 - [x] T006 Create `AdminConfig` TypeScript interface (WP02)
 - [x] T007 Create `useAdminConfig()` composable (WP02)
 - [x] T008 Write unit tests for coercion helpers and composable (WP02)
 - [x] T009 Add "Runtime config" section to README.md (WP02)
+=======
+- [ ] T005 Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (WP02)
+- [ ] T006 Create `AdminConfig` TypeScript interface (WP02)
+- [ ] T007 Create `useAdminConfig()` composable (WP02)
+- [ ] T008 Write unit tests for coercion helpers and composable (WP02)
+- [ ] T009 Add "Runtime config" section to README.md (WP02)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 #### Implementation sketch
 
@@ -113,10 +148,17 @@
 
 #### Included subtasks
 
+<<<<<<< HEAD
 - [x] T010 Migrate plugins, middleware, and composable files (WP03)
 - [x] T011 Migrate component files (AdminShell.vue, BrandPanel.vue, SchemaList.vue) (WP03)
 - [x] T012 Migrate all page files (WP03)
 - [x] T013 Verify zero residual references (WP03)
+=======
+- [ ] T010 Migrate plugins, middleware, and composable files (WP03)
+- [ ] T011 Migrate component files (AdminShell.vue, BrandPanel.vue, SchemaList.vue) (WP03)
+- [ ] T012 Migrate all page files (WP03)
+- [ ] T013 Verify zero residual references (WP03)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 #### Implementation sketch
 
@@ -147,10 +189,17 @@
 
 #### Included subtasks
 
+<<<<<<< HEAD
 - [x] T014 Create `bin/check-admin-coercion-patterns` CI gate script (WP04)
 - [x] T015 Create `packages/admin/e2e/schema-dedup.spec.ts` Playwright spec (WP04)
 - [x] T016 Add `CHANGELOG.md` `[Unreleased]` entries (WP04)
 - [x] T017 Final verification — full CI suite (WP04)
+=======
+- [ ] T014 Create `bin/check-admin-coercion-patterns` CI gate script (WP04)
+- [ ] T015 Create `packages/admin/e2e/schema-dedup.spec.ts` Playwright spec (WP04)
+- [ ] T016 Add `CHANGELOG.md` `[Unreleased]` entries (WP04)
+- [ ] T017 Final verification — full CI suite (WP04)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 #### Implementation sketch
 

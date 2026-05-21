@@ -11,6 +11,7 @@
 
 | ID | Description | WP | Parallel |
 |----|-----------|----|---------|
+<<<<<<< HEAD
 | T001 | Review spec's three options and confirm they are the complete decision space | WP01 | — | [D] |
 | T002 | Identify any unlisted options (e.g. option 4: do nothing differently + document) | WP01 | — | [D] |
 | T003 | Identify decision criteria, weights, and who the decision-maker is | WP01 | — | [D] |
@@ -22,6 +23,19 @@
 | T009 | Snapshot `packages/mcp/` capability — does it support PHP-tool registration today? | WP03 | [D] |
 | T010 | Log consumer signal — search Minoo for bimaaji-via-MCP requests or tickets | WP03 | [D] |
 | T011 | Document Node sidecar cost history — what failed before, effort cost estimate | WP03 | [D] |
+=======
+| T001 | Review spec's three options and confirm they are the complete decision space | WP01 | — |
+| T002 | Identify any unlisted options (e.g. option 4: do nothing differently + document) | WP01 | — |
+| T003 | Identify decision criteria, weights, and who the decision-maker is | WP01 | — |
+| T004 | Write `decision-frame.md` in mission directory | WP01 | — |
+| T005 | Enumerate what evidence each option needs before it can be accepted or rejected | WP02 | — |
+| T006 | Map each evidence item to a concrete source location in the repo or consumer repos | WP02 | — |
+| T007 | Write `methodology.md` in mission directory | WP02 | — |
+| T008 | Inventory bimaaji's public PHP surface (FQCNs, public methods, doc annotations) | WP03 | [P] |
+| T009 | Snapshot `packages/mcp/` capability — does it support PHP-tool registration today? | WP03 | [P] |
+| T010 | Log consumer signal — search Minoo for bimaaji-via-MCP requests or tickets | WP03 | [P] |
+| T011 | Document Node sidecar cost history — what failed before, effort cost estimate | WP03 | [P] |
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 | T012 | Evaluate Option 1 (PHP-only, close) against all decision criteria | WP04 | — |
 | T013 | Evaluate Option 2 (extend packages/mcp/) against all decision criteria | WP04 | — |
 | T014 | Evaluate Option 3 (restore Node sidecar) against all decision criteria | WP04 | — |
@@ -45,10 +59,17 @@
 
 ### Subtasks
 
+<<<<<<< HEAD
 - [x] T001 Review spec's three options and confirm they are the complete decision space (WP01)
 - [x] T002 Identify any unlisted options (e.g. option 4: do nothing differently + document) (WP01)
 - [x] T003 Identify decision criteria, weights, and who the decision-maker is (WP01)
 - [x] T004 Write `decision-frame.md` in mission directory (WP01)
+=======
+- [ ] T001 Review spec's three options and confirm they are the complete decision space (WP01)
+- [ ] T002 Identify any unlisted options (e.g. option 4: do nothing differently + document) (WP01)
+- [ ] T003 Identify decision criteria, weights, and who the decision-maker is (WP01)
+- [ ] T004 Write `decision-frame.md` in mission directory (WP01)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 ### Implementation sketch
 
@@ -102,10 +123,17 @@ Low. The evidence sources are all local to the repo or accessible via gh CLI.
 
 ### Subtasks
 
+<<<<<<< HEAD
 - [x] T008 Inventory bimaaji's public PHP surface (FQCNs, public methods, doc annotations) (WP03)
 - [x] T009 Snapshot `packages/mcp/` capability — does it support PHP-tool registration today? (WP03)
 - [x] T010 Log consumer signal — search Minoo for bimaaji-via-MCP requests or tickets (WP03)
 - [x] T011 Document Node sidecar cost history — what failed before, effort cost estimate (WP03)
+=======
+- [ ] T008 Inventory bimaaji's public PHP surface (FQCNs, public methods, doc annotations) (WP03)
+- [ ] T009 Snapshot `packages/mcp/` capability — does it support PHP-tool registration today? (WP03)
+- [ ] T010 Log consumer signal — search Minoo for bimaaji-via-MCP requests or tickets (WP03)
+- [ ] T011 Document Node sidecar cost history — what failed before, effort cost estimate (WP03)
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 
 ### Implementation sketch
 

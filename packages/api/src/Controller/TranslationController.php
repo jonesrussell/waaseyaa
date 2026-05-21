@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Waaseyaa\Api\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+use Waaseyaa\Access\AccountInterface;
+use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Api\Exception\JsonApiDocumentException;
 use Waaseyaa\Api\JsonApiDocument;
 use Waaseyaa\Api\JsonApiError;
 use Waaseyaa\Api\JsonApiResource;
 use Waaseyaa\Api\MutableTranslatableInterface;
 use Waaseyaa\Api\ResourceSerializer;
+use Waaseyaa\Entity\EntityInterface;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Entity\FieldableInterface;
 use Waaseyaa\Entity\TranslatableInterface;
@@ -29,6 +33,7 @@ final class TranslationController
 {
     public function __construct(
         private readonly EntityTypeManagerInterface $entityTypeManager,
+        private readonly EntityAccessHandler $accessHandler,
         private readonly ResourceSerializer $serializer,
     ) {}
 
@@ -37,12 +42,17 @@ final class TranslationController
      *
      * @return JsonApiDocument Collection of translation resources.
      */
-    public function index(string $entityTypeId, int|string $id): JsonApiDocument
+    public function index(Request $request, string $entityTypeId, int|string $id): JsonApiDocument
     {
         try {
             $entity = $this->loadTranslatableEntity($entityTypeId, $id);
         } catch (JsonApiDocumentException $e) {
             return $e->document;
+        }
+
+        $denied = $this->checkAccess($request, $entity, 'view');
+        if ($denied !== null) {
+            return $denied;
         }
 
         $languages = $entity->getTranslationLanguages();
@@ -71,12 +81,17 @@ final class TranslationController
     /**
      * GET /api/{entity_type}/{id}/translations/{langcode} — get a specific translation.
      */
-    public function show(string $entityTypeId, int|string $id, string $langcode): JsonApiDocument
+    public function show(Request $request, string $entityTypeId, int|string $id, string $langcode): JsonApiDocument
     {
         try {
             $entity = $this->loadTranslatableEntity($entityTypeId, $id);
         } catch (JsonApiDocumentException $e) {
             return $e->document;
+        }
+
+        $denied = $this->checkAccess($request, $entity, 'view');
+        if ($denied !== null) {
+            return $denied;
         }
 
         if (!$entity->hasTranslation($langcode)) {
@@ -107,12 +122,17 @@ final class TranslationController
      *
      * @param array<string, mixed> $data JSON:API resource data with 'attributes' key.
      */
-    public function store(string $entityTypeId, int|string $id, string $langcode, array $data): JsonApiDocument
+    public function store(Request $request, string $entityTypeId, int|string $id, string $langcode, array $data): JsonApiDocument
     {
         try {
             $entity = $this->loadTranslatableEntity($entityTypeId, $id);
         } catch (JsonApiDocumentException $e) {
             return $e->document;
+        }
+
+        $denied = $this->checkAccess($request, $entity, 'create');
+        if ($denied !== null) {
+            return $denied;
         }
 
         if ($entity->hasTranslation($langcode)) {
@@ -171,12 +191,17 @@ final class TranslationController
      *
      * @param array<string, mixed> $data JSON:API resource data with 'attributes' key.
      */
-    public function update(string $entityTypeId, int|string $id, string $langcode, array $data): JsonApiDocument
+    public function update(Request $request, string $entityTypeId, int|string $id, string $langcode, array $data): JsonApiDocument
     {
         try {
             $entity = $this->loadTranslatableEntity($entityTypeId, $id);
         } catch (JsonApiDocumentException $e) {
             return $e->document;
+        }
+
+        $denied = $this->checkAccess($request, $entity, 'update');
+        if ($denied !== null) {
+            return $denied;
         }
 
         if (!$entity->hasTranslation($langcode)) {
@@ -216,12 +241,17 @@ final class TranslationController
     /**
      * DELETE /api/{entity_type}/{id}/translations/{langcode} — delete a translation.
      */
-    public function destroy(string $entityTypeId, int|string $id, string $langcode): JsonApiDocument
+    public function destroy(Request $request, string $entityTypeId, int|string $id, string $langcode): JsonApiDocument
     {
         try {
             $entity = $this->loadTranslatableEntity($entityTypeId, $id);
         } catch (JsonApiDocumentException $e) {
             return $e->document;
+        }
+
+        $denied = $this->checkAccess($request, $entity, 'delete');
+        if ($denied !== null) {
+            return $denied;
         }
 
         // Cannot delete the original language.
@@ -253,11 +283,56 @@ final class TranslationController
     }
 
     /**
+     * Perform an access check for the given entity and operation.
+     *
+     * Returns a 403 JsonApiDocument if access is denied, null if allowed.
+     * The same response shape is returned whether the entity exists or not
+     * (anti-enumeration: the body gives no entity-state information).
+     *
+     * @param string $operation Ability name: view, create, update, delete.
+     */
+    private function checkAccess(
+        Request $request,
+        EntityInterface&TranslatableInterface $entity,
+        string $operation,
+    ): ?JsonApiDocument {
+        /** @var AccountInterface|null $account */
+        $account = $request->attributes->get('_account');
+
+        // If no account is set on the request, SessionMiddleware did not run or
+        // the session pipeline is misconfigured. Treat as anonymous-denied.
+        // The access pipeline handles anonymous via AnonymousUser; if the
+        // account is absent entirely, we must deny — do not proceed without one.
+        if ($account === null) {
+            return $this->forbiddenDocument();
+        }
+
+        $result = $this->accessHandler->check($entity, $operation, $account);
+
+        if (!$result->isAllowed()) {
+            return $this->forbiddenDocument();
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns a 403 Forbidden JSON:API error document.
+     *
+     * Does not leak entity existence — the same shape is returned whether the
+     * entity exists or the account lacks the required ability.
+     */
+    private function forbiddenDocument(): JsonApiDocument
+    {
+        return $this->errorDocument(JsonApiError::forbidden());
+    }
+
+    /**
      * Load an entity and validate it supports translations.
      *
      * @throws JsonApiDocumentException When the entity cannot be loaded or is not translatable.
      */
-    private function loadTranslatableEntity(string $entityTypeId, int|string $id): TranslatableInterface
+    private function loadTranslatableEntity(string $entityTypeId, int|string $id): EntityInterface&TranslatableInterface
     {
         if (!$this->entityTypeManager->hasDefinition($entityTypeId)) {
             throw new JsonApiDocumentException(

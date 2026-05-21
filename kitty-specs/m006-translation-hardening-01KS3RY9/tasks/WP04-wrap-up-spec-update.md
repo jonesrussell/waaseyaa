@@ -16,8 +16,11 @@ subtasks:
 - T013
 - T014
 - T015
+<<<<<<< HEAD
 agent: "claude:opus-4-7:reviewer:reviewer"
 shell_pid: "799678"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:09Z'
   author: tasks-materializer
@@ -261,6 +264,7 @@ add them to the commit message. See memory `feedback_partial_fix_closes_footer.m
 - Confirm `LangcodeValidator::BCP47_PATTERN` is referenced by its full FQCN.
 - Confirm all three `Closes #N` lines are in the commit/PR body.
 - Confirm no source code changes are in this WP — only docs and changelog.
+<<<<<<< HEAD
 
 ## Activity Log
 
@@ -268,3 +272,5 @@ add them to the commit message. See memory `feedback_partial_fix_closes_footer.m
 - 2026-05-21T01:08:30Z – claude:sonnet:implementer:implementer – shell_pid=782878 – Routes wired; DI complete; spec updated; CHANGELOG bullet added
 - 2026-05-21T01:09:15Z – claude:opus-4-7:reviewer:reviewer – shell_pid=799678 – Started review via action command
 - 2026-05-21T01:12:32Z – claude:opus-4-7:reviewer:reviewer – shell_pid=799678 – Review passed: routes wired, integration test live, spec + CHANGELOG updated
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a

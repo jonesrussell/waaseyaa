@@ -18,8 +18,11 @@ subtasks:
 - T025
 - T026
 - T027
+<<<<<<< HEAD
 agent: "claude:sonnet:implementer:implementer"
 shell_pid: "805213"
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 history:
 - date: '2026-05-20T23:57:13Z'
   event: created
@@ -299,7 +302,10 @@ Layer discipline (C-003): the CLI consumer is in L6 (`packages/cli/`) and connec
 3. Confirm `--watch` without pcntl doesn't crash (graceful degradation).
 4. Review `AiRunCommandWatchTest` — mock stream must simulate real SSE wire format.
 5. SC-001 smoke test result should be in the WP file.
+<<<<<<< HEAD
 
 ## Activity Log
 
 - 2026-05-21T01:11:58Z – claude:sonnet:implementer:implementer – shell_pid=805213 – Started implementation via action command
+=======
+>>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
