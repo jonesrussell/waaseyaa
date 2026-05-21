@@ -383,6 +383,7 @@
             "Waaseyaa\\Plugin\\Tests\\": "packages/plugin/tests/",
             "Waaseyaa\\TypedData\\Tests\\": "packages/typed-data/tests/",
             "Waaseyaa\\Entity\\PhpStan\\": "packages/entity/testing/PhpStan/",
+            "Waaseyaa\\Entity\\Testing\\": "packages/entity/testing/",
             "Waaseyaa\\Entity\\Testing\\Translation\\": "packages/entity/testing/Translation/",
             "Waaseyaa\\Entity\\Tests\\": "packages/entity/tests/",
             "Waaseyaa\\Field\\Tests\\": "packages/field/tests/",
@@ -468,6 +469,7 @@
         ],
         "phpstan": "phpstan analyse --memory-limit=512M",
         "check-dead-code": "bash bin/check-dead-code",
+        "check-getquery-bindings": "php bin/check-getquery-bindings",
         "test": "phpunit --no-coverage",
         "verify": [
             "@cs-check",
@@ -478,12 +480,14 @@
             "@check-ingestion-defaults",
             "@check-symfony-imports",
             "@check-dead-code",
+            "@check-getquery-bindings",
             "@check-external-consumers",
             "@test"
         ]
     },
     "scripts-descriptions": {
         "check-dead-code": "Fail-on-new dead-code gate (Phase 4 of the dead-code cleanup audit). Runs phpstan-dead-code.neon with shipmonk's detector; pre-existing baseline entries are suppressed, only NEW findings fail. See docs/audits/2026-05-17-dead-code-baseline-audit.md and bin/check-dead-code header for how to handle a new finding.",
+        "check-getquery-bindings": "Fail-on-new gate for unbound getQuery()->execute() callsites. Baseline at tools/getquery-bindings-baseline.txt. New callsites fail CI; add to baseline with mandatory exemption comment if legitimately exempt. See CLAUDE.md § CI gates.",
         "check-symfony-imports": "Enforce the Path R-narrow Symfony-import boundary (mission #1107 C-005 (b)). Fails when `use Symfony\\…` appears outside the framework allowlist. Allowlist lives in .symfony-import-allowlist.json — see docs/specs/api-layer.md §Symfony Import Boundary.",
         "dev": "Start the PHP dev server (delegates to dev:php). For the admin SPA, run `composer dev:admin` in a second terminal — see docs/specs/operations-playbooks.md.",
         "dev:admin": "Start the Nuxt admin SPA dev server. NUXT_BACKEND_URL points at the PHP server (default :8080); set APP_PORT to override.",

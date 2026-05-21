@@ -12,6 +12,7 @@ use Waaseyaa\Api\Schema\SchemaPresenter;
 use Waaseyaa\Entity\EntityTypeManagerInterface;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
 use Waaseyaa\Foundation\Kernel\Bootstrap\AccessPolicyRegistry;
+use Waaseyaa\Foundation\Kernel\Bootstrap\KernelPolicyDependencyResolver;
 use Waaseyaa\Foundation\Log\NullLogger;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Routing\RouteBuilder;
@@ -211,7 +212,11 @@ final class AdminSurfaceServiceProvider extends ServiceProvider
             return null;
         }
 
-        $registry = new AccessPolicyRegistry(new NullLogger());
+        $resolver = $this->kernelServices !== null
+            ? new KernelPolicyDependencyResolver($this->kernelServices)
+            : null;
+
+        $registry = new AccessPolicyRegistry(new NullLogger(), $resolver);
 
         return $registry->discover($manifest);
     }

@@ -6,24 +6,43 @@ namespace Waaseyaa\Foundation\Kernel\Bootstrap;
 
 use Waaseyaa\Access\EntityAccessHandler;
 use Waaseyaa\Foundation\Discovery\PackageManifest;
+use Waaseyaa\Foundation\Kernel\Bootstrap\Exception\PolicyInstantiationException;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 
 final class AccessPolicyRegistry
 {
+    private readonly PolicyDependencyResolverInterface $resolver;
+
     public function __construct(
         private readonly LoggerInterface $logger,
-    ) {}
+        ?PolicyDependencyResolverInterface $resolver = null,
+    ) {
+        $this->resolver = $resolver ?? new NullPolicyDependencyResolver();
+    }
 
     /**
-     * Discover and instantiate access policies from the manifest.
+     * Discover and instantiate access policies from the manifest using a two-phase algorithm.
      *
-     * Policies may accept their entity type list as a constructor argument
-     * (e.g. ConfigEntityAccessPolicy). The reflection-based heuristic detects
-     * constructors with required params and passes entity types to them.
+     * Phase 1: Instantiate all policies whose constructors do NOT require EntityAccessHandler.
+     *          Build a preliminary EntityAccessHandler from phase-1 policies.
+     *
+     * Phase 2: Instantiate deferred policies (those that require EntityAccessHandler),
+     *          substituting the preliminary handler where needed. Build the final
+     *          EntityAccessHandler from all policies.
+     *
+     * Any policy whose constructor dependency cannot be resolved throws
+     * PolicyInstantiationException immediately — no silent log-and-continue.
+     *
+     * @throws PolicyInstantiationException When any #[PolicyAttribute] class cannot be instantiated.
      */
     public function discover(PackageManifest $manifest): EntityAccessHandler
     {
-        $policies = [];
+        /** @var list<\Waaseyaa\Access\AccessPolicyInterface> $phase1Policies */
+        $phase1Policies = [];
+        /** @var list<array{class-string, array<string>}> $deferred */
+        $deferred = [];
+
+        // Phase 1: instantiate policies that do not require EntityAccessHandler.
         foreach ($manifest->policies as $class => $entityTypes) {
             if (!class_exists($class)) {
                 $this->logger->warning(sprintf(
@@ -35,40 +54,94 @@ final class AccessPolicyRegistry
                 continue;
             }
 
+            $ref = new \ReflectionClass($class);
+            $constructor = $ref->getConstructor();
+
+            if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
+                $phase1Policies[] = $ref->newInstance();
+                continue;
+            }
+
+            // Check if any parameter requires EntityAccessHandler → defer to phase 2.
+            if ($this->requiresEntityAccessHandler($constructor)) {
+                $deferred[] = [$class, $entityTypes];
+                continue;
+            }
+
+            // Resolve all parameters; throws PolicyInstantiationException on failure.
+            $args = $this->resolveParameters($class, $constructor, $entityTypes);
+            $phase1Policies[] = $ref->newInstanceArgs($args);
+        }
+
+        // Build preliminary EntityAccessHandler from phase-1 policies.
+        $preliminaryHandler = new EntityAccessHandler($phase1Policies);
+
+        if ($deferred === []) {
+            return $preliminaryHandler;
+        }
+
+        // Phase 2: instantiate deferred policies using the preliminary handler,
+        // then mutate the preliminary handler in-place via addPolicy(). This
+        // avoids creating a second EntityAccessHandler instance — phase-2 policies
+        // that hold a reference to $preliminaryHandler see the final state.
+        if ($this->resolver instanceof KernelPolicyDependencyResolver) {
+            $this->resolver->setPreliminaryHandler($preliminaryHandler);
+        }
+
+        foreach ($deferred as [$class, $entityTypes]) {
+            $ref = new \ReflectionClass($class);
+            $constructor = $ref->getConstructor();
+
+            if ($constructor === null || $constructor->getNumberOfParameters() === 0) {
+                $preliminaryHandler->addPolicy($ref->newInstance());
+                continue;
+            }
+
+            $args = $this->resolveParameters($class, $constructor, $entityTypes);
+            $preliminaryHandler->addPolicy($ref->newInstanceArgs($args));
+        }
+
+        return $preliminaryHandler;
+    }
+
+    /**
+     * @return list<mixed>
+     * @throws PolicyInstantiationException
+     */
+    private function resolveParameters(string $class, \ReflectionMethod $constructor, mixed $entityTypes): array
+    {
+        $args = [];
+        foreach ($constructor->getParameters() as $param) {
             try {
-                $ref = new \ReflectionClass($class);
-                $constructor = $ref->getConstructor();
-                if ($constructor !== null && $constructor->getNumberOfRequiredParameters() > 0) {
-                    // Heuristic: only pass the entity-types array when the first
-                    // required parameter is typed as `array` (e.g. ConfigEntityAccessPolicy).
-                    // Policies that require injected services (e.g. EntityTypeManagerInterface)
-                    // cannot be auto-instantiated here and are skipped with an error.
-                    $firstParam = $constructor->getParameters()[0];
-                    $firstType = $firstParam->getType();
-                    $firstTypeName = $firstType instanceof \ReflectionNamedType ? $firstType->getName() : null;
-                    if ($firstTypeName !== 'array') {
-                        $this->logger->error(sprintf(
-                            'Cannot auto-instantiate access policy %s: constructor requires injected '
-                            . 'services (first parameter "%s" is not array). '
-                            . 'Register this policy manually in your service provider.',
-                            $class,
-                            $firstParam->getName(),
-                        ));
-                        continue;
-                    }
-                    $policies[] = new $class($entityTypes);
-                } else {
-                    $policies[] = new $class();
-                }
+                $args[] = $this->resolver->resolveParameter($class, $param, $entityTypes);
             } catch (\Throwable $e) {
-                $this->logger->error(sprintf(
-                    'Failed to instantiate access policy %s: %s',
+                if ($e instanceof PolicyInstantiationException) {
+                    throw $e;
+                }
+                throw new PolicyInstantiationException(sprintf(
+                    'Failed to resolve constructor parameter "%s" for access policy %s: %s',
+                    $param->getName(),
                     $class,
                     $e->getMessage(),
-                ));
+                ), 0, $e);
             }
         }
 
-        return new EntityAccessHandler($policies);
+        return $args;
+    }
+
+    /**
+     * Check if any constructor parameter is typed as EntityAccessHandler.
+     */
+    private function requiresEntityAccessHandler(\ReflectionMethod $constructor): bool
+    {
+        foreach ($constructor->getParameters() as $param) {
+            $type = $param->getType();
+            if ($type instanceof \ReflectionNamedType && $type->getName() === EntityAccessHandler::class) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

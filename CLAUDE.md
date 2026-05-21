@@ -238,6 +238,33 @@ When acting on dead-code findings (separate from this CI gate):
 
 To regenerate the baseline after a triage sweep: `vendor/bin/phpstan analyse -c phpstan-dead-code.neon --generate-baseline=phpstan-dead-code-baseline.neon`. To inspect the historical backlog without running CI, grep `phpstan-dead-code-baseline.neon`.
 
+## CI Gates
+
+Two fail-on-new gates run as part of `composer verify`.
+
+### Dead code gate
+
+`bin/check-dead-code` + `phpstan-dead-code-baseline.neon` — fails on new unreferenced symbols. See the "Dead code audits" section above.
+
+### Unbound getQuery() gate
+
+`bin/check-getquery-bindings` — fails on new `getQuery()->...->execute()` callsites that have neither `->setAccount()` nor `->accessCheck(false)` in the call chain. Introduced in PR #1528 after three production 500s from unbound chains (alpha.181–triage 2026-05-20).
+
+**Baseline file**: `tools/getquery-bindings-baseline.txt`
+
+**Adding a new exemption**: Append `packages/foo/src/Bar.php:<line>  # <reason>` to the baseline and commit it in the same PR. Every entry **must** have an inline comment explaining why the callsite is exempt. Entries without a comment cause CI to fail with "Incomplete baseline entries".
+
+**Regenerating the baseline** (after fixing a batch of callsites or after a rename):
+```bash
+php bin/check-getquery-bindings --generate-baseline
+```
+Review the output, replace all `# TODO: add exemption reason` stubs with real reasons, and commit. The M-B.1 follow-up issue tracks driving this baseline to zero.
+
+**What counts as "bound"**:
+- `$storage->getQuery()->setAccount($account)->...->execute()` — bound, OK.
+- `$storage->getQuery()->accessCheck(false)->...->execute()` — explicit opt-out, OK (add an inline justification comment in the production source file).
+- `$storage->getQuery()->...->execute()` with no binding — NEW offender, CI fails.
+
 ## Architecture Gotchas
 
 Cross-cutting rules that affect work anywhere in the framework. Subsystem-specific gotchas live in their respective `docs/specs/*.md` files (see Orchestration table).

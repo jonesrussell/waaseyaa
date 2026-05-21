@@ -33,9 +33,11 @@ use Waaseyaa\Foundation\Kernel\Bootstrap\AccessPolicyRegistry;
 use Waaseyaa\Foundation\Kernel\Bootstrap\AppEntityTypeLoader;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ContentTypeValidator;
 use Waaseyaa\Foundation\Kernel\Bootstrap\DatabaseBootstrapper;
+use Waaseyaa\Foundation\Kernel\Bootstrap\KernelPolicyDependencyResolver;
 use Waaseyaa\Foundation\Kernel\Bootstrap\KnowledgeExtensionBootstrapper;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ManifestBootstrapper;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ProviderRegistry;
+use Waaseyaa\Foundation\Kernel\Bootstrap\ProviderRegistryKernelServices;
 use Waaseyaa\Foundation\Log\Handler\ErrorLogHandler as HandlerErrorLogHandler;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\LogLevel;
@@ -371,7 +373,16 @@ abstract class AbstractKernel
 
     protected function discoverAccessPolicies(): void
     {
-        $this->accessHandler = new AccessPolicyRegistry($this->logger)->discover($this->manifest);
+        $providers = $this->providers;
+        $kernelServices = new ProviderRegistryKernelServices(
+            $this->entityTypeManager,
+            $this->database,
+            $this->dispatcher,
+            $this->logger,
+            static fn() => $providers,
+        );
+        $resolver = new KernelPolicyDependencyResolver($kernelServices);
+        $this->accessHandler = new AccessPolicyRegistry($this->logger, $resolver)->discover($this->manifest);
     }
 
     /**
