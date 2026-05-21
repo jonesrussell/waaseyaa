@@ -356,3 +356,4 @@ If any grep returns matches:
 ## Activity Log
 
 - 2026-05-21T00:55:58Z – claude:sonnet:implementer:implementer – shell_pid=769518 – Started implementation via action command
+- 2026-05-21T00:59:38Z – claude:sonnet:implementer:implementer – shell_pid=769518 – 17 files migrated; String(x) === '1' pattern removed from SchemaList.vue; zero config.public.* references remain; 243 tests pass, build clean, lint 0 errors
