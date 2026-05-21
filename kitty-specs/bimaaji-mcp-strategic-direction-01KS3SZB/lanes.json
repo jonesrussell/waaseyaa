@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "mission_slug": "bimaaji-mcp-strategic-direction-01KS3SZB",
+  "mission_id": "01KS3SZB66HY2SFG18EYWXQ0ND",
+  "mission_branch": "kitty/mission-bimaaji-mcp-strategic-direction-01KS3SZB",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05",
+        "WP06"
+      ],
+      "write_scope": [
+        "docs/specs/mcp-endpoint.md",
+        "kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/analysis.md",
+        "kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/decision-frame.md",
+        "kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/decision.md",
+        "kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/methodology.md",
+        "kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/research/bimaaji-surface.md",
+        "kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/research/consumer-signal.md",
+        "kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/research/mcp-capability.md",
+        "kitty-specs/bimaaji-mcp-strategic-direction-01KS3SZB/research/sidecar-cost.md"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-21T00:12:08.206763+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP01",
+    "WP02",
+    "WP03",
+    "WP04",
+    "WP05",
+    "WP06"
+  ]
+}
