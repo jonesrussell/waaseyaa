@@ -12,6 +12,9 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-scheduler-entry-auto-discovery-01KS3SE3
+base_commit: a1763ce48f205a0f2227040f0c215e109bfba246
+created_at: '2026-05-21T00:25:49.308976+00:00'
 subtasks:
 - T001
 - T002
@@ -19,6 +22,7 @@ subtasks:
 - T004
 - T005
 - T006
+shell_pid: '705854'
 history:
 - date: '2026-05-20T23:57:21Z'
   event: created
