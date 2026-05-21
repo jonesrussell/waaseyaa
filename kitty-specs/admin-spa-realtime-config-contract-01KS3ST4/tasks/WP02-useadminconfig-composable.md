@@ -23,6 +23,8 @@ subtasks:
 - T007
 - T008
 - T009
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "728329"
 history:
 - date: '2026-05-20T23:57:32Z'
   event: created
@@ -467,3 +469,7 @@ appears in `packages/admin/app/**`. Add `// allow-coercion: <reason>` inline to 
 2. Confirm `useAdminConfig()` does NOT call `useRuntimeConfig()` on every invocation — it should use `useState()` so the computation runs once.
 3. Verify `AdminConfig` has no `any` or `unknown` fields (`npm run build` strict check covers this).
 4. Read the README section and confirm a new contributor would understand how to add a flag without reverting to direct `useRuntimeConfig()` calls.
+
+## Activity Log
+
+- 2026-05-21T00:43:32Z – claude:sonnet:implementer:implementer – shell_pid=728329 – Started implementation via action command
