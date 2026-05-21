@@ -1,7 +1,7 @@
 {
-  "event_count": 21,
-  "last_event_id": "01KS40RGBSCFXF4KQPH76VB5RG",
-  "materialized_at": "2026-05-21T01:00:23.289844+00:00",
+  "event_count": 22,
+  "last_event_id": "01KS417BG8QM033KWDEJKKVS34",
+  "materialized_at": "2026-05-21T01:08:29.832285+00:00",
   "mission_number": "",
   "mission_slug": "m006-translation-hardening-01KS3RY9",
   "mission_type": "software-dev",
@@ -11,8 +11,8 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 0
   },
@@ -39,11 +39,11 @@
       "last_transition_at": "2026-05-21T00:41:44.107998+00:00"
     },
     "WP04": {
-      "actor": "claude:sonnet:implementer:implementer",
+      "actor": "user",
       "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KS40RGBSCFXF4KQPH76VB5RG",
-      "last_transition_at": "2026-05-21T01:00:23.289844+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KS417BG8QM033KWDEJKKVS34",
+      "last_transition_at": "2026-05-21T01:08:29.832285+00:00"
     }
   }
 }
