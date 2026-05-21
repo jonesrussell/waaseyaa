@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Admin SPA realtime config contract (#1537, #1538).** Closed the duplicate `fetchSchema` race via `useSchema()` in-flight Promise dedup. Introduced `useAdminConfig()` typed envelope with `asBoolean`/`asString`/`asUrl` coercion helpers so digit-string env vars (`NUXT_PUBLIC_ENABLE_REALTIME=1`) no longer silently break `=== '1'` checks. Migrated all 17 admin SPA call sites; CI gate `bin/check-admin-coercion-patterns` prevents regression.
+
 ### Changed
 
 - **`waaseyaa/foundation` — `BroadcastRouter` no longer replays `_broadcast_log` history on EventSource connect** (#1535). New connections previously started at `cursor = 0`, dumping every historical message on the requested channels to the client. With N matching events in the log, the admin SPA's `SchemaList.watch(messages, …)` fired `fetchEntities` N times per `/admin/{entityType}` page view — pages stalled on "Loading…" under `php -S` (single-thread starvation by the resulting concurrent fetches + the open SSE stream) and burned N redundant entity queries per visit on PHP-FPM, scaling with broadcast log size. `BroadcastRouter::resolveInitialCursor(Request, int $highWaterMark)` now resumes from a numeric `Last-Event-ID` header when the client sent one (auto-reconnect path) and otherwise returns the supplied high-water mark — historical events are not replayed. Each SSE frame now carries an `id: {row_id}` line so EventSource sends `Last-Event-ID` on its native reconnect, making the resume path actually usable. Behavioral change visible to consumers: a fresh EventSource no longer receives historical `entity.saved` / `entity.deleted` events; clients that need backlog must query their own state.

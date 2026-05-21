@@ -467,6 +467,7 @@
             "PHP_CLI_SERVER_WORKERS=4 bin/waaseyaa serve"
         ],
         "phpstan": "phpstan analyse --memory-limit=512M",
+        "check-admin-coercion-patterns": "bash bin/check-admin-coercion-patterns",
         "check-dead-code": "bash bin/check-dead-code",
         "test": "phpunit --no-coverage",
         "verify": [
@@ -479,10 +480,12 @@
             "@check-symfony-imports",
             "@check-dead-code",
             "@check-external-consumers",
+            "@check-admin-coercion-patterns",
             "@test"
         ]
     },
     "scripts-descriptions": {
+        "check-admin-coercion-patterns": "Prevent regression of the useAdminConfig() migration (mission M-F). Fails when raw string-compare coercion patterns (=== '1', === '0') appear in packages/admin/app/**/*.{ts,vue} outside of configCoercion.ts, test files, or lines marked with // allow-coercion: <reason>.",
         "check-dead-code": "Fail-on-new dead-code gate (Phase 4 of the dead-code cleanup audit). Runs phpstan-dead-code.neon with shipmonk's detector; pre-existing baseline entries are suppressed, only NEW findings fail. See docs/audits/2026-05-17-dead-code-baseline-audit.md and bin/check-dead-code header for how to handle a new finding.",
         "check-symfony-imports": "Enforce the Path R-narrow Symfony-import boundary (mission #1107 C-005 (b)). Fails when `use Symfony\\…` appears outside the framework allowlist. Allowlist lives in .symfony-import-allowlist.json — see docs/specs/api-layer.md §Symfony Import Boundary.",
         "dev": "Start the PHP dev server (delegates to dev:php). For the admin SPA, run `composer dev:admin` in a second terminal — see docs/specs/operations-playbooks.md.",

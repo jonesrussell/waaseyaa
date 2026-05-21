@@ -1,0 +1,92 @@
+#!/usr/bin/env bash
+#
+# check-admin-coercion-patterns — CI gate for admin SPA raw coercion patterns
+#
+# Prevents regression of the useAdminConfig() migration (mission M-F,
+# admin-spa-realtime-config-contract-01KS3ST4). After WP02/WP03 migrated
+# all 17 call sites to typed coercion helpers, direct string-compare patterns
+# like `=== '1'` or `=== '0'` must not reappear in admin SPA source files.
+#
+# EXEMPTION MECHANISM
+# -------------------
+# If a file has a legitimate reason to use a raw coercion pattern (e.g.
+# URL query parsing in auth flows, localStorage reads, the coercion helpers
+# themselves, or test files), add an inline comment on the offending line:
+#
+#   const val = someQuery === '1' // allow-coercion: URL query param, not a runtime-config value
+#
+# Lines containing `// allow-coercion:` are excluded from the check.
+# Test files (*.test.ts, *.spec.ts, files under e2e/) are always excluded.
+# The coercion helpers file itself (configCoercion.ts) is always excluded.
+#
+# EXIT CODES
+# ----------
+# 0 — no violations found
+# 1 — one or more violations found (prints each offending file:line)
+
+set -euo pipefail
+
+WORKTREE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ADMIN_DIR="${WORKTREE_ROOT}/packages/admin/app"
+
+# Patterns that indicate raw coercion bypassing useAdminConfig()
+# We look for comparisons directly against '1' or '0' that are NOT in
+# coercion helpers, test files, or explicitly exempted lines.
+PATTERNS=(
+    "=== '1'"
+    "=== '0'"
+    "=== \"1\""
+    "=== \"0\""
+    "String([^)]*) === '1'"
+    "String([^)]*) === '0'"
+)
+
+# Build a combined grep pattern
+COMBINED_PATTERN="($(IFS='|'; echo "${PATTERNS[*]}"))"
+
+found_violations=0
+violation_lines=()
+
+# Find all .ts and .vue files in packages/admin/app
+while IFS= read -r -d '' file; do
+    # Skip the coercion helpers themselves
+    if [[ "$file" == *"configCoercion.ts" ]]; then
+        continue
+    fi
+    # Skip test files
+    if [[ "$file" == *.test.ts ]] || [[ "$file" == *.spec.ts ]]; then
+        continue
+    fi
+
+    # Grep for patterns; exclude lines with allow-coercion exemption marker
+    while IFS= read -r match_line; do
+        # Skip exempted lines
+        if echo "$match_line" | grep -qF '// allow-coercion:'; then
+            continue
+        fi
+        violation_lines+=("$match_line")
+        found_violations=1
+    done < <(grep -nEP "$COMBINED_PATTERN" "$file" 2>/dev/null | sed "s|^|${file}:|" || true)
+done < <(find "${ADMIN_DIR}" -type f \( -name "*.ts" -o -name "*.vue" \) -print0)
+
+# Also check e2e directory — but skip spec files (they're excluded above via *.spec.ts)
+# Actually skip all e2e files from this check (they may test env values directly)
+# The find above is scoped to app/ only, so e2e is already excluded.
+
+if [[ $found_violations -eq 1 ]]; then
+    echo "check-admin-coercion-patterns: FAILED" >&2
+    echo "" >&2
+    echo "Found raw coercion pattern(s) in admin SPA source." >&2
+    echo "Use useAdminConfig() with asBoolean()/asString()/asUrl() instead." >&2
+    echo "" >&2
+    echo "Offending locations:" >&2
+    for line in "${violation_lines[@]}"; do
+        echo "  $line" >&2
+    done
+    echo "" >&2
+    echo "To exempt a line with a valid reason, add: // allow-coercion: <reason>" >&2
+    exit 1
+fi
+
+echo "check-admin-coercion-patterns: OK"
+exit 0
