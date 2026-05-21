@@ -15,8 +15,8 @@ subtasks:
 - T012
 - T013
 - T014
-shell_pid: "678260"
-agent: "claude:sonnet:implementer:implementer"
+shell_pid: "685994"
+agent: "claude:opus-4-7:reviewer:reviewer"
 history:
 - date: '2026-05-20T23:30:18Z'
   agent: claude:sonnet:tasks:tasks
@@ -264,3 +264,4 @@ $query = new RecordingEntityQuery();
 
 - 2026-05-20T23:56:29Z – claude:sonnet:implementer:implementer – shell_pid=678260 – Assigned agent via action command
 - 2026-05-21T00:00:15Z – claude:sonnet:implementer:implementer – shell_pid=678260 – RecordingEntityQuery extracted; two consumers migrated (AuthControllerTest + SitemapGeneratorTest); autoload-dev only in both packages/entity/composer.json and root composer.json; 711/711 tests pass, PHPStan OK, cs-check clean. Untracked files are sibling WP01 deliverables (bin/check-getquery-bindings etc.), not WP03 scope.
+- 2026-05-21T00:00:58Z – claude:opus-4-7:reviewer:reviewer – shell_pid=685994 – Started review via action command
