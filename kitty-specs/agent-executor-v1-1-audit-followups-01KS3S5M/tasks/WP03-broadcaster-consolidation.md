@@ -17,6 +17,8 @@ subtasks:
 - T021
 - T022
 - T023
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "779252"
 history:
 - date: '2026-05-20T23:57:13Z'
   event: created
@@ -220,3 +222,7 @@ After this WP, `MessagingServiceProvider` should either delegate to `AgentRunBro
 2. Check `MessagingServiceProvider` still registers all other bindings it owned (only the adapter binding should be gone).
 3. Verify `AgentRunBroadcasterTest` uses `CoversClass(AgentRunBroadcaster::class)` not the deleted adapter.
 4. SC-005 check: `! [ -f packages/ai-agent/src/Broadcast/BroadcastStorageAdapter.php ] && echo PASS`.
+
+## Activity Log
+
+- 2026-05-21T00:59:04Z – claude:sonnet:implementer:implementer – shell_pid=779252 – Started implementation via action command
