@@ -1,19 +1,19 @@
 {
-  "event_count": 31,
-  "last_event_id": "01KS4202B2P81G3T6CKBGG4BRB",
-  "materialized_at": "2026-05-21T01:21:59.650891+00:00",
+  "event_count": 32,
+  "last_event_id": "01KS423HAFNHFFDJM9DVPBXRWB",
+  "materialized_at": "2026-05-21T01:23:53.295889+00:00",
   "mission_number": "",
   "mission_slug": "admin-spa-realtime-config-contract-01KS3ST4",
   "mission_type": "software-dev",
   "summary": {
-    "approved": 3,
+    "approved": 4,
     "blocked": 0,
     "canceled": 0,
     "claimed": 0,
     "done": 0,
     "for_review": 0,
     "in_progress": 0,
-    "in_review": 1,
+    "in_review": 0,
     "planned": 0
   },
   "work_packages": {
@@ -39,11 +39,11 @@
       "last_transition_at": "2026-05-21T01:01:49.934076+00:00"
     },
     "WP04": {
-      "actor": "claude:opus-4-7:reviewer:reviewer",
+      "actor": "user",
       "force_count": 2,
-      "lane": "in_review",
-      "last_event_id": "01KS4202B2P81G3T6CKBGG4BRB",
-      "last_transition_at": "2026-05-21T01:21:59.650891+00:00"
+      "lane": "approved",
+      "last_event_id": "01KS423HAFNHFFDJM9DVPBXRWB",
+      "last_transition_at": "2026-05-21T01:23:53.295889+00:00"
     }
   }
 }
