@@ -18,8 +18,8 @@ M-B WP02 to merge first if running in parallel).
 
 | ID   | Description                                                      | WP   | Parallel |
 |------|------------------------------------------------------------------|------|----------|
-| T001 | Add `fieldLangcode(string $fieldName): ?string` to `TranslatableInterface` | WP03 | — |
-| T002 | Contract test: reflection asserts method + signature; trait satisfies via anonymous class | WP03 | [P] |
+| T001 | Add `fieldLangcode(string $fieldName): ?string` to `TranslatableInterface` | WP03 | — | [D] |
+| T002 | Contract test: reflection asserts method + signature; trait satisfies via anonymous class | WP03 | [D] |
 | T003 | Create `packages/entity/src/LangcodeValidator.php` with `BCP47_PATTERN` const + `validate()` | WP02 | — |
 | T004 | Unit test `LangcodeValidatorTest`: acceptance + rejection cases | WP02 | [P] |
 | T005 | Wire `LangcodeValidator::validate()` into `AddTranslationsMigrationGenerator` (both render paths + `generate()`) | WP02 | — |
@@ -47,8 +47,8 @@ M-B WP02 to merge first if running in parallel).
 
 #### Subtasks
 
-- [ ] T001 Add `fieldLangcode(string $fieldName): ?string` to `TranslatableInterface` (WP03)
-- [ ] T002 Contract test: reflection asserts method + signature; trait satisfies via anonymous class (WP03)
+- [x] T001 Add `fieldLangcode(string $fieldName): ?string` to `TranslatableInterface` (WP03)
+- [x] T002 Contract test: reflection asserts method + signature; trait satisfies via anonymous class (WP03)
 
 #### Implementation sketch
 
