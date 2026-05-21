@@ -263,3 +263,4 @@ $query = new RecordingEntityQuery();
 ## Activity Log
 
 - 2026-05-20T23:56:29Z – claude:sonnet:implementer:implementer – shell_pid=678260 – Assigned agent via action command
+- 2026-05-21T00:00:15Z – claude:sonnet:implementer:implementer – shell_pid=678260 – RecordingEntityQuery extracted; two consumers migrated (AuthControllerTest + SitemapGeneratorTest); autoload-dev only in both packages/entity/composer.json and root composer.json; 711/711 tests pass, PHPStan OK, cs-check clean. Untracked files are sibling WP01 deliverables (bin/check-getquery-bindings etc.), not WP03 scope.
