@@ -22,7 +22,8 @@ subtasks:
 - T002
 - T003
 - T004
-shell_pid: '707133'
+shell_pid: "707133"
+agent: "claude:sonnet:implementer:implementer"
 history:
 - date: '2026-05-20T23:57:32Z'
   event: created
@@ -330,3 +331,7 @@ it('doesNotPoisonOnRejection: a rejected fetch() does not prevent a subsequent f
 3. Confirm `invalidate()` has TWO `delete()` calls.
 4. Run `cd packages/admin && npm test` and verify all three new test names appear in output with ✓.
 5. Run `cd packages/admin && npm run build` and verify zero TypeScript errors.
+
+## Activity Log
+
+- 2026-05-21T00:26:21Z – claude:sonnet:implementer:implementer – shell_pid=707133 – Assigned agent via action command
