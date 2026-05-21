@@ -18,6 +18,8 @@ subtasks:
 - T011
 - T012
 - T013
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "769518"
 history:
 - date: '2026-05-20T23:57:32Z'
   event: created
@@ -350,3 +352,7 @@ If any grep returns matches:
 3. Check `SchemaList.vue` specifically — this is the file that contained the original #1538 workaround. Verify `enableRealtime` is now a typed boolean consumed directly.
 4. Run `cd packages/admin && npm run build` and verify zero errors.
 5. Review `auth.global.ts` — the auth middleware is security-sensitive. Verify the boolean check (`if (auth.requireVerifiedEmail)`) is semantically equivalent to the old `=== '1'` check.
+
+## Activity Log
+
+- 2026-05-21T00:55:58Z – claude:sonnet:implementer:implementer – shell_pid=769518 – Started implementation via action command
