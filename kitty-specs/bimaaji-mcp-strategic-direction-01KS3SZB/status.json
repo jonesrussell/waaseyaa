@@ -1,7 +1,7 @@
 {
-  "event_count": 26,
-  "last_event_id": "01KS40G414CQFG368J03DJ8J8Y",
-  "materialized_at": "2026-05-21T00:55:48.516152+00:00",
+  "event_count": 28,
+  "last_event_id": "01KS40HFD6KMGYZHJD6PY91HZC",
+  "materialized_at": "2026-05-21T00:56:32.934157+00:00",
   "mission_number": "",
   "mission_slug": "bimaaji-mcp-strategic-direction-01KS3SZB",
   "mission_type": "research",
@@ -12,9 +12,9 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 2
+    "planned": 1
   },
   "work_packages": {
     "WP01": {
@@ -46,11 +46,11 @@
       "last_transition_at": "2026-05-21T00:55:48.516152+00:00"
     },
     "WP05": {
-      "actor": "finalize-tasks",
+      "actor": "claude:sonnet:researcher:implementer",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KS3Y0513FXMFEKBY4TE791HP",
-      "last_transition_at": "2026-05-21T00:12:08.099655+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KS40HFD6KMGYZHJD6PY91HZC",
+      "last_transition_at": "2026-05-21T00:56:32.934157+00:00"
     },
     "WP06": {
       "actor": "finalize-tasks",
