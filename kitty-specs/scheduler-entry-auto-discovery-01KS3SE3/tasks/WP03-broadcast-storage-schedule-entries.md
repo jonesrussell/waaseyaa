@@ -394,3 +394,4 @@ so consumers never need to wire the prune task manually.
 - 2026-05-21T01:07:18Z – claude:opus-4-7:reviewer:reviewer – shell_pid=796050 – Started review via action command
 - 2026-05-21T01:11:13Z – claude:opus-4-7:reviewer:reviewer – shell_pid=796050 – Moved to planned
 - 2026-05-21T01:12:34Z – claude:sonnet:implementer:implementer – shell_pid=806939 – Started implementation via action command
+- 2026-05-21T01:17:05Z – claude:sonnet:implementer:implementer – shell_pid=806939 – Cycle 1: surface-map updated (public disposition) + BroadcastStorage dep made nullable; 13 regressions cleared (8 SSR + 4 OIDC + 1 SurfaceMap). 1386/1386 pkg tests + 12/12 SSR+OIDC + 3/3 SurfaceMap.
