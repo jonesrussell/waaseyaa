@@ -22,8 +22,8 @@ subtasks:
 - T010
 - T011
 - T012
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "755033"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "773450"
 history:
 - date: '2026-05-20T23:57:09Z'
   author: tasks-materializer
@@ -501,3 +501,4 @@ private function makeAccount(int $id, array $roles = []): AccountInterface
 
 - 2026-05-21T00:50:13Z – claude:sonnet:implementer:implementer – shell_pid=755033 – Started implementation via action command
 - 2026-05-21T00:56:36Z – claude:sonnet:implementer:implementer – shell_pid=755033 – EntityAccessHandler injected; per-method check() calls (view/create/update/delete); 403 JSON:API error shape with FORBIDDEN code; anti-enumeration confirmed; 22 unit tests + 3 integration tests pass; phpstan clean; stale baseline entries removed
+- 2026-05-21T00:57:24Z – claude:opus-4-7:reviewer:reviewer – shell_pid=773450 – Started review via action command
