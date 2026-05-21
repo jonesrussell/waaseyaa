@@ -22,7 +22,8 @@ subtasks:
 - T004
 - T005
 - T006
-shell_pid: '705854'
+shell_pid: "705854"
+agent: "claude:sonnet:implementer:implementer"
 history:
 - date: '2026-05-20T23:57:21Z'
   event: created
@@ -326,3 +327,7 @@ final class ScheduleEntriesInterfaceTest extends TestCase
 - Confirm no `use Waaseyaa\Scheduler\...` import appears in any Foundation file (layer discipline)
 - Check `PackageManifest` for symmetric `fromArray()`/`toArray()` — asymmetric serialization causes runtime discovery gaps
 - Run `bin/waaseyaa optimize:manifest` against a dev checkout and verify `schedule_entries` key appears in the compiled manifest file
+
+## Activity Log
+
+- 2026-05-21T00:25:52Z – claude:sonnet:implementer:implementer – shell_pid=705854 – Assigned agent via action command
