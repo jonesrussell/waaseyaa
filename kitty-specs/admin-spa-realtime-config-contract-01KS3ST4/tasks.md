@@ -11,10 +11,10 @@
 
 | ID | Description | WP | Parallel? |
 |---|---|---|---|
-| T001 | Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts | WP01 | No |
-| T002 | Implement in-flight dedup in `fetch()` — return existing Promise if present | WP01 | No |
-| T003 | Clear `inflightCache` on rejection; clear both caches in `invalidate()` | WP01 | No |
-| T004 | Write unit tests FR-008 (no duplicate POSTs), FR-009 (invalidate clears inflight), FR-010 (rejection doesn't poison) | WP01 | [P] |
+| T001 | Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts | WP01 | No | [D] |
+| T002 | Implement in-flight dedup in `fetch()` — return existing Promise if present | WP01 | No | [D] |
+| T003 | Clear `inflightCache` on rejection; clear both caches in `invalidate()` | WP01 | No | [D] |
+| T004 | Write unit tests FR-008 (no duplicate POSTs), FR-009 (invalidate clears inflight), FR-010 (rejection doesn't poison) | WP01 | [D] |
 | T005 | Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (FR-007) | WP02 | [P] |
 | T006 | Create `AdminConfig` TypeScript interface (no `any`/`unknown` fields, NFR-003) | WP02 | No |
 | T007 | Create `useAdminConfig()` composable with `useState()`-backed referential stability (NFR-002) | WP02 | No |
@@ -44,10 +44,10 @@
 
 #### Included subtasks
 
-- [ ] T001 Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts (WP01)
-- [ ] T002 Implement in-flight dedup in `fetch()` — return existing Promise if present (WP01)
-- [ ] T003 Clear `inflightCache` on rejection; clear both caches in `invalidate()` (WP01)
-- [ ] T004 Write unit tests FR-008, FR-009, FR-010 (WP01)
+- [x] T001 Add `inflightCache: Map<string, Promise<EntitySchema>>` to useSchema.ts (WP01)
+- [x] T002 Implement in-flight dedup in `fetch()` — return existing Promise if present (WP01)
+- [x] T003 Clear `inflightCache` on rejection; clear both caches in `invalidate()` (WP01)
+- [x] T004 Write unit tests FR-008, FR-009, FR-010 (WP01)
 
 #### Implementation sketch
 
