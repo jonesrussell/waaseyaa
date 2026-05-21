@@ -1,13 +1,7 @@
 {
-<<<<<<< HEAD
   "event_count": 30,
   "last_event_id": "01KS422XCK378YF6Q3Z0A3R8HX",
   "materialized_at": "2026-05-21T01:23:32.883638+00:00",
-=======
-  "event_count": 7,
-  "last_event_id": "01KS3YRRNHYK8PYTQPB0CSASBM",
-  "materialized_at": "2026-05-21T00:25:34.641160+00:00",
->>>>>>> kitty/mission-admin-spa-realtime-config-contract-01KS3ST4-lane-a
   "mission_number": "",
   "mission_slug": "agent-executor-v1-1-audit-followups-01KS3S5M",
   "mission_type": "software-dev",
@@ -20,7 +14,6 @@
     "for_review": 0,
     "in_progress": 1,
     "in_review": 0,
-<<<<<<< HEAD
     "planned": 1
   },
   "work_packages": {
@@ -30,17 +23,6 @@
       "lane": "approved",
       "last_event_id": "01KS3ZNQP13ZZG3NQWAESP0Y3H",
       "last_transition_at": "2026-05-21T00:41:23.905034+00:00"
-=======
-    "planned": 4
-  },
-  "work_packages": {
-    "WP01": {
-      "actor": "implement-command",
-      "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KS3YRRNHYK8PYTQPB0CSASBM",
-      "last_transition_at": "2026-05-21T00:25:34.641160+00:00"
->>>>>>> kitty/mission-admin-spa-realtime-config-contract-01KS3ST4-lane-a
     },
     "WP02": {
       "actor": "user",
