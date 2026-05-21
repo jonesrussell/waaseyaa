@@ -13,10 +13,14 @@ requirement_refs:
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
+base_branch: kitty/mission-entrypoint-provider-trait-reachability-01KS3SMJ
+base_commit: e4620a19d4e6acaa7df15a9b9c48af6bdb44cf0b
+created_at: '2026-05-21T00:46:39.695794+00:00'
 subtasks:
 - T006
 - T007
 - T008
+shell_pid: '739599'
 history:
 - date: '2026-05-20T23:57:25Z'
   author: tasks-materializer
