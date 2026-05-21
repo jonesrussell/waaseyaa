@@ -1,7 +1,7 @@
 {
-  "event_count": 11,
-  "last_event_id": "01KS3ZZCWJX957QFRJ12CSS14W",
-  "materialized_at": "2026-05-21T00:46:40.530729+00:00",
+  "event_count": 12,
+  "last_event_id": "01KS407NKX6QF22V8C4BZK6CG6",
+  "materialized_at": "2026-05-21T00:51:11.613385+00:00",
   "mission_number": "",
   "mission_slug": "entrypoint-provider-trait-reachability-01KS3SMJ",
   "mission_type": "software-dev",
@@ -11,8 +11,8 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 2
   },
@@ -25,11 +25,11 @@
       "last_transition_at": "2026-05-21T00:45:37.681690+00:00"
     },
     "WP02": {
-      "actor": "implement-command",
+      "actor": "user",
       "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KS3ZZCWJX957QFRJ12CSS14W",
-      "last_transition_at": "2026-05-21T00:46:40.530729+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KS407NKX6QF22V8C4BZK6CG6",
+      "last_transition_at": "2026-05-21T00:51:11.613385+00:00"
     },
     "WP03": {
       "actor": "finalize-tasks",

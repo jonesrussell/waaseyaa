@@ -337,3 +337,4 @@ The plan assumes (b)/(c) is most likely based on provider code analysis, but **t
 ## Activity Log
 
 - 2026-05-21T00:46:41Z – claude:sonnet:implementer:implementer – shell_pid=739599 – Assigned agent via action command
+- 2026-05-21T00:51:12Z – claude:sonnet:implementer:implementer – shell_pid=739599 – Trait_ AST node branch added; trait_exists guard used (class_exists returns false for traits); private factory bodies copy-inlined; all 3 target traits (RevisionableEntityTrait/InteractsWithApi/RefreshDatabase) now have zero baseline entries; 7 tests pass; dead-code gate passes; baseline 66→13
