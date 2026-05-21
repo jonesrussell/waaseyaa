@@ -1116,6 +1116,50 @@ final class PackageManifestCompilerTest extends TestCase
         $this->assertEmpty($errorMessages, 'No error expected after fixing the provider declaration');
     }
 
+    #[Test]
+    public function discoversScheduleEntries(): void
+    {
+        // Load the fixture class so it is available in the classmap scan
+        // __DIR__ = packages/foundation/tests/Unit/Discovery
+        // dirname(__DIR__, 4) = packages/
+        $fixtureFile = dirname(__DIR__, 4)
+            . '/scheduler/tests/fixtures/TestScheduleEntries.php';
+        require_once $fixtureFile;
+
+        $fixtureClass = 'Waaseyaa\\Scheduler\\Tests\\Fixtures\\TestScheduleEntries';
+
+        // Classmap pointing to the fixture
+        file_put_contents(
+            $this->tempDir . '/vendor/composer/autoload_classmap.php',
+            '<?php return [\'' . $fixtureClass . '\' => \'' . $fixtureFile . '\'];',
+        );
+
+        file_put_contents(
+            $this->tempDir . '/vendor/composer/installed.json',
+            json_encode(['packages' => []], JSON_THROW_ON_ERROR),
+        );
+
+        $compiler = new PackageManifestCompiler($this->tempDir, $this->tempDir . '/storage');
+
+        $start = microtime(true);
+        $manifest = $compiler->compile();
+        $elapsed = (microtime(true) - $start) * 1000;
+
+        // FR-009: fixture FQCN appears in scheduleEntries
+        $this->assertContains(
+            $fixtureClass,
+            $manifest->scheduleEntries,
+            'ScheduleEntriesInterface implementor should be discovered and recorded',
+        );
+
+        // NFR-001: compile should complete well under 50 ms for a minimal fixture scan
+        $this->assertLessThan(50, $elapsed, sprintf('Compile took %.1f ms, expected < 50 ms', $elapsed));
+
+        // round-trip: schedule_entries key survives toArray()/fromArray()
+        $round = PackageManifest::fromArray($manifest->toArray());
+        $this->assertContains($fixtureClass, $round->scheduleEntries);
+    }
+
     private function removeDir(string $dir): void
     {
         if (!is_dir($dir)) {

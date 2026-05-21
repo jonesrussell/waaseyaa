@@ -24,6 +24,14 @@ final class PackageManifestCompiler
     /** @internal String FQN avoids upward layer import (Foundation must not import from CLI/L6). */
     private const CAPABILITY_HAS_NATIVE_COMMANDS = 'Waaseyaa\\Foundation\\ServiceProvider\\Capability\\HasNativeCommandsInterface';
 
+    /**
+     * @internal String FQN avoids a direct import from the scheduler package within Foundation.
+     * Both foundation and scheduler are L0, but importing via string constant keeps the
+     * dependency graph clean — no `use` statement needed in Foundation.
+     * Source: packages/scheduler/src/ScheduleEntriesInterface.php
+     */
+    private const SCHEDULE_ENTRIES_INTERFACE = 'Waaseyaa\\Scheduler\\ScheduleEntriesInterface';
+
     /** @internal Cache file metadata; stripped before {@see PackageManifest::fromArray()} */
     private const MANIFEST_INPUTS_FP_KEY = '_manifest_inputs_fp';
 
@@ -57,6 +65,7 @@ final class PackageManifestCompiler
         $nativeCommandProviders = [];
         $agentTools = [];
         $agentDefinitions = [];
+        $scheduleEntries = [];
         $packages = [];
 
         // Read installed packages manifest
@@ -181,6 +190,12 @@ final class PackageManifestCompiler
             }
         }
 
+        // Discover ScheduleEntriesInterface implementors (interface scan, not attribute scan)
+        foreach ($this->scanScheduleEntryClasses() as $class) {
+            $scheduleEntries[] = $class;
+        }
+        $scheduleEntries = array_values(array_unique($scheduleEntries));
+
         // Sort middleware by priority (descending)
         foreach ($middleware as &$stack) {
             usort($stack, fn(array $a, array $b) => $b['priority'] <=> $a['priority']);
@@ -201,6 +216,7 @@ final class PackageManifestCompiler
             nativeCommandProviders: $nativeCommandProviders,
             agentTools: $agentTools,
             agentDefinitions: $agentDefinitions,
+            scheduleEntries: $scheduleEntries,
         );
     }
 
@@ -635,6 +651,7 @@ final class PackageManifestCompiler
             nativeCommandProviders: $manifest->nativeCommandProviders,
             agentTools: $manifest->agentTools,
             agentDefinitions: $manifest->agentDefinitions,
+            scheduleEntries: $manifest->scheduleEntries,
         );
     }
 
@@ -751,6 +768,14 @@ final class PackageManifestCompiler
                     || $ref->getAttributes(self::AGENT_TOOL_ATTRIBUTE) !== []
                     || $ref->getAttributes(self::AGENT_DEFINITION_ATTRIBUTE) !== [];
 
+                // Also include ScheduleEntriesInterface implementors (interface scan)
+                if (!$hasDiscoveryAttribute) {
+                    $implements = @class_implements($class);
+                    if (is_array($implements) && isset($implements[self::SCHEDULE_ENTRIES_INTERFACE])) {
+                        $hasDiscoveryAttribute = true;
+                    }
+                }
+
                 if ($hasDiscoveryAttribute) {
                     $classes[] = $class;
                 }
@@ -761,6 +786,26 @@ final class PackageManifestCompiler
         }
 
         return $classes;
+    }
+
+    /**
+     * Scan all discovered classes for ScheduleEntriesInterface implementors.
+     *
+     * Uses @class_implements() with the interface FQCN as a string constant to
+     * preserve layer discipline (Foundation must not import from Scheduler via use statement).
+     *
+     * @return list<class-string>
+     */
+    private function scanScheduleEntryClasses(): array
+    {
+        $entries = [];
+        foreach ($this->scanClasses() as $class) {
+            $implements = @class_implements($class);
+            if (is_array($implements) && isset($implements[self::SCHEDULE_ENTRIES_INTERFACE])) {
+                $entries[] = $class;
+            }
+        }
+        return $entries;
     }
 
     /**

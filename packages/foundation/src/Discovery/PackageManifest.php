@@ -63,6 +63,15 @@ final class PackageManifest
          * @var list<array{class: class-string, id: string, label: string, description: string, prompt: string, system: string, tools: list<string>, model: string, max_iterations: int, destructive_default: string|null, requires_capability: string|null}>
          */
         public readonly array $agentDefinitions = [],
+        /**
+         * FQCNs of classes implementing ScheduleEntriesInterface.
+         *
+         * Discovered by PackageManifestCompiler via interface scan (string-constant FQCN,
+         * no direct import from scheduler package). Used by ScheduleEntryRegistry at boot.
+         *
+         * @var list<class-string>
+         */
+        public readonly array $scheduleEntries = [],
     ) {}
 
     /**
@@ -78,7 +87,7 @@ final class PackageManifest
         unset($data['commands'], $data['routes']);
 
         $requiredKeys = ['providers', 'migrations', 'field_types', 'middleware'];
-        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types', 'native_command_providers', 'agent_tools', 'agent_definitions'];
+        $optionalKeys = ['permissions', 'policies', 'formatters', 'package_declarations', 'attribute_entity_types', 'native_command_providers', 'agent_tools', 'agent_definitions', 'schedule_entries'];
         $missing = array_diff($requiredKeys, array_keys($data));
 
         if ($missing !== []) {
@@ -111,6 +120,7 @@ final class PackageManifest
             nativeCommandProviders: $data['native_command_providers'] ?? [],
             agentTools: $data['agent_tools'] ?? [],
             agentDefinitions: $data['agent_definitions'] ?? [],
+            scheduleEntries: $data['schedule_entries'] ?? [],
         );
     }
 
@@ -134,6 +144,7 @@ final class PackageManifest
             'native_command_providers' => $this->nativeCommandProviders,
             'agent_tools' => $this->agentTools,
             'agent_definitions' => $this->agentDefinitions,
+            'schedule_entries' => $this->scheduleEntries,
         ];
     }
 }
