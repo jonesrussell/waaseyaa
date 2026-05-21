@@ -23,10 +23,10 @@
 | T011 | Unit test `registersScheduleEntriesAtBoot` (FR-010) | WP02 | [D] |
 | T012 | Unit test `failsBootOnUnresolvableScheduleEntry` (FR-011) | WP02 | [D] |
 | T013 | Unit test `skipsDisabledScheduleEntries` (SC-004) | WP02 | [D] |
-| T014 | Verify/add `BroadcastStorage::prune(int $retentionDays)` | WP03 | No |
-| T015 | Create `BroadcastStorageScheduleEntries` implementing `ScheduleEntriesInterface` | WP03 | No |
-| T016 | Unit test: prune task registers with correct cron + calls prune() | WP03 | [P] |
-| T017 | Update `docs/specs/broadcasting.md` with scheduled pruning section | WP03 | [P] |
+| T014 | Verify/add `BroadcastStorage::prune(int $retentionDays)` | WP03 | No | [D] |
+| T015 | Create `BroadcastStorageScheduleEntries` implementing `ScheduleEntriesInterface` | WP03 | No | [D] |
+| T016 | Unit test: prune task registers with correct cron + calls prune() | WP03 | [D] |
+| T017 | Update `docs/specs/broadcasting.md` with scheduled pruning section | WP03 | [D] |
 | T018 | Add `implements ScheduleEntriesInterface` to `AgentScheduleEntries` | WP04 | No |
 | T019 | Verify no orphaned manual `register()` wiring in any ServiceProvider | WP04 | [P] |
 | T020 | Integration test `listsBuiltInTasks` (FR-012, SC-001, SC-005) | WP04 | No |
@@ -123,10 +123,10 @@
 
 #### Included subtasks
 
-- [ ] T014 Verify/add `BroadcastStorage::prune(int $retentionDays)` (WP03)
-- [ ] T015 Create `BroadcastStorageScheduleEntries` implementing `ScheduleEntriesInterface` (WP03)
-- [ ] T016 Unit test: prune task registers with correct cron + calls prune() (WP03)
-- [ ] T017 Update `docs/specs/broadcasting.md` with scheduled pruning section (WP03)
+- [x] T014 Verify/add `BroadcastStorage::prune(int $retentionDays)` (WP03)
+- [x] T015 Create `BroadcastStorageScheduleEntries` implementing `ScheduleEntriesInterface` (WP03)
+- [x] T016 Unit test: prune task registers with correct cron + calls prune() (WP03)
+- [x] T017 Update `docs/specs/broadcasting.md` with scheduled pruning section (WP03)
 
 #### Implementation sketch
 
