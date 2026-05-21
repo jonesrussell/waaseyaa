@@ -15,6 +15,8 @@ subtasks:
 - T023
 - T024
 - T025
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "825011"
 history:
 - date: '2026-05-20T23:57:21Z'
   event: created
@@ -290,3 +292,7 @@ Pick the simplest approach that doesn't require adding a new property to `Schedu
 - Confirm `Closes #1512` and `Closes #1536` appear in the merge commit or PR body
 - Check `CLAUDE.md` checklist mentions `@api` requirement (dead-code gate)
 - Verify `composer verify` is explicitly run and passes before filing PR
+
+## Activity Log
+
+- 2026-05-21T01:25:39Z – claude:sonnet:implementer:implementer – shell_pid=825011 – Started implementation via action command
