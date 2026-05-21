@@ -14,6 +14,8 @@ subtasks:
 - T019
 - T020
 - T021
+agent: "claude:sonnet:researcher:implementer"
+shell_pid: "785788"
 history:
 - date: '2026-05-20T23:57:38Z'
   agent: tasks-materializer
@@ -257,3 +259,7 @@ git commit -m "tasks(M-G): WP06 close-out — mcp-endpoint.md updated, #1463 clo
 ## Reviewer Guidance
 
 Reviewer should verify: (1) #1463 is closed with appropriate reason (not-planned vs completed), (2) the close comment quotes decision.md evidence (not generic text), (3) the mcp-endpoint.md section is discoverable and concise, (4) no production code was added to any `packages/` or `src/` path during this WP.
+
+## Activity Log
+
+- 2026-05-21T01:01:40Z – claude:sonnet:researcher:implementer – shell_pid=785788 – Started implementation via action command
