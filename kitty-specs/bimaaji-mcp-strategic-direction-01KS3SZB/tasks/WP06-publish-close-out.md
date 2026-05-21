@@ -265,3 +265,4 @@ Reviewer should verify: (1) #1463 is closed with appropriate reason (not-planned
 - 2026-05-21T01:01:40Z – claude:sonnet:researcher:implementer – shell_pid=785788 – Started implementation via action command
 - 2026-05-21T01:02:38Z – claude:sonnet:researcher:implementer – shell_pid=785788 – Issue #1463 closed as not-planned with decision rationale; positioning documented in docs/specs/mcp-endpoint.md; CHANGELOG updated
 - 2026-05-21T01:06:19Z – claude:opus-4-7:reviewer:reviewer – shell_pid=794014 – Started review via action command
+- 2026-05-21T01:07:06Z – claude:opus-4-7:reviewer:reviewer – shell_pid=794014 – Publish phase approved: #1463 CLOSED/NOT_PLANNED with Option 1 rationale + 3 evidence categories + no-sidecar guard; mcp-endpoint.md positioning section present with all 4 statements; CHANGELOG bullet under Changed; docs-only diff.
