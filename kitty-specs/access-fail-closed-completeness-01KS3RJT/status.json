@@ -1,7 +1,7 @@
 {
-  "event_count": 32,
-  "last_event_id": "01KS3YQYB8585ZX7KKJ9ZPW7WB",
-  "materialized_at": "2026-05-21T00:25:07.688043+00:00",
+  "event_count": 33,
+  "last_event_id": "01KS3ZFEZMM9CJACH2DWVKCGTJ",
+  "materialized_at": "2026-05-21T00:37:58.388262+00:00",
   "mission_number": "",
   "mission_slug": "access-fail-closed-completeness-01KS3RJT",
   "mission_type": "software-dev",
@@ -11,8 +11,8 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 0
   },
@@ -25,11 +25,11 @@
       "last_transition_at": "2026-05-20T23:57:31.573769+00:00"
     },
     "WP02": {
-      "actor": "claude:sonnet:implementer:implementer",
+      "actor": "user",
       "force_count": 2,
-      "lane": "in_progress",
-      "last_event_id": "01KS3YM2YT19XN1VA1PKD0RH5F",
-      "last_transition_at": "2026-05-21T00:23:01.338184+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KS3ZFEZMM9CJACH2DWVKCGTJ",
+      "last_transition_at": "2026-05-21T00:37:58.388262+00:00"
     },
     "WP03": {
       "actor": "user",

@@ -398,3 +398,4 @@ final class AccessPolicyRegistryTest extends TestCase
 - 2026-05-21T00:14:05Z – claude:sonnet:implementer:implementer – shell_pid=677610 – Container-resolved registry; ParentDelegatedAccessPolicy auto-instantiates via two-phase algorithm; boot fails on unresolvable deps; 5/5 tests pass, PHPStan clean
 - 2026-05-21T00:14:56Z – claude:opus-4-7:reviewer:reviewer – shell_pid=696102 – Started review via action command
 - 2026-05-21T00:23:01Z – claude:sonnet:implementer:implementer – shell_pid=702754 – Started implementation via action command
+- 2026-05-21T00:37:59Z – claude:sonnet:implementer:implementer – shell_pid=702754 – Cycle 1: optional resolver param + in-place handler mutation; SurfaceMap fixed; SSR/OIDC failures pre-existing from cycle 0
