@@ -27,7 +27,7 @@
 | T015 | Create `BroadcastStorageScheduleEntries` implementing `ScheduleEntriesInterface` | WP03 | No | [D] |
 | T016 | Unit test: prune task registers with correct cron + calls prune() | WP03 | [D] |
 | T017 | Update `docs/specs/broadcasting.md` with scheduled pruning section | WP03 | [D] |
-| T018 | Add `implements ScheduleEntriesInterface` to `AgentScheduleEntries` | WP04 | No |
+| T018 | Add `implements ScheduleEntriesInterface` to `AgentScheduleEntries` | WP04 | No | [D] |
 | T019 | Verify no orphaned manual `register()` wiring in any ServiceProvider | WP04 | [P] |
 | T020 | Integration test `listsBuiltInTasks` (FR-012, SC-001, SC-005) | WP04 | No |
 | T021 | Integration test `pruneTaskRemovesOldRows` (FR-013, SC-002) | WP04 | [P] |
@@ -156,7 +156,7 @@
 
 #### Included subtasks
 
-- [ ] T018 Add `implements ScheduleEntriesInterface` to `AgentScheduleEntries` (WP04)
+- [x] T018 Add `implements ScheduleEntriesInterface` to `AgentScheduleEntries` (WP04)
 - [ ] T019 Verify no orphaned manual `register()` wiring in any ServiceProvider (WP04)
 - [ ] T020 Integration test `listsBuiltInTasks` (WP04)
 - [ ] T021 Integration test `pruneTaskRemovesOldRows` (WP04)
