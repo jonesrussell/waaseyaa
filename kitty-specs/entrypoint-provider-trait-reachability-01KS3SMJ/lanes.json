@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "mission_slug": "entrypoint-provider-trait-reachability-01KS3SMJ",
+  "mission_id": "01KS3SMJNGNQVY11VTVDCNHJ1E",
+  "mission_branch": "kitty/mission-entrypoint-provider-trait-reachability-01KS3SMJ",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP02",
+        "WP03",
+        "WP04"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "CLAUDE.md",
+        "phpstan-dead-code-baseline.neon",
+        "tools/phpstan/WaaseyaaEntrypointProvider.php",
+        "tools/phpstan/tests/WaaseyaaEntrypointProviderTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP01"
+      ],
+      "write_scope": [
+        "kitty-specs/entrypoint-provider-trait-reachability-01KS3SMJ/research/wp01-diagnosis.md"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-21T00:10:33.515852+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP01"
+  ],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP03"
+      }
+    ],
+    "total_merges": 2,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 2
+    }
+  }
+}
