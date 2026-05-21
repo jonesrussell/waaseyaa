@@ -27,11 +27,11 @@
 | T016 | Create `packages/api/openapi.yaml` bootstrap document | WP02 | [D] |
 | T017 | Create `bin/check-openapi` lint script | WP02 | [D] |
 | T018 | Wire `bin/check-openapi` into `composer verify` | WP02 | N | [D] |
-| T019 | Verify `AgentRunBroadcasterServiceProvider` is the canonical binding | WP03 | N |
-| T020 | Delete `BroadcastStorageAdapter` and its test (if any) | WP03 | N |
-| T021 | Clean `MessagingServiceProvider` — remove adapter reference | WP03 | N |
-| T022 | Update/create `AgentRunBroadcasterTest` (FR-012) | WP03 | N |
-| T023 | Confirm `pending_approval` OpenAPI shape matches broadcaster emission | WP03 | N |
+| T019 | Verify `AgentRunBroadcasterServiceProvider` is the canonical binding | WP03 | N | [D] |
+| T020 | Delete `BroadcastStorageAdapter` and its test (if any) | WP03 | N | [D] |
+| T021 | Clean `MessagingServiceProvider` — remove adapter reference | WP03 | N | [D] |
+| T022 | Update/create `AgentRunBroadcasterTest` (FR-012) | WP03 | N | [D] |
+| T023 | Confirm `pending_approval` OpenAPI shape matches broadcaster emission | WP03 | N | [D] |
 | T024 | Implement real SSE consumer in `AiRunCommand::runAsync` | WP04 | N |
 | T025 | Wire SIGINT / Ctrl-C teardown | WP04 | N |
 | T026 | Write `AiRunCommandWatchTest` (FR-013) | WP04 | N |
@@ -129,11 +129,11 @@ Delete `BroadcastStorageAdapter` (confirmed no external consumers per plan grep)
 
 ### Included subtasks
 
-- [ ] T019 Verify `AgentRunBroadcasterServiceProvider` is the canonical binding (WP03)
-- [ ] T020 Delete `BroadcastStorageAdapter` and its test (if any) (WP03)
-- [ ] T021 Clean `MessagingServiceProvider` — remove adapter reference (WP03)
-- [ ] T022 Update/create `AgentRunBroadcasterTest` (FR-012) (WP03)
-- [ ] T023 Confirm `pending_approval` OpenAPI shape matches broadcaster emission (WP03)
+- [x] T019 Verify `AgentRunBroadcasterServiceProvider` is the canonical binding (WP03)
+- [x] T020 Delete `BroadcastStorageAdapter` and its test (if any) (WP03)
+- [x] T021 Clean `MessagingServiceProvider` — remove adapter reference (WP03)
+- [x] T022 Update/create `AgentRunBroadcasterTest` (FR-012) (WP03)
+- [x] T023 Confirm `pending_approval` OpenAPI shape matches broadcaster emission (WP03)
 
 **Parallel opportunities**: T022 can be written after T019/T020 but is independent of T021/T023.
 
