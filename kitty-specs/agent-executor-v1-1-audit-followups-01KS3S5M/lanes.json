@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "mission_slug": "agent-executor-v1-1-audit-followups-01KS3S5M",
+  "mission_id": "01KS3S5MNY4ZVG122ME4R5H7D1",
+  "mission_branch": "kitty/mission-agent-executor-v1-1-audit-followups-01KS3S5M",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP01",
+        "WP02",
+        "WP03",
+        "WP04",
+        "WP05"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "bin/check-openapi",
+        "composer.json",
+        "docs/specs/agent-executor.md",
+        "packages/ai-agent/src/AgentExecutor.php",
+        "packages/ai-agent/src/Broadcast/AgentRunBroadcaster.php",
+        "packages/ai-agent/src/Broadcast/AgentRunBroadcasterServiceProvider.php",
+        "packages/ai-agent/src/Broadcast/BroadcastStorageAdapter.php",
+        "packages/ai-agent/src/Message/RunAgentHandler.php",
+        "packages/ai-agent/src/MessagingServiceProvider.php",
+        "packages/ai-agent/src/Provider/AnthropicProvider.php",
+        "packages/ai-agent/src/Provider/ClientErrorException.php",
+        "packages/ai-agent/src/Provider/OpenAiCompatibleProvider.php",
+        "packages/ai-agent/src/Provider/ProviderException.php",
+        "packages/ai-agent/src/Provider/RateLimitException.php",
+        "packages/ai-agent/src/Provider/TransportException.php",
+        "packages/ai-agent/tests/Unit/AgentExecutorEventDispatchTest.php",
+        "packages/ai-agent/tests/Unit/Broadcast/AgentRunBroadcasterTest.php",
+        "packages/ai-agent/tests/Unit/Provider/AgentExecutorRetryTest.php",
+        "packages/api/openapi.yaml",
+        "packages/cli/composer.json",
+        "packages/cli/src/Command/Ai/AiRunCommand.php",
+        "packages/cli/tests/Unit/Command/Ai/AiRunCommandWatchTest.php",
+        "tests/Integration/AgentRun/AgentRunObservabilityTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "dashboard",
+        "legacy-cleanup",
+        "tests",
+        "tracker-integration"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-21T00:15:58.322491+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP01"
+      },
+      {
+        "wp_a": "WP03",
+        "wp_b": "WP02",
+        "rule": "dependency",
+        "evidence": "WP03 depends on WP02"
+      },
+      {
+        "wp_a": "WP04",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP04 depends on WP01"
+      },
+      {
+        "wp_a": "WP05",
+        "wp_b": "WP01",
+        "rule": "dependency",
+        "evidence": "WP05 depends on WP01"
+      }
+    ],
+    "total_merges": 4,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 4
+    }
+  }
+}
