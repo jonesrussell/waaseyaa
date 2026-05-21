@@ -20,10 +20,10 @@
 | T007 | Create `useAdminConfig()` composable with `useState()`-backed referential stability (NFR-002) | WP02 | No | [D] |
 | T008 | Write unit tests for coercion helpers and composable (FR-011) | WP02 | [D] |
 | T009 | Add "Runtime config" section to `packages/admin/README.md` (FR-013) | WP02 | [D] |
-| T010 | Migrate `app/plugins/admin.ts`, `app/middleware/auth.global.ts`, `app/composables/useApi.ts` | WP03 | No |
-| T011 | Migrate all `app/components/**` files (AdminShell.vue, BrandPanel.vue, SchemaList.vue — remove String coerce) | WP03 | [P] |
-| T012 | Migrate all `app/pages/**` files (14 page files) | WP03 | [P] |
-| T013 | Verify no residual `useRuntimeConfig`/`config.public` references remain in `packages/admin/app/**` | WP03 | No |
+| T010 | Migrate `app/plugins/admin.ts`, `app/middleware/auth.global.ts`, `app/composables/useApi.ts` | WP03 | No | [D] |
+| T011 | Migrate all `app/components/**` files (AdminShell.vue, BrandPanel.vue, SchemaList.vue — remove String coerce) | WP03 | [D] |
+| T012 | Migrate all `app/pages/**` files (14 page files) | WP03 | [D] |
+| T013 | Verify no residual `useRuntimeConfig`/`config.public` references remain in `packages/admin/app/**` | WP03 | No | [D] |
 | T014 | Create `bin/check-admin-coercion-patterns` CI gate shell script (NFR-004) | WP04 | No |
 | T015 | Create `packages/admin/e2e/schema-dedup.spec.ts` Playwright network-capture spec (FR-012) | WP04 | [P] |
 | T016 | Add `CHANGELOG.md` `[Unreleased]` entries for #1537 and #1538 | WP04 | [P] |
@@ -113,10 +113,10 @@
 
 #### Included subtasks
 
-- [ ] T010 Migrate plugins, middleware, and composable files (WP03)
-- [ ] T011 Migrate component files (AdminShell.vue, BrandPanel.vue, SchemaList.vue) (WP03)
-- [ ] T012 Migrate all page files (WP03)
-- [ ] T013 Verify zero residual references (WP03)
+- [x] T010 Migrate plugins, middleware, and composable files (WP03)
+- [x] T011 Migrate component files (AdminShell.vue, BrandPanel.vue, SchemaList.vue) (WP03)
+- [x] T012 Migrate all page files (WP03)
+- [x] T013 Verify zero residual references (WP03)
 
 #### Implementation sketch
 
