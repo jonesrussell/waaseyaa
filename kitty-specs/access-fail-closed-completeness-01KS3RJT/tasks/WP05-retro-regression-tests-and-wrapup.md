@@ -18,6 +18,8 @@ subtasks:
 - T024
 - T025
 - T026
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "699277"
 history:
 - date: '2026-05-20T23:30:18Z'
   agent: claude:sonnet:tasks:tasks
@@ -434,3 +436,7 @@ The M-B mission added \`bin/check-getquery-bindings\` and committed an initial b
 3. Confirm the M-B.1 GitHub issue exists and is linked from the PR.
 4. Confirm `CHANGELOG.md` has entries for all five WPs under `[Unreleased]`.
 5. Confirm `docs/specs/access-control.md` drift-detector stamp is updated.
+
+## Activity Log
+
+- 2026-05-21T00:18:31Z – claude:sonnet:implementer:implementer – shell_pid=699277 – Started implementation via action command
