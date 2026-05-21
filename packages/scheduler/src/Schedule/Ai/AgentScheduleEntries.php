@@ -6,6 +6,7 @@ namespace Waaseyaa\Scheduler\Schedule\Ai;
 
 use Waaseyaa\Scheduler\Schedule;
 use Waaseyaa\Scheduler\ScheduledTask;
+use Waaseyaa\Scheduler\ScheduleEntriesInterface;
 use Waaseyaa\Scheduler\ScheduleInterface;
 
 /**
@@ -37,7 +38,7 @@ use Waaseyaa\Scheduler\ScheduleInterface;
  *
  * @api
  */
-final class AgentScheduleEntries
+final class AgentScheduleEntries implements ScheduleEntriesInterface
 {
     public const TASK_PURGE = 'ai:purge-runs';
     public const TASK_REAP = 'ai:reap-stalled-runs';
