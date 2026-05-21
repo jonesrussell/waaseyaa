@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "mission_slug": "m006-translation-hardening-01KS3RY9",
+  "mission_id": "01KS3RY9TFJNQYWQX820552BP7",
+  "mission_branch": "kitty/mission-m006-translation-hardening-01KS3RY9",
+  "target_branch": "main",
+  "lanes": [
+    {
+      "lane_id": "lane-a",
+      "wp_ids": [
+        "WP03",
+        "WP01",
+        "WP02"
+      ],
+      "write_scope": [
+        "packages/api/src/Controller/TranslationController.php",
+        "packages/api/tests/Unit/TranslationControllerTest.php",
+        "packages/cli/src/Handler/AddTranslationsMigrationGenerator.php",
+        "packages/cli/tests/Unit/AddTranslationsMigrationGeneratorTest.php",
+        "packages/entity/src/LangcodeValidator.php",
+        "packages/entity/src/TranslatableInterface.php",
+        "packages/entity/tests/Unit/LangcodeValidatorTest.php",
+        "packages/entity/tests/Unit/TranslatableInterfaceContractTest.php",
+        "tests/Integration/Phase29/TranslationAccessControlTest.php"
+      ],
+      "predicted_surfaces": [
+        "api",
+        "artifact-rendering",
+        "legacy-cleanup",
+        "tests",
+        "workspace"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    },
+    {
+      "lane_id": "lane-planning",
+      "wp_ids": [
+        "WP04"
+      ],
+      "write_scope": [
+        "CHANGELOG.md",
+        "docs/specs/entity-storage-two-axis.md"
+      ],
+      "predicted_surfaces": [
+        "planning"
+      ],
+      "depends_on_lanes": [],
+      "parallel_group": 0
+    }
+  ],
+  "computed_at": "2026-05-21T00:11:51.254016+00:00",
+  "computed_from": "dependency_graph+ownership",
+  "planning_artifact_wps": [
+    "WP04"
+  ],
+  "collapse_report": {
+    "events": [
+      {
+        "wp_a": "WP01",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP01 depends on WP03"
+      },
+      {
+        "wp_a": "WP02",
+        "wp_b": "WP03",
+        "rule": "dependency",
+        "evidence": "WP02 depends on WP03"
+      }
+    ],
+    "total_merges": 2,
+    "independent_wps_collapsed": 0,
+    "by_rule": {
+      "dependency": 2
+    }
+  }
+}

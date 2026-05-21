@@ -1,7 +1,8 @@
 ---
 work_package_id: WP02
 title: CLI regex validation + escaping audit
-dependencies: []
+dependencies:
+- WP03
 requirement_refs:
 - C-004
 - FR-005
@@ -11,7 +12,7 @@ requirement_refs:
 - NFR-002
 planning_base_branch: main
 merge_target_branch: main
-branch_strategy: main → main (no worktree; lane allocated by finalize-tasks lanes.json)
+branch_strategy: Planning artifacts for this feature were generated on main. During /spec-kitty.implement this WP may branch from a dependency-specific base, but completed changes must merge back into main unless the human explicitly redirects the landing branch.
 subtasks:
 - T003
 - T004
