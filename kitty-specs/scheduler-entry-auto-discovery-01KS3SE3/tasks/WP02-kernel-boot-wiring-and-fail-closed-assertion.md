@@ -23,6 +23,8 @@ subtasks:
 - T011
 - T012
 - T013
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "754274"
 history:
 - date: '2026-05-20T23:57:21Z'
   event: created
@@ -405,3 +407,7 @@ Note: Testing `AbstractKernel` directly may require a concrete test-double subcl
 - Confirm exception message format matches NFR-004 (FQCN + dep type + doc link)
 - Check that disabled entries are truly skipped (not just not registered) — no instantiation should occur
 - Verify M-B resolver adoption is consistent: either the interface is `PolicyDependencyResolverInterface` or the parallel `ScheduleEntryDependencyResolverInterface` — not both
+
+## Activity Log
+
+- 2026-05-21T00:50:03Z – claude:sonnet:implementer:implementer – shell_pid=754274 – Started implementation via action command
