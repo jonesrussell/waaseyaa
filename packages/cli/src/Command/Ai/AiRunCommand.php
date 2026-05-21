@@ -10,6 +10,8 @@ use Waaseyaa\AI\Agent\Enum\HitlMode;
 use Waaseyaa\AI\Agent\Service\AgentRunDraft;
 use Waaseyaa\AI\Agent\Service\AgentRunService;
 use Waaseyaa\CLI\CliIO;
+use Waaseyaa\HttpClient\HttpRequestException;
+use Waaseyaa\HttpClient\SseLineStreamInterface;
 
 /**
  * `bin/waaseyaa ai:run <prompt> [...]` — the operator's primary entry to
@@ -37,12 +39,17 @@ final class AiRunCommand
     public const HITL_ALL = 'all';
     public const HITL_INTERACTIVE = 'interactive';
 
+    /** Set to true by the SIGINT handler to abort the SSE consumer loop. */
+    private bool $interrupted = false;
+
     public function __construct(
         private readonly AgentRunService $runService,
         private readonly AgentDefinitionRegistry $definitionRegistry,
         /** @var array<string, mixed> */
         private readonly array $aiConfig = [],
         private readonly int|string $serviceAccountId = 0,
+        private readonly ?SseLineStreamInterface $sseClient = null,
+        private readonly string $baseUrl = '',
     ) {}
 
     public function execute(CliIO $io): int
@@ -155,13 +162,96 @@ final class AiRunCommand
         $io->writeln(\sprintf('status: %s', (string) $run->get('status')));
 
         if ($watch) {
-            $io->writeln(\sprintf(
-                'watch: SSE consumer would attach to /broadcast?channels=agent.run.%s (--watch is informational here).',
+            $url = \sprintf(
+                '%s/broadcast?channels=agent.run.%s',
+                rtrim($this->resolveBaseUrl(), '/'),
                 $runId,
-            ));
+            );
+            $io->writeln(\sprintf('<info>Watching agent run %s…</info>', $runId));
+            $this->registerSigintHandler();
+            return $this->consumeSseStream($url, $io);
         }
 
         return 0;
+    }
+
+    /**
+     * Consume an SSE stream line-by-line, printing each event to stdout.
+     * Exits cleanly when the `terminated` event arrives or the stream closes.
+     */
+    private function consumeSseStream(string $url, CliIO $io): int
+    {
+        $client = $this->sseClient;
+        if ($client === null) {
+            $io->error('watch: no SSE client configured (missing waaseyaa/http-client dependency).');
+            return 1;
+        }
+
+        try {
+            $eventName = '';
+            foreach ($client->lines($url) as $line) {
+                // Dispatch any pending signals (SIGINT) on each line.
+                if (\function_exists('pcntl_signal_dispatch')) {
+                    \pcntl_signal_dispatch();
+                }
+                if ($this->interrupted) {
+                    $io->writeln('<comment>Interrupted — agent run continues server-side.</comment>');
+                    if ($client instanceof \Waaseyaa\HttpClient\PhpStreamSseClient) {
+                        $client->close();
+                    }
+                    return 0;
+                }
+
+                if (\str_starts_with($line, 'event:')) {
+                    $eventName = trim(\substr($line, 6));
+                } elseif (\str_starts_with($line, 'data:')) {
+                    $data = trim(\substr($line, 5));
+                    $io->writeln(\sprintf('[%s] %s', $eventName !== '' ? $eventName : 'message', $data));
+                } elseif ($line === '') {
+                    // End of SSE message block; reset pending event name.
+                    if ($this->isTerminatedEvent($eventName)) {
+                        break;
+                    }
+                    $eventName = '';
+                }
+            }
+        } catch (HttpRequestException $e) {
+            $io->error(\sprintf('watch: SSE connection failed — %s', $e->getMessage()));
+            return 1;
+        }
+
+        return 0;
+    }
+
+    private function isTerminatedEvent(string $eventName): bool
+    {
+        return \in_array($eventName, ['agent.run.terminated', 'terminated'], true);
+    }
+
+    private function registerSigintHandler(): void
+    {
+        if (!\function_exists('pcntl_signal')) {
+            return; // Graceful degradation if pcntl extension is unavailable.
+        }
+        \pcntl_signal(\SIGINT, function (): void {
+            $this->interrupted = true;
+        });
+    }
+
+    private function resolveBaseUrl(): string
+    {
+        if ($this->baseUrl !== '') {
+            return $this->baseUrl;
+        }
+        $envVal = $_ENV['WAASEYAA_BASE_URL'] ?? null;
+        if (\is_string($envVal) && $envVal !== '') {
+            return $envVal;
+        }
+        $getenvVal = getenv('WAASEYAA_BASE_URL');
+        if (\is_string($getenvVal) && $getenvVal !== '') {
+            return $getenvVal;
+        }
+        return 'http://localhost:8000';
     }
 
     private function printRunSummary(CliIO $io, AgentRun $run): void
