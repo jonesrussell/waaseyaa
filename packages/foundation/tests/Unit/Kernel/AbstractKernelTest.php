@@ -8,8 +8,12 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Waaseyaa\Foundation\Kernel\AbstractKernel;
+use Waaseyaa\Foundation\Kernel\Bootstrap\ScheduleEntryRegistry;
+use Waaseyaa\Scheduler\ScheduleEntriesInterface;
+use Waaseyaa\Scheduler\ScheduleInterface;
 
 #[CoversClass(AbstractKernel::class)]
+#[CoversClass(ScheduleEntryRegistry::class)]
 final class AbstractKernelTest extends TestCase
 {
     private string $projectRoot;
@@ -110,5 +114,224 @@ final class AbstractKernelTest extends TestCase
         $cachePath = $this->projectRoot . '/storage/framework/packages.php';
         $this->assertFileExists($cachePath);
         $this->assertIsArray(require $cachePath);
+    }
+
+    // T011 — FR-010: kernel registers ScheduleEntriesInterface implementors at boot
+    #[Test]
+    public function registers_schedule_entries_at_boot(): void
+    {
+        $registerCallCount = 0;
+        $entryClass        = $this->createSpyScheduleEntries(static function () use (&$registerCallCount): void {
+            $registerCallCount++;
+        });
+
+        $kernel = new class($this->projectRoot, null, $entryClass) extends AbstractKernel {
+            public function __construct(
+                string $projectRoot,
+                mixed $logger,
+                public readonly string $entryClass,
+            ) {
+                parent::__construct($projectRoot, $logger);
+            }
+
+            public function publicBoot(): void
+            {
+                $this->boot();
+            }
+
+            protected function compileManifest(): void
+            {
+                $this->manifest = new \Waaseyaa\Foundation\Discovery\PackageManifest(
+                    scheduleEntries: [$this->entryClass],
+                );
+            }
+        };
+
+        $kernel->publicBoot();
+
+        $this->assertSame(1, $registerCallCount, 'register() must be called once per manifest schedule entry');
+    }
+
+    // T012 — FR-011: kernel boot fails closed when schedule entry has unresolvable dependency
+    #[Test]
+    public function fails_boot_on_unresolvable_schedule_entry(): void
+    {
+        $entryClass = $this->createEntryWithUnresolvableDep();
+
+        $kernel = new class($this->projectRoot, null, $entryClass) extends AbstractKernel {
+            public function __construct(
+                string $projectRoot,
+                mixed $logger,
+                public readonly string $entryClass,
+            ) {
+                parent::__construct($projectRoot, $logger);
+            }
+
+            public function publicBoot(): void
+            {
+                $this->boot();
+            }
+
+            protected function compileManifest(): void
+            {
+                $this->manifest = new \Waaseyaa\Foundation\Discovery\PackageManifest(
+                    scheduleEntries: [$this->entryClass],
+                );
+            }
+        };
+
+        $this->expectException(\Waaseyaa\Foundation\Kernel\Bootstrap\Exception\ScheduleEntryInstantiationException::class);
+        $this->expectExceptionMessageMatches('/' . preg_quote($entryClass, '/') . '/');
+
+        $kernel->publicBoot();
+    }
+
+    // T013 — SC-004: kernel skips disabled_entries at boot
+    #[Test]
+    public function skips_disabled_schedule_entries(): void
+    {
+        $enabledCount  = 0;
+        $disabledCount = 0;
+
+        $enabledClass  = $this->createSpyScheduleEntries(static function () use (&$enabledCount): void {
+            $enabledCount++;
+        });
+        $disabledClass = $this->createSpyScheduleEntries(static function () use (&$disabledCount): void {
+            $disabledCount++;
+        });
+
+        $kernel = new class($this->projectRoot, null, $enabledClass, $disabledClass) extends AbstractKernel {
+            public function __construct(
+                string $projectRoot,
+                mixed $logger,
+                public readonly string $enabledClass,
+                public readonly string $disabledClass,
+            ) {
+                parent::__construct($projectRoot, $logger);
+            }
+
+            public function publicBoot(): void
+            {
+                $this->boot();
+            }
+
+            protected function compileManifest(): void
+            {
+                $this->manifest = new \Waaseyaa\Foundation\Discovery\PackageManifest(
+                    scheduleEntries: [$this->enabledClass, $this->disabledClass],
+                );
+            }
+
+            protected function boot(): void
+            {
+                // Inject the disabled entry into config before booting.
+                parent::boot();
+            }
+
+            /** @return array<string, mixed> */
+            public function getConfig(): array
+            {
+                return array_merge(parent::getConfig(), [
+                    'schedule' => ['disabled_entries' => [$this->disabledClass]],
+                ]);
+            }
+        };
+
+        // Override config before boot: patch config after compileManifest but before bootScheduleEntries.
+        // Since config is read from the project root, inject the disabled_entries via
+        // a subclass override of bootScheduleEntries().
+        $kernelFinal = new class($this->projectRoot, null, $enabledClass, $disabledClass) extends AbstractKernel {
+            public function __construct(
+                string $projectRoot,
+                mixed $logger,
+                public readonly string $enabledClass,
+                public readonly string $disabledClass,
+            ) {
+                parent::__construct($projectRoot, $logger);
+            }
+
+            public function publicBoot(): void
+            {
+                $this->boot();
+            }
+
+            protected function compileManifest(): void
+            {
+                $this->manifest = new \Waaseyaa\Foundation\Discovery\PackageManifest(
+                    scheduleEntries: [$this->enabledClass, $this->disabledClass],
+                );
+            }
+
+            protected function bootScheduleEntries(): void
+            {
+                // Inject disabled_entries into config for this step only.
+                $saved = $this->config;
+                $this->config = array_merge($this->config, [
+                    'schedule' => ['disabled_entries' => [$this->disabledClass]],
+                ]);
+                parent::bootScheduleEntries();
+                $this->config = $saved;
+            }
+        };
+
+        $kernelFinal->publicBoot();
+
+        $this->assertSame(1, $enabledCount, 'Enabled entry register() must be called');
+        $this->assertSame(0, $disabledCount, 'Disabled entry register() must NOT be called');
+    }
+
+    /**
+     * Creates a ScheduleEntriesInterface class whose register() calls the spy.
+     *
+     * @return class-string
+     */
+    private function createSpyScheduleEntries(\Closure $spy): string
+    {
+        $className = 'KernelTestSpyScheduleEntries_' . uniqid();
+        $spyKey    = 'spy_' . $className;
+        $GLOBALS[$spyKey] = $spy;
+
+        eval(sprintf(
+            'final class %s implements %s {
+                public function register(%s $schedule): array {
+                    ($GLOBALS["%s"])();
+                    return [];
+                }
+            }',
+            $className,
+            ScheduleEntriesInterface::class,
+            ScheduleInterface::class,
+            $spyKey,
+        ));
+
+        /** @var class-string */
+        return $className;
+    }
+
+    /**
+     * Creates a ScheduleEntriesInterface class with a constructor dep that cannot be resolved.
+     *
+     * @return class-string
+     */
+    private function createEntryWithUnresolvableDep(): string
+    {
+        // Use a unique interface name as the unresolvable dep type.
+        $depInterfaceName = 'UnresolvableDepInterface_' . uniqid();
+        $className        = 'UnresolvableDepScheduleEntries_' . uniqid();
+
+        eval(sprintf('interface %s {}', $depInterfaceName));
+        eval(sprintf(
+            'final class %s implements %s {
+                public function __construct(private readonly %s $dep) {}
+                public function register(%s $schedule): array { return []; }
+            }',
+            $className,
+            ScheduleEntriesInterface::class,
+            $depInterfaceName,
+            ScheduleInterface::class,
+        ));
+
+        /** @var class-string */
+        return $className;
     }
 }
