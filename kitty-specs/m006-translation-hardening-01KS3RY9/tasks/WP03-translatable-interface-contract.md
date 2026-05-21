@@ -7,6 +7,7 @@ requirement_refs:
 - FR-008
 - FR-009
 - FR-012
+- FR-015
 planning_base_branch: main
 merge_target_branch: main
 branch_strategy: main → main (no worktree; lane allocated by finalize-tasks lanes.json)
