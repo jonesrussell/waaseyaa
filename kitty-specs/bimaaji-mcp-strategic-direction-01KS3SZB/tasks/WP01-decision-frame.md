@@ -197,3 +197,4 @@ Reviewer should verify: (1) options match the spec exactly unless a 4th was expl
 ## Activity Log
 
 - 2026-05-21T00:26:37Z – claude:sonnet:researcher:implementer – shell_pid=707975 – Started implementation via action command
+- 2026-05-21T00:27:29Z – claude:sonnet:researcher:implementer – shell_pid=707975 – decision-frame.md committed; 3 options confirmed exhaustive; 5 criteria defined with weights
