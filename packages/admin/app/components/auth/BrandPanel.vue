@@ -4,8 +4,8 @@ const props = defineProps<{
   logoUrl?: string
 }>()
 
-const config = useRuntimeConfig()
-const appName = computed(() => config.public.appName ?? 'Waaseyaa')
+const { appName: configAppName } = useAdminConfig()
+const appName = computed(() => configAppName)
 </script>
 
 <template>

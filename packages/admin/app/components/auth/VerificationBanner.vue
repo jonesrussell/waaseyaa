@@ -19,7 +19,7 @@ const visible = computed(
 )
 
 onMounted(() => {
-  if (storageKey.value && localStorage.getItem(storageKey.value) === '1') {
+  if (storageKey.value && localStorage.getItem(storageKey.value) === '1') { // allow-coercion: localStorage dismissed flag, not a runtime-config value
     dismissed.value = true
   }
 })

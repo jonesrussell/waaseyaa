@@ -115,3 +115,92 @@ describe('useSchema fetch and caching', () => {
     expect(error.value).toBe(ADMIN_RUNTIME_UNAVAILABLE_MESSAGE)
   })
 })
+
+describe('useSchema() in-flight deduplication', () => {
+  // These tests mock requireAdminRuntime to control Promise resolution timing precisely.
+
+  it('doesNotDuplicateConcurrentFetches: two concurrent fetch() calls issue exactly one HTTP request', async () => {
+    let resolveSchema!: (s: object) => void
+    const mockSchemaFn = vi.fn().mockImplementation(
+      () => new Promise((resolve) => { resolveSchema = resolve }),
+    )
+    vi.doMock('~/composables/useAdminRuntime', () => ({
+      ADMIN_RUNTIME_UNAVAILABLE_MESSAGE,
+      requireAdminRuntime: () => ({ transport: { schema: mockSchemaFn } }),
+    }))
+
+    const { useSchema } = await import('~/composables/useSchema')
+    const composable = useSchema('dedup_node')
+
+    const p1 = composable.fetch()
+    const p2 = composable.fetch()
+
+    resolveSchema(userSchema)
+    await Promise.all([p1, p2])
+
+    // FR-008: exactly one HTTP request despite two concurrent callers
+    expect(mockSchemaFn).toHaveBeenCalledTimes(1)
+  })
+
+  it('clearsInflightOnInvalidate: invalidate() during in-flight causes next fetch() to issue a new request', async () => {
+    let callCount = 0
+    let resolveFirst!: (s: object) => void
+    const mockSchemaFn = vi.fn().mockImplementation(
+      () => new Promise((resolve) => {
+        callCount++
+        resolveFirst = resolve
+      }),
+    )
+    vi.doMock('~/composables/useAdminRuntime', () => ({
+      ADMIN_RUNTIME_UNAVAILABLE_MESSAGE,
+      requireAdminRuntime: () => ({ transport: { schema: mockSchemaFn } }),
+    }))
+
+    const { useSchema } = await import('~/composables/useSchema')
+    const composable = useSchema('invalidate_node')
+
+    const _p1 = composable.fetch() // first request in-flight
+    composable.invalidate() // FR-003: clear mid-flight
+    const _p2 = composable.fetch() // FR-009: should issue second request
+
+    // Two requests: one before invalidate, one after
+    expect(callCount).toBe(2)
+
+    // Resolve to avoid unhandled promise rejections
+    resolveFirst(userSchema)
+  })
+
+  it('doesNotPoisonOnRejection: a rejected fetch() does not prevent a subsequent fresh request', async () => {
+    let rejectFirst!: (err: Error) => void
+    let resolveSecond!: (s: object) => void
+    let callCount = 0
+    const mockSchemaFn = vi.fn().mockImplementation(
+      () => new Promise((resolve, reject) => {
+        callCount++
+        if (callCount === 1) { rejectFirst = reject }
+        else { resolveSecond = resolve }
+      }),
+    )
+    vi.doMock('~/composables/useAdminRuntime', () => ({
+      ADMIN_RUNTIME_UNAVAILABLE_MESSAGE,
+      requireAdminRuntime: () => ({ transport: { schema: mockSchemaFn } }),
+    }))
+
+    const { useSchema } = await import('~/composables/useSchema')
+    const composable = useSchema('rejection_node')
+
+    const p1 = composable.fetch()
+    rejectFirst(new Error('network error'))
+    // Composable catches error internally — p1 resolves (void), error.value is set
+    await p1
+
+    // FR-002: inflightCache cleared on rejection — next fetch issues a fresh request
+    const p2 = composable.fetch()
+    resolveSecond(userSchema)
+    await p2
+
+    // FR-010: two requests (first failed, second succeeded)
+    expect(callCount).toBe(2)
+    expect(composable.error.value).toBeNull()
+  })
+})

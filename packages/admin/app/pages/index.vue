@@ -6,9 +6,9 @@ import { TransportError } from '~/contracts/transport'
 import OnboardingPrompt from '~/components/onboarding/OnboardingPrompt.vue'
 
 const { t, entityLabel } = useLanguage()
-const config = useRuntimeConfig()
+const { appName, docsUrl } = useAdminConfig()
 const { catalog } = useAdmin()
-useHead({ title: computed(() => `${t('dashboard')} | ${config.public.appName}`) })
+useHead({ title: computed(() => `${t('dashboard')} | ${appName}`) })
 
 const onboardingReady = ref(false)
 const showOnboarding = ref(false)
@@ -73,7 +73,7 @@ onMounted(async () => {
 
     <OnboardingPrompt
       v-if="onboardingReady && showOnboarding"
-      :docs-url="config.public.docsUrl"
+      :docs-url="docsUrl"
       :note-path="onboardingNotePath"
       :custom-type-path="onboardingCustomTypePath"
     />

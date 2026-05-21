@@ -9,7 +9,7 @@ const entityType = computed(() => route.params.entityType as string)
 const { schema, fetch: fetchSchema } = useSchema(entityType.value)
 onMounted(() => fetchSchema())
 const entityLabel = computed(() => translateEntityLabel(entityType.value, schema.value?.title ?? entityType.value))
-const config = useRuntimeConfig()
+const { appName } = useAdminConfig()
 const entityId = computed(() => route.params.id as string)
 
 const mode = ref<'view' | 'edit'>('view')
@@ -18,7 +18,7 @@ const errorMessage = ref('')
 
 useHead({ title: computed(() => {
   const titleKey = mode.value === 'edit' ? 'edit_entity' : 'view_entity'
-  return `${t(titleKey, { type: entityLabel.value })} | ${config.public.appName}`
+  return `${t(titleKey, { type: entityLabel.value })} | ${appName}`
 }) })
 
 function onSaved() {

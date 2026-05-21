@@ -4,10 +4,9 @@ definePageMeta({ layout: false })
 const config = useRuntimeConfig()
 const route = useRoute()
 const { login } = useAuth()
+const { logoUrl, auth } = useAdminConfig()
 
-const logoUrl = config.public.logoUrl as string | undefined
-const authConfig = config.public.auth as Record<string, unknown> | undefined
-const registrationMode = authConfig?.registration ?? 'admin'
+const registrationMode = auth.registration ?? 'admin'
 const showRegister = registrationMode === 'open' || registrationMode === 'invite'
 
 // Validate returnTo is a local path to prevent open redirect attacks
@@ -23,7 +22,7 @@ onMounted(() => {
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue('--waaseyaa-auth-hide-brand-panel')
     .trim()
-  if (value === '1') {
+  if (value === '1') { // allow-coercion: CSS custom property --waaseyaa-auth-hide-brand-panel, not a runtime-config value
     hidePanel.value = true
   }
 })

@@ -26,8 +26,13 @@ subtasks:
 - T006
 - T007
 - T008
+<<<<<<< HEAD
 shell_pid: "720208"
 agent: "claude:opus-4-7:reviewer:reviewer"
+=======
+shell_pid: "705035"
+agent: "claude:sonnet:implementer:implementer"
+>>>>>>> kitty/mission-admin-spa-realtime-config-contract-01KS3ST4-lane-a
 history:
 - date: '2026-05-20T23:57:13Z'
   event: created
@@ -358,6 +363,9 @@ Layer note: all new exception classes live in `packages/ai-agent/src/Provider/` 
 ## Activity Log
 
 - 2026-05-21T00:25:35Z – claude:sonnet:implementer:implementer – shell_pid=705035 – Assigned agent via action command
+<<<<<<< HEAD
 - 2026-05-21T00:38:56Z – claude:sonnet:implementer:implementer – shell_pid=705035 – TransportException/ClientErrorException/RateLimitException hierarchy; AnthropicProvider and OpenAiCompatibleProvider categorize by HTTP status; AgentExecutor retry budget unchanged; 4/4 AgentExecutorRetryTest green; cs-check + phpstan clean
 - 2026-05-21T00:39:42Z – claude:opus-4-7:reviewer:reviewer – shell_pid=720208 – Started review via action command
 - 2026-05-21T00:41:24Z – claude:opus-4-7:reviewer:reviewer – shell_pid=720208 – Review passed: typed provider exception hierarchy (ProviderException abstract @api, RateLimit/Transport/ClientError siblings) correctly classifies 429/5xx/4xx/cURL across AnthropicProvider both code paths + OpenAiCompatibleProvider (new 429 path is robust, HTTP-code-based not string-match). AgentExecutor catch order RateLimit->Transport->ClientError->Throwable is sound; ClientError and Throwable re-throw without consuming retry budget. FR-025 constants (3 retries, 1s base, 30s cap) unchanged. 4/4 retry tests pass; RateLimit/Transport tests assert exact invocation count (==2). 95/95 ai-agent tests, cs-check, phpstan all clean. Minor follow-ups (not blocking): curl_init===false fallback still throws bare RuntimeException in both providers; ClientError/generic tests can't assert post-exception invocation count (acknowledged in code).
+=======
+>>>>>>> kitty/mission-admin-spa-realtime-config-contract-01KS3ST4-lane-a

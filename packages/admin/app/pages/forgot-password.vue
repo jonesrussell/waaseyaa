@@ -1,10 +1,8 @@
 <script setup lang="ts">
 definePageMeta({ layout: false })
 
-const config = useRuntimeConfig()
 const { forgotPassword } = useAuth()
-
-const logoUrl = config.public.logoUrl as string | undefined
+const { logoUrl } = useAdminConfig()
 
 const error = ref<string>('')
 const success = ref<string>('')
@@ -15,7 +13,7 @@ onMounted(() => {
   const value = getComputedStyle(document.documentElement)
     .getPropertyValue('--waaseyaa-auth-hide-brand-panel')
     .trim()
-  if (value === '1') {
+  if (value === '1') { // allow-coercion: CSS custom property --waaseyaa-auth-hide-brand-panel, not a runtime-config value
     hidePanel.value = true
   }
 })

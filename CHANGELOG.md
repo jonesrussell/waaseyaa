@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+<<<<<<< HEAD
 ### Fixed
 
 - **M-006 translation hardening (#1445, #1446, #1447).** `TranslationController` now gates every endpoint via `EntityAccessHandler::check()` with per-method abilities (view/create/update/delete); 403 JSON:API errors are anti-enumeration-safe. Operator-provided langcodes in `AddTranslationsMigrationGenerator` validated against `Waaseyaa\Entity\LangcodeValidator::BCP47_PATTERN` (BCP-47 with script + region subtags). `TranslatableInterface` now declares `fieldLangcode()` so non-trait implementors get compile-time enforcement. Closes the HIGH-severity post-merge audit blockers.
@@ -24,6 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - test(path,auth,seo,user): add `PathAliasResolverBindingTest`, `AuthControllerFindUserByNameBindingTest`, `SitemapGeneratorBindingTest`, `UserBlockServiceBindingTest` — regression guards for #1518, #1525, #1527; four dedicated `*BindingTest.php` files using `RecordingEntityQuery`
 
 ## [0.1.0-alpha.187] - 2026-05-20
+=======
+### Added
+
+- **Admin SPA realtime config contract (#1537, #1538).** Closed the duplicate `fetchSchema` race via `useSchema()` in-flight Promise dedup. Introduced `useAdminConfig()` typed envelope with `asBoolean`/`asString`/`asUrl` coercion helpers so digit-string env vars (`NUXT_PUBLIC_ENABLE_REALTIME=1`) no longer silently break `=== '1'` checks. Migrated all 17 admin SPA call sites; CI gate `bin/check-admin-coercion-patterns` prevents regression.
+>>>>>>> kitty/mission-admin-spa-realtime-config-contract-01KS3ST4-lane-a
 
 ### Changed
 

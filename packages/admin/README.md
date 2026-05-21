@@ -58,6 +58,36 @@ Translations live in `app/i18n/` and are consumed by `useLanguage()`.
   3. The topbar language selector renders new locales automatically from `useLanguage().locales`.
   4. Add/update unit tests in `tests/unit/composables/useLanguage.test.ts` and `tests/components/layout/AdminShell.test.ts`.
 
+## Runtime config
+
+All admin SPA components and composables must read runtime configuration through `useAdminConfig()` rather than calling `useRuntimeConfig().public` directly.
+
+```ts
+import { useAdminConfig } from '~/composables/useAdminConfig'
+
+const config = useAdminConfig()
+// config.enableRealtime  → boolean
+// config.appName         → string
+// config.docsUrl         → string (trailing slash removed)
+// config.baseUrl         → string (trailing slash removed)
+// config.auth.registration          → string
+// config.auth.requireVerifiedEmail  → boolean
+```
+
+**Rationale:** Nuxt's runtime-config serializer can coerce digit-string env vars to numbers (e.g. `NUXT_PUBLIC_ENABLE_REALTIME=1` arrives as the number `1`, not the string `'1'`). `useAdminConfig()` applies coercion helpers (`asBoolean`, `asString`, `asUrl` from `~/composables/configCoercion`) at a single boundary, so call sites always receive correctly typed values. The composable uses `useState()` for referential stability (NFR-002) — all consumers in a component tree get the same object reference.
+
+Do **not** call `useRuntimeConfig().public` directly in components, pages, or other composables.
+
+### CI gates
+
+`bin/check-admin-coercion-patterns` (wired into `composer verify`) fails the build if any file under `packages/admin/app/**/*.{ts,vue}` contains a raw string-compare coercion pattern (`=== '1'`, `=== '0'`) outside of:
+
+- `configCoercion.ts` (the helpers themselves)
+- Test files (`*.test.ts`, `*.spec.ts`)
+- Lines annotated with `// allow-coercion: <reason>` (inline exemption)
+
+If you have a legitimate reason to compare against `'1'` or `'0'` directly (e.g. a URL query param that is genuinely a raw string and has nothing to do with runtime config), add the exemption marker on that line with a short explanation.
+
 ## Modernization status
 
 This package is the subject of the [Admin SPA Modernization Audit](../../docs/audits/admin-spa-modernization-2026-05-10.md). The audit's Top 5 follow-up missions (M1–M5) are tracked under issues #1411–#1415 in the framework repo.

@@ -5,6 +5,7 @@ import { requireAdminRuntime } from './useAdminRuntime'
 export type { SchemaProperty, EntitySchema }
 
 const schemaCache = new Map<string, EntitySchema>()
+const inflightCache = new Map<string, Promise<EntitySchema>>()
 
 export function useSchema(entityType: string) {
   const schema: Ref<EntitySchema | null> = ref(null)
@@ -17,12 +18,34 @@ export function useSchema(entityType: string) {
       return
     }
 
+    // FR-001: return in-flight Promise if one exists for this entityType
+    const inflight = inflightCache.get(entityType)
+    if (inflight !== undefined) {
+      schema.value = await inflight
+      return
+    }
+
     loading.value = true
     error.value = null
 
     try {
-      schema.value = await requireAdminRuntime().transport.schema(entityType)
-      schemaCache.set(entityType, schema.value)
+      // FR-001: register the in-flight Promise before awaiting.
+      // requireAdminRuntime() call is inside try so a synchronous throw
+      // (e.g. runtime unavailable) is caught and sets error.value.
+      const promise = requireAdminRuntime()
+        .transport.schema(entityType)
+        .then((result: EntitySchema) => {
+          schemaCache.set(entityType, result)
+          inflightCache.delete(entityType) // clean up after resolution
+          return result
+        })
+        .catch((e: unknown) => {
+          inflightCache.delete(entityType) // FR-002: clear on rejection, no poison-caching
+          throw e
+        })
+
+      inflightCache.set(entityType, promise)
+      schema.value = await promise
     } catch (e: any) {
       error.value = e.detail ?? e.message ?? 'Failed to load schema'
     } finally {
@@ -32,6 +55,7 @@ export function useSchema(entityType: string) {
 
   function invalidate() {
     schemaCache.delete(entityType)
+    inflightCache.delete(entityType) // FR-003: clear in-flight on invalidate
   }
 
   /**

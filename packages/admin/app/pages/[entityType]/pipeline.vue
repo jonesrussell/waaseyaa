@@ -9,8 +9,8 @@ const entityType = computed(() => route.params.entityType as string)
 const pipeline = useEntityPipeline()
 
 const entityLabel = computed(() => translateEntityLabel(entityType.value, entityType.value))
-const runtimeConfig = useRuntimeConfig()
-useHead({ title: computed(() => `${entityLabel.value} Pipeline | ${runtimeConfig.public.appName}`) })
+const { appName } = useAdminConfig()
+useHead({ title: computed(() => `${entityLabel.value} Pipeline | ${appName}`) })
 
 const defaultHiddenStages = ['won', 'lost']
 const visibleStages = computed(() => {

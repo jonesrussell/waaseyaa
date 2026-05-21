@@ -13,10 +13,7 @@ const { t } = useLanguage()
 const { hasCapability } = useAdmin()
 const canUpdate = hasCapability(props.entityType, 'update')
 const canDelete = hasCapability(props.entityType, 'delete')
-const config = useRuntimeConfig()
-// Nuxt's runtime-config serializer coerces digit-string env vars to numbers,
-// so accept both the string '1' (default in nuxt.config.ts) and the number 1.
-const realtimeEnabled = String(config.public.enableRealtime) === '1'
+const { enableRealtime: realtimeEnabled } = useAdminConfig()
 const { schema, loading: schemaLoading, fetch: fetchSchema, sortedProperties } = useSchema(props.entityType)
 const { list, remove } = useEntity()
 const { messages, connected, error: sseError, connect, reconnect } = useRealtime(['admin'], { autoConnect: false })
