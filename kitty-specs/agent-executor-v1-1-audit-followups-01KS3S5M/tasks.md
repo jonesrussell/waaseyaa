@@ -58,10 +58,10 @@
 | T022 | Update/create `AgentRunBroadcasterTest` (FR-012) | WP03 | N |
 | T023 | Confirm `pending_approval` OpenAPI shape matches broadcaster emission | WP03 | N |
 >>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
-| T024 | Implement real SSE consumer in `AiRunCommand::runAsync` | WP04 | N |
-| T025 | Wire SIGINT / Ctrl-C teardown | WP04 | N |
-| T026 | Write `AiRunCommandWatchTest` (FR-013) | WP04 | N |
-| T027 | Record smoke-test result in WP notes | WP04 | N |
+| T024 | Implement real SSE consumer in `AiRunCommand::runAsync` | WP04 | N | [D] |
+| T025 | Wire SIGINT / Ctrl-C teardown | WP04 | N | [D] |
+| T026 | Write `AiRunCommandWatchTest` (FR-013) | WP04 | N | [D] |
+| T027 | Record smoke-test result in WP notes | WP04 | N | [D] |
 | T028 | Update `docs/specs/agent-executor.md` — exception hierarchy + event dispatch contract | WP05 | N |
 | T029 | Add `CHANGELOG.md` `[Unreleased]` entry | WP05 | N |
 | T030 | Run `composer verify` and confirm green | WP05 | N |
@@ -218,10 +218,10 @@ Replace the stub `--watch` print-and-exit in `AiRunCommand::runAsync` with a rea
 
 ### Included subtasks
 
-- [ ] T024 Implement real SSE consumer in `AiRunCommand::runAsync` (WP04)
-- [ ] T025 Wire SIGINT / Ctrl-C teardown (WP04)
-- [ ] T026 Write `AiRunCommandWatchTest` (FR-013) (WP04)
-- [ ] T027 Record smoke-test result in WP notes (WP04)
+- [x] T024 Implement real SSE consumer in `AiRunCommand::runAsync` (WP04)
+- [x] T025 Wire SIGINT / Ctrl-C teardown (WP04)
+- [x] T026 Write `AiRunCommandWatchTest` (FR-013) (WP04)
+- [x] T027 Record smoke-test result in WP notes (WP04)
 
 **Parallel opportunities**: T025 is wired into T024's implementation (not truly separate); T026 can be written once T024+T025 are implemented.
 
