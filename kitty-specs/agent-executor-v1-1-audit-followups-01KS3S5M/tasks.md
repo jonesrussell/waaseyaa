@@ -17,16 +17,16 @@
 | T006 | Update `OpenAiCompatibleProvider` to throw typed exceptions | WP01 | [D] |
 | T007 | Refine `AgentExecutor::callProviderWithRetry` catch clauses | WP01 | N | [D] |
 | T008 | Write `AgentExecutorRetryTest` (FR-010) | WP01 | N | [D] |
-| T009 | Inject `EventDispatcherInterface` into `AgentExecutor` | WP02 | N |
-| T010 | Dispatch `AgentRunStarted` + `AgentRunTerminated` from `AgentExecutor` | WP02 | N |
-| T011 | Dispatch `AgentRunIterationCompleted` from `AgentExecutor` | WP02 | N |
-| T012 | Dispatch `AgentRunProviderCallCompleted` + `AgentRunToolCallObserved` from `AgentExecutor` | WP02 | N |
-| T013 | Dispatch `AgentRunTerminated` from `RunAgentHandler` (owned paths only) | WP02 | N |
-| T014 | Write `AgentExecutorEventDispatchTest` (FR-011) | WP02 | N |
-| T015 | Write `AgentRunObservabilityTest` integration test (FR-014) | WP02 | N |
-| T016 | Create `packages/api/openapi.yaml` bootstrap document | WP02 | [P] |
-| T017 | Create `bin/check-openapi` lint script | WP02 | [P] |
-| T018 | Wire `bin/check-openapi` into `composer verify` | WP02 | N |
+| T009 | Inject `EventDispatcherInterface` into `AgentExecutor` | WP02 | N | [D] |
+| T010 | Dispatch `AgentRunStarted` + `AgentRunTerminated` from `AgentExecutor` | WP02 | N | [D] |
+| T011 | Dispatch `AgentRunIterationCompleted` from `AgentExecutor` | WP02 | N | [D] |
+| T012 | Dispatch `AgentRunProviderCallCompleted` + `AgentRunToolCallObserved` from `AgentExecutor` | WP02 | N | [D] |
+| T013 | Dispatch `AgentRunTerminated` from `RunAgentHandler` (owned paths only) | WP02 | N | [D] |
+| T014 | Write `AgentExecutorEventDispatchTest` (FR-011) | WP02 | N | [D] |
+| T015 | Write `AgentRunObservabilityTest` integration test (FR-014) | WP02 | N | [D] |
+| T016 | Create `packages/api/openapi.yaml` bootstrap document | WP02 | [D] |
+| T017 | Create `bin/check-openapi` lint script | WP02 | [D] |
+| T018 | Wire `bin/check-openapi` into `composer verify` | WP02 | N | [D] |
 | T019 | Verify `AgentRunBroadcasterServiceProvider` is the canonical binding | WP03 | N |
 | T020 | Delete `BroadcastStorageAdapter` and its test (if any) | WP03 | N |
 | T021 | Clean `MessagingServiceProvider` — remove adapter reference | WP03 | N |
@@ -92,16 +92,16 @@ Wire the five domain event dispatches into `AgentExecutor` and `RunAgentHandler`
 
 ### Included subtasks
 
-- [ ] T009 Inject `EventDispatcherInterface` into `AgentExecutor` (WP02)
-- [ ] T010 Dispatch `AgentRunStarted` + `AgentRunTerminated` from `AgentExecutor` (WP02)
-- [ ] T011 Dispatch `AgentRunIterationCompleted` from `AgentExecutor` (WP02)
-- [ ] T012 Dispatch `AgentRunProviderCallCompleted` + `AgentRunToolCallObserved` from `AgentExecutor` (WP02)
-- [ ] T013 Dispatch `AgentRunTerminated` from `RunAgentHandler` (owned paths only) (WP02)
-- [ ] T014 Write `AgentExecutorEventDispatchTest` (FR-011) (WP02)
-- [ ] T015 Write `AgentRunObservabilityTest` integration test (FR-014) (WP02)
-- [ ] T016 Create `packages/api/openapi.yaml` bootstrap document (WP02)
-- [ ] T017 Create `bin/check-openapi` lint script (WP02)
-- [ ] T018 Wire `bin/check-openapi` into `composer verify` (WP02)
+- [x] T009 Inject `EventDispatcherInterface` into `AgentExecutor` (WP02)
+- [x] T010 Dispatch `AgentRunStarted` + `AgentRunTerminated` from `AgentExecutor` (WP02)
+- [x] T011 Dispatch `AgentRunIterationCompleted` from `AgentExecutor` (WP02)
+- [x] T012 Dispatch `AgentRunProviderCallCompleted` + `AgentRunToolCallObserved` from `AgentExecutor` (WP02)
+- [x] T013 Dispatch `AgentRunTerminated` from `RunAgentHandler` (owned paths only) (WP02)
+- [x] T014 Write `AgentExecutorEventDispatchTest` (FR-011) (WP02)
+- [x] T015 Write `AgentRunObservabilityTest` integration test (FR-014) (WP02)
+- [x] T016 Create `packages/api/openapi.yaml` bootstrap document (WP02)
+- [x] T017 Create `bin/check-openapi` lint script (WP02)
+- [x] T018 Wire `bin/check-openapi` into `composer verify` (WP02)
 
 **Parallel opportunities**: T016+T017 (OpenAPI file + script) can be done in parallel with T009–T013 (event wiring) since they touch different files.
 
