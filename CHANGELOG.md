@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `Waaseyaa\Scheduler\ScheduleEntriesInterface`: auto-discoverable contract for recurring task registrations. Implementors are discovered by `PackageManifestCompiler` and registered at kernel boot with fail-closed dependency resolution.
+- `Waaseyaa\Api\Schedule\BroadcastStorageScheduleEntries`: nightly `_broadcast_log` prune task (cron `0 2 * * *`, 7-day default retention, configurable). Refs #1536.
+- `schedule.disabled_entries` configuration key: opt-out list for built-in schedule-entries classes.
+- `bin/waaseyaa schedule:list` now groups tasks by owning `*ScheduleEntries` class and shows `[disabled]` for opt-out entries.
+
+### Fixed
+
+- `AgentScheduleEntries` (`ai:purge-runs`, `ai:reap-stalled-runs`) now auto-discovered and registered at boot; previously, no code called `register()` and both tasks were silently inert in production. Refs #1512.
+
 ### Fixed
 
 - fix(access,api): thread request account through `SearchRouter` into `SearchController`; closes #1516
