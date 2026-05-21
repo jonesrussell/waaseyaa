@@ -15,6 +15,8 @@ subtasks:
 - T019
 - T020
 - T021
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "823012"
 history:
 - date: '2026-05-20T23:57:21Z'
   event: created
@@ -290,3 +292,4 @@ public function pruneTaskRemovesOldRows(): void
 ## Activity Log
 
 - 2026-05-21T01:23:08Z – unknown – AgentScheduleEntries auto-discovered via ScheduleEntriesInterface; Phase30 integration test asserts schedule:list tasks and prune behavior (FR-005, FR-012, FR-013)
+- 2026-05-21T01:23:48Z – claude:opus-4-7:reviewer:reviewer – shell_pid=823012 – Started review via action command
