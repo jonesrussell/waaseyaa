@@ -1,7 +1,7 @@
 {
-  "event_count": 30,
-  "last_event_id": "01KS3YM2YT19XN1VA1PKD0RH5F",
-  "materialized_at": "2026-05-21T00:23:01.338184+00:00",
+  "event_count": 31,
+  "last_event_id": "01KS3YNJXGEC07RMECTPFBP9FK",
+  "materialized_at": "2026-05-21T00:23:50.448305+00:00",
   "mission_number": "",
   "mission_slug": "access-fail-closed-completeness-01KS3RJT",
   "mission_type": "software-dev",
@@ -11,9 +11,9 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 1,
+    "for_review": 0,
     "in_progress": 1,
-    "in_review": 0,
+    "in_review": 1,
     "planned": 0
   },
   "work_packages": {
@@ -46,11 +46,11 @@
       "last_transition_at": "2026-05-21T00:12:40.223988+00:00"
     },
     "WP05": {
-      "actor": "user",
+      "actor": "claude:opus-4-7:reviewer:reviewer",
       "force_count": 1,
-      "lane": "for_review",
-      "last_event_id": "01KS3YKZ449GX59H6P1GQMG5AG",
-      "last_transition_at": "2026-05-21T00:22:57.412546+00:00"
+      "lane": "in_review",
+      "last_event_id": "01KS3YNJXGEC07RMECTPFBP9FK",
+      "last_transition_at": "2026-05-21T00:23:50.448305+00:00"
     }
   }
 }

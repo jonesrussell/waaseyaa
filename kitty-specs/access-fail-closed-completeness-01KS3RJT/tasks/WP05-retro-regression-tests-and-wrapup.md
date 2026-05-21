@@ -18,8 +18,8 @@ subtasks:
 - T024
 - T025
 - T026
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "699277"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "703327"
 history:
 - date: '2026-05-20T23:30:18Z'
   agent: claude:sonnet:tasks:tasks
@@ -441,3 +441,4 @@ The M-B mission added \`bin/check-getquery-bindings\` and committed an initial b
 
 - 2026-05-21T00:18:31Z – claude:sonnet:implementer:implementer – shell_pid=699277 – Started implementation via action command
 - 2026-05-21T00:22:58Z – claude:sonnet:implementer:implementer – shell_pid=699277 – Retro tests + M-B.1 #1539 + docs/CHANGELOG. 4 *BindingTest.php files pass; getquery-bindings gate OK (2 exemptions, 0 new); PHPStan clean.
+- 2026-05-21T00:23:51Z – claude:opus-4-7:reviewer:reviewer – shell_pid=703327 – Started review via action command
