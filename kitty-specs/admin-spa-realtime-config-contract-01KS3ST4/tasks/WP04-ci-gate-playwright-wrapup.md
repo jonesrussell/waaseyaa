@@ -19,6 +19,8 @@ subtasks:
 - T015
 - T016
 - T017
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "798647"
 history:
 - date: '2026-05-20T23:57:32Z'
   event: created
@@ -380,3 +382,7 @@ Closes #1538
 3. Verify the `schema-dedup.spec.ts` first test assertion: `schemaRequests` must have length 1 (not 2 — 2 was the pre-fix behavior).
 4. Check `CHANGELOG.md` — two bullets under `[Unreleased]` → `### Fixed`, both referencing issue numbers.
 5. Confirm the final commit's footer contains both `Closes #1537` and `Closes #1538`.
+
+## Activity Log
+
+- 2026-05-21T01:08:42Z – claude:sonnet:implementer:implementer – shell_pid=798647 – Started implementation via action command
