@@ -16,9 +16,9 @@
 | T003 | Verify hasApiPhpDoc fires for the three traits via php -r reflection script | WP01 | — | [D] |
 | T004 | Confirm loadEntitySupportingTraits populates RevisionableEntityTrait | WP01 | — | [D] |
 | T005 | Write wp01-diagnosis.md with findings, confirmed hypothesis, WP02 design instruction | WP01 | — | [D] |
-| T006 | Add `isTraitWithApiPhpDoc()` named method to WaaseyaaEntrypointProvider | WP02 | — |
-| T007 | Wire isTraitWithApiPhpDoc into shouldMarkPropertyAsRead/Written and shouldMarkMethodAsUsed | WP02 | — |
-| T008 | Write WaaseyaaEntrypointProviderTest.php: fixtures (a) @api trait, (b) no-@api trait, (c) regression for all three real traits | WP02 | — |
+| T006 | Add `isTraitWithApiPhpDoc()` named method to WaaseyaaEntrypointProvider | WP02 | — | [D] |
+| T007 | Wire isTraitWithApiPhpDoc into shouldMarkPropertyAsRead/Written and shouldMarkMethodAsUsed | WP02 | — | [D] |
+| T008 | Write WaaseyaaEntrypointProviderTest.php: fixtures (a) @api trait, (b) no-@api trait, (c) regression for all three real traits | WP02 | — | [D] |
 | T009 | Regenerate phpstan-dead-code-baseline.neon | WP03 | — |
 | T010 | Assert 31 entries dropped — grep returns 0 for the three trait names | WP03 | — |
 | T011 | Run `composer verify` — exits 0 | WP03 | — |
@@ -67,9 +67,9 @@ Write unit tests covering fixtures (a), (b) and regression cases (c).
 **Dependencies**: WP01
 
 ### Subtasks
-- [ ] T006 Add `isTraitWithApiPhpDoc()` named method to WaaseyaaEntrypointProvider (WP02)
-- [ ] T007 Wire isTraitWithApiPhpDoc into shouldMarkPropertyAsRead/Written and shouldMarkMethodAsUsed (WP02)
-- [ ] T008 Write WaaseyaaEntrypointProviderTest.php: (a) @api trait, (b) no-@api trait, (c) regression for real traits (WP02)
+- [x] T006 Add `isTraitWithApiPhpDoc()` named method to WaaseyaaEntrypointProvider (WP02)
+- [x] T007 Wire isTraitWithApiPhpDoc into shouldMarkPropertyAsRead/Written and shouldMarkMethodAsUsed (WP02)
+- [x] T008 Write WaaseyaaEntrypointProviderTest.php: (a) @api trait, (b) no-@api trait, (c) regression for real traits (WP02)
 
 ### Implementation sketch
 1. Add private static `isTraitWithApiPhpDoc(\ReflectionClass $declaringClass): bool` that returns `$declaringClass->isTrait() && self::hasApiPhpDoc($declaringClass)`.
