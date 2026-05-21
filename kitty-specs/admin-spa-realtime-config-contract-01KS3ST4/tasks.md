@@ -16,7 +16,7 @@
 | T003 | Clear `inflightCache` on rejection; clear both caches in `invalidate()` | WP01 | No | [D] |
 | T004 | Write unit tests FR-008 (no duplicate POSTs), FR-009 (invalidate clears inflight), FR-010 (rejection doesn't poison) | WP01 | [D] |
 | T005 | Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (FR-007) | WP02 | [D] |
-| T006 | Create `AdminConfig` TypeScript interface (no `any`/`unknown` fields, NFR-003) | WP02 | No |
+| T006 | Create `AdminConfig` TypeScript interface (no `any`/`unknown` fields, NFR-003) | WP02 | No | [D] |
 | T007 | Create `useAdminConfig()` composable with `useState()`-backed referential stability (NFR-002) | WP02 | No |
 | T008 | Write unit tests for coercion helpers and composable (FR-011) | WP02 | [P] |
 | T009 | Add "Runtime config" section to `packages/admin/README.md` (FR-013) | WP02 | [P] |
@@ -78,7 +78,7 @@
 #### Included subtasks
 
 - [x] T005 Create `configCoercion.ts` with `asBoolean`, `asString`, `asUrl` helpers (WP02)
-- [ ] T006 Create `AdminConfig` TypeScript interface (WP02)
+- [x] T006 Create `AdminConfig` TypeScript interface (WP02)
 - [ ] T007 Create `useAdminConfig()` composable (WP02)
 - [ ] T008 Write unit tests for coercion helpers and composable (WP02)
 - [ ] T009 Add "Runtime config" section to README.md (WP02)
