@@ -385,3 +385,7 @@ so consumers never need to wire the prune task manually.
 - Verify no raw PDO / SQL in `BroadcastStorage::prune()`
 - Check `@api` presence on `BroadcastStorageScheduleEntries` (dead-code gate)
 - Verify the `Schedule/` directory is included in `packages/api/composer.json` PSR-4 autoload (the namespace `Waaseyaa\Api\` should already cover `src/`)
+
+## Activity Log
+
+- 2026-05-21T01:06:21Z – unknown – BroadcastStorageScheduleEntries + PackageManifestCompiler regression fix; 30/30 manifest tests pass, 3/3 new unit tests pass, phpstan clean, 1385 total tests green
