@@ -194,11 +194,13 @@ final class AnthropicProvider implements StreamingProviderInterface
 
         if ($responseBody === false) {
             $error = \curl_error($ch);
-            throw new \RuntimeException("cURL error: {$error}");
+            \curl_close($ch);
+            throw new TransportException("cURL error: {$error}");
         }
 
         if (!\is_string($responseBody)) {
-            throw new \RuntimeException('Unexpected cURL response type.');
+            \curl_close($ch);
+            throw new TransportException('Unexpected cURL response type.');
         }
 
         /** @var array<string, mixed> $data */
@@ -209,9 +211,14 @@ final class AnthropicProvider implements StreamingProviderInterface
             throw new RateLimitException($retryAfter, $data['error']['message'] ?? 'Rate limited');
         }
 
+        if ($httpCode >= 500) {
+            $errorMessage = $data['error']['message'] ?? "HTTP {$httpCode}";
+            throw new TransportException("Anthropic API error: {$errorMessage}");
+        }
+
         if ($httpCode >= 400) {
             $errorMessage = $data['error']['message'] ?? "HTTP {$httpCode}";
-            throw new \RuntimeException("Anthropic API error: {$errorMessage}");
+            throw new ClientErrorException("Anthropic API error: {$errorMessage}");
         }
 
         return $data;
@@ -310,7 +317,11 @@ final class AnthropicProvider implements StreamingProviderInterface
                 throw new RateLimitException($retryAfter, $errorMessage);
             }
 
-            throw new \RuntimeException("Anthropic API error: {$errorMessage}");
+            if ($httpCode >= 500) {
+                throw new TransportException("Anthropic API error: {$errorMessage}");
+            }
+
+            throw new ClientErrorException("Anthropic API error: {$errorMessage}");
         }
 
         // Parse all events for tool use blocks and final state.

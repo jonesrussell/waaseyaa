@@ -10,11 +10,13 @@ use Waaseyaa\AI\Agent\Entity\AgentRun;
 use Waaseyaa\AI\Agent\Enum\EventType;
 use Waaseyaa\AI\Agent\Enum\HitlMode;
 use Waaseyaa\AI\Agent\Enum\RunStatus;
+use Waaseyaa\AI\Agent\Provider\ClientErrorException;
 use Waaseyaa\AI\Agent\Provider\MessageRequest;
 use Waaseyaa\AI\Agent\Provider\MessageResponse;
 use Waaseyaa\AI\Agent\Provider\ProviderInterface;
 use Waaseyaa\AI\Agent\Provider\RateLimitException;
 use Waaseyaa\AI\Agent\Provider\ToolResultBlock;
+use Waaseyaa\AI\Agent\Provider\TransportException;
 use Waaseyaa\AI\Agent\Repository\AgentAuditLogRepository;
 use Waaseyaa\AI\Agent\Repository\AgentRunRepository;
 use Waaseyaa\AI\Tools\AgentTool;
@@ -606,6 +608,7 @@ final class AgentExecutor
 
                 return $response;
             } catch (RateLimitException $e) {
+                // 429 — retryable with backoff
                 $lastError = $e;
                 $lastErrorIsRateLimit = true;
                 $this->appendAudit(
@@ -616,14 +619,33 @@ final class AgentExecutor
                     toolResultSummary: sprintf('attempt %d: rate-limited (%s)', $attempts, $e->getMessage()),
                     durationMs: self::msSince($started),
                 );
-            } catch (\Throwable $e) {
-                // @todo Narrow this catch once the provider exception
-                // hierarchy lands (see #1509). FR-025 calls for
-                // retry on 429 + 5xx + transport only; today the
-                // AnthropicProvider throws bare \RuntimeException for both
-                // 4xx (non-429) and 5xx, so we can't distinguish here.
+            } catch (TransportException $e) {
+                // 5xx / network — retryable, same budget
                 $lastError = $e;
                 $lastErrorIsRateLimit = false;
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ProviderCall,
+                    success: false,
+                    toolResultSummary: sprintf('attempt %d: transport error (%s)', $attempts, $e->getMessage()),
+                    durationMs: self::msSince($started),
+                );
+            } catch (ClientErrorException $e) {
+                // 4xx non-429 — non-retryable, re-throw immediately
+                $this->appendAudit(
+                    $runId,
+                    $iteration,
+                    EventType::ProviderCall,
+                    success: false,
+                    toolResultSummary: sprintf('attempt %d: client error (non-retryable): %s', $attempts, $e->getMessage()),
+                    durationMs: self::msSince($started),
+                );
+                throw $e;
+            } catch (\Throwable $e) {
+                // Retry semantics: RateLimitException (429) and TransportException (5xx/network)
+                // are retried. ClientErrorException (4xx non-429) and all other exceptions re-throw
+                // immediately without consuming retry budget. See FR-003.
                 $this->appendAudit(
                     $runId,
                     $iteration,
@@ -632,6 +654,7 @@ final class AgentExecutor
                     toolResultSummary: sprintf('attempt %d: %s (%s)', $attempts, $e::class, $e->getMessage()),
                     durationMs: self::msSince($started),
                 );
+                throw $e;
             }
 
             if ($attempts < self::PROVIDER_MAX_RETRIES) {

@@ -94,19 +94,35 @@ final class OpenAiCompatibleProvider implements ProviderInterface
 
         if ($responseBody === false) {
             $error = \curl_error($ch);
-            throw new \RuntimeException("cURL error: {$error}");
+            \curl_close($ch);
+            throw new TransportException("cURL error: {$error}");
         }
 
         if (!\is_string($responseBody)) {
-            throw new \RuntimeException('Unexpected cURL response type.');
+            \curl_close($ch);
+            throw new TransportException('Unexpected cURL response type.');
         }
 
         /** @var array<string, mixed> $data */
         $data = \json_decode($responseBody, true, 512, \JSON_THROW_ON_ERROR);
 
+        if ($httpCode === 429) {
+            $errorMessage = self::extractOpenAiErrorMessage($data, $httpCode);
+            $retryAfter = 60;
+            if (\is_array($data['error'] ?? null) && isset($data['error']['retry_after'])) {
+                $retryAfter = (int) $data['error']['retry_after'];
+            }
+            throw new RateLimitException($retryAfter, "OpenAI-compatible API error: {$errorMessage}");
+        }
+
+        if ($httpCode >= 500) {
+            $errorMessage = self::extractOpenAiErrorMessage($data, $httpCode);
+            throw new TransportException("OpenAI-compatible API error: {$errorMessage}");
+        }
+
         if ($httpCode >= 400) {
             $errorMessage = self::extractOpenAiErrorMessage($data, $httpCode);
-            throw new \RuntimeException("OpenAI-compatible API error: {$errorMessage}");
+            throw new ClientErrorException("OpenAI-compatible API error: {$errorMessage}");
         }
 
         return $data;
