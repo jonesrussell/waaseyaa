@@ -19,8 +19,8 @@ subtasks:
 - T015
 - T016
 - T017
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "816006"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "818990"
 history:
 - date: '2026-05-20T23:57:32Z'
   event: created
@@ -393,3 +393,4 @@ Closes #1538
 >>>>>>> kitty/mission-m006-translation-hardening-01KS3RY9-lane-a
 - 2026-05-21T01:19:48Z – claude:sonnet:implementer:implementer – shell_pid=816006 – Started implementation via action command
 - 2026-05-21T01:21:09Z – claude:sonnet:implementer:implementer – shell_pid=816006 – Cycle 1: gate detects real violations + self-test asserts; JSONL conflict resolved; allow-coercion exemptions added for 5 legitimate non-runtime-config uses
+- 2026-05-21T01:22:00Z – claude:opus-4-7:reviewer:reviewer – shell_pid=818990 – Started review via action command
