@@ -293,3 +293,4 @@ public function pruneTaskRemovesOldRows(): void
 
 - 2026-05-21T01:23:08Z – unknown – AgentScheduleEntries auto-discovered via ScheduleEntriesInterface; Phase30 integration test asserts schedule:list tasks and prune behavior (FR-005, FR-012, FR-013)
 - 2026-05-21T01:23:48Z – claude:opus-4-7:reviewer:reviewer – shell_pid=823012 – Started review via action command
+- 2026-05-21T01:24:49Z – claude:opus-4-7:reviewer:reviewer – shell_pid=823012 – Review passed: AgentScheduleEntries cleanly implements ScheduleEntriesInterface (1-line change, @api preserved, exact signature match). New integration test (141 LOC) boots real Schedule + DBALDatabase::createSqlite — 6/6 pass, 19 assertions. Prune-removes-stale-rows test (FR-013/#1536) genuinely exercises real SQLite: inserts stale + fresh _broadcast_log rows, invokes the registered closure, asserts only fresh row remains. cs-check + phpstan + 428 regression tests green.
