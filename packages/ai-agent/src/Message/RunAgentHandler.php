@@ -16,6 +16,8 @@ use Waaseyaa\AI\Agent\Enum\HitlMode;
 use Waaseyaa\AI\Agent\Enum\RunStatus;
 use Waaseyaa\AI\Agent\Provider\ProviderInterface;
 use Waaseyaa\AI\Agent\Repository\AgentRunRepository;
+use Waaseyaa\AI\Observability\Event\AgentRunTerminated;
+use Waaseyaa\Foundation\Event\EventDispatcherInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
@@ -64,6 +66,7 @@ final class RunAgentHandler
         private readonly InitiatorAccountLoaderInterface $accountLoader,
         ?LoggerInterface $logger = null,
         ?\Closure $now = null,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
         $this->now = $now ?? static fn(): \DateTimeImmutable => new \DateTimeImmutable('now');
@@ -160,6 +163,11 @@ final class RunAgentHandler
             // Final safety net: the handler MUST NOT propagate to the
             // transport. Persist a terminal Failed (CAS — no-op if the
             // executor already marked it terminal) and emit run_failed.
+            //
+            // DISPATCH OWNERSHIP: RunAgentHandler dispatches AgentRunTerminated
+            // only for supervisor-kill and pre-executor cancellation paths.
+            // AgentExecutor owns AgentRunTerminated for normal-completion paths.
+            // Exactly one AgentRunTerminated per agent run (FR-005).
             $errorCode = 'handler_exception';
             $errorMessage = $e->getMessage();
             $this->logger->error(\sprintf(
@@ -169,13 +177,22 @@ final class RunAgentHandler
                 $errorMessage,
             ));
 
+            $finishedAt = ($this->now)();
             $this->runRepository->markTerminal(
                 $runId,
                 RunStatus::Failed,
-                ($this->now)(),
+                $finishedAt,
                 errorCode: $errorCode,
                 errorMessage: $errorMessage,
             );
+
+            // Dispatch AgentRunTerminated for this handler-owned failure path.
+            $this->dispatchSafely(new AgentRunTerminated(
+                runId: $runId,
+                status: RunStatus::Failed->value,
+                errorCode: $errorCode,
+                finishedAt: $finishedAt,
+            ));
 
             $this->broadcast($runId, 'run_failed', [
                 'error_code' => $errorCode,
@@ -295,6 +312,29 @@ final class RunAgentHandler
             $this->logger->error(\sprintf(
                 'RunAgentHandler: failed to persist result metadata for run "%s": %s',
                 $runId,
+                $e->getMessage(),
+            ));
+        }
+    }
+
+    /**
+     * Dispatch an event via the injected dispatcher, swallowing any listener
+     * exception so that observability faults never crash the handler.
+     *
+     * Constitution gotcha: "Best-effort side effects".
+     */
+    private function dispatchSafely(object $event): void
+    {
+        if ($this->eventDispatcher === null) {
+            return;
+        }
+
+        try {
+            $this->eventDispatcher->dispatch($event);
+        } catch (\Throwable $e) {
+            $this->logger->error(\sprintf(
+                'RunAgentHandler: event dispatch failed for %s: %s',
+                $event::class,
                 $e->getMessage(),
             ));
         }

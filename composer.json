@@ -447,6 +447,7 @@
     },
     "scripts": {
         "check-composer-policy": "bash bin/check-composer-policy",
+        "check-openapi": "bash bin/check-openapi",
         "check-external-consumers": "php bin/check-external-consumers ai-agent-orphans",
         "check-ingestion-defaults": "bash bin/check-ingestion-defaults",
         "check-no-secrets": "bash bin/check-no-secrets",
@@ -479,11 +480,13 @@
             "@check-symfony-imports",
             "@check-dead-code",
             "@check-external-consumers",
+            "@check-openapi",
             "@test"
         ]
     },
     "scripts-descriptions": {
         "check-dead-code": "Fail-on-new dead-code gate (Phase 4 of the dead-code cleanup audit). Runs phpstan-dead-code.neon with shipmonk's detector; pre-existing baseline entries are suppressed, only NEW findings fail. See docs/audits/2026-05-17-dead-code-baseline-audit.md and bin/check-dead-code header for how to handle a new finding.",
+        "check-openapi": "Validate packages/api/openapi.yaml against OpenAPI 3.1.0 spec via @stoplight/spectral-cli. Requires Node.js + npx; exits 0 with SKIP notice when npx is unavailable (CI-safe). Wired as a hard gate in verify per NFR-004 (WP02, mission agent-executor-v1-1-audit-followups-01KS3S5M).",
         "check-symfony-imports": "Enforce the Path R-narrow Symfony-import boundary (mission #1107 C-005 (b)). Fails when `use Symfony\\…` appears outside the framework allowlist. Allowlist lives in .symfony-import-allowlist.json — see docs/specs/api-layer.md §Symfony Import Boundary.",
         "dev": "Start the PHP dev server (delegates to dev:php). For the admin SPA, run `composer dev:admin` in a second terminal — see docs/specs/operations-playbooks.md.",
         "dev:admin": "Start the Nuxt admin SPA dev server. NUXT_BACKEND_URL points at the PHP server (default :8080); set APP_PORT to override.",

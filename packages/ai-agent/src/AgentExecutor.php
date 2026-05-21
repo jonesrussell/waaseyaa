@@ -19,10 +19,16 @@ use Waaseyaa\AI\Agent\Provider\ToolResultBlock;
 use Waaseyaa\AI\Agent\Provider\TransportException;
 use Waaseyaa\AI\Agent\Repository\AgentAuditLogRepository;
 use Waaseyaa\AI\Agent\Repository\AgentRunRepository;
+use Waaseyaa\AI\Observability\Event\AgentRunIterationCompleted;
+use Waaseyaa\AI\Observability\Event\AgentRunProviderCallCompleted;
+use Waaseyaa\AI\Observability\Event\AgentRunStarted;
+use Waaseyaa\AI\Observability\Event\AgentRunTerminated;
+use Waaseyaa\AI\Observability\Event\AgentRunToolCallObserved;
 use Waaseyaa\AI\Tools\AgentTool;
 use Waaseyaa\AI\Tools\AgentToolResult;
 use Waaseyaa\AI\Tools\ToolNotFoundException;
 use Waaseyaa\AI\Tools\ToolRegistryInterface;
+use Waaseyaa\Foundation\Event\EventDispatcherInterface;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\NullLogger;
 
@@ -77,6 +83,7 @@ final class AgentExecutor
         ?LoggerInterface $logger = null,
         ?\Closure $sleepMs = null,
         ?\Closure $now = null,
+        private readonly ?EventDispatcherInterface $eventDispatcher = null,
     ) {
         $this->logger = $logger ?? new NullLogger();
         $this->sleepMs = $sleepMs ?? static function (int $ms): void {
@@ -133,6 +140,19 @@ final class AgentExecutor
         $tokenOut = 0;
         $costCents = null;
         $finalText = '';
+        $runStartedAt = ($this->now)();
+
+        // DISPATCH OWNERSHIP: AgentExecutor dispatches AgentRunStarted, AgentRunIterationCompleted,
+        // AgentRunProviderCallCompleted, AgentRunToolCallObserved, and AgentRunTerminated for
+        // normal-completion paths. RunAgentHandler dispatches AgentRunTerminated only for
+        // supervisor-kill and pre-executor cancellation. Exactly one AgentRunTerminated per
+        // agent run (FR-005).
+        $this->dispatchSafely(new AgentRunStarted(
+            runId: $runId,
+            agentDefinitionId: \is_string($run->get('agent_definition_id')) ? $run->get('agent_definition_id') : null,
+            accountId: (int) $initiatorAccount->id(),
+            startedAt: $runStartedAt,
+        ));
 
         while (true) {
             $iteration++;
@@ -172,6 +192,7 @@ final class AgentExecutor
             }
 
             $this->appendAudit($runId, $iteration, EventType::IterationStart, success: true);
+            $iterationStartMs = microtime(true);
 
             $request = new MessageRequest(
                 messages: $messages,
@@ -193,6 +214,17 @@ final class AgentExecutor
                 );
             }
 
+            // Dispatch provider-call-completed event (FR-012).
+            // ProviderInterface does not expose provider/model names; use the
+            // class short-name as a best-effort identifier.
+            $this->dispatchSafely(new AgentRunProviderCallCompleted(
+                runId: $runId,
+                provider: new \ReflectionClass($provider)->getShortName(),
+                model: 'unknown',
+                tokensIn: $response->usage['input_tokens'],
+                tokensOut: $response->usage['output_tokens'],
+            ));
+
             $tokenIn += $response->usage['input_tokens'];
             $tokenOut += $response->usage['output_tokens'];
 
@@ -201,6 +233,12 @@ final class AgentExecutor
 
             if ($response->stopReason !== 'tool_use') {
                 $finalText = self::extractText($response);
+                // Dispatch iteration-completed before breaking (final iteration). FR-011.
+                $this->dispatchSafely(new AgentRunIterationCompleted(
+                    runId: $runId,
+                    iterationIndex: $iteration - 1,
+                    durationMs: (int) round((microtime(true) - $iterationStartMs) * 1000),
+                ));
                 break;
             }
 
@@ -295,6 +333,12 @@ final class AgentExecutor
                         content: json_encode(['error' => $e->getMessage()], JSON_THROW_ON_ERROR),
                         isError: true,
                     )->toArray();
+                    // Dispatch tool-call-observed for the failed (threw) path. FR-013.
+                    $this->dispatchSafely(new AgentRunToolCallObserved(
+                        runId: $runId,
+                        toolName: $toolName,
+                        succeeded: false,
+                    ));
                     continue;
                 }
 
@@ -317,13 +361,38 @@ final class AgentExecutor
                     content: $resultText,
                     isError: $toolResult->isError,
                 )->toArray();
+
+                // Dispatch tool-call-observed event after terminal lifecycle
+                // (completed or failed). FR-013.
+                $this->dispatchSafely(new AgentRunToolCallObserved(
+                    runId: $runId,
+                    toolName: $toolName,
+                    succeeded: !$toolResult->isError,
+                ));
             }
 
             $messages[] = ['role' => 'user', 'content' => $toolResults];
+
+            // Dispatch iteration-completed event at the bottom of each loop
+            // iteration (after tool calls resolved, before next iteration). FR-011.
+            $this->dispatchSafely(new AgentRunIterationCompleted(
+                runId: $runId,
+                iterationIndex: $iteration - 1,
+                durationMs: (int) round((microtime(true) - $iterationStartMs) * 1000),
+            ));
         }
 
         $finishedAt = ($this->now)();
         $this->runRepository->markTerminal($runId, RunStatus::Completed, $finishedAt);
+
+        // Dispatch terminal event for normal-completion path. RunAgentHandler
+        // dispatches AgentRunTerminated for its owned paths (cancelled/pre-executor).
+        $this->dispatchSafely(new AgentRunTerminated(
+            runId: $runId,
+            status: RunStatus::Completed->value,
+            errorCode: null,
+            finishedAt: $finishedAt,
+        ));
 
         return AgentResult::success(
             message: $finalText,
@@ -798,5 +867,29 @@ final class AgentExecutor
         }
 
         return $text;
+    }
+
+    /**
+     * Dispatch an event via the injected dispatcher, swallowing any listener
+     * exception so that observability faults never abort the agent run.
+     *
+     * Constitution gotcha: "Best-effort side effects" — event listeners for
+     * non-critical operations must wrap in try-catch and log.
+     */
+    private function dispatchSafely(object $event): void
+    {
+        if ($this->eventDispatcher === null) {
+            return;
+        }
+
+        try {
+            $this->eventDispatcher->dispatch($event);
+        } catch (\Throwable $e) {
+            $this->logger->error(sprintf(
+                'AgentExecutor: event dispatch failed for %s: %s',
+                $event::class,
+                $e->getMessage(),
+            ));
+        }
     }
 }
