@@ -193,30 +193,6 @@ parameters:
 			path: packages/api/src/Controller/BroadcastStorage.php
 
 		-
-			message: '#^Parameter \#1 \$entity of method Waaseyaa\\Api\\ResourceSerializer\:\:serialize\(\) expects Waaseyaa\\Entity\\EntityInterface, Waaseyaa\\Api\\MutableTranslatableInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: packages/api/src/Controller/TranslationController.php
-
-		-
-			message: '#^Parameter \#1 \$entity of method Waaseyaa\\Api\\ResourceSerializer\:\:serialize\(\) expects Waaseyaa\\Entity\\EntityInterface, Waaseyaa\\Entity\\TranslatableInterface given\.$#'
-			identifier: argument.type
-			count: 3
-			path: packages/api/src/Controller/TranslationController.php
-
-		-
-			message: '#^Parameter \#1 \$entity of method Waaseyaa\\Entity\\Storage\\EntityStorageInterface\:\:save\(\) expects Waaseyaa\\Entity\\EntityInterface, Waaseyaa\\Api\\MutableTranslatableInterface given\.$#'
-			identifier: argument.type
-			count: 1
-			path: packages/api/src/Controller/TranslationController.php
-
-		-
-			message: '#^Parameter \#1 \$entity of method Waaseyaa\\Entity\\Storage\\EntityStorageInterface\:\:save\(\) expects Waaseyaa\\Entity\\EntityInterface, Waaseyaa\\Entity\\TranslatableInterface given\.$#'
-			identifier: argument.type
-			count: 2
-			path: packages/api/src/Controller/TranslationController.php
-
-		-
 			message: '#^Casting to string something that''s already string\.$#'
 			identifier: cast.useless
 			count: 9
