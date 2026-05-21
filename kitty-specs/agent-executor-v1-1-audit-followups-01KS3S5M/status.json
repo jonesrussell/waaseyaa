@@ -1,7 +1,7 @@
 {
-  "event_count": 5,
-  "last_event_id": "01KS3Y75SS5KZZZFG6V1HRPC31",
-  "materialized_at": "2026-05-21T00:15:58.265257+00:00",
+  "event_count": 7,
+  "last_event_id": "01KS3YRRNHYK8PYTQPB0CSASBM",
+  "materialized_at": "2026-05-21T00:25:34.641160+00:00",
   "mission_number": "",
   "mission_slug": "agent-executor-v1-1-audit-followups-01KS3S5M",
   "mission_type": "software-dev",
@@ -12,17 +12,17 @@
     "claimed": 0,
     "done": 0,
     "for_review": 0,
-    "in_progress": 0,
+    "in_progress": 1,
     "in_review": 0,
-    "planned": 5
+    "planned": 4
   },
   "work_packages": {
     "WP01": {
-      "actor": "finalize-tasks",
+      "actor": "implement-command",
       "force_count": 1,
-      "lane": "planned",
-      "last_event_id": "01KS3Y752MMZ3SSSGVT16T2JFA",
-      "last_transition_at": "2026-05-21T00:15:57.524599+00:00"
+      "lane": "in_progress",
+      "last_event_id": "01KS3YRRNHYK8PYTQPB0CSASBM",
+      "last_transition_at": "2026-05-21T00:25:34.641160+00:00"
     },
     "WP02": {
       "actor": "finalize-tasks",
