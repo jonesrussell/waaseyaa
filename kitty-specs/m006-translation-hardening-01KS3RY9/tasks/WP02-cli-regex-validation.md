@@ -19,8 +19,8 @@ subtasks:
 - T005
 - T006
 - T007
-agent: "claude:sonnet:implementer:implementer"
-shell_pid: "732406"
+agent: "claude:opus-4-7:reviewer:reviewer"
+shell_pid: "742669"
 history:
 - date: '2026-05-20T23:57:09Z'
   author: tasks-materializer
@@ -499,3 +499,4 @@ methods. Add them as no-ops returning sensible defaults.
 
 - 2026-05-21T00:43:51Z – claude:sonnet:implementer:implementer – shell_pid=732406 – Started implementation via action command
 - 2026-05-21T00:46:19Z – claude:sonnet:implementer:implementer – shell_pid=732406 – BCP-47 regex constant in packages/entity/src/LangcodeValidator.php; validation wired in render(), generate(), renderTwoAxisFromRevisionable(); backend assert added; all interpolation sites confirmed; 32 tests pass (cs-check + phpstan clean)
+- 2026-05-21T00:47:25Z – claude:opus-4-7:reviewer:reviewer – shell_pid=742669 – Started review via action command
