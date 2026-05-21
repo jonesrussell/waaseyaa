@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **ai-agent**: `AgentExecutor::callProviderWithRetry` now correctly retries only
+  transient errors (`TransportException`, `RateLimitException`); 4xx non-429
+  `ClientErrorException` re-throws immediately without burning retry budget (#1509).
+- **ai-agent**: `AgentExecutor` and `RunAgentHandler` now dispatch all five
+  `AgentRunTelemetryListener` domain events at their lifecycle points; the
+  observability listener was previously wired but received no events (#1510).
+- **ai-agent**: Removed `BroadcastStorageAdapter`; `AgentRunBroadcaster` is the
+  sole broadcaster implementation; `pending_approval` OpenAPI shape aligned with
+  broadcaster emission (#1511).
+- **cli**: `bin/waaseyaa ai:run --watch` is now a working SSE consumer; prior
+  implementation was a stub that printed a single message and exited (#1513).
+
+### Added
+
+- **api**: `packages/api/openapi.yaml` bootstrapped as the canonical OpenAPI 3.1.0
+  document for the Waaseyaa Framework API.
+- **api**: `bin/check-openapi` lint script added to `composer verify` gate (NFR-004).
+- **ai-agent**: Typed provider exception hierarchy — `ProviderException` (abstract),
+  `TransportException`, `ClientErrorException`; `RateLimitException` now extends
+  `ProviderException` (FR-001/FR-002).
+
 ### Changed
 
 - **`waaseyaa/foundation` — `BroadcastRouter` no longer replays `_broadcast_log` history on EventSource connect** (#1535). New connections previously started at `cursor = 0`, dumping every historical message on the requested channels to the client. With N matching events in the log, the admin SPA's `SchemaList.watch(messages, …)` fired `fetchEntities` N times per `/admin/{entityType}` page view — pages stalled on "Loading…" under `php -S` (single-thread starvation by the resulting concurrent fetches + the open SSE stream) and burned N redundant entity queries per visit on PHP-FPM, scaling with broadcast log size. `BroadcastRouter::resolveInitialCursor(Request, int $highWaterMark)` now resumes from a numeric `Last-Event-ID` header when the client sent one (auto-reconnect path) and otherwise returns the supplied high-water mark — historical events are not replayed. Each SSE frame now carries an `id: {row_id}` line so EventSource sends `Last-Event-ID` on its native reconnect, making the resume path actually usable. Behavioral change visible to consumers: a fresh EventSource no longer receives historical `entity.saved` / `entity.deleted` events; clients that need backlog must query their own state.

@@ -1,4 +1,4 @@
-<!-- Spec reviewed 2026-05-18 - new spec, brainstorming pass for agent executor v1 -->
+<!-- Spec reviewed 2026-05-20 - M-A audit follow-ups: exception hierarchy, lifecycle events, broadcaster consolidation, --watch SSE -->
 
 # Agent Executor
 
@@ -453,6 +453,79 @@ Hot-reload follows the existing `config:*` CLI / CMI sync model.
 | `tool_not_found` | Agent referenced an undeclared tool. |
 | `worker_crashed` | Reaper transitioned stuck `running` row. |
 | `internal_error` | Last-resort catch in `RunAgentHandler`. |
+
+## Provider Exception Hierarchy
+
+All AI provider exceptions extend `Waaseyaa\AI\Agent\Provider\ProviderException`
+(abstract, extends `\RuntimeException`):
+
+| Class | HTTP trigger | Retry behaviour |
+|---|---|---|
+| `RateLimitException` | 429 | Retried with backoff per FR-025 budget (honour `retryAfterSeconds`, up to 3×, cap 30 s). Exhausted → `provider_rate_limited`. |
+| `TransportException` | 5xx, network errors | Retried per FR-025 budget (up to 3×, exponential backoff). Exhausted → `provider_unavailable`. |
+| `ClientErrorException` | 4xx non-429 | Re-thrown immediately, no retry — these errors indicate a malformed request or auth failure, retrying will not help. |
+
+`AnthropicProvider` and `OpenAiCompatibleProvider` throw these typed exceptions
+for all HTTP outcomes. Bare `\RuntimeException` is not used for HTTP status codes.
+`RateLimitException` extends `ProviderException` directly; `TransportException`
+and `ClientErrorException` are siblings. Callers may catch any of the three typed
+subclasses or the abstract base `ProviderException` to handle all provider errors.
+
+See also: `packages/api/openapi.yaml` — the `pending_approval` schema shape is
+documented there and aligns with what `AgentRunBroadcaster` emits on the SSE channel.
+
+## Lifecycle Event Dispatch
+
+`AgentExecutor` dispatches these events via `EventDispatcherInterface` (L0):
+
+| Event | Dispatch point | Owner |
+|---|---|---|
+| `AgentRunStarted` | Entry of run loop | `AgentExecutor` |
+| `AgentRunIterationCompleted` | End of each iteration | `AgentExecutor` |
+| `AgentRunProviderCallCompleted` | After provider call returns | `AgentExecutor` |
+| `AgentRunToolCallObserved` | Per tool call in the loop | `AgentExecutor` |
+| `AgentRunTerminated` (normal) | Normal run completion | `AgentExecutor` |
+| `AgentRunTerminated` (abnormal) | Supervisor kill / pre-executor cancel | `RunAgentHandler` |
+
+Dispatch is best-effort: listener exceptions are logged via `LoggerInterface` and
+do not abort the run. Exactly one `AgentRunTerminated` fires per run — either from
+`AgentExecutor` (normal exit) or from `RunAgentHandler` (pre-executor abort path).
+
+`AgentRunTelemetryListener` in `packages/ai-observability` subscribes to all five
+events and captures token/cost/tool-count/latency per run.
+
+## Broadcaster
+
+`AgentRunBroadcaster` (in `packages/ai-agent`) is the sole implementation of
+`AgentRunBroadcasterInterface`. `BroadcastStorageAdapter` was removed in mission
+`agent-executor-v1-1-audit-followups` (PR #1511). The canonical service binding
+is `AgentRunBroadcasterServiceProvider` (registered in `extra.waaseyaa.providers`
+of `packages/ai-agent/composer.json`).
+
+`AgentRunBroadcaster` writes directly to `BroadcastStorage` and is responsible
+for all SSE event emission on channel `agent.run.<id>` (see SSE event vocabulary
+section above). The `pending_approval` event shape is documented in
+`packages/api/openapi.yaml`.
+
+## CLI --watch
+
+`bin/waaseyaa ai:run "<prompt>" --watch` attaches an SSE consumer to
+`/broadcast?channels=agent.run.<id>` via `StreamHttpClient`. Events are printed
+to stdout as they arrive. The command exits cleanly on `terminated` event.
+SIGINT (Ctrl-C) closes the stream; the server-side run continues.
+
+`--watch` is incompatible with `--inline`. When `--inline` is used, output is
+written directly to stdout as the run proceeds and no SSE consumer is spawned.
+
+## OpenAPI document
+
+`packages/api/openapi.yaml` is the canonical OpenAPI 3.1.0 document for the
+Waaseyaa Framework API. It was bootstrapped in mission `agent-executor-v1-1-audit-followups`
+(WP02/T018) and includes the `pending_approval` shape for the agent approval endpoint.
+
+`bin/check-openapi` runs Spectral lint against this document and is included in
+`composer verify`. All additions to the HTTP API surface should include corresponding
+OpenAPI schema entries.
 
 ## Provider error handling
 
