@@ -11,10 +11,10 @@
 
 | ID | Description | WP | Parallel |
 |----|-----------|----|---------|
-| T001 | Review spec's three options and confirm they are the complete decision space | WP01 | — |
-| T002 | Identify any unlisted options (e.g. option 4: do nothing differently + document) | WP01 | — |
-| T003 | Identify decision criteria, weights, and who the decision-maker is | WP01 | — |
-| T004 | Write `decision-frame.md` in mission directory | WP01 | — |
+| T001 | Review spec's three options and confirm they are the complete decision space | WP01 | — | [D] |
+| T002 | Identify any unlisted options (e.g. option 4: do nothing differently + document) | WP01 | — | [D] |
+| T003 | Identify decision criteria, weights, and who the decision-maker is | WP01 | — | [D] |
+| T004 | Write `decision-frame.md` in mission directory | WP01 | — | [D] |
 | T005 | Enumerate what evidence each option needs before it can be accepted or rejected | WP02 | — |
 | T006 | Map each evidence item to a concrete source location in the repo or consumer repos | WP02 | — |
 | T007 | Write `methodology.md` in mission directory | WP02 | — |
@@ -45,10 +45,10 @@
 
 ### Subtasks
 
-- [ ] T001 Review spec's three options and confirm they are the complete decision space (WP01)
-- [ ] T002 Identify any unlisted options (e.g. option 4: do nothing differently + document) (WP01)
-- [ ] T003 Identify decision criteria, weights, and who the decision-maker is (WP01)
-- [ ] T004 Write `decision-frame.md` in mission directory (WP01)
+- [x] T001 Review spec's three options and confirm they are the complete decision space (WP01)
+- [x] T002 Identify any unlisted options (e.g. option 4: do nothing differently + document) (WP01)
+- [x] T003 Identify decision criteria, weights, and who the decision-maker is (WP01)
+- [x] T004 Write `decision-frame.md` in mission directory (WP01)
 
 ### Implementation sketch
 
