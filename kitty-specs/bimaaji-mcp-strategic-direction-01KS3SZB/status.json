@@ -1,0 +1,63 @@
+{
+  "event_count": 6,
+  "last_event_id": "01KS3Y052NQY8Y47B8YYDK90DX",
+  "materialized_at": "2026-05-21T00:12:08.149897+00:00",
+  "mission_number": "",
+  "mission_slug": "bimaaji-mcp-strategic-direction-01KS3SZB",
+  "mission_type": "research",
+  "summary": {
+    "approved": 0,
+    "blocked": 0,
+    "canceled": 0,
+    "claimed": 0,
+    "done": 0,
+    "for_review": 0,
+    "in_progress": 0,
+    "in_review": 0,
+    "planned": 6
+  },
+  "work_packages": {
+    "WP01": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS3Y049J0XEBW1J6FBB8DZBY",
+      "last_transition_at": "2026-05-21T00:12:07.346103+00:00"
+    },
+    "WP02": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS3Y04W2DBC4DZ7ZSCJJQYKW",
+      "last_transition_at": "2026-05-21T00:12:07.938204+00:00"
+    },
+    "WP03": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS3Y04XMD20AXR4NRBYM04JG",
+      "last_transition_at": "2026-05-21T00:12:07.988505+00:00"
+    },
+    "WP04": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS3Y04ZA9CGH1KY2F7V54XC5",
+      "last_transition_at": "2026-05-21T00:12:08.042957+00:00"
+    },
+    "WP05": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS3Y0513FXMFEKBY4TE791HP",
+      "last_transition_at": "2026-05-21T00:12:08.099655+00:00"
+    },
+    "WP06": {
+      "actor": "finalize-tasks",
+      "force_count": 1,
+      "lane": "planned",
+      "last_event_id": "01KS3Y052NQY8Y47B8YYDK90DX",
+      "last_transition_at": "2026-05-21T00:12:08.149897+00:00"
+    }
+  }
+}
