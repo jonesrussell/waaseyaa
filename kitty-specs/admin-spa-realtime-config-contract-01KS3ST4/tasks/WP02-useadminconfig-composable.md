@@ -476,3 +476,4 @@ appears in `packages/admin/app/**`. Add `// allow-coercion: <reason>` inline to 
 - 2026-05-21T00:48:10Z – claude:sonnet:implementer:implementer – shell_pid=728329 – useAdminConfig + asBoolean/asString/asUrl + README runtime-config section
 - 2026-05-21T00:48:50Z – claude:opus-4-7:reviewer:reviewer – shell_pid=746729 – Started review via action command
 - 2026-05-21T00:52:38Z – claude:sonnet:implementer:implementer – shell_pid=760574 – Started implementation via action command
+- 2026-05-21T00:53:50Z – claude:sonnet:implementer:implementer – shell_pid=760574 – Removed buggy app/utils/configCoercion.ts duplicate; build/test/lint clean (243/243 tests, 0 errors)
