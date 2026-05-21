@@ -402,3 +402,4 @@ final class AccessPolicyRegistryTest extends TestCase
 - 2026-05-21T00:38:53Z – claude:opus-4-7:reviewer:reviewer – shell_pid=717401 – Started review via action command
 - 2026-05-21T00:41:45Z – claude:opus-4-7:reviewer:reviewer – shell_pid=717401 – Moved to planned
 - 2026-05-21T00:43:15Z – claude:sonnet:implementer:implementer – shell_pid=727675 – Started implementation via action command
+- 2026-05-21T00:44:57Z – claude:sonnet:implementer:implementer – shell_pid=727675 – Cycle 2: fixed missed AdminSurfaceServiceProvider call site; 12 SSR+OIDC regressions cleared (16/16 pass)
