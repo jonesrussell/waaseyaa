@@ -12,6 +12,8 @@ subtasks:
 - T005
 - T006
 - T007
+agent: "claude:sonnet:researcher:implementer"
+shell_pid: "733210"
 history:
 - date: '2026-05-20T23:57:38Z'
   agent: tasks-materializer
@@ -183,3 +185,7 @@ WP01 established the decision space (options 1–3) and criteria. WP02 asks: for
 ## Reviewer Guidance
 
 Reviewer should verify: (1) methodology.md gives WP03 enough specificity to execute without further research design, (2) all four `research/*.md` targets are mapped, (3) NFR-003 coverage is complete.
+
+## Activity Log
+
+- 2026-05-21T00:44:12Z – claude:sonnet:researcher:implementer – shell_pid=733210 – Started implementation via action command
