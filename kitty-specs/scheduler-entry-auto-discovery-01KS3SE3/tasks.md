@@ -10,12 +10,12 @@
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
-| T001 | Define `ScheduleEntriesInterface` in `packages/scheduler/src/` | WP01 | No |
-| T002 | Add `$scheduleEntries` field to `PackageManifest` (fromArray/toArray) | WP01 | [P] |
-| T003 | Extend `PackageManifestCompiler::filterDiscoveryClasses()` for interface scan | WP01 | No |
-| T004 | Extend `PackageManifestCompiler::compile()` to populate `schedule_entries` | WP01 | No |
-| T005 | Contract test for `ScheduleEntriesInterface` shape | WP01 | [P] |
-| T006 | Unit test `discoversScheduleEntries` (FR-009) | WP01 | [P] |
+| T001 | Define `ScheduleEntriesInterface` in `packages/scheduler/src/` | WP01 | No | [D] |
+| T002 | Add `$scheduleEntries` field to `PackageManifest` (fromArray/toArray) | WP01 | [D] |
+| T003 | Extend `PackageManifestCompiler::filterDiscoveryClasses()` for interface scan | WP01 | No | [D] |
+| T004 | Extend `PackageManifestCompiler::compile()` to populate `schedule_entries` | WP01 | No | [D] |
+| T005 | Contract test for `ScheduleEntriesInterface` shape | WP01 | [D] |
+| T006 | Unit test `discoversScheduleEntries` (FR-009) | WP01 | [D] |
 | T007 | Check M-B resolver landing; adopt or introduce parallel resolver | WP02 | No |
 | T008 | Create `ScheduleEntryRegistry` with `boot()` method | WP02 | No |
 | T009 | Create `ScheduleEntryInstantiationException` | WP02 | [P] |
@@ -49,12 +49,12 @@
 
 #### Included subtasks
 
-- [ ] T001 Define `ScheduleEntriesInterface` in `packages/scheduler/src/` (WP01)
-- [ ] T002 Add `$scheduleEntries` field to `PackageManifest` (WP01)
-- [ ] T003 Extend `PackageManifestCompiler::filterDiscoveryClasses()` (WP01)
-- [ ] T004 Extend `PackageManifestCompiler::compile()` to populate `schedule_entries` (WP01)
-- [ ] T005 Contract test for `ScheduleEntriesInterface` shape (WP01)
-- [ ] T006 Unit test `discoversScheduleEntries` (WP01)
+- [x] T001 Define `ScheduleEntriesInterface` in `packages/scheduler/src/` (WP01)
+- [x] T002 Add `$scheduleEntries` field to `PackageManifest` (WP01)
+- [x] T003 Extend `PackageManifestCompiler::filterDiscoveryClasses()` (WP01)
+- [x] T004 Extend `PackageManifestCompiler::compile()` to populate `schedule_entries` (WP01)
+- [x] T005 Contract test for `ScheduleEntriesInterface` shape (WP01)
+- [x] T006 Unit test `discoversScheduleEntries` (WP01)
 
 #### Implementation sketch
 
