@@ -440,3 +440,4 @@ The M-B mission added \`bin/check-getquery-bindings\` and committed an initial b
 ## Activity Log
 
 - 2026-05-21T00:18:31Z – claude:sonnet:implementer:implementer – shell_pid=699277 – Started implementation via action command
+- 2026-05-21T00:22:58Z – claude:sonnet:implementer:implementer – shell_pid=699277 – Retro tests + M-B.1 #1539 + docs/CHANGELOG. 4 *BindingTest.php files pass; getquery-bindings gate OK (2 exemptions, 0 new); PHPStan clean.
