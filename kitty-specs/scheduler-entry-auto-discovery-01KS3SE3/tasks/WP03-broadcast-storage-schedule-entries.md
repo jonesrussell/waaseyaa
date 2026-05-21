@@ -15,8 +15,8 @@ subtasks:
 - T015
 - T016
 - T017
-agent: "claude:opus-4-7:reviewer:reviewer"
-shell_pid: "796050"
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "806939"
 history:
 - date: '2026-05-20T23:57:21Z'
   event: created
@@ -393,3 +393,4 @@ so consumers never need to wire the prune task manually.
 - 2026-05-21T01:06:21Z – unknown – BroadcastStorageScheduleEntries + PackageManifestCompiler regression fix; 30/30 manifest tests pass, 3/3 new unit tests pass, phpstan clean, 1385 total tests green
 - 2026-05-21T01:07:18Z – claude:opus-4-7:reviewer:reviewer – shell_pid=796050 – Started review via action command
 - 2026-05-21T01:11:13Z – claude:opus-4-7:reviewer:reviewer – shell_pid=796050 – Moved to planned
+- 2026-05-21T01:12:34Z – claude:sonnet:implementer:implementer – shell_pid=806939 – Started implementation via action command
