@@ -338,3 +338,4 @@ Three hypotheses for the failure:
 ## Activity Log
 
 - 2026-05-21T00:26:09Z – claude:sonnet:implementer:implementer – shell_pid=706738 – Started implementation via action command
+- 2026-05-21T00:42:51Z – claude:sonnet:implementer:implementer – shell_pid=706738 – Diagnosis at research/wp01-diagnosis.md; hypothesis (d) mixed confirmed; WP02 design instruction written. Root cause: PHPStan NodeScopeResolver short-circuits Trait_ nodes before InClassNode, so ReflectionBasedMemberUsageProvider is never invoked for trait files. Fix: override getUsages() to handle Node\Stmt\Trait_ directly for @api-tagged traits.
