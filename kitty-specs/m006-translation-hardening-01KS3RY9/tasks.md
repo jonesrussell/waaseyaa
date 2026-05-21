@@ -20,11 +20,11 @@ M-B WP02 to merge first if running in parallel).
 |------|------------------------------------------------------------------|------|----------|
 | T001 | Add `fieldLangcode(string $fieldName): ?string` to `TranslatableInterface` | WP03 | — | [D] |
 | T002 | Contract test: reflection asserts method + signature; trait satisfies via anonymous class | WP03 | [D] |
-| T003 | Create `packages/entity/src/LangcodeValidator.php` with `BCP47_PATTERN` const + `validate()` | WP02 | — |
-| T004 | Unit test `LangcodeValidatorTest`: acceptance + rejection cases | WP02 | [P] |
-| T005 | Wire `LangcodeValidator::validate()` into `AddTranslationsMigrationGenerator` (both render paths + `generate()`) | WP02 | — |
-| T006 | Audit `$backend` interpolation in generator; document PHP type narrowing; add assertion per FR-007 | WP02 | [P] |
-| T007 | Unit test `AddTranslationsMigrationGeneratorTest`: injection payload rejection + valid langcode acceptance | WP02 | [P] |
+| T003 | Create `packages/entity/src/LangcodeValidator.php` with `BCP47_PATTERN` const + `validate()` | WP02 | — | [D] |
+| T004 | Unit test `LangcodeValidatorTest`: acceptance + rejection cases | WP02 | [D] |
+| T005 | Wire `LangcodeValidator::validate()` into `AddTranslationsMigrationGenerator` (both render paths + `generate()`) | WP02 | — | [D] |
+| T006 | Audit `$backend` interpolation in generator; document PHP type narrowing; add assertion per FR-007 | WP02 | [D] |
+| T007 | Unit test `AddTranslationsMigrationGeneratorTest`: injection payload rejection + valid langcode acceptance | WP02 | [D] |
 | T008 | Add `EntityAccessHandler` constructor parameter to `TranslationController` | WP01 | — |
 | T009 | Insert per-method `check()` calls with FR-002 ability mapping (index/show→view, store→create, update→update, destroy→delete) | WP01 | — |
 | T010 | Implement 403 response shape: JSON:API error document with `status: "403"`, `code: "FORBIDDEN"`, stable title | WP01 | — |
@@ -70,11 +70,11 @@ M-B WP02 to merge first if running in parallel).
 
 #### Subtasks
 
-- [ ] T003 Create `packages/entity/src/LangcodeValidator.php` with `BCP47_PATTERN` const + `validate()` method (WP02)
-- [ ] T004 Unit test `LangcodeValidatorTest`: acceptance and rejection cases (WP02)
-- [ ] T005 Wire `LangcodeValidator::validate()` into generator `render()`, `renderTwoAxisFromRevisionable()`, and `generate()` (WP02)
-- [ ] T006 Audit `$backend` interpolation; document PHP type narrowing; add assertion per FR-007 defense-in-depth (WP02)
-- [ ] T007 Unit test `AddTranslationsMigrationGeneratorTest`: injection payload rejection + acceptance (WP02)
+- [x] T003 Create `packages/entity/src/LangcodeValidator.php` with `BCP47_PATTERN` const + `validate()` method (WP02)
+- [x] T004 Unit test `LangcodeValidatorTest`: acceptance and rejection cases (WP02)
+- [x] T005 Wire `LangcodeValidator::validate()` into generator `render()`, `renderTwoAxisFromRevisionable()`, and `generate()` (WP02)
+- [x] T006 Audit `$backend` interpolation; document PHP type narrowing; add assertion per FR-007 defense-in-depth (WP02)
+- [x] T007 Unit test `AddTranslationsMigrationGeneratorTest`: injection payload rejection + acceptance (WP02)
 
 #### Implementation sketch
 
