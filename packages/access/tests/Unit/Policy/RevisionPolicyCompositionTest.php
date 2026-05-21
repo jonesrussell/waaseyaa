@@ -298,6 +298,11 @@ final class RevisionPolicyCompositionTest extends TestCase
             {
                 return $this->langcodes;
             }
+
+            public function fieldLangcode(string $fieldName): ?string
+            {
+                return null;
+            }
         };
     }
 
@@ -467,6 +472,11 @@ final class RevisionPolicyCompositionTest extends TestCase
             public function getTranslationLanguages(): array
             {
                 return [$this->activeLangcode];
+            }
+
+            public function fieldLangcode(string $fieldName): ?string
+            {
+                return null;
             }
         };
     }

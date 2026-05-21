@@ -378,6 +378,11 @@ final class ListingCacheInvalidatorTest extends TestCase
             {
                 return [$this->activeLc];
             }
+
+            public function fieldLangcode(string $fieldName): ?string
+            {
+                return null;
+            }
         };
     }
 }
