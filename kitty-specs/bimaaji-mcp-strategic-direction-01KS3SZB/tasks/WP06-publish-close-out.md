@@ -263,3 +263,4 @@ Reviewer should verify: (1) #1463 is closed with appropriate reason (not-planned
 ## Activity Log
 
 - 2026-05-21T01:01:40Z – claude:sonnet:researcher:implementer – shell_pid=785788 – Started implementation via action command
+- 2026-05-21T01:02:38Z – claude:sonnet:researcher:implementer – shell_pid=785788 – Issue #1463 closed as not-planned with decision rationale; positioning documented in docs/specs/mcp-endpoint.md; CHANGELOG updated
