@@ -20,6 +20,7 @@ use Waaseyaa\CLI\OptionMode;
 use Waaseyaa\Entity\Repository\EntityRepositoryInterface;
 use Waaseyaa\Foundation\ServiceProvider\Capability\HasNativeCommandsInterface;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
+use Waaseyaa\HttpClient\PhpStreamSseClient;
 
 /**
  * Registers the operator-facing `ai:*` CLI commands:
@@ -36,12 +37,28 @@ final class AiServiceProvider extends ServiceProvider implements HasNativeComman
     {
         $this->singleton(
             AiRunCommand::class,
-            fn(): AiRunCommand => new AiRunCommand(
-                runService: $this->resolve(AgentRunService::class),
-                definitionRegistry: $this->resolve(AgentDefinitionRegistry::class),
-                aiConfig: \is_array($this->config['ai'] ?? null) ? $this->config['ai'] : [],
-                serviceAccountId: $this->config['ai']['service_account_id'] ?? 0,
-            ),
+            function (): AiRunCommand {
+                $configBaseUrl = $this->config['app']['base_url'] ?? null;
+                $envBaseUrl = $_ENV['WAASEYAA_BASE_URL'] ?? null;
+                $getenvBaseUrl = getenv('WAASEYAA_BASE_URL');
+                if (\is_string($configBaseUrl) && $configBaseUrl !== '') {
+                    $baseUrl = $configBaseUrl;
+                } elseif (\is_string($envBaseUrl) && $envBaseUrl !== '') {
+                    $baseUrl = $envBaseUrl;
+                } elseif (\is_string($getenvBaseUrl) && $getenvBaseUrl !== '') {
+                    $baseUrl = $getenvBaseUrl;
+                } else {
+                    $baseUrl = '';
+                }
+                return new AiRunCommand(
+                    runService: $this->resolve(AgentRunService::class),
+                    definitionRegistry: $this->resolve(AgentDefinitionRegistry::class),
+                    aiConfig: \is_array($this->config['ai'] ?? null) ? $this->config['ai'] : [],
+                    serviceAccountId: $this->config['ai']['service_account_id'] ?? 0,
+                    sseClient: new PhpStreamSseClient(),
+                    baseUrl: $baseUrl,
+                );
+            },
         );
 
         $this->singleton(

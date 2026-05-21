@@ -11,11 +11,8 @@ use Waaseyaa\Foundation\Log\NullLogger;
 /**
  * Canonical {@see AgentRunBroadcasterInterface} implementation.
  *
- * WP-04 shipped {@see BroadcastStorageAdapter} as a baseline that wraps
- * {@see BroadcastStorage} so the executor could emit events without a
- * dedicated broadcaster. WP-05 (T031) promotes this into the canonical
- * broadcaster: same SSE channel (`agent.run.<runId>`), same delivery
- * surface, but shaped per the data-model § "SSE event vocabulary".
+ * Writes events through {@see BroadcastStorage} onto the SSE channel
+ * `agent.run.<runId>`, shaped per the data-model § "SSE event vocabulary".
  *
  * NFR-006: the push is synchronous — `BroadcastStorage::push()` persists
  * to the broadcast log inside this call, so callers can rely on the

@@ -13,9 +13,8 @@ namespace Waaseyaa\AI\Agent\Broadcast;
  * `approval_*`, `run_completed`, `run_failed`, `run_cancelled`).
  *
  * Implementations MUST be best-effort: a failure to deliver an event
- * must not propagate to the run loop. {@see BroadcastStorageAdapter} is
- * the WP-04 baseline implementation; WP-05 replaces it with the real
- * `AgentRunBroadcaster` once the broadcast surface lands.
+ * must not propagate to the run loop. {@see AgentRunBroadcaster} is the
+ * canonical implementation, bound by {@see AgentRunBroadcasterServiceProvider}.
  *
  * @api
  */

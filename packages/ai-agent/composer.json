@@ -10,6 +10,10 @@
         },
         {
             "type": "path",
+            "url": "../ai-observability"
+        },
+        {
+            "type": "path",
             "url": "../ai-schema"
         },
         {
@@ -66,6 +70,7 @@
         "symfony/messenger": "^7.0",
         "symfony/uid": "^7.0",
         "waaseyaa/access": "^0.1.0-alpha.187",
+        "waaseyaa/ai-observability": "^0.1.0-alpha.187",
         "waaseyaa/ai-schema": "^0.1.0-alpha.187",
         "waaseyaa/ai-tools": "^0.1.0-alpha.187",
         "waaseyaa/api": "^0.1.0-alpha.187",
@@ -99,7 +104,8 @@
             "providers": [
                 "Waaseyaa\\AI\\Agent\\AiAgentEntityServiceProvider",
                 "Waaseyaa\\AI\\Agent\\AiAgentServiceProvider",
-                "Waaseyaa\\AI\\Agent\\MessagingServiceProvider"
+                "Waaseyaa\\AI\\Agent\\MessagingServiceProvider",
+                "Waaseyaa\\AI\\Agent\\Broadcast\\AgentRunBroadcasterServiceProvider"
             ]
         }
     },

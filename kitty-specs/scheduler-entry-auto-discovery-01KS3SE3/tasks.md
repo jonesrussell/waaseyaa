@@ -31,10 +31,10 @@
 | T019 | Verify no orphaned manual `register()` wiring in any ServiceProvider | WP04 | [D] |
 | T020 | Integration test `listsBuiltInTasks` (FR-012, SC-001, SC-005) | WP04 | No | [D] |
 | T021 | Integration test `pruneTaskRemovesOldRows` (FR-013, SC-002) | WP04 | [D] |
-| T022 | Update `CLAUDE.md` — "Adding a schedule-entries class" checklist | WP05 | [P] |
-| T023 | Update `docs/specs/operations-playbooks.md` — `schedule.disabled_entries` | WP05 | [P] |
-| T024 | Extend `ScheduleListHandler` to group by entries class + show `[disabled]` | WP05 | No |
-| T025 | Add `CHANGELOG.md` `[Unreleased]` entries | WP05 | [P] |
+| T022 | Update `CLAUDE.md` — "Adding a schedule-entries class" checklist | WP05 | [D] |
+| T023 | Update `docs/specs/operations-playbooks.md` — `schedule.disabled_entries` | WP05 | [D] |
+| T024 | Extend `ScheduleListHandler` to group by entries class + show `[disabled]` | WP05 | No | [D] |
+| T025 | Add `CHANGELOG.md` `[Unreleased]` entries | WP05 | [D] |
 
 ---
 
@@ -191,10 +191,10 @@
 
 #### Included subtasks
 
-- [ ] T022 Update `CLAUDE.md` — "Adding a schedule-entries class" checklist (WP05)
-- [ ] T023 Update `docs/specs/operations-playbooks.md` — `schedule.disabled_entries` (WP05)
-- [ ] T024 Extend `ScheduleListHandler` grouping + `[disabled]` marker (WP05)
-- [ ] T025 Add `CHANGELOG.md` `[Unreleased]` entries (WP05)
+- [x] T022 Update `CLAUDE.md` — "Adding a schedule-entries class" checklist (WP05)
+- [x] T023 Update `docs/specs/operations-playbooks.md` — `schedule.disabled_entries` (WP05)
+- [x] T024 Extend `ScheduleListHandler` grouping + `[disabled]` marker (WP05)
+- [x] T025 Add `CHANGELOG.md` `[Unreleased]` entries (WP05)
 
 #### Implementation sketch
 

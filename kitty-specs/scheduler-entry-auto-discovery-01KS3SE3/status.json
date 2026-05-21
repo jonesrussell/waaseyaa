@@ -1,7 +1,7 @@
 {
-  "event_count": 32,
-  "last_event_id": "01KS426RENBVTTBNV9EMCKPAPF",
-  "materialized_at": "2026-05-21T01:25:38.901556+00:00",
+  "event_count": 33,
+  "last_event_id": "01KS42GMVBY66JMGDM332SZ6G9",
+  "materialized_at": "2026-05-21T01:31:02.891194+00:00",
   "mission_number": "",
   "mission_slug": "scheduler-entry-auto-discovery-01KS3SE3",
   "mission_type": "software-dev",
@@ -11,8 +11,8 @@
     "canceled": 0,
     "claimed": 0,
     "done": 0,
-    "for_review": 0,
-    "in_progress": 1,
+    "for_review": 1,
+    "in_progress": 0,
     "in_review": 0,
     "planned": 0
   },
@@ -46,11 +46,11 @@
       "last_transition_at": "2026-05-21T01:24:48.558076+00:00"
     },
     "WP05": {
-      "actor": "claude:sonnet:implementer:implementer",
+      "actor": "user",
       "force_count": 1,
-      "lane": "in_progress",
-      "last_event_id": "01KS426RENBVTTBNV9EMCKPAPF",
-      "last_transition_at": "2026-05-21T01:25:38.901556+00:00"
+      "lane": "for_review",
+      "last_event_id": "01KS42GMVBY66JMGDM332SZ6G9",
+      "last_transition_at": "2026-05-21T01:31:02.891194+00:00"
     }
   }
 }

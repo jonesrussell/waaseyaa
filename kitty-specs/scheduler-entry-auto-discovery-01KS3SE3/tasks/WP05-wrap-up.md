@@ -296,3 +296,4 @@ Pick the simplest approach that doesn't require adding a new property to `Schedu
 ## Activity Log
 
 - 2026-05-21T01:25:39Z – claude:sonnet:implementer:implementer – shell_pid=825011 – Started implementation via action command
+- 2026-05-21T01:31:03Z – claude:sonnet:implementer:implementer – shell_pid=825011 – CLAUDE.md schedule-entries checklist + ops playbook disabled_entries doc + CHANGELOG bullets (Refs #1512 #1536). All tests pass (643), cs-check clean, phpstan clean.

@@ -7,10 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-<<<<<<< HEAD
-### Fixed
+### Added
 
-- **M-006 translation hardening (#1445, #1446, #1447).** `TranslationController` now gates every endpoint via `EntityAccessHandler::check()` with per-method abilities (view/create/update/delete); 403 JSON:API errors are anti-enumeration-safe. Operator-provided langcodes in `AddTranslationsMigrationGenerator` validated against `Waaseyaa\Entity\LangcodeValidator::BCP47_PATTERN` (BCP-47 with script + region subtags). `TranslatableInterface` now declares `fieldLangcode()` so non-trait implementors get compile-time enforcement. Closes the HIGH-severity post-merge audit blockers.
+- **Admin SPA realtime config contract (#1537, #1538).** Closed the duplicate `fetchSchema` race via `useSchema()` in-flight Promise dedup. Introduced `useAdminConfig()` typed envelope with `asBoolean`/`asString`/`asUrl` coercion helpers so digit-string env vars (`NUXT_PUBLIC_ENABLE_REALTIME=1`) no longer silently break `=== '1'` checks. Migrated all 17 admin SPA call sites; CI gate `bin/check-admin-coercion-patterns` prevents regression.
+- **api**: `packages/api/openapi.yaml` bootstrapped as the canonical OpenAPI 3.1.0 document for the Waaseyaa Framework API.
+- **api**: `bin/check-openapi` lint script added to `composer verify` gate (NFR-004).
+- **ai-agent**: Typed provider exception hierarchy — `ProviderException` (abstract), `TransportException`, `ClientErrorException`; `RateLimitException` now extends `ProviderException` (FR-001/FR-002).
 
 ### Changed
 
@@ -18,18 +20,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **M-006 translation hardening (#1445, #1446, #1447).** `TranslationController` now gates every endpoint via `EntityAccessHandler::check()` with per-method abilities (view/create/update/delete); 403 JSON:API errors are anti-enumeration-safe. Operator-provided langcodes in `AddTranslationsMigrationGenerator` validated against `Waaseyaa\Entity\LangcodeValidator::BCP47_PATTERN` (BCP-47 with script + region subtags). `TranslatableInterface` now declares `fieldLangcode()` so non-trait implementors get compile-time enforcement. Closes the HIGH-severity post-merge audit blockers.
 - fix(access,api): thread request account through `SearchRouter` into `SearchController`; closes #1516
 - fix(foundation): replace `AccessPolicyRegistry` silent-skip heuristic with container-resolved instantiation; auto-discovers policies with service dependencies; fail-closed on unresolvable deps via `PolicyInstantiationException`; closes #1519
 - fix(entity,access): add `RecordingEntityQuery` shared test helper to `packages/entity/testing/`; closes #1529
 - fix(foundation): add `bin/check-getquery-bindings` CI gate and `tools/getquery-bindings-baseline.txt`; `composer verify` now enforces no new unbound `getQuery()->execute()` callsites; closes #1528
 - test(path,auth,seo,user): add `PathAliasResolverBindingTest`, `AuthControllerFindUserByNameBindingTest`, `SitemapGeneratorBindingTest`, `UserBlockServiceBindingTest` — regression guards for #1518, #1525, #1527; four dedicated `*BindingTest.php` files using `RecordingEntityQuery`
+- **ai-agent**: `AgentExecutor::callProviderWithRetry` now correctly retries only transient errors (`TransportException`, `RateLimitException`); 4xx non-429 `ClientErrorException` re-throws immediately without burning retry budget (#1509).
+- **ai-agent**: `AgentExecutor` and `RunAgentHandler` now dispatch all five `AgentRunTelemetryListener` domain events at their lifecycle points; the observability listener was previously wired but received no events (#1510).
+- **ai-agent**: Removed `BroadcastStorageAdapter`; `AgentRunBroadcaster` is the sole broadcaster implementation; `pending_approval` OpenAPI shape aligned with broadcaster emission (#1511).
+- **cli**: `bin/waaseyaa ai:run --watch` is now a working SSE consumer; prior implementation was a stub that printed a single message and exited (#1513).
 
 ## [0.1.0-alpha.187] - 2026-05-20
-=======
-### Added
-
-- **Admin SPA realtime config contract (#1537, #1538).** Closed the duplicate `fetchSchema` race via `useSchema()` in-flight Promise dedup. Introduced `useAdminConfig()` typed envelope with `asBoolean`/`asString`/`asUrl` coercion helpers so digit-string env vars (`NUXT_PUBLIC_ENABLE_REALTIME=1`) no longer silently break `=== '1'` checks. Migrated all 17 admin SPA call sites; CI gate `bin/check-admin-coercion-patterns` prevents regression.
->>>>>>> kitty/mission-admin-spa-realtime-config-contract-01KS3ST4-lane-a
 
 ### Changed
 

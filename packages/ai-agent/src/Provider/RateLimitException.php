@@ -7,7 +7,7 @@ namespace Waaseyaa\AI\Agent\Provider;
 /**
  * @api
  */
-final class RateLimitException extends \RuntimeException
+final class RateLimitException extends ProviderException
 {
     public function __construct(
         public readonly int $retryAfterSeconds,
