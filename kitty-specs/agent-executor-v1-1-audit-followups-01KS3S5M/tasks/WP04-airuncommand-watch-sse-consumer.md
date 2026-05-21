@@ -303,3 +303,4 @@ Layer discipline (C-003): the CLI consumer is in L6 (`packages/cli/`) and connec
 ## Activity Log
 
 - 2026-05-21T01:11:58Z – claude:sonnet:implementer:implementer – shell_pid=805213 – Started implementation via action command
+- 2026-05-21T01:21:13Z – claude:sonnet:implementer:implementer – shell_pid=805213 – SSE consumer via SseLineStreamInterface+PhpStreamSseClient in packages/http-client; SIGINT teardown; informational stub removed; 4/4 unit tests pass; PHPStan+CS clean
