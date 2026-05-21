@@ -12,6 +12,8 @@ subtasks:
 - T013
 - T014
 - T015
+agent: "claude:sonnet:implementer:implementer"
+shell_pid: "778658"
 history:
 - date: '2026-05-20T23:57:25Z'
   author: tasks-materializer
@@ -177,3 +179,7 @@ Update `CLAUDE.md` to document the trait `@api` propagation behavior (FR-005). A
 - Confirm the new note names the specific method `isTraitWithApiPhpDoc()` so it can be found by grep.
 - Confirm CHANGELOG entry is under `[Unreleased]` and not under a versioned heading.
 - Confirm `composer verify` passed (check the worktree's CI run or local output).
+
+## Activity Log
+
+- 2026-05-21T00:58:40Z – claude:sonnet:implementer:implementer – shell_pid=778658 – Started implementation via action command
