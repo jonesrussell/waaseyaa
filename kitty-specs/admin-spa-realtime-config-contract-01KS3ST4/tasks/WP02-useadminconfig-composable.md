@@ -473,3 +473,4 @@ appears in `packages/admin/app/**`. Add `// allow-coercion: <reason>` inline to 
 ## Activity Log
 
 - 2026-05-21T00:43:32Z – claude:sonnet:implementer:implementer – shell_pid=728329 – Started implementation via action command
+- 2026-05-21T00:48:10Z – claude:sonnet:implementer:implementer – shell_pid=728329 – useAdminConfig + asBoolean/asString/asUrl + README runtime-config section
