@@ -11,11 +11,11 @@
 
 | ID | Description | WP | Parallel |
 |---|---|---|---|
-| T001 | Run PHPStan baseline grep — enumerate all 31 trait entries | WP01 | — |
-| T002 | Add temporary probe in provider to capture declaringClass + isTrait() | WP01 | — |
-| T003 | Verify hasApiPhpDoc fires for the three traits via php -r reflection script | WP01 | — |
-| T004 | Confirm loadEntitySupportingTraits populates RevisionableEntityTrait | WP01 | — |
-| T005 | Write wp01-diagnosis.md with findings, confirmed hypothesis, WP02 design instruction | WP01 | — |
+| T001 | Run PHPStan baseline grep — enumerate all 31 trait entries | WP01 | — | [D] |
+| T002 | Add temporary probe in provider to capture declaringClass + isTrait() | WP01 | — | [D] |
+| T003 | Verify hasApiPhpDoc fires for the three traits via php -r reflection script | WP01 | — | [D] |
+| T004 | Confirm loadEntitySupportingTraits populates RevisionableEntityTrait | WP01 | — | [D] |
+| T005 | Write wp01-diagnosis.md with findings, confirmed hypothesis, WP02 design instruction | WP01 | — | [D] |
 | T006 | Add `isTraitWithApiPhpDoc()` named method to WaaseyaaEntrypointProvider | WP02 | — |
 | T007 | Wire isTraitWithApiPhpDoc into shouldMarkPropertyAsRead/Written and shouldMarkMethodAsUsed | WP02 | — |
 | T008 | Write WaaseyaaEntrypointProviderTest.php: fixtures (a) @api trait, (b) no-@api trait, (c) regression for all three real traits | WP02 | — |
@@ -39,11 +39,11 @@ No code changes. Deliverable is `research/wp01-diagnosis.md`.
 **Dependencies**: none
 
 ### Subtasks
-- [ ] T001 Run PHPStan baseline grep — enumerate all 31 trait entries (WP01)
-- [ ] T002 Add temporary probe in provider to capture declaringClass + isTrait() (WP01)
-- [ ] T003 Verify hasApiPhpDoc fires for the three traits via php -r reflection script (WP01)
-- [ ] T004 Confirm loadEntitySupportingTraits populates RevisionableEntityTrait (WP01)
-- [ ] T005 Write wp01-diagnosis.md with findings, confirmed hypothesis, WP02 design instruction (WP01)
+- [x] T001 Run PHPStan baseline grep — enumerate all 31 trait entries (WP01)
+- [x] T002 Add temporary probe in provider to capture declaringClass + isTrait() (WP01)
+- [x] T003 Verify hasApiPhpDoc fires for the three traits via php -r reflection script (WP01)
+- [x] T004 Confirm loadEntitySupportingTraits populates RevisionableEntityTrait (WP01)
+- [x] T005 Write wp01-diagnosis.md with findings, confirmed hypothesis, WP02 design instruction (WP01)
 
 ### Implementation sketch
 1. Run PHPStan dead-code analysis, grep for the three trait names, capture all 31 findings.
