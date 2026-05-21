@@ -49,8 +49,52 @@ Created idempotently by `BroadcastStorage::ensureTable()`:
 
 This is a non-entity table (a message queue), so it lives outside the entity
 storage pipeline per `.claude/rules/entity-storage-invariant.md`. Pruning is
-manual via `BroadcastStorage::prune(int $maxAgeSeconds = 300)`; no scheduler is
-wired by default.
+automatic via `BroadcastStorageScheduleEntries` (see "Scheduled Pruning" below).
+
+## Scheduled Pruning
+
+`_broadcast_log` is pruned automatically by `BroadcastStorageScheduleEntries`, which is
+auto-discovered at kernel boot via `ScheduleEntriesInterface`.
+
+### Default schedule
+
+| Property | Value |
+|---|---|
+| Cron | `0 2 * * *` (02:00 UTC nightly) |
+| Retention window | 7 days (rows older than 7 days are deleted) |
+| Config key | `schedule.broadcast_log_retention_days` (integer) |
+| Task identity | `broadcast_log_prune` |
+
+### Customizing retention
+
+Set `schedule.broadcast_log_retention_days` in your configuration:
+
+```yaml
+schedule:
+  broadcast_log_retention_days: 14  # keep 14 days of broadcast log history
+```
+
+### Disabling the prune task
+
+Add the class FQCN to `schedule.disabled_entries`:
+
+```yaml
+schedule:
+  disabled_entries:
+    - Waaseyaa\Api\Schedule\BroadcastStorageScheduleEntries
+```
+
+When disabled, the entry appears as `[disabled]` in `bin/waaseyaa schedule:list` output
+and `prune()` is never called — the table grows without bound. Disable only if you manage
+pruning externally (e.g. via a custom database maintenance job).
+
+### Background
+
+Issue #1536 documented 243 rows accumulating in Minoo's local DB from 2026-03 testing.
+The fix (`BroadcastStorageScheduleEntries`, scheduler-entry-auto-discovery mission) adds
+auto-discovered pruning so consumers never need to wire the prune task manually.
+
+<!-- Spec reviewed 2026-05-20 - updated for BroadcastStorageScheduleEntries (WP03) -->
 
 ## Endpoint
 

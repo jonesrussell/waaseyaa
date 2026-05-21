@@ -157,6 +157,46 @@ CI must invoke `composer verify` rather than re-implement these checks individua
    - `php bin/waaseyaa fixture:pack:refresh --input-dir tests/fixtures/scenarios --output tests/fixtures/scenarios/fixture-pack.aggregate.json`
 3. Verify repeated refresh runs keep the same aggregate hash.
 
+## Schedule Entry Auto-Discovery
+
+Waaseyaa automatically discovers and registers all classes implementing
+`ScheduleEntriesInterface` at kernel boot. No manual service-provider wiring is needed.
+
+### Built-in schedule entries
+
+| Class | Tasks | Cron |
+|---|---|---|
+| `Waaseyaa\Scheduler\Schedule\Ai\AgentScheduleEntries` | `ai:purge-runs` | Daily (`0 0 * * *`) |
+| `Waaseyaa\Scheduler\Schedule\Ai\AgentScheduleEntries` | `ai:reap-stalled-runs` | Every 5 min (`*/5 * * * *`) |
+| `Waaseyaa\Api\Schedule\BroadcastStorageScheduleEntries` | `broadcast_log_prune` | Nightly (`0 2 * * *`) |
+
+Verify exact cron expressions with `bin/waaseyaa schedule:list`.
+
+### Disabling a built-in schedule entry
+
+Set `schedule.disabled_entries` to a list of class-string FQCNs:
+
+```yaml
+schedule:
+  disabled_entries:
+    - Waaseyaa\Api\Schedule\BroadcastStorageScheduleEntries
+```
+
+**Effect**:
+- The entry is not instantiated at boot
+- `bin/waaseyaa schedule:list` shows the entry as `[disabled]`
+- The underlying task (e.g. `broadcast_log_prune`) never runs
+
+**When to disable**:
+- You manage pruning externally (database maintenance job, custom cron script)
+- You want to replace a built-in entry with your own implementation
+- You are testing and want to suppress background tasks
+
+**Warning**: Disabling `AgentScheduleEntries` stops the AI runtime's retention sweep
+(`ai:purge-runs`) and crash-recovery reaper (`ai:reap-stalled-runs`). The agent run
+table will grow without bound and stalled runs will never be reaped. Disable only if
+you handle these operations externally.
+
 ### Playbook G: Fresh App Bootstrap And Site Bring-Up
 
 1. Scaffold the app:

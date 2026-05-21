@@ -115,7 +115,7 @@ return [
     'Waaseyaa\Queue\FailedJobRepositoryInterface' => 'internal',
     'Waaseyaa\Queue\Job' => 'internal',
     'Waaseyaa\Scheduler\Lock\LockInterface' => 'internal',
-    'Waaseyaa\Scheduler\ScheduleEntriesInterface' => 'internal',
+    'Waaseyaa\Scheduler\ScheduleEntriesInterface' => 'public',
     'Waaseyaa\Scheduler\ScheduleInterface' => 'internal',
     'Waaseyaa\State\StateInterface' => 'internal',
     'Waaseyaa\Mail\MailerInterface' => 'internal',

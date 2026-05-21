@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **api**: `packages/api/openapi.yaml` bootstrapped as the canonical OpenAPI 3.1.0 document for the Waaseyaa Framework API.
 - **api**: `bin/check-openapi` lint script added to `composer verify` gate (NFR-004).
 - **ai-agent**: Typed provider exception hierarchy — `ProviderException` (abstract), `TransportException`, `ClientErrorException`; `RateLimitException` now extends `ProviderException` (FR-001/FR-002).
+- `Waaseyaa\Scheduler\ScheduleEntriesInterface`: auto-discoverable contract for recurring task registrations. Implementors are discovered by `PackageManifestCompiler` and registered at kernel boot with fail-closed dependency resolution.
+- `Waaseyaa\Api\Schedule\BroadcastStorageScheduleEntries`: nightly `_broadcast_log` prune task (cron `0 2 * * *`, 7-day default retention, configurable). Refs #1536.
+- `schedule.disabled_entries` configuration key: opt-out list for built-in schedule-entries classes.
+- `bin/waaseyaa schedule:list` now groups tasks by owning `*ScheduleEntries` class and shows `[disabled]` for opt-out entries.
 
 ### Changed
 
@@ -30,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **ai-agent**: `AgentExecutor` and `RunAgentHandler` now dispatch all five `AgentRunTelemetryListener` domain events at their lifecycle points; the observability listener was previously wired but received no events (#1510).
 - **ai-agent**: Removed `BroadcastStorageAdapter`; `AgentRunBroadcaster` is the sole broadcaster implementation; `pending_approval` OpenAPI shape aligned with broadcaster emission (#1511).
 - **cli**: `bin/waaseyaa ai:run --watch` is now a working SSE consumer; prior implementation was a stub that printed a single message and exited (#1513).
+- `AgentScheduleEntries` (`ai:purge-runs`, `ai:reap-stalled-runs`) now auto-discovered and registered at boot; previously, no code called `register()` and both tasks were silently inert in production. Refs #1512.
 
 ## [0.1.0-alpha.187] - 2026-05-20
 

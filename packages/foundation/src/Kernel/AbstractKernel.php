@@ -38,6 +38,7 @@ use Waaseyaa\Foundation\Kernel\Bootstrap\KnowledgeExtensionBootstrapper;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ManifestBootstrapper;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ProviderRegistry;
 use Waaseyaa\Foundation\Kernel\Bootstrap\ProviderRegistryKernelServices;
+use Waaseyaa\Foundation\Kernel\Bootstrap\ScheduleEntryRegistry;
 use Waaseyaa\Foundation\Log\Handler\ErrorLogHandler as HandlerErrorLogHandler;
 use Waaseyaa\Foundation\Log\LoggerInterface;
 use Waaseyaa\Foundation\Log\LogLevel;
@@ -47,6 +48,8 @@ use Waaseyaa\Foundation\Migration\MigrationRepository;
 use Waaseyaa\Foundation\Migration\Migrator;
 use Waaseyaa\Foundation\ServiceProvider\ServiceProvider;
 use Waaseyaa\Plugin\Extension\KnowledgeToolingExtensionRunner;
+use Waaseyaa\Scheduler\Schedule;
+use Waaseyaa\Scheduler\ScheduleInterface;
 
 /**
  * @internal
@@ -57,6 +60,7 @@ abstract class AbstractKernel
     protected EventDispatcherInterface&SymfonyContractEventDispatcherInterface $dispatcher;
     protected DatabaseInterface $database;
     protected EntityTypeManager $entityTypeManager;
+    protected ?ScheduleInterface $schedule = null;
     protected ?\Waaseyaa\Entity\Field\FieldDefinitionRegistryInterface $fieldRegistry = null;
     protected PackageManifest $manifest;
     protected EntityAccessHandler $accessHandler;
@@ -156,6 +160,7 @@ abstract class AbstractKernel
         $this->validateContentTypes();
         $this->bootProviders();
         $this->discoverAccessPolicies();
+        $this->bootScheduleEntries();
         $this->validateQueryDefinitions();
         $this->bootKnowledgeExtensionRunner();
 
@@ -386,6 +391,34 @@ abstract class AbstractKernel
     }
 
     /**
+     * Boot schedule entries discovered in the package manifest (FR-003, FR-004, FR-007).
+     *
+     * Creates a fresh Schedule, instantiates each ScheduleEntriesInterface class
+     * via PolicyDependencyResolverInterface (M-B resolver adopted — same DI semantics
+     * as AccessPolicyRegistry), and calls register() on each. Entries listed in
+     * `schedule.disabled_entries` are silently skipped. Fail-closed: an unresolvable
+     * constructor dependency throws ScheduleEntryInstantiationException and aborts boot.
+     *
+     * Placed after discoverAccessPolicies() so all provider bindings are live.
+     */
+    protected function bootScheduleEntries(): void
+    {
+        $this->schedule = new Schedule();
+
+        $providers = $this->providers;
+        $kernelServices = new ProviderRegistryKernelServices(
+            $this->entityTypeManager,
+            $this->database,
+            $this->dispatcher,
+            $this->logger,
+            static fn() => $providers,
+        );
+        $resolver = new KernelPolicyDependencyResolver($kernelServices);
+        new ScheduleEntryRegistry($this->logger, $resolver)
+            ->boot($this->manifest, $this->schedule, $this->config);
+    }
+
+    /**
      * Enforce FR-021 fail-fast contract: every indexed field must be backed by
      * a backend that returns true from supportsQuery(). Called once at boot,
      * after all service providers have registered their entity types, and before
@@ -511,6 +544,11 @@ abstract class AbstractKernel
     public function getEntityTypeManager(): EntityTypeManager
     {
         return $this->entityTypeManager;
+    }
+
+    public function getSchedule(): ?ScheduleInterface
+    {
+        return $this->schedule;
     }
 
     public function getDatabase(): DatabaseInterface

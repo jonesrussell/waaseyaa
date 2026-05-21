@@ -137,6 +137,15 @@ When the mapping is not obvious, search under `docs/specs/` (e.g. `rg -n "TopicO
 3. `boot()` — subscribe to events, register routes, warm caches (after all providers registered)
 4. Add `extra.waaseyaa.providers` to the package's `composer.json` for auto-discovery
 
+**Adding a schedule-entries class:**
+1. Create class implementing `ScheduleEntriesInterface` in `packages/<name>/src/Schedule/`
+2. Mark with `@api` in PHPDoc (required — dead-code detector gates on this)
+3. Declare a `register(ScheduleInterface $schedule): array` method returning `array<string, ScheduledTask>`
+4. Ensure constructor dependencies are container-resolvable (type-hint to interfaces bound by service providers)
+5. Run `bin/waaseyaa optimize:manifest` (or restart dev server) to trigger discovery
+6. Verify with `bin/waaseyaa schedule:list` — your tasks should appear grouped under the class FQCN
+7. To disable a built-in entry: add its FQCN to `schedule.disabled_entries` in configuration
+
 ## Workflow (Spec Kitty–first)
 
 Substantive work is driven by **[Spec Kitty](https://github.com/Priivacy-ai/spec-kitty)** missions and work packages (`.kittify/`, `spec-kitty next`, dashboard); **GitHub** is the PR/CI/releases surface and optional issue visibility. Full rules: `docs/specs/workflow.md` (versioning, PR traceability).
